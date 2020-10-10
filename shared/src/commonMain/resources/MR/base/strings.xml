@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="word_partofspeech_noun">Noun</string>
+    <string name="word_partofspeech_verb">Verb</string>
+    <string name="word_partofspeech_unknown">Other</string>
+
+    <string name="word_providedBy_template">from %1$s</string>
+    <string name="word_section_examples">Examples</string>
+    <string name="word_section_synonyms">Synonyms</string>
+</resources>

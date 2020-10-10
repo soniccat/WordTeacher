@@ -1,0 +1,15 @@
+.gradle/
+.idea/
+.DS_Store
+
+captures/
+
+.externalNativeBuild
+.cxx
+local.properties
+*.iml
+
+build/
+androidApp/build/
+shared/build/
+buildSrc/build/
