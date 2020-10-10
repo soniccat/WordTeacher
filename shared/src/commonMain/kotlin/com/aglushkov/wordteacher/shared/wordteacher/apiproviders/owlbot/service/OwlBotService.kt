@@ -23,7 +23,6 @@ class OwlBotService(
 ) {
     companion object {}
 
-    // TODO: hide token in resources
     private val httpClient = HttpClient {
         install(CustomHeader.Feature) {
             headerName = HttpHeaders.Authorization
@@ -31,7 +30,6 @@ class OwlBotService(
         }
     }
 
-    //@GET("api/v4/dictionary/{word}")
     suspend fun loadDefinition(word: String): OwlBotWord {
         val res: HttpResponse = httpClient.get("${baseUrl}api/v4/dictionary/${word}")
         return withContext(Dispatchers.Default) {
