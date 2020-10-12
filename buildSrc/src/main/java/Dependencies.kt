@@ -31,6 +31,7 @@ object Deps {
         val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.android_gradle_plugin}"
     }
 
+    val kotlinxRepo = URI("https://kotlin.bintray.com/kotlinx/")
     val mokoRepo = URI("https://dl.bintray.com/icerockdev/moko")
     val mokoPluginsRepo = URI("https://dl.bintray.com/icerockdev/plugins")
 
@@ -63,6 +64,8 @@ object Deps {
         val recyclerView = "androidx.recyclerview:recyclerview:1.1.0"
     }
 
+    val okio = "com.squareup.okio:okio-multiplatform:2.9.0"
+    val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.1.0"
     val junit = "junit:junit:${Versions.junit}"
     val stately = "co.touchlab:stately-common:${Versions.stately}"
     val multiplatformSettings = "com.russhwolf:multiplatform-settings:${Versions.multiplatformSettings}"

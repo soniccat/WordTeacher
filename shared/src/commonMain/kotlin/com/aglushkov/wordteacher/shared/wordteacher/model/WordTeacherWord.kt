@@ -7,10 +7,13 @@ import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.resources.StringResource
 
 @Parcelize
-data class WordTeacherWord(val word: String,
-                           val transcription: String?,
-                           val definitions: Map<PartOfSpeech, List<WordTeacherDefinition>>,
-                           val types: List<Config.Type>) : Parcelable {
+data class WordTeacherWord(
+    val word: String,
+    val transcription: String?,
+    val definitions: Map<PartOfSpeech, List<WordTeacherDefinition>>,
+    val types: List<Config.Type>
+) : Parcelable {
+
     enum class PartOfSpeech {
         Noun,
         Verb,

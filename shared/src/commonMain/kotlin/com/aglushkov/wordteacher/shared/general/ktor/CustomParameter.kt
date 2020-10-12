@@ -1,9 +1,8 @@
-package com.aglushkov.wordteacher.shared.general
+package com.aglushkov.wordteacher.shared.general.ktor
 
 import io.ktor.client.HttpClient
 import io.ktor.client.features.HttpClientFeature
 import io.ktor.client.request.HttpRequestPipeline
-import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.util.AttributeKey
 

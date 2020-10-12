@@ -2,7 +2,7 @@ package com.aglushkov.wordteacher.apiproviders.wordnik.service
 
 import com.aglushkov.wordteacher.apiproviders.wordnik.model.WordnikWord
 import com.aglushkov.wordteacher.apiproviders.wordnik.model.asWordTeacherWords
-import com.aglushkov.wordteacher.shared.general.CustomParameter
+import com.aglushkov.wordteacher.shared.general.ktor.CustomParameter
 import com.aglushkov.wordteacher.shared.wordteacher.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.wordteacher.repository.Config
 import com.aglushkov.wordteacher.shared.wordteacher.repository.ServiceMethodParams

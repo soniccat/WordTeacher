@@ -35,6 +35,8 @@ kotlin {
                 implementation(Deps.MokoResources.impl)
                 implementation(Deps.MokoParcelize.impl)
                 implementation(Deps.MokoGraphics.impl)
+                implementation(Deps.okio)
+                implementation(Deps.dateTime)
             }
         }
         val commonTest by getting {

@@ -1,6 +1,6 @@
 package com.aglushkov.wordteacher.shared.wordteacher.apiproviders.owlbot.service
 
-import com.aglushkov.wordteacher.shared.general.CustomHeader
+import com.aglushkov.wordteacher.shared.general.ktor.CustomHeader
 import com.aglushkov.wordteacher.shared.wordteacher.apiproviders.owlbot.model.OwlBotWord
 import com.aglushkov.wordteacher.shared.wordteacher.apiproviders.owlbot.model.asWordTeacherWord
 import com.aglushkov.wordteacher.shared.wordteacher.model.WordTeacherWord

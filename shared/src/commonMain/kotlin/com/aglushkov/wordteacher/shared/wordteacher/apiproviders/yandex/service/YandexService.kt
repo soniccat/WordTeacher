@@ -2,7 +2,7 @@ package com.aglushkov.wordteacher.apiproviders.yandex.service
 
 import com.aglushkov.wordteacher.apiproviders.yandex.model.YandexWords
 import com.aglushkov.wordteacher.apiproviders.yandex.model.asWordTeacherWord
-import com.aglushkov.wordteacher.shared.general.CustomParameter
+import com.aglushkov.wordteacher.shared.general.ktor.CustomParameter
 import com.aglushkov.wordteacher.shared.wordteacher.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.wordteacher.repository.Config
 import com.aglushkov.wordteacher.shared.wordteacher.repository.ServiceMethodParams
@@ -74,6 +74,7 @@ fun YandexService.Companion.createWordTeacherWordService(
             val lang = lookup?.get(LookupLang) ?: "en-en"
             val ui = lookup?.get(LookupUi) ?: "en"
             val flags = lookup?.get(LookupFlags)?.toIntOrNull() ?: 4
+
             return service.definitions(word, lang, ui, flags).words.mapNotNull { it.asWordTeacherWord() }
         }
     }
