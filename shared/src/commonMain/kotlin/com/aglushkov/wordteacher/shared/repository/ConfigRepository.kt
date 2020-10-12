@@ -5,6 +5,8 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
 import com.aglushkov.wordteacher.shared.service.ConfigService
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -13,9 +15,10 @@ import kotlinx.coroutines.launch
 
 class ConfigRepository(
     val service: ConfigService,
-    val scope: CoroutineScope,
     private val connectivityManager: ConnectivityManager
 ) {
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
     private val stateFlow = MutableStateFlow<Resource<List<Config>>>(Resource.Uninitialized())
     val flow = stateFlow
     val value: Resource<List<Config>>

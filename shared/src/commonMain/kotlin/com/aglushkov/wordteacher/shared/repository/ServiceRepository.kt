@@ -3,6 +3,9 @@ package com.aglushkov.wordteacher.shared.repository
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -15,7 +18,7 @@ class ServiceRepository(
     val serviceFactory: WordTeacherWordServiceFactory
 ) {
 
-    val scope = configRepository.scope
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val stateFlow = MutableStateFlow<Resource<List<WordTeacherWordService>>>(Resource.Uninitialized())
     val flow = stateFlow
 

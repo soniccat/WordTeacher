@@ -35,6 +35,7 @@ kotlin {
                 implementation(Deps.MokoResources.impl)
                 implementation(Deps.MokoParcelize.impl)
                 implementation(Deps.MokoGraphics.impl)
+                implementation(Deps.mokoMvvm)
                 implementation(Deps.okio)
                 implementation(Deps.dateTime)
             }

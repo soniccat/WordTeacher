@@ -25,13 +25,12 @@ sealed class Resource<T>(needShowNext: Boolean) {
 
     @JsName("resData")
     fun data(): T? {
-        val data = when (this) {
-            is Loaded -> data
-            is Loading -> data
-            is Error -> data
+        return when (this) {
+            is Loaded -> this.data
+            is Loading -> this.data
+            is Error -> this.data
             else -> null
         }
-        return data
     }
 
     fun copy(data: T? = this.data()): Resource<T> {
