@@ -1,6 +1,9 @@
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 plugins {
     id("com.android.application")
-    kotlin("android")
+    id("kotlin-android")
+    id("kotlin-kapt")
     id("kotlin-android-extensions")
 }
 
@@ -56,6 +59,12 @@ dependencies {
     implementation(Deps.Google.coreKtx)
     implementation(Deps.Google.lifecycleExtensions)
 
+    implementation(Deps.Coroutines.common)
+    implementation(Deps.Coroutines.android)
+
     implementation(Deps.MokoResources.impl)
     implementation(Deps.mokoMvvm)
+
+    implementation("com.google.dagger:dagger:2.27")
+    kapt("com.google.dagger:dagger-compiler:2.27")
 }

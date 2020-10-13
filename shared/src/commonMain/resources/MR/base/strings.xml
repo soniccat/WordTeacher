@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <string name="config_base_url">https://soniccat.ru/</string>
+
     <string name="app_name">WordTeacher</string>
     <string name="tab_definitions">Words</string>
     <string name="tab_articles">Articles</string>
