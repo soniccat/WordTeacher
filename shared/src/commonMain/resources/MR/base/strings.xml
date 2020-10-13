@@ -7,4 +7,9 @@
     <string name="word_providedBy_template">from %1$s</string>
     <string name="word_section_examples">Examples</string>
     <string name="word_section_synonyms">Synonyms</string>
+
+    <string name="error_bad_response">Something went wrong, sorry :(.\nPlease try again later.</string>
+    <string name="error_bad_connection">Couldn\'t establish connection to the network.\nTry to check your network settings and try again.</string>
+    <string name="error_no_connection">No internet connection.\nPlease check your device network settings and try again.</string>
+    <string name="error_try_again">Try again</string>
 </resources>

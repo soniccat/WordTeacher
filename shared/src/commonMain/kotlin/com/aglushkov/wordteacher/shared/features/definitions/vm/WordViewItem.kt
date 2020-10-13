@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.definitions.vm
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.Config
+import dev.icerock.moko.resources.desc.StringDesc
 
 
 class WordViewItem(word: WordTeacherWord): BaseViewItem<WordTeacherWord>(word, Type) {
@@ -27,7 +28,7 @@ class WordTranscriptionViewItem(transcription: String): BaseViewItem<String>(tra
     }
 }
 
-class WordPartOfSpeechViewItem(partOfSpeech: String): BaseViewItem<String>(partOfSpeech, Type) {
+class WordPartOfSpeechViewItem(partOfSpeech: StringDesc): BaseViewItem<StringDesc>(partOfSpeech, Type) {
     companion object {
         const val Type = 103
     }
@@ -51,7 +52,7 @@ class WordSynonymViewItem(synonym: String): BaseViewItem<String>(synonym, Type) 
     }
 }
 
-class WordSubHeaderViewItem(name: String): BaseViewItem<String>(name, Type) {
+class WordSubHeaderViewItem(name: StringDesc): BaseViewItem<StringDesc>(name, Type) {
     companion object {
         const val Type = 107
     }

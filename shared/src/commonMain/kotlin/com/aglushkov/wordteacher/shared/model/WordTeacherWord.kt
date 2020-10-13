@@ -4,7 +4,8 @@ import com.aglushkov.wordteacher.shared.repository.Config
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.resources.StringResource
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 
 @Parcelize
 data class WordTeacherWord(
@@ -57,10 +58,11 @@ fun WordTeacherWord.PartOfSpeech.Companion.fromString(string: String?): WordTeac
     }
 }
 
-fun WordTeacherWord.PartOfSpeech.toString(): StringResource {
-    return when(this) {
+fun WordTeacherWord.PartOfSpeech.toStringDesc(): StringDesc {
+    val res = when(this) {
         WordTeacherWord.PartOfSpeech.Noun -> MR.strings.word_partofspeech_noun
         WordTeacherWord.PartOfSpeech.Verb -> MR.strings.word_partofspeech_verb
         else -> MR.strings.word_partofspeech_unknown
     }
+    return StringDesc.Resource(res)
 }

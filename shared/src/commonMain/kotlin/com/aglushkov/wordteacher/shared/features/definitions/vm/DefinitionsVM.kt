@@ -4,14 +4,19 @@ import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepo
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.load
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.Config
+import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.mvvm.livedata.LiveData
 import dev.icerock.moko.mvvm.livedata.MutableLiveData
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -123,7 +128,7 @@ class DefinitionsVM(
         }
 
         for (partOfSpeech in word.definitions.keys) {
-            items.add(WordPartOfSpeechViewItem(partOfSpeech.toString(getApplication())))
+            items.add(WordPartOfSpeechViewItem(partOfSpeech.toStringDesc()))
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
                 for (d in def.definitions) {
@@ -131,14 +136,14 @@ class DefinitionsVM(
                 }
 
                 if (def.examples.isNotEmpty()) {
-                    items.add(WordSubHeaderViewItem(getString(R.string.word_section_examples)))
+                    items.add(WordSubHeaderViewItem(StringDesc.Resource(MR.strings.word_section_examples)))
                     for (ex in def.examples) {
                         items.add(WordExampleViewItem(ex))
                     }
                 }
 
                 if (def.synonyms.isNotEmpty()) {
-                    items.add(WordSubHeaderViewItem(getString(R.string.word_section_synonyms)))
+                    items.add(WordSubHeaderViewItem(StringDesc.Resource(MR.strings.word_section_synonyms)))
                     for (synonym in def.synonyms) {
                         items.add(WordSynonymViewItem(synonym))
                     }
@@ -224,10 +229,10 @@ class DefinitionsVM(
         return WordTeacherDefinition(allDefs, allExamples, allSynonyms, null)
     }
 
-    fun getErrorText(res: Resource<*>): String? {
+    fun getErrorText(res: Resource<*>): StringDesc? {
         val hasConnection = connectivityManager.isDeviceOnline
         val hasResponse = true // TODO: handle error server response
-        return res.getErrorString(getApplication(), hasConnection, hasResponse)
+        return res.getErrorString(hasConnection, hasResponse)
     }
 
     class State {
