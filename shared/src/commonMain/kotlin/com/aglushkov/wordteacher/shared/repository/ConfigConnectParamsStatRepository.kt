@@ -3,15 +3,14 @@ package com.aglushkov.wordteacher.shared.repository
 import com.aglushkov.wordteacher.repository.ConfigConnectParamsStat
 import com.aglushkov.wordteacher.repository.fromByteArray
 import com.aglushkov.wordteacher.repository.toByteArray
+import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
-import com.aglushkov.wordteacher.shared.repository.ConfigConnectParamsStatFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -43,9 +42,7 @@ class ConfigConnectParamsStatRepository(
         scope.launch {
             loadConfigConnectParamsStatFlow().onStart {
                 stateFlow.value.toLoading()
-            }.collect {
-                stateFlow.value = it
-            }
+            }.forward(stateFlow)
         }
     }
 

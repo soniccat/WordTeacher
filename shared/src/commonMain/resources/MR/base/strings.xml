@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <string name="app_name">WordTeacher</string>
+    <string name="tab_definitions">Words</string>
+    <string name="tab_articles">Articles</string>
+    <string name="search">Search</string>
+
     <string name="word_partofspeech_noun">Noun</string>
     <string name="word_partofspeech_verb">Verb</string>
     <string name="word_partofspeech_unknown">Other</string>
@@ -7,6 +12,9 @@
     <string name="word_providedBy_template">from %1$s</string>
     <string name="word_section_examples">Examples</string>
     <string name="word_section_synonyms">Synonyms</string>
+
+    <string name="definitions_displayMode_bySource">Grouped By Source</string>
+    <string name="definitions_displayMode_merge">Merged</string>
 
     <string name="error_bad_response">Something went wrong, sorry :(.\nPlease try again later.</string>
     <string name="error_bad_connection">Couldn\'t establish connection to the network.\nTry to check your network settings and try again.</string>

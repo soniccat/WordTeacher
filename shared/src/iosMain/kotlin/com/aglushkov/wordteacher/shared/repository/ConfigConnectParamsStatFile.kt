@@ -9,7 +9,7 @@ import platform.Foundation.dataWithContentsOfFile
 import platform.Foundation.writeToFile
 
 actual class ConfigConnectParamsStatFile {
-    private val path = NSFileManager.documentDirectoryFilePath(fileName())
+    private val path = NSFileManager.documentDirectoryFilePath(fileName)
 
     actual fun loadContent(): ByteArray {
         val data: NSData? = NSData.dataWithContentsOfFile(path)

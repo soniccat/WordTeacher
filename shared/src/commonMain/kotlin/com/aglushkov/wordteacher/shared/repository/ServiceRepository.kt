@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.repository
 
+import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
@@ -48,9 +49,7 @@ class ServiceRepository(
                     }
 
                     it.copyWith(services.toList())
-                }.collect {
-                    stateFlow.value = it
-                }
+                }.forward(stateFlow)
         }
     }
 

@@ -46,16 +46,5 @@ abstract class BaseViewItem<T> {
         return result
     }
 
-//    companion object {
-//        // ListAdapter diff callback
-//        @JvmStatic val DiffCallback = object : DiffUtil.ItemCallback<BaseViewItem<*>>() {
-//            override fun areItemsTheSame(oldCellInfo: BaseViewItem<*>, newCellInfo: BaseViewItem<*>): Boolean {
-//                return oldCellInfo.equalsByIds(newCellInfo)
-//            }
-//
-//            override fun areContentsTheSame(oldCellInfo: BaseViewItem<*>, newCellInfo: BaseViewItem<*>): Boolean {
-//                return oldCellInfo.equalsByContent(newCellInfo)
-//            }
-//        }
-//    }
+    companion object {}
 }

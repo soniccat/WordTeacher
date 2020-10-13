@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WordStyle">
+        <attr name="wordTitleTextAppearance" format="reference"/>
+        <attr name="wordProvidedByTextAppearance" format="reference"/>
+        <attr name="wordTranscriptionTextAppearance" format="reference"/>
+        <attr name="wordPartOfSpeechTextAppearance" format="reference"/>
+        <attr name="wordDefinitionTextAppearance" format="reference"/>
+        <attr name="wordExampleTextAppearance" format="reference"/>
+        <attr name="wordSynonymTextAppearance" format="reference"/>
+        <attr name="wordSubHeaderTextAppearance" format="reference"/>
+    </declare-styleable>
+</resources>

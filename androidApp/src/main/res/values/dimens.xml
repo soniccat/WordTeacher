@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="definitions_search_margin">8dp</dimen>
+    <dimen name="definitions_displayMode_padding">@dimen/definitions_search_margin</dimen>
+</resources>

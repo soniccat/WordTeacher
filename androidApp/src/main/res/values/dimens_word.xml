@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="word_divider_topMargin">@dimen/definitions_search_margin</dimen>
+    <dimen name="word_horizontalPadding">@dimen/definitions_search_margin</dimen>
+    <dimen name="word_divider_bottomMargin">12dp</dimen>
+    <dimen name="word_partOfSpeech_topMargin">6dp</dimen>
+    <dimen name="word_subHeader_topMargin">4dp</dimen>
+
+    <dimen name="word_divider_height">1dp</dimen>
+    <dimen name="word_providedBy_maxWidth">150dp</dimen>
+</resources>

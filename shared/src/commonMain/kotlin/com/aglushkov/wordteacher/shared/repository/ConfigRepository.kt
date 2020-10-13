@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository
 
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
 import com.aglushkov.wordteacher.shared.service.ConfigService
@@ -49,9 +50,7 @@ class ConfigRepository(
         scope.launch {
             loadConfigFlow().onStart {
                 stateFlow.value.toLoading()
-            }.collect {
-                stateFlow.value = it
-            }
+            }.forward(stateFlow)
         }
     }
 

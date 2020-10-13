@@ -64,6 +64,7 @@ object Deps {
         val coreKtx = "androidx.core:core-ktx:1.2.0"
         val constraintLayout = "androidx.constraintlayout:constraintlayout:2.0.2"
         val recyclerView = "androidx.recyclerview:recyclerview:1.1.0"
+        val lifecycleExtensions = "androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
     }
 
     val okio = "com.squareup.okio:okio-multiplatform:2.9.0"

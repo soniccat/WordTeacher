@@ -5,7 +5,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 
 class DefinitionsDisplayModeViewItem(
     modes: List<DefinitionsDisplayMode>,
-    internal val selected: DefinitionsDisplayMode
+    val selected: DefinitionsDisplayMode
 ): BaseViewItem<DefinitionsDisplayMode>(modes, Type) {
 
     companion object {

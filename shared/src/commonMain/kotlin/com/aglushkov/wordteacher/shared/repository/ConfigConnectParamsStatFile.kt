@@ -1,10 +1,10 @@
 package com.aglushkov.wordteacher.shared.repository
 
+// TODO: come up with a more general solution for any file like MPFile
 expect class ConfigConnectParamsStatFile {
     fun loadContent(): ByteArray
     fun saveContent(bytes: ByteArray)
 }
 
-fun ConfigConnectParamsStatFile.fileName(): String {
-    return "config_connect_params_stats"
-}
+val ConfigConnectParamsStatFile.fileName: String
+    get(): String = "config_connect_params_stats"
