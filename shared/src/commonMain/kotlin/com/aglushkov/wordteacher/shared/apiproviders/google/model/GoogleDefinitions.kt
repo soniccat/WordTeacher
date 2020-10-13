@@ -8,39 +8,41 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 // All possible types were found on https://github.com/meetDeveloper/googleDictionaryAPI/issues/32
 // TODO: add types not added here
 @Parcelize
+@Serializable
 data class GoogleDefinitions(
-    @SerialName("noun") val nouns: List<GoogleDefinition>?,
-    @SerialName("proper noun") val properNouns: List<GoogleDefinition>?,
-    @SerialName("plural noun") val pluralNouns: List<GoogleDefinition>?,
+    @SerialName("noun") val nouns: List<GoogleDefinition>? = null,
+    @SerialName("proper noun") val properNouns: List<GoogleDefinition>? = null,
+    @SerialName("plural noun") val pluralNouns: List<GoogleDefinition>? = null,
 
-    @SerialName("verb") val verbs: List<GoogleDefinition>?,
-    @SerialName("transitive verb") val transitiveVerbs: List<GoogleDefinition>?,
-    @SerialName("intransitive verb") val intransitiveVerbs: List<GoogleDefinition>?,
-    @SerialName("modal verb") val modalVerbs: List<GoogleDefinition>?,
-    @SerialName("auxiliary verb") val auxiliaryVerbs: List<GoogleDefinition>?,
+    @SerialName("verb") val verbs: List<GoogleDefinition>? = null,
+    @SerialName("transitive verb") val transitiveVerbs: List<GoogleDefinition>? = null,
+    @SerialName("intransitive verb") val intransitiveVerbs: List<GoogleDefinition>? = null,
+    @SerialName("modal verb") val modalVerbs: List<GoogleDefinition>? = null,
+    @SerialName("auxiliary verb") val auxiliaryVerbs: List<GoogleDefinition>? = null,
 
-    @SerialName("adjective") val adjectives: List<GoogleDefinition>?,
-    @SerialName("adjective & determiner") val adjectivesAndDetermines: List<GoogleDefinition>?,
-    @SerialName("adjective & pronoun") val adjectivesAndPronouns: List<GoogleDefinition>?,
-    @SerialName("determiner, pronoun, & adjective") val determinersPronounsAndAdjectives: List<GoogleDefinition>?,
+    @SerialName("adjective") val adjectives: List<GoogleDefinition>? = null,
+    @SerialName("adjective & determiner") val adjectivesAndDetermines: List<GoogleDefinition>? = null,
+    @SerialName("adjective & pronoun") val adjectivesAndPronouns: List<GoogleDefinition>? = null,
+    @SerialName("determiner, pronoun, & adjective") val determinersPronounsAndAdjectives: List<GoogleDefinition>? = null,
 
-    @SerialName("adverb") val adverbs: List<GoogleDefinition>?,
-    @SerialName("interrogative adverb") val interrogativeAdverbs: List<GoogleDefinition>?,
-    @SerialName("preposition & adverb") val prepositionsAndAdverbs: List<GoogleDefinition>?,
-    @SerialName("adverb & adjective") val adverbsAndAdjectives: List<GoogleDefinition>?,
-    @SerialName("conjunction & adverb") val conjunctionAndAdverb: List<GoogleDefinition>?,
-    @SerialName("preposition, conjunction, & adverb") val prepositionsConjunctionsAndAdverb: List<GoogleDefinition>?,
+    @SerialName("adverb") val adverbs: List<GoogleDefinition>? = null,
+    @SerialName("interrogative adverb") val interrogativeAdverbs: List<GoogleDefinition>? = null,
+    @SerialName("preposition & adverb") val prepositionsAndAdverbs: List<GoogleDefinition>? = null,
+    @SerialName("adverb & adjective") val adverbsAndAdjectives: List<GoogleDefinition>? = null,
+    @SerialName("conjunction & adverb") val conjunctionAndAdverb: List<GoogleDefinition>? = null,
+    @SerialName("preposition, conjunction, & adverb") val prepositionsConjunctionsAndAdverb: List<GoogleDefinition>? = null,
 
-    @SerialName("pronoun") val pronouns: List<GoogleDefinition>?,
-    @SerialName("relative pronoun & determiner") val relativePronounsAndDeterminers: List<GoogleDefinition>?,
+    @SerialName("pronoun") val pronouns: List<GoogleDefinition>? = null,
+    @SerialName("relative pronoun & determiner") val relativePronounsAndDeterminers: List<GoogleDefinition>? = null,
 
-    @SerialName("determiner") val determiners: List<GoogleDefinition>?,
-    @SerialName("abbreviation") val abbreviations: List<GoogleDefinition>?,
-    @SerialName("exclamation") val exclamations: List<GoogleDefinition>?
+    @SerialName("determiner") val determiners: List<GoogleDefinition>? = null,
+    @SerialName("abbreviation") val abbreviations: List<GoogleDefinition>? = null,
+    @SerialName("exclamation") val exclamations: List<GoogleDefinition>? = null
 
 //    @SerializedName("nom_masculin") val nomMasculins: List<GoogleDefinition>?
 ) : Parcelable {

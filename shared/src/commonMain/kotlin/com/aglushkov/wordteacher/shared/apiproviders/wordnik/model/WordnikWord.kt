@@ -8,24 +8,26 @@ import com.aglushkov.wordteacher.shared.repository.Config
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 // TODO: check possible values of WordnikLinkRelatedWords.relationshipType
 @Parcelize
+@Serializable
 data class WordnikWord(
-        @SerialName("id") val id: String?,
-        @SerialName("attributionText") val attributionText: String?,
-        @SerialName("attributionUrl") val attributionUrl: String?,
+        @SerialName("id") val id: String? = null,
+        @SerialName("attributionText") val attributionText: String? = null,
+        @SerialName("attributionUrl") val attributionUrl: String? = null,
         @SerialName("citations") val citations: List<WordnikCitation>,
         @SerialName("exampleUses") val exampleUses: List<WordnikExampleUse>,
         @SerialName("labels") val labels: List<WordnikLabel>,
 //        @SerializedName("notes") val notes: List<Any>,
-        @SerialName("partOfSpeech") val partOfSpeech: String?,
+        @SerialName("partOfSpeech") val partOfSpeech: String? = null,
         @SerialName("relatedWords") val relatedWords: List<WordnikRelatedWords>,
-        @SerialName("sourceDictionary") val sourceDictionary: String?,
-        @SerialName("text") val text: String?,
+        @SerialName("sourceDictionary") val sourceDictionary: String? = null,
+        @SerialName("text") val text: String? = null,
 //        @SerializedName("textProns") val textProns: List<Any>,
-        @SerialName("word") val word: String?,
-        @SerialName("wordnikUrl") val wordnikUrl: String?
+        @SerialName("word") val word: String? = null,
+        @SerialName("wordnikUrl") val wordnikUrl: String? = null
 ) : Parcelable {
     fun exampleUsesTexts() = exampleUses.mapNotNull { it.text } + (citations.mapNotNull { it.cite })
     fun synonyms() = relatedWords.filter { it.relationshipType == "synonym" }.map { it.words }.flatten()

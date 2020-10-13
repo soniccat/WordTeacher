@@ -16,7 +16,7 @@ class ConfigService(
 ) {
     companion object {}
 
-    private val httpClient = HttpClient {}
+    private val httpClient = HttpClient { }
 
     //@GET("wordteacher/config")
     suspend fun config(): List<Config> {

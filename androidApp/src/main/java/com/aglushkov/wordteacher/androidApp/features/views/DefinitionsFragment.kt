@@ -1,26 +1,50 @@
 package com.aglushkov.wordteacher.androidApp.features.views
 
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.SavedStateViewModelFactory
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.aglushkov.wordteacher.androidApp.GApp
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentDefinitionsBinding
 import com.aglushkov.wordteacher.androidApp.features.definitions.DefinitionsAdapter
 import com.aglushkov.wordteacher.androidApp.features.definitions.DefinitionsBinder
 import com.aglushkov.wordteacher.androidApp.general.views.bind
+import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import dev.icerock.moko.mvvm.utils.bind
+
+class DefinitionsVMWrapper(
+    application: Application,
+    saveState: SavedStateHandle
+): AndroidViewModel(application) {
+
+    // TODO: fix DI mess
+    val vm: DefinitionsVM = DefinitionsVM(
+        (application as AppComponentOwner).appComponent.getConnectivityManager(),
+        (application as AppComponentOwner).appComponent.getWordRepository(),
+        saveState.get<DefinitionsVM.State>("state") ?: DefinitionsVM.State()
+    )
+
+    init {
+
+    }
+}
 
 class DefinitionsFragment: Fragment() {
     private lateinit var vm: DefinitionsVM
@@ -30,7 +54,7 @@ class DefinitionsFragment: Fragment() {
         super.onCreate(savedInstanceState)
         
         vm = ViewModelProviders.of(this, SavedStateViewModelFactory(requireActivity().application, this))
-                .get(DefinitionsVM::class.java)
+                .get(DefinitionsVMWrapper::class.java).vm
         observeViewModel()
     }
 

@@ -56,7 +56,7 @@ class ServiceRepository(
     private fun createWordTeacherWordService(it: Config): WordTeacherWordService? {
         // TODO: filter connectParams with connectParamsStat
         val connectParams = it.connectParams.first()
-        return serviceFactory.createService(it.type, connectParams, it.methods)
+        return serviceFactory.createService(it.type, connectParams, ServiceMethodParams(it.methods))
     }
 
     init {

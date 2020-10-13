@@ -59,6 +59,7 @@ class ConfigRepository(
             val configs = service.config()
             emit(Resource.Loaded(configs))
         } catch (e: Exception) {
+            e.printStackTrace()
             emit(stateFlow.value.toError(e, true))
         }
     }

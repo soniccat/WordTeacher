@@ -108,6 +108,7 @@ class DefinitionsAdapter(
             addView(byCardChip)
             addView(mergedChip)
 
+            isSelectionRequired = true
             isSingleSelection = true
             layoutParams = lp
         }

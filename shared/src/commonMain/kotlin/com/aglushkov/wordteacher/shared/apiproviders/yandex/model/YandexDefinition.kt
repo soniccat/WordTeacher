@@ -4,20 +4,22 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
 @Parcelize
+@Serializable
 data class YandexDefinition(
-    @SerialName("ex") val examples: List<YandexExample>?,
-    @SerialName("mean") val meanings: List<YandexMeaning>?,
-    @SerialName("syn") val synonyms: List<YandexSynonym>?,
+    @SerialName("ex") val examples: List<YandexExample>? = null,
+    @SerialName("mean") val meanings: List<YandexMeaning>? = null,
+    @SerialName("syn") val synonyms: List<YandexSynonym>? = null,
 
     // Universal attributes
     @SerialName("text") val text: String,
-    @SerialName("num") val num: String?,
-    @SerialName("pos") val pos: String?,
-    @SerialName("gen") val gender: String?,
-    @SerialName("asp") val asp: String?
+    @SerialName("num") val num: String? = null,
+    @SerialName("pos") val pos: String? = null,
+    @SerialName("gen") val gender: String? = null,
+    @SerialName("asp") val asp: String? = null
 ) : Parcelable
 
 fun YandexDefinition.asWordTeacherDefinition(): WordTeacherDefinition? {

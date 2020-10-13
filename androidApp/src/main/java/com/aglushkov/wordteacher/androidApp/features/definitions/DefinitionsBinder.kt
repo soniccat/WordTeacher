@@ -6,7 +6,6 @@ import com.aglushkov.wordteacher.androidApp.features.views.WordTitleView
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTitleViewItem
-import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
 

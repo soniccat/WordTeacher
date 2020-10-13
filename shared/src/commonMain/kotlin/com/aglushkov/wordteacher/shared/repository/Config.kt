@@ -10,8 +10,11 @@ import kotlinx.serialization.Serializable
 data class Config(
     @SerialName("type") val type: Type,
     @SerialName("connectParams") val connectParams: List<ConfigConnectParams>,
-    @SerialName("methods") val methods: ServiceMethodParams = ServiceMethodParams(emptyMap())) {
+    @SerialName("methods") val methods: Map<String, Map<String, String>>
+    //@SerialName("methods") val methods: ServiceMethodParams = ServiceMethodParams(emptyMap())
+) {
 
+    @Serializable
     enum class Type {
         @SerialName("google") Google,
         @SerialName("owlbot") OwlBot,

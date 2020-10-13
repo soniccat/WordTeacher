@@ -65,6 +65,8 @@ dependencies {
     implementation(Deps.MokoResources.impl)
     implementation(Deps.mokoMvvm)
 
+    implementation(Deps.Ktor.androidClient)
+
     implementation("com.google.dagger:dagger:2.27")
     kapt("com.google.dagger:dagger-compiler:2.27")
 }

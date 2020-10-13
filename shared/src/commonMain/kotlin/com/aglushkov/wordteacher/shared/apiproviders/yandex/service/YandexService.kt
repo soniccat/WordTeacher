@@ -31,7 +31,7 @@ class YandexService(
 
     private val httpClient = HttpClient {
         install(CustomParameter) {
-            parameterName = "api_key"
+            parameterName = "key" // TODO: handle exception if we send a wrong name
             parameterValue = apiKey
         }
     }

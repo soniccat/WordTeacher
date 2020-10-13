@@ -5,13 +5,15 @@ import com.aglushkov.wordteacher.shared.repository.Config
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
 @Parcelize
+@Serializable
 data class GoogleWord(
     @SerialName("meaning") val definitions: GoogleDefinitions,
-    @SerialName("origin") val origin: String?,
-    @SerialName("phonetic") val phonetic: String?,
+    @SerialName("origin") val origin: String? = null,
+    @SerialName("phonetic") val phonetic: String? = null,
     @SerialName("word") val word: String
 ) : Parcelable
 
