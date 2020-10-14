@@ -62,6 +62,15 @@ fun WordTeacherWord.PartOfSpeech.toStringDesc(): StringDesc {
     val res = when(this) {
         WordTeacherWord.PartOfSpeech.Noun -> MR.strings.word_partofspeech_noun
         WordTeacherWord.PartOfSpeech.Verb -> MR.strings.word_partofspeech_verb
+        WordTeacherWord.PartOfSpeech.Adjective -> MR.strings.word_partofspeech_adjective
+        WordTeacherWord.PartOfSpeech.Adverb -> MR.strings.word_partofspeech_adverb
+        WordTeacherWord.PartOfSpeech.Pronoun -> MR.strings.word_partofspeech_pronoun
+        WordTeacherWord.PartOfSpeech.Preposition -> MR.strings.word_partofspeech_preposition
+        WordTeacherWord.PartOfSpeech.Conjunction -> MR.strings.word_partofspeech_conjunction
+        WordTeacherWord.PartOfSpeech.Interjection -> MR.strings.word_partofspeech_interjection
+        WordTeacherWord.PartOfSpeech.Abbreviation -> MR.strings.word_partofspeech_abbreviation
+        WordTeacherWord.PartOfSpeech.Exclamation -> MR.strings.word_partofspeech_exclamation
+        WordTeacherWord.PartOfSpeech.Determiner -> MR.strings.word_partofspeech_determiner
         else -> MR.strings.word_partofspeech_unknown
     }
     return StringDesc.Resource(res)

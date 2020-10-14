@@ -7,7 +7,19 @@ import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
+// TODO: add "phonetics" support
+/*
+    {
+        "word": "cat",
+        "phonetics": [
+            {
+                "text": "/kæt/",
+                "audio": "https://lex-audio.useremarkable.com/mp3/cat_us_1.mp3"
+            }
+        ],
+        "meaning": {}
+    }
+ */
 @Parcelize
 @Serializable
 data class GoogleWord(
@@ -18,8 +30,15 @@ data class GoogleWord(
 ) : Parcelable
 
 fun GoogleWord.asWordTeacherWord(): WordTeacherWord? {
-    return WordTeacherWord(word,
+    val definitionsMap = definitions.asMap()
+    val isEmpty = phonetic == null && definitionsMap.isEmpty()
+
+    return if (isEmpty) {
+        null
+    } else {
+        WordTeacherWord(word,
             phonetic,
-            definitions.asMap(),
+            definitionsMap,
             listOf(Config.Type.Google))
+    }
 }

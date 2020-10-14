@@ -9,13 +9,22 @@
 
     <string name="word_partofspeech_noun">Noun</string>
     <string name="word_partofspeech_verb">Verb</string>
+    <string name="word_partofspeech_adjective">Adjective</string>
+    <string name="word_partofspeech_adverb">Adverb</string>
+    <string name="word_partofspeech_pronoun">Pronoun</string>
+    <string name="word_partofspeech_preposition">Preposition</string>
+    <string name="word_partofspeech_conjunction">Conjunction</string>
+    <string name="word_partofspeech_interjection">Interjection</string>
+    <string name="word_partofspeech_abbreviation">Abbreviation</string>
+    <string name="word_partofspeech_exclamation">Exclamation</string>
+    <string name="word_partofspeech_determiner">Determiner</string>
     <string name="word_partofspeech_unknown">Other</string>
 
     <string name="word_providedBy_template">from %1$s</string>
     <string name="word_section_examples">Examples</string>
     <string name="word_section_synonyms">Synonyms</string>
 
-    <string name="definitions_displayMode_bySource">Grouped By Source</string>
+    <string name="definitions_displayMode_bySource">By Source</string>
     <string name="definitions_displayMode_merge">Merged</string>
 
     <string name="error_bad_response">Something went wrong, sorry :(.\nPlease try again later.</string>

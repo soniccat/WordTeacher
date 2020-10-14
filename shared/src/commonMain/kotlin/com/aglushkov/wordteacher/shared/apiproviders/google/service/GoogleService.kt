@@ -28,9 +28,10 @@ class GoogleService(
     suspend fun loadDefinitions(word: String, lang: String): List<GoogleWord> {
         val res: HttpResponse = httpClient.get("${baseUrl}api/v1/entries/${lang}/${word}")
         return withContext(Dispatchers.Default) {
+            val string = res.readBytes().decodeToString()
             Json {
                 ignoreUnknownKeys = true
-            }.decodeFromString(res.readBytes().decodeToString())
+            }.decodeFromString(string)
         }
     }
 }
