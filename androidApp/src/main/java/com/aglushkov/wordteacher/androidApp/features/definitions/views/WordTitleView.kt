@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.androidApp.features.views
+package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -6,7 +6,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.aglushkov.wordteacher.androidApp.R
-import com.aglushkov.wordteacher.androidApp.features.definitions.DefinitionsAdapter
+import com.aglushkov.wordteacher.androidApp.features.Design
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
 import com.aglushkov.wordteacher.androidApp.general.extensions.setTextAppearanceCompat
 
@@ -46,7 +46,7 @@ class WordTitleView: LinearLayout {
         addView(title)
         addView(providedBy)
 
-        DefinitionsAdapter.setWordHorizontalPadding(this)
+        Design.setTextHorizontalPadding(this)
     }
 
     private fun applyAttributeSet(attrs: AttributeSet?) {

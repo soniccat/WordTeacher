@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.di
 
 import com.aglushkov.wordteacher.androidApp.di.AppComp
+import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
 import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.ConfigConnectParamsStatRepository
@@ -20,6 +21,7 @@ public interface AppComponent {
     fun getServiceRepository(): ServiceRepository
     fun getWordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
     fun getWordRepository(): WordRepository
+    fun getItemViewBinder(): ItemViewBinder
 
     fun getConnectivityManager(): ConnectivityManager
 }

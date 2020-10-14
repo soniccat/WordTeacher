@@ -1,7 +1,6 @@
-package com.aglushkov.wordteacher.androidApp.features.views
+package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import android.app.Application
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,17 +12,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.SavedStateViewModelFactory
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.aglushkov.wordteacher.androidApp.GApp
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentDefinitionsBinding
-import com.aglushkov.wordteacher.androidApp.features.definitions.DefinitionsAdapter
-import com.aglushkov.wordteacher.androidApp.features.definitions.DefinitionsBinder
+import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -126,16 +121,17 @@ class DefinitionsFragment: Fragment() {
         val binding = this.binding!!
 
         if (binding.list.adapter != null) {
-            (binding.list.adapter as DefinitionsAdapter).submitList(it.data())
+            (binding.list.adapter as SimpleAdapter).submitList(it.data())
         } else {
-            val binder = DefinitionsBinder()
-            binder.listener = object : DefinitionsBinder.Listener {
-                override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
-                    vm.onDisplayModeChanged(mode)
-                }
-            }
+//            val binder = DefinitionsBinder()
+//            binder.listener = object : DefinitionsBinder.Listener {
+//                override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
+//                    vm.onDisplayModeChanged(mode)
+//                }
+//            }
 
-            binding.list.adapter = DefinitionsAdapter(binder).apply {
+            val binder = (context!!.applicationContext as AppComponentOwner).appComponent.getItemViewBinder()
+            binding.list.adapter = SimpleAdapter(binder).apply {
                 submitList(it.data())
             }
         }

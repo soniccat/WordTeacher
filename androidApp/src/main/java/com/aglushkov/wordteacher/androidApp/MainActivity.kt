@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
-import com.aglushkov.wordteacher.androidApp.features.views.DefinitionsFragment
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
