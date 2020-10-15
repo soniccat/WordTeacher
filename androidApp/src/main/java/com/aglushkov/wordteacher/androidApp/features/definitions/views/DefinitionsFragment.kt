@@ -16,13 +16,16 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentDefinitionsBinding
+import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
+import com.aglushkov.wordteacher.di.DaggerDefinitionsComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import dev.icerock.moko.mvvm.utils.bind
+import javax.inject.Inject
 
 class DefinitionsVMWrapper(
     application: Application,
@@ -37,7 +40,6 @@ class DefinitionsVMWrapper(
     )
 
     init {
-
     }
 }
 
@@ -45,8 +47,14 @@ class DefinitionsFragment: Fragment() {
     private lateinit var vm: DefinitionsVM
     private var binding: FragmentDefinitionsBinding? = null
 
+    @Inject lateinit var binder: ItemViewBinder
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val deps = (requireContext().applicationContext as AppComponentOwner).appComponent
+        val component = DaggerDefinitionsComponent.builder().definitionsDependencies(deps).build()
+        component.injectDefinitionsFragment(this)
         
         vm = ViewModelProviders.of(this, SavedStateViewModelFactory(requireActivity().application, this))
                 .get(DefinitionsVMWrapper::class.java).vm
@@ -102,10 +110,6 @@ class DefinitionsFragment: Fragment() {
         vm.definitions.bind(viewLifecycleOwner) {
             showDefinitions(it!!)
         }
-
-//        vm.definitions.observe(viewLifecycleOwner, Observer {
-//            showDefinitions(it)
-//        })
     }
 
     private fun showDefinitions(it: Resource<List<BaseViewItem<*>>>) {
@@ -130,7 +134,6 @@ class DefinitionsFragment: Fragment() {
 //                }
 //            }
 
-            val binder = (context!!.applicationContext as AppComponentOwner).appComponent.getItemViewBinder()
             binding.list.adapter = SimpleAdapter(binder).apply {
                 submitList(it.data())
             }

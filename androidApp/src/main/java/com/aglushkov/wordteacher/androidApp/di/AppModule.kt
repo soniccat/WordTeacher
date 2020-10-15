@@ -29,8 +29,6 @@ import kotlinx.coroutines.SupervisorJob
 
 @Module
 class AppModule {
-    private val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
     @AppComp
     @Provides
     fun createConfigService(context: Context): ConfigService {
@@ -70,20 +68,5 @@ class AppModule {
     @Provides
     fun getWordTeacherWordServiceFactory(): WordTeacherWordServiceFactory {
         return WordTeacherWordServiceFactory()
-    }
-
-    @AppComp
-    @Provides
-    fun createItemViewBinder(): ItemViewBinder {
-        return ItemViewBinder()
-            .addBlueprint(DefinitionsDisplayModeBlueprint())
-            .addBlueprint(WordDefinitionBlueprint())
-            .addBlueprint(WordDividerBlueprint())
-            .addBlueprint(WordExampleBlueprint())
-            .addBlueprint(WordPartOfSpeechBlueprint())
-            .addBlueprint(WordSubHeaderBlueprint())
-            .addBlueprint(WordSynonymBlueprint())
-            .addBlueprint(WordTitleBlueprint())
-            .addBlueprint(WordTranscriptionBlueprint())
     }
 }
