@@ -15,11 +15,11 @@ import dagger.Component
 @AppComp
 @Component(modules = [AppModule::class, GeneralModule::class] )
 public interface AppComponent: DefinitionsDependencies {
-    override fun getConfigService(): ConfigService
-    override fun getConfigRepository(): ConfigRepository
-    override fun getConfigConnectParamsStatRepository(): ConfigConnectParamsStatRepository
-    override fun getServiceRepository(): ServiceRepository
-    override fun getWordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
+    fun getConfigService(): ConfigService
+    fun getConfigRepository(): ConfigRepository
+    fun getConfigConnectParamsStatRepository(): ConfigConnectParamsStatRepository
+    fun getServiceRepository(): ServiceRepository
+    fun getWordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
     override fun getWordRepository(): WordRepository
 
     override fun getConnectivityManager(): ConnectivityManager

@@ -14,11 +14,13 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentDefinitionsBinding
+import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.DefinitionsDisplayModeBlueprint
 import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.di.DaggerDefinitionsComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -32,7 +34,7 @@ class DefinitionsVMWrapper(
     @Inject lateinit var vm: DefinitionsVM
 }
 
-class DefinitionsFragment: Fragment() {
+class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener {
     private lateinit var vm: DefinitionsVM
     private var binding: FragmentDefinitionsBinding? = null
 
@@ -48,6 +50,7 @@ class DefinitionsFragment: Fragment() {
         val component = DaggerDefinitionsComponent.builder()
             .setDeps(deps)
             .setVMState(vmState)
+            .setDefinitionsDisplayListener(this)
             .build()
         component.injectViewModelWrapper(wmWrapper)
         component.injectDefinitionsFragment(this)
@@ -127,17 +130,15 @@ class DefinitionsFragment: Fragment() {
         if (binding.list.adapter != null) {
             (binding.list.adapter as SimpleAdapter).submitList(it.data())
         } else {
-//            val binder = DefinitionsBinder()
-//            binder.listener = object : DefinitionsBinder.Listener {
-//                override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
-//                    vm.onDisplayModeChanged(mode)
-//                }
-//            }
-
             binding.list.adapter = SimpleAdapter(binder).apply {
                 submitList(it.data())
             }
         }
+    }
+
+    // DefinitionsDisplayModeBlueprint.Listener
+    override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
+        vm.onDisplayModeChanged(mode)
     }
 }
 

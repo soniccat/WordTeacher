@@ -9,8 +9,11 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDispl
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import javax.inject.Inject
 
-class DefinitionsDisplayModeBlueprint: Blueprint<ChipGroup, DefinitionsDisplayModeViewItem> {
+class DefinitionsDisplayModeBlueprint @Inject constructor (
+    var listener: Listener?
+): Blueprint<ChipGroup, DefinitionsDisplayModeViewItem> {
     override val type: Int = DefinitionsDisplayModeViewItem.Type
 
     override fun createView(parent: ViewGroup): ChipGroup {
@@ -52,7 +55,11 @@ class DefinitionsDisplayModeBlueprint: Blueprint<ChipGroup, DefinitionsDisplayMo
                 R.id.definitions_displayMode_merged -> DefinitionsDisplayMode.Merged
                 else -> DefinitionsDisplayMode.BySource
             }
-            //listener?.onDisplayModeChanged(mode)
+            listener?.onDisplayModeChanged(mode)
         }
+    }
+
+    interface Listener {
+        fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     }
 }

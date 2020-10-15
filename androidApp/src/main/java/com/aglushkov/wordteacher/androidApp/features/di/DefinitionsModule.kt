@@ -22,9 +22,11 @@ import dagger.Provides
 class DefinitionsModule {
     @FragmentComp
     @Provides
-    fun createItemViewBinder(): ItemViewBinder {
+    fun createItemViewBinder(
+        definitionsDisplayModeListener: DefinitionsDisplayModeBlueprint.Listener
+    ): ItemViewBinder {
         return ItemViewBinder()
-            .addBlueprint(DefinitionsDisplayModeBlueprint())
+            .addBlueprint(DefinitionsDisplayModeBlueprint(definitionsDisplayModeListener))
             .addBlueprint(WordDefinitionBlueprint())
             .addBlueprint(WordDividerBlueprint())
             .addBlueprint(WordExampleBlueprint())
