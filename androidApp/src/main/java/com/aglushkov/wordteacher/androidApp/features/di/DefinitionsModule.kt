@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.di
 
-import com.aglushkov.wordteacher.androidApp.di.AppComp
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.DefinitionsDisplayModeBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordDefinitionBlueprint

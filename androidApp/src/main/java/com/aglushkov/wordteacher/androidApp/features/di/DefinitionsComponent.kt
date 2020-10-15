@@ -33,6 +33,5 @@ public interface DefinitionsComponent {
 
 interface DefinitionsDependencies {
     fun getWordRepository(): WordRepository
-
     fun getConnectivityManager(): ConnectivityManager
 }
