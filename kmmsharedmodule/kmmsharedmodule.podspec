@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
 
     spec.ios.deployment_target = '13.5'
 
-    spec.dependency 'AFNetworking', '4.0.1'
+    spec.dependency 'Reachability', '3.2'
 
     spec.pod_target_xcconfig = {
         'KOTLIN_TARGET[sdk=iphonesimulator*]' => 'ios_x64',

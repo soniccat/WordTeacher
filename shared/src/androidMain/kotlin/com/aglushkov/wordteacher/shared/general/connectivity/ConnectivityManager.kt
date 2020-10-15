@@ -37,17 +37,13 @@ actual class ConnectivityManager constructor(
     }
 
     actual fun register() {
-        registerNetworkCallback()
+        val builder = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        connectivityManager.registerNetworkCallback(builder.build(), networkCallback)
     }
 
     actual fun unregister() {
         connectivityManager.unregisterNetworkCallback(networkCallback)
-    }
-
-    private fun registerNetworkCallback() {
-        val builder = NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        connectivityManager.registerNetworkCallback(builder.build(), networkCallback)
     }
 
     actual fun checkNetworkState() {

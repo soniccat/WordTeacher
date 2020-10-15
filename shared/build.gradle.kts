@@ -31,6 +31,7 @@ kotlin {
 //        }
 //    }
     ios()
+//    iosX64()
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -67,13 +68,12 @@ kotlin {
     }
 
     cocoapods {
-        summary = "Kotlin sample project with CocoaPods dependencies"
-        homepage = "https://github.com/Kotlin/kotlin-with-cocoapods-sample"
+        summary = "Nothing"
+        homepage = "https://aglushkov.com"
 
-        ios.deploymentTarget = "13.5"
+        ios.deploymentTarget = "11.0"
 
-//      Example of usage remote Cocoapods dependency from Cocoapods repository
-        pod("AFNetworking","4.0.1")
+        pod("Reachability","3.2")
     }
 }
 

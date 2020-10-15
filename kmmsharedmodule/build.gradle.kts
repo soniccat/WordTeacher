@@ -43,7 +43,7 @@ kotlin {
         ios.deploymentTarget = "13.5"
 
 //      Example of usage remote Cocoapods dependency from Cocoapods repository
-        pod("AFNetworking","4.0.1")
+        pod("Reachability","3.2")
     }
 }
 android {
