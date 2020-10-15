@@ -1,0 +1,5 @@
+platform :ios, '11.0'
+
+target 'iosApp' do
+  pod 'Reachability', '3.2'
+end
