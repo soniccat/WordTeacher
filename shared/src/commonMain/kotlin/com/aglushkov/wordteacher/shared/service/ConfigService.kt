@@ -18,7 +18,6 @@ class ConfigService(
 
     private val httpClient = HttpClient { }
 
-    //@GET("wordteacher/config")
     suspend fun config(): List<Config> {
         val res: HttpResponse = httpClient.get("${baseUrl}wordteacher/config")
         return withContext(Dispatchers.Default) {

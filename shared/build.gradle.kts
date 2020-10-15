@@ -4,6 +4,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     id("kotlin-android-extensions")
+    kotlin("native.cocoapods")
     id(Deps.Mp.serializationPlugin)
     id(Deps.MokoResources.plugin)
 }
@@ -15,17 +16,21 @@ repositories {
     google()
     jcenter()
     mavenCentral()
+    maven {
+        url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
+    }
 }
 
 kotlin {
     android()
-    ios {
-        binaries {
-            framework {
-                baseName = "shared"
-            }
-        }
-    }
+//    ios {
+//        binaries {
+//            framework {
+//                baseName = "shared"
+//            }
+//        }
+//    }
+    ios()
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -59,6 +64,16 @@ kotlin {
         }
         val iosMain by getting
         val iosTest by getting
+    }
+
+    cocoapods {
+        summary = "Kotlin sample project with CocoaPods dependencies"
+        homepage = "https://github.com/Kotlin/kotlin-with-cocoapods-sample"
+
+        ios.deploymentTarget = "13.5"
+
+//      Example of usage remote Cocoapods dependency from Cocoapods repository
+        pod("AFNetworking","4.0.1")
     }
 }
 
