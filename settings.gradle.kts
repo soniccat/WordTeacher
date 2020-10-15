@@ -1,4 +1,3 @@
-include(":kmmsharedmodule")
 //pluginManagement {
 //    repositories {
 //        gradlePluginPortal()
