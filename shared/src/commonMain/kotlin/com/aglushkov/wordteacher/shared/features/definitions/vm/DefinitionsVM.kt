@@ -15,6 +15,8 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.mvvm.livedata.LiveData
 import dev.icerock.moko.mvvm.livedata.MutableLiveData
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.first
@@ -24,7 +26,7 @@ import kotlinx.coroutines.launch
 class DefinitionsVM(
     private val connectivityManager: ConnectivityManager,
     private val wordRepository: WordRepository,
-    private val state: State
+    val state: State
 ): ViewModel() {
 
     private val innerDefinitions = MutableLiveData<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
@@ -235,7 +237,8 @@ class DefinitionsVM(
         return res.getErrorString(hasConnection, hasResponse)
     }
 
-    class State {
+    @Parcelize
+    class State(
         var word: String? = null
-    }
+    ): Parcelable
 }

@@ -12,6 +12,9 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTitleBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTranscriptionBlueprint
 import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
+import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import dagger.Module
 import dagger.Provides
 
@@ -30,5 +33,15 @@ class DefinitionsModule {
             .addBlueprint(WordSynonymBlueprint())
             .addBlueprint(WordTitleBlueprint())
             .addBlueprint(WordTranscriptionBlueprint())
+    }
+
+    @FragmentComp
+    @Provides
+    fun viewModel(
+        connectivityManager: ConnectivityManager,
+        wordRepository: WordRepository,
+        state: DefinitionsVM.State
+    ): DefinitionsVM {
+        return DefinitionsVM(connectivityManager, wordRepository, state)
     }
 }

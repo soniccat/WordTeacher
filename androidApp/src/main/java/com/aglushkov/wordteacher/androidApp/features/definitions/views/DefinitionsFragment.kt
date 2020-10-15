@@ -10,8 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,19 +26,10 @@ import dev.icerock.moko.mvvm.utils.bind
 import javax.inject.Inject
 
 class DefinitionsVMWrapper(
-    application: Application,
-    saveState: SavedStateHandle
+    application: Application
 ): AndroidViewModel(application) {
 
-    // TODO: fix DI mess
-    val vm: DefinitionsVM = DefinitionsVM(
-        (application as AppComponentOwner).appComponent.getConnectivityManager(),
-        (application as AppComponentOwner).appComponent.getWordRepository(),
-        saveState.get<DefinitionsVM.State>("state") ?: DefinitionsVM.State()
-    )
-
-    init {
-    }
+    @Inject lateinit var vm: DefinitionsVM
 }
 
 class DefinitionsFragment: Fragment() {
@@ -51,14 +40,25 @@ class DefinitionsFragment: Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val wmWrapper = ViewModelProviders.of(this)
+                .get(DefinitionsVMWrapper::class.java)
 
+        val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: DefinitionsVM.State()
         val deps = (requireContext().applicationContext as AppComponentOwner).appComponent
-        val component = DaggerDefinitionsComponent.builder().definitionsDependencies(deps).build()
+        val component = DaggerDefinitionsComponent.builder()
+            .setDeps(deps)
+            .setVMState(vmState)
+            .build()
+        component.injectViewModelWrapper(wmWrapper)
         component.injectDefinitionsFragment(this)
-        
-        vm = ViewModelProviders.of(this, SavedStateViewModelFactory(requireActivity().application, this))
-                .get(DefinitionsVMWrapper::class.java).vm
+
+        vm = wmWrapper.vm
         observeViewModel()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(VM_STATE, vm.state)
     }
 
     private fun observeViewModel() {
@@ -140,3 +140,5 @@ class DefinitionsFragment: Fragment() {
         }
     }
 }
+
+private val VM_STATE = "vm_state"
