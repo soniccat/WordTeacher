@@ -73,9 +73,10 @@ class WordnikService(
     }
 
     private val httpClient = HttpClient {
+        val anApiKey = apiKey
         install(CustomParameter.Feature) {
             parameterName = "api_key"
-            parameterValue = apiKey
+            parameterValue = anApiKey
         }
     }
 

@@ -33,7 +33,7 @@ class ConfigRepository(
         mainScope.launch {
             connectivityManager.flow.collect {
                 if (it) {
-                    loadIfNeeded()
+                    //loadIfNeeded() // TODO: uncomment that
                 }
             }
         }

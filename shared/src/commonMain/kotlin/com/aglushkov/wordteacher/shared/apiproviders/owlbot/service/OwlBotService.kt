@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.repository.Config
 import com.aglushkov.wordteacher.shared.repository.ServiceMethodParams
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import io.ktor.client.HttpClient
+import io.ktor.client.features.UserAgent
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
@@ -24,9 +25,10 @@ class OwlBotService(
     companion object {}
 
     private val httpClient = HttpClient {
-        install(CustomHeader.Feature) {
-            headerName = HttpHeaders.Authorization
-            headerValue = "Token $key"
+        val aKey = key // to fix mutation attempt of frozen OwlBot@<address> as otherwise "this" is captured
+        install(CustomHeader) {
+            headerName = "HttpHeaders.Authorization"
+            headerValue = "Token $aKey"
         }
     }
 
