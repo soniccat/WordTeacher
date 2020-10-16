@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlin.jvm.Volatile
 
 expect class ConnectivityManager {
+    var isRegistered: Boolean
     val flow: StateFlow<Boolean>
 
     @Volatile var isDeviceOnline: Boolean

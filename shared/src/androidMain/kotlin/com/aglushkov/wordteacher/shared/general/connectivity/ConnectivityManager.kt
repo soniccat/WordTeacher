@@ -14,6 +14,7 @@ actual class ConnectivityManager constructor(
 ) {
 
     private var connectivityManager = getConnectivityManager()
+    actual var isRegistered = false
 
     private val stateFlow = MutableStateFlow<Boolean>(false)
     actual val flow: StateFlow<Boolean> = stateFlow
@@ -37,13 +38,19 @@ actual class ConnectivityManager constructor(
     }
 
     actual fun register() {
-        val builder = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        connectivityManager.registerNetworkCallback(builder.build(), networkCallback)
+        if (!isRegistered) {
+            val builder = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            connectivityManager.registerNetworkCallback(builder.build(), networkCallback)
+            isRegistered = true
+        }
     }
 
     actual fun unregister() {
-        connectivityManager.unregisterNetworkCallback(networkCallback)
+        if (isRegistered) {
+            connectivityManager.unregisterNetworkCallback(networkCallback)
+            isRegistered = false
+        }
     }
 
     actual fun checkNetworkState() {
