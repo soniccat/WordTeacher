@@ -52,7 +52,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         viewModel.definitions.addObserver { (res: Resource<NSArray>?) in
             let t = type(of: res)
-            print("status '\(t)'")
+            let isLoaded = res!.isLoaded() ? "true" : "false"
+            print("status '\(t)' isLoaded: \(isLoaded)")
         }
     }
 

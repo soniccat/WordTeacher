@@ -27,7 +27,7 @@ class OwlBotService(
     private val httpClient = HttpClient {
         val aKey = key // to fix mutation attempt of frozen OwlBot@<address> as otherwise "this" is captured
         install(CustomHeader) {
-            headerName = "HttpHeaders.Authorization"
+            headerName = HttpHeaders.Authorization
             headerValue = "Token $aKey"
         }
     }
@@ -35,9 +35,10 @@ class OwlBotService(
     suspend fun loadDefinition(word: String): OwlBotWord {
         val res: HttpResponse = httpClient.get("${baseUrl}api/v4/dictionary/${word}")
         return withContext(Dispatchers.Default) {
+            val string = res.readBytes().decodeToString()
             Json {
                 ignoreUnknownKeys = true
-            }.decodeFromString(res.readBytes().decodeToString())
+            }.decodeFromString(string)
         }
     }
 }
