@@ -19,7 +19,7 @@ class ServiceRepository(
     val serviceFactory: WordTeacherWordServiceFactory
 ) {
 
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlow = MutableStateFlow<Resource<List<WordTeacherWordService>>>(Resource.Uninitialized())
     val flow = stateFlow
 

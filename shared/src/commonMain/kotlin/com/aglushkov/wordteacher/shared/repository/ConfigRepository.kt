@@ -18,8 +18,7 @@ class ConfigRepository(
     val service: ConfigService,
     private val connectivityManager: ConnectivityManager
 ) {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-
+    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlow = MutableStateFlow<Resource<List<Config>>>(Resource.Uninitialized())
     val flow = stateFlow
     val value: Resource<List<Config>>
@@ -31,7 +30,7 @@ class ConfigRepository(
         loadIfNeeded()
 
         // load a config on connecting to the internet
-        scope.launch {
+        mainScope.launch {
             connectivityManager.flow.collect {
                 if (it) {
                     loadIfNeeded()
@@ -47,7 +46,7 @@ class ConfigRepository(
     }
 
     private fun load() {
-        scope.launch {
+        mainScope.launch {
             loadConfigFlow().onStart {
                 stateFlow.value.toLoading()
             }.forward(stateFlow)

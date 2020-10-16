@@ -3,19 +3,15 @@ package com.aglushkov.wordteacher.shared.general.connectivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import cocoapods.Reachability.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import platform.Foundation.NSNotificationCenter
+import kotlin.native.concurrent.ensureNeverFrozen
+import kotlin.native.concurrent.freeze
 
 actual class ConnectivityManager {
     private val reachability = Reachability.reachabilityForInternetConnection()!!
     actual var isRegistered = false
 
-    private val stateFlow = MutableStateFlow<Boolean>(false)
+    private val stateFlow = MutableStateFlow(false)
     actual val flow: StateFlow<Boolean> = stateFlow
 
     actual var isDeviceOnline = false
@@ -25,6 +21,9 @@ actual class ConnectivityManager {
         private set
 
     init {
+        ensureNeverFrozen()
+        reachability.freeze()
+
         NSNotificationCenter.defaultCenter.addObserverForName(
             name = kReachabilityChangedNotification,
             `object` = null,

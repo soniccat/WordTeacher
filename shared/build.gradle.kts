@@ -23,6 +23,7 @@ repositories {
 
 kotlin {
     android()
+// HACK: commented to be able build the project with native.cocoapods plugin
 //    ios {
 //        binaries {
 //            framework {
@@ -31,7 +32,6 @@ kotlin {
 //        }
 //    }
     ios()
-//    iosX64()
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -63,7 +63,18 @@ kotlin {
                 implementation(Deps.junit)
             }
         }
-        val iosMain by getting
+        val iosMain by getting {
+            dependencies {
+                implementation(Deps.Ktor.ios)
+                implementation(Deps.Coroutines.common) {
+                    version {
+                        // HACK: to fix InvalidMutabilityException: mutation attempt of frozen kotlinx.coroutines.ChildHandleNode
+                        // during HttpClient initialization
+                        strictly(Versions.coroutines)
+                    }
+                }
+            }
+        }
         val iosTest by getting
     }
 
@@ -73,6 +84,9 @@ kotlin {
 
         ios.deploymentTarget = "11.0"
 
+        // HACK: it's important to update iOS project Podfile with the same deps and call pod install as
+        // the deps here aren't linked in the result shared framework and otherwise you'll have sth like
+        // Reachability object isn't found for <any> architecture while linking step
         pod("Reachability","3.2")
     }
 }

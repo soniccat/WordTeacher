@@ -5,6 +5,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
+import io.ktor.utils.io.preventFreeze
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -16,7 +17,10 @@ class ConfigService(
 ) {
     companion object {}
 
-    private val httpClient = HttpClient { }
+    private val httpClient = HttpClient()
+
+    init {
+    }
 
     suspend fun config(): List<Config> {
         val res: HttpResponse = httpClient.get("${baseUrl}wordteacher/config")
