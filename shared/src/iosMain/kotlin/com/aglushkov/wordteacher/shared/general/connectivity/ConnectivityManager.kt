@@ -3,11 +3,17 @@ package com.aglushkov.wordteacher.shared.general.connectivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import cocoapods.Reachability.*
-import platform.darwin.dispatch_async
-import platform.darwin.dispatch_get_main_queue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import platform.Foundation.NSNotificationCenter
 
 actual class ConnectivityManager {
     private val reachability = Reachability.reachabilityForInternetConnection()!!
+    actual var isRegistered = false
 
     private val stateFlow = MutableStateFlow<Boolean>(false)
     actual val flow: StateFlow<Boolean> = stateFlow
@@ -19,41 +25,34 @@ actual class ConnectivityManager {
         private set
 
     init {
-        reachability.reachableBlock = {
-            val isReachable = it!!.isReachable()
-            val isOverWifi = it!!.isReachableViaWiFi()
-
-            dispatch_async(dispatch_get_main_queue()) {
-                updateNetworkState(isReachable, isOverWifi)
-            }
-        }
-
-        reachability.unreachableBlock = {
-            val isReachable = it!!.isReachable()
-            val isOverWifi = it!!.isReachableViaWiFi()
-
-            dispatch_async(dispatch_get_main_queue()) {
-                updateNetworkState(isReachable, isOverWifi)
-            }
-        }
+        NSNotificationCenter.defaultCenter.addObserverForName(
+            name = kReachabilityChangedNotification,
+            `object` = null,
+            queue = null,
+            usingBlock = {
+                checkNetworkState()
+            })
     }
 
     actual fun register() {
-        reachability.startNotifier()
+        if (!isRegistered) {
+            reachability.startNotifier()
+            isRegistered = true
+        }
     }
 
     actual fun unregister() {
-        reachability.stopNotifier()
+        if (isRegistered) {
+            reachability.stopNotifier()
+            isRegistered = false
+        }
     }
 
     actual fun checkNetworkState() {
-        updateNetworkState(reachability.isReachable(), reachability.isReachableViaWiFi())
-    }
+        this.isDeviceOnline = reachability.isReachable()
+        this.isWifiMode = reachability.isReachableViaWiFi()
 
-    private fun updateNetworkState(isReachable: Boolean, isOverWifi: Boolean) {
-        this.isDeviceOnline = isReachable
-        this.isWifiMode = isOverWifi
-
+        //NSLog("isOnline %d", reachability.isReachable())
         if (stateFlow.value != isDeviceOnline) {
             stateFlow.value = isDeviceOnline
         }
