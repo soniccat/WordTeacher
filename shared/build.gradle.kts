@@ -44,7 +44,7 @@ kotlin {
                 implementation(Deps.mokoMvvm)
                 implementation(Deps.okio)
                 implementation(Deps.dateTime)
-                api("com.github.aakira:napier:1.4.1")
+                implementation(Deps.logger)
             }
         }
         val commonTest by getting {

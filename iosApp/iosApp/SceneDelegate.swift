@@ -1,61 +1,35 @@
 import UIKit
 import SwiftUI
 import shared
+import Cleanse
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    private let connectivityManager = ConnectivityManager()
+    private var factory: ComponentFactory<AppComponent>!
+    private var app: App!
+    
+    private var connectivityManager: ConnectivityManager!
     var window: UIWindow?
-
-    var configService: ConfigService!
-    var configRepository: ConfigRepository!
-    var configConnectParamsStatRepository: ConfigConnectParamsStatRepository!
-    var serviceRepository: ServiceRepository!
-    var wordTeacherWordServiceFactory: WordTeacherWordServiceFactory!
-    var wordRepository: WordRepository!
-    var viewModel: DefinitionsVM!
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         
-        Logger().setupDebug()
+        factory = try! ComponentFactory.of(AppComponent.self)
+        app = factory.build(())
+        connectivityManager = app.connectivityManager
         
-        if viewModel == nil {
-            configService = ConfigService(baseUrl: "https://soniccat.ru/")
-            configRepository = ConfigRepository(
-                service: configService,
-                connectivityManager: connectivityManager)
-            configConnectParamsStatRepository = ConfigConnectParamsStatRepository(
-                file: ConfigConnectParamsStatFile())
-            wordTeacherWordServiceFactory = WordTeacherWordServiceFactory()
-            serviceRepository = ServiceRepository(
-                configRepository: configRepository,
-                connectParamsStatRepository: configConnectParamsStatRepository,
-                serviceFactory: wordTeacherWordServiceFactory)
-            wordRepository = WordRepository(serviceRepository: serviceRepository)
-            
-            viewModel = DefinitionsVM(
-                connectivityManager: connectivityManager,
-                wordRepository: wordRepository,
-                state: DefinitionsVM.State.init(word: nil))
-        }
+        Logger().setupDebug()
 
-        // Create the SwiftUI view that provides the window contents.
-        let contentView = ContentView()
-
-        // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = UIHostingController(rootView: contentView)
+            
+            let defVc = app!.definitions()
+            let navVc = UINavigationController.init(rootViewController: defVc)
+            
+            window.rootViewController = navVc
             self.window = window
             window.makeKeyAndVisible()
-        }
-        
-        viewModel.definitions.addObserver { (res: Resource<NSArray>?) in
-            let t = type(of: res)
-            let isLoaded = res!.isLoaded() ? "true" : "false"
-            print("status '\(t)' isLoaded: \(isLoaded)")
         }
     }
 

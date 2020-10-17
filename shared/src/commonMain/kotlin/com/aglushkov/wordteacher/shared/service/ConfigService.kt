@@ -41,7 +41,7 @@ class ConfigService(
         }
     }
 
-    fun logResponse(
+    private fun logResponse(
         response: HttpResponse,
         stringResponse: String
     ) {

@@ -83,6 +83,7 @@ object Deps {
     val lifecycle_extension = "android.arch.lifecycle:extensions:${Versions.lifecycle}"
     val karmok = "co.touchlab:karmok-library:${Versions.karmok}"
     val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
+    val logger = "com.github.aakira:napier:1.4.1"
 
     object AndroidXTest {
         val core = "androidx.test:core:${Versions.androidx_test}"
