@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.apiproviders.google.service
 
 import com.aglushkov.wordteacher.apiproviders.google.model.GoogleWord
 import com.aglushkov.wordteacher.apiproviders.google.model.asWordTeacherWord
+import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.Config
 import com.aglushkov.wordteacher.shared.repository.ServiceMethodParams
@@ -23,15 +24,20 @@ class GoogleService(
         val EntriesLang = "google_entries_lang"
     }
 
-    private val httpClient = HttpClient { }
+    private val logger = WordServiceLogger(Config.Type.OwlBot.name)
+    private val httpClient = HttpClient()
 
     suspend fun loadDefinitions(word: String, lang: String): List<GoogleWord> {
+        logger.logLoadingStarted(word)
+
         val res: HttpResponse = httpClient.get("${baseUrl}api/v1/entries/${lang}/${word}")
         return withContext(Dispatchers.Default) {
-            val string = res.readBytes().decodeToString()
+            val responseString = res.readBytes().decodeToString()
+            logger.logLoadingCompleted(word, res, responseString)
+
             Json {
                 ignoreUnknownKeys = true
-            }.decodeFromString(string)
+            }.decodeFromString(responseString)
         }
     }
 }

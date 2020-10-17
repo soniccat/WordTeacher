@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.apiproviders.wordnik.service
 
 import com.aglushkov.wordteacher.apiproviders.wordnik.model.WordnikWord
 import com.aglushkov.wordteacher.apiproviders.wordnik.model.asWordTeacherWords
+import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.general.ktor.CustomParameter
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.Config
@@ -72,6 +73,7 @@ class WordnikService(
         val DefinitionsIncludeTags = "wordnik_definitions_includeTags"
     }
 
+    private val logger = WordServiceLogger(Config.Type.Wordnik.name)
     private val httpClient = HttpClient {
         val anApiKey = apiKey
         install(CustomParameter.Feature) {
@@ -89,6 +91,8 @@ class WordnikService(
         useCanonical: Boolean,
         includeTags: Boolean
     ): List<WordnikWord> {
+        logger.logLoadingStarted(word)
+
         val res: HttpResponse = httpClient.get("${baseUrl}v4/word.json/${word}/definitions") {
             parameter("sourceDictionaries", dictionaries)
             parameter("limit", limit)
@@ -98,9 +102,12 @@ class WordnikService(
             parameter("includeTags", includeTags)
         }
         return withContext(Dispatchers.Default) {
+            val responseString = res.readBytes().decodeToString()
+            logger.logLoadingCompleted(word, res, responseString)
+
             Json {
                 ignoreUnknownKeys = true
-            }.decodeFromString(res.readBytes().decodeToString())
+            }.decodeFromString(responseString)
         }
     }
 }

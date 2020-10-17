@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.di.AppComponent
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.di.DaggerAppComponent
 import com.aglushkov.wordteacher.di.GeneralModule
+import com.aglushkov.wordteacher.shared.general.Logger
 
 
 class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listener {
@@ -14,6 +15,9 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
 
     override fun onCreate() {
         super.onCreate()
+
+        Logger().setupDebug()
+
         appComponent = DaggerAppComponent.builder().generalModule(GeneralModule(this)).build()
         appComponent.getConnectivityManager().checkNetworkState()
 

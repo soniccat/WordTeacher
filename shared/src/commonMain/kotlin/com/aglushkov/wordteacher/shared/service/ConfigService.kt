@@ -1,10 +1,14 @@
 package com.aglushkov.wordteacher.shared.service
 
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.repository.Config
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
+import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.preventFreeze
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,17 +21,34 @@ class ConfigService(
 ) {
     companion object {}
 
+    private val TAG = "Config"
     private val httpClient = HttpClient()
 
     init {
     }
 
     suspend fun config(): List<Config> {
+        Logger.v("Loading", tag = TAG)
+
         val res: HttpResponse = httpClient.get("${baseUrl}wordteacher/config")
         return withContext(Dispatchers.Default) {
+            val stringResponse = res.readBytes().decodeToString()
+            logResponse(res, stringResponse)
+
             Json {
                 ignoreUnknownKeys = true
-            }.decodeFromString(res.readBytes().decodeToString())
+            }.decodeFromString(stringResponse)
+        }
+    }
+
+    fun logResponse(
+        response: HttpResponse,
+        stringResponse: String
+    ) {
+        if (response.status == HttpStatusCode.OK) {
+            Logger.v("Loaded", tag = TAG)
+        } else {
+            Logger.e("Status: ${response.status} response: $stringResponse", tag = TAG)
         }
     }
 }

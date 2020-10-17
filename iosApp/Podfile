@@ -2,4 +2,5 @@ platform :ios, '11.0'
 
 target 'iosApp' do
   pod 'Reachability', '3.2'
+  pod 'Cleanse', '4.2.6'
 end

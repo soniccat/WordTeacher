@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.apiproviders.owlbot.service
 
+import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.general.ktor.CustomHeader
 import com.aglushkov.wordteacher.shared.apiproviders.owlbot.model.OwlBotWord
 import com.aglushkov.wordteacher.shared.apiproviders.owlbot.model.asWordTeacherWord
@@ -8,7 +9,6 @@ import com.aglushkov.wordteacher.shared.repository.Config
 import com.aglushkov.wordteacher.shared.repository.ServiceMethodParams
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import io.ktor.client.HttpClient
-import io.ktor.client.features.UserAgent
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
@@ -24,6 +24,7 @@ class OwlBotService(
 ) {
     companion object {}
 
+    private val logger = WordServiceLogger(Config.Type.Google.name)
     private val httpClient = HttpClient {
         val aKey = key // to fix mutation attempt of frozen OwlBot@<address> as otherwise "this" is captured
         install(CustomHeader) {
@@ -33,14 +34,19 @@ class OwlBotService(
     }
 
     suspend fun loadDefinition(word: String): OwlBotWord {
+        logger.logLoadingStarted(word)
+
         val res: HttpResponse = httpClient.get("${baseUrl}api/v4/dictionary/${word}")
         return withContext(Dispatchers.Default) {
-            val string = res.readBytes().decodeToString()
+            val responseString = res.readBytes().decodeToString()
+            logger.logLoadingCompleted(word, res, responseString)
+
             Json {
                 ignoreUnknownKeys = true
-            }.decodeFromString(string)
+            }.decodeFromString(responseString)
         }
     }
+
 }
 
 fun OwlBotService.Companion.createWordTeacherWordService(

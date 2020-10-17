@@ -1,16 +1,20 @@
 PODS:
+  - Cleanse (4.2.6)
   - Reachability (3.2)
 
 DEPENDENCIES:
+  - Cleanse (= 4.2.6)
   - Reachability (= 3.2)
 
 SPEC REPOS:
   trunk:
+    - Cleanse
     - Reachability
 
 SPEC CHECKSUMS:
+  Cleanse: 6bfc62033dcc0e5ba7992f410a5352ddd1283551
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
 
-PODFILE CHECKSUM: 592c7a8980f027f5a0066c05ff8d412cb9b55876
+PODFILE CHECKSUM: a5a26cf3411436b3a657b204d76a7337d7280ca1
 
 COCOAPODS: 1.9.3
