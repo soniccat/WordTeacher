@@ -10,17 +10,15 @@ import UIKit
 import Cleanse
 import shared
 
-struct DefinitionsProperties {
-    let backgroundColor: UIColor
-    let vm: DefinitionsVM
-}
-
 class DefinitionsViewController: UIViewController {
-    let props: DefinitionsProperties
+    @IBOutlet var collectionView: UICollectionView!
     
-    init(definitionsProperties: DefinitionsProperties) {
-        self.props = definitionsProperties
-        super.init(nibName: nil, bundle: nil)
+    var adapter: SimpleAdapter!
+    let vm: DefinitionsVM
+    
+    init(vm: DefinitionsVM) {
+        self.vm = vm
+        super.init(nibName: "DefinitionsViewController", bundle: Bundle.main)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -29,12 +27,30 @@ class DefinitionsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = self.props.backgroundColor
-        
-        props.vm.definitions.addObserver { (res: Resource<NSArray>?) in
-            let t = type(of: res)
-            let isLoaded = res!.isLoaded() ? "true" : "false"
-            print("status '\(t)' isLoaded: \(isLoaded)")
+
+        bindView()
+        observeViewModel()
+    }
+    
+    private func observeViewModel() {
+        vm.definitions.addObserver { [weak self] (res: Resource<NSArray>?) in
+            self?.showDefinitions(res: res!)
+        }
+    }
+    
+    private func bindView() {
+        adapter = SimpleAdapter(collectionView: collectionView)
+    }
+    
+    private func showDefinitions(res: Resource<NSArray>) {
+        if res.isLoaded() {
+            if let items = res.data() {
+                var snapshot = adapter.dataSource.snapshot()
+                snapshot.appendSections([.main])
+                snapshot.appendItems([items.firstObject] as! [BaseViewItem<AnyObject>])
+                
+                adapter.dataSource.apply(snapshot, animatingDifferences: true)
+            }
         }
     }
 }
@@ -46,10 +62,6 @@ extension DefinitionsViewController {
                 DefinitionsVM(connectivityManager: manager,
                               wordRepository: wordRepository,
                               state: DefinitionsVM.State(word: nil))
-            }
-            
-            binder.bind(DefinitionsProperties.self).to { (vm: DefinitionsVM) -> DefinitionsProperties in
-                DefinitionsProperties(backgroundColor: .blue, vm: vm)
             }
         }
     }

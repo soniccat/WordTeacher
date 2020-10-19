@@ -25,7 +25,7 @@ class App {
         self.connectivityManager = connectivityManager
     }
     
-    func definitions() -> DefinitionsViewController {
+    func definitionsVC() -> DefinitionsViewController {
         return definitionsComponentFactory.build(())
     }
 }

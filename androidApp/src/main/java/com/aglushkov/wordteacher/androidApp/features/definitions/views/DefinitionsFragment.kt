@@ -56,19 +56,11 @@ class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener 
         component.injectDefinitionsFragment(this)
 
         vm = wmWrapper.vm
-        observeViewModel()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable(VM_STATE, vm.state)
-    }
-
-    private fun observeViewModel() {
-        viewLifecycleOwnerLiveData.observe(this, Observer {
-            if (it == null) return@Observer
-            onViewLifecycleOwnerReady(it)
-        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -79,6 +71,10 @@ class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindView()
+
+        vm.definitions.bind(viewLifecycleOwner) {
+            showDefinitions(it!!)
+        }
     }
 
     private fun bindView() {
@@ -107,12 +103,6 @@ class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener 
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-    }
-
-    private fun onViewLifecycleOwnerReady(viewLifecycleOwner: LifecycleOwner) {
-        vm.definitions.bind(viewLifecycleOwner) {
-            showDefinitions(it!!)
-        }
     }
 
     private fun showDefinitions(it: Resource<List<BaseViewItem<*>>>) {
