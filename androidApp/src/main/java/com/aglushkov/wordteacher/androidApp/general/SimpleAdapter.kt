@@ -7,26 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.general.extensions.DiffCallback
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 
-interface Blueprint<V, I> {
-    val type: Int
-
-    fun createView(parent: ViewGroup): V
-    fun bind(view: V, viewItem: I)
-}
-
-class ViewItemBinder {
-    private val blueprints = mutableMapOf<Int, Blueprint<*,*>>()
-
-    fun addBlueprint(blueprint: Blueprint<*,*>): ViewItemBinder {
-        blueprints[blueprint.type] = blueprint
-        return this
-    }
-
-    fun findBlueprint(type: Int): Blueprint<*,*>? {
-        return blueprints[type]
-    }
-}
-
 class SimpleAdapter(
     private val binder: ViewItemBinder
 ): ListAdapter<BaseViewItem<*>, SimpleAdapter.ViewHolder>(BaseViewItem.DiffCallback) {

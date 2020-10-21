@@ -28,10 +28,6 @@ class WordDefinitionBlueprint: Blueprint {
            return "TextCell"
         }
     }
-    
-    func bind(view: UIView, viewItem: AnyObject) {
-        bind(view: view as! TextCell, viewItem: viewItem as! WordDefinitionViewItem)
-    }
 
     func bind(view: TextCell, viewItem: WordDefinitionViewItem) {
         view.textView.text = viewItem.firstItem() as String? ?? ("class " + viewItem.description)

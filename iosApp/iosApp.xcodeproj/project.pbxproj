@@ -28,6 +28,8 @@
 		D61EEADA253B76D100EF8B3B /* DefinitionsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61EEAD9253B76D100EF8B3B /* DefinitionsComponent.swift */; };
 		D61EEADC253B77A200EF8B3B /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61EEADB253B77A200EF8B3B /* App.swift */; };
 		D630B37825407C6C0035D95E /* WordDefinitionBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B37725407C6C0035D95E /* WordDefinitionBlueprint.swift */; };
+		D630B37A2540B7350035D95E /* Blueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B3792540B7350035D95E /* Blueprint.swift */; };
+		D630B37C2540B7910035D95E /* ItemViewBinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B37B2540B7910035D95E /* ItemViewBinder.swift */; };
 		F668C22F1954FAF7379E9B58 /* libPods-iosApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84C1F6F0E0144727FE502A /* libPods-iosApp.a */; };
 /* End PBXBuildFile section */
 
@@ -92,6 +94,8 @@
 		D61EEAD9253B76D100EF8B3B /* DefinitionsComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionsComponent.swift; sourceTree = "<group>"; };
 		D61EEADB253B77A200EF8B3B /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		D630B37725407C6C0035D95E /* WordDefinitionBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDefinitionBlueprint.swift; sourceTree = "<group>"; };
+		D630B3792540B7350035D95E /* Blueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Blueprint.swift; sourceTree = "<group>"; };
+		D630B37B2540B7910035D95E /* ItemViewBinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewBinder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,7 +212,9 @@
 			isa = PBXGroup;
 			children = (
 				D60B08BB253CD7770053C558 /* SelfSizingCell.swift */,
+				D630B3792540B7350035D95E /* Blueprint.swift */,
 				D60B08B8253CD12F0053C558 /* SimpleAdapter.swift */,
+				D630B37B2540B7910035D95E /* ItemViewBinder.swift */,
 			);
 			path = General;
 			sourceTree = "<group>";
@@ -441,8 +447,10 @@
 				D61EEADC253B77A200EF8B3B /* App.swift in Sources */,
 				D61EEAD1253B4BF200EF8B3B /* AppComponent.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
+				D630B37C2540B7910035D95E /* ItemViewBinder.swift in Sources */,
 				D61EEACF253B4B2900EF8B3B /* DefinitionsViewController.swift in Sources */,
 				D60B08B9253CD12F0053C558 /* SimpleAdapter.swift in Sources */,
+				D630B37A2540B7350035D95E /* Blueprint.swift in Sources */,
 				D60B08BC253CD7770053C558 /* SelfSizingCell.swift in Sources */,
 				D630B37825407C6C0035D95E /* WordDefinitionBlueprint.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
