@@ -9,24 +9,31 @@
 import UIKit
 import shared
 
-class WordDefinitionBlueprint: Blueprint<TextCell, WordDefinitionViewItem, NSString> {
-    override var type: Int {
+class WordDefinitionBlueprint: Blueprint {
+    typealias T = WordDefinitionViewItem
+    typealias V = TextCell
+    
+    var type: Int {
         get {
             return Int(WordDefinitionViewItem.Companion().Type)
         }
     }
-    override var cellIdentifier: String {
+    var cellIdentifier: String {
         get {
             return "TextCell"
         }
     }
-    override var nibName: String {
+    var nibName: String {
         get {
            return "TextCell"
         }
     }
+    
+    func bind(view: UIView, viewItem: AnyObject) {
+        bind(view: view as! TextCell, viewItem: viewItem as! WordDefinitionViewItem)
+    }
 
-    override func bind(view: TextCell, viewItem: WordDefinitionViewItem) {
-        
+    func bind(view: TextCell, viewItem: WordDefinitionViewItem) {
+        view.textView.text = viewItem.firstItem() as String? ?? ("class " + viewItem.description)
     }
 }

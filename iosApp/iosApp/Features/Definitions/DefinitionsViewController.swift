@@ -52,7 +52,9 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
             if let items = res.data() {
                 var snapshot = adapter.dataSource.snapshot()
                 snapshot.appendSections([.main])
-                snapshot.appendItems(items as! [BaseViewItem<AnyObject>])
+                snapshot.appendItems(items.filter({ (item) -> Bool in
+                    item is WordDefinitionViewItem
+                }) as! [BaseViewItem<AnyObject>])
                 
                 adapter.dataSource.apply(snapshot, animatingDifferences: true)
             }
