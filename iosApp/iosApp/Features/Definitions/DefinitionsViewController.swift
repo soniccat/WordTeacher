@@ -16,8 +16,15 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
     var adapter: SimpleAdapter!
     let vm: DefinitionsVM
     
-    init(vm: Assisted<DefinitionsVM>) {
-        self.vm = vm.get()
+    init(deps: DefinitionsDeps) {
+        let vm = DefinitionsVM(
+            connectivityManager: deps.connectivityManager,
+            wordRepository: deps.wordRepository,
+            idGenerator: deps.idGenerator,
+            state: DefinitionsVM.State(word: nil)
+        )
+
+        self.vm = vm
         super.init(nibName: "DefinitionsViewController", bundle: Bundle.main)
     }
 

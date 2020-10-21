@@ -17,13 +17,5 @@ struct DefinitionsModule: Cleanse.Module {
     }
     
     static func configure(binder: UnscopedBinder) {
-//        binder.bind().to {
-//            DefinitionsVM(connectivityManager: $0,
-//                          wordRepository: $1,
-//                          idGenerator: $2,
-//                          state: DefinitionsVM.State(word: nil))
-//        }
-        
-//        binder.binder
     }
 }
