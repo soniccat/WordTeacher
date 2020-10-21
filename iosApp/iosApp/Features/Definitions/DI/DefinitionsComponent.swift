@@ -25,6 +25,21 @@ public struct DefinitionsComponent: RootComponent {
     }
 
     public static func configure(binder: Binder<Unscoped>) {
-        binder.include(module: DefinitionsModule.self)
+    }
+}
+
+extension DefinitionsDeps {
+    func createViewModel() -> DefinitionsVM {
+        return DefinitionsVM(
+            connectivityManager: connectivityManager,
+            wordRepository: wordRepository,
+            idGenerator: idGenerator,
+            state: DefinitionsVM.State(word: nil)
+        )
+    }
+    
+    func createItemViewBinder() -> ItemViewBinder {
+        return ItemViewBinder()
+        .addBlueprint(blueprint: WordDefinitionBlueprint())
     }
 }

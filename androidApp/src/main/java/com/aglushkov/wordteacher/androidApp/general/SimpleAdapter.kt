@@ -14,10 +14,10 @@ interface Blueprint<V, I> {
     fun bind(view: V, viewItem: I)
 }
 
-class ItemViewBinder {
+class ViewItemBinder {
     private val blueprints = mutableMapOf<Int, Blueprint<*,*>>()
 
-    fun addBlueprint(blueprint: Blueprint<*,*>): ItemViewBinder {
+    fun addBlueprint(blueprint: Blueprint<*,*>): ViewItemBinder {
         blueprints[blueprint.type] = blueprint
         return this
     }
@@ -28,7 +28,7 @@ class ItemViewBinder {
 }
 
 class SimpleAdapter(
-    private val binder: ItemViewBinder
+    private val binder: ViewItemBinder
 ): ListAdapter<BaseViewItem<*>, SimpleAdapter.ViewHolder>(BaseViewItem.DiffCallback) {
 
     override fun getItemViewType(position: Int): Int {

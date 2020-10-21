@@ -10,7 +10,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordSynonymBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTitleBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTranscriptionBlueprint
-import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
+import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -24,8 +24,8 @@ class DefinitionsModule {
     @Provides
     fun createItemViewBinder(
         definitionsDisplayModeListener: DefinitionsDisplayModeBlueprint.Listener
-    ): ItemViewBinder {
-        return ItemViewBinder()
+    ): ViewItemBinder {
+        return ViewItemBinder()
             .addBlueprint(DefinitionsDisplayModeBlueprint(definitionsDisplayModeListener))
             .addBlueprint(WordDefinitionBlueprint())
             .addBlueprint(WordDividerBlueprint())

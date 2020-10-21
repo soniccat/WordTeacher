@@ -15,16 +15,12 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
     
     var adapter: SimpleAdapter!
     let vm: DefinitionsVM
+    let binder: ItemViewBinder
     
     init(deps: DefinitionsDeps) {
-        let vm = DefinitionsVM(
-            connectivityManager: deps.connectivityManager,
-            wordRepository: deps.wordRepository,
-            idGenerator: deps.idGenerator,
-            state: DefinitionsVM.State(word: nil)
-        )
+        self.vm = deps.createViewModel()
+        self.binder = deps.createItemViewBinder()
 
-        self.vm = vm
         super.init(nibName: "DefinitionsViewController", bundle: Bundle.main)
     }
 
@@ -48,7 +44,7 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
     private func bindView() {
         let flowLayout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
         flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        adapter = SimpleAdapter(collectionView: collectionView)
+        adapter = SimpleAdapter(binder: binder, collectionView: collectionView)
     }
     
     private func showDefinitions(res: Resource<NSArray>) {

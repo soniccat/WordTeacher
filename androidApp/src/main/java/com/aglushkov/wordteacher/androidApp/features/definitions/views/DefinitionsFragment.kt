@@ -8,14 +8,12 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentDefinitionsBinding
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.DefinitionsDisplayModeBlueprint
-import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
+import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
@@ -38,7 +36,7 @@ class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener 
     private lateinit var vm: DefinitionsVM
     private var binding: FragmentDefinitionsBinding? = null
 
-    @Inject lateinit var binder: ItemViewBinder
+    @Inject lateinit var binder: ViewItemBinder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

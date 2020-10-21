@@ -4,7 +4,7 @@ import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.DefinitionsDisplayModeBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
-import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
+import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -16,7 +16,7 @@ import dagger.Component
 @FragmentComp
 @Component(dependencies = [DefinitionsDependencies::class], modules = [DefinitionsModule::class])
 public interface DefinitionsComponent {
-    fun getItemViewBinder(): ItemViewBinder
+    fun getItemViewBinder(): ViewItemBinder
 
     fun injectDefinitionsFragment(fragment: DefinitionsFragment)
     fun injectViewModelWrapper(fragment: DefinitionsVMWrapper)

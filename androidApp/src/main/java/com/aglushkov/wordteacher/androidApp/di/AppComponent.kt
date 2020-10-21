@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.di
 
 import com.aglushkov.wordteacher.androidApp.di.AppComp
-import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
 import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
