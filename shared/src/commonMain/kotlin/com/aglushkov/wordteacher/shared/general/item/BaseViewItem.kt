@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.general.item
 
 abstract class BaseViewItem<T> {
+    var id = 0 // a unique id, required for NSDiffableDataSourceSnapshot
     var type = 0
     var items = listOf<T>()
 
@@ -21,13 +22,13 @@ abstract class BaseViewItem<T> {
         // if an id is available in a subclass this check should be used:
         //     this.javaClass == item.javaClass && type == item.type && id == item.id
         // and equalsByContent should be overridden too
-        return equals(item)
+        return id == item.id && type == item.type
     }
 
-    open fun equalsByContent(other: Any?): Boolean {
+    open fun equalsByContent(other: BaseViewItem<*>): Boolean {
         // as we check the content in equalsByIds we can return true here
         // this should be overridden if equalsByIds is overridden
-        return true
+        return equals(other)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -36,6 +37,7 @@ abstract class BaseViewItem<T> {
 
         if (type != other.type) return false
         if (items != other.items) return false
+        if (id != other.id) return false
 
         return true
     }
@@ -43,8 +45,12 @@ abstract class BaseViewItem<T> {
     override fun hashCode(): Int {
         var result = type
         result = 31 * result + items.hashCode()
+        result = 31 * result + id
         return result
     }
+
+    fun itemsHashCode(): Int = this.items.hashCode()
+    fun itemsEquals(items: List<T>) = this.items.equals(items)
 
     companion object {}
 }

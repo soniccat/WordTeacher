@@ -4,7 +4,8 @@ import shared
 import Cleanse
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    private var factory: ComponentFactory<AppComponent>!
+    private var appComponentFactory: ComponentFactory<AppComponent>!
+    private var definitionsComponentFactory: ComponentFactory<DefinitionsComponent>!
     private var app: App!
     
     private var connectivityManager: ConnectivityManager!
@@ -15,8 +16,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         
-        factory = try! ComponentFactory.of(AppComponent.self)
-        app = factory.build(())
+        appComponentFactory = try! ComponentFactory.of(AppComponent.self)
+        definitionsComponentFactory = try! ComponentFactory.of(DefinitionsComponent.self)
+        app = appComponentFactory.build(())
         connectivityManager = app.connectivityManager
         
         Logger().setupDebug()
@@ -24,7 +26,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
             
-            let defVc = app!.definitionsVC()
+            let defVc = definitionsComponentFactory!.build(app)
             let navVc = UINavigationController.init(rootViewController: defVc)
             
             window.rootViewController = navVc

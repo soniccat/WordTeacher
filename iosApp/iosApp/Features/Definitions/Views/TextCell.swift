@@ -10,4 +10,10 @@ import UIKit
 
 class TextCell: SelfSizingCell {
     @IBOutlet var textView: UILabel!
+    
+    override var childView: UIView? {
+        get {
+            textView
+        }
+    }
 }

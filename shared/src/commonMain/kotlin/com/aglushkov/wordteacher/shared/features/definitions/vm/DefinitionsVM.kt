@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
 import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 class DefinitionsVM(
     private val connectivityManager: ConnectivityManager,
     private val wordRepository: WordRepository,
+    private val idGenerator: IdGenerator,
     val state: State
 ): ViewModel() {
 
@@ -82,7 +84,7 @@ class DefinitionsVM(
     private fun load(word: String) {
         this.word = word
         viewModelScope.launch {
-            innerDefinitions.load(true) {
+            innerDefinitions.load {
                 // TODO: handle Loading to show intermediate results
                 val words = wordRepository.define(word).first {
                     if (it is Resource.Error) {
@@ -106,7 +108,44 @@ class DefinitionsVM(
             else -> addWordsGroupedBySource(words, items)
         }
 
+        generateIds(items)
         return items
+    }
+
+    // set unique id taking into account that for the same items id shouldn't change
+    private fun generateIds(items: MutableList<BaseViewItem<*>>) {
+        val prevItems = innerDefinitions.value.data() ?: emptyList()
+        val map: MutableMap<Int, MutableList<BaseViewItem<*>>> = mutableMapOf()
+
+        // put items with ids in map
+        prevItems.forEach {
+            val itemsHashCode = it.itemsHashCode()
+            val mapListOfViewItems = map[itemsHashCode]
+
+            // obtain mutable list
+            val listOfViewItems: MutableList<BaseViewItem<*>> = if (mapListOfViewItems == null) {
+                mutableListOf<BaseViewItem<*>>().also { list ->
+                    map[itemsHashCode] = list
+                }
+            } else {
+                mapListOfViewItems
+            }
+
+            listOfViewItems.add(it)
+        }
+
+        // set ids for item not in the map
+        items.forEach {
+            val itemsHashCode = it.itemsHashCode()
+            val mapListOfViewItems = map[itemsHashCode]
+            val item = mapListOfViewItems?.firstOrNull { listItem -> listItem.items == it.items }
+
+            if (item != null) {
+                it.id = item.id
+            } else {
+                it.id = idGenerator.nextId()
+            }
+        }
     }
 
     private fun addMergedWords(words: List<WordTeacherWord>, items: MutableList<BaseViewItem<*>>) {

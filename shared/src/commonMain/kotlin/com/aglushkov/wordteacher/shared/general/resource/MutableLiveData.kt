@@ -4,7 +4,7 @@ import dev.icerock.moko.mvvm.livedata.MutableLiveData
 import kotlinx.coroutines.CancellationException
 
 suspend fun <T> MutableLiveData<Resource<T>>.load(
-    canTryAgain: Boolean,
+    canTryAgain: Boolean = true,
     loader: suspend () -> T?
 ) {
     val initialValue = value
@@ -14,8 +14,9 @@ suspend fun <T> MutableLiveData<Resource<T>>.load(
     try {
         val result = loader()
         val newStatus: Resource<T> = if (result != null) {
-            Resource.Loaded(result)
+            initialValue.toLoaded(result)
         } else {
+            // treat a null response as Uninitialized
             Resource.Uninitialized()
         }
 
@@ -24,7 +25,10 @@ suspend fun <T> MutableLiveData<Resource<T>>.load(
         }
     } catch (e: CancellationException) {
         if (value == loadingRes) {
-            postValue(initialValue)
+            // show an error as it's a strange situation when we cancel the current loading and
+            // don't start a new loading
+            val errorRes = initialValue.toError(e, canTryAgain)
+            postValue(errorRes)
         }
         throw e
     } catch (e: Exception) {

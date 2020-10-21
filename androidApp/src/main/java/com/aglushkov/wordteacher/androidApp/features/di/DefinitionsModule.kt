@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
 import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import dagger.Module
 import dagger.Provides
@@ -41,8 +42,9 @@ class DefinitionsModule {
     fun viewModel(
         connectivityManager: ConnectivityManager,
         wordRepository: WordRepository,
+        idGenerator: IdGenerator,
         state: DefinitionsVM.State
     ): DefinitionsVM {
-        return DefinitionsVM(connectivityManager, wordRepository, state)
+        return DefinitionsVM(connectivityManager, wordRepository, idGenerator, state)
     }
 }

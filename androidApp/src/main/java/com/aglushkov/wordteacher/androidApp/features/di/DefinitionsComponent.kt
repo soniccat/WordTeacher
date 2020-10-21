@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.views.Definitio
 import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
 import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import dagger.BindsInstance
 import dagger.Component
@@ -32,6 +33,7 @@ public interface DefinitionsComponent {
 
 
 interface DefinitionsDependencies {
-    fun getWordRepository(): WordRepository
-    fun getConnectivityManager(): ConnectivityManager
+    fun wordRepository(): WordRepository
+    fun connectivityManager(): ConnectivityManager
+    fun idGenerator(): IdGenerator
 }

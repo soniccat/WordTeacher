@@ -10,13 +10,13 @@ import dagger.Provides
 @Module
 class GeneralModule(private val aContext: Context) {
     @Provides
-    fun getContext(): Context {
+    fun context(): Context {
         return aContext
     }
 
     @AppComp
     @Provides
-    fun getConnectivityManager(context: Context): ConnectivityManager {
+    fun connectivityManager(context: Context): ConnectivityManager {
         return ConnectivityManager(context)
     }
 }

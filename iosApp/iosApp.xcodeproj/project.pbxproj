@@ -27,6 +27,7 @@
 		D61EEAD5253B534300EF8B3B /* SingletonScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61EEAD4253B534200EF8B3B /* SingletonScope.swift */; };
 		D61EEADA253B76D100EF8B3B /* DefinitionsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61EEAD9253B76D100EF8B3B /* DefinitionsComponent.swift */; };
 		D61EEADC253B77A200EF8B3B /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61EEADB253B77A200EF8B3B /* App.swift */; };
+		D630B374254036E60035D95E /* DefinitionsModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B373254036E60035D95E /* DefinitionsModule.swift */; };
 		F668C22F1954FAF7379E9B58 /* libPods-iosApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84C1F6F0E0144727FE502A /* libPods-iosApp.a */; };
 /* End PBXBuildFile section */
 
@@ -90,6 +91,7 @@
 		D61EEAD4253B534200EF8B3B /* SingletonScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingletonScope.swift; sourceTree = "<group>"; };
 		D61EEAD9253B76D100EF8B3B /* DefinitionsComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionsComponent.swift; sourceTree = "<group>"; };
 		D61EEADB253B77A200EF8B3B /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		D630B373254036E60035D95E /* DefinitionsModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionsModule.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -253,6 +255,7 @@
 			isa = PBXGroup;
 			children = (
 				D61EEAD9253B76D100EF8B3B /* DefinitionsComponent.swift */,
+				D630B373254036E60035D95E /* DefinitionsModule.swift */,
 			);
 			path = DI;
 			sourceTree = "<group>";
@@ -435,6 +438,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D630B374254036E60035D95E /* DefinitionsModule.swift in Sources */,
 				D61EEADC253B77A200EF8B3B /* App.swift in Sources */,
 				D61EEAD1253B4BF200EF8B3B /* AppComponent.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,

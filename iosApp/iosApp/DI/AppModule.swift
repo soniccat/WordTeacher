@@ -20,5 +20,6 @@ struct AppModule : Module {
         binder.bind().sharedInScope().to(factory: WordTeacherWordServiceFactory.init)
         binder.bind().sharedInScope().to(factory: ServiceRepository.init)
         binder.bind().sharedInScope().to(factory: WordRepository.init)
+        binder.bind().sharedInScope().to(factory: IdGenerator.init)
     }
 }

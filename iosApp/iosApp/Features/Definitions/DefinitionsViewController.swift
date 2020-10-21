@@ -10,14 +10,14 @@ import UIKit
 import Cleanse
 import shared
 
-class DefinitionsViewController: UIViewController {
+public class DefinitionsViewController: UIViewController, UICollectionViewDelegateFlowLayout {
     @IBOutlet var collectionView: UICollectionView!
     
     var adapter: SimpleAdapter!
     let vm: DefinitionsVM
     
-    init(vm: DefinitionsVM) {
-        self.vm = vm
+    init(vm: Assisted<DefinitionsVM>) {
+        self.vm = vm.get()
         super.init(nibName: "DefinitionsViewController", bundle: Bundle.main)
     }
 
@@ -25,7 +25,7 @@ class DefinitionsViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         bindView()
@@ -39,6 +39,8 @@ class DefinitionsViewController: UIViewController {
     }
     
     private func bindView() {
+        let flowLayout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+        flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         adapter = SimpleAdapter(collectionView: collectionView)
     }
     
@@ -47,22 +49,15 @@ class DefinitionsViewController: UIViewController {
             if let items = res.data() {
                 var snapshot = adapter.dataSource.snapshot()
                 snapshot.appendSections([.main])
-                snapshot.appendItems([items.firstObject] as! [BaseViewItem<AnyObject>])
+                snapshot.appendItems(items as! [BaseViewItem<AnyObject>])
                 
                 adapter.dataSource.apply(snapshot, animatingDifferences: true)
             }
         }
     }
-}
-
-extension DefinitionsViewController {
-    struct Module: Cleanse.Module {
-        static func configure(binder: UnscopedBinder) {
-            binder.bind().to { (manager: ConnectivityManager, wordRepository: WordRepository) in
-                DefinitionsVM(connectivityManager: manager,
-                              wordRepository: wordRepository,
-                              state: DefinitionsVM.State(word: nil))
-            }
-        }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        // to get the right width in preferredLayoutAttributesFitting
+        return CGSize(width: collectionView.bounds.width, height: 1000)
     }
 }

@@ -19,7 +19,7 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         Logger().setupDebug()
 
         appComponent = DaggerAppComponent.builder().generalModule(GeneralModule(this)).build()
-        appComponent.getConnectivityManager().checkNetworkState()
+        appComponent.connectivityManager().checkNetworkState()
 
         initActivityVisibilityResolver()
     }
@@ -31,10 +31,10 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     }
 
     override fun onFirstActivityStarted() {
-        appComponent.getConnectivityManager().register()
+        appComponent.connectivityManager().register()
     }
 
     override fun onLastActivityStopped() {
-        appComponent.getConnectivityManager().unregister()
+        appComponent.connectivityManager().unregister()
     }
 }

@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTranscriptionBlueprint
 import com.aglushkov.wordteacher.androidApp.general.ItemViewBinder
 import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.ConfigConnectParamsStatFile
 import com.aglushkov.wordteacher.shared.repository.ConfigConnectParamsStatRepository
@@ -31,26 +32,26 @@ import kotlinx.coroutines.SupervisorJob
 class AppModule {
     @AppComp
     @Provides
-    fun createConfigService(context: Context): ConfigService {
+    fun configService(context: Context): ConfigService {
         val baseUrl = context.getString(R.string.config_base_url)
         return ConfigService(baseUrl)
     }
 
     @AppComp
     @Provides
-    fun createConfigRepository(configService: ConfigService, connectivityManager: ConnectivityManager): ConfigRepository {
+    fun configRepository(configService: ConfigService, connectivityManager: ConnectivityManager): ConfigRepository {
         return ConfigRepository(configService, connectivityManager)
     }
 
     @AppComp
     @Provides
-    fun createConfigConnectParamsStatRepository(context: Context): ConfigConnectParamsStatRepository {
+    fun configConnectParamsStatRepository(context: Context): ConfigConnectParamsStatRepository {
         return ConfigConnectParamsStatRepository(ConfigConnectParamsStatFile(context))
     }
 
     @AppComp
     @Provides
-    fun createServiceRepository(
+    fun serviceRepository(
         configRepository: ConfigRepository,
         configConnectParamsStatRepository: ConfigConnectParamsStatRepository,
         factory: WordTeacherWordServiceFactory
@@ -60,13 +61,19 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun createWordRepository(serviceRepository: ServiceRepository): WordRepository {
+    fun wordRepository(serviceRepository: ServiceRepository): WordRepository {
         return WordRepository(serviceRepository)
     }
 
     @AppComp
     @Provides
-    fun getWordTeacherWordServiceFactory(): WordTeacherWordServiceFactory {
+    fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory {
         return WordTeacherWordServiceFactory()
+    }
+
+    @AppComp
+    @Provides
+    fun idGenerator(): IdGenerator {
+        return IdGenerator()
     }
 }

@@ -10,22 +10,18 @@ import Foundation
 import Cleanse
 import shared
 
-class App {
-    private let definitionsComponentFactory: ComponentFactory<DefinitionsComponent>
+class App: DefinitionsDeps {
     let wordRepository: WordRepository
     let connectivityManager: ConnectivityManager
+    let idGenerator: IdGenerator
     
     init(
-        definitionsComponentFactory: ComponentFactory<DefinitionsComponent>,
         wordRepository: WordRepository,
-        connectivityManager: ConnectivityManager
+        connectivityManager: ConnectivityManager,
+        idGenerator: IdGenerator
     ) {
-        self.definitionsComponentFactory = definitionsComponentFactory
         self.wordRepository = wordRepository
         self.connectivityManager = connectivityManager
-    }
-    
-    func definitionsVC() -> DefinitionsViewController {
-        return definitionsComponentFactory.build(())
+        self.idGenerator = idGenerator
     }
 }
