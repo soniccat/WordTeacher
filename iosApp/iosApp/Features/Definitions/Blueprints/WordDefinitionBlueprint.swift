@@ -11,7 +11,7 @@ import shared
 
 class WordDefinitionBlueprint: Blueprint {
     typealias T = WordDefinitionViewItem
-    typealias V = TextCell
+    typealias V = LabelCell
     
     var type: Int { return Int(T.Companion().Type) }
 

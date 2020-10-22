@@ -20,7 +20,7 @@ protocol BaseBlueprint {
 
 extension BaseBlueprint {
     var nibName: String? {
-        return cellIdentifier
+        return nil
     }
     
     var nib: UINib? {

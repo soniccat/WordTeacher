@@ -23,7 +23,16 @@ class DefinitionsDisplayModeBlueprint: Blueprint {
             view.segmentedControl.insertSegment(
                 withTitle: "zzz", // TODO: get a string from resources
                 at: view.segmentedControl.numberOfSegments,
-                animated: false)
+                animated: false
+            )
         }
+        
+        var seletedIndex = 0
+        switch viewItem.selected {
+            case .merged: seletedIndex = 1
+            default: seletedIndex = 0
+        }
+        
+        view.segmentedControl.selectedSegmentIndex = seletedIndex
     }
 }
