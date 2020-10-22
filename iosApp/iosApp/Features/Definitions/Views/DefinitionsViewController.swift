@@ -17,9 +17,9 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
     let vm: DefinitionsVM
     let binder: ItemViewBinder
     
-    init(deps: DefinitionsDeps) {
-        self.vm = deps.createViewModel()
-        self.binder = deps.createItemViewBinder()
+    init(vm: DefinitionsVM, binder: ItemViewBinder) {
+        self.vm = vm
+        self.binder = binder
 
         super.init(nibName: "DefinitionsViewController", bundle: Bundle.main)
     }

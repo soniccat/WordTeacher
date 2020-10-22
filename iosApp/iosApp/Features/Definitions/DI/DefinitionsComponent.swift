@@ -16,6 +16,22 @@ public protocol DefinitionsDeps {
     var idGenerator: IdGenerator { get }
 }
 
+struct DefinitionsDepsModule: Module {
+    typealias Scope = Unscoped
+    
+    static func configure(binder: Binder<Unscoped>) {
+        binder.bind(ConnectivityManager.self).to { (seed: DefinitionsDeps) in
+            return seed.connectivityManager
+        }
+        binder.bind(WordRepository.self).to { (seed: DefinitionsDeps) in
+            return seed.wordRepository
+        }
+        binder.bind(IdGenerator.self).to { (seed: DefinitionsDeps) in
+            return seed.idGenerator
+        }
+    }
+}
+
 public struct DefinitionsComponent: RootComponent {
     public typealias Root = DefinitionsViewController
     public typealias Seed = DefinitionsDeps
@@ -25,22 +41,7 @@ public struct DefinitionsComponent: RootComponent {
     }
 
     public static func configure(binder: Binder<Unscoped>) {
-    }
-}
-
-extension DefinitionsDeps {
-    func createViewModel() -> DefinitionsVM {
-        return DefinitionsVM(
-            connectivityManager: connectivityManager,
-            wordRepository: wordRepository,
-            idGenerator: idGenerator,
-            state: DefinitionsVM.State(word: nil)
-        )
-    }
-    
-    func createItemViewBinder() -> ItemViewBinder {
-        return ItemViewBinder()
-        .addBlueprint(blueprint: WordDefinitionBlueprint())
-        .addBlueprint(blueprint: DefinitionsDisplayModeBlueprint())
+        binder.include(module: DefinitionsDepsModule.self)
+        binder.include(module: DefinitionsModule.self)
     }
 }

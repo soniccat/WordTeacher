@@ -17,7 +17,6 @@ struct AppComponent : Cleanse.RootComponent {
     }
 
     static func configure(binder: SingletonBinder) {
-        //binder.install(dependency: DefinitionsComponent.self)
         binder.include(module: AppModule.self)
     }
 }
