@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="7CT-uR-Igj" customClass="DefinitionsDisplayModeCell" customModule="iosApp" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="269" height="60"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="3EM-RW-G9d">
+                <rect key="frame" x="0.0" y="0.0" width="269" height="60"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <segmentedControl opaque="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="apR-Ay-Bik">
+                        <rect key="frame" x="16" y="8" width="237" height="45"/>
+                        <segments>
+                            <segment title="First"/>
+                            <segment title="Second"/>
+                        </segments>
+                    </segmentedControl>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="apR-Ay-Bik" firstAttribute="leading" secondItem="3EM-RW-G9d" secondAttribute="leadingMargin" id="6ed-vl-nte"/>
+                    <constraint firstItem="apR-Ay-Bik" firstAttribute="top" secondItem="3EM-RW-G9d" secondAttribute="topMargin" id="ers-7m-T59"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="apR-Ay-Bik" secondAttribute="bottom" id="tne-Fc-DeP"/>
+                    <constraint firstItem="apR-Ay-Bik" firstAttribute="trailing" secondItem="3EM-RW-G9d" secondAttribute="trailingMargin" id="xWy-RA-0k8"/>
+                </constraints>
+            </collectionViewCellContentView>
+            <size key="customSize" width="269" height="60"/>
+            <connections>
+                <outlet property="segmentedControl" destination="apR-Ay-Bik" id="KA4-3k-iPu"/>
+            </connections>
+            <point key="canvasLocation" x="296.37681159420293" y="124.55357142857142"/>
+        </collectionViewCell>
+    </objects>
+</document>

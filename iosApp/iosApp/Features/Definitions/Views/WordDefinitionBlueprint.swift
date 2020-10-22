@@ -13,23 +13,9 @@ class WordDefinitionBlueprint: Blueprint {
     typealias T = WordDefinitionViewItem
     typealias V = TextCell
     
-    var type: Int {
-        get {
-            return Int(WordDefinitionViewItem.Companion().Type)
-        }
-    }
-    var cellIdentifier: String {
-        get {
-            return "TextCell"
-        }
-    }
-    var nibName: String {
-        get {
-           return "TextCell"
-        }
-    }
+    var type: Int { return Int(T.Companion().Type) }
 
-    func bind(view: TextCell, viewItem: WordDefinitionViewItem) {
-        view.textView.text = viewItem.firstItem() as String? ?? ("class " + viewItem.description)
+    func bind(view: V, viewItem: T) {
+        view.textView.text = viewItem.firstItem() as String?
     }
 }

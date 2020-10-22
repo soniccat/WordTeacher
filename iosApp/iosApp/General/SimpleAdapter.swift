@@ -19,9 +19,9 @@ class SimpleAdapter {
     
     init(binder: ItemViewBinder, collectionView: UICollectionView) {
         self.binder = binder
-        self.binder.blueprints.forEach { (entity) in
+        self.binder.blueprints.forEach { entity in
             let (_, value) = entity
-            collectionView.register(value.nib, forCellWithReuseIdentifier: value.cellIdentifier)
+            value.register(collectionView: collectionView)
         }
         
         dataSource = UICollectionViewDiffableDataSource<Section, BaseViewItem<AnyObject>>(

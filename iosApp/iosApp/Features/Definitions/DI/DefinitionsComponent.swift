@@ -41,5 +41,6 @@ extension DefinitionsDeps {
     func createItemViewBinder() -> ItemViewBinder {
         return ItemViewBinder()
         .addBlueprint(blueprint: WordDefinitionBlueprint())
+        .addBlueprint(blueprint: DefinitionsDisplayModeBlueprint())
     }
 }

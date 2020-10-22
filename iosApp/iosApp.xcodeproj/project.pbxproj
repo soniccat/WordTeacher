@@ -30,6 +30,9 @@
 		D630B37825407C6C0035D95E /* WordDefinitionBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B37725407C6C0035D95E /* WordDefinitionBlueprint.swift */; };
 		D630B37A2540B7350035D95E /* Blueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B3792540B7350035D95E /* Blueprint.swift */; };
 		D630B37C2540B7910035D95E /* ItemViewBinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B37B2540B7910035D95E /* ItemViewBinder.swift */; };
+		D630B37E2540BBC00035D95E /* DefinitionsDisplayModeBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B37D2540BBC00035D95E /* DefinitionsDisplayModeBlueprint.swift */; };
+		D630B3802540BC1A0035D95E /* DefinitionsDisplayModeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B37F2540BC1A0035D95E /* DefinitionsDisplayModeCell.swift */; };
+		D630B3822540BCFA0035D95E /* DefinitionsDisplayModeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D630B3812540BCFA0035D95E /* DefinitionsDisplayModeCell.xib */; };
 		F668C22F1954FAF7379E9B58 /* libPods-iosApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84C1F6F0E0144727FE502A /* libPods-iosApp.a */; };
 /* End PBXBuildFile section */
 
@@ -96,6 +99,9 @@
 		D630B37725407C6C0035D95E /* WordDefinitionBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDefinitionBlueprint.swift; sourceTree = "<group>"; };
 		D630B3792540B7350035D95E /* Blueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Blueprint.swift; sourceTree = "<group>"; };
 		D630B37B2540B7910035D95E /* ItemViewBinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewBinder.swift; sourceTree = "<group>"; };
+		D630B37D2540BBC00035D95E /* DefinitionsDisplayModeBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionsDisplayModeBlueprint.swift; sourceTree = "<group>"; };
+		D630B37F2540BC1A0035D95E /* DefinitionsDisplayModeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionsDisplayModeCell.swift; sourceTree = "<group>"; };
+		D630B3812540BCFA0035D95E /* DefinitionsDisplayModeCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DefinitionsDisplayModeCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -225,6 +231,9 @@
 				D60B08BD253CDA0D0053C558 /* TextCell.swift */,
 				D60B08BF253CDA370053C558 /* TextCell.xib */,
 				D630B37725407C6C0035D95E /* WordDefinitionBlueprint.swift */,
+				D630B37D2540BBC00035D95E /* DefinitionsDisplayModeBlueprint.swift */,
+				D630B37F2540BC1A0035D95E /* DefinitionsDisplayModeCell.swift */,
+				D630B3812540BCFA0035D95E /* DefinitionsDisplayModeCell.xib */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -377,6 +386,7 @@
 				D60B08C0253CDA370053C558 /* TextCell.xib in Resources */,
 				D60B08B6253CCD840053C558 /* DefinitionsViewController.xib in Resources */,
 				7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */,
+				D630B3822540BCFA0035D95E /* DefinitionsDisplayModeCell.xib in Resources */,
 				7555FF85242A565B00829871 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -444,10 +454,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D630B37E2540BBC00035D95E /* DefinitionsDisplayModeBlueprint.swift in Sources */,
 				D61EEADC253B77A200EF8B3B /* App.swift in Sources */,
 				D61EEAD1253B4BF200EF8B3B /* AppComponent.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				D630B37C2540B7910035D95E /* ItemViewBinder.swift in Sources */,
+				D630B3802540BC1A0035D95E /* DefinitionsDisplayModeCell.swift in Sources */,
 				D61EEACF253B4B2900EF8B3B /* DefinitionsViewController.swift in Sources */,
 				D60B08B9253CD12F0053C558 /* SimpleAdapter.swift in Sources */,
 				D630B37A2540B7350035D95E /* Blueprint.swift in Sources */,

@@ -53,7 +53,7 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
                 var snapshot = adapter.dataSource.snapshot()
                 snapshot.appendSections([.main])
                 snapshot.appendItems(items.filter({ (item) -> Bool in
-                    item is WordDefinitionViewItem
+                    item is WordDefinitionViewItem || item is DefinitionsDisplayModeViewItem
                 }) as! [BaseViewItem<AnyObject>])
                 
                 adapter.dataSource.apply(snapshot, animatingDifferences: true)
@@ -63,6 +63,7 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         // to get the right width in preferredLayoutAttributesFitting
+        // 1000 - not to get AutoLayout warnings
         return CGSize(width: collectionView.bounds.width, height: 1000)
     }
 }
