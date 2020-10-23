@@ -34,6 +34,15 @@
 		D630B38425418E390035D95E /* NSLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B38325418E390035D95E /* NSLayoutConstraint.swift */; };
 		D630B3872541ADC30035D95E /* UICollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B3862541ADC30035D95E /* UICollectionViewCell.swift */; };
 		D630B38A2541B7E80035D95E /* DefinitionsModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = D630B3892541B7E80035D95E /* DefinitionsModule.swift */; };
+		D66AD9DC2541FEBB00FA02E5 /* WordExampleBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9DB2541FEBB00FA02E5 /* WordExampleBlueprint.swift */; };
+		D66AD9E02543461B00FA02E5 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9DF2543461B00FA02E5 /* Style.swift */; };
+		D66AD9E22543501500FA02E5 /* WordDividerBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9E12543501500FA02E5 /* WordDividerBlueprint.swift */; };
+		D66AD9E4254351EB00FA02E5 /* DividerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9E3254351EB00FA02E5 /* DividerCell.swift */; };
+		D66AD9E62543557C00FA02E5 /* WordPartOfSpeechBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9E52543557C00FA02E5 /* WordPartOfSpeechBlueprint.swift */; };
+		D66AD9E8254355F600FA02E5 /* WordSubHeaderBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9E7254355F600FA02E5 /* WordSubHeaderBlueprint.swift */; };
+		D66AD9EA254356B000FA02E5 /* WordSynonymBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9E9254356B000FA02E5 /* WordSynonymBlueprint.swift */; };
+		D66AD9EC254356DD00FA02E5 /* WordTitleBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9EB254356DD00FA02E5 /* WordTitleBlueprint.swift */; };
+		D66AD9EE2543573D00FA02E5 /* WordTranscriptionBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */; };
 		F668C22F1954FAF7379E9B58 /* libPods-iosApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84C1F6F0E0144727FE502A /* libPods-iosApp.a */; };
 /* End PBXBuildFile section */
 
@@ -104,6 +113,15 @@
 		D630B38325418E390035D95E /* NSLayoutConstraint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSLayoutConstraint.swift; sourceTree = "<group>"; };
 		D630B3862541ADC30035D95E /* UICollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewCell.swift; sourceTree = "<group>"; };
 		D630B3892541B7E80035D95E /* DefinitionsModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionsModule.swift; sourceTree = "<group>"; };
+		D66AD9DB2541FEBB00FA02E5 /* WordExampleBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordExampleBlueprint.swift; sourceTree = "<group>"; };
+		D66AD9DF2543461B00FA02E5 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
+		D66AD9E12543501500FA02E5 /* WordDividerBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDividerBlueprint.swift; sourceTree = "<group>"; };
+		D66AD9E3254351EB00FA02E5 /* DividerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerCell.swift; sourceTree = "<group>"; };
+		D66AD9E52543557C00FA02E5 /* WordPartOfSpeechBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordPartOfSpeechBlueprint.swift; sourceTree = "<group>"; };
+		D66AD9E7254355F600FA02E5 /* WordSubHeaderBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSubHeaderBlueprint.swift; sourceTree = "<group>"; };
+		D66AD9E9254356B000FA02E5 /* WordSynonymBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSynonymBlueprint.swift; sourceTree = "<group>"; };
+		D66AD9EB254356DD00FA02E5 /* WordTitleBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTitleBlueprint.swift; sourceTree = "<group>"; };
+		D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTranscriptionBlueprint.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -232,9 +250,17 @@
 			isa = PBXGroup;
 			children = (
 				D60B08BD253CDA0D0053C558 /* LabelCell.swift */,
-				D630B37725407C6C0035D95E /* WordDefinitionBlueprint.swift */,
+				D66AD9E3254351EB00FA02E5 /* DividerCell.swift */,
 				D630B37F2540BC1A0035D95E /* DefinitionsDisplayModeCell.swift */,
+				D630B37725407C6C0035D95E /* WordDefinitionBlueprint.swift */,
 				D630B37D2540BBC00035D95E /* DefinitionsDisplayModeBlueprint.swift */,
+				D66AD9DB2541FEBB00FA02E5 /* WordExampleBlueprint.swift */,
+				D66AD9E12543501500FA02E5 /* WordDividerBlueprint.swift */,
+				D66AD9E52543557C00FA02E5 /* WordPartOfSpeechBlueprint.swift */,
+				D66AD9E7254355F600FA02E5 /* WordSubHeaderBlueprint.swift */,
+				D66AD9E9254356B000FA02E5 /* WordSynonymBlueprint.swift */,
+				D66AD9EB254356DD00FA02E5 /* WordTitleBlueprint.swift */,
+				D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */,
 			);
 			path = Blueprints;
 			sourceTree = "<group>";
@@ -253,6 +279,7 @@
 			isa = PBXGroup;
 			children = (
 				D61EEAD7253B769900EF8B3B /* Definitions */,
+				D66AD9DF2543461B00FA02E5 /* Style.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -473,18 +500,27 @@
 			files = (
 				D630B38A2541B7E80035D95E /* DefinitionsModule.swift in Sources */,
 				D630B37E2540BBC00035D95E /* DefinitionsDisplayModeBlueprint.swift in Sources */,
+				D66AD9DC2541FEBB00FA02E5 /* WordExampleBlueprint.swift in Sources */,
+				D66AD9E22543501500FA02E5 /* WordDividerBlueprint.swift in Sources */,
+				D66AD9E02543461B00FA02E5 /* Style.swift in Sources */,
 				D61EEADC253B77A200EF8B3B /* App.swift in Sources */,
+				D66AD9EC254356DD00FA02E5 /* WordTitleBlueprint.swift in Sources */,
 				D61EEAD1253B4BF200EF8B3B /* AppComponent.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				D630B37C2540B7910035D95E /* ItemViewBinder.swift in Sources */,
 				D630B3802540BC1A0035D95E /* DefinitionsDisplayModeCell.swift in Sources */,
 				D61EEACF253B4B2900EF8B3B /* DefinitionsViewController.swift in Sources */,
+				D66AD9EE2543573D00FA02E5 /* WordTranscriptionBlueprint.swift in Sources */,
+				D66AD9EA254356B000FA02E5 /* WordSynonymBlueprint.swift in Sources */,
 				D60B08B9253CD12F0053C558 /* SimpleAdapter.swift in Sources */,
 				D630B37A2540B7350035D95E /* Blueprint.swift in Sources */,
 				D630B38425418E390035D95E /* NSLayoutConstraint.swift in Sources */,
 				D60B08BC253CD7770053C558 /* SelfSizingCell.swift in Sources */,
+				D66AD9E8254355F600FA02E5 /* WordSubHeaderBlueprint.swift in Sources */,
+				D66AD9E62543557C00FA02E5 /* WordPartOfSpeechBlueprint.swift in Sources */,
 				D630B37825407C6C0035D95E /* WordDefinitionBlueprint.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
+				D66AD9E4254351EB00FA02E5 /* DividerCell.swift in Sources */,
 				D61EEADA253B76D100EF8B3B /* DefinitionsComponent.swift in Sources */,
 				D630B3872541ADC30035D95E /* UICollectionViewCell.swift in Sources */,
 				D61EEAD5253B534300EF8B3B /* SingletonScope.swift in Sources */,

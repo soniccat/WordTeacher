@@ -14,7 +14,7 @@ class WordExampleBlueprint: Blueprint<TextView, WordExampleViewItem> {
 
     override fun createView(parent: ViewGroup): TextView {
         return Design.createTextView(parent).apply {
-            setTextAppearanceCompat(parent.context.resolveThemeStyle(R.attr.wordDefinitionTextAppearance))
+            setTextAppearanceCompat(parent.context.resolveThemeStyle(R.attr.wordExampleTextAppearance))
         }
     }
 

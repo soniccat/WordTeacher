@@ -19,8 +19,15 @@ class DefinitionsModule: Module {
         
         binder.bind().to {
             return ItemViewBinder()
-                .addBlueprint(blueprint: WordDefinitionBlueprint())
                 .addBlueprint(blueprint: DefinitionsDisplayModeBlueprint())
+                .addBlueprint(blueprint: WordDefinitionBlueprint())
+                .addBlueprint(blueprint: WordDividerBlueprint())
+                .addBlueprint(blueprint: WordExampleBlueprint())
+                .addBlueprint(blueprint: WordPartOfSpeechBlueprint())
+                .addBlueprint(blueprint: WordSubHeaderBlueprint())
+                .addBlueprint(blueprint: WordSynonymBlueprint())
+                .addBlueprint(blueprint: WordTitleBlueprint())
+                .addBlueprint(blueprint: WordTranscriptionBlueprint())
         }
     }
 }

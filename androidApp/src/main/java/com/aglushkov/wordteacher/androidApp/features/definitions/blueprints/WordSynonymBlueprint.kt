@@ -14,7 +14,7 @@ class WordSynonymBlueprint: Blueprint<TextView, WordSynonymViewItem> {
 
     override fun createView(parent: ViewGroup): TextView {
         return Design.createTextView(parent).apply {
-            setTextAppearanceCompat(parent.context.resolveThemeStyle(R.attr.wordDefinitionTextAppearance))
+            setTextAppearanceCompat(parent.context.resolveThemeStyle(R.attr.wordSynonymTextAppearance))
         }
     }
 

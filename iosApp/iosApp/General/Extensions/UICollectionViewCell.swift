@@ -9,12 +9,12 @@
 import UIKit
 
 extension UICollectionViewCell {
-    func setConstraintsToContentViewMargins(view: UIView) {
+    func setConstraintsToContentViewMargins(view: UIView, insets: UIEdgeInsets = UIEdgeInsets.zero) {
         [
-            view.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            view.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
-            view.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
-            view.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor)
+            view.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor, constant: insets.top),
+            view.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor, constant: insets.left),
+            view.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor, constant: insets.right),
+            view.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: insets.bottom)
         ].activate()
     }
 }

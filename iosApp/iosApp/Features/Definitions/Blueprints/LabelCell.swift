@@ -9,15 +9,14 @@
 import UIKit
 
 class LabelCell: SelfSizingCell {
-    var textView: UILabel!
+    var label: UILabel!
     
     override func baseInit() {
-        // TODO: apply style from Design
-        textView = UILabel(frame: bounds)
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.numberOfLines = 0
-        contentView.addSubview(textView)
+        label = UILabel(frame: bounds)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        contentView.addSubview(label)
         
-        setConstraintsToContentViewMargins(view: textView)
+        setConstraintsToContentViewMargins(view: label)
     }
 }

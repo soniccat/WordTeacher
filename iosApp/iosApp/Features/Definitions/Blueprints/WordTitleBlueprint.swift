@@ -1,22 +1,23 @@
 //
-//  WordDefinitionBlueprint.swift
+//  WordTitleBlueprint.swift
 //  iosApp
 //
-//  Created by Alexey Glushkov on 21.10.2020.
+//  Created by Alexey Glushkov on 23.10.2020.
 //  Copyright © 2020 orgName. All rights reserved.
 //
 
 import UIKit
 import shared
 
-class WordDefinitionBlueprint: Blueprint {
-    typealias T = WordDefinitionViewItem
+class WordTitleBlueprint: Blueprint {
+    typealias T = WordTitleViewItem
     typealias V = LabelCell
     
     var type: Int { return Int(T.Companion().Type) }
 
     func bind(view: V, viewItem: T) {
-        view.label.applyTextAppearance(Style.wordDefinitionTextAppearance)
+        view.label.applyTextAppearance(Style.wordExampleTextAppearance)
         view.label.text = viewItem.firstItem() as String?
+        // TODO: show providedBy
     }
 }
