@@ -23,6 +23,15 @@ class SelfSizingCell: UICollectionViewCell {
     }
     
     func baseInit() {
+        resetMargins()
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        resetMargins()
+    }
+    
+    private func resetMargins() {
         contentView.layoutMargins.top = Style.cellTopMargin
         contentView.layoutMargins.bottom = Style.cellBottomMargin
     }
