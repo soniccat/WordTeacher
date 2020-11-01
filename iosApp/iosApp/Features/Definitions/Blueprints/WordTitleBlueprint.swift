@@ -16,7 +16,8 @@ class WordTitleBlueprint: Blueprint {
     var type: Int { return Int(T.Companion().Type) }
 
     func bind(view: V, viewItem: T) {
-        view.label.applyTextAppearance(Style.wordExampleTextAppearance)
+        //view.contentView.layoutMargins.top = Style.cellExtraTopMargin
+        view.label.applyTextAppearance(Style.wordTitleTextAppearance)
         view.label.text = viewItem.firstItem() as String?
         // TODO: show providedBy
     }

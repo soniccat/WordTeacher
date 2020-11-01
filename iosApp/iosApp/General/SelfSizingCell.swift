@@ -23,11 +23,13 @@ class SelfSizingCell: UICollectionViewCell {
     }
     
     func baseInit() {
-        
+        contentView.layoutMargins.top = Style.cellTopMargin
+        contentView.layoutMargins.bottom = Style.cellBottomMargin
     }
     
     override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
         updateWidthConstraint(width: layoutAttributes.size.width)
+        
         let attrs = super.preferredLayoutAttributesFitting(layoutAttributes)
 
         // We should keep width of passed layoutAttrs here because UICollectionView
@@ -44,6 +46,13 @@ class SelfSizingCell: UICollectionViewCell {
             installWidthConstraint(width: width)
         } else {
             widthConstraint?.constant = width
+        }
+        
+        for constraint in contentView.constraints {
+            if constraint.firstAttribute == .width && constraint != widthConstraint {
+                // to disable auto added UIView-Encapsulated-Layout-Width
+                constraint.priority = UILayoutPriority.defaultLow
+            }
         }
     }
     

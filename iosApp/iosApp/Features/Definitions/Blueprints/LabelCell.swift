@@ -18,5 +18,6 @@ class LabelCell: SelfSizingCell {
         contentView.addSubview(label)
         
         setConstraintsToContentViewMargins(view: label)
+        super.baseInit()
     }
 }

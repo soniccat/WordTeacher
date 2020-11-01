@@ -9,33 +9,37 @@
 import UIKit
 
 class Style {
-    static let wordTitleTextAppearance = TextAppearances.headerTextAppearance
+    static let wordTitleTextAppearance = TextAppearances.titleTextAppearance
     static let wordProvidedByTextAppearance = TextAppearances.bodyTextAppearance
     static let wordTranscriptionTextAppearance = TextAppearances.bodyTextAppearance
-    static let wordPartOfSpeechTextAppearance = TextAppearances.header2TextAppearance
+    static let wordPartOfSpeechTextAppearance = TextAppearances.title2SemiboldTextAppearance
     static let wordDefinitionTextAppearance = TextAppearances.bodyTextAppearance
     static let wordExampleTextAppearance = TextAppearances.bodyTextAppearance
     static let wordSynonymTextAppearance = TextAppearances.bodyTextAppearance
-    static let wordSubHeaderTextAppearance = TextAppearances.subtitleTextAppearance
+    static let wordSubHeaderTextAppearance = TextAppearances.headlineTextAppearance
     
     static let dividerColor = Colors.lightGray
     static let dividerHeight: CGFloat = 1
-    static let dividerLeftMargin: CGFloat = 36
+    static let dividerLeftMargin: CGFloat = 0
+    
+    static let cellTopMargin: CGFloat = 0
+    static let cellBottomMargin: CGFloat = 4
+    static let cellExtraTopMargin: CGFloat = 8
 }
 
 private class TextAppearances {
-    static let headerTextAppearance = TextAppearance(
+    static let titleTextAppearance = TextAppearance(
+        font: UIFont.preferredFont(forTextStyle: .title1),
+        textColor: UIColor.black
+    )
+    
+    static let title2SemiboldTextAppearance = TextAppearance(
+        font: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2).toSemibold().toFont(),
+        textColor: UIColor.black
+    )
+    
+    static let headlineTextAppearance = TextAppearance(
         font: UIFont.preferredFont(forTextStyle: .headline),
-        textColor: UIColor.black
-    )
-    
-    static let header2TextAppearance = TextAppearance(
-        font: UIFont.preferredFont(forTextStyle: .subheadline),
-        textColor: UIColor.black
-    )
-    
-    static let subtitleTextAppearance = TextAppearance(
-        font: UIFont.preferredFont(forTextStyle: .caption1),
         textColor: UIColor.black
     )
     
