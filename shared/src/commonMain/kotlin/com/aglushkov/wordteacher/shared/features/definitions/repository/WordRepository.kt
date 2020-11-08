@@ -85,7 +85,7 @@ class WordRepository(
         word: String,
         services: List<WordTeacherWordService>,
         stateFlow: MutableStateFlow<Resource<List<WordTeacherWord>>>
-    ) = withContext(Dispatchers.Main) {
+    ) = withContext(Dispatchers.Main + SupervisorJob()) {
         stateFlow.value = stateFlow.value.toLoading()
 
         try {

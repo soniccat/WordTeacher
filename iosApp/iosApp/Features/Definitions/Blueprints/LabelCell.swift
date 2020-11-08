@@ -12,12 +12,13 @@ class LabelCell: SelfSizingCell {
     var label: UILabel!
     
     override func baseInit() {
+        super.baseInit()
+        
         label = UILabel(frame: bounds)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 0
         contentView.addSubview(label)
         
         setConstraintsToContentViewMargins(view: label)
-        super.baseInit()
     }
 }

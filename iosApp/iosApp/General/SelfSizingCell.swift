@@ -23,6 +23,9 @@ class SelfSizingCell: UICollectionViewCell {
     }
     
     func baseInit() {
+        // Set autoresizingMask to avoid zero autoresizingMask which will lead to having a wrong width of the contentView in preferredLayoutAttributesFitting, so self-sizing will work buggy
+        // More details: https://stackoverflow.com/questions/24750158/autoresizing-issue-of-uicollectionviewcell-contentviews-frame-in-storyboard-pro
+        contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         resetMargins()
     }
     
@@ -60,6 +63,10 @@ class SelfSizingCell: UICollectionViewCell {
         for constraint in contentView.constraints {
             if constraint.firstAttribute == .width && constraint != widthConstraint {
                 // to disable auto added UIView-Encapsulated-Layout-Width
+                constraint.priority = UILayoutPriority.defaultLow
+
+            } else if constraint.firstAttribute == .height && (constraint.firstItem === self.contentView || constraint.secondItem === self.contentView) {
+                // to disable auto added UIView-Encapsulated-Layout-Height
                 constraint.priority = UILayoutPriority.defaultLow
             }
         }

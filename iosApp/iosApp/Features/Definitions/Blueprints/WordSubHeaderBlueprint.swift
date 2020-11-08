@@ -16,6 +16,7 @@ class WordSubHeaderBlueprint: Blueprint {
     var type: Int { return Int(T.Companion().Type) }
 
     func bind(view: V, viewItem: T) {
+        view.contentView.layoutMargins.top = Style.cellSubHeaderTopMargin
         view.label.applyTextAppearance(Style.wordSubHeaderTextAppearance)
         view.label.text = viewItem.firstItem()?.localized()
     }

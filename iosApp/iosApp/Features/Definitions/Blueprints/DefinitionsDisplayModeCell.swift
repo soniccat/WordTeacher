@@ -12,6 +12,8 @@ class DefinitionsDisplayModeCell: SelfSizingCell {
     var segmentedControl: UISegmentedControl!
     
     override func baseInit() {
+        super.baseInit()
+        
         // TODO: apply style from Design
         segmentedControl = UISegmentedControl(frame: bounds)
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false

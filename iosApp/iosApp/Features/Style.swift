@@ -23,8 +23,12 @@ class Style {
     static let dividerLeftMargin: CGFloat = 0
     
     static let cellTopMargin: CGFloat = 0
-    static let cellBottomMargin: CGFloat = 4
-    static let cellExtraTopMargin: CGFloat = 8
+    static let cellBottomMargin: CGFloat = 0
+    
+    static let cellDividerTopMargin: CGFloat = 10
+    static let cellDividerBottomMargin: CGFloat = 12
+    static let cellPartOfSpeechTopMargin: CGFloat = 8
+    static let cellSubHeaderTopMargin: CGFloat = 6
 }
 
 private class TextAppearances {
