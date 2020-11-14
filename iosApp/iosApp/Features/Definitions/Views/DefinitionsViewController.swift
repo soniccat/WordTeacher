@@ -44,7 +44,6 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
     private func bindView() {
         let flowLayout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
         flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        //flowLayout.minimumInteritemSpacing = 0
         flowLayout.minimumLineSpacing = 0
         adapter = SimpleAdapter(binder: binder, collectionView: collectionView)
     }

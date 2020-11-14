@@ -17,6 +17,7 @@ class WordPartOfSpeechBlueprint: Blueprint {
 
     func bind(view: V, viewItem: T) {
         view.contentView.layoutMargins.top = Style.cellPartOfSpeechTopMargin
+        view.contentView.layoutMargins.bottom = Style.cellHeaderBottomMargin
         view.label.applyTextAppearance(Style.wordPartOfSpeechTextAppearance)
         view.label.text = viewItem.firstItem()?.localized()
     }

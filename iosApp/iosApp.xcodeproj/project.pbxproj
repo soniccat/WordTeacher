@@ -337,6 +337,7 @@
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
 				7555FFB4242A642300829871 /* Embed Frameworks */,
+				D631705725605D0F00A8519D /* moko-resources */,
 			);
 			buildRules = (
 			);
@@ -493,6 +494,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION}\n";
+		};
+		D631705725605D0F00A8519D /* moko-resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "moko-resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :shared:copyFrameworkResourcesToApp \\\n-Pmoko.resources.PLATFORM_NAME=$PLATFORM_NAME \\\n-Pmoko.resources.CONFIGURATION=$CONFIGURATION \\\n-Pmoko.resources.BUILT_PRODUCTS_DIR=$BUILT_PRODUCTS_DIR \\\n-Pmoko.resources.CONTENTS_FOLDER_PATH=$CONTENTS_FOLDER_PATH\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

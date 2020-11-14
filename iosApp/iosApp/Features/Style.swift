@@ -29,6 +29,8 @@ class Style {
     static let cellDividerBottomMargin: CGFloat = 12
     static let cellPartOfSpeechTopMargin: CGFloat = 8
     static let cellSubHeaderTopMargin: CGFloat = 6
+    static let cellHeaderBottomMargin: CGFloat = 2
+    static let cellDefinitionsDisplayVerticalMargin: CGFloat = 12
 }
 
 private class TextAppearances {

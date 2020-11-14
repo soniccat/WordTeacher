@@ -30,6 +30,8 @@ class DefinitionsVMWrapper(
 ): AndroidViewModel(application) {
 
     @Inject lateinit var vm: DefinitionsVM
+
+    fun isInitialized() = ::vm.isInitialized
 }
 
 class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener {
@@ -40,7 +42,7 @@ class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val wmWrapper = ViewModelProviders.of(this)
+        val vmWrapper = ViewModelProviders.of(this)
                 .get(DefinitionsVMWrapper::class.java)
 
         val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: DefinitionsVM.State()
@@ -50,10 +52,12 @@ class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener 
             .setVMState(vmState)
             .setDefinitionsDisplayListener(this)
             .build()
-        component.injectViewModelWrapper(wmWrapper)
+        if (!vmWrapper.isInitialized()) {
+            component.injectViewModelWrapper(vmWrapper)
+        }
         component.injectDefinitionsFragment(this)
 
-        vm = wmWrapper.vm
+        vm = vmWrapper.vm
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

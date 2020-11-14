@@ -22,6 +22,5 @@ public interface AppComponent: DefinitionsDependencies {
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
     override fun wordRepository(): WordRepository
     override fun idGenerator(): IdGenerator
-
     override fun connectivityManager(): ConnectivityManager
 }

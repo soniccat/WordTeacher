@@ -16,12 +16,14 @@ class DefinitionsDisplayModeBlueprint: Blueprint {
     var type: Int { return Int(T.Companion().Type) }
 
     func bind(view: V, viewItem: T) {
+        view.contentView.layoutMargins.top = Style.cellDefinitionsDisplayVerticalMargin
+        
         let items = viewItem.items as! [DefinitionsDisplayMode]
         view.segmentedControl.removeAllSegments()
-        
+
         items.forEach { item in
             view.segmentedControl.insertSegment(
-                withTitle: "zzz", // TODO: get a string from resources
+                withTitle: item.toStringDesc().localized(),
                 at: view.segmentedControl.numberOfSegments,
                 animated: false
             )
