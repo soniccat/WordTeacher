@@ -23,10 +23,10 @@ class DefinitionsModule {
     @FragmentComp
     @Provides
     fun createItemViewBinder(
-        definitionsDisplayModeListener: DefinitionsDisplayModeBlueprint.Listener
+        definitionsDisplayModeBlueprint: DefinitionsDisplayModeBlueprint
     ): ViewItemBinder {
         return ViewItemBinder()
-            .addBlueprint(DefinitionsDisplayModeBlueprint(definitionsDisplayModeListener))
+            .addBlueprint(definitionsDisplayModeBlueprint)
             .addBlueprint(WordDefinitionBlueprint())
             .addBlueprint(WordDividerBlueprint())
             .addBlueprint(WordExampleBlueprint())

@@ -34,7 +34,7 @@ class DefinitionsVMWrapper(
     fun isInitialized() = ::vm.isInitialized
 }
 
-class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener {
+class DefinitionsFragment: Fragment() {
     private lateinit var vm: DefinitionsVM
     private var binding: FragmentDefinitionsBinding? = null
 
@@ -50,7 +50,7 @@ class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener 
         val component = DaggerDefinitionsComponent.builder()
             .setDeps(deps)
             .setVMState(vmState)
-            .setDefinitionsDisplayListener(this)
+            .setVMWrapper(vmWrapper)
             .build()
         if (!vmWrapper.isInitialized()) {
             component.injectViewModelWrapper(vmWrapper)
@@ -126,11 +126,6 @@ class DefinitionsFragment: Fragment(), DefinitionsDisplayModeBlueprint.Listener 
                 submitList(it.data())
             }
         }
-    }
-
-    // DefinitionsDisplayModeBlueprint.Listener
-    override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
-        vm.onDisplayModeChanged(mode)
     }
 }
 

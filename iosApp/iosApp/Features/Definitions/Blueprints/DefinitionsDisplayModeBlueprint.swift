@@ -21,12 +21,6 @@ class DefinitionsDisplayModeBlueprint: Blueprint {
             view.segmentedControl.setTitle(mode.toStringDesc().localized(), forSegmentAt: i)
         }
         
-        var seletedIndex = 0
-        switch viewItem.selected {
-            case .merged: seletedIndex = 1
-            default: seletedIndex = 0
-        }
-        
-        view.segmentedControl.selectedSegmentIndex = seletedIndex
+        view.segmentedControl.selectedSegmentIndex = Int(viewItem.selectedIndex)
     }
 }

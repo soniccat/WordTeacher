@@ -33,9 +33,17 @@ class DefinitionsVM(
 
     private val innerDefinitions = MutableLiveData<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
     val definitions: LiveData<Resource<List<BaseViewItem<*>>>> = innerDefinitions
+    val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
 
     // State
-    var displayMode = DefinitionsDisplayMode.BySource
+    var displayModeIndex: Int = 0
+    var displayMode: DefinitionsDisplayMode
+        set(value) {
+            displayModeIndex = displayModes.indexOf(value)
+        }
+        get() {
+            return displayModes[displayModeIndex]
+        }
     var word: String?
         get() {
             return state.word
@@ -100,7 +108,7 @@ class DefinitionsVM(
 
     private fun buildViewItems(words: List<WordTeacherWord>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
-        items.add(DefinitionsDisplayModeViewItem(listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged), displayMode))
+        items.add(DefinitionsDisplayModeViewItem(displayModes, displayModeIndex))
         items.add(WordDividerViewItem())
 
         when (displayMode) {
