@@ -67,7 +67,7 @@ class SelfSizingCell: UICollectionViewCell {
         }
         
         for constraint in contentView.constraints {
-            if constraint.firstAttribute == .width && constraint.firstItem === self.contentView {
+            if constraint.firstAttribute == .width && constraint != widthConstraint && constraint.firstItem === self.contentView {
                 // to disable auto added UIView-Encapsulated-Layout-Width
                 constraint.priority = UILayoutPriority.defaultLow
 

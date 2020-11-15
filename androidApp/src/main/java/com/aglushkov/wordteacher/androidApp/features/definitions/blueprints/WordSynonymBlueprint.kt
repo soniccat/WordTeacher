@@ -8,8 +8,9 @@ import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
 import com.aglushkov.wordteacher.androidApp.general.extensions.setTextAppearanceCompat
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
+import javax.inject.Inject
 
-class WordSynonymBlueprint: Blueprint<TextView, WordSynonymViewItem> {
+class WordSynonymBlueprint @Inject constructor(): Blueprint<TextView, WordSynonymViewItem> {
     override val type: Int = WordSynonymViewItem.Type
 
     override fun createView(parent: ViewGroup): TextView {

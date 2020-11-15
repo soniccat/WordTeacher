@@ -8,8 +8,9 @@ import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
 import com.aglushkov.wordteacher.androidApp.general.extensions.setTextAppearanceCompat
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
+import javax.inject.Inject
 
-class WordDefinitionBlueprint: Blueprint<TextView, WordDefinitionViewItem> {
+class WordDefinitionBlueprint @Inject constructor(): Blueprint<TextView, WordDefinitionViewItem> {
     override val type: Int = WordDefinitionViewItem.Type
 
     override fun createView(parent: ViewGroup): TextView {

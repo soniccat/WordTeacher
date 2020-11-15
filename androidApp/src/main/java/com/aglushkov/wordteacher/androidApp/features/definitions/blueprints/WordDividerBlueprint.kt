@@ -8,8 +8,9 @@ import com.aglushkov.wordteacher.androidApp.features.Design
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeDrawable
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
+import javax.inject.Inject
 
-class WordDividerBlueprint: Blueprint<View, WordDividerViewItem> {
+class WordDividerBlueprint @Inject constructor(): Blueprint<View, WordDividerViewItem> {
     override val type: Int = WordDividerViewItem.Type
 
     override fun createView(parent: ViewGroup): View {

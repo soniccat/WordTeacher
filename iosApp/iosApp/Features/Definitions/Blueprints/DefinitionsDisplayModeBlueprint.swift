@@ -14,6 +14,9 @@ class DefinitionsDisplayModeBlueprint: Blueprint {
     typealias V = DefinitionsDisplayModeCell
     
     var type: Int { return Int(T.Companion().Type) }
+    
+    init(vm: DefinitionsVM) {
+    }
 
     func bind(view: V, viewItem: T) {
         let items = viewItem.items as! [DefinitionsDisplayMode]

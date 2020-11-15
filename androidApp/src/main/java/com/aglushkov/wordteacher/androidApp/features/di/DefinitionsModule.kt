@@ -23,18 +23,26 @@ class DefinitionsModule {
     @FragmentComp
     @Provides
     fun createItemViewBinder(
-        definitionsDisplayModeBlueprint: DefinitionsDisplayModeBlueprint
+        definitionsDisplayModeBlueprint: DefinitionsDisplayModeBlueprint,
+        wordDefinitionBlueprint: WordDefinitionBlueprint,
+        wordDividerBlueprint: WordDividerBlueprint,
+        wordExampleBlueprint: WordExampleBlueprint,
+        wordPartOfSpeechBlueprint: WordPartOfSpeechBlueprint,
+        wordSubHeaderBlueprint: WordSubHeaderBlueprint,
+        wordSynonymBlueprint: WordSynonymBlueprint,
+        wordTitleBlueprint: WordTitleBlueprint,
+        wordTranscriptionBlueprint: WordTranscriptionBlueprint
     ): ViewItemBinder {
         return ViewItemBinder()
             .addBlueprint(definitionsDisplayModeBlueprint)
-            .addBlueprint(WordDefinitionBlueprint())
-            .addBlueprint(WordDividerBlueprint())
-            .addBlueprint(WordExampleBlueprint())
-            .addBlueprint(WordPartOfSpeechBlueprint())
-            .addBlueprint(WordSubHeaderBlueprint())
-            .addBlueprint(WordSynonymBlueprint())
-            .addBlueprint(WordTitleBlueprint())
-            .addBlueprint(WordTranscriptionBlueprint())
+            .addBlueprint(wordDefinitionBlueprint)
+            .addBlueprint(wordDividerBlueprint)
+            .addBlueprint(wordExampleBlueprint)
+            .addBlueprint(wordPartOfSpeechBlueprint)
+            .addBlueprint(wordSubHeaderBlueprint)
+            .addBlueprint(wordSynonymBlueprint)
+            .addBlueprint(wordTitleBlueprint)
+            .addBlueprint(wordTranscriptionBlueprint)
     }
 
     @FragmentComp

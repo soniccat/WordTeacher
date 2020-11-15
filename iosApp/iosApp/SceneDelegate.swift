@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         definitionsComponentFactory = try! ComponentFactory.of(DefinitionsComponent.self)
         app = appComponentFactory.build(())
         connectivityManager = app.connectivityManager
-        
+
         Logger().setupDebug()
 
         if let windowScene = scene as? UIWindowScene {

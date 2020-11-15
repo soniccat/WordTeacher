@@ -9,8 +9,9 @@ import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
 import com.aglushkov.wordteacher.androidApp.general.extensions.setTextAppearanceCompat
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
+import javax.inject.Inject
 
-class WordSubHeaderBlueprint: Blueprint<TextView, WordSubHeaderViewItem> {
+class WordSubHeaderBlueprint @Inject constructor(): Blueprint<TextView, WordSubHeaderViewItem> {
     override val type: Int = WordSubHeaderViewItem.Type
 
     override fun createView(parent: ViewGroup): TextView {

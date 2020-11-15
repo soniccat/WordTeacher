@@ -5,8 +5,9 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.WordTitleView
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTitleViewItem
+import javax.inject.Inject
 
-class WordTitleBlueprint: Blueprint<WordTitleView, WordTitleViewItem> {
+class WordTitleBlueprint @Inject constructor(): Blueprint<WordTitleView, WordTitleViewItem> {
     override val type: Int = WordTitleViewItem.Type
 
     override fun createView(parent: ViewGroup): WordTitleView {
