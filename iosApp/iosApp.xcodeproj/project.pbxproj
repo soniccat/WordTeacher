@@ -44,6 +44,7 @@
 		D66AD9EC254356DD00FA02E5 /* WordTitleBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9EB254356DD00FA02E5 /* WordTitleBlueprint.swift */; };
 		D66AD9EE2543573D00FA02E5 /* WordTranscriptionBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */; };
 		D66AD9F0254F256E00FA02E5 /* UIFontDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9EF254F256E00FA02E5 /* UIFontDescriptor.swift */; };
+		D6F0817C256118F100CE0A25 /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F0817B256118F100CE0A25 /* Array.swift */; };
 		F668C22F1954FAF7379E9B58 /* libPods-iosApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84C1F6F0E0144727FE502A /* libPods-iosApp.a */; };
 /* End PBXBuildFile section */
 
@@ -124,6 +125,7 @@
 		D66AD9EB254356DD00FA02E5 /* WordTitleBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTitleBlueprint.swift; sourceTree = "<group>"; };
 		D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTranscriptionBlueprint.swift; sourceTree = "<group>"; };
 		D66AD9EF254F256E00FA02E5 /* UIFontDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFontDescriptor.swift; sourceTree = "<group>"; };
+		D6F0817B256118F100CE0A25 /* Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -254,8 +256,8 @@
 				D60B08BD253CDA0D0053C558 /* LabelCell.swift */,
 				D66AD9E3254351EB00FA02E5 /* DividerCell.swift */,
 				D630B37F2540BC1A0035D95E /* DefinitionsDisplayModeCell.swift */,
-				D630B37725407C6C0035D95E /* WordDefinitionBlueprint.swift */,
 				D630B37D2540BBC00035D95E /* DefinitionsDisplayModeBlueprint.swift */,
+				D630B37725407C6C0035D95E /* WordDefinitionBlueprint.swift */,
 				D66AD9DB2541FEBB00FA02E5 /* WordExampleBlueprint.swift */,
 				D66AD9E12543501500FA02E5 /* WordDividerBlueprint.swift */,
 				D66AD9E52543557C00FA02E5 /* WordPartOfSpeechBlueprint.swift */,
@@ -311,6 +313,7 @@
 				D630B38325418E390035D95E /* NSLayoutConstraint.swift */,
 				D630B3862541ADC30035D95E /* UICollectionViewCell.swift */,
 				D66AD9EF254F256E00FA02E5 /* UIFontDescriptor.swift */,
+				D6F0817B256118F100CE0A25 /* Array.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -541,6 +544,7 @@
 				D60B08BC253CD7770053C558 /* SelfSizingCell.swift in Sources */,
 				D66AD9E8254355F600FA02E5 /* WordSubHeaderBlueprint.swift in Sources */,
 				D66AD9E62543557C00FA02E5 /* WordPartOfSpeechBlueprint.swift in Sources */,
+				D6F0817C256118F100CE0A25 /* Array.swift in Sources */,
 				D630B37825407C6C0035D95E /* WordDefinitionBlueprint.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				D66AD9E4254351EB00FA02E5 /* DividerCell.swift in Sources */,

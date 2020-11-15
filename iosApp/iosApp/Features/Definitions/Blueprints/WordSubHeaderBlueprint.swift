@@ -22,4 +22,3 @@ class WordSubHeaderBlueprint: Blueprint {
         view.label.text = viewItem.firstItem()?.localized()
     }
 }
-

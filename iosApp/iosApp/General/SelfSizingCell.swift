@@ -11,6 +11,12 @@ import UIKit
 class SelfSizingCell: UICollectionViewCell {
     
     var widthConstraint: NSLayoutConstraint?
+    var topMargin: CGFloat {
+        Style.cellTopMargin
+    }
+    var bottomMargin: CGFloat {
+        Style.cellBottomMargin
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -26,17 +32,17 @@ class SelfSizingCell: UICollectionViewCell {
         // Set autoresizingMask to avoid zero autoresizingMask which will lead to having a wrong width of the contentView in preferredLayoutAttributesFitting, so self-sizing will work buggy
         // More details: https://stackoverflow.com/questions/24750158/autoresizing-issue-of-uicollectionviewcell-contentviews-frame-in-storyboard-pro
         contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        resetMargins()
+        updateMargins()
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        resetMargins()
+        updateMargins()
     }
     
-    private func resetMargins() {
-        contentView.layoutMargins.top = Style.cellTopMargin
-        contentView.layoutMargins.bottom = Style.cellBottomMargin
+    private func updateMargins() {
+        contentView.layoutMargins.top = topMargin
+        contentView.layoutMargins.bottom = bottomMargin
     }
     
     override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {

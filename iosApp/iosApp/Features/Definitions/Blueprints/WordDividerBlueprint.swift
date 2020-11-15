@@ -16,8 +16,5 @@ class WordDividerBlueprint: Blueprint {
     var type: Int { return Int(T.Companion().Type) }
 
     func bind(view: DividerCell, viewItem: WordDividerViewItem) {
-        view.contentView.layoutMargins.top = Style.cellDividerTopMargin
-        view.contentView.layoutMargins.bottom = Style.cellDividerBottomMargin
-        view.dividerView.backgroundColor = Style.dividerColor
     }
 }

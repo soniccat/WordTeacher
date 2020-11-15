@@ -10,7 +10,11 @@ import UIKit
 
 extension UIFontDescriptor {
     func toSemibold() -> UIFontDescriptor {
-        return addingAttributes([UIFontDescriptor.AttributeName.traits : [UIFontDescriptor.TraitKey.weight : UIFont.Weight.semibold]])
+        return addingAttributes(
+            [UIFontDescriptor.AttributeName.traits :
+                [UIFontDescriptor.TraitKey.weight : UIFont.Weight.semibold]
+            ]
+        )
     }
     
     func toFont() -> UIFont {
