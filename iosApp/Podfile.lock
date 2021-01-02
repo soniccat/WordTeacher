@@ -1,20 +1,27 @@
 PODS:
   - Cleanse (4.2.6)
   - Reachability (3.2)
+  - shared (1.0-SNAPSHOT):
+    - Reachability (= 3.2)
 
 DEPENDENCIES:
   - Cleanse (= 4.2.6)
-  - Reachability (= 3.2)
+  - shared (from `../shared`)
 
 SPEC REPOS:
   trunk:
     - Cleanse
     - Reachability
 
+EXTERNAL SOURCES:
+  shared:
+    :path: "../shared"
+
 SPEC CHECKSUMS:
   Cleanse: 6bfc62033dcc0e5ba7992f410a5352ddd1283551
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  shared: 15c425acc59a8c342d8b7f59300ea941d60080b7
 
-PODFILE CHECKSUM: a5a26cf3411436b3a657b204d76a7337d7280ca1
+PODFILE CHECKSUM: 7bc57aeecf55687500a98cf55f96bf2ffdeb26bf
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0

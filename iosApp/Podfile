@@ -1,6 +1,8 @@
 platform :ios, '11.0'
 
+use_frameworks!
+
 target 'iosApp' do
-  pod 'Reachability', '3.2'
+  pod 'shared', :path => '../shared'
   pod 'Cleanse', '4.2.6'
 end

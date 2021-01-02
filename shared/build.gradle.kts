@@ -85,10 +85,8 @@ kotlin {
 
         ios.deploymentTarget = "11.0"
 
-        // HACK: it's important to update iOS project Podfile with the same deps and call pod install as
-        // the deps here aren't linked in the result shared framework and otherwise you'll have sth like
-        // Reachability object isn't found for <any> architecture while linking step
         pod("Reachability","3.2")
+        podfile = project.file("../iosApp/Podfile")
     }
 }
 
@@ -113,17 +111,3 @@ multiplatformResources {
     multiplatformResourcesPackage = "com.aglushkov.wordteacher.shared.res" // required
     iosBaseLocalizationRegion = "en" // optional, default "en"
 }
-
-val packForXcode by tasks.creating(Sync::class) {
-    group = "build"
-    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
-    val sdkName = System.getenv("SDK_NAME") ?: "iphonesimulator"
-    val targetName = "ios" + if (sdkName.startsWith("iphoneos")) "Arm64" else "X64"
-    val framework = kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
-    inputs.property("mode", mode)
-    dependsOn(framework.linkTask)
-    val targetDir = File(buildDir, "xcode-frameworks")
-    from({ framework.outputDirectory })
-    into(targetDir)
-}
-tasks.getByName("build").dependsOn(packForXcode)
