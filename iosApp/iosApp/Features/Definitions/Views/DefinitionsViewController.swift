@@ -51,7 +51,7 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
     private func showDefinitions(res: Resource<NSArray>) {
         if res.isLoaded() {
             if let items = res.data() {
-                var snapshot = adapter.dataSource.snapshot()
+                var snapshot = NSDiffableDataSourceSnapshot<Section, BaseViewItem<AnyObject>>() //adapter.dataSource.snapshot()
                 snapshot.appendSections([.main])
                 snapshot.appendItems(items as! [BaseViewItem<AnyObject>])
                 

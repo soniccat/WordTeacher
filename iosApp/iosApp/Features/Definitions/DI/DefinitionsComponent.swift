@@ -40,7 +40,7 @@ public struct DefinitionsComponent: RootComponent {
         bind.to(factory: DefinitionsViewController.init)
     }
 
-    public static func configure(binder: Binder<Unscoped>) {
+    public static func configure(binder: Binder<Singleton>) {
         binder.include(module: DefinitionsDepsModule.self)
         binder.include(module: DefinitionsModule.self)
     }

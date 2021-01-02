@@ -150,6 +150,7 @@ class DefinitionsVM(
 
             if (item != null) {
                 it.id = item.id
+                map.remove(itemsHashCode)
             } else {
                 it.id = idGenerator.nextId()
             }

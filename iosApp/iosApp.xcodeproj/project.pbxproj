@@ -45,6 +45,7 @@
 		D66AD9EE2543573D00FA02E5 /* WordTranscriptionBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */; };
 		D66AD9F0254F256E00FA02E5 /* UIFontDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9EF254F256E00FA02E5 /* UIFontDescriptor.swift */; };
 		D6F0817C256118F100CE0A25 /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F0817B256118F100CE0A25 /* Array.swift */; };
+		D6F0817E25613CD800CE0A25 /* UIControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F0817D25613CD800CE0A25 /* UIControl.swift */; };
 		F668C22F1954FAF7379E9B58 /* libPods-iosApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB84C1F6F0E0144727FE502A /* libPods-iosApp.a */; };
 /* End PBXBuildFile section */
 
@@ -126,6 +127,7 @@
 		D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTranscriptionBlueprint.swift; sourceTree = "<group>"; };
 		D66AD9EF254F256E00FA02E5 /* UIFontDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFontDescriptor.swift; sourceTree = "<group>"; };
 		D6F0817B256118F100CE0A25 /* Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
+		D6F0817D25613CD800CE0A25 /* UIControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -314,6 +316,7 @@
 				D630B3862541ADC30035D95E /* UICollectionViewCell.swift */,
 				D66AD9EF254F256E00FA02E5 /* UIFontDescriptor.swift */,
 				D6F0817B256118F100CE0A25 /* Array.swift */,
+				D6F0817D25613CD800CE0A25 /* UIControl.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -551,6 +554,7 @@
 				D61EEADA253B76D100EF8B3B /* DefinitionsComponent.swift in Sources */,
 				D630B3872541ADC30035D95E /* UICollectionViewCell.swift in Sources */,
 				D61EEAD5253B534300EF8B3B /* SingletonScope.swift in Sources */,
+				D6F0817E25613CD800CE0A25 /* UIControl.swift in Sources */,
 				D61EEAD3253B531700EF8B3B /* AppModule.swift in Sources */,
 				D60B08BE253CDA0D0053C558 /* LabelCell.swift in Sources */,
 			);

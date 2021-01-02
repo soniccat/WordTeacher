@@ -14,8 +14,10 @@ class DefinitionsDisplayModeBlueprint: Blueprint {
     typealias V = DefinitionsDisplayModeCell
     
     var type: Int { return Int(T.Companion().Type) }
+    private var vm: DefinitionsVM
     
     init(vm: DefinitionsVM) {
+        self.vm = vm
     }
 
     func bind(view: V, viewItem: T) {
@@ -25,5 +27,18 @@ class DefinitionsDisplayModeBlueprint: Blueprint {
         }
         
         view.segmentedControl.selectedSegmentIndex = Int(viewItem.selectedIndex)
+        
+        view.segmentedControl.removeAction(event: .valueChanged)
+        view.segmentedControl.setAction(event: .valueChanged) { [weak self] control in
+            guard let strongSelf = self,
+                let segmentControl = control as? UISegmentedControl
+                else { return }
+            let mode = viewItem.items[segmentControl.selectedSegmentIndex] as! DefinitionsDisplayMode
+            strongSelf.vm.onDisplayModeChanged(mode: mode)
+        }
+        
     }
+//    @objc func onSegmentChanged(sender: UISegmentedControl, forEvent event: UIEvent) {
+//        vm.onDisplayModeChanged(mode: <#T##DefinitionsDisplayMode#>)
+//    }
 }

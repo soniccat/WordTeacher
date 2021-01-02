@@ -5,7 +5,7 @@ object Versions {
     val targetSdk = 29
     val compileSdk = 29
 
-    val kotlin = "1.4.10"
+    val kotlin = "1.4.21"
     val androidx_test = "1.2.0"
     val androidx_test_ext = "1.1.1"
     val android_gradle_plugin = "4.0.1"

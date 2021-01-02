@@ -11,22 +11,22 @@ import Cleanse
 import shared
 
 class DefinitionsModule: Module {
-    typealias Scope = Unscoped
+    typealias Scope = Singleton
     
-    static func configure(binder: Binder<Unscoped>) {
-        binder.bind().to { DefinitionsVM.State(word: nil) }
-        binder.bind().to(factory: DefinitionsVM.init.self)
-        binder.bind().to(factory: DefinitionsDisplayModeBlueprint.init.self)
-        binder.bind().to(factory: WordDefinitionBlueprint.init.self)
-        binder.bind().to(factory: WordDividerBlueprint.init.self)
-        binder.bind().to(factory: WordExampleBlueprint.init.self)
-        binder.bind().to(factory: WordPartOfSpeechBlueprint.init.self)
-        binder.bind().to(factory: WordSubHeaderBlueprint.init.self)
-        binder.bind().to(factory: WordSynonymBlueprint.init.self)
-        binder.bind().to(factory: WordTitleBlueprint.init.self)
-        binder.bind().to(factory: WordTranscriptionBlueprint.init.self)
+    static func configure(binder: Binder<Singleton>) {
+        binder.bind().sharedInScope().to { DefinitionsVM.State(word: nil) }
+        binder.bind().sharedInScope().to(factory: DefinitionsVM.init.self)
+        binder.bind().sharedInScope().to(factory: DefinitionsDisplayModeBlueprint.init.self)
+        binder.bind().sharedInScope().to(factory: WordDefinitionBlueprint.init.self)
+        binder.bind().sharedInScope().to(factory: WordDividerBlueprint.init.self)
+        binder.bind().sharedInScope().to(factory: WordExampleBlueprint.init.self)
+        binder.bind().sharedInScope().to(factory: WordPartOfSpeechBlueprint.init.self)
+        binder.bind().sharedInScope().to(factory: WordSubHeaderBlueprint.init.self)
+        binder.bind().sharedInScope().to(factory: WordSynonymBlueprint.init.self)
+        binder.bind().sharedInScope().to(factory: WordTitleBlueprint.init.self)
+        binder.bind().sharedInScope().to(factory: WordTranscriptionBlueprint.init.self)
         
-        binder.bind().to { (
+        binder.bind().sharedInScope().to { (
                 definitionsDisplayModeBlueprint: DefinitionsDisplayModeBlueprint,
                 wordDefinitionBlueprint: WordDefinitionBlueprint,
                 wordDividerBlueprint: WordDividerBlueprint,
