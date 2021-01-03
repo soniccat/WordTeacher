@@ -23,19 +23,11 @@ repositories {
 
 kotlin {
     android()
-// HACK: commented to be able build the project with native.cocoapods plugin
-//    ios {
-//        binaries {
-//            framework {
-//                baseName = "shared"
-//            }
-//        }
-//    }
     ios()
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(Deps.Mp.serializationCore)
+                implementation(Deps.Mp.serializationJson)
                 implementation(Deps.Ktor.commonCore)
                 implementation(Deps.Coroutines.common)
                 implementation(Deps.MokoResources.impl)
@@ -66,7 +58,7 @@ kotlin {
         }
         val iosMain by getting {
             dependencies {
-                implementation(Deps.Ktor.ios)
+                implementation(Deps.Ktor.iOSClient)
                 implementation(Deps.Coroutines.common) {
                     version {
                         // HACK: to fix InvalidMutabilityException: mutation attempt of frozen kotlinx.coroutines.ChildHandleNode
