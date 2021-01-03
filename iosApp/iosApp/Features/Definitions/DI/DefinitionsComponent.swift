@@ -12,7 +12,7 @@ import shared
 
 public protocol DefinitionsDeps {
     var connectivityManager: ConnectivityManager { get }
-    var wordRepository: WordRepository { get }
+    var wordRepository: WordDefinitionRepository { get }
     var idGenerator: IdGenerator { get }
 }
 
@@ -23,7 +23,7 @@ struct DefinitionsDepsModule: Module {
         binder.bind(ConnectivityManager.self).to { (seed: DefinitionsDeps) in
             return seed.connectivityManager
         }
-        binder.bind(WordRepository.self).to { (seed: DefinitionsDeps) in
+        binder.bind(WordDefinitionRepository.self).to { (seed: DefinitionsDeps) in
             return seed.wordRepository
         }
         binder.bind(IdGenerator.self).to { (seed: DefinitionsDeps) in

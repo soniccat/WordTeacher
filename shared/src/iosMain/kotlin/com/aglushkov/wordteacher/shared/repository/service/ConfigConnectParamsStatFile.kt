@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.repository
+package com.aglushkov.wordteacher.shared.repository.service
 
 import com.aglushkov.wordteacher.shared.extensions.documentDirectoryFilePath
 import com.aglushkov.wordteacher.shared.extensions.toByteArray

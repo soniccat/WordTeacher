@@ -3,14 +3,14 @@ package com.aglushkov.wordteacher.di
 import android.content.Context
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.di.AppComp
-import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.repository.ConfigConnectParamsStatFile
-import com.aglushkov.wordteacher.shared.repository.ConfigConnectParamsStatRepository
-import com.aglushkov.wordteacher.shared.repository.ConfigRepository
-import com.aglushkov.wordteacher.shared.repository.ServiceRepository
-import com.aglushkov.wordteacher.shared.repository.WordTeacherWordServiceFactory
+import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatFile
+import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
+import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
+import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
+import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.service.ConfigService
 import dagger.Module
 import dagger.Provides
@@ -48,8 +48,8 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun wordRepository(serviceRepository: ServiceRepository): WordRepository {
-        return WordRepository(serviceRepository)
+    fun wordRepository(serviceRepository: ServiceRepository): WordDefinitionRepository {
+        return WordDefinitionRepository(serviceRepository)
     }
 
     @AppComp

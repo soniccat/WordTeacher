@@ -1,6 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
-import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -11,7 +11,7 @@ import com.aglushkov.wordteacher.shared.general.resource.load
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
-import com.aglushkov.wordteacher.shared.repository.Config
+import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.mvvm.livedata.LiveData
 import dev.icerock.moko.mvvm.livedata.MutableLiveData
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 
 class DefinitionsVM(
     private val connectivityManager: ConnectivityManager,
-    private val wordRepository: WordRepository,
+    private val wordDefinitionRepository: WordDefinitionRepository,
     private val idGenerator: IdGenerator,
     val state: State
 ): ViewModel() {
@@ -64,7 +64,7 @@ class DefinitionsVM(
 
     fun onWordSubmitted(word: String) {
         this.word?.let {
-            wordRepository.clear(it)
+            wordDefinitionRepository.clear(it)
         }
 
         if (word.isNotEmpty()) {
@@ -76,7 +76,7 @@ class DefinitionsVM(
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
         if (this.displayMode == mode) return
 
-        val words = wordRepository.obtainStateFlow(this.word!!).value
+        val words = wordDefinitionRepository.obtainStateFlow(this.word!!).value
         if (words.isLoaded()) {
             this.displayMode = mode
             innerDefinitions.value = Resource.Loaded(buildViewItems(words.data()!!))
@@ -94,7 +94,7 @@ class DefinitionsVM(
         viewModelScope.launch {
             innerDefinitions.load {
                 // TODO: handle Loading to show intermediate results
-                val words = wordRepository.define(word).first {
+                val words = wordDefinitionRepository.define(word).first {
                     if (it is Resource.Error) {
                         throw it.throwable
                     }

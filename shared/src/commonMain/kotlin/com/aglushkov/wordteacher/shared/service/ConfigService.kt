@@ -3,13 +3,12 @@ package com.aglushkov.wordteacher.shared.service
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.v
-import com.aglushkov.wordteacher.shared.repository.Config
+import com.aglushkov.wordteacher.shared.repository.config.Config
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
 import io.ktor.http.HttpStatusCode
-import io.ktor.utils.io.preventFreeze
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString

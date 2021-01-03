@@ -1,6 +1,6 @@
-package com.aglushkov.wordteacher.repository
+package com.aglushkov.wordteacher.shared.repository.service
 
-import com.aglushkov.wordteacher.shared.repository.Config
+import com.aglushkov.wordteacher.shared.repository.config.Config
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName

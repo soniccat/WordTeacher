@@ -5,8 +5,8 @@ import com.aglushkov.wordteacher.apiproviders.wordnik.model.asWordTeacherWords
 import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.general.ktor.CustomParameter
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.Config
-import com.aglushkov.wordteacher.shared.repository.ServiceMethodParams
+import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get

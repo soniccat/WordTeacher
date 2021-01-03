@@ -2,7 +2,7 @@ package com.aglushkov.wordteacher.shared.features.definitions.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.Config
+import com.aglushkov.wordteacher.shared.repository.config.Config
 import dev.icerock.moko.resources.desc.StringDesc
 
 

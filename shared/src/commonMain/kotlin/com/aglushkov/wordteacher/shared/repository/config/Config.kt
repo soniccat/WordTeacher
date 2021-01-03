@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.repository
+package com.aglushkov.wordteacher.shared.repository.config
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -4,8 +4,8 @@ import com.aglushkov.wordteacher.apiproviders.google.model.GoogleWord
 import com.aglushkov.wordteacher.apiproviders.google.model.asWordTeacherWord
 import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.Config
-import com.aglushkov.wordteacher.shared.repository.ServiceMethodParams
+import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -24,7 +24,7 @@ class GoogleService(
         val EntriesLang = "google_entries_lang"
     }
 
-    private val logger = WordServiceLogger(Config.Type.OwlBot.name)
+    private val logger = WordServiceLogger(Config.Type.Google.name)
     private val httpClient = HttpClient()
 
     suspend fun loadDefinitions(word: String, lang: String): List<GoogleWord> {

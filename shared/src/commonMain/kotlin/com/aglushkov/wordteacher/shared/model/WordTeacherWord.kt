@@ -1,6 +1,6 @@
 package com.aglushkov.wordteacher.shared.model
 
-import com.aglushkov.wordteacher.shared.repository.Config
+import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize

@@ -1,8 +1,5 @@
-package com.aglushkov.wordteacher.shared.repository
+package com.aglushkov.wordteacher.shared.repository.service
 
-import com.aglushkov.wordteacher.repository.ConfigConnectParamsStat
-import com.aglushkov.wordteacher.repository.fromByteArray
-import com.aglushkov.wordteacher.repository.toByteArray
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading

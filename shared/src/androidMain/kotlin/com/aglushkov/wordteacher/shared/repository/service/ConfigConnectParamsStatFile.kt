@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.repository
+package com.aglushkov.wordteacher.shared.repository.service
 
 import android.content.Context
 

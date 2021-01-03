@@ -4,7 +4,7 @@ import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
-import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -30,7 +30,7 @@ public interface DefinitionsComponent {
 }
 
 interface DefinitionsDependencies {
-    fun wordRepository(): WordRepository
+    fun wordRepository(): WordDefinitionRepository
     fun connectivityManager(): ConnectivityManager
     fun idGenerator(): IdGenerator
 }

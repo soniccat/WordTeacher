@@ -11,12 +11,12 @@ import Cleanse
 import shared
 
 class App: DefinitionsDeps {
-    let wordRepository: WordRepository
+    let wordRepository: WordDefinitionRepository
     let connectivityManager: ConnectivityManager
     let idGenerator: IdGenerator
     
     init(
-        wordRepository: WordRepository,
+        wordRepository: WordDefinitionRepository,
         connectivityManager: ConnectivityManager,
         idGenerator: IdGenerator
     ) {

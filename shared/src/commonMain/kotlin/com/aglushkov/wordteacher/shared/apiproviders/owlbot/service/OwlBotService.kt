@@ -4,9 +4,11 @@ import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.general.ktor.CustomHeader
 import com.aglushkov.wordteacher.shared.apiproviders.owlbot.model.OwlBotWord
 import com.aglushkov.wordteacher.shared.apiproviders.owlbot.model.asWordTeacherWord
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.Config
-import com.aglushkov.wordteacher.shared.repository.ServiceMethodParams
+import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -24,7 +26,7 @@ class OwlBotService(
 ) {
     companion object {}
 
-    private val logger = WordServiceLogger(Config.Type.Google.name)
+    private val logger = WordServiceLogger(Config.Type.OwlBot.name)
     private val httpClient = HttpClient {
         val aKey = key // to fix mutation attempt of frozen OwlBot@<address> as otherwise "this" is captured
         install(CustomHeader) {
@@ -46,7 +48,6 @@ class OwlBotService(
             }.decodeFromString(responseString)
         }
     }
-
 }
 
 fun OwlBotService.Companion.createWordTeacherWordService(

@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.service
 
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.Config
-import com.aglushkov.wordteacher.shared.repository.ServiceMethodParams
+import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
 
 interface WordTeacherWordService {
     val id: Int // TODO: parse id from a config

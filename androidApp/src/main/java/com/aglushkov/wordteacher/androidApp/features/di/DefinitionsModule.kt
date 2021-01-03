@@ -11,7 +11,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTitleBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTranscriptionBlueprint
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
-import com.aglushkov.wordteacher.shared.features.definitions.repository.WordRepository
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -49,10 +49,10 @@ class DefinitionsModule {
     @Provides
     fun viewModel(
         connectivityManager: ConnectivityManager,
-        wordRepository: WordRepository,
+        wordDefinitionRepository: WordDefinitionRepository,
         idGenerator: IdGenerator,
         state: DefinitionsVM.State
     ): DefinitionsVM {
-        return DefinitionsVM(connectivityManager, wordRepository, idGenerator, state)
+        return DefinitionsVM(connectivityManager, wordDefinitionRepository, idGenerator, state)
     }
 }

@@ -1,13 +1,16 @@
-package com.aglushkov.wordteacher.shared.features.definitions.repository
+package com.aglushkov.wordteacher.shared.repository.worddefinition
 
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
 import com.aglushkov.wordteacher.shared.general.resource.isUninitialized
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.ServiceRepository
+import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class WordRepository(
+class WordDefinitionRepository(
     private val serviceRepository: ServiceRepository
 ) {
 
@@ -85,7 +88,7 @@ class WordRepository(
         word: String,
         services: List<WordTeacherWordService>,
         stateFlow: MutableStateFlow<Resource<List<WordTeacherWord>>>
-    ) = withContext(Dispatchers.Main + SupervisorJob()) {
+    ) = withContext(Dispatchers.Main) {
         stateFlow.value = stateFlow.value.toLoading()
 
         try {
@@ -93,7 +96,8 @@ class WordRepository(
             val asyncs = mutableListOf<Deferred<List<WordTeacherWord>>>()
 
             for (service in services) {
-                asyncs.add(async {
+                // SupervisorJob to disable cancelling the parent job
+                asyncs.add(async(SupervisorJob()) {
                     service.define(word)
                 })
             }

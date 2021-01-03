@@ -3,10 +3,12 @@ package com.aglushkov.wordteacher.apiproviders.yandex.service
 import com.aglushkov.wordteacher.apiproviders.yandex.model.YandexWords
 import com.aglushkov.wordteacher.apiproviders.yandex.model.asWordTeacherWord
 import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.ktor.CustomParameter
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.Config
-import com.aglushkov.wordteacher.shared.repository.ServiceMethodParams
+import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -33,7 +35,7 @@ class YandexService(
     private val httpClient = HttpClient {
         val anApiKey = apiKey
         install(CustomParameter) {
-            parameterName = "key" // TODO: handle exception if we send a wrong name
+            parameterName = "key2" // TODO: handle exception if we send a wrong name
             parameterValue = anApiKey
         }
     }
@@ -56,9 +58,13 @@ class YandexService(
             val responseString = res.readBytes().decodeToString()
             logger.logLoadingCompleted(word, res, responseString)
 
-            Json {
-                ignoreUnknownKeys = true
-            }.decodeFromString(responseString)
+            try {
+                Json {
+                    ignoreUnknownKeys = true
+                }.decodeFromString(responseString)
+            } catch (e: Exception) {
+                throw IllegalArgumentException(e.message)
+            }
         }
     }
 }

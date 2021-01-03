@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.repository
+package com.aglushkov.wordteacher.shared.repository.service
 
 // TODO: come up with a more general solution for any file like MPFile
 expect class ConfigConnectParamsStatFile {

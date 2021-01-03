@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.repository
+package com.aglushkov.wordteacher.shared.repository.service
 
 import com.aglushkov.wordteacher.apiproviders.google.service.GoogleService
 import com.aglushkov.wordteacher.apiproviders.google.service.createWordTeacherWordService
@@ -8,6 +8,9 @@ import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService
 import com.aglushkov.wordteacher.apiproviders.yandex.service.createWordTeacherWordService
 import com.aglushkov.wordteacher.shared.apiproviders.owlbot.service.OwlBotService
 import com.aglushkov.wordteacher.shared.apiproviders.owlbot.service.createWordTeacherWordService
+import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
+import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 
 class WordTeacherWordServiceFactory {
