@@ -11,8 +11,8 @@ object Versions {
     val android_gradle_plugin = "4.1.0"
     val junit = "4.13"
     val sqlDelight = "1.4.1"
-    val ktor = "1.5.0"
-    val coroutines = "1.4.2-native-mt"
+    val ktor = "1.4.3"
+    val coroutines = "1.3.9-native-mt-2"
     val serialization = "1.0.1"
     val lifecycle = "2.1.0"
 }
