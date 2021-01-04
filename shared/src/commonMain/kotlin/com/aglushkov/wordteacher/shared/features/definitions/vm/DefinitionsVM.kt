@@ -1,17 +1,18 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
-import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.extensions.forwardUntilLoadedOrError
+import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrError
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
-import com.aglushkov.wordteacher.shared.general.resource.load
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.mvvm.livedata.LiveData
 import dev.icerock.moko.mvvm.livedata.MutableLiveData
@@ -20,7 +21,10 @@ import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -34,6 +38,7 @@ class DefinitionsVM(
     private val innerDefinitions = MutableLiveData<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
     val definitions: LiveData<Resource<List<BaseViewItem<*>>>> = innerDefinitions
     val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
+    var loadJob: Job? = null
 
     // State
     var displayModeIndex: Int = 0
@@ -91,18 +96,20 @@ class DefinitionsVM(
 
     private fun load(word: String) {
         this.word = word
-        viewModelScope.launch {
-            innerDefinitions.load {
-                // TODO: handle Loading to show intermediate results
-                val words = wordDefinitionRepository.define(word).first {
-                    if (it is Resource.Error) {
-                        throw it.throwable
-                    }
 
-                    it.isLoaded()
-                }.data()!!
-                buildViewItems(words)
-            }
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            listOf(
+                async {
+                    wordDefinitionRepository.obtainStateFlow(word)
+                        .forwardUntilLoadedOrError(innerDefinitions) {
+                            buildViewItems(it.data() ?: emptyList())
+                        }
+                },
+                async {
+                    wordDefinitionRepository.define(word).takeUntilLoadedOrError().collect()
+                }
+            ).awaitAll()
         }
     }
 
@@ -128,16 +135,12 @@ class DefinitionsVM(
         // put items with ids in map
         prevItems.forEach {
             val itemsHashCode = it.itemsHashCode()
-            val mapListOfViewItems = map[itemsHashCode]
 
             // obtain mutable list
-            val listOfViewItems: MutableList<BaseViewItem<*>> = if (mapListOfViewItems == null) {
-                mutableListOf<BaseViewItem<*>>().also { list ->
+            val listOfViewItems: MutableList<BaseViewItem<*>> = map[itemsHashCode]
+                ?: mutableListOf<BaseViewItem<*>>().also { list ->
                     map[itemsHashCode] = list
                 }
-            } else {
-                mapListOfViewItems
-            }
 
             listOfViewItems.add(it)
         }

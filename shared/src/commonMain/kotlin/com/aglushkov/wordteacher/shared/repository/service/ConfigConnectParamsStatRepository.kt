@@ -52,10 +52,10 @@ class ConfigConnectParamsStatRepository(
 
     private fun loadConfigConnectParamsStatFlow() = flow {
         try {
-            val fileBytes = withContext(Dispatchers.Default) {
-                file.loadContent()
+            val configs = withContext(Dispatchers.Default) {
+                val bytes = file.loadContent()
+                ConfigConnectParamsStat.fromByteArray(bytes)
             }
-            val configs = ConfigConnectParamsStat.fromByteArray(fileBytes)
             emit(Resource.Loaded(configs))
         } catch (e: Exception) {
             emit(Resource.Loaded<List<ConfigConnectParamsStat>>(emptyList()))

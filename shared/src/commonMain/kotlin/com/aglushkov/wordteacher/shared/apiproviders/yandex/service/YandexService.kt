@@ -3,8 +3,6 @@ package com.aglushkov.wordteacher.apiproviders.yandex.service
 import com.aglushkov.wordteacher.apiproviders.yandex.model.YandexWords
 import com.aglushkov.wordteacher.apiproviders.yandex.model.asWordTeacherWord
 import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
-import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.ktor.CustomParameter
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
@@ -35,7 +33,7 @@ class YandexService(
     private val httpClient = HttpClient {
         val anApiKey = apiKey
         install(CustomParameter) {
-            parameterName = "key2" // TODO: handle exception if we send a wrong name
+            parameterName = "key"
             parameterValue = anApiKey
         }
     }

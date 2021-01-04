@@ -25,7 +25,7 @@
     <string name="word_section_synonyms">Synonyms</string>
 
     <string name="definitions_displayMode_bySource">By Source</string>
-    <string name="definitions_displayMode_merge">Merged</string>
+    <string name="definitions_displayMode_merge">Combined</string>
 
     <string name="error_bad_response">Something went wrong, sorry :(.\nPlease try again later.</string>
     <string name="error_bad_connection">Couldn\'t establish connection to the network.\nTry to check your network settings and try again.</string>

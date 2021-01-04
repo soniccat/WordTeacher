@@ -11,20 +11,24 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.supervisorScope
 
 
 class WordDefinitionRepository(
-    private val serviceRepository: ServiceRepository
+    private val serviceRepository: ServiceRepository,
 ) {
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -88,31 +92,29 @@ class WordDefinitionRepository(
         word: String,
         services: List<WordTeacherWordService>,
         stateFlow: MutableStateFlow<Resource<List<WordTeacherWord>>>
-    ) = withContext(Dispatchers.Main) {
+    ) = supervisorScope {
         stateFlow.value = stateFlow.value.toLoading()
 
         try {
             val words = mutableListOf<WordTeacherWord>()
-            val asyncs = mutableListOf<Deferred<List<WordTeacherWord>>>()
+            val jobs: MutableList<Job> = mutableListOf()
 
+            stateFlow.value = stateFlow.value.toLoading(words.toList())
             for (service in services) {
-                // SupervisorJob to disable cancelling the parent job
-                asyncs.add(async(SupervisorJob()) {
-                    service.define(word)
-                })
-            }
-
-            asyncs.forEach {
-                try {
-                    // TODO: think how to return first loaded definitions first to show them early
-                    words.addAll(it.await())
+                // launch instead of async/await to get results as soon as possible in a completion order
+                val job = launch(CoroutineExceptionHandler { _, throwable ->
+                    Logger.e("Define Exception: " + throwable.message, service.type.toString())
+                }) {
+                    words.addAll(service.define(word))
                     stateFlow.value = stateFlow.value.toLoading(words.toList())
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
+
+                jobs.add(job)
             }
 
-            // TODO: sort somehow
+            jobs.joinAll()
+
+            // TODO: sort somehow if needed (consider adding this in settings)
             stateFlow.value = stateFlow.value.toLoaded(words.toList())
         } catch (e: Exception) {
             stateFlow.value = stateFlow.value.toError(e, true)
