@@ -1,13 +1,15 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.general.extensions.forwardUntilLoadedOrError
-import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrError
+import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
@@ -21,10 +23,9 @@ import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 
@@ -35,8 +36,9 @@ class DefinitionsVM(
     val state: State
 ): ViewModel() {
 
-    private val innerDefinitions = MutableLiveData<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
-    val definitions: LiveData<Resource<List<BaseViewItem<*>>>> = innerDefinitions
+    private val definitionsStateFlow = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
+    private val viewItemsLiveData = MutableLiveData<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+    val definitions: LiveData<Resource<List<BaseViewItem<*>>>> = viewItemsLiveData
     val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     var loadJob: Job? = null
 
@@ -58,6 +60,13 @@ class DefinitionsVM(
         }
 
     init {
+        viewModelScope.launch {
+            definitionsStateFlow.forward(viewItemsLiveData) {
+                Logger.v("build view items for " + it)
+                buildViewItems(it ?: emptyList())
+            }
+        }
+
         word?.let {
             load(it)
         } ?: run {
@@ -68,12 +77,8 @@ class DefinitionsVM(
     // Events
 
     fun onWordSubmitted(word: String) {
-        this.word?.let {
-            wordDefinitionRepository.clear(it)
-        }
-
         if (word.isNotEmpty()) {
-            innerDefinitions.value = Resource.Uninitialized()
+            viewItemsLiveData.value = Resource.Uninitialized()
             load(word)
         }
     }
@@ -84,7 +89,7 @@ class DefinitionsVM(
         val words = wordDefinitionRepository.obtainStateFlow(this.word!!).value
         if (words.isLoaded()) {
             this.displayMode = mode
-            innerDefinitions.value = Resource.Loaded(buildViewItems(words.data()!!))
+            viewItemsLiveData.value = Resource.Loaded(buildViewItems(words.data()!!))
         }
     }
 
@@ -95,21 +100,14 @@ class DefinitionsVM(
     // Actions
 
     private fun load(word: String) {
+        Logger.v("Start loading " + word)
         this.word = word
 
         loadJob?.cancel()
-        loadJob = viewModelScope.launch {
-            listOf(
-                async {
-                    wordDefinitionRepository.obtainStateFlow(word)
-                        .forwardUntilLoadedOrError(innerDefinitions) {
-                            buildViewItems(it.data() ?: emptyList())
-                        }
-                },
-                async {
-                    wordDefinitionRepository.define(word).takeUntilLoadedOrError().collect()
-                }
-            ).awaitAll()
+        loadJob = viewModelScope.launch(CoroutineExceptionHandler { coroutineContext, throwable ->
+            Logger.e("Load Word exception for " + word +" " + throwable.message)
+        }) {
+            wordDefinitionRepository.define(word).forward(definitionsStateFlow)
         }
     }
 
@@ -129,7 +127,7 @@ class DefinitionsVM(
 
     // set unique id taking into account that for the same items id shouldn't change
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
-        val prevItems = innerDefinitions.value.data() ?: emptyList()
+        val prevItems = viewItemsLiveData.value.data() ?: emptyList()
         val map: MutableMap<Int, MutableList<BaseViewItem<*>>> = mutableMapOf()
 
         // put items with ids in map

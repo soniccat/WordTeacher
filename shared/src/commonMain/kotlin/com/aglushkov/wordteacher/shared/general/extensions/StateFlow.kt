@@ -1,13 +1,17 @@
 package com.aglushkov.wordteacher.shared.general.extensions
 
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.v
 import dev.icerock.moko.mvvm.livedata.LiveData
 import dev.icerock.moko.mvvm.livedata.MutableLiveData
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.dropWhile
@@ -22,17 +26,26 @@ suspend fun <T> Flow<T>.forward(stateFlow: MutableStateFlow<T>) {
     }
 }
 
+suspend fun <T, D> Flow<Resource<T>>.forward(
+    liveData: MutableLiveData<Resource<D>>,
+    transform: (T?) -> D
+) {
+    collect {
+        val viewItems = transform(it.data())
+        liveData.postValue(it.copyWith(viewItems))
+    }
+}
+
 suspend fun <T, D> Flow<Resource<T>>.forwardUntilLoadedOrError(
     liveData: MutableLiveData<Resource<D>>,
     transform: (Resource<T>) -> D
 ) {
-    dropWhile {
-        it.isUninitialized()
-    }.onStart {
+    onStart {
         emit(Resource.Loading())
     }.catch { e ->
         emit(Resource.Error(e, true))
     }.map {
+        Logger.v("mapped " + it)
         val viewItems = transform(it)
         it.copyWith(viewItems)
     }.collect { viewItemsRes ->

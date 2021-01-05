@@ -1,30 +1,31 @@
 package com.aglushkov.wordteacher.shared.repository.worddefinition
 
 import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
 import com.aglushkov.wordteacher.shared.general.resource.isUninitialized
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 
 
 class WordDefinitionRepository(
@@ -63,15 +64,33 @@ class WordDefinitionRepository(
         }
     }
 
-    suspend fun define(word: String): StateFlow<Resource<List<WordTeacherWord>>> {
+    suspend fun define(word: String): Flow<Resource<List<WordTeacherWord>>> {
         val services = serviceRepository.services.data()
         val stateFlow = obtainMutableStateFlow(word)
 
-        if (services != null && services.isNotEmpty() && stateFlow.value.isNotLoadedAndNotLoading()) {
-            loadDefinitions(word, services, stateFlow)
+        return if (stateFlow.value.isLoaded()) {
+            // TODO: remove after updating to new coroutine lib version
+            // where distinctUntilChanged isn't built-in
+            // SharedFlow with replayCapacity = 1 might be a solution
+            // Here I create a copy to force StateFlow notification even if nothing has changed (the result is already Loaded)
+            flowOf(stateFlow.value.toLoaded(stateFlow.value.data()!!))
+        } else if (services != null && services.isNotEmpty() && stateFlow.value.isNotLoadedAndNotLoading()) {
+            loadDefinitionsFlow(word, services).cancellable()
+                .onEach {
+                    stateFlow.value = it
+                }
+                .onCompletion { cause ->
+                    cause?.let {
+                        stateFlow.value = Resource.Error(it, true)
+                    }
+                }
+        } else {
+            Logger.v(
+                "" + word + " is already loading " + stateFlow.value,
+                WordDefinitionRepository::class.simpleName
+            )
+            emptyFlow()
         }
-
-        return stateFlow
     }
 
     fun obtainStateFlow(word: String): StateFlow<Resource<List<WordTeacherWord>>> {
@@ -88,37 +107,40 @@ class WordDefinitionRepository(
         return stateFlow
     }
 
-    private suspend fun loadDefinitions(
+    suspend fun loadDefinitionsFlow(
+        word: String
+    ): Flow<Resource<List<WordTeacherWord>>> {
+        val services = serviceRepository.services.data()
+        return if (services == null || services.isEmpty()) {
+            emptyFlow()
+        } else {
+            loadDefinitionsFlow(word, services)
+        }
+    }
+
+    private suspend fun loadDefinitionsFlow(
         word: String,
-        services: List<WordTeacherWordService>,
-        stateFlow: MutableStateFlow<Resource<List<WordTeacherWord>>>
-    ) = supervisorScope {
-        stateFlow.value = stateFlow.value.toLoading()
+        services: List<WordTeacherWordService>
+    ): Flow<Resource<List<WordTeacherWord>>> = channelFlow {
+        // channelFlow to be able to emit from different coroutines
+        val words = mutableListOf<WordTeacherWord>()
+        val jobs: MutableList<Job> = mutableListOf()
 
-        try {
-            val words = mutableListOf<WordTeacherWord>()
-            val jobs: MutableList<Job> = mutableListOf()
-
-            stateFlow.value = stateFlow.value.toLoading(words.toList())
-            for (service in services) {
-                // launch instead of async/await to get results as soon as possible in a completion order
-                val job = launch(CoroutineExceptionHandler { _, throwable ->
-                    Logger.e("Define Exception: " + throwable.message, service.type.toString())
-                }) {
-                    words.addAll(service.define(word))
-                    stateFlow.value = stateFlow.value.toLoading(words.toList())
-                }
-
-                jobs.add(job)
+        send(Resource.Loading())
+        for (service in services) {
+            // launch instead of async/await to get results as soon as possible in a completion order
+            val job = launch {
+                words.addAll(service.define(word))
+                send(Resource.Loading(words.toList()))
             }
 
-            jobs.joinAll()
-
-            // TODO: sort somehow if needed (consider adding this in settings)
-            stateFlow.value = stateFlow.value.toLoaded(words.toList())
-        } catch (e: Exception) {
-            stateFlow.value = stateFlow.value.toError(e, true)
+            jobs.add(job)
         }
+
+        jobs.joinAll()
+
+        // TODO: sort somehow if needed (consider adding this in settings)
+        send(Resource.Loaded(words.toList()))
     }
 
     fun clear(word: String) {
