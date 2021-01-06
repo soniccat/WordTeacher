@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.worddefinition
 
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -10,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 
 
 class WordDefinitionRepository(
@@ -69,18 +72,15 @@ class WordDefinitionRepository(
         val stateFlow = obtainMutableStateFlow(word)
 
         return if (stateFlow.value.isLoaded()) {
-            // TODO: remove after updating to new coroutine lib version
-            // where distinctUntilChanged isn't built-in
-            // SharedFlow with replayCapacity = 1 might be a solution
-            // Here I create a copy to force StateFlow notification even if nothing has changed (the result is already Loaded)
-            flowOf(stateFlow.value.toLoaded(stateFlow.value.data()!!))
+            flowOf(stateFlow.value)
         } else if (services != null && services.isNotEmpty() && stateFlow.value.isNotLoadedAndNotLoading()) {
-            loadDefinitionsFlow(word, services).cancellable()
+            loadDefinitionsFlow(word, services)
                 .onEach {
                     stateFlow.value = it
                 }
                 .onCompletion { cause ->
                     cause?.let {
+                        // keep resource state in sync after cancellation or an error
                         stateFlow.value = Resource.Error(it, true)
                     }
                 }
@@ -89,7 +89,7 @@ class WordDefinitionRepository(
                 "" + word + " is already loading " + stateFlow.value,
                 WordDefinitionRepository::class.simpleName
             )
-            emptyFlow()
+            stateFlow
         }
     }
 
@@ -123,24 +123,29 @@ class WordDefinitionRepository(
         services: List<WordTeacherWordService>
     ): Flow<Resource<List<WordTeacherWord>>> = channelFlow {
         // channelFlow to be able to emit from different coroutines
-        val words = mutableListOf<WordTeacherWord>()
-        val jobs: MutableList<Job> = mutableListOf()
+        // supervisorScope not to interrupt when a service fails
+        supervisorScope {
+            val words = mutableListOf<WordTeacherWord>()
+            val jobs: MutableList<Job> = mutableListOf()
 
-        send(Resource.Loading())
-        for (service in services) {
-            // launch instead of async/await to get results as soon as possible in a completion order
-            val job = launch {
-                words.addAll(service.define(word))
-                send(Resource.Loading(words.toList()))
+            send(Resource.Loading())
+            for (service in services) {
+                // launch instead of async/await to get results as soon as possible in a completion order
+                val job = launch(CoroutineExceptionHandler { _, throwable ->
+                    Logger.e("loadDefinitionsFlow Exception: " + throwable.message, service.type.toString())
+                }) {
+                    words.addAll(service.define(word))
+                    send(Resource.Loading(words.toList()))
+                }
+
+                jobs.add(job)
             }
 
-            jobs.add(job)
+            jobs.joinAll()
+
+            // TODO: sort somehow if needed (consider adding this in settings)
+            send(Resource.Loaded(words.toList()))
         }
-
-        jobs.joinAll()
-
-        // TODO: sort somehow if needed (consider adding this in settings)
-        send(Resource.Loaded(words.toList()))
     }
 
     fun clear(word: String) {

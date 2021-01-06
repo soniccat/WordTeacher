@@ -5,9 +5,11 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.forward
+import com.aglushkov.wordteacher.shared.general.extensions.forwardUntilLoadedOrError
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
+import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
@@ -26,6 +28,8 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.launch
 
 
@@ -78,7 +82,6 @@ class DefinitionsVM(
 
     fun onWordSubmitted(word: String) {
         if (word.isNotEmpty()) {
-            viewItemsLiveData.value = Resource.Uninitialized()
             load(word)
         }
     }
@@ -107,6 +110,14 @@ class DefinitionsVM(
         loadJob = viewModelScope.launch(CoroutineExceptionHandler { coroutineContext, throwable ->
             Logger.e("Load Word exception for " + word +" " + throwable.message)
         }) {
+// Kept for testing
+//            launch {
+//                val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
+//                Logger.v("obtained " + stateFlow.value)
+//                stateFlow.forwardUntilLoadedOrError(definitionsStateFlow)
+//                Logger.v("completed")
+//            }
+
             wordDefinitionRepository.define(word).forward(definitionsStateFlow)
         }
     }
