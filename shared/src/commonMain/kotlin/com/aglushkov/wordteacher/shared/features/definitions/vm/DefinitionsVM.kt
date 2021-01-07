@@ -126,10 +126,7 @@ class DefinitionsVM(
 //                Logger.v("completed")
 //            }
 
-            launch {
-                wordDefinitionRepository.defineFlow(word).forward(definitionsStateFlow)
-            }
-            wordDefinitionRepository.define(word)
+            wordDefinitionRepository.define(word, this).forward(definitionsStateFlow)
         }
     }
 

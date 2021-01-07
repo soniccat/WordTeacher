@@ -58,7 +58,7 @@ class WordDefinitionRepository(
     private suspend fun defineUninitializedFlows() {
         for (flowEntry in stateFlows) {
             if (flowEntry.value.isUninitialized()) {
-                define(flowEntry.key)
+                define(flowEntry.key, scope)
             }
         }
     }
@@ -74,22 +74,20 @@ class WordDefinitionRepository(
     // return a flow of a single word definitions loading
     // need to be called before define method not to confuse the current error state with an error of
     // the next request
-    fun defineFlow(word: String): Flow<Resource<List<WordTeacherWord>>> {
-        val stateFlow = obtainMutableStateFlow(word)
-        val currentValue = stateFlow.value
+//    fun defineFlow(word: String){
+//        val stateFlow = obtainMutableStateFlow(word)
+//        val currentValue = stateFlow.value
+//
+//
+//    }
 
-        return stateFlow.dropWhile {
-            it.isError() && it == currentValue // skip error from the previous loading attempt
-        }.takeUntilLoadedOrError()
-    }
-
-    suspend fun define(word: String) = coroutineScope {
+    suspend fun define(word: String, scope: CoroutineScope): Flow<Resource<List<WordTeacherWord>>> {
         val services = serviceRepository.services.data()
         val stateFlow = obtainMutableStateFlow(word)
 
         val currentValue = stateFlow.value
 
-        launch {
+        scope.launch {
             val loadFlow = if (currentValue.isLoaded()) {
                 flowOf(stateFlow.value)
             } else if (services != null && services.isNotEmpty() && stateFlow.value.isNotLoadedAndNotLoading()) {
@@ -107,10 +105,15 @@ class WordDefinitionRepository(
             }.onCompletion { cause ->
                 cause?.let {
                     // keep resource state in sync after cancellation or an error
+                    Logger.e("Define flow error " + it.message)
                     stateFlow.value = Resource.Error(it, true)
                 }
             }.collect()
         }
+
+        return stateFlow.dropWhile {
+            it.isError() && it == currentValue // skip error from the previous loading attempt
+        }.takeUntilLoadedOrError()
     }
 
     fun obtainStateFlow(word: String): StateFlow<Resource<List<WordTeacherWord>>> {
@@ -127,16 +130,16 @@ class WordDefinitionRepository(
         return stateFlow
     }
 
-    suspend fun loadDefinitionsFlow(
-        word: String
-    ): Flow<Resource<List<WordTeacherWord>>> {
-        val services = serviceRepository.services.data()
-        return if (services == null || services.isEmpty()) {
-            emptyFlow()
-        } else {
-            loadDefinitionsFlow(word, services)
-        }
-    }
+//    suspend fun loadDefinitionsFlow(
+//        word: String
+//    ): Flow<Resource<List<WordTeacherWord>>> {
+//        val services = serviceRepository.services.data()
+//        return if (services == null || services.isEmpty()) {
+//            emptyFlow()
+//        } else {
+//            loadDefinitionsFlow(word, services)
+//        }
+//    }
 
     private suspend fun loadDefinitionsFlow(
         word: String,
