@@ -3,17 +3,19 @@ package com.aglushkov.wordteacher.shared.general.resource
 import kotlin.js.JsName
 
 
-sealed class Resource<T>(needShowNext: Boolean) {
-    val canLoadNextPage: Boolean = needShowNext
+sealed class Resource<T>(
+    val canLoadNextPage: Boolean,
+    val version: Int = 0
+) {
 
-    class Uninitialized<T> : Resource<T>(false)
-    class Loaded<T>(val data: T, canLoadNext: Boolean = false) : Resource<T>(canLoadNext)
-    class Loading<T>(val data: T? = null, canLoadNext: Boolean = false) : Resource<T>(canLoadNext)
-    class Error<T>(val throwable: Throwable, val canTryAgain: Boolean, val data: T? = null, canLoadNext: Boolean = false) : Resource<T>(canLoadNext)
+    class Uninitialized<T>(version: Int = 0) : Resource<T>(false, version = version)
+    class Loaded<T>(val data: T, canLoadNext: Boolean = false, version: Int = 0) : Resource<T>(canLoadNext, version)
+    class Loading<T>(val data: T? = null, canLoadNext: Boolean = false, version: Int = 0) : Resource<T>(canLoadNext, version)
+    class Error<T>(val throwable: Throwable, val canTryAgain: Boolean, val data: T? = null, canLoadNext: Boolean = false, version: Int = 0) : Resource<T>(canLoadNext, version)
 
-    fun toLoading(data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage) = Loading(data, canLoadNext)
-    fun toLoaded(data: T, canLoadNext: Boolean = this.canLoadNextPage) = Loaded(data, canLoadNext)
-    fun toError(throwable: Throwable, canTryAgain: Boolean, data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage) = Error(throwable, canTryAgain, data, canLoadNext)
+    fun toLoading(data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loading(data, canLoadNext, version)
+    fun toLoaded(data: T, canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loaded(data, canLoadNext, version)
+    fun toError(throwable: Throwable, canTryAgain: Boolean, data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Error(throwable, canTryAgain, data, canLoadNext, version)
 
     // Getters
     fun isUninitialized(): Boolean {
@@ -33,23 +35,25 @@ sealed class Resource<T>(needShowNext: Boolean) {
         }
     }
 
-    fun copy(data: T? = this.data()): Resource<T> {
+    fun copy(data: T? = this.data(), version: Int = this.version): Resource<T> {
         return when(this) {
-            is Uninitialized -> Uninitialized()
-            is Loaded -> Loaded(data!!, canLoadNextPage)
-            is Loading -> Loading(data, canLoadNextPage)
-            is Error -> Error(throwable, canTryAgain, data, canLoadNextPage)
+            is Uninitialized -> Uninitialized(version)
+            is Loaded -> Loaded(data!!, canLoadNextPage, version)
+            is Loading -> Loading(data, canLoadNextPage, version)
+            is Error -> Error(throwable, canTryAgain, data, canLoadNextPage, version)
         }
     }
 
     fun <R> copyWith(data: R?): Resource<R> {
         return when(this) {
-            is Uninitialized -> Uninitialized()
-            is Loaded -> Loaded(data!!, canLoadNextPage)
-            is Loading -> Loading(data, canLoadNextPage)
-            is Error -> Error(throwable, canTryAgain, data, canLoadNextPage)
+            is Uninitialized -> Uninitialized(version)
+            is Loaded -> Loaded(data!!, canLoadNextPage, version)
+            is Loading -> Loading(data, canLoadNextPage, version)
+            is Error -> Error(throwable, canTryAgain, data, canLoadNextPage, version)
         }
     }
+
+    fun bumpVersion() = copy(version = this.version + 1)
 }
 
 

@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -58,7 +59,7 @@ class WordDefinitionRepository(
     private suspend fun defineUninitializedFlows() {
         for (flowEntry in stateFlows) {
             if (flowEntry.value.isUninitialized()) {
-                define(flowEntry.key, scope)
+                define(flowEntry.key, scope, false)
             }
         }
     }
@@ -81,17 +82,26 @@ class WordDefinitionRepository(
 //
 //    }
 
-    suspend fun define(word: String, scope: CoroutineScope): Flow<Resource<List<WordTeacherWord>>> {
+    suspend fun define(word: String, scope: CoroutineScope, reload: Boolean = false): Flow<Resource<List<WordTeacherWord>>> {
         val services = serviceRepository.services.data()
         val stateFlow = obtainMutableStateFlow(word)
 
         val currentValue = stateFlow.value
+        val nextVersion = if (reload) {
+            currentValue.version + 1
+        } else {
+            currentValue.version
+        }
+
 
         scope.launch {
-            val loadFlow = if (currentValue.isLoaded()) {
-                flowOf(stateFlow.value)
-            } else if (services != null && services.isNotEmpty() && stateFlow.value.isNotLoadedAndNotLoading()) {
-                loadDefinitionsFlow(word, services)
+            val currentValue = stateFlow.value
+            val loadFlow = if (currentValue is Resource.Loaded) {
+                Logger.v("called flowOf with Loaded")
+                flowOf(currentValue.toLoaded(currentValue.data, version = nextVersion))
+            } else if (services != null && services.isNotEmpty() && (reload || stateFlow.value.isNotLoadedAndNotLoading())) {
+                Logger.v("called loadDefinitionsFlow")
+                loadDefinitionsFlow(word, nextVersion, services)
             } else {
                 Logger.v(
                     "" + word + " is already loading " + stateFlow.value,
@@ -101,19 +111,22 @@ class WordDefinitionRepository(
             }
 
             loadFlow.onEach {
-                stateFlow.value = it
+                if (it.version == nextVersion) {
+                    stateFlow.value = it
+                }
             }.onCompletion { cause ->
                 cause?.let {
                     // keep resource state in sync after cancellation or an error
-                    Logger.e("Define flow error " + it.message)
-                    stateFlow.value = Resource.Error(it, true)
+                    Logger.e("Define flow error (${nextVersion}) " + it.message)
+                    val currentValue = stateFlow.value
+                    if (currentValue.version == nextVersion) {
+                        stateFlow.value = Resource.Error(it, true, version = nextVersion)
+                    }
                 }
             }.collect()
         }
 
-        return stateFlow.dropWhile {
-            it.isError() && it == currentValue // skip error from the previous loading attempt
-        }.takeUntilLoadedOrError()
+        return stateFlow.takeUntilLoadedOrError(nextVersion)
     }
 
     fun obtainStateFlow(word: String): StateFlow<Resource<List<WordTeacherWord>>> {
@@ -143,6 +156,7 @@ class WordDefinitionRepository(
 
     private suspend fun loadDefinitionsFlow(
         word: String,
+        version: Int,
         services: List<WordTeacherWordService>
     ): Flow<Resource<List<WordTeacherWord>>> = channelFlow {
         // channelFlow to be able to emit from different coroutines
@@ -151,7 +165,7 @@ class WordDefinitionRepository(
             val words = mutableListOf<WordTeacherWord>()
             val jobs: MutableList<Job> = mutableListOf()
 
-            send(Resource.Loading())
+            send(Resource.Loading(version = version))
             Logger.v("loadDefinitionsFlow set Loading")
 
             for (service in services) {
@@ -160,7 +174,7 @@ class WordDefinitionRepository(
                     Logger.e("loadDefinitionsFlow Exception: " + throwable.message, service.type.toString())
                 }) {
                     words.addAll(service.define(word))
-                    send(Resource.Loading(words.toList()))
+                    send(Resource.Loading(words.toList(), version = version))
                 }
 
                 jobs.add(job)
@@ -169,7 +183,7 @@ class WordDefinitionRepository(
             jobs.joinAll()
 
             // TODO: sort somehow if needed (consider adding this in settings)
-            send(Resource.Loaded(words.toList()))
+            send(Resource.Loaded(words.toList(), version = version))
             Logger.v("loadDefinitionsFlow set Loaded")
         }
     }

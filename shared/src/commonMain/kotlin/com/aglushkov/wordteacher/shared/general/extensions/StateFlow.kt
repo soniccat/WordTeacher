@@ -64,16 +64,24 @@ suspend fun <T, D> Flow<Resource<T>>.forward(
 //}
 
 // Take until a resource operation is completed, the last state is emitted
-fun <T> Flow<Resource<T>>.takeUntilLoadedOrError(): Flow<Resource<T>> {
+fun <T> Flow<Resource<T>>.takeUntilLoadedOrError(version: Int): Flow<Resource<T>> {
     return flow {
         try {
             collect { value ->
-                Logger.v("taken " + value)
-                if (value.isLoadedOrError()) {
-                    emit(value)
+                Logger.v("taken value.version(${value.version}) with version(${version}) " + value)
+                if (value.version > version) {
+                    // new flow started, interrupt as the current flow is outdated
+                    Logger.v("Going to stop: value.version(${value.version}) > version(${version})")
                     throw AbortFlowException(this)
+                } else if (value.version == version) {
+                    if (value.isLoadedOrError()) {
+                        emit(value)
+                        throw AbortFlowException(this)
+                    } else {
+                        emit(value)
+                    }
                 } else {
-                    emit(value)
+                    Logger.v("Got value from prev version: value.version(${value.version}) and version(${version})")
                 }
             }
         } catch (e: AbortFlowException) {
