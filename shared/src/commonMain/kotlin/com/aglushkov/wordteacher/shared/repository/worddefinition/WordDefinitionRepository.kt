@@ -2,7 +2,9 @@ package com.aglushkov.wordteacher.shared.repository.worddefinition
 
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
@@ -16,12 +18,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onCompletion
@@ -67,29 +71,45 @@ class WordDefinitionRepository(
         }
     }
 
-    suspend fun define(word: String): Flow<Resource<List<WordTeacherWord>>> {
+    // return a flow of a single word definitions loading
+    // need to be called before define method not to confuse the current error state with an error of
+    // the next request
+    fun defineFlow(word: String): Flow<Resource<List<WordTeacherWord>>> {
+        val stateFlow = obtainMutableStateFlow(word)
+        val currentValue = stateFlow.value
+
+        return stateFlow.dropWhile {
+            it.isError() && it == currentValue // skip error from the previous loading attempt
+        }.takeUntilLoadedOrError()
+    }
+
+    suspend fun define(word: String) = coroutineScope {
         val services = serviceRepository.services.data()
         val stateFlow = obtainMutableStateFlow(word)
 
-        return if (stateFlow.value.isLoaded()) {
-            flowOf(stateFlow.value)
-        } else if (services != null && services.isNotEmpty() && stateFlow.value.isNotLoadedAndNotLoading()) {
-            loadDefinitionsFlow(word, services)
-                .onEach {
-                    stateFlow.value = it
+        val currentValue = stateFlow.value
+
+        launch {
+            val loadFlow = if (currentValue.isLoaded()) {
+                flowOf(stateFlow.value)
+            } else if (services != null && services.isNotEmpty() && stateFlow.value.isNotLoadedAndNotLoading()) {
+                loadDefinitionsFlow(word, services)
+            } else {
+                Logger.v(
+                    "" + word + " is already loading " + stateFlow.value,
+                    WordDefinitionRepository::class.simpleName
+                )
+                emptyFlow()
+            }
+
+            loadFlow.onEach {
+                stateFlow.value = it
+            }.onCompletion { cause ->
+                cause?.let {
+                    // keep resource state in sync after cancellation or an error
+                    stateFlow.value = Resource.Error(it, true)
                 }
-                .onCompletion { cause ->
-                    cause?.let {
-                        // keep resource state in sync after cancellation or an error
-                        stateFlow.value = Resource.Error(it, true)
-                    }
-                }
-        } else {
-            Logger.v(
-                "" + word + " is already loading " + stateFlow.value,
-                WordDefinitionRepository::class.simpleName
-            )
-            stateFlow
+            }.collect()
         }
     }
 
@@ -129,6 +149,8 @@ class WordDefinitionRepository(
             val jobs: MutableList<Job> = mutableListOf()
 
             send(Resource.Loading())
+            Logger.v("loadDefinitionsFlow set Loading")
+
             for (service in services) {
                 // launch instead of async/await to get results as soon as possible in a completion order
                 val job = launch(CoroutineExceptionHandler { _, throwable ->
@@ -145,6 +167,7 @@ class WordDefinitionRepository(
 
             // TODO: sort somehow if needed (consider adding this in settings)
             send(Resource.Loaded(words.toList()))
+            Logger.v("loadDefinitionsFlow set Loaded")
         }
     }
 

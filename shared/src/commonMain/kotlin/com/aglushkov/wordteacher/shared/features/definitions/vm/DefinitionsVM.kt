@@ -5,7 +5,6 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.forward
-import com.aglushkov.wordteacher.shared.general.extensions.forwardUntilLoadedOrError
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
@@ -66,15 +65,15 @@ class DefinitionsVM(
     init {
         viewModelScope.launch {
             definitionsStateFlow.forward(viewItemsLiveData) {
-                Logger.v("build view items for " + it)
+                Logger.v("build view items")
                 buildViewItems(it ?: emptyList())
             }
         }
 
         word?.let {
-            load(it)
+            loadIfNeeded(it)
         } ?: run {
-            load("owl")
+            loadIfNeeded("owl")
         }
     }
 
@@ -82,7 +81,7 @@ class DefinitionsVM(
 
     fun onWordSubmitted(word: String) {
         if (word.isNotEmpty()) {
-            load(word)
+            loadIfNeeded(word)
         }
     }
 
@@ -97,18 +96,27 @@ class DefinitionsVM(
     }
 
     fun onTryAgainClicked() {
-        load(word!!)
+        loadIfNeeded(word!!)
     }
 
     // Actions
+
+    private fun loadIfNeeded(word: String) {
+        val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
+        if (stateFlow.value.isLoaded()) {
+            definitionsStateFlow.value = stateFlow.value
+        } else {
+            load(word)
+        }
+    }
 
     private fun load(word: String) {
         Logger.v("Start loading " + word)
         this.word = word
 
         loadJob?.cancel()
-        loadJob = viewModelScope.launch(CoroutineExceptionHandler { coroutineContext, throwable ->
-            Logger.e("Load Word exception for " + word +" " + throwable.message)
+        loadJob = viewModelScope.launch(CoroutineExceptionHandler { _, e ->
+            Logger.e("Load Word exception for " + word + " " + e.message)
         }) {
 // Kept for testing
 //            launch {
@@ -118,7 +126,10 @@ class DefinitionsVM(
 //                Logger.v("completed")
 //            }
 
-            wordDefinitionRepository.define(word).forward(definitionsStateFlow)
+            launch {
+                wordDefinitionRepository.defineFlow(word).forward(definitionsStateFlow)
+            }
+            wordDefinitionRepository.define(word)
         }
     }
 

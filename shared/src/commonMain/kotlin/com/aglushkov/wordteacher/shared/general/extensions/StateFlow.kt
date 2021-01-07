@@ -39,32 +39,32 @@ suspend fun <T, D> Flow<Resource<T>>.forward(
     }
 }
 
-// useful for a StateFlow to collect only the current loading session states
-suspend fun <T> Flow<Resource<T>>.forwardUntilLoadedOrError(
-    flow: MutableStateFlow<Resource<T>>
-) {
-    dropWhile {
-        it.isError() // skip an error from the previous loading attempt
-    }.takeUntilLoadedOrError().collect { res ->
-        flow.value = res
-    }
-}
-
-// useful for a StateFlow to collect only the current loading session states
-suspend fun <T, D> Flow<Resource<T>>.forwardUntilLoadedOrError(
-    liveData: MutableLiveData<Resource<D>>,
-    transform: (Resource<T>) -> D
-) {
-    dropWhile {
-        it.isError() // skip an error from the previous loading attempt
-    }.takeUntilLoadedOrError().collect { res ->
-        val viewItemsRes = res.copyWith(transform(res))
-        liveData.postValue(viewItemsRes)
-    }
-}
+//// useful for a StateFlow to collect only the current loading session states
+//suspend fun <T> Flow<Resource<T>>.forwardUntilLoadedOrError(
+//    flow: MutableStateFlow<Resource<T>>
+//) {
+//    dropWhile {
+//        it.isError() // skip an error from the previous loading attempt
+//    }.takeUntilLoadedOrError().collect { res ->
+//        flow.value = res
+//    }
+//}
+//
+//// useful for a StateFlow to collect only the current loading session states
+//suspend fun <T, D> Flow<Resource<T>>.forwardUntilLoadedOrError(
+//    liveData: MutableLiveData<Resource<D>>,
+//    transform: (Resource<T>) -> D
+//) {
+//    dropWhile {
+//        it.isError() // skip an error from the previous loading attempt
+//    }.takeUntilLoadedOrError().collect { res ->
+//        val viewItemsRes = res.copyWith(transform(res))
+//        liveData.postValue(viewItemsRes)
+//    }
+//}
 
 // Take until a resource operation is completed, the last state is emitted
-private fun <T> Flow<Resource<T>>.takeUntilLoadedOrError(): Flow<Resource<T>> {
+fun <T> Flow<Resource<T>>.takeUntilLoadedOrError(): Flow<Resource<T>> {
     return flow {
         try {
             collect { value ->
