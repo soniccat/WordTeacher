@@ -4,7 +4,6 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
@@ -78,17 +77,18 @@ class WordDefinitionRepository(
         word: String,
         reload: Boolean = false
     ): Flow<Resource<List<WordTeacherWord>>> {
-        // ignore if we have no services
+        val tag = "WordDefinitionRepository.define"
+
         val services = serviceRepository.services.data()
         if (services == null || services.isEmpty()) {
-            Logger.v("No services")
-            return emptyFlow()
+            Logger.e("No available services", tag)
+            throw NoAvailableServicesException()
         }
 
         // decide if we need to load or reuse what we've already loaded or what we're loading now
         val stateFlow = obtainMutableStateFlow(word)
         val currentValue = stateFlow.value
-        val needLoad = reload || currentValue.isError() || currentValue.isNotLoadedAndNotLoading()
+        val needLoad = reload || currentValue.isNotLoadedAndNotLoading()
 
         val nextVersion = if (needLoad) {
             currentValue.version + 1
@@ -103,21 +103,6 @@ class WordDefinitionRepository(
 
             jobs[word]?.cancel()
             jobs[word] = scope.launch { // use our scope here to avoid cancellation by Structured Concurrency
-//                val currentValue = stateFlow.value
-//                val loadFlow = if (needLoad) {
-//                    Logger.v("called loadDefinitionsFlow")
-//                    loadDefinitionsFlow(word, nextVersion, services)
-//                } else if (currentValue is Resource.Loaded) {
-//                    Logger.v("called flowOf with Loaded")
-//                    flowOf(currentValue.toLoaded(currentValue.data, version = nextVersion))
-//                } else {
-//                    Logger.v(
-//                        "" + word + " is already loading " + stateFlow.value,
-//                        WordDefinitionRepository::class.simpleName
-//                    )
-//                    emptyFlow()
-//                }
-
                 loadDefinitionsFlow(word, nextVersion, services).onEach {
                     if (it.version == nextVersion) {
                         stateFlow.value = it
@@ -125,7 +110,7 @@ class WordDefinitionRepository(
                 }.onCompletion { cause ->
                     cause?.let {
                         // keep resource state in sync after cancellation or an error
-                        Logger.e("Define flow error (${nextVersion}) " + it.message)
+                        Logger.e("Define flow error ($nextVersion) " + it.message, tag)
                         val completionValue = stateFlow.value
                         if (completionValue.version == nextVersion) {
                             stateFlow.value = Resource.Error(it, true)
@@ -133,6 +118,8 @@ class WordDefinitionRepository(
                     }
                 }.collect()
             }
+        } else {
+            Logger.v("Going to reuse resource state $currentValue", tag)
         }
 
         return stateFlow.takeUntilLoadedOrErrorForVersion()
@@ -160,11 +147,12 @@ class WordDefinitionRepository(
         // channelFlow to be able to emit from different coroutines
         // supervisorScope not to interrupt when a service fails
         supervisorScope {
+            val tag = "WordDefinitionRepository.loadDefinitionsFlow"
             val words = mutableListOf<WordTeacherWord>()
             val jobs: MutableList<Job> = mutableListOf()
 
             send(Resource.Loading(version = version))
-            Logger.v("loadDefinitionsFlow set Loading")
+            Logger.v("send Loading", tag)
 
             for (service in services) {
                 // launch instead of async/await to get results as soon as possible in a completion order
@@ -182,7 +170,7 @@ class WordDefinitionRepository(
 
             // TODO: sort somehow if needed (consider adding this in settings)
             send(Resource.Loaded(words.toList(), version = version))
-            Logger.v("loadDefinitionsFlow set Loaded")
+            Logger.v("send Loaded", tag)
         }
     }
 

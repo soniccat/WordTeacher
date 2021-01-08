@@ -116,23 +116,17 @@ class DefinitionsVM(
     }
 
     private fun load(word: String) {
-        Logger.v("Start loading " + word)
+        val tag = "DefinitionsVM.load"
+
+        Logger.v("Start Loading $word", tag)
         this.word = word
 
         loadJob?.cancel()
         loadJob = viewModelScope.launch(CoroutineExceptionHandler { _, e ->
-            Logger.e("Load Word exception for " + word + " " + e.message)
+            Logger.e("Load Word exception for $word ${e.message}", tag)
         }) {
-// Kept for testing
-//            launch {
-//                val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
-//                Logger.v("obtained " + stateFlow.value)
-//                stateFlow.forwardUntilLoadedOrError(definitionsStateFlow)
-//                Logger.v("completed")
-//            }
-
             wordDefinitionRepository.define(word, false).forward(definitionsStateFlow)
-            Logger.v("Finish Loading " + word)
+            Logger.v("Finish Loading $word", tag)
         }
     }
 
