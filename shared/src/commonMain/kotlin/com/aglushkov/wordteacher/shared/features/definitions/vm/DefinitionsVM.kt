@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilLoaded
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -29,6 +30,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 
@@ -70,10 +72,13 @@ class DefinitionsVM(
             }
         }
 
-        word?.let {
-            loadIfNeeded(it)
-        } ?: run {
-            loadIfNeeded("owl")
+        viewModelScope.launch {
+            wordDefinitionRepository.servicesFlow.collectUntilLoaded()
+            word?.let {
+                loadIfNeeded(it)
+            } ?: run {
+                loadIfNeeded("owl")
+            }
         }
     }
 
@@ -126,7 +131,7 @@ class DefinitionsVM(
 //                Logger.v("completed")
 //            }
 
-            wordDefinitionRepository.define(word, this, false).forward(definitionsStateFlow)
+            wordDefinitionRepository.define(word, false).forward(definitionsStateFlow)
             Logger.v("Finish Loading " + word)
         }
     }

@@ -2,92 +2,122 @@ package com.aglushkov.wordteacher.shared.general.extensions
 
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.v
-import dev.icerock.moko.mvvm.livedata.LiveData
 import dev.icerock.moko.mvvm.livedata.MutableLiveData
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.takeWhile
 
-suspend fun <T> Flow<T>.forward(stateFlow: MutableStateFlow<T>) {
-    collect {
-        stateFlow.value = it
+suspend fun <T> Flow<Resource<T>>.forward(stateFlow: MutableStateFlow<Resource<T>>) {
+    collect { newRes ->
+        stateFlow.value = newRes
     }
 }
 
+suspend fun <T> StateFlow<Resource<T>>.forwardForVersion(
+    stateFlow: MutableStateFlow<Resource<T>>
+) = forward(value.version, stateFlow)
+
+suspend fun <T> Flow<Resource<T>>.forward(version: Int, stateFlow: MutableStateFlow<Resource<T>>) {
+    collect { newRes ->
+        applyResValueIfNeeded(version, newRes) {
+            stateFlow.value = newRes
+        }
+    }
+}
+
+suspend fun <T, D> Flow<Resource<T>>.forward(liveData: MutableLiveData<Resource<D>>, transform: (T?) -> D) {
+    collect { newRes ->
+        val liveDataRes = newRes.copyWith(transform(newRes.data()))
+        liveData.postValue(liveDataRes)
+    }
+}
+
+suspend fun <T, D> StateFlow<Resource<T>>.forwardForVersion(
+    liveData: MutableLiveData<Resource<D>>,
+    transform: (T?) -> D
+) = forward(value.version, liveData, transform)
+
 suspend fun <T, D> Flow<Resource<T>>.forward(
+    version: Int,
     liveData: MutableLiveData<Resource<D>>,
     transform: (T?) -> D
 ) {
-    collect {
-        val viewItems = transform(it.data())
-        liveData.postValue(it.copyWith(viewItems))
+    collect { newRes ->
+        applyResValueIfNeeded(version, newRes) {
+            val liveDataRes = newRes.copyWith(transform(newRes.data()))
+            liveData.postValue(liveDataRes)
+        }
     }
 }
 
-//// useful for a StateFlow to collect only the current loading session states
-//suspend fun <T> Flow<Resource<T>>.forwardUntilLoadedOrError(
-//    flow: MutableStateFlow<Resource<T>>
-//) {
-//    dropWhile {
-//        it.isError() // skip an error from the previous loading attempt
-//    }.takeUntilLoadedOrError().collect { res ->
-//        flow.value = res
-//    }
-//}
-//
-//// useful for a StateFlow to collect only the current loading session states
-//suspend fun <T, D> Flow<Resource<T>>.forwardUntilLoadedOrError(
-//    liveData: MutableLiveData<Resource<D>>,
-//    transform: (Resource<T>) -> D
-//) {
-//    dropWhile {
-//        it.isError() // skip an error from the previous loading attempt
-//    }.takeUntilLoadedOrError().collect { res ->
-//        val viewItemsRes = res.copyWith(transform(res))
-//        liveData.postValue(viewItemsRes)
-//    }
-//}
+suspend fun <T> StateFlow<Resource<T>>.collectUntilLoaded() {
+    takeWhile { !it.isLoaded() }.collect()
+}
 
 // Take until a resource operation is completed, the last state is emitted
-fun <T> Flow<Resource<T>>.takeUntilLoadedOrError(version: Int): Flow<Resource<T>> {
+fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(): Flow<Resource<T>> {
+    val version = value.version
     return flow {
         try {
-            collect { value ->
-                Logger.v("taken value.version(${value.version}) with version(${version}) " + value)
-                if (value.version > version) {
-                    // new flow started, interrupt as the current flow is outdated
-                    Logger.v("Going to stop: value.version(${value.version}) > version(${version})")
-                    throw AbortFlowException(this)
-                } else if (value.version == version) {
-                    if (value.isLoadedOrError()) {
-                        emit(value)
-                        throw AbortFlowException(this)
-                    } else {
-                        emit(value)
+            collect { newRes ->
+                Logger.v("got value.version(${value.version}) with version(${version}) " + value)
+                applyResValueIfNeeded(
+                    startVersion = version,
+                    newRes = newRes,
+                    applyFun = {
+                        if (newRes.isLoadedOrError()) {
+                            emit(newRes)
+                            throw AbortFlowException(this)
+                        } else {
+                            emit(newRes)
+                        }
+                    },
+                    createOutdatedException = {
+                        AbortFlowException(this@flow)
                     }
-                } else {
-                    Logger.v("Got value from prev version: value.version(${value.version}) and version(${version})")
-                }
+                )
             }
         } catch (e: AbortFlowException) {
             if (this != e.owner) {
                 throw e
             }
+        }
+    }
+}
+
+private suspend fun <T> applyResValueIfNeeded(
+    startVersion: Int,
+    newRes: Resource<T>,
+    applyFun: suspend () -> Unit
+) {
+    applyResValueIfNeeded(startVersion, newRes, applyFun) {
+        CancellationException("Version ${startVersion} is outdated with version ${newRes.version}")
+    }
+}
+
+private suspend fun <T> applyResValueIfNeeded(
+    startVersion: Int,
+    newRes: Resource<T>,
+    applyFun: suspend () -> Unit,
+    createOutdatedException: () -> CancellationException
+) {
+    when {
+        startVersion == newRes.version -> {
+            applyFun()
+        }
+        startVersion < newRes.version -> {
+            throw createOutdatedException()
+        }
+        else -> {
+            Logger.v("Got value from prev version: version(${startVersion}) and newRes.version(${newRes.version})")
         }
     }
 }

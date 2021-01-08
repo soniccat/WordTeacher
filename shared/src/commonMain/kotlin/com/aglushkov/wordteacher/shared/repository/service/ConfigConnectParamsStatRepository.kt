@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.repository.service
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -57,7 +58,10 @@ class ConfigConnectParamsStatRepository(
                 ConfigConnectParamsStat.fromByteArray(bytes)
             }
             emit(Resource.Loaded(configs))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
+            e.printStackTrace()
             emit(Resource.Loaded<List<ConfigConnectParamsStat>>(emptyList()))
         }
     }
@@ -70,8 +74,10 @@ class ConfigConnectParamsStatRepository(
                 val bytes = value.toByteArray()
                 file.saveContent(bytes)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            // TODO: ???
+            e.printStackTrace()
         }
     }
 }

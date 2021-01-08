@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
 import com.aglushkov.wordteacher.shared.service.ConfigService
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -57,6 +58,8 @@ class ConfigRepository(
         try {
             val configs = service.config()
             emit(Resource.Loaded(configs))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             e.printStackTrace()
             emit(stateFlow.value.toError(e, true))

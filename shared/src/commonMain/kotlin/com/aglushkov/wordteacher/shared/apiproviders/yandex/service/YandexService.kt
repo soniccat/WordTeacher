@@ -56,13 +56,9 @@ class YandexService(
             val responseString = res.readBytes().decodeToString()
             logger.logLoadingCompleted(word, res, responseString)
 
-            try {
-                Json {
-                    ignoreUnknownKeys = true
-                }.decodeFromString(responseString)
-            } catch (e: Exception) {
-                throw IllegalArgumentException(e.message)
-            }
+            Json {
+                ignoreUnknownKeys = true
+            }.decodeFromString(responseString)
         }
     }
 }
