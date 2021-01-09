@@ -78,27 +78,22 @@ class WordDefinitionRepository(
         reload: Boolean = false
     ): Flow<Resource<List<WordTeacherWord>>> {
         val tag = "WordDefinitionRepository.define"
+        val services = serviceRepository.services.data().orEmpty()
 
-        val services = serviceRepository.services.data()
-        if (services == null || services.isEmpty()) {
-            Logger.e("No available services", tag)
-            throw NoAvailableServicesException()
-        }
-
-        // decide if we need to load or reuse what we've already loaded or what we're loading now
+        // Decide if we need to load or reuse what we've already loaded or what we're loading now
         val stateFlow = obtainMutableStateFlow(word)
         val currentValue = stateFlow.value
         val needLoad = reload || currentValue.isNotLoadedAndNotLoading()
 
-        val nextVersion = if (needLoad) {
+        // Keep version for Uninitialized to support flow collecting in advance when services aren't loaded
+        val nextVersion = if (needLoad && !currentValue.isUninitialized()) {
             currentValue.version + 1
         } else {
             currentValue.version
         }
 
-        // launch loading flow
-        if (needLoad) {
-            // update the version of a resource as soon as possible to filter changes from the current flow if it exists
+        if (needLoad && services.isNotEmpty()) {
+            // Update the version of a resource as soon as possible to filter changes from the current flow if it exists
             stateFlow.value = Resource.Loading(version = nextVersion)
 
             jobs[word]?.cancel()
@@ -109,7 +104,7 @@ class WordDefinitionRepository(
                     }
                 }.onCompletion { cause ->
                     cause?.let {
-                        // keep resource state in sync after cancellation or an error
+                        // Keep resource state in sync after cancellation or an error
                         Logger.e("Define flow error ($nextVersion) " + it.message, tag)
                         val completionValue = stateFlow.value
                         if (completionValue.version == nextVersion) {
@@ -144,8 +139,8 @@ class WordDefinitionRepository(
         version: Int,
         services: List<WordTeacherWordService>
     ): Flow<Resource<List<WordTeacherWord>>> = channelFlow {
-        // channelFlow to be able to emit from different coroutines
-        // supervisorScope not to interrupt when a service fails
+        // ChannelFlow to be able to emit from different coroutines
+        // SupervisorScope not to interrupt when a service fails
         supervisorScope {
             val tag = "WordDefinitionRepository.loadDefinitionsFlow"
             val words = mutableListOf<WordTeacherWord>()

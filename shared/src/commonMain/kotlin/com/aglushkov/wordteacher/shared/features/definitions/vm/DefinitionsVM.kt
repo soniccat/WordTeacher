@@ -4,12 +4,10 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.extensions.collectUntilLoaded
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
-import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
@@ -28,9 +26,6 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 
@@ -72,13 +67,10 @@ class DefinitionsVM(
             }
         }
 
-        viewModelScope.launch {
-            wordDefinitionRepository.servicesFlow.collectUntilLoaded()
-            word?.let {
-                loadIfNeeded(it)
-            } ?: run {
-                loadIfNeeded("owl")
-            }
+        word?.let {
+            loadIfNeeded(it)
+        } ?: run {
+            loadIfNeeded("owl")
         }
     }
 
@@ -144,16 +136,16 @@ class DefinitionsVM(
         return items
     }
 
-    // set unique id taking into account that for the same items id shouldn't change
+    // Set unique id taking into account that for the same items id shouldn't change
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
         val prevItems = viewItemsLiveData.value.data() ?: emptyList()
         val map: MutableMap<Int, MutableList<BaseViewItem<*>>> = mutableMapOf()
 
-        // put items with ids in map
+        // Put items with ids in map
         prevItems.forEach {
             val itemsHashCode = it.itemsHashCode()
 
-            // obtain mutable list
+            // Obtain mutable list
             val listOfViewItems: MutableList<BaseViewItem<*>> = map[itemsHashCode]
                 ?: mutableListOf<BaseViewItem<*>>().also { list ->
                     map[itemsHashCode] = list
