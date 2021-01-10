@@ -81,7 +81,6 @@ class DefinitionsFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         bindView()
 
-        androidVM.viewModelScope
         viewLifecycleOwner.lifecycleScope.launch {
             definitionsVM.definitions.collect {
                 showDefinitions(it)

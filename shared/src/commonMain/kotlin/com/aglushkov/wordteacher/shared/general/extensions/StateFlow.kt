@@ -5,7 +5,6 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.v
-import dev.icerock.moko.mvvm.livedata.MutableLiveData
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -29,31 +28,6 @@ suspend fun <T> Flow<Resource<T>>.forward(version: Int, stateFlow: MutableStateF
     collect { newRes ->
         applyResValueIfNeeded(version, newRes) {
             stateFlow.value = newRes
-        }
-    }
-}
-
-suspend fun <T, D> Flow<Resource<T>>.forward(liveData: MutableLiveData<Resource<D>>, transform: (T?) -> D) {
-    collect { newRes ->
-        val liveDataRes = newRes.copyWith(transform(newRes.data()))
-        liveData.postValue(liveDataRes)
-    }
-}
-
-suspend fun <T, D> StateFlow<Resource<T>>.forwardForVersion(
-    liveData: MutableLiveData<Resource<D>>,
-    transform: (T?) -> D
-) = forward(value.version, liveData, transform)
-
-suspend fun <T, D> Flow<Resource<T>>.forward(
-    version: Int,
-    liveData: MutableLiveData<Resource<D>>,
-    transform: (T?) -> D
-) {
-    collect { newRes ->
-        applyResValueIfNeeded(version, newRes) {
-            val liveDataRes = newRes.copyWith(transform(newRes.data()))
-            liveData.postValue(liveDataRes)
         }
     }
 }
