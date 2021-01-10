@@ -14,7 +14,7 @@ object Versions {
     val ktor = "1.4.3"
     val coroutines = "1.3.9-native-mt-2"
     val serialization = "1.0.1"
-    val lifecycle = "2.1.0"
+    val lifecycle = "2.2.0"
 }
 
 object Deps {
@@ -56,7 +56,8 @@ object Deps {
         val coreKtx = "androidx.core:core-ktx:1.2.0"
         val constraintLayout = "androidx.constraintlayout:constraintlayout:2.0.2"
         val recyclerView = "androidx.recyclerview:recyclerview:1.1.0"
-        val lifecycleExtensions = "androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
+        val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
+        val lifecycleKtx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}"
     }
 
     val okio = "com.squareup.okio:okio-multiplatform:2.9.0"

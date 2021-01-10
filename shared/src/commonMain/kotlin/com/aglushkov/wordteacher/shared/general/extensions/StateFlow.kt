@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.takeWhile
 
-suspend fun <T> Flow<Resource<T>>.forward(stateFlow: MutableStateFlow<Resource<T>>) {
+suspend fun <T> Flow<T>.forward(stateFlow: MutableStateFlow<T>) {
     collect { newRes ->
         stateFlow.value = newRes
     }

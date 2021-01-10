@@ -57,7 +57,8 @@ dependencies {
     implementation(Deps.Google.appcompat)
     implementation(Deps.Google.constraintLayout)
     implementation(Deps.Google.coreKtx)
-    implementation(Deps.Google.lifecycleExtensions)
+    implementation(Deps.Google.viewModelKtx)
+    implementation(Deps.Google.lifecycleKtx)
 
     implementation(Deps.Coroutines.common)
     implementation(Deps.Coroutines.android)

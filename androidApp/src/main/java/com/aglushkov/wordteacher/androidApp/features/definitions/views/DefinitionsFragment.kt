@@ -2,13 +2,17 @@ package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import android.app.Application
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentDefinitionsBinding
@@ -23,6 +27,8 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import dev.icerock.moko.mvvm.utils.bind
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DefinitionsVMWrapper(
@@ -35,14 +41,15 @@ class DefinitionsVMWrapper(
 }
 
 class DefinitionsFragment: Fragment() {
-    private lateinit var vm: DefinitionsVM
+    private lateinit var androidVM: DefinitionsVMWrapper
+    private lateinit var definitionsVM: DefinitionsVM
     private var binding: FragmentDefinitionsBinding? = null
 
     @Inject lateinit var binder: ViewItemBinder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val vmWrapper = ViewModelProviders.of(this)
+        androidVM = ViewModelProvider(this)
                 .get(DefinitionsVMWrapper::class.java)
 
         val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: DefinitionsVM.State()
@@ -50,19 +57,19 @@ class DefinitionsFragment: Fragment() {
         val component = DaggerDefinitionsComponent.builder()
             .setDeps(deps)
             .setVMState(vmState)
-            .setVMWrapper(vmWrapper)
+            .setVMWrapper(androidVM)
             .build()
-        if (!vmWrapper.isInitialized()) {
-            component.injectViewModelWrapper(vmWrapper)
+        if (!androidVM.isInitialized()) {
+            component.injectViewModelWrapper(androidVM)
         }
         component.injectDefinitionsFragment(this)
 
-        vm = vmWrapper.vm
+        definitionsVM = androidVM.vm
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(VM_STATE, vm.state)
+        outState.putParcelable(VM_STATE, definitionsVM.state)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -74,8 +81,11 @@ class DefinitionsFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         bindView()
 
-        vm.definitions.bind(viewLifecycleOwner) {
-            showDefinitions(it!!)
+        androidVM.viewModelScope
+        viewLifecycleOwner.lifecycleScope.launch {
+            definitionsVM.definitions.collect {
+                showDefinitions(it)
+            }
         }
     }
 
@@ -87,12 +97,12 @@ class DefinitionsFragment: Fragment() {
         }
 
         binding.loadingStatusView.setOnTryAgainListener {
-            vm.onTryAgainClicked()
+            definitionsVM.onTryAgainClicked()
         }
 
         binding.searchview.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                vm.onWordSubmitted(query ?: "")
+                definitionsVM.onWordSubmitted(query ?: "")
                 return true
             }
 
@@ -110,7 +120,7 @@ class DefinitionsFragment: Fragment() {
     private fun showDefinitions(it: Resource<List<BaseViewItem<*>>>) {
         val binding = this.binding!!
 
-        val errorText = vm.getErrorText(it)?.toString(requireContext())
+        val errorText = definitionsVM.getErrorText(it)?.toString(requireContext())
         it.bind(binding.loadingStatusView, errorText)
 
         updateListAdapter(it)

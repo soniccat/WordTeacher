@@ -16,8 +16,6 @@ import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.mvvm.livedata.LiveData
-import dev.icerock.moko.mvvm.livedata.MutableLiveData
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
@@ -26,6 +24,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
@@ -36,9 +35,8 @@ class DefinitionsVM(
     val state: State
 ): ViewModel() {
 
-    private val definitionsStateFlow = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
-    private val viewItemsLiveData = MutableLiveData<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
-    val definitions: LiveData<Resource<List<BaseViewItem<*>>>> = viewItemsLiveData
+    private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
+    val definitions = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
     val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     var loadJob: Job? = null
 
@@ -60,11 +58,13 @@ class DefinitionsVM(
         }
 
     init {
+        // TODO: remove after updating to 1.4 coroutines version
+        // need to write sth like val definitions = definitionWords.map{...}.asStateFlow()
         viewModelScope.launch {
-            definitionsStateFlow.forward(viewItemsLiveData) {
+            definitionWords.map {
                 Logger.v("build view items")
-                buildViewItems(it ?: emptyList())
-            }
+                it.copyWith(buildViewItems(it.data() ?: emptyList()))
+            }.forward(definitions)
         }
 
         word?.let {
@@ -88,7 +88,7 @@ class DefinitionsVM(
         val words = wordDefinitionRepository.obtainStateFlow(this.word!!).value
         if (words.isLoaded()) {
             this.displayMode = mode
-            viewItemsLiveData.value = Resource.Loaded(buildViewItems(words.data()!!))
+            definitions.value = Resource.Loaded(buildViewItems(words.data()!!))
         }
     }
 
@@ -101,7 +101,7 @@ class DefinitionsVM(
     private fun loadIfNeeded(word: String) {
         val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
         if (stateFlow.value.isLoaded()) {
-            definitionsStateFlow.value = stateFlow.value
+            definitionWords.value = stateFlow.value
         } else {
             load(word)
         }
@@ -117,7 +117,7 @@ class DefinitionsVM(
         loadJob = viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             Logger.e("Load Word exception for $word ${e.message}", tag)
         }) {
-            wordDefinitionRepository.define(word, false).forward(definitionsStateFlow)
+            wordDefinitionRepository.define(word, false).forward(definitionWords)
             Logger.v("Finish Loading $word", tag)
         }
     }
@@ -138,7 +138,7 @@ class DefinitionsVM(
 
     // Set unique id taking into account that for the same items id shouldn't change
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
-        val prevItems = viewItemsLiveData.value.data() ?: emptyList()
+        val prevItems = definitions.value.data() ?: emptyList()
         val map: MutableMap<Int, MutableList<BaseViewItem<*>>> = mutableMapOf()
 
         // Put items with ids in map
