@@ -8,10 +8,11 @@ buildscript {
     }
 
     dependencies {
-        classpath(Deps.Gradle.androidGradlePlugin)
-        classpath(Deps.Gradle.kotlinGradlePlugin)
-        classpath(Deps.Mp.serialization)
+        classpath(Deps.Gradle.androidClasspath)
+        classpath(Deps.Gradle.kotlinClasspath)
+        classpath(Deps.Mp.serializationClasspath)
         classpath(Deps.MokoResources.classpath)
+        classpath(Deps.SqlDelight.classpath)
     }
 }
 

@@ -10,7 +10,7 @@ object Versions {
     val androidx_test_ext = "1.1.1"
     val android_gradle_plugin = "4.1.0"
     val junit = "4.13"
-    val sqlDelight = "1.4.1"
+    val sqlDelight = "1.4.4"
     val ktor = "1.4.3"
     val coroutines = "1.3.9-native-mt-2"
     val serialization = "1.0.1"
@@ -19,8 +19,8 @@ object Versions {
 
 object Deps {
     object Gradle {
-        val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
-        val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.android_gradle_plugin}"
+        val kotlinClasspath = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+        val androidClasspath = "com.android.tools.build:gradle:${Versions.android_gradle_plugin}"
     }
 
     val kotlinxRepo = URI("https://kotlin.bintray.com/kotlinx/")
@@ -45,7 +45,7 @@ object Deps {
 
     object Mp {
         val serializationPlugin = "org.jetbrains.kotlin.plugin.serialization"
-        val serialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}"
+        val serializationClasspath = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}"
         val serializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}"
     }
 
@@ -86,7 +86,8 @@ object Deps {
     }
 
     object SqlDelight{
-        val gradle = "com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}"
+        val classpath = "com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}"
+        val plugin = "com.squareup.sqldelight"
         val runtime = "com.squareup.sqldelight:runtime:${Versions.sqlDelight}"
         val runtimeJdk = "com.squareup.sqldelight:runtime-jvm:${Versions.sqlDelight}"
         val iOSDriver = "com.squareup.sqldelight:native-driver:${Versions.sqlDelight}"

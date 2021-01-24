@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform")
@@ -7,7 +6,9 @@ plugins {
     kotlin("native.cocoapods")
     id(Deps.Mp.serializationPlugin)
     id(Deps.MokoResources.plugin)
+    id(Deps.SqlDelight.plugin)
 }
+
 group = "com.aglushkov.wordteacher"
 version = "1.0-SNAPSHOT"
 
@@ -37,6 +38,7 @@ kotlin {
                 implementation(Deps.okio)
                 implementation(Deps.dateTime)
                 implementation(Deps.logger)
+                implementation(Deps.SqlDelight.runtime)
             }
         }
         val commonTest by getting {
@@ -48,6 +50,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(Deps.Google.material)
+                implementation(Deps.SqlDelight.androidDriver)
             }
         }
         val androidTest by getting {
@@ -66,6 +69,7 @@ kotlin {
                         strictly(Versions.coroutines)
                     }
                 }
+                implementation(Deps.SqlDelight.iOSDriver)
             }
         }
         val iosTest by getting
@@ -102,4 +106,11 @@ android {
 multiplatformResources {
     multiplatformResourcesPackage = "com.aglushkov.wordteacher.shared.res" // required
     iosBaseLocalizationRegion = "en" // optional, default "en"
+}
+
+sqldelight {
+    database("AppDatabase") {
+        packageName = "com.aglushkov.wordteacher.shared.cache"
+//        schemaOutputDirectory = File("/shared/src/commonMain/kotlin/com/aglushkov/wordteacher/db")
+    }
 }
