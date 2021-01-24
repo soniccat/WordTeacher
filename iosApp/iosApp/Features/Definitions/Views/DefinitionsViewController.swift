@@ -17,6 +17,8 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
     let vm: DefinitionsVM
     let binder: ItemViewBinder
     
+    var definitionCollect: Ktor_ioCloseable?
+    
     init(vm: DefinitionsVM, binder: ItemViewBinder) {
         self.vm = vm
         self.binder = binder
@@ -32,12 +34,21 @@ public class DefinitionsViewController: UIViewController, UICollectionViewDelega
         super.viewDidLoad()
 
         bindView()
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         observeViewModel()
     }
     
+    public override func viewDidDisappear(_ animated: Bool) {
+        definitionCollect?.close()
+        super.viewDidDisappear(animated)
+    }
+    
     private func observeViewModel() {
-        vm.definitions.addObserver { [weak self] (res: Resource<NSArray>?) in
-            self?.showDefinitions(res: res!)
+        definitionCollect = FlowKt.asCommonFlow(vm.definitions).collect { [weak self] (res: AnyObject?) in
+            self?.showDefinitions(res: res as! Resource<NSArray>)
         }
     }
     
