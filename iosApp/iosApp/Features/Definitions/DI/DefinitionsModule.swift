@@ -14,7 +14,7 @@ class DefinitionsModule: Module {
     typealias Scope = Singleton
     
     static func configure(binder: Binder<Singleton>) {
-        binder.bind().sharedInScope().to { DefinitionsVM.State(word: nil) }
+        binder.bind().sharedInScope().to(value: DefinitionsVM.State(word: nil) )
         binder.bind().sharedInScope().to(factory: DefinitionsVM.init.self)
         binder.bind().sharedInScope().to(factory: DefinitionsDisplayModeBlueprint.init.self)
         binder.bind().sharedInScope().to(factory: WordDefinitionBlueprint.init.self)
@@ -26,7 +26,7 @@ class DefinitionsModule: Module {
         binder.bind().sharedInScope().to(factory: WordTitleBlueprint.init.self)
         binder.bind().sharedInScope().to(factory: WordTranscriptionBlueprint.init.self)
         
-        binder.bind().sharedInScope().to { (
+        binder.bind().sharedInScope().to(factory: { (
                 definitionsDisplayModeBlueprint: DefinitionsDisplayModeBlueprint,
                 wordDefinitionBlueprint: WordDefinitionBlueprint,
                 wordDividerBlueprint: WordDividerBlueprint,
@@ -47,6 +47,6 @@ class DefinitionsModule: Module {
                 .addBlueprint(blueprint: wordSynonymBlueprint)
                 .addBlueprint(blueprint: wordTitleBlueprint)
                 .addBlueprint(blueprint: wordTranscriptionBlueprint)
-        }
+        })
     }
 }
