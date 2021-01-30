@@ -122,3 +122,12 @@ sqldelight {
 //        schemaOutputDirectory = File("/shared/src/commonMain/kotlin/com/aglushkov/wordteacher/db")
     }
 }
+
+// HACK: add sqlite3 lib in libraries deps
+tasks.getByName("podspec").doLast {
+    val podspec = file("${project.name.replace("-", "_")}.podspec")
+    val newPodspecContent = podspec.readLines().map {
+        if (it.contains("spec.libraries")) "    spec.libraries                = \"c++\", \"sqlite3\"" else it
+    }
+    podspec.writeText(newPodspecContent.joinToString(separator = "\n"))
+}

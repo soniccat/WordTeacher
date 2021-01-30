@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -42,9 +42,10 @@
 		D66AD9EC254356DD00FA02E5 /* WordTitleBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9EB254356DD00FA02E5 /* WordTitleBlueprint.swift */; };
 		D66AD9EE2543573D00FA02E5 /* WordTranscriptionBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */; };
 		D66AD9F0254F256E00FA02E5 /* UIFontDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9EF254F256E00FA02E5 /* UIFontDescriptor.swift */; };
+		D6E6B50D25C5B0FD00968C46 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6E6B50C25C5B0FD00968C46 /* Pods_iosApp.framework */; };
+		D6E6B50E25C5B0FD00968C46 /* Pods_iosApp.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D6E6B50C25C5B0FD00968C46 /* Pods_iosApp.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D6F0817C256118F100CE0A25 /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F0817B256118F100CE0A25 /* Array.swift */; };
 		D6F0817E25613CD800CE0A25 /* UIControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F0817D25613CD800CE0A25 /* UIControl.swift */; };
-		EDFB1B7912668ECF28598241 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B30C4FB1CDF32F2A16354715 /* Pods_iosApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +65,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		D6E6B50925C5B0E900968C46 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D6E6B50E25C5B0FD00968C46 /* Pods_iosApp.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		74C88E66E473911227FB0100 /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -80,7 +95,6 @@
 		7555FFA0242A565B00829871 /* iosAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosAppUITests.swift; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7DAFF2873FB8E4A8C45D9D4B /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
-		B30C4FB1CDF32F2A16354715 /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D60B08B5253CCD840053C558 /* DefinitionsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DefinitionsViewController.xib; sourceTree = "<group>"; };
 		D60B08B8253CD12F0053C558 /* SimpleAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleAdapter.swift; sourceTree = "<group>"; };
 		D60B08BB253CD7770053C558 /* SelfSizingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfSizingCell.swift; sourceTree = "<group>"; };
@@ -109,6 +123,7 @@
 		D66AD9EB254356DD00FA02E5 /* WordTitleBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTitleBlueprint.swift; sourceTree = "<group>"; };
 		D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTranscriptionBlueprint.swift; sourceTree = "<group>"; };
 		D66AD9EF254F256E00FA02E5 /* UIFontDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFontDescriptor.swift; sourceTree = "<group>"; };
+		D6E6B50C25C5B0FD00968C46 /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6F0817B256118F100CE0A25 /* Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
 		D6F0817D25613CD800CE0A25 /* UIControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -118,7 +133,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EDFB1B7912668ECF28598241 /* Pods_iosApp.framework in Frameworks */,
+				D6E6B50D25C5B0FD00968C46 /* Pods_iosApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,7 +231,7 @@
 		7555FFB0242A642200829871 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B30C4FB1CDF32F2A16354715 /* Pods_iosApp.framework */,
+				D6E6B50C25C5B0FD00968C46 /* Pods_iosApp.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -323,9 +338,9 @@
 				7555FF77242A565900829871 /* Sources */,
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
-				7555FFB4242A642300829871 /* Embed Frameworks */,
 				D631705725605D0F00A8519D /* moko-resources */,
 				49C506982EFA920096BC2053 /* [CP] Embed Pods Frameworks */,
+				D6E6B50925C5B0E900968C46 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -379,7 +394,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1130;
-				LastUpgradeCheck = 1130;
+				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = orgName;
 				TargetAttributes = {
 					7555FF7A242A565900829871 = {
@@ -628,6 +643,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -688,6 +704,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -726,6 +743,11 @@
 				DEVELOPMENT_TEAM = XP6VQC3J3R;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Cleanse/Cleanse.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Reachability/Reachability.framework/Headers\"",
+				);
 				INFOPLIST_FILE = iosApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
