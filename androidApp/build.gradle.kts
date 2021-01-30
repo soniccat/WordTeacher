@@ -54,6 +54,7 @@ android {
 dependencies {
     implementation(project(":shared"))
 
+    implementation(Deps.Google.fragments)
     implementation(Deps.Google.material)
     implementation(Deps.Google.appcompat)
     implementation(Deps.Google.constraintLayout)

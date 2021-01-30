@@ -12,7 +12,7 @@ object Versions {
     val junit = "4.13"
     val sqlDelight = "1.4.4"
     val ktor = "1.4.3"
-    val coroutines = "1.3.9-native-mt-2"
+    val coroutines = "1.4.2-native-mt"
     val serialization = "1.0.1"
     val lifecycle = "2.2.0"
 }
@@ -41,7 +41,7 @@ object Deps {
         val impl = "dev.icerock.moko:graphics:0.4.0"
     }
 
-    val mokoMvvm = "dev.icerock.moko:mvvm:0.8.0"
+    val mokoMvvm = "dev.icerock.moko:mvvm-core:0.9.1"
 
     object Mp {
         val serializationPlugin = "org.jetbrains.kotlin.plugin.serialization"
@@ -58,6 +58,7 @@ object Deps {
         val recyclerView = "androidx.recyclerview:recyclerview:1.1.0"
         val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
         val lifecycleKtx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}"
+        val fragments = "androidx.fragment:fragment-ktx:1.2.5"
     }
 
     val okio = "com.squareup.okio:okio-multiplatform:2.9.0"
