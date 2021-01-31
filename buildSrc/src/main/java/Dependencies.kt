@@ -15,6 +15,8 @@ object Versions {
     val coroutines = "1.4.2-native-mt"
     val serialization = "1.0.1"
     val lifecycle = "2.2.0"
+
+    val mokoResources = "0.14.0"
 }
 
 object Deps {
@@ -29,8 +31,8 @@ object Deps {
 
     object MokoResources {
         val plugin = "dev.icerock.mobile.multiplatform-resources"
-        val classpath = "dev.icerock.moko:resources-generator:0.13.1"
-        val impl = "dev.icerock.moko:resources:0.13.1"
+        val classpath = "dev.icerock.moko:resources-generator:${Versions.mokoResources}"
+        val impl = "dev.icerock.moko:resources:${Versions.mokoResources}"
     }
 
     object MokoParcelize {

@@ -43,7 +43,6 @@
 		D66AD9EE2543573D00FA02E5 /* WordTranscriptionBlueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9ED2543573D00FA02E5 /* WordTranscriptionBlueprint.swift */; };
 		D66AD9F0254F256E00FA02E5 /* UIFontDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66AD9EF254F256E00FA02E5 /* UIFontDescriptor.swift */; };
 		D6E6B50D25C5B0FD00968C46 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6E6B50C25C5B0FD00968C46 /* Pods_iosApp.framework */; };
-		D6E6B50E25C5B0FD00968C46 /* Pods_iosApp.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D6E6B50C25C5B0FD00968C46 /* Pods_iosApp.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D6F0817C256118F100CE0A25 /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F0817B256118F100CE0A25 /* Array.swift */; };
 		D6F0817E25613CD800CE0A25 /* UIControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F0817D25613CD800CE0A25 /* UIControl.swift */; };
 /* End PBXBuildFile section */
@@ -64,20 +63,6 @@
 			remoteInfo = iosApp;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		D6E6B50925C5B0E900968C46 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				D6E6B50E25C5B0FD00968C46 /* Pods_iosApp.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		74C88E66E473911227FB0100 /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
@@ -334,13 +319,10 @@
 			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "iosApp" */;
 			buildPhases = (
 				00D5C77F579137EAF8BA71F1 /* [CP] Check Pods Manifest.lock */,
-				7555FFB5242A651A00829871 /* ShellScript */,
 				7555FF77242A565900829871 /* Sources */,
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
-				D631705725605D0F00A8519D /* moko-resources */,
 				49C506982EFA920096BC2053 /* [CP] Embed Pods Frameworks */,
-				D6E6B50925C5B0E900968C46 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -497,41 +479,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
-		};
-		7555FFB5242A651A00829871 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-frameworks.sh\"\n";
-		};
-		D631705725605D0F00A8519D /* moko-resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "moko-resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :shared:copyFrameworkResourcesToApp \\\n-Pmoko.resources.PLATFORM_NAME=$PLATFORM_NAME \\\n-Pmoko.resources.CONFIGURATION=$CONFIGURATION \\\n-Pmoko.resources.BUILT_PRODUCTS_DIR=$BUILT_PRODUCTS_DIR \\\n-Pmoko.resources.CONTENTS_FOLDER_PATH=$CONTENTS_FOLDER_PATH\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

@@ -87,10 +87,10 @@ kotlin {
         summary = "Nothing"
         homepage = "https://aglushkov.com"
 
-        ios.deploymentTarget = "11.0"
-
-        pod("Reachability","3.2")
         podfile = project.file("../iosApp/Podfile")
+        pod("Reachability","3.2")
+
+        ios.deploymentTarget = "11.0"
     }
 }
 
