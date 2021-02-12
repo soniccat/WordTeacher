@@ -5,18 +5,18 @@ object Versions {
     val targetSdk = 29
     val compileSdk = 29
 
-    val kotlin = "1.4.21"
+    val kotlin = "1.4.30"
     val androidx_test = "1.2.0"
     val androidx_test_ext = "1.1.1"
     val android_gradle_plugin = "4.1.0"
     val junit = "4.13"
     val sqlDelight = "1.4.4"
-    val ktor = "1.4.3"
+    val ktor = "1.5.1"
     val coroutines = "1.4.2-native-mt"
-    val serialization = "1.0.1"
+    val serialization = "1.1.0-RC"
     val lifecycle = "2.2.0"
 
-    val mokoResources = "0.14.0"
+    val mokoResources = "0.15.0"
 }
 
 object Deps {
@@ -36,14 +36,14 @@ object Deps {
     }
 
     object MokoParcelize {
-        val impl = "dev.icerock.moko:parcelize:0.4.0"
+        val impl = "dev.icerock.moko:parcelize:0.5.0"
     }
 
     object MokoGraphics {
-        val impl = "dev.icerock.moko:graphics:0.4.0"
+        val impl = "dev.icerock.moko:graphics:0.6.0"
     }
 
-    val mokoMvvm = "dev.icerock.moko:mvvm-core:0.9.1"
+    val mokoMvvmCore = "dev.icerock.moko:mvvm-core:0.9.1"
 
     object Mp {
         val serializationPlugin = "org.jetbrains.kotlin.plugin.serialization"

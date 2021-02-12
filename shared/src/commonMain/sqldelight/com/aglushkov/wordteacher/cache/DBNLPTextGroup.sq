@@ -1,0 +1,24 @@
+CREATE TABLE IF NOT EXISTS DBNLPTextGroup (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  name TEXT NOT NULL,
+  date INTEGER NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM DBNLPTextGroup;
+
+insert:
+INSERT INTO DBNLPTextGroup(name, date)
+VALUES (?, ?);
+
+insertTextGroup:
+INSERT INTO DBNLPTextGroup(name, date)
+VALUES ?;
+
+lastInsertedRowId:
+SELECT last_insert_rowid();
+
+removeAll:
+DELETE
+FROM DBNLPTextGroup;

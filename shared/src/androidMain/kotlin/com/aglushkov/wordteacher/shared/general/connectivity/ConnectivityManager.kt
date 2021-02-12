@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.aglushkov.wordteacher.shared.general.connectivity
 
 import android.content.Context

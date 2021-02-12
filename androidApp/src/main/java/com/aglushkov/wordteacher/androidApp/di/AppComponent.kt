@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.di
 
+import com.aglushkov.nlp.NLPCore
 import com.aglushkov.wordteacher.androidApp.di.AppComp
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -20,6 +21,7 @@ public interface AppComponent: DefinitionsDependencies {
     fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
+    fun nlpCore(): NLPCore
     override fun wordRepository(): WordDefinitionRepository
     override fun idGenerator(): IdGenerator
     override fun connectivityManager(): ConnectivityManager

@@ -4,7 +4,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
-    id("kotlin-android-extensions")
+    id("kotlin-parcelize")
     id(Deps.SqlDelight.plugin)
 }
 
@@ -66,7 +66,7 @@ dependencies {
     implementation(Deps.Coroutines.android)
 
     implementation(Deps.MokoResources.impl)
-    implementation(Deps.mokoMvvm)
+    implementation(Deps.mokoMvvmCore)
 
     implementation(Deps.Ktor.androidClient)
 

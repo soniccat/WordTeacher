@@ -1,0 +1,28 @@
+CREATE TABLE IF NOT EXISTS DBNLPSentence (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  tokens TEXT NOT NULL,
+  tags TEXT NOT NULL,
+  lemmas TEXT NOT NULL,
+  chunks TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS DBNLPSentence_id ON DBNLPSentence(id);
+
+selectAll:
+SELECT *
+FROM DBNLPSentence;
+
+insert:
+INSERT INTO DBNLPSentence(tokens, tags, lemmas, chunks)
+VALUES (?, ?, ?, ?);
+
+insertSentence:
+INSERT INTO DBNLPSentence(tokens, tags, lemmas, chunks)
+VALUES ?;
+
+lastInsertedRowId:
+SELECT last_insert_rowid();
+
+removeAll:
+DELETE
+FROM DBNLPSentence;

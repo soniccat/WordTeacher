@@ -43,12 +43,12 @@ fun List<WordnikWord>.asWordTeacherWords(): List<WordTeacherWord> {
         val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(word.partOfSpeech)
         val definition = word.asDefinition() ?: continue
         val wordTeacherWord = map[word.word] ?: run {
-            val word = WordTeacherWord(word.word,
+            val resultWord = WordTeacherWord(word.word,
                     null,
                     mutableMapOf(partOfSpeech to mutableListOf()),
                     listOf(Config.Type.Wordnik))
-            map[word.word] = word
-            word
+            map[word.word] = resultWord
+            resultWord
         }
 
         val definitionsMap = wordTeacherWord.definitions as MutableMap

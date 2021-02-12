@@ -2,7 +2,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-    id("kotlin-android-extensions")
+    id("kotlin-parcelize")
     kotlin("native.cocoapods")
     id(Deps.Mp.serializationPlugin)
     id(Deps.MokoResources.plugin)
@@ -42,7 +42,7 @@ kotlin {
                 implementation(Deps.MokoResources.impl)
                 implementation(Deps.MokoParcelize.impl)
                 implementation(Deps.MokoGraphics.impl)
-                implementation(Deps.mokoMvvm)
+                implementation(Deps.mokoMvvmCore)
                 implementation(Deps.okio)
                 implementation(Deps.dateTime)
                 implementation(Deps.logger)
@@ -59,6 +59,7 @@ kotlin {
             dependencies {
                 implementation(Deps.Google.material)
                 implementation(Deps.SqlDelight.androidDriver)
+                implementation("org.apache.opennlp:opennlp-tools:1.9.2")
             }
         }
         val androidTest by getting {
@@ -103,6 +104,7 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
@@ -117,7 +119,7 @@ multiplatformResources {
 }
 
 sqldelight {
-    database("AppDatabase") {
+    database("SQLDelightDatabase") {
         packageName = "com.aglushkov.wordteacher.shared.cache"
 //        schemaOutputDirectory = File("/shared/src/commonMain/kotlin/com/aglushkov/wordteacher/db")
     }
@@ -130,4 +132,9 @@ tasks.getByName("podspec").doLast {
         if (it.contains("spec.libraries")) "    spec.libraries                = \"c++\", \"sqlite3\"" else it
     }
     podspec.writeText(newPodspecContent.joinToString(separator = "\n"))
+}
+
+// HACK: fix "Cannot inline bytecode built with JVM target 1.8 into bytecode that is being built with JVM target 1.6"
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions.jvmTarget = "1.8"
 }
