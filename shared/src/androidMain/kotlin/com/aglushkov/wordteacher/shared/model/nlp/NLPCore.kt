@@ -1,4 +1,4 @@
-package com.aglushkov.nlp
+package com.aglushkov.wordteacher.shared.model.nlp
 
 import android.content.res.Resources
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -21,7 +21,7 @@ import opennlp.tools.sentdetect.SentenceModel
 import opennlp.tools.tokenize.TokenizerME
 import opennlp.tools.tokenize.TokenizerModel
 
-class NLPCore(
+actual class NLPCore(
     private val resources: Resources,
     private val sentenceModelRes: Int,
     private val tokenRes: Int,
@@ -52,21 +52,21 @@ class NLPCore(
 
     suspend fun waitUntilInitialized() = state.first { it.isLoaded() }
 
-    fun sentences(text: String): Array<out String> = sentenceDetector?.sentDetect(text).orEmpty()
-    fun tokenize(sentence: String): Array<out String> = tokenizer?.tokenize(sentence).orEmpty()
-    fun tag(tokens: Array<out String>): Array<out String> = tagger?.tag(tokens).orEmpty()
-    fun tagEnums(tags: Array<out String>): List<Tag> = tags.map {
+    actual fun sentences(text: String): Array<out String> = sentenceDetector?.sentDetect(text).orEmpty()
+    actual fun tokenize(sentence: String): Array<out String> = tokenizer?.tokenize(sentence).orEmpty()
+    actual fun tag(tokens: Array<out String>): Array<out String> = tagger?.tag(tokens).orEmpty()
+    actual fun tagEnums(tags: Array<out String>): List<Tag> = tags.map {
         try {
             Tag.valueOf(it)
         } catch (e: java.lang.Exception) {
             Tag.UNKNOWN
         }
     }
-    fun lemmatize(tokens: Array<out String>, tags: Array<out String>) = lemmatizer?.lemmatize(tokens, tags).orEmpty()
-    fun chunk(tokens: Array<out String>, tags: Array<out String>) = chunker?.chunk(tokens, tags).orEmpty()
-    fun spanList(tokens: Array<out String>, tags: Array<out String>, chunks: Array<out String>) =
+    actual fun lemmatize(tokens: Array<out String>, tags: Array<out String>) = lemmatizer?.lemmatize(tokens, tags).orEmpty()
+    actual fun chunk(tokens: Array<out String>, tags: Array<out String>) = chunker?.chunk(tokens, tags).orEmpty()
+    actual fun spanList(tokens: Array<out String>, tags: Array<out String>, chunks: Array<out String>): List<Span> =
             ChunkSample.phrasesAsSpanList(tokens, tags, chunks).map {
-                Span.fromNLPSpan(it)
+                createSpan(it)
             }
 
     fun load() {
@@ -134,72 +134,7 @@ class NLPCore(
         }
     }
 
-    companion object {
-        val UNKNOWN_LEMMA = "O"
-    }
-
-    enum class Tag {
-        NN,     //	Noun, singular or mass
-        NNS,    //	Noun, plural
-        NNP,    //	Proper noun, singular
-        NNPS,   //	Proper noun, plural
-
-        VB,     //	Verb, base form
-        VBD,    //	Verb, past tense
-        VBG,    //	Verb, gerund or present participle
-        VBN,    //	Verb, past participle
-        VBP,    //	Verb, non-3rd person singular present
-        VBZ,    //	Verb, 3rd person singular present
-
-        IN,     // Preposition or subordinating conjunction
-
-        UNKNOWN
-        ;
-
-        fun isNoun() = when (this) {
-            NN, NNS, NNP, NNPS -> true
-            else -> false
-        }
-
-        fun isVerb() = when (this) {
-            VB, VBD, VBG, VBN, VBP, VBZ -> true
-            else -> false
-        }
-
-        fun isPrep() = when (this) {
-            IN -> true
-            else -> false
-        }
-    }
-
-    enum class ChunkType {
-        NP,     // Noun Phrase
-        VP,     // Verb phrase
-        PP,     // Prepositional phrase
-        ADJP,   // Adjective phrase
-        ADVP,   // Adverb phrase
-        X;
-
-        companion object {
-            fun parse(str: String): ChunkType {
-                return try {
-                    valueOf(str)
-                } catch (e: java.lang.Exception) {
-                    X
-                }
-            }
-        }
-
-        fun isNounPhrase() = this == NP
-        fun isVerbPhrase() = this == VP
-        fun isPrepositionalPhrase() = this == PP
-    }
-
-    data class Span(val start: Int, val end: Int, val type: ChunkType) {
-        companion object {
-            fun fromNLPSpan(span: opennlp.tools.util.Span): Span {
-                return Span(span.start, span.end, ChunkType.parse(span.type))
-            }
-        }
+    fun createSpan(span: opennlp.tools.util.Span): Span {
+        return Span(span.start, span.end, ChunkType.parse(span.type))
     }
 }

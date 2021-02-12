@@ -1,0 +1,31 @@
+package com.aglushkov.wordteacher.shared.model.nlp
+
+actual class NLPCore {
+    actual fun sentences(text: String): Array<out String> {
+        TODO("not implemented")
+    }
+
+    actual fun tokenize(sentence: String): Array<out String> {
+        TODO("not implemented")
+    }
+
+    actual fun tag(tokens: Array<out String>): Array<out String> {
+        TODO("not implemented")
+    }
+
+    actual fun tagEnums(tags: Array<out String>): List<Tag> {
+        TODO("not implemented")
+    }
+
+    actual fun lemmatize(tokens: Array<out String>, tags: Array<out String>): Array<out String> {
+        TODO("not implemented")
+    }
+
+    actual fun chunk(tokens: Array<out String>, tags: Array<out String>): Array<out String> {
+        TODO("not implemented")
+    }
+
+    actual fun spanList(tokens: Array<out String>, tags: Array<out String>, chunks: Array<out String>): List<out Span> {
+        TODO("not implemented")
+    }
+}

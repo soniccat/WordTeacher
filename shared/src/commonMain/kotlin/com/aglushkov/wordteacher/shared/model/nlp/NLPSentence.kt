@@ -1,6 +1,4 @@
-package com.aglushkov.wordteacher.shared.nlp
-
-import com.aglushkov.nlp.NLPCore
+package com.aglushkov.wordteacher.shared.model.nlp
 
 class NLPSentence {
     companion object {
@@ -45,13 +43,13 @@ class NLPSentence {
     fun tagEnums() = core.tagEnums(tags)
     fun spanList() = core.spanList(tokens, tags, chunks)
 
-    fun lemmaOrToken(i: Int) = if (lemmas[i] != NLPCore.UNKNOWN_LEMMA) {
+    fun lemmaOrToken(i: Int) = if (lemmas[i] != NLPConstants.UNKNOWN_LEMMA) {
         lemmas[i]
     } else {
         tokens[i]
     }
 
     override fun toString(): String {
-        return java.lang.String.join(" ", *tokens)
+        return tokens.joinToString(separator = " ")
     }
 }
