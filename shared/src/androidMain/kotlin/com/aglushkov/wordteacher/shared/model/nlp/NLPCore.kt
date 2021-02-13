@@ -50,7 +50,7 @@ actual class NLPCore(
         System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
     }
 
-    suspend fun waitUntilInitialized() = state.first { it.isLoaded() }
+    actual suspend fun waitUntilInitialized(): Resource<NLPCore> = state.first { it.isLoaded() }
 
     actual fun sentences(text: String): Array<out String> = sentenceDetector?.sentDetect(text).orEmpty()
     actual fun tokenize(sentence: String): Array<out String> = tokenizer?.tokenize(sentence).orEmpty()
@@ -114,7 +114,7 @@ actual class NLPCore(
     }
 
     // to be able to work with NLPCore in a separate thread
-    fun clone(): NLPCore {
+    actual fun clone(): NLPCore {
         assert(state.value.isLoaded()) { "Can't copy NLPCore when it isn't loaded" }
 
         return NLPCore(

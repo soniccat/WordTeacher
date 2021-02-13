@@ -1,11 +1,12 @@
 package com.aglushkov.wordteacher.shared.repository.db
 
 import com.aglushkov.extensions.firstLong
+import com.aglushkov.wordteacher.cache.DBArticle
 import com.aglushkov.wordteacher.cache.DBNLPSentence
-import com.aglushkov.wordteacher.cache.DBNLPTextGroup
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import kotlinx.coroutines.CoroutineScope
@@ -21,7 +22,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     private val driver = driverFactory.createDriver()
     private var db = SQLDelightDatabase(driver)
 
-    val textGroups = TextGroups()
+    val articles = Articles()
     val sentencesNLP = DBNLPSentences()
 
     val state = MutableStateFlow<Resource<AppDatabase>>(Resource.Uninitialized())
@@ -50,6 +51,9 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
 
     inner class DBNLPSentences {
         fun insert(nlpSentence: NLPSentence) = db.dBNLPSentenceQueries.insert(
+            nlpSentence.articleId,
+            nlpSentence.orderId,
+            nlpSentence.text,
             nlpSentence.tokens.joinToString(nlpSeparator),
             nlpSentence.tags.joinToString(nlpSeparator),
             nlpSentence.lemmas.joinToString(nlpSeparator),
@@ -57,35 +61,52 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         )
 
         fun selectAll() = db.dBNLPSentenceQueries.selectAll()
+        fun selectForArticle(articleId: Long, nlpCore: NLPCore) = db.dBNLPSentenceQueries
+            .selectForArticle(articleId)
+            .executeAsList()
+            .map {
+                it.toNLPSentence(nlpCore)
+            }
 
         fun removeAll() = db.dBNLPSentenceQueries.removeAll()
     }
 
-    inner class TextGroups {
-        fun insert(textGroup: DBNLPTextGroup) = db.dBNLPTextGroupQueries.insertTextGroup(textGroup)
-        fun insertedTextGroupId() = db.dBNLPTextGroupQueries.lastInsertedRowId().firstLong()
+    inner class Articles {
+        fun insert(article: Article) = db.dBArticleQueries.insert(article.name, article.date)
+        fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong()
+        fun selectAll() = db.dBArticleQueries.selectAll()
 
-        fun removeAll() = db.dBNLPTextGroupQueries.removeAll()
+        fun removeAll() = db.dBArticleQueries.removeAll()
     }
 
     companion object {
         const val nlpSeparator = "&&"
-
-        fun splitNLPString(str: String) = str.split(nlpSeparator)
-
-        fun createNLPSentence(sentence: DBNLPSentence, nlpCore: NLPCore): NLPSentence {
-            val tokens = sentence.tokens.split(nlpSeparator)
-            val tags = sentence.tags.split(nlpSeparator)
-            val lemmas = sentence.lemmas.split(nlpSeparator)
-            val chunks = sentence.chunks.split(nlpSeparator)
-
-            return NLPSentence(
-                tokens.toTypedArray(),
-                tags.toTypedArray(),
-                lemmas.toTypedArray(),
-                chunks.toTypedArray(),
-                nlpCore
-            )
-        }
     }
+}
+
+fun DBNLPSentence.toNLPSentence(nlpCore: NLPCore): NLPSentence {
+    val tokens = tokens.split(AppDatabase.nlpSeparator)
+    val tags = tags.split(AppDatabase.nlpSeparator)
+    val lemmas = lemmas.split(AppDatabase.nlpSeparator)
+    val chunks = chunks.split(AppDatabase.nlpSeparator)
+
+    return NLPSentence(
+        nlpCore,
+        articleId,
+        orderId,
+        text,
+        tokens.toTypedArray(),
+        tags.toTypedArray(),
+        lemmas.toTypedArray(),
+        chunks.toTypedArray()
+    )
+}
+
+fun DBArticle.toArticle(): Article {
+    return Article(
+        id,
+        name,
+        date,
+        ""
+    )
 }

@@ -5,8 +5,10 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
+import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.service.ConfigService
@@ -21,6 +23,8 @@ public interface AppComponent: DefinitionsDependencies {
     fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
+    fun articleRepository(): ArticleRepository
+    fun database(): AppDatabase
     fun nlpCore(): NLPCore
     override fun wordRepository(): WordDefinitionRepository
     override fun idGenerator(): IdGenerator

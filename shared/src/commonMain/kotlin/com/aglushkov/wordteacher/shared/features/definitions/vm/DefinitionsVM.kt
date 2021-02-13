@@ -59,8 +59,6 @@ class DefinitionsVM(
         }
 
     init {
-        // TODO: remove after updating to 1.4 coroutines version
-        // need to write sth like val definitions = definitionWords.map{...}.asStateFlow()
         viewModelScope.launch {
             definitionWords.map {
                 Logger.v("build view items")

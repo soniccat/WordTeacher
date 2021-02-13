@@ -1,5 +1,8 @@
 CREATE TABLE IF NOT EXISTS DBNLPSentence (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  articleId INTEGER NOT NULL,
+  orderId INTEGER NOT NULL,
+  text TEXT NOT NULL,
   tokens TEXT NOT NULL,
   tags TEXT NOT NULL,
   lemmas TEXT NOT NULL,
@@ -12,12 +15,18 @@ selectAll:
 SELECT *
 FROM DBNLPSentence;
 
+selectForArticle:
+SELECT *
+FROM DBNLPSentence
+WHERE articleId = ?
+ORDER BY orderId ASC;
+
 insert:
-INSERT INTO DBNLPSentence(tokens, tags, lemmas, chunks)
-VALUES (?, ?, ?, ?);
+INSERT INTO DBNLPSentence(articleId, orderId, text, tokens, tags, lemmas, chunks)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 insertSentence:
-INSERT INTO DBNLPSentence(tokens, tags, lemmas, chunks)
+INSERT INTO DBNLPSentence(articleId, orderId, text, tokens, tags, lemmas, chunks)
 VALUES ?;
 
 lastInsertedRowId:

@@ -7,9 +7,12 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatFile
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
+import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.service.ConfigService
@@ -58,6 +61,22 @@ class AppModule {
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory {
         return WordTeacherWordServiceFactory()
     }
+
+    @AppComp
+    @Provides
+    fun articleRepository(database: AppDatabase, nlpCore: NLPCore): ArticleRepository {
+        return ArticleRepository(database, nlpCore)
+    }
+
+    @AppComp
+    @Provides
+    fun database(driver: DatabaseDriverFactory): AppDatabase {
+        return AppDatabase(driver)
+    }
+
+    @AppComp
+    @Provides
+    fun databaseFactory(context: Context) = DatabaseDriverFactory(context)
 
     @AppComp
     @Provides
