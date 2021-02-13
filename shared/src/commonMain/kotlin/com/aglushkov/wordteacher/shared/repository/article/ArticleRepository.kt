@@ -1,7 +1,9 @@
 package com.aglushkov.wordteacher.shared.repository.article
 
 import com.aglushkov.extensions.asFlow
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
@@ -35,6 +37,7 @@ class ArticleRepository(
                         this.sentences = sentences
                     }
                 }
+                Logger.v("ArticleRepository loaded ${result.size} articles")
                 stateFlow.value = Resource.Loaded(result)
             }
         }

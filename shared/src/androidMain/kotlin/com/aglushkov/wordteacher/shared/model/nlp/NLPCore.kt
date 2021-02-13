@@ -1,8 +1,11 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
 import android.content.res.Resources
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.measure
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.v
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -85,24 +88,35 @@ actual class NLPCore(
     }
 
     private fun loadModels() {
-        resources.openRawResource(sentenceModelRes).use { modelIn ->
-            sentenceModel = SentenceModel(modelIn)
+        val buffer = 100 * 1024
+        Logger.measure("SentenceModel loaded: ") {
+            resources.openRawResource(sentenceModelRes).buffered(buffer).use { modelIn ->
+                sentenceModel = SentenceModel(modelIn)
+            }
         }
 
-        resources.openRawResource(tokenRes).buffered().use { stream ->
-            tokenModel = TokenizerModel(stream)
+        Logger.measure("TokenizerModel loaded: ") {
+            resources.openRawResource(tokenRes).buffered(buffer).use { stream ->
+                tokenModel = TokenizerModel(stream)
+            }
         }
 
-        resources.openRawResource(posModelRes).buffered().use { stream ->
-            posModel = POSModel(stream)
+        Logger.measure("POSModel loaded: ") {
+            resources.openRawResource(posModelRes).buffered(buffer).use { stream ->
+                posModel = POSModel(stream)
+            }
         }
 
-        resources.openRawResource(lemmatizerRes).buffered().use { stream ->
-            lemmatizer = DictionaryLemmatizer(stream)
+        Logger.measure("DictionaryLemmatizer loaded: ") {
+            resources.openRawResource(lemmatizerRes).buffered(buffer).use { stream ->
+                lemmatizer = DictionaryLemmatizer(stream)
+            }
         }
 
-        resources.openRawResource(chunkerRes).buffered().use { stream ->
-            chunkerModel = ChunkerModel(stream)
+        Logger.measure("ChunkerModel loaded: ") {
+            resources.openRawResource(chunkerRes).buffered(buffer).use { stream ->
+                chunkerModel = ChunkerModel(stream)
+            }
         }
     }
 

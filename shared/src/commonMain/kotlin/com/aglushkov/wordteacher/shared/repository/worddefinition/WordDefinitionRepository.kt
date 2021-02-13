@@ -38,6 +38,7 @@ import kotlinx.coroutines.supervisorScope
 class WordDefinitionRepository(
     private val serviceRepository: ServiceRepository,
 ) {
+
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlows: MutableMap<String, MutableStateFlow<Resource<List<WordTeacherWord>>>> = hashMapOf()
     private val jobs: MutableMap<String, Job> = hashMapOf()

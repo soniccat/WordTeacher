@@ -10,6 +10,7 @@ import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -78,11 +79,11 @@ class ArticlesFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         bindView()
 
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            definitionsVM.definitions.collect {
-//                showDefinitions(it)
-//            }
-//        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            articlesVM.articles.collect {
+                showArticles(it)
+            }
+        }
 
         view.postDelayed(
             {
@@ -105,6 +106,26 @@ class ArticlesFragment: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+    }
+
+    private fun showArticles(it: Resource<List<BaseViewItem<*>>>) {
+        val binding = this.binding!!
+
+        it.bind(binding.loadingStatusView)
+
+        updateListAdapter(it)
+    }
+
+    private fun updateListAdapter(it: Resource<List<BaseViewItem<*>>>) {
+        val binding = this.binding!!
+
+        if (binding.list.adapter != null) {
+            (binding.list.adapter as SimpleAdapter).submitList(it.data())
+        } else {
+            binding.list.adapter = SimpleAdapter(binder).apply {
+                submitList(it.data())
+            }
+        }
     }
 }
 

@@ -13,5 +13,13 @@ val BaseViewItem.Companion.DiffCallback: DiffUtil.ItemCallback<BaseViewItem<*>>
             override fun areContentsTheSame(oldCellInfo: BaseViewItem<*>, newCellInfo: BaseViewItem<*>): Boolean {
                 return oldCellInfo.equalsByContent(newCellInfo)
             }
+
+            override fun getChangePayload(
+                oldItem: BaseViewItem<*>,
+                newItem: BaseViewItem<*>
+            ): Any {
+                //return super.getChangePayload(oldItem, newItem)
+                return Unit
+            }
         }
     }
