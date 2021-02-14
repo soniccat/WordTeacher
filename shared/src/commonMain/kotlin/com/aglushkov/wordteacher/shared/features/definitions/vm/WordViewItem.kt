@@ -48,15 +48,21 @@ class WordSynonymViewItem(synonym: String): BaseViewItem<String>(synonym, Type) 
     }
 }
 
-class WordSubHeaderViewItem(name: StringDesc): BaseViewItem<StringDesc>(name, Type) {
+class WordHeaderViewItem(name: StringDesc): BaseViewItem<StringDesc>(name, Type) {
     companion object {
         const val Type = 107
+    }
+}
+
+class WordSubHeaderViewItem(name: StringDesc): BaseViewItem<StringDesc>(name, Type) {
+    companion object {
+        const val Type = 108
     }
 }
 
 class WordDividerViewItem(): BaseViewItem<Any>(Obj, Type) {
     companion object {
         val Obj = Any()
-        const val Type = 108
+        const val Type = 109
     }
 }

@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Defi
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordDefinitionBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordDividerBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordExampleBlueprint
+import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordHeaderBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordPartOfSpeechBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordSubHeaderBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordSynonymBlueprint
@@ -28,6 +29,7 @@ class DefinitionsModule {
         wordDividerBlueprint: WordDividerBlueprint,
         wordExampleBlueprint: WordExampleBlueprint,
         wordPartOfSpeechBlueprint: WordPartOfSpeechBlueprint,
+        wordHeaderBlueprint: WordHeaderBlueprint,
         wordSubHeaderBlueprint: WordSubHeaderBlueprint,
         wordSynonymBlueprint: WordSynonymBlueprint,
         wordTitleBlueprint: WordTitleBlueprint,
@@ -39,6 +41,7 @@ class DefinitionsModule {
             .addBlueprint(wordDividerBlueprint)
             .addBlueprint(wordExampleBlueprint)
             .addBlueprint(wordPartOfSpeechBlueprint)
+            .addBlueprint(wordHeaderBlueprint)
             .addBlueprint(wordSubHeaderBlueprint)
             .addBlueprint(wordSynonymBlueprint)
             .addBlueprint(wordTitleBlueprint)

@@ -8,6 +8,7 @@
         <attr name="wordDefinitionTextAppearance" format="reference"/>
         <attr name="wordExampleTextAppearance" format="reference"/>
         <attr name="wordSynonymTextAppearance" format="reference"/>
+        <attr name="wordHeaderTextAppearance" format="reference"/>
         <attr name="wordSubHeaderTextAppearance" format="reference"/>
     </declare-styleable>
 </resources>
