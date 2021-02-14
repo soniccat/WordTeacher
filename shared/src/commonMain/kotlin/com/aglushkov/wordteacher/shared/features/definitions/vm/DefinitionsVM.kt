@@ -98,6 +98,8 @@ class DefinitionsVM(
     // Actions
 
     private fun loadIfNeeded(word: String) {
+        this.word = word
+
         val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
         if (stateFlow.value.isLoaded()) {
             definitionWords.value = stateFlow.value
@@ -110,7 +112,6 @@ class DefinitionsVM(
         val tag = "DefinitionsVM.load"
 
         Logger.v("Start Loading $word", tag)
-        this.word = word
 
         loadJob?.cancel()
         loadJob = viewModelScope.launch(CoroutineExceptionHandler { _, e ->

@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.bottomBar.setOnNavigationItemReselectedListener {
+            // do nothing
         }
 
         supportFragmentManager.fragmentFactory = object : FragmentFactory() {
@@ -39,30 +40,57 @@ class MainActivity : AppCompatActivity() {
                 return super.instantiate(classLoader, className)
             }
         }
+        supportFragmentManager.addOnBackStackChangedListener {
+            supportFragmentManager.fragments.lastOrNull()?.let {
+                val itemId = screenIdByClass(it::class)
+                binding.bottomBar.selectedItemId = itemId
+            }
+        }
 
-        openFragment(DefinitionsFragment::class)
+        if (supportFragmentManager.fragments.size == 0) {
+            openFragment(DefinitionsFragment::class)
+        }
     }
 
     private fun openFragment(cl: KClass<*>) {
         val tag = screenNameByClass(cl)
-        if (supportFragmentManager.findFragmentByTag(tag) == null) {
-            val fragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, cl.java.name)
+        val fragment = supportFragmentManager.findFragmentByTag(tag)
+        val topFragment = supportFragmentManager.fragments.lastOrNull()
+        if (fragment == null) {
+            val newFragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, cl.java.name)
             supportFragmentManager.beginTransaction()
-                .setReorderingAllowed(true)
-                .add(binding.fragmentContainer.id, fragment, tag)
+                .setReorderingAllowed(true).apply {
+                    if (topFragment != null) {
+                        addToBackStack(tag)
+                    }
+                }
+                .replace(binding.fragmentContainer.id, newFragment, tag)
                 .commitAllowingStateLoss()
+
+        } else if (topFragment == null || topFragment::class != cl) {
+            if (supportFragmentManager.backStackEntryCount == 1) {
+                supportFragmentManager.popBackStack()
+            } else {
+                supportFragmentManager.popBackStack(tag, 0)
+            }
         }
     }
 
     private fun screenClassById(id: Int): KClass<*> = when(id) {
         R.id.tab_definitions -> DefinitionsFragment::class
         R.id.tab_articles -> ArticlesFragment::class
-        else -> throw IllegalArgumentException("Wrong screen id " + id)
+        else -> throw IllegalArgumentException("Wrong screen id $id")
+    }
+
+    private fun screenIdByClass(cl: KClass<*>): Int = when(cl) {
+        DefinitionsFragment::class -> R.id.tab_definitions
+        ArticlesFragment::class -> R.id.tab_articles
+        else -> throw IllegalArgumentException("Wrong screen class $cl")
     }
 
     private fun screenNameByClass(cl: KClass<*>): String = when(cl) {
         DefinitionsFragment::class -> "definitions"
         ArticlesFragment::class -> "articles"
-        else -> throw IllegalArgumentException("Wrong screen class " + cl)
+        else -> throw IllegalArgumentException("Wrong screen class $cl")
     }
 }
