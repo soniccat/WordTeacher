@@ -13,6 +13,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class ArticlesVM(
     private val articlesRepository: ArticleRepository,
@@ -45,7 +48,10 @@ class ArticlesVM(
     private fun buildViewItems(articles: List<Article>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         articles.forEach {
-            items.add(ArticleViewItem(it.name, it.date).apply {
+            val dateTime = Instant.fromEpochMilliseconds(it.date).toLocalDateTime(TimeZone.currentSystemDefault())
+            val dateTimeString = "${dateTime.dayOfMonth}.${dateTime.monthNumber}.${dateTime.year}"
+
+            items.add(ArticleViewItem(it.name, dateTimeString).apply {
                 id = idGenerator.nextId()
             })
         }

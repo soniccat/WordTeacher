@@ -5,7 +5,7 @@ import com.aglushkov.wordteacher.shared.model.Article
 
 class ArticleViewItem(
     val name: String,
-    val date: Long
+    val date: String
 ): BaseViewItem<String>(name, Type) {
 
     companion object {
