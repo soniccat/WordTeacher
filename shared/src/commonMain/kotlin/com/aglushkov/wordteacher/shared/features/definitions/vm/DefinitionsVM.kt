@@ -162,7 +162,7 @@ class DefinitionsVM(
 
             if (item != null) {
                 it.id = item.id
-                map.remove(itemsHashCode)
+                mapListOfViewItems.remove(item)
             } else {
                 it.id = idGenerator.nextId()
             }

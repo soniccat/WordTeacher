@@ -22,13 +22,13 @@ abstract class BaseViewItem<T> {
         // if an id is available in a subclass this check should be used:
         //     this.javaClass == item.javaClass && type == item.type && id == item.id
         // and equalsByContent should be overridden too
-        return id == item.id && type == item.type
+        return this::class == item::class && type == item.type && id == item.id
     }
 
     open fun equalsByContent(other: BaseViewItem<*>): Boolean {
         // as we check the content in equalsByIds we can return true here
         // this should be overridden if equalsByIds is overridden
-        return equals(other)
+        return items == other.items
     }
 
     override fun equals(other: Any?): Boolean {

@@ -1,11 +1,12 @@
 package com.aglushkov.wordteacher.androidApp.features.articles.blueprints
 
-import android.content.Context
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.databinding.ItemArticleBinding
 
-class ArticleItemView(context: Context) : View(context) {
-    lateinit var binding: ItemArticleBinding
+class ArticleItemViewHolder(
+    private var binding: ItemArticleBinding
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(title: String, date: String) {
         binding.title.text = title

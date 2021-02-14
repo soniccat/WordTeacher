@@ -9,27 +9,31 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 
 class SimpleAdapter(
     private val binder: ViewItemBinder
-): ListAdapter<BaseViewItem<*>, SimpleAdapter.ViewHolder>(BaseViewItem.DiffCallback) {
+): ListAdapter<BaseViewItem<*>, RecyclerView.ViewHolder>(BaseViewItem.DiffCallback) {
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val blueprint = binder.findBlueprint(viewType) ?: throw IllegalStateException("Unexpected viewType: $viewType")
-        val view = blueprint.createView(parent) as View
-        view.layoutParams = RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT)
-
-        return ViewHolder(view)
+        return blueprint.createViewHolder(parent).apply {
+            itemView.layoutParams = RecyclerView.LayoutParams(
+                RecyclerView.LayoutParams.MATCH_PARENT,
+                RecyclerView.LayoutParams.WRAP_CONTENT
+            )
+        }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         val type = item.type
-        val blueprint = binder.findBlueprint(type)!! as Blueprint<Any, Any>
-        blueprint.bind(holder.itemView, item)
+        val blueprint = binder.findBlueprint(type)!! as Blueprint<RecyclerView.ViewHolder, Any>
+        blueprint.bind(holder, item)
     }
 
-    class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    class ViewHolder<T: View>(view: T): RecyclerView.ViewHolder(view) {
+        val typedView: T
+            get() = itemView as T
     }
 }
