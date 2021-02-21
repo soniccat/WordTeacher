@@ -1,8 +1,10 @@
 package com.aglushkov.wordteacher.di
 
+import android.app.Application
 import android.content.Context
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.di.AppComp
+import com.aglushkov.wordteacher.androidApp.general.ActivityVisibilityResolver
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -21,6 +23,12 @@ import dagger.Provides
 
 @Module
 class AppModule {
+//    @AppComp
+//    @Provides
+//    fun activityVisibilityResolver(application: Application): ActivityVisibilityResolver {
+//        return ActivityVisibilityResolver(application)
+//    }
+
     @AppComp
     @Provides
     fun configService(context: Context): ConfigService {

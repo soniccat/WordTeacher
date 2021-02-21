@@ -8,49 +8,41 @@ import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.di.DaggerAppComponent
 import com.aglushkov.wordteacher.di.GeneralModule
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listener {
+    override lateinit var appComponent: AppComponent
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    private lateinit var routerResolver: RouterResolver
-    private lateinit var activityVisibilityResolver: ActivityVisibilityResolver
-    override lateinit var appComponent: AppComponent
+    @Inject lateinit var nlpCore: NLPCore
+    @Inject lateinit var routerResolver: RouterResolver
+    @Inject lateinit var activityVisibilityResolver: ActivityVisibilityResolver
 
     override fun onCreate() {
         super.onCreate()
 
         Logger().setupDebug()
 
-        initRouterResolver()
-        initActivityVisibilityResolver()
-
         appComponent = DaggerAppComponent.builder()
             .generalModule(GeneralModule(this))
-            .setRouterResolver(routerResolver)
-            .setActivityVisibilityResolver(activityVisibilityResolver)
             .build()
+        appComponent.injectApplication(this)
+
+        routerResolver.attach()
+        activityVisibilityResolver.listener = this
+        activityVisibilityResolver.attach()
+
         appComponent.connectivityManager().checkNetworkState()
 
-        val nlpCore = appComponent.nlpCore()
         mainScope.launch(Dispatchers.Default) {
             nlpCore.load()
         }
-    }
-
-    private fun initRouterResolver() {
-        routerResolver = RouterResolver(this)
-        routerResolver.attach()
-    }
-
-    private fun initActivityVisibilityResolver() {
-        activityVisibilityResolver = ActivityVisibilityResolver(this)
-        activityVisibilityResolver.listener = this
-        activityVisibilityResolver.attach()
     }
 
     override fun onFirstActivityStarted() {

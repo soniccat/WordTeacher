@@ -1,8 +1,10 @@
 package com.aglushkov.wordteacher.di
 
+import com.aglushkov.wordteacher.androidApp.GApp
 import com.aglushkov.wordteacher.androidApp.di.AppComp
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.AddArticleComponent
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.AddArticleDependencies
+import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleVMWrapper
 import com.aglushkov.wordteacher.androidApp.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.androidApp.general.ActivityVisibilityResolver
@@ -40,16 +42,12 @@ public interface AppComponent: DefinitionsDependencies, ArticlesDependencies, Ad
     override fun idGenerator(): IdGenerator
     override fun connectivityManager(): ConnectivityManager
 
+    fun injectApplication(app: GApp)
+
     @Component.Builder
     interface Builder {
         fun generalModule(module: GeneralModule): Builder
         fun appModule(module: AppModule): Builder
-
-        @BindsInstance
-        fun setRouterResolver(resolver: RouterResolver): Builder
-
-        @BindsInstance
-        fun setActivityVisibilityResolver(resolver: ActivityVisibilityResolver): Builder
 
         fun build(): AppComponent
     }

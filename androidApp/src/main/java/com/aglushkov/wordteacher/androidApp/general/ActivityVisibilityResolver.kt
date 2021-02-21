@@ -3,9 +3,12 @@ package com.aglushkov.wordteacher.androidApp.general
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import com.aglushkov.wordteacher.androidApp.di.AppComp
 import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
 
-class ActivityVisibilityResolver(private val application: Application) {
+@AppComp
+class ActivityVisibilityResolver @Inject constructor(private val application: Application) {
     var listener: Listener? = null
 
     interface Listener {

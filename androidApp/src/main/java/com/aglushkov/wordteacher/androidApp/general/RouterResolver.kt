@@ -4,9 +4,12 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import com.aglushkov.wordteacher.androidApp.Router
+import com.aglushkov.wordteacher.androidApp.di.AppComp
 import java.lang.ref.WeakReference
+import javax.inject.Inject
 
-class RouterResolver(private val application: Application) {
+@AppComp
+class RouterResolver @Inject constructor(private val application: Application) {
     var router: WeakReference<Router>? = null
 
     private val callback = object : Application.ActivityLifecycleCallbacks {
