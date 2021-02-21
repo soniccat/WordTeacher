@@ -7,10 +7,11 @@ import androidx.fragment.app.FragmentFactory
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
+import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Router {
     lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,5 +93,11 @@ class MainActivity : AppCompatActivity() {
         DefinitionsFragment::class -> "definitions"
         ArticlesFragment::class -> "articles"
         else -> throw IllegalArgumentException("Wrong screen class $cl")
+    }
+
+    // Router
+
+    override fun openAddArticle() {
+
     }
 }

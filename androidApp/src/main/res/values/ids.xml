@@ -2,4 +2,6 @@
 <resources>
     <item name="definitions_displayMode_bySource" type="id"/>
     <item name="definitions_displayMode_merged" type="id"/>
+
+    <item name="articles_action_add_text" type="id" />
 </resources>

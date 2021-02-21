@@ -16,6 +16,7 @@ repositories {
     google()
     jcenter()
     mavenCentral()
+    maven(url = "https://jitpack.io")
 }
 
 android {
@@ -30,7 +31,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true // TODO: consider to remove
+        viewBinding = true
     }
 
     compileOptions {
@@ -61,6 +62,7 @@ dependencies {
     implementation(Deps.Google.coreKtx)
     implementation(Deps.Google.viewModelKtx)
     implementation(Deps.Google.lifecycleKtx)
+    implementation("com.github.leinardi:FloatingActionButtonSpeedDial:3.1.1")
 
     implementation(Deps.Coroutines.common)
     implementation(Deps.Coroutines.android)

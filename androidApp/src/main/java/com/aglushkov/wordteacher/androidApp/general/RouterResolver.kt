@@ -3,17 +3,12 @@ package com.aglushkov.wordteacher.androidApp.general
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import java.util.concurrent.atomic.AtomicInteger
+import com.aglushkov.wordteacher.androidApp.Router
+import java.lang.ref.WeakReference
 
-class ActivityVisibilityResolver(private val application: Application) {
-    var listener: Listener? = null
+class RouterResolver(private val application: Application) {
+    var router: WeakReference<Router>? = null
 
-    interface Listener {
-        fun onFirstActivityStarted()
-        fun onLastActivityStopped()
-    }
-
-    private val startedActivity = AtomicInteger()
     private val callback = object : Application.ActivityLifecycleCallbacks {
         override fun onActivityPaused(activity: Activity?) {
         }
@@ -22,9 +17,8 @@ class ActivityVisibilityResolver(private val application: Application) {
         }
 
         override fun onActivityStarted(activity: Activity?) {
-            val value = startedActivity.incrementAndGet()
-            if (value == 1) {
-                listener?.onFirstActivityStarted()
+            if (activity is Router) {
+                router = WeakReference(activity)
             }
         }
 
@@ -35,10 +29,6 @@ class ActivityVisibilityResolver(private val application: Application) {
         }
 
         override fun onActivityStopped(activity: Activity?) {
-            val value = startedActivity.decrementAndGet()
-            if (value == 0) {
-                listener?.onLastActivityStopped()
-            }
         }
 
         override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {

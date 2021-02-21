@@ -46,7 +46,7 @@ class ArticleRepository(
     suspend fun putArticle(article: Article) = coroutineScope {
         nlpCore.waitUntilInitialized()
 
-        withContext(Dispatchers.Default) {
+        scope.launch(Dispatchers.Default) {
             putArticleInternal(article)
         }
     }
@@ -56,6 +56,7 @@ class ArticleRepository(
             insert(article)
             insertedArticleId()
         } ?: 0L
+        article.id = articleId
 
         val resultText = clearString(article.text)
         try {

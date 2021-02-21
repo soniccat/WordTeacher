@@ -20,6 +20,7 @@ import kotlinx.datetime.toLocalDateTime
 class ArticlesVM(
     private val articlesRepository: ArticleRepository,
     private val idGenerator: IdGenerator,
+    private val router: ArticlesRouter
 ): ViewModel() {
 
     private val articlesFlow = articlesRepository.articles //MutableStateFlow<Resource<List<Article>>>(Resource.Uninitialized())
@@ -34,15 +35,8 @@ class ArticlesVM(
         }
     }
 
-    suspend fun onTextAdded(text: String) = coroutineScope {
-//        val article = Article(
-//            0,
-//            "unknown",
-//            Clock.System.now().toEpochMilliseconds(),
-//            text
-//        )
-//
-//        articlesRepository.putArticle(article)
+    fun onCreateTextArticleClicked() {
+        router.openAddArticle()
     }
 
     private fun buildViewItems(articles: List<Article>): List<BaseViewItem<*>> {
