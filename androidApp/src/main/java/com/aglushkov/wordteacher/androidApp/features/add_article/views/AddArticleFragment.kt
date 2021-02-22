@@ -4,21 +4,22 @@ import android.app.Application
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.view.Window
-import android.view.WindowManager
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentAddArticleBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComponent
-import com.aglushkov.wordteacher.androidApp.general.extensions.resolveBoolean
-import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeColor
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
-import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
 import com.aglushkov.wordteacher.di.AppComponentOwner
+import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleVM
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -57,11 +58,7 @@ class AddArticleFragment: DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val inflater = LayoutInflater.from(context)
-        binding = FragmentAddArticleBinding.inflate(inflater, null, false)
-
         val dialog = Dialog(requireContext(), R.style.DialogStyle)
-        dialog.setContentView(binding!!.root)
 
         // Apply layout_width and layout_height from the style as otherwise they are simply ignored
         dialog.window?.attributes?.let {
@@ -73,9 +70,59 @@ class AddArticleFragment: DialogFragment() {
         return dialog
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val inflater = LayoutInflater.from(context)
+        binding = FragmentAddArticleBinding.inflate(inflater, null, false)
+
+        return binding!!.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindView()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable(VM_STATE, addArticleVM.state)
+    }
+
+    private fun bindView() {
+        val binding = binding!!
+
+        binding.titleField.doOnTextChanged { text, start, count, after ->
+            addArticleVM.onTitleChanged(text?.toString().orEmpty())
+        }
+
+        binding.textField.doOnTextChanged { text, start, count, after ->
+            addArticleVM.onTextChanged(text?.toString().orEmpty())
+        }
+
+        binding.doneButton.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                addArticleVM.onCompletePressed()
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            addArticleVM.eventFlow.collect {
+                when (it) {
+                    is CompletionEvent -> {
+                        dismiss()
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            addArticleVM.completeButtonEnabled.collect { isEnabled ->
+                binding.doneButton.isEnabled = isEnabled
+            }
+        }
     }
 
     override fun onDestroyView() {

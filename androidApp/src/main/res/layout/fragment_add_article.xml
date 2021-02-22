@@ -23,56 +23,52 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <LinearLayout
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/content_padding"
+            android:paddingTop="@dimen/content_padding"
+            android:paddingBottom="88dp">
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingHorizontal="@dimen/content_padding"
-                android:paddingTop="@dimen/content_padding"
-                android:paddingBottom="56dp">
+                android:hint="@string/add_article_field_title_hint"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <com.google.android.material.textfield.TextInputLayout
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/title_field"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/add_article_field_title_hint"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:layout_height="wrap_content" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/content_padding"
+                android:hint="@string/add_article_field_text_hint"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <com.google.android.material.textfield.TextInputLayout
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/text_field"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/content_padding"
-                    android:hint="@string/add_article_field_text_hint"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:gravity="top|start"
+                    android:minLines="3"/>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="top|start"
-                        android:minLines="3"/>
-
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/done_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="@dimen/content_padding"
-                android:text="@string/add_article_done"
-                android:textAlignment="center"/>
-        </FrameLayout>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
     </ScrollView>
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/done_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/content_padding"
+        android:text="@string/add_article_done"
+        android:textAlignment="center"
+        app:layout_anchorGravity="bottom|end"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

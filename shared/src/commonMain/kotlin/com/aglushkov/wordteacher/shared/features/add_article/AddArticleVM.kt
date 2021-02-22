@@ -9,10 +9,12 @@ import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 
 class AddArticleVM(
@@ -29,6 +31,7 @@ class AddArticleVM(
 
     private val mutableTitle = MutableStateFlow("")
     val title: StateFlow<String> = mutableTitle
+    val completeButtonEnabled: Flow<Boolean> = title.map { it.isNotBlank() }
 
     private val mutableText = MutableStateFlow("")
     val text: StateFlow<String> = mutableText
