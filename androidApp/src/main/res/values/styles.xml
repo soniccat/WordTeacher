@@ -2,8 +2,13 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">false</item>
+
+        <!-- To have the same status bar color here and in DialogStyle.
+            When windowTranslucentStatus is true, the statusbar is a bit darker and
+            we can't use windowTranslucentStatus in dialogs as it breaks adjustResize -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/primaryDarkColor</item>
 
         <!-- Material Colors -->
         <item name="colorPrimary">@color/primaryColor</item>
@@ -39,5 +44,23 @@
 
     <style name="WordProvidedByTextAppearance" parent="TextAppearance.MaterialComponents.Body2">
         <item name="android:textColor">@color/word_provided_by</item>
+    </style>
+
+    <style name="DialogStyle" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+
+        <!-- To make a dialog fullscreen and keep adjustResize -->
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowIsFloating">false</item>
+
+        <!-- The same part we have in AppTheme, check the comment there -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/primaryDarkColor</item>
     </style>
 </resources>

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="definitions_search_margin">8dp</dimen>
-    <dimen name="definitions_displayMode_padding">@dimen/definitions_search_margin</dimen>
+    <dimen name="content_padding">16dp</dimen>
+    <dimen name="definitions_search_horizontal_margin">@dimen/content_padding</dimen>
+    <dimen name="definitions_search_vertical_margin">8dp</dimen>
+    <dimen name="definitions_displayMode_padding">@dimen/definitions_search_horizontal_margin</dimen>
 </resources>

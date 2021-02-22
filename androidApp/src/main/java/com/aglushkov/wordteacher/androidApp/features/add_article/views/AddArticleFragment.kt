@@ -1,19 +1,26 @@
 package com.aglushkov.wordteacher.androidApp.features.add_article.views
 
 import android.app.Application
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import android.view.Window
+import android.view.WindowManager
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.aglushkov.wordteacher.androidApp.databinding.FragmentArticlesBinding
+import com.aglushkov.wordteacher.androidApp.R
+import com.aglushkov.wordteacher.androidApp.databinding.FragmentAddArticleBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComponent
+import com.aglushkov.wordteacher.androidApp.general.extensions.resolveBoolean
+import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeColor
+import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
+import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleVM
-
 import javax.inject.Inject
+
 
 class AddArticleVMWrapper(
     application: Application
@@ -24,10 +31,10 @@ class AddArticleVMWrapper(
     fun isInitialized() = ::vm.isInitialized
 }
 
-class AddArticleFragment: Fragment() {
+class AddArticleFragment: DialogFragment() {
     private lateinit var androidVM: AddArticleVMWrapper
     private lateinit var addArticleVM: AddArticleVM
-    private var binding: FragmentArticlesBinding? = null
+    private var binding: FragmentAddArticleBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,22 +56,26 @@ class AddArticleFragment: Fragment() {
         addArticleVM = androidVM.vm
     }
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val inflater = LayoutInflater.from(context)
+        binding = FragmentAddArticleBinding.inflate(inflater, null, false)
+
+        val dialog = Dialog(requireContext(), R.style.DialogStyle)
+        dialog.setContentView(binding!!.root)
+
+        // Apply layout_width and layout_height from the style as otherwise they are simply ignored
+        dialog.window?.attributes?.let {
+            it.width = dialog.context.resolveThemeInt(android.R.attr.layout_width)
+            it.height = dialog.context.resolveThemeInt(android.R.attr.layout_height)
+            dialog.window?.attributes = it
+        }
+
+        return dialog
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable(VM_STATE, addArticleVM.state)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentArticlesBinding.inflate(inflater, container, false)
-        return binding!!.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        bindView()
-    }
-
-    private fun bindView() {
     }
 
     override fun onDestroyView() {

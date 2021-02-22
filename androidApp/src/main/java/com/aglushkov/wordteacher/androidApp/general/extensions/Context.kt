@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.LayoutInflater
 import androidx.annotation.AttrRes
+import androidx.annotation.BoolRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -17,6 +18,16 @@ private val SharedTypedValue = TypedValue()
 fun Context.resolveThemeColor(@AttrRes attribute: Int) = SharedTypedValue.let {
     theme.resolveAttribute(attribute, it, true)
     it.data
+}
+
+fun Context.resolveThemeInt(@AttrRes attribute: Int) = SharedTypedValue.let {
+    theme.resolveAttribute(attribute, it, true)
+    it.data
+}
+
+fun Context.resolveBoolean(@AttrRes attribute: Int): Boolean = SharedTypedValue.let {
+    theme.resolveAttribute(attribute, it, true)
+    it.data == 1
 }
 
 fun Context.resolveThemeDrawable(@AttrRes attribute: Int) = SharedTypedValue.let {

@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.articles.blueprints.ArticleBlueprint
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
+import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
@@ -28,6 +29,10 @@ class ArticlesModule {
         articleRepository: ArticleRepository,
         idGenerator: IdGenerator
     ): ArticlesVM {
-        return ArticlesVM(articleRepository, idGenerator, routerResolver.router!!.get()!!)
+        return ArticlesVM(articleRepository, idGenerator, object : ArticlesRouter {
+            override fun openAddArticle() {
+                routerResolver.router?.get()?.openAddArticle()
+            }
+        })
     }
 }

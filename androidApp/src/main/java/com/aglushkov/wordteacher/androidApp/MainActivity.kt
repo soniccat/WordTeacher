@@ -1,14 +1,15 @@
 package com.aglushkov.wordteacher.androidApp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.FragmentTransaction
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
+import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
-import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
-import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 
 class MainActivity : AppCompatActivity(), Router {
@@ -36,6 +37,8 @@ class MainActivity : AppCompatActivity(), Router {
                     return DefinitionsFragment()
                 } else if (ArticlesFragment::class.java.name == className) {
                     return ArticlesFragment()
+                } else if (AddArticleFragment::class.java.name == className) {
+                    return AddArticleFragment()
                 }
 
                 return super.instantiate(classLoader, className)
@@ -43,8 +46,9 @@ class MainActivity : AppCompatActivity(), Router {
         }
         supportFragmentManager.addOnBackStackChangedListener {
             supportFragmentManager.fragments.lastOrNull()?.let {
-                val itemId = screenIdByClass(it::class)
-                binding.bottomBar.selectedItemId = itemId
+                screenIdByClass(it::class)?.let { itemId ->
+                    binding.bottomBar.selectedItemId = itemId
+                }
             }
         }
 
@@ -58,7 +62,10 @@ class MainActivity : AppCompatActivity(), Router {
         val fragment = supportFragmentManager.findFragmentByTag(tag)
         val topFragment = supportFragmentManager.fragments.lastOrNull()
         if (fragment == null) {
-            val newFragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, cl.java.name)
+            val newFragment = supportFragmentManager.fragmentFactory.instantiate(
+                classLoader,
+                cl.java.name
+            )
             supportFragmentManager.beginTransaction()
                 .setReorderingAllowed(true).apply {
                     if (topFragment != null) {
@@ -83,21 +90,32 @@ class MainActivity : AppCompatActivity(), Router {
         else -> throw IllegalArgumentException("Wrong screen id $id")
     }
 
-    private fun screenIdByClass(cl: KClass<*>): Int = when(cl) {
+    private fun screenIdByClass(cl: KClass<*>): Int? = when(cl) {
         DefinitionsFragment::class -> R.id.tab_definitions
         ArticlesFragment::class -> R.id.tab_articles
-        else -> throw IllegalArgumentException("Wrong screen class $cl")
+        else -> null
     }
 
     private fun screenNameByClass(cl: KClass<*>): String = when(cl) {
         DefinitionsFragment::class -> "definitions"
         ArticlesFragment::class -> "articles"
+        AddArticleFragment::class -> "addArticle"
         else -> throw IllegalArgumentException("Wrong screen class $cl")
     }
 
     // Router
 
     override fun openAddArticle() {
+        openDialogFragment(AddArticleFragment::class)
+    }
 
+    private fun openDialogFragment(cl: KClass<*>) {
+        val tag = screenNameByClass(cl)
+        val newFragment = supportFragmentManager.fragmentFactory.instantiate(
+            classLoader,
+            cl.java.name
+        ) as DialogFragment
+
+        newFragment.show(supportFragmentManager, tag)
     }
 }

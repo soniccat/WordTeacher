@@ -20,7 +20,8 @@
                 android:layout_height="wrap_content"
                 android:iconifiedByDefault="false"
                 android:background="@drawable/search_bg"
-                android:layout_margin="@dimen/definitions_search_margin"/>
+                android:layout_marginHorizontal="@dimen/definitions_search_horizontal_margin"
+                android:layout_marginVertical="@dimen/definitions_search_vertical_margin"/>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
