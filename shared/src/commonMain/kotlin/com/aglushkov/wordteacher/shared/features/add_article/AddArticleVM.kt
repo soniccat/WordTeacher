@@ -39,8 +39,8 @@ class AddArticleVM(
 
     private val mutableTitle = MutableStateFlow("")
     val title: StateFlow<String> = mutableTitle
-    // TODO: remove and replace with titleError
-    val completeButtonEnabled: Flow<Boolean> = title.map { it.isNotBlank() }
+    private val mutableTitleErrorFlow = MutableStateFlow<StringDesc?>(null)
+    val titleErrorFlow: Flow<StringDesc?> = mutableTitleErrorFlow
 
     private val mutableText = MutableStateFlow("")
     val text: StateFlow<String> = mutableText
@@ -52,17 +52,31 @@ class AddArticleVM(
 
     fun onTitleChanged(title: String) {
         mutableTitle.value = title
+        updateTitleErrorFlow()
     }
 
     fun onTextChanged(text: String) {
         mutableText.value = text
     }
 
-    suspend fun onCancelPressed() {
+    fun onCancelPressed() = viewModelScope.launch {
         mutableEventFlow.emit(CompletionEvent(CompletionResult.CANCELLED))
     }
 
-    fun onCompletePressed() = viewModelScope.launch {
+    fun onTitleFocusChanged(hasFocus: Boolean) {
+        if (!hasFocus) {
+            updateTitleErrorFlow()
+        }
+    }
+
+    fun onCompletePressed() {
+        updateTitleErrorFlow()
+        if (mutableTitleErrorFlow.value == null) {
+            createArticle()
+        }
+    }
+
+    private fun createArticle() = viewModelScope.launch {
         val article = Article(
             0,
             title.value,
@@ -77,10 +91,18 @@ class AddArticleVM(
             throw e
         } catch (e: Exception) {
             val errorText = e.message?.let {
-               StringDesc.Raw(it)
+                StringDesc.Raw(it)
             } ?: StringDesc.Resource(MR.strings.error_default)
 
             mutableEventFlow.emit(ErrorEvent(errorText))
+        }
+    }
+
+    private fun updateTitleErrorFlow() {
+        if (title.value.isBlank()) {
+            mutableTitleErrorFlow.value = StringDesc.Resource(MR.strings.add_article_error_empty_title)
+        } else {
+            mutableTitleErrorFlow.value = null
         }
     }
 

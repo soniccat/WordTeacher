@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
+import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleVM
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Resource
@@ -107,8 +108,22 @@ class AddArticleFragment: DialogFragment() {
     private fun bindView() {
         val binding = binding!!
 
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.close -> {
+                    addArticleVM.onCancelPressed()
+                    true
+                }
+                else -> false
+            }
+        }
+
         binding.titleField.doOnTextChanged { text, start, count, after ->
             addArticleVM.onTitleChanged(text?.toString().orEmpty())
+        }
+
+        binding.titleField.setOnFocusChangeListener { _, hasFocus ->
+            addArticleVM.onTitleFocusChanged(hasFocus)
         }
 
         binding.textField.doOnTextChanged { text, start, count, after ->
@@ -121,20 +136,24 @@ class AddArticleFragment: DialogFragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             addArticleVM.eventFlow.collect {
-                when (it) {
-                    is CompletionEvent -> {
-                        dismiss()
-                    }
-                    is ErrorEvent -> {
-                        showError(it.text.toString(requireContext()))
-                    }
-                }
+                handleEvent(it)
             }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            addArticleVM.completeButtonEnabled.collect { isEnabled ->
-                binding.doneButton.isEnabled = isEnabled
+            addArticleVM.titleErrorFlow.collect { text ->
+                binding.titleInput.error = text?.toString(requireContext())
+            }
+        }
+    }
+
+    private fun handleEvent(it: Event) {
+        when (it) {
+            is CompletionEvent -> {
+                dismiss()
+            }
+            is ErrorEvent -> {
+                showError(it.text.toString(requireContext()))
             }
         }
     }

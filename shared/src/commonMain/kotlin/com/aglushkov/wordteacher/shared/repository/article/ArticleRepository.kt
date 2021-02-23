@@ -49,13 +49,9 @@ class ArticleRepository(
     }
 
     suspend fun putArticle(article: Article) = supervisorScope {
-        // Async in the scope to avoid retaining the parent coroutine and cancel immediately
-        // when it cancels (corresponding ViewModel is cleared for example)
+        // Async in the scope to avoid retaining the parent coroutine and to cancel immediately
+        // when it cancels (when corresponding ViewModel is cleared for example)
         scope.async(Dispatchers.Default + SupervisorJob()) {
-            delay(5000)
-            Logger.v("wwwww")
-            delay(4000)
-            throw IllegalArgumentException("aaa")
             putArticleInternal(article)
         }.await()
     }

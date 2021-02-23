@@ -6,6 +6,7 @@
     <string name="tab_definitions">Words</string>
     <string name="tab_articles">Articles</string>
     <string name="search">Search</string>
+    <string name="close">Close</string>
 
     <string name="word_partofspeech_noun">Noun</string>
     <string name="word_partofspeech_verb">Verb</string>
@@ -33,6 +34,7 @@
     <string name="add_article_field_title_hint">Title</string>
     <string name="add_article_field_text_hint">Text</string>
     <string name="add_article_done">Add</string>
+    <string name="add_article_error_empty_title">Title is required</string>
 
     <string name="error_default">Something went wrong :(</string>
     <string name="error_bad_response">Something went wrong, sorry :(.\nPlease try again later.</string>
