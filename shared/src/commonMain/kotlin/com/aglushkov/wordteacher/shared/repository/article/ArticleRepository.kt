@@ -49,20 +49,15 @@ class ArticleRepository(
     }
 
     suspend fun putArticle(article: Article) = supervisorScope {
-        var e: Throwable? = null
-
-        // Launch in the scope to avoid cancellation when the parent scope is cancelled (viewModel scope for example)
-        // Then wait until it finishes
-        scope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, throwable ->
-            e = throwable
-        }) {
+        // Async in the scope to avoid retaining the parent coroutine and cancel immediately
+        // when it cancels (corresponding ViewModel is cleared for example)
+        scope.async(Dispatchers.Default + SupervisorJob()) {
+            delay(5000)
+            Logger.v("wwwww")
+            delay(4000)
+            throw IllegalArgumentException("aaa")
             putArticleInternal(article)
-        }.join()
-
-        // Rethrow an exception if it has happened
-        e?.let {
-            throw it
-        }
+        }.await()
     }
 
     private suspend fun putArticleInternal(article: Article) {
