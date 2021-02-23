@@ -37,6 +37,11 @@ class ArticlesVMWrapper(
     @Inject lateinit var vm: ArticlesVM
 
     fun isInitialized() = ::vm.isInitialized
+
+    override fun onCleared() {
+        super.onCleared()
+        vm.onCleared()
+    }
 }
 
 class ArticlesFragment: Fragment() {

@@ -6,18 +6,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentAddArticleBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComponent
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
+import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleVM
+import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,6 +37,12 @@ class AddArticleVMWrapper(
     @Inject lateinit var vm: AddArticleVM
 
     fun isInitialized() = ::vm.isInitialized
+
+    // TODO: create a base class for a MokoVM wrapper
+    override fun onCleared() {
+        super.onCleared()
+        vm.onCleared()
+    }
 }
 
 class AddArticleFragment: DialogFragment() {
@@ -103,9 +116,7 @@ class AddArticleFragment: DialogFragment() {
         }
 
         binding.doneButton.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                addArticleVM.onCompletePressed()
-            }
+            addArticleVM.onCompletePressed()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -113,6 +124,9 @@ class AddArticleFragment: DialogFragment() {
                 when (it) {
                     is CompletionEvent -> {
                         dismiss()
+                    }
+                    is ErrorEvent -> {
+                        showError(it.text.toString(requireContext()))
                     }
                 }
             }
@@ -123,6 +137,10 @@ class AddArticleFragment: DialogFragment() {
                 binding.doneButton.isEnabled = isEnabled
             }
         }
+    }
+
+    private fun showError(text: String) {
+        Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

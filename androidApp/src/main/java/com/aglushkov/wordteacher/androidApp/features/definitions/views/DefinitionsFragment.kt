@@ -36,6 +36,11 @@ class DefinitionsVMWrapper(
     @Inject lateinit var vm: DefinitionsVM
 
     fun isInitialized() = ::vm.isInitialized
+
+    override fun onCleared() {
+        super.onCleared()
+        vm.onCleared()
+    }
 }
 
 class DefinitionsFragment: Fragment() {

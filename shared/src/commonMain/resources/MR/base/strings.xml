@@ -34,6 +34,7 @@
     <string name="add_article_field_text_hint">Text</string>
     <string name="add_article_done">Add</string>
 
+    <string name="error_default">Something went wrong :(</string>
     <string name="error_bad_response">Something went wrong, sorry :(.\nPlease try again later.</string>
     <string name="error_bad_connection">Couldn\'t establish connection to the network.\nTry to check your network settings and try again.</string>
     <string name="error_no_connection">No internet connection.\nPlease check your device network settings and try again.</string>

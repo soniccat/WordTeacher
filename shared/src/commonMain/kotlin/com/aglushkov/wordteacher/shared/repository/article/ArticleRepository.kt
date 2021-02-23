@@ -9,14 +9,19 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.toArticle
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 
 class ArticleRepository(
@@ -43,15 +48,26 @@ class ArticleRepository(
         }
     }
 
-    suspend fun putArticle(article: Article) = coroutineScope {
-        nlpCore.waitUntilInitialized()
+    suspend fun putArticle(article: Article) = supervisorScope {
+        var e: Throwable? = null
 
-        scope.launch(Dispatchers.Default) {
+        // Launch in the scope to avoid cancellation when the parent scope is cancelled (viewModel scope for example)
+        // Then wait until it finishes
+        scope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, throwable ->
+            e = throwable
+        }) {
             putArticleInternal(article)
+        }.join()
+
+        // Rethrow an exception if it has happened
+        e?.let {
+            throw it
         }
     }
 
-    private fun putArticleInternal(article: Article) {
+    private suspend fun putArticleInternal(article: Article) {
+        nlpCore.waitUntilInitialized()
+
         val articleId = database.articles.run {
             insert(article)
             insertedArticleId()
