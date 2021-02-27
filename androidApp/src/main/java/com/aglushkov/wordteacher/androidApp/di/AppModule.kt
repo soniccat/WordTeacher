@@ -1,15 +1,13 @@
 package com.aglushkov.wordteacher.di
 
-import android.app.Application
 import android.content.Context
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.di.AppComp
-import com.aglushkov.wordteacher.androidApp.general.ActivityVisibilityResolver
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
-import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatFile
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
@@ -72,8 +70,8 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun articleRepository(database: AppDatabase, nlpCore: NLPCore): ArticleRepository {
-        return ArticleRepository(database, nlpCore)
+    fun articleRepository(database: AppDatabase, nlpCore: NLPCore): ArticlesRepository {
+        return ArticlesRepository(database, nlpCore)
     }
 
     @AppComp

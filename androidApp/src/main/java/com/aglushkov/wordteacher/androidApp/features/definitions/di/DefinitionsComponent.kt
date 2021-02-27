@@ -8,8 +8,6 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
-import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import dagger.BindsInstance
 import dagger.Component
 

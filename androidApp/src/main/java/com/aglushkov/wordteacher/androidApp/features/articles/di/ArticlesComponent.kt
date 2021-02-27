@@ -5,9 +5,8 @@ import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFrag
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesVMWrapper
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.di.ArticlesModule
-import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import dagger.BindsInstance
 import dagger.Component
 
@@ -29,6 +28,6 @@ interface ArticlesComponent {
 
 interface ArticlesDependencies {
     fun routerResolver(): RouterResolver
-    fun articleRepository(): ArticleRepository
+    fun articleRepository(): ArticlesRepository
     fun idGenerator(): IdGenerator
 }

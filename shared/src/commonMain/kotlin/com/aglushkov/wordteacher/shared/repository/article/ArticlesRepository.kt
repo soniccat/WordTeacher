@@ -13,13 +13,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
-class ArticleRepository(
+class ArticlesRepository(
     private val database: AppDatabase,
     private val nlpCore: NLPCore
 ) {
@@ -41,7 +42,7 @@ class ArticleRepository(
     suspend fun createArticle(article: Article) = supervisorScope {
         // Async in the scope to avoid retaining the parent coroutine and to cancel immediately
         // when it cancels (when corresponding ViewModel is cleared for example)
-        scope.async(Dispatchers.Default + SupervisorJob()) {
+        scope.async(Dispatchers.Default) {
             createArticleInternal(article)
         }.await()
     }
@@ -56,15 +57,10 @@ class ArticleRepository(
         article.id = articleId
 
         val resultText = clearString(article.text)
-        try {
-            val nlpCoreCopy = nlpCore.clone()
-            nlpCoreCopy.sentences(resultText).forEachIndexed { index, s ->
-                val nlpSentence = NLPSentence(nlpCoreCopy, articleId, index.toLong(), s)
-                database.sentencesNLP.insert(nlpSentence)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            println(resultText)
+        val nlpCoreCopy = nlpCore.clone()
+        nlpCoreCopy.sentences(resultText).forEachIndexed { index, s ->
+            val nlpSentence = NLPSentence(nlpCoreCopy, articleId, index.toLong(), s)
+            database.sentencesNLP.insert(nlpSentence)
         }
     }
 

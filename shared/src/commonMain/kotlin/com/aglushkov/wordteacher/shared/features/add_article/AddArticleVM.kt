@@ -5,7 +5,7 @@ import com.aglushkov.wordteacher.shared.events.CompletionResult
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.model.Article
-import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.parcelize.Parcelable
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
 class AddArticleVM(
-    private val articlesRepository: ArticleRepository,
+    private val articlesRepository: ArticlesRepository,
     val state: State
 ): ViewModel() {
 

@@ -6,11 +6,9 @@ import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
-import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.ShortArticle
-import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -19,7 +17,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class ArticlesVM(
-    articlesRepository: ArticleRepository,
+    articlesRepository: ArticlesRepository,
     private val idGenerator: IdGenerator,
     private val router: ArticlesRouter
 ): ViewModel() {

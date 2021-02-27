@@ -5,7 +5,7 @@ import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticl
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleVMWrapper
 import com.aglushkov.wordteacher.di.AddArticleModule
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleVM
-import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import dagger.BindsInstance
 import dagger.Component
 
@@ -29,5 +29,5 @@ interface AddArticleComponent {
 }
 
 interface AddArticleDependencies {
-    fun articleRepository(): ArticleRepository
+    fun articleRepository(): ArticlesRepository
 }

@@ -1,27 +1,19 @@
 package com.aglushkov.wordteacher.shared.features.article
 
-import com.aglushkov.wordteacher.shared.events.CompletionEvent
-import com.aglushkov.wordteacher.shared.events.CompletionResult
-import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Article
-import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
-import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.resources.desc.Raw
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 class ArticleVM(
-    private val articlesRepository: ArticleRepository,
+    private val articlesRepository: ArticlesRepository,
     val state: State
 ): ViewModel() {
 
