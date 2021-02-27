@@ -58,19 +58,12 @@ actual class NLPCore(
     actual fun sentences(text: String): Array<out String> = sentenceDetector?.sentDetect(text).orEmpty()
     actual fun tokenize(sentence: String): Array<out String> = tokenizer?.tokenize(sentence).orEmpty()
     actual fun tag(tokens: Array<out String>): Array<out String> = tagger?.tag(tokens).orEmpty()
-    actual fun tagEnums(tags: Array<out String>): List<Tag> = tags.map {
-        try {
-            Tag.valueOf(it)
-        } catch (e: java.lang.Exception) {
-            Tag.UNKNOWN
-        }
-    }
     actual fun lemmatize(tokens: Array<out String>, tags: Array<out String>) = lemmatizer?.lemmatize(tokens, tags).orEmpty()
     actual fun chunk(tokens: Array<out String>, tags: Array<out String>) = chunker?.chunk(tokens, tags).orEmpty()
-    actual fun spanList(tokens: Array<out String>, tags: Array<out String>, chunks: Array<out String>): List<Span> =
-            ChunkSample.phrasesAsSpanList(tokens, tags, chunks).map {
-                createSpan(it)
-            }
+    actual fun spanList(sentence: NLPSentence): List<Span> =
+        ChunkSample.phrasesAsSpanList(sentence.tokens, sentence.tags, sentence.chunks).map {
+            createSpan(it)
+        }
 
     fun load() {
         state.value = Resource.Loading(this@NLPCore)

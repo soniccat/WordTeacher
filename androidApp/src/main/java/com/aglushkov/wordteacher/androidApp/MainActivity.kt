@@ -1,13 +1,16 @@
 package com.aglushkov.wordteacher.androidApp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
+import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import kotlin.reflect.KClass
@@ -27,10 +30,6 @@ class MainActivity : AppCompatActivity(), Router {
             true
         }
 
-        binding.bottomBar.setOnNavigationItemReselectedListener {
-            // do nothing
-        }
-
         supportFragmentManager.fragmentFactory = object : FragmentFactory() {
             override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
                 if (DefinitionsFragment::class.java.name == className) {
@@ -39,6 +38,8 @@ class MainActivity : AppCompatActivity(), Router {
                     return ArticlesFragment()
                 } else if (AddArticleFragment::class.java.name == className) {
                     return AddArticleFragment()
+                } else if (ArticlesFragment::class.java.name == className) {
+                    return ArticlesFragment()
                 }
 
                 return super.instantiate(classLoader, className)
@@ -57,7 +58,15 @@ class MainActivity : AppCompatActivity(), Router {
         }
     }
 
-    private fun openFragment(cl: KClass<*>) {
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount == 1) {
+            finish()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    private fun openFragment(cl: KClass<*>, arguments: Bundle? = null) {
         val tag = screenNameByClass(cl)
         val fragment = supportFragmentManager.findFragmentByTag(tag)
         val topFragment = supportFragmentManager.fragments.lastOrNull()
@@ -66,21 +75,15 @@ class MainActivity : AppCompatActivity(), Router {
                 classLoader,
                 cl.java.name
             )
+            newFragment.arguments = arguments
             supportFragmentManager.beginTransaction()
-                .setReorderingAllowed(true).apply {
-                    if (topFragment != null) {
-                        addToBackStack(tag)
-                    }
-                }
+                .setReorderingAllowed(true)
+                .addToBackStack(tag)
                 .replace(binding.fragmentContainer.id, newFragment, tag)
                 .commitAllowingStateLoss()
 
         } else if (topFragment == null || topFragment::class != cl) {
-            if (supportFragmentManager.backStackEntryCount == 1) {
-                supportFragmentManager.popBackStack()
-            } else {
-                supportFragmentManager.popBackStack(tag, 0)
-            }
+            supportFragmentManager.popBackStack(tag, 0)
         }
     }
 
@@ -100,6 +103,7 @@ class MainActivity : AppCompatActivity(), Router {
         DefinitionsFragment::class -> "definitions"
         ArticlesFragment::class -> "articles"
         AddArticleFragment::class -> "addArticle"
+        ArticleFragment::class -> "article"
         else -> throw IllegalArgumentException("Wrong screen class $cl")
     }
 
@@ -107,6 +111,10 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun openAddArticle() {
         openDialogFragment(AddArticleFragment::class)
+    }
+
+    override fun openArticle(id: Long) {
+        openFragment(ArticleFragment::class, ArticleFragment.createArguments(id))
     }
 
     private fun openDialogFragment(cl: KClass<*>) {

@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
 class NLPSentence(
-    private val core: NLPCore, // TODO: remove it out of here... to NLPProcessor or sth like that...
     var articleId: Long = 0,
     var orderId: Long = 0,
     var text: String = "",
@@ -10,19 +9,13 @@ class NLPSentence(
     var lemmas: Array<out String> = emptyArray(),
     var chunks: Array<out String> = emptyArray()
 ) {
-    init {
-        load()
+    fun tagEnums(): List<Tag> = tags.map {
+        try {
+            Tag.valueOf(it)
+        } catch (e: Exception) {
+            Tag.UNKNOWN
+        }
     }
-
-    private fun load() {
-        tokens = core.tokenize(text)
-        tags = core.tag(tokens)
-        lemmas = core.lemmatize(tokens, tags)
-        chunks = core.chunk(tokens, tags)
-    }
-
-    fun tagEnums() = core.tagEnums(tags)
-    fun spanList() = core.spanList(tokens, tags, chunks)
 
     fun lemmaOrToken(i: Int) = if (lemmas[i] != NLPConstants.UNKNOWN_LEMMA) {
         lemmas[i]

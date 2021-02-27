@@ -1,19 +1,16 @@
 package com.aglushkov.wordteacher.shared.features.article
 
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.model.Article
-import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 class ArticleVM(
-    private val articlesRepository: ArticlesRepository,
+    private val articleRepository: ArticleRepository,
     val state: State
 ): ViewModel() {
 
@@ -23,13 +20,12 @@ class ArticleVM(
     )
     val eventFlow: SharedFlow<Event> = mutableEventFlow
 
-    private val article = MutableStateFlow<Resource<Article>>(Resource.Uninitialized())
+    private val article = articleRepository.article
 
     init {
-    }
-
-    private fun loadArticle(id: Long) {
-
+        viewModelScope.launch {
+            articleRepository.loadArticle(state.id)
+        }
     }
 
     private fun saveArticle() = viewModelScope.launch {

@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.androidApp.features.add_article.views
+package com.aglushkov.wordteacher.androidApp.features.article.views
 
 import android.app.Application
 import android.app.Dialog
@@ -7,41 +7,40 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.androidApp.R
-import com.aglushkov.wordteacher.androidApp.databinding.FragmentAddArticleBinding
-import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComponent
+import com.aglushkov.wordteacher.androidApp.databinding.FragmentArticleBinding
+import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComponent
 import com.aglushkov.wordteacher.androidApp.general.VMWrapper
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.features.add_article.AddArticleVM
+import com.aglushkov.wordteacher.shared.features.article.ArticleVM
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class AddArticleVMWrapper(
+class ArticleVMWrapper(
     application: Application
-): VMWrapper<AddArticleVM>(application)
+): VMWrapper<ArticleVM>(application)
 
-class AddArticleFragment: DialogFragment() {
-    private lateinit var androidVM: AddArticleVMWrapper
-    private lateinit var addArticleVM: AddArticleVM
-    private var binding: FragmentAddArticleBinding? = null
+class ArticleFragment: DialogFragment() {
+    private lateinit var androidVM: ArticleVMWrapper
+    private lateinit var articleVM: ArticleVM
+    private var binding: FragmentArticleBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         androidVM = ViewModelProvider(this)
-                .get(AddArticleVMWrapper::class.java)
+                .get(ArticleVMWrapper::class.java)
 
-        val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: AddArticleVM.State()
+        val id = requireArguments().getLong(STATE_ID)
+        val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: ArticleVM.State(id)
         val deps = (requireContext().applicationContext as AppComponentOwner).appComponent
-        val component = DaggerAddArticleComponent.builder()
+        val component = DaggerArticleComponent.builder()
             .setDeps(deps)
             .setVMState(vmState)
             .setVMWrapper(androidVM)
@@ -49,9 +48,9 @@ class AddArticleFragment: DialogFragment() {
         if (!androidVM.isInitialized()) {
             component.injectViewModelWrapper(androidVM)
         }
-        component.injectAddArticleFragment(this)
+        component.injectArticleFragment(this)
 
-        addArticleVM = androidVM.vm
+        articleVM = androidVM.vm
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -72,7 +71,7 @@ class AddArticleFragment: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentAddArticleBinding.inflate(inflater, null, false)
+        binding = FragmentArticleBinding.inflate(inflater, null, false)
         return binding!!.root
     }
 
@@ -83,16 +82,11 @@ class AddArticleFragment: DialogFragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(VM_STATE, addArticleVM.state)
+        outState.putParcelable(VM_STATE, articleVM.state)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        binding?.let {
-            if (it.titleField.text?.isEmpty() == true) {
-                it.titleField.requestFocus()
-            }
-        }
     }
 
     private fun bindView() {
@@ -101,38 +95,17 @@ class AddArticleFragment: DialogFragment() {
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.close -> {
-                    addArticleVM.onCancelPressed()
+                    //TODO:
+                    //articleVM.onCancelPressed()
                     true
                 }
                 else -> false
             }
         }
 
-        binding.titleField.doOnTextChanged { text, start, count, after ->
-            addArticleVM.onTitleChanged(text?.toString().orEmpty())
-        }
-
-        binding.titleField.setOnFocusChangeListener { _, hasFocus ->
-            addArticleVM.onTitleFocusChanged(hasFocus)
-        }
-
-        binding.textField.doOnTextChanged { text, start, count, after ->
-            addArticleVM.onTextChanged(text?.toString().orEmpty())
-        }
-
-        binding.doneButton.setOnClickListener {
-            addArticleVM.onCompletePressed()
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
-            addArticleVM.eventFlow.collect {
+            articleVM.eventFlow.collect {
                 handleEvent(it)
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            addArticleVM.titleErrorFlow.collect { text ->
-                binding.titleInput.error = text?.toString(requireContext())
             }
         }
     }
@@ -156,6 +129,14 @@ class AddArticleFragment: DialogFragment() {
         super.onDestroyView()
         binding = null
     }
+
+
+    companion object {
+        fun createArguments(id: Long) = Bundle().apply {
+            putLong(STATE_ID, id)
+        }
+    }
 }
 
 private val VM_STATE = "vm_state"
+private val STATE_ID = "state_id"

@@ -28,6 +28,6 @@ interface ArticlesComponent {
 
 interface ArticlesDependencies {
     fun routerResolver(): RouterResolver
-    fun articleRepository(): ArticlesRepository
+    fun articlesRepository(): ArticlesRepository
     fun idGenerator(): IdGenerator
 }

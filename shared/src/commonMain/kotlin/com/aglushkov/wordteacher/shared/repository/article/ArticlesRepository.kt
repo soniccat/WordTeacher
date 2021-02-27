@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
+import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,8 @@ import kotlinx.coroutines.supervisorScope
 
 class ArticlesRepository(
     private val database: AppDatabase,
-    private val nlpCore: NLPCore
+    private val nlpCore: NLPCore,
+    private val nlpSentenceProcessor: NLPSentenceProcessor
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlow = MutableStateFlow<Resource<List<ShortArticle>>>(Resource.Uninitialized())
@@ -58,7 +60,8 @@ class ArticlesRepository(
         val resultText = clearString(article.text)
         val nlpCoreCopy = nlpCore.clone()
         nlpCoreCopy.sentences(resultText).forEachIndexed { index, s ->
-            val nlpSentence = NLPSentence(nlpCoreCopy, articleId, index.toLong(), s)
+            val nlpSentence = NLPSentence(articleId, index.toLong(), s)
+            nlpSentenceProcessor.process(nlpSentence)
             database.sentencesNLP.insert(nlpSentence)
         }
     }

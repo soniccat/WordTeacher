@@ -1,24 +1,18 @@
 package com.aglushkov.wordteacher.shared.repository.article
 
 import com.aglushkov.extensions.asFlow
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
-import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
-import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 
 class ArticleRepository(
     private val database: AppDatabase,
@@ -33,7 +27,7 @@ class ArticleRepository(
     suspend fun loadArticle(id: Long) {
         loadJob?.cancel()
         loadJob = scope.launch(Dispatchers.Default) {
-            database.articles.selectArticle(id, nlpCore).asFlow().collect {
+            database.articles.selectArticle(id).asFlow().collect {
                 val result = it.executeAsOneOrNull()
                 stateFlow.value = if (result != null) {
                     Resource.Loaded(result)

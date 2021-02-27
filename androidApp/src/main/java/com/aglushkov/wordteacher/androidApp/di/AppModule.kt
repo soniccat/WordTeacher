@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatFile
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
@@ -21,12 +22,6 @@ import dagger.Provides
 
 @Module
 class AppModule {
-//    @AppComp
-//    @Provides
-//    fun activityVisibilityResolver(application: Application): ActivityVisibilityResolver {
-//        return ActivityVisibilityResolver(application)
-//    }
-
     @AppComp
     @Provides
     fun configService(context: Context): ConfigService {
@@ -70,9 +65,17 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun articleRepository(database: AppDatabase, nlpCore: NLPCore): ArticlesRepository {
-        return ArticlesRepository(database, nlpCore)
+    fun articleRepository(
+        database: AppDatabase,
+        nlpCore: NLPCore,
+        processor: NLPSentenceProcessor
+    ): ArticlesRepository {
+        return ArticlesRepository(database, nlpCore, processor)
     }
+
+    @AppComp
+    @Provides
+    fun nlpSentenceProcessor(nlpCore: NLPCore) = NLPSentenceProcessor(nlpCore)
 
     @AppComp
     @Provides

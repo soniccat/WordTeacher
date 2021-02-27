@@ -38,13 +38,17 @@ class ArticlesVM(
         router.openAddArticle()
     }
 
+    fun onArticleClicked(item: ArticleViewItem) {
+        router.openArticle(item.articleId)
+    }
+
     private fun buildViewItems(articles: List<ShortArticle>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         articles.forEach {
             val dateTime = Instant.fromEpochMilliseconds(it.date).toLocalDateTime(TimeZone.currentSystemDefault())
             val dateTimeString = "${dateTime.dayOfMonth}.${dateTime.monthNumber}.${dateTime.year}"
 
-            items.add(ArticleViewItem(it.name, dateTimeString).apply {
+            items.add(ArticleViewItem(it.id, it.name, dateTimeString).apply {
                 id = idGenerator.nextId()
             })
         }

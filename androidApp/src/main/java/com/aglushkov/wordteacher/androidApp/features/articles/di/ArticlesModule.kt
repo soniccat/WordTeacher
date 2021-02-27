@@ -33,6 +33,10 @@ class ArticlesModule {
             override fun openAddArticle() {
                 routerResolver.router?.get()?.openAddArticle()
             }
+
+            override fun openArticle(id: Long) {
+                routerResolver.router?.get()?.openArticle(id)
+            }
         })
     }
 }

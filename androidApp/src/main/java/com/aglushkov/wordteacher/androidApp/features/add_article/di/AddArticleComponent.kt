@@ -29,5 +29,5 @@ interface AddArticleComponent {
 }
 
 interface AddArticleDependencies {
-    fun articleRepository(): ArticlesRepository
+    fun articlesRepository(): ArticlesRepository
 }

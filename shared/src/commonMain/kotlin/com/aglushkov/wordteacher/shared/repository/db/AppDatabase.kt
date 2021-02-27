@@ -62,11 +62,11 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         )
 
         fun selectAll() = db.dBNLPSentenceQueries.selectAll()
-        fun selectForArticle(articleId: Long, nlpCore: NLPCore) = db.dBNLPSentenceQueries
+        fun selectForArticle(articleId: Long) = db.dBNLPSentenceQueries
             .selectForArticle(articleId)
             .executeAsList()
             .map {
-                it.toNLPSentence(nlpCore)
+                it.toNLPSentence()
             }
 
         fun removeAll() = db.dBNLPSentenceQueries.removeAll()
@@ -81,8 +81,8 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date ->
             ShortArticle(id, name, date)
         }
-        fun selectArticle(anId: Long, nlpCore: NLPCore) = db.dBArticleQueries.selectArticle(anId) { id, name, date, text ->
-            val sentences = sentencesNLP.selectForArticle(anId, nlpCore)
+        fun selectArticle(anId: Long) = db.dBArticleQueries.selectArticle(anId) { id, name, date, text ->
+            val sentences = sentencesNLP.selectForArticle(anId)
             Article(id, name, date, text, sentences)
         }
 
@@ -94,14 +94,13 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 }
 
-fun DBNLPSentence.toNLPSentence(nlpCore: NLPCore): NLPSentence {
+fun DBNLPSentence.toNLPSentence(): NLPSentence {
     val tokens = tokens.split(AppDatabase.nlpSeparator)
     val tags = tags.split(AppDatabase.nlpSeparator)
     val lemmas = lemmas.split(AppDatabase.nlpSeparator)
     val chunks = chunks.split(AppDatabase.nlpSeparator)
 
     return NLPSentence(
-        nlpCore,
         articleId,
         orderId,
         text,

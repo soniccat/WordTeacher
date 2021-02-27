@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,14 +13,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentArticlesBinding
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComponent
-import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
+import com.aglushkov.wordteacher.androidApp.general.VMWrapper
+import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeColor
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
-import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.leinardi.android.speeddial.SpeedDialActionItem
@@ -32,17 +30,7 @@ import javax.inject.Inject
 
 class ArticlesVMWrapper(
     application: Application
-): AndroidViewModel(application) {
-
-    @Inject lateinit var vm: ArticlesVM
-
-    fun isInitialized() = ::vm.isInitialized
-
-    override fun onCleared() {
-        super.onCleared()
-        vm.onCleared()
-    }
-}
+): VMWrapper<ArticlesVM>(application)
 
 class ArticlesFragment: Fragment() {
     private lateinit var androidVM: ArticlesVMWrapper

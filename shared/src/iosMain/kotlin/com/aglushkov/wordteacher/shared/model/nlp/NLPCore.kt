@@ -15,10 +15,6 @@ actual class NLPCore {
         TODO("not implemented")
     }
 
-    actual fun tagEnums(tags: Array<out String>): List<Tag> {
-        TODO("not implemented")
-    }
-
     actual fun lemmatize(tokens: Array<out String>, tags: Array<out String>): Array<out String> {
         TODO("not implemented")
     }
@@ -27,7 +23,7 @@ actual class NLPCore {
         TODO("not implemented")
     }
 
-    actual fun spanList(tokens: Array<out String>, tags: Array<out String>, chunks: Array<out String>): List<out Span> {
+    actual fun spanList(sentence: NLPSentence): List<out Span> {
         TODO("not implemented")
     }
 

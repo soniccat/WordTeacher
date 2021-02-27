@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.Article
 
 class ArticleViewItem(
+    val articleId: Long,
     val name: String,
     val date: String
 ): BaseViewItem<String>(name, Type) {
