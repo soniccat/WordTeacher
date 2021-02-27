@@ -13,6 +13,11 @@ selectShort:
 SELECT id, name, date
 FROM DBArticle;
 
+selectArticle:
+SELECT *
+FROM DBArticle
+WHERE id = ?;
+
 insert:
 INSERT INTO DBArticle(name, date, text)
 VALUES (?, ?, ?);

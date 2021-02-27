@@ -81,6 +81,10 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date ->
             ShortArticle(id, name, date)
         }
+        fun selectArticle(anId: Long, nlpCore: NLPCore) = db.dBArticleQueries.selectArticle(anId) { id, name, date, text ->
+            val sentences = sentencesNLP.selectForArticle(anId, nlpCore)
+            Article(id, name, date, text, sentences)
+        }
 
         fun removeAll() = db.dBArticleQueries.removeAll()
     }

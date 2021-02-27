@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
 class NLPSentence(
-    private val core: NLPCore,
+    private val core: NLPCore, // TODO: remove it out of here... to NLPProcessor or sth like that...
     var articleId: Long = 0,
     var orderId: Long = 0,
     var text: String = "",
