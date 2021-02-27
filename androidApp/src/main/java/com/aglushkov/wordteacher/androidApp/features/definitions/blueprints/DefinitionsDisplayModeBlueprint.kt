@@ -21,8 +21,9 @@ class DefinitionsDisplayModeBlueprint @Inject constructor (
 
     override fun createViewHolder(parent: ViewGroup) = SimpleAdapter.ViewHolder(
         ChipGroup(parent.context).apply {
-            val padding = context.resources.getDimensionPixelSize(R.dimen.definitions_displayMode_padding)
-            updatePadding(left = padding, top = padding, right = padding)
+            val horizontalPadding = context.resources.getDimensionPixelSize(R.dimen.definitions_displayMode_horizontal_padding)
+            val verticalPadding = context.resources.getDimensionPixelSize(R.dimen.definitions_displayMode_vertical_padding)
+            updatePadding(left = horizontalPadding, top = verticalPadding, right = horizontalPadding)
 
             for (i in 0 until 2) {
                 addView(createChip(context, i))

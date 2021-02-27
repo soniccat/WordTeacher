@@ -1,19 +1,24 @@
 CREATE TABLE IF NOT EXISTS DBArticle (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT NOT NULL,
-  date INTEGER NOT NULL
+  date INTEGER NOT NULL,
+  text TEXT NOT NULL
 );
 
 selectAll:
 SELECT *
 FROM DBArticle;
 
+selectShort:
+SELECT id, name, date
+FROM DBArticle;
+
 insert:
-INSERT INTO DBArticle(name, date)
-VALUES (?, ?);
+INSERT INTO DBArticle(name, date, text)
+VALUES (?, ?, ?);
 
 insertArticle:
-INSERT INTO DBArticle(name, date)
+INSERT INTO DBArticle(name, date, text)
 VALUES ?;
 
 lastInsertedRowId:

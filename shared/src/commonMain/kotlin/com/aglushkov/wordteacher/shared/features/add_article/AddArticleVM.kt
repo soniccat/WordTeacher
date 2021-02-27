@@ -14,15 +14,11 @@ import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
@@ -85,7 +81,7 @@ class AddArticleVM(
         )
 
         try {
-            articlesRepository.putArticle(article)
+            articlesRepository.createArticle(article)
             mutableEventFlow.emit(CompletionEvent(CompletionResult.COMPLETED))
         } catch (e: CancellationException) {
             throw e

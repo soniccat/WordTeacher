@@ -105,6 +105,15 @@ class AddArticleFragment: DialogFragment() {
         outState.putParcelable(VM_STATE, addArticleVM.state)
     }
 
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        binding?.let {
+            if (it.titleField.text?.isEmpty() == true) {
+                it.titleField.requestFocus()
+            }
+        }
+    }
+
     private fun bindView() {
         val binding = binding!!
 

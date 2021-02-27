@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
+import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.coroutineScope
@@ -18,12 +19,12 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class ArticlesVM(
-    private val articlesRepository: ArticleRepository,
+    articlesRepository: ArticleRepository,
     private val idGenerator: IdGenerator,
     private val router: ArticlesRouter
 ): ViewModel() {
 
-    private val articlesFlow = articlesRepository.articles //MutableStateFlow<Resource<List<Article>>>(Resource.Uninitialized())
+    private val articlesFlow = articlesRepository.shortArticles
     val articles = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
 
     init {
@@ -39,7 +40,7 @@ class ArticlesVM(
         router.openAddArticle()
     }
 
-    private fun buildViewItems(articles: List<Article>): List<BaseViewItem<*>> {
+    private fun buildViewItems(articles: List<ShortArticle>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         articles.forEach {
             val dateTime = Instant.fromEpochMilliseconds(it.date).toLocalDateTime(TimeZone.currentSystemDefault())

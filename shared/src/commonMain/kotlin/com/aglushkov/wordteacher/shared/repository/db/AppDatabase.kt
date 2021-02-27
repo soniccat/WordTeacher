@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.Article
+import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import kotlinx.coroutines.CoroutineScope
@@ -72,9 +73,14 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 
     inner class Articles {
-        fun insert(article: Article) = db.dBArticleQueries.insert(article.name, article.date)
+        fun insert(article: Article) = db.dBArticleQueries.insert(article.name, article.date, article.text)
         fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong()
-        fun selectAll() = db.dBArticleQueries.selectAll()
+        fun selectAll() = db.dBArticleQueries.selectAll { id, name, date, text ->
+            Article(id, name, date, text)
+        }
+        fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date ->
+            ShortArticle(id, name, date)
+        }
 
         fun removeAll() = db.dBArticleQueries.removeAll()
     }
@@ -99,14 +105,5 @@ fun DBNLPSentence.toNLPSentence(nlpCore: NLPCore): NLPSentence {
         tags.toTypedArray(),
         lemmas.toTypedArray(),
         chunks.toTypedArray()
-    )
-}
-
-fun DBArticle.toArticle(): Article {
-    return Article(
-        id,
-        name,
-        date,
-        ""
     )
 }
