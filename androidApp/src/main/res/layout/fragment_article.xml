@@ -37,4 +37,25 @@
         </LinearLayout>
     </ScrollView>
 
+    <LinearLayout
+        android:id="@+id/definitions_bottomsheet"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:orientation="vertical"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        android:background="@color/secondaryLightColor">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/definitions_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp"/>
+
+        <com.aglushkov.wordteacher.androidApp.general.views.LoadingStatusView
+            android:id="@+id/defintions_loader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

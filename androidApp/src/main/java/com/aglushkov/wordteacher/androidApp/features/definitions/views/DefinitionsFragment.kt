@@ -19,6 +19,7 @@ import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.di.DaggerDefinitionsComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import kotlinx.coroutines.flow.collect
@@ -61,7 +62,7 @@ class DefinitionsFragment: Fragment() {
         outState.putParcelable(VM_STATE, definitionsVM.state)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentDefinitionsBinding.inflate(inflater, container, false)
         return binding!!.root
     }

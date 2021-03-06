@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import dagger.Module
@@ -56,6 +57,6 @@ class DefinitionsModule {
         idGenerator: IdGenerator,
         state: DefinitionsVM.State
     ): DefinitionsVM {
-        return DefinitionsVM(connectivityManager, wordDefinitionRepository, idGenerator, state)
+        return DefinitionsVMImpl(connectivityManager, wordDefinitionRepository, idGenerator, state)
     }
 }

@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.article.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ArticleVM(
+    private val definitionsVM: DefinitionsVM,
     private val articleRepository: ArticleRepository,
     val state: State,
     private val router: ArticleRouter
@@ -47,8 +49,9 @@ class ArticleVM(
 //        }
     }
 
-    fun onWordClicked(word: String) {
-
+    fun onWordClicked(word: String) = viewModelScope.launch {
+//        mutableEventFlow.emit(ShowDefinitionEvent(word))
+        definitionsVM.onWordSubmitted(word)
     }
 
     fun onBackPressed() {
@@ -57,6 +60,9 @@ class ArticleVM(
 
     @Parcelize
     class State(
-        var id: Long
+        var id: Long,
+        var definitionsState: DefinitionsVM.State
     ) : Parcelable
 }
+
+data class ShowDefinitionEvent(val word: String): Event

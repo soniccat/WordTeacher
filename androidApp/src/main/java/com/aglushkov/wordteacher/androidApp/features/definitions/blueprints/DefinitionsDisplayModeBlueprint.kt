@@ -9,12 +9,13 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.views.Definitio
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import javax.inject.Inject
 
 class DefinitionsDisplayModeBlueprint @Inject constructor (
-    var vmWrapper: DefinitionsVMWrapper
+    var vm: DefinitionsVM
 ): Blueprint<SimpleAdapter.ViewHolder<ChipGroup>, DefinitionsDisplayModeViewItem> {
 
     override val type: Int = DefinitionsDisplayModeViewItem.Type
@@ -50,7 +51,7 @@ class DefinitionsDisplayModeBlueprint @Inject constructor (
         view.check(viewItem.selectedIndex)
         view.setOnCheckedChangeListener { group, checkedId ->
             val selectedMode = viewItem.items[checkedId]
-            vmWrapper.vm.onDisplayModeChanged(selectedMode)
+            vm.onDisplayModeChanged(selectedMode)
         }
     }
 }

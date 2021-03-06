@@ -130,4 +130,8 @@ class MainActivity : AppCompatActivity(), Router {
     override fun closeArticle() {
         supportFragmentManager.popBackStack()
     }
+
+    fun openDefinition(word: String) {
+
+    }
 }

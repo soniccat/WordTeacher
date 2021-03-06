@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import javax.inject.Inject
 
-open class VMWrapper<T: ViewModel>(
+open class VMWrapper<T: Any>(
     application: Application
 ): AndroidViewModel(application) {
 
@@ -16,6 +16,6 @@ open class VMWrapper<T: ViewModel>(
     // TODO: create a base class for a MokoVM wrapper
     override fun onCleared() {
         super.onCleared()
-        vm.onCleared()
+        (vm as? ViewModel)?.onCleared()
     }
 }

@@ -28,16 +28,30 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+interface DefinitionsVM {
+    fun onWordSubmitted(word: String)
+    fun onTryAgainClicked()
+    fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
+    fun getErrorText(res: Resource<*>): StringDesc?
 
-class DefinitionsVM(
+    val state: State
+    val definitions: MutableStateFlow<Resource<List<BaseViewItem<*>>>>
+
+    @Parcelize
+    class State(
+        var word: String? = null
+    ): Parcelable
+}
+
+class DefinitionsVMImpl(
     private val connectivityManager: ConnectivityManager,
     private val wordDefinitionRepository: WordDefinitionRepository,
     private val idGenerator: IdGenerator,
-    val state: State
-): ViewModel() {
+    override val state: DefinitionsVM.State
+): ViewModel(), DefinitionsVM {
 
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
-    val definitions = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+    override val definitions = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
     val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     var loadJob: Job? = null
 
@@ -75,13 +89,13 @@ class DefinitionsVM(
 
     // Events
 
-    fun onWordSubmitted(word: String) {
+    override fun onWordSubmitted(word: String) {
         if (word.isNotEmpty()) {
             loadIfNeeded(word)
         }
     }
 
-    fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
+    override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
         if (this.displayMode == mode) return
 
         val words = wordDefinitionRepository.obtainStateFlow(this.word!!).value
@@ -91,7 +105,7 @@ class DefinitionsVM(
         }
     }
 
-    fun onTryAgainClicked() {
+    override fun onTryAgainClicked() {
         loadIfNeeded(word!!)
     }
 
@@ -292,14 +306,9 @@ class DefinitionsVM(
         return WordTeacherDefinition(allDefs, allExamples, allSynonyms, null)
     }
 
-    fun getErrorText(res: Resource<*>): StringDesc? {
+    override fun getErrorText(res: Resource<*>): StringDesc? {
         val hasConnection = connectivityManager.isDeviceOnline
         val hasResponse = true // TODO: handle error server response
         return res.getErrorString(hasConnection, hasResponse)
     }
-
-    @Parcelize
-    class State(
-        var word: String? = null
-    ): Parcelable
 }
