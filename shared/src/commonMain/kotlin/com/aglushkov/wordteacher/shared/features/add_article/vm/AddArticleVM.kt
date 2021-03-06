@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.features.add_article
+package com.aglushkov.wordteacher.shared.features.add_article.vm
 
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.CompletionResult
@@ -81,6 +81,7 @@ class AddArticleVM(
         )
 
         try {
+            // TODO: show loading, adding might take for a while
             articlesRepository.createArticle(article)
             mutableEventFlow.emit(CompletionEvent(CompletionResult.COMPLETED))
         } catch (e: CancellationException) {

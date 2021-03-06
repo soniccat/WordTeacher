@@ -4,7 +4,7 @@ import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleVMWrapper
 import com.aglushkov.wordteacher.di.AddArticleModule
-import com.aglushkov.wordteacher.shared.features.add_article.AddArticleVM
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import dagger.BindsInstance
 import dagger.Component

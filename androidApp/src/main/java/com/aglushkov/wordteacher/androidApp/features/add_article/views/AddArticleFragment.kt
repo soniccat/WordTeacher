@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.androidApp.R
@@ -21,7 +20,7 @@ import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.features.add_article.AddArticleVM
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 

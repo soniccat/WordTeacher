@@ -107,6 +107,16 @@ class MainActivity : AppCompatActivity(), Router {
         else -> throw IllegalArgumentException("Wrong screen class $cl")
     }
 
+    private fun openDialogFragment(cl: KClass<*>) {
+        val tag = screenNameByClass(cl)
+        val newFragment = supportFragmentManager.fragmentFactory.instantiate(
+            classLoader,
+            cl.java.name
+        ) as DialogFragment
+
+        newFragment.show(supportFragmentManager, tag)
+    }
+
     // Router
 
     override fun openAddArticle() {
@@ -117,13 +127,7 @@ class MainActivity : AppCompatActivity(), Router {
         openFragment(ArticleFragment::class, ArticleFragment.createArguments(id))
     }
 
-    private fun openDialogFragment(cl: KClass<*>) {
-        val tag = screenNameByClass(cl)
-        val newFragment = supportFragmentManager.fragmentFactory.instantiate(
-            classLoader,
-            cl.java.name
-        ) as DialogFragment
-
-        newFragment.show(supportFragmentManager, tag)
+    override fun closeArticle() {
+        supportFragmentManager.popBackStack()
     }
 }

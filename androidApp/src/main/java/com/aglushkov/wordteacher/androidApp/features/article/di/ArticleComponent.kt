@@ -3,8 +3,9 @@ package com.aglushkov.wordteacher.androidApp.features.article.di
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleVMWrapper
+import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.di.ArticleModule
-import com.aglushkov.wordteacher.shared.features.article.ArticleVM
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import dagger.BindsInstance
@@ -30,6 +31,7 @@ interface ArticleComponent {
 }
 
 interface ArticleDependencies {
+    fun routerResolver(): RouterResolver
     fun database(): AppDatabase
     fun nlpCore(): NLPCore
 }

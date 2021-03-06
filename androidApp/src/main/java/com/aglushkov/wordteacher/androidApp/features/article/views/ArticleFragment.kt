@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.androidApp.features.article.views
 import android.app.Application
 import android.app.Dialog
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,12 +15,14 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentArticleBinding
 import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComponent
 import com.aglushkov.wordteacher.androidApp.general.VMWrapper
+import com.aglushkov.wordteacher.androidApp.general.extensions.getDrawableCompat
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
 import com.aglushkov.wordteacher.di.AppComponentOwner
-import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.features.article.ArticleVM
+import com.aglushkov.wordteacher.shared.events.BackNavigationEvent
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
+import com.aglushkov.wordteacher.shared.general.resource.Resource
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -92,6 +95,11 @@ class ArticleFragment: DialogFragment() {
     private fun bindView() {
         val binding = binding!!
 
+        binding.toolbar.navigationIcon = requireContext().getDrawableCompat(R.drawable.ic_arrow_back_24)
+        binding.toolbar.setNavigationOnClickListener {
+            articleVM.onBackPressed()
+        }
+
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.close -> {
@@ -103,6 +111,33 @@ class ArticleFragment: DialogFragment() {
             }
         }
 
+        binding.text.setOnTouchListener { v, event ->
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                val x = event.x
+                val y = event.y
+
+                val offset = binding.text.getOffsetForPosition(x, y)
+                val word = findWord(binding.text.text, offset)
+                if (word.isNotBlank()) {
+                    articleVM.onWordClicked(word)
+                }
+            }
+            false
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            articleVM.article.collect {
+                when (it) {
+                    // TODO: handle loading
+                    is Resource.Loaded -> {
+                        binding.toolbar.title = it.data.name
+                        binding.text.text = it.data.text
+                    }
+                    else -> {}
+                }
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             articleVM.eventFlow.collect {
                 handleEvent(it)
@@ -110,10 +145,48 @@ class ArticleFragment: DialogFragment() {
         }
     }
 
+    private fun findWord(
+        str: CharSequence,
+        anOffset: Int
+    ): String {
+        var offset = anOffset
+        if (str.length == offset) {
+            offset--
+        }
+
+        if (offset > 0 && str[offset] == ' ') {
+            offset--
+        }
+
+        var startIndex = offset
+        var endIndex = offset
+
+        while (startIndex > 0 && !isBlankChar(str[startIndex])) {
+            startIndex--
+        }
+
+        while (endIndex < str.length && !isBlankChar(str[endIndex])) {
+            endIndex++
+        }
+
+        // without this code, you will get 'here!' instead of 'here'
+        // if you use only english, just check whether this is alphabet,
+        // but 'I' use korean, so i use below algorithm to get clean word.
+//        val last = str[endIndex - 1]
+//        if (last == ',' || last == '.' || last == '!' || last == '?' || last == ':' || last == ';') {
+//            endIndex--
+//        }
+        return str.substring(startIndex, endIndex)
+    }
+
+    private fun isBlankChar(char: Char): Boolean {
+        return char == ' ' || char == '\n'
+    }
+
     private fun handleEvent(it: Event) {
         when (it) {
-            is CompletionEvent -> {
-                dismiss()
+            is BackNavigationEvent -> {
+                childFragmentManager.popBackStack()
             }
             is ErrorEvent -> {
                 showError(it.text.toString(requireContext()))
