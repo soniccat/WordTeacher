@@ -32,6 +32,17 @@ class SimpleAdapter(
         blueprint.bind(holder, item)
     }
 
+    override fun submitList(list: List<BaseViewItem<*>>?) {
+        submitList(list, null)
+    }
+
+    override fun submitList(list: List<BaseViewItem<*>>?, commitCallback: Runnable?) {
+        super.submitList(
+            list.takeIf { it?.isNotEmpty() == true },
+            commitCallback
+        )
+    }
+
     class ViewHolder<T: View>(view: T): RecyclerView.ViewHolder(view) {
         val typedView: T
             get() = itemView as T

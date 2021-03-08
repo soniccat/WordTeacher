@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.androidApp.features.article.views
 import android.app.Application
 import android.app.Dialog
 import android.os.Bundle
+import android.view.GestureDetector
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -115,38 +116,11 @@ class ArticleFragment: DialogFragment() {
 
     private fun bindView() {
         val binding = binding!!
+
+        bindToolbar(binding)
+        bindTextView(binding)
         bindDefinitionsBottomSheet(binding)
         bindDefinitions(binding)
-
-        binding.toolbar.navigationIcon = requireContext().getDrawableCompat(R.drawable.ic_arrow_back_24)
-        binding.toolbar.setNavigationOnClickListener {
-            articleVM.onBackPressed()
-        }
-
-        binding.toolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.close -> {
-                    //TODO:
-                    //articleVM.onCancelPressed()
-                    true
-                }
-                else -> false
-            }
-        }
-
-        binding.text.setOnTouchListener { v, event ->
-            if (event.action == KeyEvent.ACTION_DOWN) {
-                val x = event.x
-                val y = event.y
-
-                val offset = binding.text.getOffsetForPosition(x, y)
-                val word = findWord(binding.text.text, offset)
-                if (word.isNotBlank()) {
-                    articleVM.onWordClicked(word)
-                }
-            }
-            false
-        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             articleVM.article.collect {
@@ -168,10 +142,55 @@ class ArticleFragment: DialogFragment() {
         }
     }
 
+    private fun bindToolbar(binding: FragmentArticleBinding) {
+        binding.toolbar.navigationIcon =
+            requireContext().getDrawableCompat(R.drawable.ic_arrow_back_24)
+        binding.toolbar.setNavigationOnClickListener {
+            articleVM.onBackPressed()
+        }
+
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.close -> {
+                    //TODO:
+                    //articleVM.onCancelPressed()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun bindTextView(binding: FragmentArticleBinding) {
+        val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent?): Boolean {
+                return true
+            }
+
+            override fun onSingleTapConfirmed(event: MotionEvent): Boolean {
+                val x = event.x
+                val y = event.y
+                val offset = binding.text.getOffsetForPosition(x, y)
+                val word = findWord(binding.text.text, offset)
+
+                return if (word.isNotBlank()) {
+                    articleVM.onWordClicked(word)
+                    true
+                } else {
+                    false
+                }
+            }
+        })
+
+        binding.text.setOnTouchListener { v, event ->
+            gestureDetector.onTouchEvent(event)
+        }
+    }
+
+
     private fun bindDefinitionsBottomSheet(binding: FragmentArticleBinding) {
-        val bottomSheetBehavior = BottomSheetBehavior.from(binding.definitionsBottomsheet)
-        bottomSheetBehavior.setPeekHeight(100);
-        bottomSheetBehavior.setHideable(true);
+        val bottomSheetBehavior = bottomSheetBehavior(binding)
+        hideDefinitionsBottomSheet()
 
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -182,22 +201,11 @@ class ArticleFragment: DialogFragment() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 //                TODO("Not yet implemented")
             }
-        });
-//
-//        binding.definitionsList.setOnTouchListener { v, event ->
-//            val action = event.action
-//            when (action) {
-//                MotionEvent.ACTION_DOWN ->                         // Disallow NestedScrollView to intercept touch events.
-//                    v.parent.requestDisallowInterceptTouchEvent(false)
-//                MotionEvent.ACTION_UP ->                         // Allow NestedScrollView to intercept touch events.
-//                    v.parent.requestDisallowInterceptTouchEvent(false)
-//            }
-//
-//            // Handle RecyclerView touch events.
-//            v.onTouchEvent(event)
-//            true
-//        }
+        })
     }
+
+    private fun bottomSheetBehavior(binding: FragmentArticleBinding) =
+        BottomSheetBehavior.from(binding.definitionsBottomsheet)
 
     private fun bindDefinitions(binding: FragmentArticleBinding) {
         binding.definitionsList.apply {
@@ -210,18 +218,26 @@ class ArticleFragment: DialogFragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             definitionsVM.definitions.collect {
-                showDefinitions(it)
+                val errorText = definitionsVM.getErrorText(it)?.toString(requireContext())
+                it.bind(binding.defintionsLoader, errorText)
+
+                when (it) {
+                    is Resource.Loading,
+                    is Resource.Loaded -> {
+                        if (it is Resource.Loaded && it.data.isEmpty()) {
+                            hideDefinitionsBottomSheet()
+                        } else {
+                            showDefinitionsBottomSheet()
+                            updateListAdapter(it)
+                        }
+                    }
+                    is Resource.Error -> {
+                        hideDefinitionsBottomSheet()
+                    }
+                    else -> {}
+                }
             }
         }
-    }
-
-    private fun showDefinitions(it: Resource<List<BaseViewItem<*>>>) {
-        val binding = this.binding!!
-
-        val errorText = definitionsVM.getErrorText(it)?.toString(requireContext())
-        it.bind(binding.defintionsLoader, errorText)
-
-        updateListAdapter(it)
     }
 
     private fun updateListAdapter(it: Resource<List<BaseViewItem<*>>>) {
@@ -275,9 +291,6 @@ class ArticleFragment: DialogFragment() {
 
     private fun handleEvent(it: Event) {
         when (it) {
-            is ShowDefinitionEvent -> {
-                showDefinitionPopup(it.word)
-            }
             is BackNavigationEvent -> {
                 childFragmentManager.popBackStack()
             }
@@ -287,19 +300,22 @@ class ArticleFragment: DialogFragment() {
         }
     }
 
-    private fun showDefinitionPopup(word: String) {
-
-    }
-
     private fun showError(text: String) {
         Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showDefinitionsBottomSheet() {
+        bottomSheetBehavior(binding!!).state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun hideDefinitionsBottomSheet() {
+        bottomSheetBehavior(binding!!).state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
     }
-
 
     companion object {
         fun createArguments(id: Long) = Bundle().apply {

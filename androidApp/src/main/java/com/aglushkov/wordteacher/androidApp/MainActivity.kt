@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity(), Router {
         }
     }
 
-    private fun openFragment(cl: KClass<*>, arguments: Bundle? = null) {
+    private fun openFragment(cl: KClass<*>, arguments: Bundle? = null, isFullscreen: Boolean = false) {
         val tag = screenNameByClass(cl)
         val fragment = supportFragmentManager.findFragmentByTag(tag)
         val topFragment = supportFragmentManager.fragments.lastOrNull()
@@ -76,10 +76,12 @@ class MainActivity : AppCompatActivity(), Router {
                 cl.java.name
             )
             newFragment.arguments = arguments
+
+            val container = if (isFullscreen) binding.fragmentContainerFullscreen else binding.fragmentContainer
             supportFragmentManager.beginTransaction()
                 .setReorderingAllowed(true)
                 .addToBackStack(tag)
-                .replace(binding.fragmentContainer.id, newFragment, tag)
+                .replace(container.id, newFragment, tag)
                 .commitAllowingStateLoss()
 
         } else if (topFragment == null || topFragment::class != cl) {
@@ -124,14 +126,10 @@ class MainActivity : AppCompatActivity(), Router {
     }
 
     override fun openArticle(id: Long) {
-        openFragment(ArticleFragment::class, ArticleFragment.createArguments(id))
+        openFragment(ArticleFragment::class, ArticleFragment.createArguments(id), true)
     }
 
     override fun closeArticle() {
         supportFragmentManager.popBackStack()
-    }
-
-    fun openDefinition(word: String) {
-
     }
 }

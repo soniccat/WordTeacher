@@ -82,9 +82,9 @@ class DefinitionsVMImpl(
 
         word?.let {
             loadIfNeeded(it)
-        } ?: run {
+        } /*?: run {
             loadIfNeeded("owl")
-        }
+        }*/
     }
 
     // Events
@@ -138,8 +138,10 @@ class DefinitionsVMImpl(
 
     private fun buildViewItems(words: List<WordTeacherWord>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
-        items.add(DefinitionsDisplayModeViewItem(displayModes, displayModeIndex))
-        items.add(WordDividerViewItem())
+        if (words.isNotEmpty()) {
+            items.add(DefinitionsDisplayModeViewItem(displayModes, displayModeIndex))
+            items.add(WordDividerViewItem())
+        }
 
         when (displayMode) {
             DefinitionsDisplayMode.Merged -> addMergedWords(words, items)

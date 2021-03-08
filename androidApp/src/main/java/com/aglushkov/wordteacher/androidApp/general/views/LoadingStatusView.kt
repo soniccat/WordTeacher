@@ -86,7 +86,8 @@ fun <T> Resource<T>.bind(view: LoadingStatusView?,
     if (view == null) return
 
     val data = data()
-    if (data != null) {
+    val isEmptyList = data is List<*> && data.isEmpty()
+    if (data != null && !isEmptyList) {
         view.hideElements()
     } else {
         if (isLoading()) {
