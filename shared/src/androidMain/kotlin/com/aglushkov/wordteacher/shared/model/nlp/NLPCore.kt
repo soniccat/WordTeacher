@@ -55,13 +55,17 @@ actual class NLPCore(
 
     actual suspend fun waitUntilInitialized(): Resource<NLPCore> = state.first { it.isLoaded() }
 
-    actual fun sentences(text: String): Array<out String> = sentenceDetector?.sentDetect(text).orEmpty()
-    actual fun tokenize(sentence: String): Array<out String> = tokenizer?.tokenize(sentence).orEmpty()
-    actual fun tag(tokens: Array<out String>): Array<out String> = tagger?.tag(tokens).orEmpty()
-    actual fun lemmatize(tokens: Array<out String>, tags: Array<out String>) = lemmatizer?.lemmatize(tokens, tags).orEmpty()
-    actual fun chunk(tokens: Array<out String>, tags: Array<out String>) = chunker?.chunk(tokens, tags).orEmpty()
+    actual fun sentences(text: String) = sentenceDetector?.sentDetect(text).orEmpty().asList()
+    actual fun tokenize(sentence: String) = tokenizer?.tokenize(sentence).orEmpty().asList()
+    actual fun tag(tokens: List<String>) = tagger?.tag(tokens.toTypedArray()).orEmpty().asList()
+    actual fun lemmatize(tokens: List<String>, tags: List<String>) = lemmatizer?.lemmatize(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
+    actual fun chunk(tokens: List<String>, tags: List<String>) = chunker?.chunk(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
     actual fun spanList(sentence: NLPSentence): List<Span> =
-        ChunkSample.phrasesAsSpanList(sentence.tokens, sentence.tags, sentence.chunks).map {
+        ChunkSample.phrasesAsSpanList(
+            sentence.tokens.toTypedArray(),
+            sentence.tags.toTypedArray(),
+            sentence.chunks.toTypedArray()
+        ).map {
             createSpan(it)
         }
 

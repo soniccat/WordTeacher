@@ -3,27 +3,27 @@ package com.aglushkov.wordteacher.shared.model.nlp
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 
 actual class NLPCore {
-    actual fun sentences(text: String): Array<out String> {
+    actual fun sentences(text: String): List<String> {
         TODO("not implemented")
     }
 
-    actual fun tokenize(sentence: String): Array<out String> {
+    actual fun tokenize(sentence: String): List<String> {
         TODO("not implemented")
     }
 
-    actual fun tag(tokens: Array<out String>): Array<out String> {
+    actual fun tag(tokens: List<String>): List<String> {
         TODO("not implemented")
     }
 
-    actual fun lemmatize(tokens: Array<out String>, tags: Array<out String>): Array<out String> {
+    actual fun lemmatize(tokens: List<String>, tags: List<String>): List<String> {
         TODO("not implemented")
     }
 
-    actual fun chunk(tokens: Array<out String>, tags: Array<out String>): Array<out String> {
+    actual fun chunk(tokens: List<String>, tags: List<String>): List<String> {
         TODO("not implemented")
     }
 
-    actual fun spanList(sentence: NLPSentence): List<out Span> {
+    actual fun spanList(sentence: NLPSentence): List<Span> {
         TODO("not implemented")
     }
 

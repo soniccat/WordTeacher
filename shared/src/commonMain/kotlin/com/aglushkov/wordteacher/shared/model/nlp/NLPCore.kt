@@ -3,11 +3,11 @@ package com.aglushkov.wordteacher.shared.model.nlp
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 
 expect class NLPCore {
-    fun sentences(text: String): Array<out String>
-    fun tokenize(sentence: String): Array<out String>
-    fun tag(tokens: Array<out String>): Array<out String>
-    fun lemmatize(tokens: Array<out String>, tags: Array<out String>): Array<out String>
-    fun chunk(tokens: Array<out String>, tags: Array<out String>): Array<out String>
+    fun sentences(text: String): List<String>
+    fun tokenize(sentence: String): List<String>
+    fun tag(tokens: List<String>): List<String>
+    fun lemmatize(tokens: List<String>, tags: List<String>): List<String>
+    fun chunk(tokens: List<String>, tags: List<String>): List<String>
     fun spanList(sentence: NLPSentence): List<Span>
 
     suspend fun waitUntilInitialized(): Resource<NLPCore>

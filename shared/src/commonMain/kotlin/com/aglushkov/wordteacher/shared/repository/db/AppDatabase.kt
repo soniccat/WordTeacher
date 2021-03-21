@@ -104,9 +104,9 @@ fun DBNLPSentence.toNLPSentence(): NLPSentence {
         articleId,
         orderId,
         text,
-        tokens.toTypedArray(),
-        tags.toTypedArray(),
-        lemmas.toTypedArray(),
-        chunks.toTypedArray()
+        tokens,
+        tags,
+        lemmas,
+        chunks
     )
 }

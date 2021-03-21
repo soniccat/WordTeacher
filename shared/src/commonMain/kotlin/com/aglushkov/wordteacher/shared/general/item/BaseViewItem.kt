@@ -1,18 +1,16 @@
 package com.aglushkov.wordteacher.shared.general.item
 
 abstract class BaseViewItem<T> {
-    var id = 0 // a unique id, required for NSDiffableDataSourceSnapshot
+    var id = 0L // a unique id, required for NSDiffableDataSourceSnapshot
     var type = 0
     var items = listOf<T>()
 
-    constructor(item: T, type: Int) {
-        this.items = listOf(item)
-        this.type = type
-    }
+    constructor(item: T, type: Int, id: Long = 0L): this(listOf(item), type, id)
 
-    constructor(items: List<T>, type: Int) {
+    constructor(items: List<T>, type: Int, id: Long = 0L) {
         this.items = items
         this.type = type
+        this.id = id
     }
 
     fun firstItem() = items.first()
@@ -45,7 +43,7 @@ abstract class BaseViewItem<T> {
     override fun hashCode(): Int {
         var result = type
         result = 31 * result + items.hashCode()
-        result = 31 * result + id
+        result = 31 * result + id.toInt()
         return result
     }
 

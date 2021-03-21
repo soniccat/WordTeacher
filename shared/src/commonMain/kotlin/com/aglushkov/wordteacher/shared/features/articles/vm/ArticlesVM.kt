@@ -39,7 +39,7 @@ class ArticlesVM(
     }
 
     fun onArticleClicked(item: ArticleViewItem) {
-        router.openArticle(item.articleId)
+        router.openArticle(item.id)
     }
 
     private fun buildViewItems(articles: List<ShortArticle>): List<BaseViewItem<*>> {

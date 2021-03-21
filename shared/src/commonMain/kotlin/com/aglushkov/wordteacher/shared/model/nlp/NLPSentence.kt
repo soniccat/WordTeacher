@@ -1,13 +1,13 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
-class NLPSentence(
+data class NLPSentence(
     var articleId: Long = 0,
     var orderId: Long = 0,
     var text: String = "",
-    var tokens: Array<out String> = emptyArray(),
-    var tags: Array<out String> = emptyArray(),
-    var lemmas: Array<out String> = emptyArray(),
-    var chunks: Array<out String> = emptyArray()
+    var tokens: List<String> = emptyList(),
+    var tags: List<String> = emptyList(),
+    var lemmas: List<String> = emptyList(),
+    var chunks: List<String> = emptyList()
 ) {
     fun tagEnums(): List<Tag> = tags.map {
         try {
