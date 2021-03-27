@@ -17,6 +17,7 @@ import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.VMWrapper
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeColor
+import com.aglushkov.wordteacher.androidApp.general.extensions.submit
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
@@ -132,17 +133,8 @@ class ArticlesFragment: Fragment() {
         updateListAdapter(it)
     }
 
-    private fun updateListAdapter(it: Resource<List<BaseViewItem<*>>>) {
-        val binding = this.binding!!
-
-        if (binding.list.adapter != null) {
-            (binding.list.adapter as SimpleAdapter).submitList(it.data())
-        } else {
-            binding.list.adapter = SimpleAdapter(binder).apply {
-                submitList(it.data())
-            }
-        }
-    }
+    private fun updateListAdapter(it: Resource<List<BaseViewItem<*>>>) =
+        binding!!.list.submit(it, binder)
 }
 
 private val VM_STATE = "vm_state"

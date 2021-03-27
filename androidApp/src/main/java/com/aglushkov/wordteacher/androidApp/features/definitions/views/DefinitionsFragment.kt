@@ -12,14 +12,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentDefinitionsBinding
-import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.VMWrapper
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
+import com.aglushkov.wordteacher.androidApp.general.extensions.submit
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.di.DaggerDefinitionsComponent
+import com.aglushkov.wordteacher.di.DefinitionsBinder
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import kotlinx.coroutines.flow.collect
@@ -35,7 +35,7 @@ class DefinitionsFragment: Fragment() {
     private lateinit var definitionsVM: DefinitionsVM
     private var binding: FragmentDefinitionsBinding? = null
 
-    @Inject lateinit var binder: ViewItemBinder
+    @Inject @DefinitionsBinder lateinit var binder: ViewItemBinder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,17 +115,8 @@ class DefinitionsFragment: Fragment() {
         updateListAdapter(it)
     }
 
-    private fun updateListAdapter(it: Resource<List<BaseViewItem<*>>>) {
-        val binding = this.binding!!
-
-        if (binding.list.adapter != null) {
-            (binding.list.adapter as SimpleAdapter).submitList(it.data())
-        } else {
-            binding.list.adapter = SimpleAdapter(binder).apply {
-                submitList(it.data())
-            }
-        }
-    }
+    private fun updateListAdapter(it: Resource<List<BaseViewItem<*>>>) =
+        binding!!.list.submit(it, binder)
 }
 
 private val VM_STATE = "vm_state"

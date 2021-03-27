@@ -26,15 +26,21 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.math.min
 
 interface ArticleVM {
     val state: State
-    val paragraphs: MutableStateFlow<Resource<List<BaseViewItem<*>>>>
+    val article: StateFlow<Resource<Article>>
+    val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
+    val eventFlow: SharedFlow<Event>
+
+    fun onBackPressed()
+    fun onWordClicked(word: String)
 
     @Parcelize
     class State(
         var id: Long,
-        var state: State
+        var definitionsState: DefinitionsVM.State
     ) : Parcelable
 }
 
@@ -51,8 +57,8 @@ class ArticleVMImpl(
         replay = Int.MAX_VALUE,
         extraBufferCapacity = Int.MAX_VALUE
     )
-    val eventFlow: SharedFlow<Event> = mutableEventFlow
-    private val article: StateFlow<Resource<Article>> = articleRepository.article
+    override val eventFlow: SharedFlow<Event> = mutableEventFlow
+    override val article: StateFlow<Resource<Article>> = articleRepository.article
     override val paragraphs = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
 
     init {
@@ -87,23 +93,39 @@ class ArticleVMImpl(
     private fun buildViewItems(article: Resource<Article>): List<BaseViewItem<*>> {
         return when (article) {
             is Resource.Loaded -> {
-                listOf(
-                    ParagraphViewItem(
-                        idGenerator.nextId(),
-                        article.data.sentences
-                    )
-                )
+                makeParagraphs(article)
             }
             else -> emptyList()
         }
     }
 
-    fun onWordClicked(word: String) = viewModelScope.launch {
-//        mutableEventFlow.emit(ShowDefinitionEvent(word))
-        definitionsVM.onWordSubmitted(word)
+    private fun makeParagraphs(article: Resource.Loaded<Article>): MutableList<BaseViewItem<*>> {
+        // TODO: write proper paragraph separation
+        val paragraphSize = 5
+        var sentenceIndex = 0
+        val paragraphList = mutableListOf<BaseViewItem<*>>()
+
+        while (sentenceIndex < article.data.sentences.size) {
+            val nextSentenceIndex = min(article.data.sentences.size, sentenceIndex + paragraphSize)
+            paragraphList.add(
+                ParagraphViewItem(
+                    idGenerator.nextId(),
+                    article.data.sentences.subList(sentenceIndex, nextSentenceIndex)
+                )
+            )
+            sentenceIndex = nextSentenceIndex
+        }
+        return paragraphList
     }
 
-    fun onBackPressed() {
+    override fun onWordClicked(word: String) {
+        viewModelScope.launch {
+//        mutableEventFlow.emit(ShowDefinitionEvent(word))
+            definitionsVM.onWordSubmitted(word)
+        }
+    }
+
+    override fun onBackPressed() {
         router.closeArticle()
     }
 }

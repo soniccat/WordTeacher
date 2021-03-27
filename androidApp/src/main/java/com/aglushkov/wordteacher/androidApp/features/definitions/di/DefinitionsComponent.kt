@@ -14,8 +14,6 @@ import dagger.Component
 @FragmentComp
 @Component(dependencies = [DefinitionsDependencies::class], modules = [DefinitionsModule::class])
 public interface DefinitionsComponent {
-    fun getItemViewBinder(): ViewItemBinder
-
     fun injectDefinitionsFragment(fragment: DefinitionsFragment)
     fun injectViewModelWrapper(fragment: DefinitionsVMWrapper)
 

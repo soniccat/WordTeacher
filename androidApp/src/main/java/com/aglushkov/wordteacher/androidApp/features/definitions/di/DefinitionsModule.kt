@@ -19,11 +19,13 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import dagger.Module
 import dagger.Provides
+import javax.inject.Qualifier
 
 @Module
 class DefinitionsModule {
     @FragmentComp
     @Provides
+    @DefinitionsBinder
     fun createItemViewBinder(
         definitionsDisplayModeBlueprint: DefinitionsDisplayModeBlueprint,
         wordDefinitionBlueprint: WordDefinitionBlueprint,
@@ -35,8 +37,7 @@ class DefinitionsModule {
         wordSynonymBlueprint: WordSynonymBlueprint,
         wordTitleBlueprint: WordTitleBlueprint,
         wordTranscriptionBlueprint: WordTranscriptionBlueprint
-    ): ViewItemBinder {
-        return ViewItemBinder()
+    ) = ViewItemBinder()
             .addBlueprint(definitionsDisplayModeBlueprint)
             .addBlueprint(wordDefinitionBlueprint)
             .addBlueprint(wordDividerBlueprint)
@@ -47,7 +48,6 @@ class DefinitionsModule {
             .addBlueprint(wordSynonymBlueprint)
             .addBlueprint(wordTitleBlueprint)
             .addBlueprint(wordTranscriptionBlueprint)
-    }
 
     @FragmentComp
     @Provides
@@ -60,3 +60,7 @@ class DefinitionsModule {
         return DefinitionsVMImpl(connectivityManager, wordDefinitionRepository, idGenerator, state)
     }
 }
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class DefinitionsBinder

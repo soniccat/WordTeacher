@@ -7,7 +7,7 @@ actual class NLPCore {
         TODO("not implemented")
     }
 
-    actual fun tokenize(sentence: String): List<String> {
+    actual fun tokenSpans(sentence: String): List<TokenSpan> {
         TODO("not implemented")
     }
 
@@ -23,7 +23,7 @@ actual class NLPCore {
         TODO("not implemented")
     }
 
-    actual fun spanList(sentence: NLPSentence): List<Span> {
+    actual fun phrases(sentence: NLPSentence): List<PhraseSpan> {
         TODO("not implemented")
     }
 

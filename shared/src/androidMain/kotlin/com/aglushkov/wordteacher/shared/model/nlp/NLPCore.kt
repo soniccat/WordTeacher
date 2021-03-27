@@ -5,7 +5,6 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.measure
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
-import com.aglushkov.wordteacher.shared.general.v
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,6 +22,7 @@ import opennlp.tools.sentdetect.SentenceDetectorME
 import opennlp.tools.sentdetect.SentenceModel
 import opennlp.tools.tokenize.TokenizerME
 import opennlp.tools.tokenize.TokenizerModel
+import opennlp.tools.util.Span
 
 actual class NLPCore(
     private val resources: Resources,
@@ -56,18 +56,21 @@ actual class NLPCore(
     actual suspend fun waitUntilInitialized(): Resource<NLPCore> = state.first { it.isLoaded() }
 
     actual fun sentences(text: String) = sentenceDetector?.sentDetect(text).orEmpty().asList()
-    actual fun tokenize(sentence: String) = tokenizer?.tokenize(sentence).orEmpty().asList()
+    actual fun tokenSpans(sentence: String) = tokenizer?.tokenizePos(sentence).orEmpty().asList().map {
+        createTokenSpan(it)
+    }
     actual fun tag(tokens: List<String>) = tagger?.tag(tokens.toTypedArray()).orEmpty().asList()
     actual fun lemmatize(tokens: List<String>, tags: List<String>) = lemmatizer?.lemmatize(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
     actual fun chunk(tokens: List<String>, tags: List<String>) = chunker?.chunk(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
-    actual fun spanList(sentence: NLPSentence): List<Span> =
+    actual fun phrases(sentence: NLPSentence): List<PhraseSpan> =
         ChunkSample.phrasesAsSpanList(
-            sentence.tokens.toTypedArray(),
+            sentence.tokenStrings().toTypedArray(),
             sentence.tags.toTypedArray(),
             sentence.chunks.toTypedArray()
         ).map {
-            createSpan(it)
+            createPhraseSpan(it)
         }
+    // TODO: get rid of all these toTypedArray above...
 
     fun load() {
         state.value = Resource.Loading(this@NLPCore)
@@ -145,7 +148,11 @@ actual class NLPCore(
         }
     }
 
-    fun createSpan(span: opennlp.tools.util.Span): Span {
-        return Span(span.start, span.end, ChunkType.parse(span.type))
+    fun createPhraseSpan(span: opennlp.tools.util.Span): PhraseSpan {
+        return PhraseSpan(span.start, span.end, ChunkType.parse(span.type))
+    }
+
+    fun createTokenSpan(span: Span): TokenSpan {
+        return TokenSpan(span.start, span.end)
     }
 }

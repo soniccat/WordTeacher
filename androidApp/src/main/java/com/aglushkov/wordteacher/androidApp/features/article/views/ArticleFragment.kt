@@ -3,12 +3,8 @@ package com.aglushkov.wordteacher.androidApp.features.article.views
 import android.app.Application
 import android.app.Dialog
 import android.os.Bundle
-import android.view.GestureDetector
-import android.view.KeyEvent
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -20,18 +16,19 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentArticleBinding
 import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
-import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.VMWrapper
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.getDrawableCompat
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
+import com.aglushkov.wordteacher.androidApp.general.extensions.submit
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
+import com.aglushkov.wordteacher.di.ArticleBinder
+import com.aglushkov.wordteacher.di.DefinitionsBinder
 import com.aglushkov.wordteacher.shared.events.BackNavigationEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
-import com.aglushkov.wordteacher.shared.features.article.vm.ShowDefinitionEvent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -52,7 +49,8 @@ class ArticleFragment: DialogFragment() {
     @Inject lateinit var definitionsVM: DefinitionsVM
     private var binding: FragmentArticleBinding? = null
 
-    @Inject lateinit var binder: ViewItemBinder
+    @Inject @ArticleBinder lateinit var articleBinder: ViewItemBinder
+    @Inject @DefinitionsBinder lateinit var definitionsBinder: ViewItemBinder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,17 +116,26 @@ class ArticleFragment: DialogFragment() {
         val binding = binding!!
 
         bindToolbar(binding)
-        bindTextView(binding)
+        bindParagraphsList(binding)
         bindDefinitionsBottomSheet(binding)
         bindDefinitions(binding)
 
         viewLifecycleOwner.lifecycleScope.launch {
             articleVM.article.collect {
                 when (it) {
-                    // TODO: handle loading
                     is Resource.Loaded -> {
                         binding.toolbar.title = it.data.name
-                        binding.text.text = it.data.text
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            articleVM.paragraphs.collect {
+                when (it) {
+                    // TODO: handle loading
+                    is Resource.Loaded -> {
+                        updateArticleAdapter(it)
                     }
                     else -> {}
                 }
@@ -161,32 +168,33 @@ class ArticleFragment: DialogFragment() {
         }
     }
 
-    private fun bindTextView(binding: FragmentArticleBinding) {
-        val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
-            override fun onDown(e: MotionEvent?): Boolean {
-                return true
-            }
+    private fun bindParagraphsList(binding: FragmentArticleBinding) {
+//        val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
+//            override fun onDown(e: MotionEvent?): Boolean {
+//                return true
+//            }
+//
+//            override fun onSingleTapConfirmed(event: MotionEvent): Boolean {
+//                val x = event.x
+//                val y = event.y
+//                val offset = binding.text.getOffsetForPosition(x, y)
+//                val word = findWord(binding.text.text, offset)
+//
+//                return if (word.isNotBlank()) {
+//                    articleVM.onWordClicked(word)
+//                    true
+//                } else {
+//                    false
+//                }
+//            }
+//        })
+//
+//        binding.text.setOnTouchListener { v, event ->
+//            gestureDetector.onTouchEvent(event)
+//        }
 
-            override fun onSingleTapConfirmed(event: MotionEvent): Boolean {
-                val x = event.x
-                val y = event.y
-                val offset = binding.text.getOffsetForPosition(x, y)
-                val word = findWord(binding.text.text, offset)
-
-                return if (word.isNotBlank()) {
-                    articleVM.onWordClicked(word)
-                    true
-                } else {
-                    false
-                }
-            }
-        })
-
-        binding.text.setOnTouchListener { v, event ->
-            gestureDetector.onTouchEvent(event)
-        }
+        binding.paragraphsList.layoutManager = LinearLayoutManager(binding.root.context, RecyclerView.VERTICAL, false)
     }
-
 
     private fun bindDefinitionsBottomSheet(binding: FragmentArticleBinding) {
         val bottomSheetBehavior = bottomSheetBehavior(binding)
@@ -208,10 +216,7 @@ class ArticleFragment: DialogFragment() {
         BottomSheetBehavior.from(binding.definitionsBottomsheet)
 
     private fun bindDefinitions(binding: FragmentArticleBinding) {
-        binding.definitionsList.apply {
-            layoutManager = LinearLayoutManager(binding.root.context, RecyclerView.VERTICAL, false)
-        }
-
+        binding.definitionsList.layoutManager = LinearLayoutManager(binding.root.context, RecyclerView.VERTICAL, false)
         binding.defintionsLoader.setOnTryAgainListener {
             definitionsVM.onTryAgainClicked()
         }
@@ -228,7 +233,7 @@ class ArticleFragment: DialogFragment() {
                             hideDefinitionsBottomSheet()
                         } else {
                             showDefinitionsBottomSheet()
-                            updateListAdapter(it)
+                            updateDefinitionsAdapter(it)
                         }
                     }
                     is Resource.Error -> {
@@ -240,17 +245,11 @@ class ArticleFragment: DialogFragment() {
         }
     }
 
-    private fun updateListAdapter(it: Resource<List<BaseViewItem<*>>>) {
-        val binding = this.binding!!
+    private fun updateArticleAdapter(it: Resource<List<BaseViewItem<*>>>) =
+        binding!!.paragraphsList.submit(it, articleBinder)
 
-        if (binding.definitionsList.adapter != null) {
-            (binding.definitionsList.adapter as SimpleAdapter).submitList(it.data())
-        } else {
-            binding.definitionsList.adapter = SimpleAdapter(binder).apply {
-                submitList(it.data())
-            }
-        }
-    }
+    private fun updateDefinitionsAdapter(it: Resource<List<BaseViewItem<*>>>) =
+        binding!!.definitionsList.submit(it, definitionsBinder)
 
     // Helpers
 
