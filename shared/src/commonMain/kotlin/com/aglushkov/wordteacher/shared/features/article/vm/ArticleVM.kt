@@ -1,8 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.article.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
@@ -11,21 +9,17 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
-import com.aglushkov.wordteacher.shared.model.ShortArticle
+import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlin.math.min
 
 interface ArticleVM {
@@ -35,7 +29,7 @@ interface ArticleVM {
     val eventFlow: SharedFlow<Event>
 
     fun onBackPressed()
-    fun onWordClicked(word: String)
+    fun onTextClicked(index: Int, sentence: NLPSentence)
 
     @Parcelize
     class State(
@@ -118,10 +112,14 @@ class ArticleVMImpl(
         return paragraphList
     }
 
-    override fun onWordClicked(word: String) {
+    override fun onTextClicked(index: Int, sentence: NLPSentence) {
         viewModelScope.launch {
 //        mutableEventFlow.emit(ShowDefinitionEvent(word))
-            definitionsVM.onWordSubmitted(word)
+            article.value.data()?.let { article ->
+                sentence.sliceFromTextIndex(index)?.let {
+                    definitionsVM.onWordSubmitted(it.tokenString)
+                }
+            }
         }
     }
 

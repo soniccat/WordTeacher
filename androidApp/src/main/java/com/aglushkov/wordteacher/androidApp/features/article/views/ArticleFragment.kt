@@ -169,30 +169,6 @@ class ArticleFragment: DialogFragment() {
     }
 
     private fun bindParagraphsList(binding: FragmentArticleBinding) {
-//        val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
-//            override fun onDown(e: MotionEvent?): Boolean {
-//                return true
-//            }
-//
-//            override fun onSingleTapConfirmed(event: MotionEvent): Boolean {
-//                val x = event.x
-//                val y = event.y
-//                val offset = binding.text.getOffsetForPosition(x, y)
-//                val word = findWord(binding.text.text, offset)
-//
-//                return if (word.isNotBlank()) {
-//                    articleVM.onWordClicked(word)
-//                    true
-//                } else {
-//                    false
-//                }
-//            }
-//        })
-//
-//        binding.text.setOnTouchListener { v, event ->
-//            gestureDetector.onTouchEvent(event)
-//        }
-
         binding.paragraphsList.layoutManager = LinearLayoutManager(binding.root.context, RecyclerView.VERTICAL, false)
     }
 
@@ -252,41 +228,6 @@ class ArticleFragment: DialogFragment() {
         binding!!.definitionsList.submit(it, definitionsBinder)
 
     // Helpers
-
-    private fun findWord(
-        str: CharSequence,
-        anOffset: Int
-    ): String {
-        var offset = anOffset
-        if (str.length == offset) {
-            offset--
-        }
-
-        if (offset > 0 && str[offset] == ' ') {
-            offset--
-        }
-
-        var startIndex = offset
-        var endIndex = offset
-
-        while (startIndex - 1 >= 0 && !isBlankChar(str[startIndex - 1])) {
-            --startIndex
-        }
-
-        while (endIndex + 1 < str.length && !isBlankChar(str[endIndex + 1])) {
-            ++endIndex
-        }
-
-        if (startIndex != endIndex && endIndex < str.length) {
-            ++endIndex
-        }
-
-        return str.substring(startIndex, endIndex)
-    }
-
-    private fun isBlankChar(char: Char): Boolean {
-        return char == ' ' || char == '\n'
-    }
 
     private fun handleEvent(it: Event) {
         when (it) {

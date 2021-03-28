@@ -9,6 +9,34 @@ data class NLPSentence(
     var lemmas: List<String> = emptyList(),
     var chunks: List<String> = emptyList()
 ) {
+    fun textIndexToNlpIndex(textIndex: Int): Int {
+        return tokenSpans.binarySearch {
+            when {
+                it.end <= textIndex -> -1
+                it.start > textIndex -> 1
+                else -> 0
+            }
+        }
+    }
+
+    fun sliceFromTextIndex(textIndex: Int): NLPSentenceSlice? {
+        val nlpIndex = textIndexToNlpIndex(textIndex)
+        return sliceFromNlpIndex(nlpIndex)
+    }
+
+    fun sliceFromNlpIndex(nlpIndex: Int): NLPSentenceSlice? {
+        if (nlpIndex < 0 || nlpIndex >= tokenSpans.size) return null
+        val tokenSpan = tokenSpans[nlpIndex]
+
+        return NLPSentenceSlice(
+            text.substring(tokenSpan.start, tokenSpan.end),
+            tokenSpan,
+            tags[nlpIndex],
+            lemmas[nlpIndex],
+            chunks[nlpIndex]
+        )
+    }
+
     fun tokenStrings() = tokenSpans.map {
         text.substring(it.start, it.end)
     }
@@ -33,3 +61,11 @@ data class NLPSentence(
         return tokenSpans.joinToString(separator = " ")
     }
 }
+
+data class NLPSentenceSlice(
+    val tokenString: String,
+    val tokenSpan: TokenSpan,
+    val tag: String,
+    val lemma: String,
+    val chunk: String
+)
