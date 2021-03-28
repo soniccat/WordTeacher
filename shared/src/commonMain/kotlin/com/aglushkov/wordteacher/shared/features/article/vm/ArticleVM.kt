@@ -115,10 +115,8 @@ class ArticleVMImpl(
     override fun onTextClicked(index: Int, sentence: NLPSentence) {
         viewModelScope.launch {
 //        mutableEventFlow.emit(ShowDefinitionEvent(word))
-            article.value.data()?.let { article ->
-                sentence.sliceFromTextIndex(index)?.let {
-                    definitionsVM.onWordSubmitted(it.tokenString)
-                }
+            sentence.sliceFromTextIndex(index)?.let {
+                definitionsVM.onWordSubmitted(it.tokenString)
             }
         }
     }

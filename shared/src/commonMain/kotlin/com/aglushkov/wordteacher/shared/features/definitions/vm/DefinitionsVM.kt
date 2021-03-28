@@ -116,7 +116,12 @@ class DefinitionsVMImpl(
 
         val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
         if (stateFlow.value.isLoaded()) {
-            definitionWords.value = stateFlow.value
+            definitionWords.value = if (definitionWords.value != stateFlow.value) {
+                stateFlow.value
+            } else {
+                // HACK: copy to trigger flow event
+                stateFlow.value.copy()
+            }
         } else {
             load(word)
         }
