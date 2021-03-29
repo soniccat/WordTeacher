@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="RoundedBgTextView" parent="@android:style/Widget.TextView">
+    <style name="RoundedBgTextView">
         <item name="roundedTextHorizontalPadding">2dp</item>
         <item name="roundedTextVerticalPadding">2dp</item>
         <item name="roundedTextDrawable">@drawable/rounded_text_bg</item>

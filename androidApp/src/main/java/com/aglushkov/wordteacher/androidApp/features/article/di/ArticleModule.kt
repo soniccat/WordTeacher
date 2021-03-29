@@ -1,7 +1,13 @@
 package com.aglushkov.wordteacher.di
 
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.text.Annotation
+import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.article.blueprints.ParagraphBlueprint
+import com.aglushkov.wordteacher.androidApp.features.article.blueprints.RoundedBgAnnotations
+import com.aglushkov.wordteacher.androidApp.features.article.di.ViewContext
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.DefinitionsDisplayModeBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordDefinitionBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordDividerBlueprint
@@ -14,6 +20,10 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTranscriptionBlueprint
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
+import com.aglushkov.wordteacher.androidApp.general.textroundedbg.BgRendererResolver
+import com.aglushkov.wordteacher.androidApp.general.textroundedbg.MultiLineRenderer
+import com.aglushkov.wordteacher.androidApp.general.textroundedbg.SingleLineRenderer
+import com.aglushkov.wordteacher.androidApp.general.textroundedbg.TextRoundedBgRenderer
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVMImpl
@@ -68,6 +78,33 @@ class ArticleModule {
         database: AppDatabase,
         nlpCore: NLPCore
     ) = ArticleRepository(database, nlpCore)
+
+    @FragmentComp
+    @Provides
+    fun bgRendererResolver(
+        @ViewContext context: Context
+    ): BgRendererResolver {
+        return object : BgRendererResolver {
+            override fun resolve(annotation: Annotation, isSingleLine: Boolean): TextRoundedBgRenderer? {
+                return when (annotation) {
+                    RoundedBgAnnotations.Adjective.annotation -> {
+                        if (isSingleLine) {
+                            SingleLineRenderer(
+                                context,
+                                R.style.RoundedBgTextView
+                            )
+                        } else {
+                            MultiLineRenderer(
+                                context,
+                                R.style.RoundedBgTextView
+                            )
+                        }
+                    }
+                    else -> null
+                }
+            }
+        }
+    }
 }
 
 @Qualifier

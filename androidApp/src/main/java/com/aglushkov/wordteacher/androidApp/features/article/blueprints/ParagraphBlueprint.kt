@@ -4,32 +4,36 @@ import android.text.Annotation
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.text.set
 import androidx.core.text.toSpannable
 import com.aglushkov.wordteacher.androidApp.R
-import com.aglushkov.wordteacher.androidApp.features.Design
+import com.aglushkov.wordteacher.androidApp.features.Design.createCustomTextView
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
 import com.aglushkov.wordteacher.androidApp.general.extensions.setTextAppearanceCompat
-import com.aglushkov.wordteacher.androidApp.general.views.RoundedBgTextView
+import com.aglushkov.wordteacher.androidApp.general.textroundedbg.BgRendererResolver
+import com.aglushkov.wordteacher.androidApp.general.textroundedbg.RoundedTextBgDrawer
+import com.aglushkov.wordteacher.androidApp.general.views.CustomTextView
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import javax.inject.Inject
 
 class ParagraphBlueprint @Inject constructor(
-    val vm: ArticleVM
-): Blueprint<SimpleAdapter.ViewHolder<RoundedBgTextView>, ParagraphViewItem> {
+    val vm: ArticleVM,
+    val bgRendererResolver: BgRendererResolver
+): Blueprint<SimpleAdapter.ViewHolder<CustomTextView>, ParagraphViewItem> {
     override val type: Int = ParagraphViewItem.Type
 
     override fun createViewHolder(parent: ViewGroup) = SimpleAdapter.ViewHolder(
-        RoundedBgTextView(parent.context).apply {
+        createCustomTextView(parent).apply {
+            this.bgDrawer = RoundedTextBgDrawer(this@ParagraphBlueprint.bgRendererResolver)
+            this.setLineSpacing(0.0f, 1.2f)
             setTextAppearanceCompat(parent.context.resolveThemeStyle(R.attr.wordDefinitionTextAppearance))
         }
     )
 
-    override fun bind(viewHolder: SimpleAdapter.ViewHolder<RoundedBgTextView>, viewItem: ParagraphViewItem) {
+    override fun bind(viewHolder: SimpleAdapter.ViewHolder<CustomTextView>, viewItem: ParagraphViewItem) {
         setGesture(viewHolder) { index ->
             handleTextTap(index, viewItem)
         }
@@ -42,7 +46,7 @@ class ParagraphBlueprint @Inject constructor(
                 "$a$SENTENCE_CONNECTOR$b"
             }.toSpannable()
 
-        spannable[0..40] = Annotation("value", "rounded")
+        spannable[0..40] = RoundedBgAnnotations.Adjective.annotation
         //spannable[0..40] = RoundedBackgroundSpan(Color.CYAN, Color.BLACK, 160, 30.0f)//BackgroundColorSpan(Color.CYAN)
 
         viewHolder.typedView.text = spannable
@@ -71,7 +75,7 @@ class ParagraphBlueprint @Inject constructor(
     }
 
     private fun setGesture(
-        viewHolder: SimpleAdapter.ViewHolder<RoundedBgTextView>,
+        viewHolder: SimpleAdapter.ViewHolder<CustomTextView>,
         listener: (Int) -> Unit
     ) {
         val gestureDetector = GestureDetector(
@@ -99,4 +103,13 @@ class ParagraphBlueprint @Inject constructor(
     }
 }
 
+
+enum class RoundedBgAnnotations(val annotation: Annotation) {
+    Noun(Annotation(ROUNDED_ANNOTATION_KEY, "noun")),
+    Adjective(Annotation(ROUNDED_ANNOTATION_KEY, "adjective")),
+    Adverb(Annotation(ROUNDED_ANNOTATION_KEY, "adverb")),
+    Phrase(Annotation(ROUNDED_ANNOTATION_KEY, "phrase")),
+}
+
+const val ROUNDED_ANNOTATION_KEY = "rounded"
 private const val SENTENCE_CONNECTOR = " "

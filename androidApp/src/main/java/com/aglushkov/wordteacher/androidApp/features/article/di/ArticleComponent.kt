@@ -1,12 +1,12 @@
 package com.aglushkov.wordteacher.androidApp.features.article.di
 
+import android.content.Context
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleVMWrapper
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.di.ArticleModule
-import com.aglushkov.wordteacher.di.DefinitionsComponent
 import com.aglushkov.wordteacher.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.di.DefinitionsModule
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import dagger.BindsInstance
 import dagger.Component
+import javax.inject.Qualifier
 
 @FragmentComp
 @Component(
@@ -31,6 +32,7 @@ interface ArticleComponent {
         @BindsInstance fun setVMWrapper(vmWrapper: ArticleVMWrapper): Builder
         @BindsInstance fun setDefinitionsState(state: DefinitionsVM.State): Builder
         @BindsInstance fun setVMState(state: ArticleVM.State): Builder
+        @BindsInstance fun setViewContext(@ViewContext context: Context): Builder
 
         fun setDeps(deps: ArticleDependencies): Builder
         fun setDefinitionsDeps(deps: DefinitionsDependencies): Builder
@@ -43,3 +45,9 @@ interface ArticleDependencies {
     fun database(): AppDatabase
     fun nlpCore(): NLPCore
 }
+
+//@kotlin.annotation.Target(AnnotationTarget.TYPE)
+@Qualifier
+@MustBeDocumented
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ViewContext

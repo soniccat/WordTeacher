@@ -7,7 +7,7 @@ import androidx.core.content.res.getDrawableOrThrow
 import com.aglushkov.wordteacher.androidApp.R
 
 /**
- * Reads default attributes that [TextRoundedBgHelper] needs from resources. The attributes read
+ * Reads default attributes that [TextRoundedBgDrawer] needs from resources. The attributes read
  * are:
  *
  * - chHorizontalPadding: the padding to be applied to left & right of the background

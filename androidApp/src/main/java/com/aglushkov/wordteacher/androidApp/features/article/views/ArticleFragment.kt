@@ -66,6 +66,7 @@ class ArticleFragment: DialogFragment() {
             .setVMState(vmState)
             .setDefinitionsState(vmState.definitionsState)
             .setVMWrapper(androidVM)
+            .setViewContext(requireContext())
             .build()
         if (!androidVM.isInitialized()) {
             component.injectViewModelWrapper(androidVM)

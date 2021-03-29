@@ -1,10 +1,16 @@
 package com.aglushkov.wordteacher.androidApp.general.textroundedbg
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.text.Layout
+import androidx.core.content.res.getDrawableOrThrow
+import androidx.core.content.withStyledAttributes
+import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.general.extensions.getLineBottomWithoutPadding
 import com.aglushkov.wordteacher.androidApp.general.extensions.getLineTopWithoutPadding
+import com.google.android.material.resources.MaterialResources.getDimensionPixelSize
 import kotlin.math.max
 import kotlin.math.min
 
@@ -14,7 +20,7 @@ import kotlin.math.min
  * @param horizontalPadding the padding to be applied to left & right of the background
  * @param verticalPadding the padding to be applied to top & bottom of the background
  */
-internal abstract class TextRoundedBgRenderer(
+abstract class TextRoundedBgRenderer(
     val horizontalPadding: Int,
     val verticalPadding: Int
 ) {
@@ -68,11 +74,36 @@ internal abstract class TextRoundedBgRenderer(
  * @param verticalPadding the padding to be applied to top & bottom of the background
  * @param drawable the drawable used to draw the background
  */
-internal class SingleLineRenderer(
-    horizontalPadding: Int,
-    verticalPadding: Int,
+internal class SingleLineRenderer: TextRoundedBgRenderer {
     val drawable: Drawable
-) : TextRoundedBgRenderer(horizontalPadding, verticalPadding) {
+
+    constructor(
+        horizontalPadding: Int,
+        verticalPadding: Int,
+        drawable: Drawable
+    ) : super(horizontalPadding, verticalPadding) {
+        this.drawable = drawable
+    }
+
+    constructor(
+        context: Context,
+        style: Int
+    ): super(
+        context.obtainStyleAttributeInt(style, R.attr.roundedTextHorizontalPadding),
+        context.obtainStyleAttributeInt(style, R.attr.roundedTextVerticalPadding)
+    ) {
+        var drawable: Drawable? = null
+        val attrs = intArrayOf(
+            R.attr.roundedTextDrawable,
+        )
+        context.withStyledAttributes(
+            resourceId = style, attrs = attrs
+        ) {
+            drawable = getDrawableOrThrow(0)
+        }
+
+        this.drawable = drawable!!
+    }
 
     override fun draw(
         canvas: Canvas,
@@ -102,13 +133,49 @@ internal class SingleLineRenderer(
  * @param drawableMid the drawable used to draw for whole line
  * @param drawableRight the drawable used to draw right edge of the background
  */
-internal class MultiLineRenderer(
-    horizontalPadding: Int,
-    verticalPadding: Int,
-    val drawableLeft: Drawable,
-    val drawableMid: Drawable,
+internal class MultiLineRenderer: TextRoundedBgRenderer {
+    val drawableLeft: Drawable
+    val drawableMid: Drawable
     val drawableRight: Drawable
-) : TextRoundedBgRenderer(horizontalPadding, verticalPadding) {
+
+    constructor(
+        horizontalPadding: Int,
+        verticalPadding: Int,
+        drawableLeft: Drawable,
+        drawableMid: Drawable,
+        drawableRight: Drawable
+    ) : super(horizontalPadding, verticalPadding) {
+        this.drawableLeft = drawableLeft
+        this.drawableMid = drawableMid
+        this.drawableRight = drawableRight
+    }
+
+    @SuppressLint("ResourceType")
+    constructor(context: Context, style: Int) : super(
+        context.obtainStyleAttributeInt(style, R.attr.roundedTextHorizontalPadding),
+        context.obtainStyleAttributeInt(style, R.attr.roundedTextVerticalPadding)
+    ) {
+        var drawableLeft: Drawable? = null
+        var drawableMid: Drawable? = null
+        var drawableRight: Drawable? = null
+
+        val attrs = intArrayOf(
+            R.attr.roundedTextDrawableLeft,
+            R.attr.roundedTextDrawableMid,
+            R.attr.roundedTextDrawableRight
+        )
+        context.withStyledAttributes(
+            resourceId = style, attrs = attrs
+        ) {
+            drawableLeft = getDrawableOrThrow(0)
+            drawableMid = getDrawableOrThrow(1)
+            drawableRight = getDrawableOrThrow(2)
+        }
+
+        this.drawableLeft = drawableLeft!!
+        this.drawableMid = drawableMid!!
+        this.drawableRight = drawableRight!!
+    }
 
     override fun draw(
         canvas: Canvas,
@@ -193,4 +260,14 @@ internal class MultiLineRenderer(
             drawableRight.draw(canvas)
         }
     }
+}
+
+// TODO: this looks bizarre...
+fun Context.obtainStyleAttributeInt(style: Int, attribute: Int): Int {
+    var value = 0
+    val attrs = intArrayOf(attribute)
+    withStyledAttributes(resourceId = style, attrs = attrs) {
+        value = getDimensionPixelSize(0, 0)
+    }
+    return value
 }

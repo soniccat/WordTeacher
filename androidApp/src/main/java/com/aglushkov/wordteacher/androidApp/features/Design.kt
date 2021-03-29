@@ -5,10 +5,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.updatePadding
 import com.aglushkov.wordteacher.androidApp.R
+import com.aglushkov.wordteacher.androidApp.general.views.CustomTextView
 
 object Design {
     fun createTextView(parent: ViewGroup): TextView {
         val textView = TextView(parent.context)
+        setTextHorizontalPadding(textView)
+        return textView
+    }
+
+    fun createCustomTextView(parent: ViewGroup): CustomTextView {
+        val textView = CustomTextView(parent.context)
         setTextHorizontalPadding(textView)
         return textView
     }
