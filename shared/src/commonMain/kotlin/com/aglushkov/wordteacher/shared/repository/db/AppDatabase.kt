@@ -54,7 +54,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             nlpSentence.articleId,
             nlpSentence.orderId,
             nlpSentence.text,
-            nlpSentence.tokenSpans.joinToString(nlpSeparator),
+            nlpSentence.tokenStrings().joinToString(nlpSeparator),
             nlpSentence.tags.joinToString(nlpSeparator),
             nlpSentence.lemmas.joinToString(nlpSeparator),
             nlpSentence.chunks.joinToString(nlpSeparator)

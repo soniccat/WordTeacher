@@ -31,7 +31,7 @@ class TextRoundedBgAttributeReader(context: Context, attrs: AttributeSet?) {
             attrs,
             R.styleable.TextRoundedBgHelper,
             0,
-            R.style.RoundedBgTextView
+            R.style.AdjectiveBgStyle
         )
         horizontalPadding = typedArray.getDimensionPixelSize(
             R.styleable.TextRoundedBgHelper_roundedTextHorizontalPadding,

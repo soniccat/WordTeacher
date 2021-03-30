@@ -1,11 +1,14 @@
 package com.aglushkov.wordteacher.androidApp.features.article.blueprints
 
 import android.text.Annotation
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.core.text.set
 import androidx.core.text.toSpannable
+import androidx.core.text.toSpanned
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.features.Design.createCustomTextView
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
@@ -17,6 +20,7 @@ import com.aglushkov.wordteacher.androidApp.general.textroundedbg.RoundedTextBgD
 import com.aglushkov.wordteacher.androidApp.general.views.CustomTextView
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
+import com.aglushkov.wordteacher.shared.model.nlp.Tag
 import javax.inject.Inject
 
 class ParagraphBlueprint @Inject constructor(
@@ -38,18 +42,30 @@ class ParagraphBlueprint @Inject constructor(
             handleTextTap(index, viewItem)
         }
 
-        val spannable = viewItem.items
-            .map {
-                it.text
-            }
-            .fold("") { a, b ->
-                "$a$SENTENCE_CONNECTOR$b"
-            }.toSpannable()
+        val spannableBuilder = SpannableStringBuilder()
+        viewItem.items.forEach {
+            //val spannableString = SpannableString(it.text)
+            val spanStartIndex = spannableBuilder.length
+            spannableBuilder.append(it.text)
 
-        spannable[0..40] = RoundedBgAnnotations.Adjective.annotation
+            val tagEnums = it.tagEnums()
+            it.tokenSpans.forEachIndexed { index, tokenSpan ->
+                val tag = tagEnums[index]
+                when {
+                    tag.isAdj() -> spannableBuilder[tokenSpan.range + spanStartIndex] =
+                        RoundedBgAnnotations.Adjective.annotation.cloneWithKeySuffix("${tokenSpan.start + spanStartIndex}")
+                    tag.isAdverb() -> spannableBuilder[tokenSpan.range + spanStartIndex] =
+                        RoundedBgAnnotations.Adverb.annotation.cloneWithKeySuffix("${tokenSpan.start + spanStartIndex}")
+                }
+            }
+
+            spannableBuilder.append(SENTENCE_CONNECTOR)
+        }
+
+//        spannableBuilder[0..40] = RoundedBgAnnotations.Adjective.annotation
         //spannable[0..40] = RoundedBackgroundSpan(Color.CYAN, Color.BLACK, 160, 30.0f)//BackgroundColorSpan(Color.CYAN)
 
-        viewHolder.typedView.text = spannable
+        viewHolder.typedView.text = spannableBuilder
     }
 
     private fun handleTextTap(
@@ -113,3 +129,7 @@ enum class RoundedBgAnnotations(val annotation: Annotation) {
 
 const val ROUNDED_ANNOTATION_KEY = "rounded"
 private const val SENTENCE_CONNECTOR = " "
+
+operator fun IntRange.plus(value: Int) = IntRange(start + value, endInclusive + value)
+
+fun Annotation.cloneWithKeySuffix(keySuffix: String) = Annotation(key + keySuffix, value)

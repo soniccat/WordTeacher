@@ -41,7 +41,7 @@ class RoundedTextBgDrawer(
         // invalidation of the cache is required whenever anything related to text has changed.
         val spans = text.getSpans(0, text.length, Annotation::class.java)
         spans.forEach { span ->
-            if (span.key.equals(ROUNDED_ANNOTATION_KEY)) {
+            if (span.key.startsWith(ROUNDED_ANNOTATION_KEY)) {
                 val spanStart = text.getSpanStart(span)
                 val spanEnd = text.getSpanEnd(span)
                 val startLine = layout.getLineForOffset(spanStart)

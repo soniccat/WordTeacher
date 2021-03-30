@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/roundedTextBg"/>
-    <stroke android:width="@dimen/roundedTextBorderWidth" android:color="@color/roundedTextBorder"/>
+    <solid android:color="@color/roundedTextBgBlue"/>
+    <stroke android:width="@dimen/roundedTextBorderWidth" android:color="@color/roundedTextBorderBlue"/>
     <corners android:radius="@dimen/roundedTextBorderRadius"/>
 </shape>

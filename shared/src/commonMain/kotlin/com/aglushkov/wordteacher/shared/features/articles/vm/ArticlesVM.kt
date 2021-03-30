@@ -48,9 +48,7 @@ class ArticlesVM(
             val dateTime = Instant.fromEpochMilliseconds(it.date).toLocalDateTime(TimeZone.currentSystemDefault())
             val dateTimeString = "${dateTime.dayOfMonth}.${dateTime.monthNumber}.${dateTime.year}"
 
-            items.add(ArticleViewItem(it.id, it.name, dateTimeString).apply {
-                id = idGenerator.nextId()
-            })
+            items.add(ArticleViewItem(it.id, it.name, dateTimeString))
         }
 
         return items

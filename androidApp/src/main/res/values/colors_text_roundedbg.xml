@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="roundedTextBg">#554fC3f7</color>
-    <color name="roundedTextBorder">#DD0277BD</color>
+    <color name="roundedTextBgBlue">#554fC3f7</color>
+    <color name="roundedTextBorderBlue">#DD0277BD</color>
+
+    <color name="roundedTextBgYellow">#54FFEB3B</color>
+    <color name="roundedTextBorderYellow">#FFEB3B</color>
 </resources>

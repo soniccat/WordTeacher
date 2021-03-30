@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="RoundedBgTextView">
+    <style name="AdjectiveBgStyle">
         <item name="roundedTextHorizontalPadding">2dp</item>
         <item name="roundedTextVerticalPadding">2dp</item>
-        <item name="roundedTextDrawable">@drawable/rounded_text_bg</item>
-        <item name="roundedTextDrawableLeft">@drawable/rounded_text_bg_left</item>
-        <item name="roundedTextDrawableMid">@drawable/rounded_text_bg_mid</item>
-        <item name="roundedTextDrawableRight">@drawable/rounded_text_bg_right</item>
+        <item name="roundedTextDrawable">@drawable/rounded_text_bg_blue</item>
+        <item name="roundedTextDrawableLeft">@drawable/rounded_text_bg_left_blue</item>
+        <item name="roundedTextDrawableMid">@drawable/rounded_text_bg_mid_blue</item>
+        <item name="roundedTextDrawableRight">@drawable/rounded_text_bg_right_blue</item>
+    </style>
+
+    <style name="AdverbBgStyle">
+        <item name="roundedTextHorizontalPadding">2dp</item>
+        <item name="roundedTextVerticalPadding">2dp</item>
+        <item name="roundedTextDrawable">@drawable/rounded_text_bg_yellow</item>
+        <item name="roundedTextDrawableLeft">@drawable/rounded_text_bg_left_yellow</item>
+        <item name="roundedTextDrawableMid">@drawable/rounded_text_bg_mid_yellow</item>
+        <item name="roundedTextDrawableRight">@drawable/rounded_text_bg_right_yellow</item>
     </style>
 </resources>
