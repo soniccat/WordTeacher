@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -75,6 +76,10 @@ class ArticleFragment: DialogFragment() {
             component.injectDefinitionsViewModelWrapper(androidDefinitionsVM)
         }
         component.injectArticleFragment(this)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            onBackPressed()
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -154,7 +159,7 @@ class ArticleFragment: DialogFragment() {
         binding.toolbar.navigationIcon =
             requireContext().getDrawableCompat(R.drawable.ic_arrow_back_24)
         binding.toolbar.setNavigationOnClickListener {
-            articleVM.onBackPressed()
+            onBackPressed()
         }
 
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
@@ -166,6 +171,14 @@ class ArticleFragment: DialogFragment() {
                 }
                 else -> false
             }
+        }
+    }
+
+    private fun onBackPressed() {
+        if (isDefinitionsBottomSheetExpanded()) {
+            hideDefinitionsBottomSheet()
+        } else {
+            articleVM.onBackPressed()
         }
     }
 
@@ -251,7 +264,11 @@ class ArticleFragment: DialogFragment() {
 
     private fun hideDefinitionsBottomSheet() {
         bottomSheetBehavior(binding!!).state = BottomSheetBehavior.STATE_HIDDEN
+        articleVM.onWordDefinitionHidden()
     }
+
+    private fun isDefinitionsBottomSheetExpanded() =
+        bottomSheetBehavior(binding!!).state == BottomSheetBehavior.STATE_EXPANDED
 
     override fun onDestroyView() {
         super.onDestroyView()

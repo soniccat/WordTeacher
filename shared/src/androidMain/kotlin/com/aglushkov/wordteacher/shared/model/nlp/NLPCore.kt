@@ -62,6 +62,8 @@ actual class NLPCore(
     actual fun tag(tokens: List<String>) = tagger?.tag(tokens.toTypedArray()).orEmpty().asList()
     actual fun lemmatize(tokens: List<String>, tags: List<String>) = lemmatizer?.lemmatize(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
     actual fun chunk(tokens: List<String>, tags: List<String>) = chunker?.chunk(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
+
+    // TODO: move to NLPSentence
     actual fun phrases(sentence: NLPSentence): List<PhraseSpan> =
         ChunkSample.phrasesAsSpanList(
             sentence.tokenStrings().toTypedArray(),

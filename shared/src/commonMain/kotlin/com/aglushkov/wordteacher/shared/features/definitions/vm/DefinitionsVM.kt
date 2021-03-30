@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 interface DefinitionsVM {
-    fun onWordSubmitted(word: String)
+    fun onWordSubmitted(word: String?)
     fun onTryAgainClicked()
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
@@ -89,8 +89,10 @@ class DefinitionsVMImpl(
 
     // Events
 
-    override fun onWordSubmitted(word: String) {
-        if (word.isNotEmpty()) {
+    override fun onWordSubmitted(word: String?) {
+        if (word == null) {
+            this.word = null
+        } else if (word.isNotEmpty()) {
             loadIfNeeded(word)
         }
     }

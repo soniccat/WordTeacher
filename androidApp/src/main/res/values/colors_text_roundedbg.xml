@@ -5,4 +5,7 @@
 
     <color name="roundedTextBgYellow">#54FFEB3B</color>
     <color name="roundedTextBorderYellow">#FFEB3B</color>
+
+    <color name="roundedTextBgGray">#54C8C7C0</color>
+    <color name="roundedTextBorderGray">#C8C7C0</color>
 </resources>

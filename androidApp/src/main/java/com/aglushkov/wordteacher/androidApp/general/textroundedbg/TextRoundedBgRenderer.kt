@@ -74,7 +74,7 @@ abstract class TextRoundedBgRenderer(
  * @param verticalPadding the padding to be applied to top & bottom of the background
  * @param drawable the drawable used to draw the background
  */
-internal class SingleLineRenderer: TextRoundedBgRenderer {
+class SingleLineRenderer: TextRoundedBgRenderer {
     val drawable: Drawable
 
     constructor(
@@ -133,7 +133,7 @@ internal class SingleLineRenderer: TextRoundedBgRenderer {
  * @param drawableMid the drawable used to draw for whole line
  * @param drawableRight the drawable used to draw right edge of the background
  */
-internal class MultiLineRenderer: TextRoundedBgRenderer {
+class MultiLineRenderer: TextRoundedBgRenderer {
     val drawableLeft: Drawable
     val drawableMid: Drawable
     val drawableRight: Drawable

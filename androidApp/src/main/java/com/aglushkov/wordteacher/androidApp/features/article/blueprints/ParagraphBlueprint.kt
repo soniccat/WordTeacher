@@ -20,12 +20,15 @@ import com.aglushkov.wordteacher.androidApp.general.textroundedbg.RoundedTextBgD
 import com.aglushkov.wordteacher.androidApp.general.views.CustomTextView
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
+import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.Tag
 import javax.inject.Inject
 
 class ParagraphBlueprint @Inject constructor(
     val vm: ArticleVM,
-    val bgRendererResolver: BgRendererResolver
+    val bgRendererResolver: BgRendererResolver,
+    val nlpCore: NLPCore
 ): Blueprint<SimpleAdapter.ViewHolder<CustomTextView>, ParagraphViewItem> {
     override val type: Int = ParagraphViewItem.Type
 
@@ -43,19 +46,41 @@ class ParagraphBlueprint @Inject constructor(
         }
 
         val spannableBuilder = SpannableStringBuilder()
-        viewItem.items.forEach {
+        viewItem.items.forEach { sentence ->
             //val spannableString = SpannableString(it.text)
             val spanStartIndex = spannableBuilder.length
-            spannableBuilder.append(it.text)
+            spannableBuilder.append(sentence.text)
 
-            val tagEnums = it.tagEnums()
-            it.tokenSpans.forEachIndexed { index, tokenSpan ->
+            val tagEnums = sentence.tagEnums()
+            val tokenSpans = sentence.tokenSpans
+            tokenSpans.forEachIndexed { index, tokenSpan ->
                 val tag = tagEnums[index]
                 when {
                     tag.isAdj() -> spannableBuilder[tokenSpan.range + spanStartIndex] =
                         RoundedBgAnnotations.Adjective.annotation.cloneWithKeySuffix("${tokenSpan.start + spanStartIndex}")
                     tag.isAdverb() -> spannableBuilder[tokenSpan.range + spanStartIndex] =
                         RoundedBgAnnotations.Adverb.annotation.cloneWithKeySuffix("${tokenSpan.start + spanStartIndex}")
+                }
+            }
+
+            val chunks = nlpCore.phrases(sentence)
+            chunks.forEach { phraseSpan ->
+                if (phraseSpan.type != ChunkType.X) {
+                    val startIndex = tokenSpans[phraseSpan.start].start
+                    val endIndex = if (phraseSpan.end < tokenSpans.size) {
+                        tokenSpans[phraseSpan.end].end
+                    } else {
+                        tokenSpans[phraseSpan.start].end
+                    }
+                    when (phraseSpan.type) {
+                        ChunkType.ADJP -> RoundedBgAnnotations.Adjective.annotation.cloneWithKeySuffix("${startIndex + spanStartIndex}")
+                        ChunkType.ADVP -> RoundedBgAnnotations.Adverb.annotation.cloneWithKeySuffix("${startIndex + spanStartIndex}")
+                        ChunkType.VP -> RoundedBgAnnotations.Phrase.annotation.cloneWithKeySuffix("${startIndex + spanStartIndex}")
+                        else -> null
+                        //else -> RoundedBgAnnotations.Phrase.annotation.cloneWithKeySuffix("${startIndex + spanStartIndex}")
+                    }?.let { span ->
+                        spannableBuilder[(startIndex..endIndex) + spanStartIndex] = span
+                    }
                 }
             }
 
@@ -121,13 +146,17 @@ class ParagraphBlueprint @Inject constructor(
 
 
 enum class RoundedBgAnnotations(val annotation: Annotation) {
-    Noun(Annotation(ROUNDED_ANNOTATION_KEY, "noun")),
-    Adjective(Annotation(ROUNDED_ANNOTATION_KEY, "adjective")),
-    Adverb(Annotation(ROUNDED_ANNOTATION_KEY, "adverb")),
-    Phrase(Annotation(ROUNDED_ANNOTATION_KEY, "phrase")),
+    Noun(Annotation(ROUNDED_ANNOTATION_KEY, ROUNDED_ANNOTATION_VALUE_NOUN)),
+    Adjective(Annotation(ROUNDED_ANNOTATION_KEY, ROUNDED_ANNOTATION_VALUE_ADJECTIVE)),
+    Adverb(Annotation(ROUNDED_ANNOTATION_KEY, ROUNDED_ANNOTATION_VALUE_ADVERB)),
+    Phrase(Annotation(ROUNDED_ANNOTATION_KEY, ROUNDED_ANNOTATION_VALUE_PHRASE)),
 }
 
 const val ROUNDED_ANNOTATION_KEY = "rounded"
+const val ROUNDED_ANNOTATION_VALUE_NOUN = "noun"
+const val ROUNDED_ANNOTATION_VALUE_ADJECTIVE = "adjective"
+const val ROUNDED_ANNOTATION_VALUE_ADVERB = "adverb"
+const val ROUNDED_ANNOTATION_VALUE_PHRASE = "phrase"
 private const val SENTENCE_CONNECTOR = " "
 
 operator fun IntRange.plus(value: Int) = IntRange(start + value, endInclusive + value)

@@ -17,4 +17,13 @@
         <item name="roundedTextDrawableMid">@drawable/rounded_text_bg_mid_yellow</item>
         <item name="roundedTextDrawableRight">@drawable/rounded_text_bg_right_yellow</item>
     </style>
+
+    <style name="PhraseBgStyle">
+        <item name="roundedTextHorizontalPadding">2dp</item>
+        <item name="roundedTextVerticalPadding">2dp</item>
+        <item name="roundedTextDrawable">@drawable/rounded_text_bg_gray</item>
+        <item name="roundedTextDrawableLeft">@drawable/rounded_text_bg_left_gray</item>
+        <item name="roundedTextDrawableMid">@drawable/rounded_text_bg_mid_gray</item>
+        <item name="roundedTextDrawableRight">@drawable/rounded_text_bg_right_gray</item>
+    </style>
 </resources>

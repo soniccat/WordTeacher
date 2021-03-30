@@ -28,6 +28,7 @@ interface ArticleVM {
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
     val eventFlow: SharedFlow<Event>
 
+    fun onWordDefinitionHidden()
     fun onBackPressed()
     fun onTextClicked(index: Int, sentence: NLPSentence)
 
@@ -119,6 +120,10 @@ class ArticleVMImpl(
                 definitionsVM.onWordSubmitted(it.tokenString)
             }
         }
+    }
+
+    override fun onWordDefinitionHidden() {
+        definitionsVM.onWordSubmitted(null)
     }
 
     override fun onBackPressed() {
