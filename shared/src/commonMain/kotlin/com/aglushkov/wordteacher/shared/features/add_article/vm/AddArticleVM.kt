@@ -14,11 +14,11 @@ import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
@@ -27,11 +27,8 @@ class AddArticleVM(
     val state: State
 ): ViewModel() {
 
-    private val mutableEventFlow = MutableSharedFlow<Event>(
-        replay = Int.MAX_VALUE,
-        extraBufferCapacity = Int.MAX_VALUE
-    )
-    val eventFlow: SharedFlow<Event> = mutableEventFlow
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    val eventFlow = eventChannel.receiveAsFlow()
 
     private val mutableTitle = MutableStateFlow("")
     val title: StateFlow<String> = mutableTitle
@@ -56,7 +53,7 @@ class AddArticleVM(
     }
 
     fun onCancelPressed() = viewModelScope.launch {
-        mutableEventFlow.emit(CompletionEvent(CompletionResult.CANCELLED))
+        eventChannel.offer(CompletionEvent(CompletionResult.CANCELLED))
     }
 
     fun onTitleFocusChanged(hasFocus: Boolean) {
@@ -83,7 +80,7 @@ class AddArticleVM(
         try {
             // TODO: show loading, adding might take for a while
             articlesRepository.createArticle(article)
-            mutableEventFlow.emit(CompletionEvent(CompletionResult.COMPLETED))
+            eventChannel.offer(CompletionEvent(CompletionResult.COMPLETED))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -91,7 +88,7 @@ class AddArticleVM(
                 StringDesc.Raw(it)
             } ?: StringDesc.Resource(MR.strings.error_default)
 
-            mutableEventFlow.emit(ErrorEvent(errorText))
+            eventChannel.offer(ErrorEvent(errorText))
         }
     }
 
@@ -101,6 +98,11 @@ class AddArticleVM(
         } else {
             mutableTitleErrorFlow.value = null
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        eventChannel.cancel()
     }
 
     @Parcelize

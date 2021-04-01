@@ -14,11 +14,15 @@ import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
@@ -26,7 +30,7 @@ interface ArticleVM {
     val state: State
     val article: StateFlow<Resource<Article>>
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
-    val eventFlow: SharedFlow<Event>
+    val eventFlow: Flow<Event>
 
     fun onWordDefinitionHidden()
     fun onBackPressed()
@@ -48,11 +52,8 @@ class ArticleVMImpl(
     private val idGenerator: IdGenerator,
 ): ViewModel(), ArticleVM {
 
-    private val mutableEventFlow = MutableSharedFlow<Event>(
-        replay = Int.MAX_VALUE,
-        extraBufferCapacity = Int.MAX_VALUE
-    )
-    override val eventFlow: SharedFlow<Event> = mutableEventFlow
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    override val eventFlow = eventChannel.receiveAsFlow()
     override val article: StateFlow<Resource<Article>> = articleRepository.article
     override val paragraphs = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
 
@@ -67,22 +68,6 @@ class ArticleVMImpl(
                 it.copyWith(buildViewItems(it))
             }.forward(paragraphs)
         }
-    }
-
-    private fun saveArticle() = viewModelScope.launch {
-        // TODO:
-//        try {
-//            articlesRepository.createArticle(article)
-//            mutableEventFlow.emit(CompletionEvent(CompletionResult.COMPLETED))
-//        } catch (e: CancellationException) {
-//            throw e
-//        } catch (e: Exception) {
-//            val errorText = e.message?.let {
-//                StringDesc.Raw(it)
-//            } ?: StringDesc.Resource(MR.strings.error_default)
-//
-//            mutableEventFlow.emit(ErrorEvent(errorText))
-//        }
     }
 
     private fun buildViewItems(article: Resource<Article>): List<BaseViewItem<*>> {
@@ -115,7 +100,6 @@ class ArticleVMImpl(
 
     override fun onTextClicked(index: Int, sentence: NLPSentence) {
         viewModelScope.launch {
-//        mutableEventFlow.emit(ShowDefinitionEvent(word))
             sentence.sliceFromTextIndex(index)?.let {
                 definitionsVM.onWordSubmitted(it.tokenString)
             }
@@ -129,6 +113,9 @@ class ArticleVMImpl(
     override fun onBackPressed() {
         router.closeArticle()
     }
-}
 
-data class ShowDefinitionEvent(val word: String): Event
+    override fun onCleared() {
+        super.onCleared()
+        eventChannel.cancel()
+    }
+}

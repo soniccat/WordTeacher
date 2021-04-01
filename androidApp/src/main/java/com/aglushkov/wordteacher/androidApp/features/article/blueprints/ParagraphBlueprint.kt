@@ -47,7 +47,6 @@ class ParagraphBlueprint @Inject constructor(
 
         val spannableBuilder = SpannableStringBuilder()
         viewItem.items.forEach { sentence ->
-            //val spannableString = SpannableString(it.text)
             val spanStartIndex = spannableBuilder.length
             spannableBuilder.append(sentence.text)
 
@@ -86,9 +85,6 @@ class ParagraphBlueprint @Inject constructor(
 
             spannableBuilder.append(SENTENCE_CONNECTOR)
         }
-
-//        spannableBuilder[0..40] = RoundedBgAnnotations.Adjective.annotation
-        //spannable[0..40] = RoundedBackgroundSpan(Color.CYAN, Color.BLACK, 160, 30.0f)//BackgroundColorSpan(Color.CYAN)
 
         viewHolder.typedView.text = spannableBuilder
     }

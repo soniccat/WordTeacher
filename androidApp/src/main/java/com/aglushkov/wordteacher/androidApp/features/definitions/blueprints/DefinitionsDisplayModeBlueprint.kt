@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.androidApp.features.definitions.blueprints
 
 import android.content.Context
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.R
@@ -16,40 +17,59 @@ import javax.inject.Inject
 
 class DefinitionsDisplayModeBlueprint @Inject constructor (
     var vm: DefinitionsVM
-): Blueprint<SimpleAdapter.ViewHolder<ChipGroup>, DefinitionsDisplayModeViewItem> {
+): Blueprint<SimpleAdapter.ViewHolder<ViewGroup>, DefinitionsDisplayModeViewItem> {
 
     override val type: Int = DefinitionsDisplayModeViewItem.Type
 
-    override fun createViewHolder(parent: ViewGroup) = SimpleAdapter.ViewHolder(
-        ChipGroup(parent.context).apply {
-            val horizontalPadding = context.resources.getDimensionPixelSize(R.dimen.definitions_displayMode_horizontal_padding)
-            val verticalPadding = context.resources.getDimensionPixelSize(R.dimen.definitions_displayMode_vertical_padding)
-            updatePadding(left = horizontalPadding, top = verticalPadding, right = horizontalPadding)
+    override fun createViewHolder(parent: ViewGroup): SimpleAdapter.ViewHolder<ViewGroup> {
+        val context = parent.context
+        val container = LinearLayout(context)
+        container.orientation = LinearLayout.HORIZONTAL
 
+        val horizontalPadding = context.resources.getDimensionPixelSize(R.dimen.definitions_displayMode_horizontal_padding)
+        val verticalPadding = context.resources.getDimensionPixelSize(R.dimen.definitions_displayMode_vertical_padding)
+        container.updatePadding(left = horizontalPadding, top = verticalPadding, right = horizontalPadding)
+
+        val partOfSpeechChip = createChip(context, 0, false)
+        partOfSpeechChip.id = R.id.definitions_partOfSpeech_chip
+        container.addView(partOfSpeechChip)
+
+        val displayModeChipGroup = ChipGroup(context).apply {
             for (i in 0 until 2) {
-                addView(createChip(context, i))
+                addView(createChip(context, i, true))
             }
 
             isSelectionRequired = true
             isSingleSelection = true
         }
-    )
+        displayModeChipGroup.id = R.id.definitions_displayMode_chipGroup
+        displayModeChipGroup.updatePadding(left = horizontalPadding)
+        container.addView(displayModeChipGroup)
 
-    private fun createChip(context: Context, anId: Int): Chip {
+        return SimpleAdapter.ViewHolder(container)
+    }
+
+    private fun createChip(context: Context, anId: Int, checkable: Boolean): Chip {
         return Chip(context).apply {
             id = anId
-            isCheckable = true
+            isCheckable = checkable
         }
     }
 
-    override fun bind(viewHolder: SimpleAdapter.ViewHolder<ChipGroup>, viewItem: DefinitionsDisplayModeViewItem) {
-        val view = viewHolder.typedView
+    override fun bind(viewHolder: SimpleAdapter.ViewHolder<ViewGroup>, viewItem: DefinitionsDisplayModeViewItem) {
+        val partOfSpeechChip: Chip = viewHolder.itemView.findViewById(R.id.definitions_partOfSpeech_chip)
+        partOfSpeechChip.setOnClickListener {
+            vm.onPartOfSpeechFilterClicked(viewItem.partsOfSpeechFilter)
+        }
+        partOfSpeechChip.text = "test"
+
+        val chipGroup: ChipGroup = viewHolder.itemView.findViewById(R.id.definitions_displayMode_chipGroup)
         viewItem.items.forEachIndexed { index, definitionsDisplayMode ->
-            (view.getChildAt(index) as Chip).text = definitionsDisplayMode.toStringDesc().toString(view.context)
+            (chipGroup.getChildAt(index) as Chip).text = definitionsDisplayMode.toStringDesc().toString(viewHolder.itemView.context)
         }
 
-        view.check(viewItem.selectedIndex)
-        view.setOnCheckedChangeListener { group, checkedId ->
+        chipGroup.check(viewItem.selectedIndex)
+        chipGroup.setOnCheckedChangeListener { group, checkedId ->
             val selectedMode = viewItem.items[checkedId]
             vm.onDisplayModeChanged(selectedMode)
         }

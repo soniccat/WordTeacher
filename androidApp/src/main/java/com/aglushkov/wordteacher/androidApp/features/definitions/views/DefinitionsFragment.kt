@@ -16,10 +16,14 @@ import com.aglushkov.wordteacher.androidApp.general.VMWrapper
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.submit
 import com.aglushkov.wordteacher.androidApp.general.views.bind
+import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserDialog
+import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.di.DaggerDefinitionsComponent
 import com.aglushkov.wordteacher.di.DefinitionsBinder
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterEvent
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import kotlinx.coroutines.flow.collect
@@ -36,6 +40,7 @@ class DefinitionsFragment: Fragment() {
     private var binding: FragmentDefinitionsBinding? = null
 
     @Inject @DefinitionsBinder lateinit var binder: ViewItemBinder
+    @Inject lateinit var idGenerator: IdGenerator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +79,22 @@ class DefinitionsFragment: Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             definitionsVM.definitions.collect {
                 showDefinitions(it)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            definitionsVM.eventFlow.collect {
+                when (it) {
+                    is ShowPartsOfSpeechFilterEvent -> {
+                        ChooserDialog(requireContext()).apply {
+                            show()
+                            showOptions(it.partsOfSpeech.map { partOfSpeech ->
+                                val isSelected = it.selectedPartsOfSpeech.contains(partOfSpeech)
+                                ChooserViewItem(idGenerator.nextId(), partOfSpeech.name, partOfSpeech, isSelected)
+                            })
+                        }
+                    }
+                }
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
+import com.aglushkov.wordteacher.apiproviders.wordnik.service.WordnikService
+import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -23,19 +25,24 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 interface DefinitionsVM {
     fun onWordSubmitted(word: String?)
     fun onTryAgainClicked()
+    fun onPartOfSpeechFilterClicked(filter: List<WordTeacherWord.PartOfSpeech>)
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
 
     val state: State
     val definitions: MutableStateFlow<Resource<List<BaseViewItem<*>>>>
+    val eventFlow: Flow<Event>
 
     @Parcelize
     class State(
@@ -50,6 +57,8 @@ class DefinitionsVMImpl(
     override val state: DefinitionsVM.State
 ): ViewModel(), DefinitionsVM {
 
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    override val eventFlow = eventChannel.receiveAsFlow()
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     override val definitions = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
     val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
@@ -95,6 +104,21 @@ class DefinitionsVMImpl(
         } else if (word.isNotEmpty()) {
             loadIfNeeded(word)
         }
+    }
+
+    override fun onPartOfSpeechFilterClicked(partsOfSpeech: List<WordTeacherWord.PartOfSpeech>) {
+        eventChannel.offer(ShowPartsOfSpeechFilterEvent(
+            currentPartsOfSpeech(),
+            partsOfSpeech
+        ))
+    }
+
+
+    private fun currentPartsOfSpeech(): List<WordTeacherWord.PartOfSpeech> {
+        return definitionWords.value.data()
+            ?.map {
+                it.definitions.keys
+            }?.flatten()?.distinct() ?: emptyList()
     }
 
     override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
@@ -146,7 +170,11 @@ class DefinitionsVMImpl(
     private fun buildViewItems(words: List<WordTeacherWord>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         if (words.isNotEmpty()) {
-            items.add(DefinitionsDisplayModeViewItem(displayModes, displayModeIndex))
+            items.add(DefinitionsDisplayModeViewItem(
+                listOf(WordTeacherWord.PartOfSpeech.Undefined),
+                displayModes,
+                displayModeIndex
+            ))
             items.add(WordDividerViewItem())
         }
 
@@ -321,3 +349,8 @@ class DefinitionsVMImpl(
         return res.getErrorString(hasConnection, hasResponse)
     }
 }
+
+data class ShowPartsOfSpeechFilterEvent(
+    val partsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
+    val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech>
+): Event
