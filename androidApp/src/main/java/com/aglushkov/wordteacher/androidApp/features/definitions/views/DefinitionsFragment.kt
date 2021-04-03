@@ -26,6 +26,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeec
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -86,7 +87,17 @@ class DefinitionsFragment: Fragment() {
             definitionsVM.eventFlow.collect {
                 when (it) {
                     is ShowPartsOfSpeechFilterEvent -> {
-                        ChooserDialog(requireContext()).apply {
+                        ChooserDialog(
+                            requireContext()
+                        ) { options ->
+                            definitionsVM.onPartOfSpeechFilterUpdated(
+                                options.filter {
+                                    option -> option.isSelected
+                                }.map {
+                                    option -> option.obj as WordTeacherWord.PartOfSpeech
+                                }
+                            )
+                        }.apply {
                             show()
                             showOptions(it.partsOfSpeech.map { partOfSpeech ->
                                 val isSelected = it.selectedPartsOfSpeech.contains(partOfSpeech)

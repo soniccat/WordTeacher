@@ -64,9 +64,10 @@ class ArticleFragment: DialogFragment() {
         val component = DaggerArticleComponent.builder()
             .setDeps(deps)
             .setDefinitionsDeps(deps)
-            .setVMState(vmState)
-            .setDefinitionsState(vmState.definitionsState)
             .setVMWrapper(androidVM)
+            .setVMState(vmState)
+            .setDefinitionsVMWrapper(androidDefinitionsVM)
+            .setDefinitionsState(vmState.definitionsState)
             .setViewContext(requireContext())
             .build()
         if (!androidVM.isInitialized()) {

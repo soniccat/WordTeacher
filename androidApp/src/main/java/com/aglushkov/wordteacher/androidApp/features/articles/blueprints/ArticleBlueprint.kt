@@ -15,10 +15,9 @@ class ArticleBlueprint @Inject constructor(
 ): Blueprint<ArticleItemViewHolder, ArticleViewItem> {
     override val type: Int = ArticleViewItem.Type
 
-    override fun createViewHolder(parent: ViewGroup): ArticleItemViewHolder {
-        val binding = ItemArticleBinding.inflate(LayoutInflater.from(parent.context))
-        return ArticleItemViewHolder(binding)
-    }
+    override fun createViewHolder(parent: ViewGroup) = ArticleItemViewHolder(
+            ItemArticleBinding.inflate(LayoutInflater.from(parent.context))
+        )
 
     override fun bind(viewHolder: ArticleItemViewHolder, viewItem: ArticleViewItem) {
         viewHolder.bind(

@@ -26,6 +26,7 @@
     <string name="word_section_examples">Examples</string>
     <string name="word_section_synonyms">Synonyms</string>
 
+    <string name="definitions_add_filter">Add Filter</string>
     <string name="definitions_displayMode_bySource">By Source</string>
     <string name="definitions_displayMode_merge">Combined</string>
 

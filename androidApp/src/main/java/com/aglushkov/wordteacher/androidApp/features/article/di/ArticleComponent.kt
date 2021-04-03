@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleVMWrap
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.di.ArticleModule
+import com.aglushkov.wordteacher.di.DefinitionsComponent
 import com.aglushkov.wordteacher.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.di.DefinitionsModule
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
@@ -30,8 +31,9 @@ interface ArticleComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance fun setVMWrapper(vmWrapper: ArticleVMWrapper): Builder
-        @BindsInstance fun setDefinitionsState(state: DefinitionsVM.State): Builder
         @BindsInstance fun setVMState(state: ArticleVM.State): Builder
+        @BindsInstance fun setDefinitionsVMWrapper(vmWrapper: DefinitionsVMWrapper): Builder
+        @BindsInstance fun setDefinitionsState(state: DefinitionsVM.State): Builder
         @BindsInstance fun setViewContext(@ViewContext context: Context): Builder
 
         fun setDeps(deps: ArticleDependencies): Builder

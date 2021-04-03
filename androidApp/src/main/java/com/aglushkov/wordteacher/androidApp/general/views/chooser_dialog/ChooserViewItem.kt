@@ -11,4 +11,8 @@ class ChooserViewItem (
     companion object {
         const val Type = 301
     }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) && isSelected == (other as ChooserViewItem).isSelected
+    }
 }

@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
+import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -36,7 +37,9 @@ import kotlinx.coroutines.launch
 interface DefinitionsVM {
     fun onWordSubmitted(word: String?)
     fun onTryAgainClicked()
-    fun onPartOfSpeechFilterClicked(filter: List<WordTeacherWord.PartOfSpeech>)
+    fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
+    fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem)
+    fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
 
@@ -61,6 +64,8 @@ class DefinitionsVMImpl(
     override val eventFlow = eventChannel.receiveAsFlow()
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     override val definitions = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+
+    var partsOfSpeechFilter: MutableList<WordTeacherWord.PartOfSpeech> = mutableListOf()
     val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     var loadJob: Job? = null
 
@@ -106,13 +111,22 @@ class DefinitionsVMImpl(
         }
     }
 
-    override fun onPartOfSpeechFilterClicked(partsOfSpeech: List<WordTeacherWord.PartOfSpeech>) {
+    override fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>) {
+        partsOfSpeechFilter = filter.toMutableList()
+        rebuildViewItems()
+    }
+
+    override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
         eventChannel.offer(ShowPartsOfSpeechFilterEvent(
             currentPartsOfSpeech(),
-            partsOfSpeech
+            partsOfSpeechFilter
         ))
     }
 
+    override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
+        partsOfSpeechFilter.clear()
+        rebuildViewItems()
+    }
 
     private fun currentPartsOfSpeech(): List<WordTeacherWord.PartOfSpeech> {
         return definitionWords.value.data()
@@ -123,10 +137,13 @@ class DefinitionsVMImpl(
 
     override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
         if (this.displayMode == mode) return
+        this.displayMode = mode
+        rebuildViewItems()
+    }
 
+    private fun rebuildViewItems() {
         val words = wordDefinitionRepository.obtainStateFlow(this.word!!).value
         if (words.isLoaded()) {
-            this.displayMode = mode
             definitions.value = Resource.Loaded(buildViewItems(words.data()!!))
         }
     }
@@ -162,6 +179,7 @@ class DefinitionsVMImpl(
         loadJob = viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             Logger.e("Load Word exception for $word ${e.message}", tag)
         }) {
+            partsOfSpeechFilter.clear()
             wordDefinitionRepository.define(word, false).forward(definitionWords)
             Logger.v("Finish Loading $word", tag)
         }
@@ -171,7 +189,8 @@ class DefinitionsVMImpl(
         val items = mutableListOf<BaseViewItem<*>>()
         if (words.isNotEmpty()) {
             items.add(DefinitionsDisplayModeViewItem(
-                listOf(WordTeacherWord.PartOfSpeech.Undefined),
+                getPartOfSpeechChipText(partsOfSpeechFilter),
+                partsOfSpeechFilter.isNotEmpty(),
                 displayModes,
                 displayModeIndex
             ))
@@ -179,12 +198,23 @@ class DefinitionsVMImpl(
         }
 
         when (displayMode) {
-            DefinitionsDisplayMode.Merged -> addMergedWords(words, items)
-            else -> addWordsGroupedBySource(words, items)
+            DefinitionsDisplayMode.Merged -> addMergedWords(words, partsOfSpeechFilter, items)
+            else -> addWordsGroupedBySource(words, partsOfSpeechFilter, items)
         }
 
         generateIds(items)
         return items
+    }
+
+    private fun getPartOfSpeechChipText(
+        partOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+    ): StringDesc {
+        return if (partOfSpeechFilter.isEmpty()) {
+            StringDesc.Resource(MR.strings.definitions_add_filter)
+        } else {
+            val firstFilter = partOfSpeechFilter.first()
+            firstFilter.toStringDesc()
+        }
     }
 
     // Set unique id taking into account that for the same items id shouldn't change
@@ -220,27 +250,41 @@ class DefinitionsVMImpl(
         }
     }
 
-    private fun addMergedWords(words: List<WordTeacherWord>, items: MutableList<BaseViewItem<*>>) {
-        val word = mergeWords(words)
+    private fun addMergedWords(
+        words: List<WordTeacherWord>,
+        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+        items: MutableList<BaseViewItem<*>>
+    ) {
+        val word = mergeWords(words, partsOfSpeechFilter)
 
-        addWordViewItems(word, items)
+        addWordViewItems(word, partsOfSpeechFilter, items)
         items.add(WordDividerViewItem())
     }
 
-    private fun addWordsGroupedBySource(words: List<WordTeacherWord>, items: MutableList<BaseViewItem<*>>) {
+    private fun addWordsGroupedBySource(
+        words: List<WordTeacherWord>,
+        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+        items: MutableList<BaseViewItem<*>>
+    ) {
         for (word in words) {
-            addWordViewItems(word, items)
+            addWordViewItems(word, partsOfSpeechFilter, items)
             items.add(WordDividerViewItem())
         }
     }
 
-    private fun addWordViewItems(word: WordTeacherWord, items: MutableList<BaseViewItem<*>>) {
+    private fun addWordViewItems(
+        word: WordTeacherWord,
+        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+        items: MutableList<BaseViewItem<*>>
+    ) {
         items.add(WordTitleViewItem(word.word, word.types))
         word.transcription?.let {
             items.add(WordTranscriptionViewItem(it))
         }
 
-        for (partOfSpeech in word.definitions.keys) {
+        for (partOfSpeech in word.definitions.keys.filter {
+            partsOfSpeechFilter.isEmpty() || partsOfSpeechFilter.contains(it)
+        }) {
             items.add(WordPartOfSpeechViewItem(partOfSpeech.toStringDesc()))
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
@@ -266,7 +310,10 @@ class DefinitionsVMImpl(
         }
     }
 
-    private fun mergeWords(words: List<WordTeacherWord>): WordTeacherWord {
+    private fun mergeWords(
+        words: List<WordTeacherWord>,
+        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>
+    ): WordTeacherWord {
         if (words.size == 1) return words.first()
 
         val allWords = mutableListOf<String>()
@@ -285,12 +332,14 @@ class DefinitionsVMImpl(
                 }
             }
 
-            for (partOfSpeech in it.definitions) {
-                val originalDefs = it.definitions[partOfSpeech.key] as? MutableList ?: continue
-                var list = allDefinitions[partOfSpeech.key] as? MutableList
+            for (partOfSpeech in it.definitions.keys.filter { definition ->
+                partsOfSpeechFilter.isEmpty() || partsOfSpeechFilter.contains(definition)
+            }) {
+                val originalDefs = it.definitions[partOfSpeech] as? MutableList ?: continue
+                var list = allDefinitions[partOfSpeech] as? MutableList
                 if (list == null) {
                     list = mutableListOf()
-                    allDefinitions[partOfSpeech.key] = list
+                    allDefinitions[partOfSpeech] = list
                 }
 
                 list.addAll(originalDefs)

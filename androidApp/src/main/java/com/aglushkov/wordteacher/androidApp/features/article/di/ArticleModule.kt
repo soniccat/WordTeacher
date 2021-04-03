@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.androidApp.features.article.blueprints.ROUNDED_
 import com.aglushkov.wordteacher.androidApp.features.article.blueprints.ROUNDED_ANNOTATION_VALUE_PHRASE
 import com.aglushkov.wordteacher.androidApp.features.article.blueprints.RoundedBgAnnotations
 import com.aglushkov.wordteacher.androidApp.features.article.di.ViewContext
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.textroundedbg.BgRendererResolver
@@ -44,14 +45,14 @@ class ArticleModule {
     @FragmentComp
     @Provides
     fun viewModel(
-        definitionsVM: DefinitionsVM,
+        definitionsVM: DefinitionsVMWrapper,
         routerResolver: RouterResolver,
         articlesRepository: ArticleRepository,
         state: ArticleVM.State,
         idGenerator: IdGenerator
     ): ArticleVM {
         return ArticleVMImpl(
-            definitionsVM,
+            definitionsVM.vm,
             articlesRepository,
             state,
             object : ArticleRouter {

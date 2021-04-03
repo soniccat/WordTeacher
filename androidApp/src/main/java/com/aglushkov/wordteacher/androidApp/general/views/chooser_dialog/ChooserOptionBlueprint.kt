@@ -1,10 +1,14 @@
 package com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.R
+import com.aglushkov.wordteacher.androidApp.databinding.ItemArticleBinding
+import com.aglushkov.wordteacher.androidApp.databinding.ItemChooserBinding
 import com.aglushkov.wordteacher.androidApp.features.Design
+import com.aglushkov.wordteacher.androidApp.features.articles.blueprints.ArticleItemViewHolder
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
@@ -12,16 +16,27 @@ import com.aglushkov.wordteacher.androidApp.general.extensions.setTextAppearance
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import javax.inject.Inject
 
-class ChooserOptionBlueprint @Inject constructor(): Blueprint<SimpleAdapter.ViewHolder<TextView>, ChooserViewItem> {
+class ChooserOptionBlueprint @Inject constructor(
+    val onItemSelectionChanged: (viewItem: ChooserViewItem) -> Unit
+): Blueprint<ChooserOptionViewHolder, ChooserViewItem> {
     override val type: Int = ChooserViewItem.Type
 
-    override fun createViewHolder(parent: ViewGroup) = SimpleAdapter.ViewHolder(
-        Design.createTextView(parent).apply {
-            setTextAppearanceCompat(parent.context.resolveThemeStyle(R.attr.wordDefinitionTextAppearance))
-        }
-    )
+    override fun createViewHolder(parent: ViewGroup) = ChooserOptionViewHolder(
+            ItemChooserBinding.inflate(LayoutInflater.from(parent.context))
+        )
 
-    override fun bind(viewHolder: SimpleAdapter.ViewHolder<TextView>, viewItem: ChooserViewItem) {
-        viewHolder.typedView.text = viewItem.firstItem()
+    override fun bind(viewHolder: ChooserOptionViewHolder, viewItem: ChooserViewItem) {
+        viewHolder.itemView.setOnClickListener {
+            onItemSelectionChanged(viewItem)
+        }
+
+        bindInternal(viewHolder, viewItem)
+    }
+
+    private fun bindInternal(
+        viewHolder: ChooserOptionViewHolder,
+        viewItem: ChooserViewItem
+    ) {
+        viewHolder.bind(viewItem.name, viewItem.isSelected)
     }
 }

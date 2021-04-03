@@ -10,17 +10,18 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.views.Definitio
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import javax.inject.Inject
 
 class DefinitionsDisplayModeBlueprint @Inject constructor (
-    var vm: DefinitionsVM
+    var vmWrapper: DefinitionsVMWrapper
 ): Blueprint<SimpleAdapter.ViewHolder<ViewGroup>, DefinitionsDisplayModeViewItem> {
 
     override val type: Int = DefinitionsDisplayModeViewItem.Type
 
+    // TODO: create UI in xml
     override fun createViewHolder(parent: ViewGroup): SimpleAdapter.ViewHolder<ViewGroup> {
         val context = parent.context
         val container = LinearLayout(context)
@@ -32,6 +33,7 @@ class DefinitionsDisplayModeBlueprint @Inject constructor (
 
         val partOfSpeechChip = createChip(context, 0, false)
         partOfSpeechChip.id = R.id.definitions_partOfSpeech_chip
+        partOfSpeechChip.setChipBackgroundColorResource(R.color.partOfSpeechChipColor)
         container.addView(partOfSpeechChip)
 
         val displayModeChipGroup = ChipGroup(context).apply {
@@ -57,21 +59,26 @@ class DefinitionsDisplayModeBlueprint @Inject constructor (
     }
 
     override fun bind(viewHolder: SimpleAdapter.ViewHolder<ViewGroup>, viewItem: DefinitionsDisplayModeViewItem) {
+        val context = viewHolder.itemView.context
         val partOfSpeechChip: Chip = viewHolder.itemView.findViewById(R.id.definitions_partOfSpeech_chip)
         partOfSpeechChip.setOnClickListener {
-            vm.onPartOfSpeechFilterClicked(viewItem.partsOfSpeechFilter)
+            vmWrapper.vm.onPartOfSpeechFilterClicked(viewItem)
         }
-        partOfSpeechChip.text = "test"
+        partOfSpeechChip.setOnCloseIconClickListener {
+            vmWrapper.vm.onPartOfSpeechFilterCloseClicked(viewItem)
+        }
+        partOfSpeechChip.text = viewItem.partsOfSpeechFilterText.toString(context)
+        partOfSpeechChip.isCloseIconVisible = viewItem.canClearPartsOfSpeechFilter
 
         val chipGroup: ChipGroup = viewHolder.itemView.findViewById(R.id.definitions_displayMode_chipGroup)
         viewItem.items.forEachIndexed { index, definitionsDisplayMode ->
-            (chipGroup.getChildAt(index) as Chip).text = definitionsDisplayMode.toStringDesc().toString(viewHolder.itemView.context)
+            (chipGroup.getChildAt(index) as Chip).text = definitionsDisplayMode.toStringDesc().toString(context)
         }
 
         chipGroup.check(viewItem.selectedIndex)
         chipGroup.setOnCheckedChangeListener { group, checkedId ->
             val selectedMode = viewItem.items[checkedId]
-            vm.onDisplayModeChanged(selectedMode)
+            vmWrapper.vm.onDisplayModeChanged(selectedMode)
         }
     }
 }
