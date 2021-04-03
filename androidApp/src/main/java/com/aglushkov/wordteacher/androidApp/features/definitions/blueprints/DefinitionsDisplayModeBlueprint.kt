@@ -3,12 +3,14 @@ package com.aglushkov.wordteacher.androidApp.features.definitions.blueprints
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
+import com.aglushkov.wordteacher.androidApp.general.extensions.getColorCompat
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.google.android.material.chip.Chip
@@ -33,7 +35,9 @@ class DefinitionsDisplayModeBlueprint @Inject constructor (
 
         val partOfSpeechChip = createChip(context, 0, false)
         partOfSpeechChip.id = R.id.definitions_partOfSpeech_chip
-        partOfSpeechChip.setChipBackgroundColorResource(R.color.partOfSpeechChipColor)
+        partOfSpeechChip.setChipBackgroundColorResource(R.color.partOfSpeechChipBgColor)
+        partOfSpeechChip.setTextColor(context.getColorCompat(R.color.partOfSpeechChipTextColor))
+        partOfSpeechChip.setCloseIconTintResource(R.color.partOfSpeechChipTextColor)
         container.addView(partOfSpeechChip)
 
         val displayModeChipGroup = ChipGroup(context).apply {

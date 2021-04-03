@@ -16,11 +16,8 @@ import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -101,7 +98,10 @@ class ArticleVMImpl(
     override fun onTextClicked(index: Int, sentence: NLPSentence) {
         viewModelScope.launch {
             sentence.sliceFromTextIndex(index)?.let {
-                definitionsVM.onWordSubmitted(it.tokenString)
+                definitionsVM.onWordSubmitted(
+                    it.tokenString,
+                    listOf(it.partOfSpeech())
+                )
             }
         }
     }

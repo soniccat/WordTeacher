@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="word_provided_by">@android:color/darker_gray</color>
+    <color name="partOfSpeechChipBgColor">@color/secondaryColor</color>
+    <color name="partOfSpeechChipTextColor">@color/secondaryTextColor</color>
 </resources>

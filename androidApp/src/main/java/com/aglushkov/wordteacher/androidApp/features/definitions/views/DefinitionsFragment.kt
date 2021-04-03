@@ -87,23 +87,13 @@ class DefinitionsFragment: Fragment() {
             definitionsVM.eventFlow.collect {
                 when (it) {
                     is ShowPartsOfSpeechFilterEvent -> {
-                        ChooserDialog(
-                            requireContext()
-                        ) { options ->
-                            definitionsVM.onPartOfSpeechFilterUpdated(
-                                options.filter {
-                                    option -> option.isSelected
-                                }.map {
-                                    option -> option.obj as WordTeacherWord.PartOfSpeech
-                                }
-                            )
-                        }.apply {
-                            show()
-                            showOptions(it.partsOfSpeech.map { partOfSpeech ->
-                                val isSelected = it.selectedPartsOfSpeech.contains(partOfSpeech)
-                                ChooserViewItem(idGenerator.nextId(), partOfSpeech.name, partOfSpeech, isSelected)
-                            })
-                        }
+                        showPartsOfSpeechFilterChooser(
+                            requireContext(),
+                            idGenerator,
+                            definitionsVM,
+                            it.partsOfSpeech,
+                            it.selectedPartsOfSpeech
+                        )
                     }
                 }
             }

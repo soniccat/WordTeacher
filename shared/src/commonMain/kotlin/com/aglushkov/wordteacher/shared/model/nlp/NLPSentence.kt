@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+
 data class NLPSentence(
     var articleId: Long = 0,
     var orderId: Long = 0,
@@ -42,11 +44,7 @@ data class NLPSentence(
     }
 
     fun tagEnums(): List<Tag> = tags.map {
-        try {
-            Tag.valueOf(it)
-        } catch (e: Exception) {
-            Tag.UNKNOWN
-        }
+        tagEnum(it)
     }
 
     fun lemmaOrToken(i: Int) = if (lemmas[i] != NLPConstants.UNKNOWN_LEMMA) {
@@ -68,4 +66,28 @@ data class NLPSentenceSlice(
     val tag: String,
     val lemma: String,
     val chunk: String
-)
+) {
+    fun tagEnum() = tagEnum(tag)
+    fun partOfSpeech() = tagEnum().toPartOfSpeech()
+}
+
+private fun tagEnum(it: String) = try {
+    Tag.valueOf(it)
+} catch (e: Exception) {
+    Tag.UNKNOWN
+}
+
+private fun Tag.toPartOfSpeech() = when {
+    isNoun() -> WordTeacherWord.PartOfSpeech.Noun
+    isAdj() -> WordTeacherWord.PartOfSpeech.Adjective
+    isAdverb() -> WordTeacherWord.PartOfSpeech.Adverb
+    isPrep() -> WordTeacherWord.PartOfSpeech.Preposition
+    isVerb() -> WordTeacherWord.PartOfSpeech.Verb
+    isDeterminer() -> WordTeacherWord.PartOfSpeech.Determiner
+    isPronoun() -> WordTeacherWord.PartOfSpeech.Pronoun
+    isInterjection() -> WordTeacherWord.PartOfSpeech.Interjection
+    isConjunction() -> WordTeacherWord.PartOfSpeech.Conjunction
+    else -> {
+        WordTeacherWord.PartOfSpeech.Undefined
+    }
+}

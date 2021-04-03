@@ -1,30 +1,43 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
-enum class Tag {
-    NN,     //	Noun, singular or mass
-    NNS,    //	Noun, plural
-    NNP,    //	Proper noun, singular
-    NNPS,   //	Proper noun, plural
+enum class Tag(val value: String) {
+    NN("NN"),       // Noun, singular or mass
+    NNS("NNS"),     // Noun, plural
+    NNP("NNP"),     // Proper noun, singular
+    NNPS("NNPS"),   // Proper noun, plural
 
-    VB,     //	Verb, base form
-    VBD,    //	Verb, past tense
-    VBG,    //	Verb, gerund or present participle
-    VBN,    //	Verb, past participle
-    VBP,    //	Verb, non-3rd person singular present
-    VBZ,    //	Verb, 3rd person singular present
+    VB("VB"),       // Verb, base form
+    VBD("VBD"),     // Verb, past tense
+    VBG("VBG"),     // Verb, gerund or present participle
+    VBN("VBN"),     // Verb, past participle
+    VBP("VBP"),     // Verb, non-3rd person singular present
+    VBZ("VBZ"),     // Verb, 3rd person singular present
 
-    JJ,     //  Adjective
-    JJR,    //  Adjective, comparative
-    JJS,    //  Adjective, superlative
+    JJ("JJ"),       // Adjective
+    JJR("JJR"),     // Adjective, comparative
+    JJS("JJS"),     // Adjective, superlative
 
-    RB,     //  Adverb
-    RBR,    //  Adverb, comparative
-    RBS,    //  Adverb, superlative
-    WRB,    //  Wh-adverb
+    RB("RB"),       // Adverb
+    RBR("RBR"),     // Adverb, comparative
+    RBS("RBS"),     // Adverb, superlative
+    WRB("WRB"),     // Wh-adverb
 
-    IN,     // Preposition or subordinating conjunction
+    CC("CC"),       // Coordinating conjunction
 
-    UNKNOWN
+    IN("IN"),       // Preposition or subordinating conjunction
+
+    DT("DT"),       // Determiner
+    PDT("PDT"),     // Predeterminer
+    WDT("WDT"),     // Wh-determiner
+
+    PRP("PRP"),     // Personal pronoun
+    PSP("PRP$"),    // Possessive pronoun
+    WP("WP"),       // Wh-pronoun
+    PWP("WP$"),     // Possessive wh-pronoun
+
+    UH("UH"),       // Interjection
+
+    UNKNOWN("UNKNOWN")
     ;
 
     fun isNoun() = when (this) {
@@ -42,6 +55,8 @@ enum class Tag {
         else -> false
     }
 
+    fun isConjunction() = this == CC
+
     fun isAdj() = when (this) {
         JJ, JJR, JJS -> true
         else -> false
@@ -51,4 +66,16 @@ enum class Tag {
         RB, RBR, RBS, WRB -> true
         else -> false
     }
+
+    fun isDeterminer() = when (this) {
+        DT, PDT, WDT -> true
+        else -> false
+    }
+
+    fun isPronoun() = when (this) {
+        PRP, PSP, WP, PWP -> true
+        else -> false
+    }
+
+    fun isInterjection() = this == Tag.UH
 }

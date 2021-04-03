@@ -17,6 +17,7 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentArticleBinding
 import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.showPartsOfSpeechFilterChooser
 import com.aglushkov.wordteacher.androidApp.general.VMWrapper
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.getDrawableCompat
@@ -31,10 +32,13 @@ import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterEvent
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -50,6 +54,7 @@ class ArticleFragment: DialogFragment() {
     @Inject lateinit var definitionsVM: DefinitionsVM
     private var binding: FragmentArticleBinding? = null
 
+    @Inject lateinit var idGenerator: IdGenerator
     @Inject @ArticleBinder lateinit var articleBinder: ViewItemBinder
     @Inject @DefinitionsBinder lateinit var definitionsBinder: ViewItemBinder
 
@@ -70,11 +75,11 @@ class ArticleFragment: DialogFragment() {
             .setDefinitionsState(vmState.definitionsState)
             .setViewContext(requireContext())
             .build()
-        if (!androidVM.isInitialized()) {
-            component.injectViewModelWrapper(androidVM)
-        }
         if (!androidDefinitionsVM.isInitialized()) {
             component.injectDefinitionsViewModelWrapper(androidDefinitionsVM)
+        }
+        if (!androidVM.isInitialized()) {
+            component.injectViewModelWrapper(androidVM)
         }
         component.injectArticleFragment(this)
 
@@ -150,7 +155,7 @@ class ArticleFragment: DialogFragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            articleVM.eventFlow.collect {
+            merge(articleVM.eventFlow, definitionsVM.eventFlow).collect {
                 handleEvent(it)
             }
         }
@@ -251,6 +256,15 @@ class ArticleFragment: DialogFragment() {
             }
             is ErrorEvent -> {
                 showError(it.text.toString(requireContext()))
+            }
+            is ShowPartsOfSpeechFilterEvent -> {
+                showPartsOfSpeechFilterChooser(
+                    requireContext(),
+                    idGenerator,
+                    definitionsVM,
+                    it.partsOfSpeech,
+                    it.selectedPartsOfSpeech
+                )
             }
         }
     }

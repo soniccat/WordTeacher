@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 interface DefinitionsVM {
-    fun onWordSubmitted(word: String?)
+    fun onWordSubmitted(word: String?, filter: List<WordTeacherWord.PartOfSpeech> = emptyList())
     fun onTryAgainClicked()
     fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
     fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem)
@@ -65,7 +65,7 @@ class DefinitionsVMImpl(
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     override val definitions = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
 
-    var partsOfSpeechFilter: MutableList<WordTeacherWord.PartOfSpeech> = mutableListOf()
+    var partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech> = emptyList()
     val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     var loadJob: Job? = null
 
@@ -103,7 +103,8 @@ class DefinitionsVMImpl(
 
     // Events
 
-    override fun onWordSubmitted(word: String?) {
+    override fun onWordSubmitted(word: String?, filter: List<WordTeacherWord.PartOfSpeech>) {
+        this.partsOfSpeechFilter = filter
         if (word == null) {
             this.word = null
         } else if (word.isNotEmpty()) {
@@ -112,7 +113,7 @@ class DefinitionsVMImpl(
     }
 
     override fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>) {
-        partsOfSpeechFilter = filter.toMutableList()
+        partsOfSpeechFilter = filter
         rebuildViewItems()
     }
 
@@ -124,7 +125,7 @@ class DefinitionsVMImpl(
     }
 
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
-        partsOfSpeechFilter.clear()
+        partsOfSpeechFilter = emptyList()
         rebuildViewItems()
     }
 
@@ -179,7 +180,6 @@ class DefinitionsVMImpl(
         loadJob = viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             Logger.e("Load Word exception for $word ${e.message}", tag)
         }) {
-            partsOfSpeechFilter.clear()
             wordDefinitionRepository.define(word, false).forward(definitionWords)
             Logger.v("Finish Loading $word", tag)
         }
