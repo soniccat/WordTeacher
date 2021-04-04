@@ -3,4 +3,7 @@
     <color name="word_provided_by">@android:color/darker_gray</color>
     <color name="partOfSpeechChipBgColor">@color/secondaryColor</color>
     <color name="partOfSpeechChipTextColor">@color/secondaryTextColor</color>
+
+    <color name="word_partOfSpeech">#6E6E6E</color>
+    <color name="word_subheader">#6E6E6E</color>
 </resources>

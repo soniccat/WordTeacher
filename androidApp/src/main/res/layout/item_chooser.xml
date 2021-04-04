@@ -3,7 +3,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
+    android:paddingLeft="@dimen/content_padding"
     android:descendantFocusability="blocksDescendants">
     <TextView
         android:id="@+id/name"

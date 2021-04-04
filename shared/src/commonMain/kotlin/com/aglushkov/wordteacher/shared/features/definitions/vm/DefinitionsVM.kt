@@ -288,22 +288,28 @@ class DefinitionsVMImpl(
             items.add(WordPartOfSpeechViewItem(partOfSpeech.toStringDesc()))
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
-                items.add(WordHeaderViewItem(StringDesc.Resource(MR.strings.word_section_definition)))
+                //items.add(WordHeaderViewItem(StringDesc.Resource(MR.strings.word_section_definition)))
                 for (d in def.definitions) {
-                    items.add(WordDefinitionViewItem(d))
+                    items.add(WordDefinitionViewItem("• $d"))
                 }
 
                 if (def.examples.isNotEmpty()) {
-                    items.add(WordSubHeaderViewItem(StringDesc.Resource(MR.strings.word_section_examples)))
+                    items.add(WordSubHeaderViewItem(
+                        StringDesc.Resource(MR.strings.word_section_examples),
+                        Indent.SMALL
+                    ))
                     for (ex in def.examples) {
-                        items.add(WordExampleViewItem(ex))
+                        items.add(WordExampleViewItem(ex, Indent.SMALL))
                     }
                 }
 
                 if (def.synonyms.isNotEmpty()) {
-                    items.add(WordSubHeaderViewItem(StringDesc.Resource(MR.strings.word_section_synonyms)))
+                    items.add(WordSubHeaderViewItem(
+                        StringDesc.Resource(MR.strings.word_section_synonyms),
+                        Indent.SMALL
+                    ))
                     for (synonym in def.synonyms) {
-                        items.add(WordSynonymViewItem(synonym))
+                        items.add(WordSynonymViewItem(synonym, Indent.SMALL))
                     }
                 }
             }

@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.features.Design
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
+import com.aglushkov.wordteacher.androidApp.general.extensions.getColorCompat
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
 import com.aglushkov.wordteacher.androidApp.general.extensions.setTextAppearanceCompat
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
@@ -23,9 +24,11 @@ class WordSubHeaderBlueprint @Inject constructor(): Blueprint<SimpleAdapter.View
 
     override fun bind(viewHolder: SimpleAdapter.ViewHolder<TextView>, viewItem: WordSubHeaderViewItem) {
         val view = viewHolder.itemView
+        viewHolder.typedView.setTextColor(view.context.getColorCompat(R.color.word_subheader))
         viewHolder.typedView.text = viewItem.firstItem().toString(view.context)
 
         val lp = view.layoutParams as RecyclerView.LayoutParams
+        lp.leftMargin = viewItem.indent.toDp(view.resources)
         lp.topMargin = view.resources.getDimensionPixelSize(R.dimen.word_subHeader_topMargin)
     }
 }

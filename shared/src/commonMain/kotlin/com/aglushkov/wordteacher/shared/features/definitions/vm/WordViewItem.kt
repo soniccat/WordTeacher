@@ -36,13 +36,13 @@ class WordDefinitionViewItem(definition: String): BaseViewItem<String>(definitio
     }
 }
 
-class WordExampleViewItem(example: String): BaseViewItem<String>(example, Type) {
+class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE): BaseViewItem<String>(example, Type) {
     companion object {
         const val Type = 105
     }
 }
 
-class WordSynonymViewItem(synonym: String): BaseViewItem<String>(synonym, Type) {
+class WordSynonymViewItem(synonym: String, val indent: Indent = Indent.NONE): BaseViewItem<String>(synonym, Type) {
     companion object {
         const val Type = 106
     }
@@ -54,7 +54,7 @@ class WordHeaderViewItem(name: StringDesc): BaseViewItem<StringDesc>(name, Type)
     }
 }
 
-class WordSubHeaderViewItem(name: StringDesc): BaseViewItem<StringDesc>(name, Type) {
+class WordSubHeaderViewItem(name: StringDesc, val indent: Indent = Indent.NONE): BaseViewItem<StringDesc>(name, Type) {
     companion object {
         const val Type = 108
     }
@@ -65,4 +65,9 @@ class WordDividerViewItem(): BaseViewItem<Any>(Obj, Type) {
         val Obj = Any()
         const val Type = 109
     }
+}
+
+enum class Indent {
+    NONE,
+    SMALL
 }

@@ -23,5 +23,8 @@ class WordDefinitionBlueprint @Inject constructor(): Blueprint<SimpleAdapter.Vie
 
     override fun bind(viewHolder: SimpleAdapter.ViewHolder<TextView>, viewItem: WordDefinitionViewItem) {
         viewHolder.typedView.text = viewItem.firstItem()
+
+        val lp = viewHolder.typedView.layoutParams as RecyclerView.LayoutParams
+        lp.topMargin = viewHolder.itemView.resources.getDimensionPixelSize(R.dimen.word_header_topMargin)
     }
 }

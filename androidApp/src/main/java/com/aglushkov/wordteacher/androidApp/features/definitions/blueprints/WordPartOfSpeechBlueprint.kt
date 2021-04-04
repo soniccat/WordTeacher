@@ -7,9 +7,11 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.features.Design
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
+import com.aglushkov.wordteacher.androidApp.general.extensions.getColorCompat
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeStyle
 import com.aglushkov.wordteacher.androidApp.general.extensions.setTextAppearanceCompat
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
+import java.util.*
 import javax.inject.Inject
 
 class WordPartOfSpeechBlueprint @Inject constructor(): Blueprint<SimpleAdapter.ViewHolder<TextView>, WordPartOfSpeechViewItem> {
@@ -23,7 +25,9 @@ class WordPartOfSpeechBlueprint @Inject constructor(): Blueprint<SimpleAdapter.V
 
     override fun bind(viewHolder: SimpleAdapter.ViewHolder<TextView>, viewItem: WordPartOfSpeechViewItem) {
         val view = viewHolder.typedView
-        viewHolder.typedView.text = viewItem.firstItem().toString(context = view.context)
+        viewHolder.typedView.setTextColor(view.context.getColorCompat(R.color.word_partOfSpeech))
+        viewHolder.typedView.text = viewItem.firstItem().toString(context = view.context).toUpperCase(
+            Locale.getDefault())
 
         val lp = view.layoutParams as RecyclerView.LayoutParams
         lp.topMargin = view.resources.getDimensionPixelSize(R.dimen.word_partOfSpeech_topMargin)

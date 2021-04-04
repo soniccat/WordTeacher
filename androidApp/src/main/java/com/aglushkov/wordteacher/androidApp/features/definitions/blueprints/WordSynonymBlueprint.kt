@@ -23,5 +23,8 @@ class WordSynonymBlueprint @Inject constructor(): Blueprint<SimpleAdapter.ViewHo
 
     override fun bind(viewHolder: SimpleAdapter.ViewHolder<TextView>, viewItem: WordSynonymViewItem) {
         viewHolder.typedView.text = viewItem.firstItem()
+
+        val lp = viewHolder.typedView.layoutParams as RecyclerView.LayoutParams
+        lp.leftMargin = viewItem.indent.toDp(viewHolder.typedView.resources)
     }
 }
