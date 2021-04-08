@@ -267,8 +267,10 @@ class DefinitionsVMImpl(
         items: MutableList<BaseViewItem<*>>
     ) {
         for (word in words) {
-            addWordViewItems(word, partsOfSpeechFilter, items)
-            items.add(WordDividerViewItem())
+            val isAdded = addWordViewItems(word, partsOfSpeechFilter, items)
+            if (isAdded) {
+                items.add(WordDividerViewItem())
+            }
         }
     }
 
@@ -276,12 +278,8 @@ class DefinitionsVMImpl(
         word: WordTeacherWord,
         partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
         items: MutableList<BaseViewItem<*>>
-    ) {
-        items.add(WordTitleViewItem(word.word, word.types))
-        word.transcription?.let {
-            items.add(WordTranscriptionViewItem(it))
-        }
-
+    ): Boolean {
+        val topIndex = items.size
         for (partOfSpeech in word.definitions.keys.filter {
             partsOfSpeechFilter.isEmpty() || partsOfSpeechFilter.contains(it)
         }) {
@@ -314,6 +312,16 @@ class DefinitionsVMImpl(
                 }
             }
         }
+
+        val hasNewItems = items.size - topIndex > 0
+        if (hasNewItems) {
+            items.add(topIndex, WordTitleViewItem(word.word, word.types))
+            word.transcription?.let {
+                items.add(topIndex + 1, WordTranscriptionViewItem(it))
+            }
+        }
+
+        return hasNewItems
     }
 
     private fun mergeWords(

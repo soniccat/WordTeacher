@@ -60,10 +60,21 @@ class DefinitionsDisplayModeViewHolder(
             (chipGroup.getChildAt(index) as Chip).text = definitionsDisplayMode.toStringDesc().toString(context)
         }
 
-        chipGroup.check(viewItem.selectedIndex)
+        chipGroup.check(getDisplayModeChipId(viewItem))
         chipGroup.setOnCheckedChangeListener { group, checkedId ->
-            val selectedMode = viewItem.items[checkedId]
+            val selectedMode = getDisplayMode(checkedId)
             listener.onDisplayModeChanged(selectedMode)
         }
+    }
+
+    private fun getDisplayModeChipId(viewItem: DefinitionsDisplayModeViewItem) =
+        when (viewItem.selectedIndex) {
+            0 -> R.id.definitions_displayMode_bySource
+            else -> R.id.definitions_displayMode_merged
+        }
+
+    private fun getDisplayMode(checkedId: Int) = when (checkedId) {
+        R.id.definitions_displayMode_bySource -> DefinitionsDisplayMode.BySource
+        else -> DefinitionsDisplayMode.Merged
     }
 }
