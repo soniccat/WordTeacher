@@ -16,6 +16,10 @@ class WordTitleViewItem(title: String, val providers: List<Config.Type>): BaseVi
     companion object {
         const val Type = 101
     }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) && providers == (other as WordTitleViewItem).providers
+    }
 }
 
 class WordTranscriptionViewItem(transcription: String): BaseViewItem<String>(transcription, Type) {

@@ -13,7 +13,6 @@ open class VMWrapper<T: Any>(
 
     fun isInitialized() = ::vm.isInitialized
 
-    // TODO: create a base class for a MokoVM wrapper
     override fun onCleared() {
         super.onCleared()
         (vm as? ViewModel)?.onCleared()

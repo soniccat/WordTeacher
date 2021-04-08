@@ -363,39 +363,8 @@ class DefinitionsVMImpl(
                 null
             else
                 allTranscriptions.joinToString()
-        val resultDefinitions = allDefinitions.mapValues {
-            listOf(mergeDefinitions(it.value))
-        }
 
-        return WordTeacherWord(resultWord, resultTranscription, resultDefinitions, allTypes)
-    }
-
-    private fun mergeDefinitions(defs: List<WordTeacherDefinition>): WordTeacherDefinition {
-        val allDefs = mutableListOf<String>()
-        val allExamples = mutableListOf<String>()
-        val allSynonyms = mutableListOf<String>()
-
-        defs.forEach {
-            for (d in it.definitions) {
-                if (!allDefs.contains(d)) {
-                    allDefs.add(d)
-                }
-            }
-
-            for (example in it.examples) {
-                if (!allExamples.contains(example)) {
-                    allExamples.add(example)
-                }
-            }
-
-            for (synonym in it.synonyms) {
-                if (!allSynonyms.contains(synonym)) {
-                    allSynonyms.add(synonym)
-                }
-            }
-        }
-
-        return WordTeacherDefinition(allDefs, allExamples, allSynonyms, null)
+        return WordTeacherWord(resultWord, resultTranscription, allDefinitions, allTypes)
     }
 
     override fun getErrorText(res: Resource<*>): StringDesc? {

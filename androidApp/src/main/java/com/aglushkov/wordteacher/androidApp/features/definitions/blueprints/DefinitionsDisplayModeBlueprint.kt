@@ -3,22 +3,19 @@ package com.aglushkov.wordteacher.androidApp.features.definitions.blueprints
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
-import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.extensions.getColorCompat
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
-import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import javax.inject.Inject
 
 class DefinitionsDisplayModeBlueprint @Inject constructor (
-    var vmWrapper: DefinitionsVMWrapper
+    var vmWrapper: DefinitionsVMWrapper // TODO: use an interface
 ): Blueprint<SimpleAdapter.ViewHolder<ViewGroup>, DefinitionsDisplayModeViewItem> {
 
     override val type: Int = DefinitionsDisplayModeViewItem.Type
