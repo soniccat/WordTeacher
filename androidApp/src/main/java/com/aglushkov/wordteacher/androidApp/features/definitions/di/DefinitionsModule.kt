@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.DefinitionsDisplayModeBlueprint
+import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.DefinitionsDisplayModeBlueprintListener
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordDefinitionBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordDividerBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordExampleBlueprint
@@ -11,7 +12,11 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordSynonymBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTitleBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTranscriptionBlueprint
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
+import com.aglushkov.wordteacher.androidApp.general.VMWrapper
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
@@ -58,6 +63,18 @@ class DefinitionsModule {
         state: DefinitionsVM.State
     ): DefinitionsVM {
         return DefinitionsVMImpl(connectivityManager, wordDefinitionRepository, idGenerator, state)
+    }
+
+    @FragmentComp
+    @Provides
+    fun definitionsDisplayModeBlueprintListener(
+        vmWrapper: DefinitionsVMWrapper
+    ): DefinitionsDisplayModeBlueprintListener {
+        return object : DefinitionsDisplayModeBlueprintListener {
+            override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) = vmWrapper.vm.onPartOfSpeechFilterClicked(item)
+            override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) = vmWrapper.vm.onPartOfSpeechFilterCloseClicked(item)
+            override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) = vmWrapper.vm.onDisplayModeChanged(mode)
+        }
     }
 }
 

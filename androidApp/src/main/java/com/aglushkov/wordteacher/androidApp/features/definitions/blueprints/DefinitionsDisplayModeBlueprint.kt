@@ -5,17 +5,23 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.view.updatePadding
 import com.aglushkov.wordteacher.androidApp.R
-import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
 import com.aglushkov.wordteacher.androidApp.general.extensions.getColorCompat
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import javax.inject.Inject
 
+interface DefinitionsDisplayModeBlueprintListener {
+    fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem)
+    fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
+    fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
+}
+
 class DefinitionsDisplayModeBlueprint @Inject constructor (
-    var vmWrapper: DefinitionsVMWrapper // TODO: use an interface
+    var listener: DefinitionsDisplayModeBlueprintListener
 ): Blueprint<SimpleAdapter.ViewHolder<ViewGroup>, DefinitionsDisplayModeViewItem> {
 
     override val type: Int = DefinitionsDisplayModeViewItem.Type
@@ -63,10 +69,10 @@ class DefinitionsDisplayModeBlueprint @Inject constructor (
         val context = viewHolder.itemView.context
         val partOfSpeechChip: Chip = viewHolder.itemView.findViewById(R.id.definitions_partOfSpeech_chip)
         partOfSpeechChip.setOnClickListener {
-            vmWrapper.vm.onPartOfSpeechFilterClicked(viewItem)
+            listener.onPartOfSpeechFilterClicked(viewItem)
         }
         partOfSpeechChip.setOnCloseIconClickListener {
-            vmWrapper.vm.onPartOfSpeechFilterCloseClicked(viewItem)
+            listener.onPartOfSpeechFilterCloseClicked(viewItem)
         }
         partOfSpeechChip.text = viewItem.partsOfSpeechFilterText.toString(context)
         partOfSpeechChip.isCloseIconVisible = viewItem.canClearPartsOfSpeechFilter
@@ -79,7 +85,7 @@ class DefinitionsDisplayModeBlueprint @Inject constructor (
         chipGroup.check(viewItem.selectedIndex)
         chipGroup.setOnCheckedChangeListener { group, checkedId ->
             val selectedMode = viewItem.items[checkedId]
-            vmWrapper.vm.onDisplayModeChanged(selectedMode)
+            listener.onDisplayModeChanged(selectedMode)
         }
     }
 }

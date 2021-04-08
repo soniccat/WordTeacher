@@ -16,8 +16,6 @@ import com.aglushkov.wordteacher.androidApp.general.VMWrapper
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.submit
 import com.aglushkov.wordteacher.androidApp.general.views.bind
-import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserDialog
-import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.di.DaggerDefinitionsComponent
 import com.aglushkov.wordteacher.di.DefinitionsBinder
