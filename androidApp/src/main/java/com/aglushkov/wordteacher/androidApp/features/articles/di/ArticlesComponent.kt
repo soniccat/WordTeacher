@@ -2,7 +2,7 @@ package com.aglushkov.wordteacher.androidApp.features.articles.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
-import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesVMWrapper
+import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesAndroidVM
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.di.ArticlesModule
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -14,12 +14,12 @@ import dagger.Component
 @Component(dependencies = [ArticlesDependencies::class], modules = [ArticlesModule::class])
 interface ArticlesComponent {
     fun injectArticlesFragment(fragment: ArticlesFragment)
-    fun injectViewModelWrapper(fragment: ArticlesVMWrapper)
+    fun injectViewModelWrapper(fragment: ArticlesAndroidVM)
 
     @Component.Builder
     interface Builder {
         @BindsInstance
-        fun setVMWrapper(vmWrapper: ArticlesVMWrapper): Builder
+        fun setVMWrapper(vmWrapper: ArticlesAndroidVM): Builder
 
         fun setDeps(deps: ArticlesDependencies): Builder
         fun build(): ArticlesComponent

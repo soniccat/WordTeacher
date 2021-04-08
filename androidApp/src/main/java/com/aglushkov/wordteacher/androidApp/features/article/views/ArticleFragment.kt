@@ -16,9 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentArticleBinding
 import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComponent
-import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.showPartsOfSpeechFilterChooser
-import com.aglushkov.wordteacher.androidApp.general.VMWrapper
+import com.aglushkov.wordteacher.androidApp.general.AndroidVM
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.getDrawableCompat
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
@@ -43,14 +43,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-class ArticleVMWrapper(
+class ArticleAndroidVM(
     application: Application
-): VMWrapper<ArticleVM>(application)
+): AndroidVM<ArticleVM>(application)
 
 class ArticleFragment: DialogFragment() {
-    private lateinit var androidVM: ArticleVMWrapper
+    private lateinit var androidVM: ArticleAndroidVM
     @Inject lateinit var articleVM: ArticleVM
-    private lateinit var androidDefinitionsVM: DefinitionsVMWrapper
+    private lateinit var androidDefinitionsVM: DefinitionsAndroidVM
     @Inject lateinit var definitionsVM: DefinitionsVM
     private var binding: FragmentArticleBinding? = null
 
@@ -60,8 +60,8 @@ class ArticleFragment: DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        androidDefinitionsVM = ViewModelProvider(this).get(DefinitionsVMWrapper::class.java)
-        androidVM = ViewModelProvider(this).get(ArticleVMWrapper::class.java)
+        androidDefinitionsVM = ViewModelProvider(this).get(DefinitionsAndroidVM::class.java)
+        androidVM = ViewModelProvider(this).get(ArticleAndroidVM::class.java)
 
         val id = requireArguments().getLong(STATE_ID)
         val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: ArticleVM.State(id, DefinitionsVM.State())
@@ -133,30 +133,31 @@ class ArticleFragment: DialogFragment() {
         bindDefinitions(binding)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            articleVM.article.collect {
-                when (it) {
-                    is Resource.Loaded -> {
-                        binding.toolbar.title = it.data.name
+            launch {
+                articleVM.article.collect {
+                    when (it) {
+                        is Resource.Loaded -> {
+                            binding.toolbar.title = it.data.name
+                        }
                     }
                 }
             }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            articleVM.paragraphs.collect {
-                when (it) {
-                    // TODO: handle loading
-                    is Resource.Loaded -> {
-                        updateArticleAdapter(it)
+            launch {
+                articleVM.paragraphs.collect {
+                    when (it) {
+                        // TODO: handle loading
+                        is Resource.Loaded -> {
+                            updateArticleAdapter(it)
+                        }
+                        else -> {
+                        }
                     }
-                    else -> {}
                 }
             }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            merge(articleVM.eventFlow, definitionsVM.eventFlow).collect {
-                handleEvent(it)
+            launch {
+                merge(articleVM.eventFlow, definitionsVM.eventFlow).collect {
+                    handleEvent(it)
+                }
             }
         }
     }

@@ -2,8 +2,7 @@ package com.aglushkov.wordteacher.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
-import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
-import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -15,12 +14,12 @@ import dagger.Component
 @Component(dependencies = [DefinitionsDependencies::class], modules = [DefinitionsModule::class])
 public interface DefinitionsComponent {
     fun injectDefinitionsFragment(fragment: DefinitionsFragment)
-    fun injectViewModelWrapper(fragment: DefinitionsVMWrapper)
+    fun injectViewModelWrapper(fragment: DefinitionsAndroidVM)
 
     @Component.Builder
     interface Builder {
         @BindsInstance fun setVMState(state: DefinitionsVM.State): Builder
-        @BindsInstance fun setVMWrapper(vmWrapper: DefinitionsVMWrapper): Builder
+        @BindsInstance fun setVMWrapper(vmWrapper: DefinitionsAndroidVM): Builder
 
         fun setDeps(deps: DefinitionsDependencies): Builder
         fun build(): DefinitionsComponent

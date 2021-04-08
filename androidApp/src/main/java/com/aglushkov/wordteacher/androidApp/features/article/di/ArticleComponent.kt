@@ -3,11 +3,10 @@ package com.aglushkov.wordteacher.androidApp.features.article.di
 import android.content.Context
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
-import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleVMWrapper
-import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
+import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleAndroidVM
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.di.ArticleModule
-import com.aglushkov.wordteacher.di.DefinitionsComponent
 import com.aglushkov.wordteacher.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.di.DefinitionsModule
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
@@ -25,14 +24,14 @@ import javax.inject.Qualifier
 )
 interface ArticleComponent {
     fun injectArticleFragment(fragment: ArticleFragment)
-    fun injectViewModelWrapper(fragment: ArticleVMWrapper)
-    fun injectDefinitionsViewModelWrapper(fragment: DefinitionsVMWrapper)
+    fun injectViewModelWrapper(fragment: ArticleAndroidVM)
+    fun injectDefinitionsViewModelWrapper(fragment: DefinitionsAndroidVM)
 
     @Component.Builder
     interface Builder {
-        @BindsInstance fun setVMWrapper(vmWrapper: ArticleVMWrapper): Builder
+        @BindsInstance fun setVMWrapper(vmWrapper: ArticleAndroidVM): Builder
         @BindsInstance fun setVMState(state: ArticleVM.State): Builder
-        @BindsInstance fun setDefinitionsVMWrapper(vmWrapper: DefinitionsVMWrapper): Builder
+        @BindsInstance fun setDefinitionsVMWrapper(vmWrapper: DefinitionsAndroidVM): Builder
         @BindsInstance fun setDefinitionsState(state: DefinitionsVM.State): Builder
         @BindsInstance fun setViewContext(@ViewContext context: Context): Builder
 

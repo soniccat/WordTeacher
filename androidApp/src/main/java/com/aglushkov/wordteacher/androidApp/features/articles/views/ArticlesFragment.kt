@@ -13,8 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentArticlesBinding
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComponent
-import com.aglushkov.wordteacher.androidApp.general.SimpleAdapter
-import com.aglushkov.wordteacher.androidApp.general.VMWrapper
+import com.aglushkov.wordteacher.androidApp.general.AndroidVM
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeColor
 import com.aglushkov.wordteacher.androidApp.general.extensions.submit
@@ -29,12 +28,12 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ArticlesVMWrapper(
+class ArticlesAndroidVM(
     application: Application
-): VMWrapper<ArticlesVM>(application)
+): AndroidVM<ArticlesVM>(application)
 
 class ArticlesFragment: Fragment() {
-    private lateinit var androidVM: ArticlesVMWrapper
+    private lateinit var androidVM: ArticlesAndroidVM
     private lateinit var articlesVM: ArticlesVM
     private var binding: FragmentArticlesBinding? = null
 
@@ -43,7 +42,7 @@ class ArticlesFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         androidVM = ViewModelProvider(this)
-                .get(ArticlesVMWrapper::class.java)
+                .get(ArticlesAndroidVM::class.java)
 
         //val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: DefinitionsVM.State()
         val deps = (requireContext().applicationContext as AppComponentOwner).appComponent

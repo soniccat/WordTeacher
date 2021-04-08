@@ -8,9 +8,8 @@ import com.aglushkov.wordteacher.androidApp.features.article.blueprints.Paragrap
 import com.aglushkov.wordteacher.androidApp.features.article.blueprints.ROUNDED_ANNOTATION_VALUE_ADJECTIVE
 import com.aglushkov.wordteacher.androidApp.features.article.blueprints.ROUNDED_ANNOTATION_VALUE_ADVERB
 import com.aglushkov.wordteacher.androidApp.features.article.blueprints.ROUNDED_ANNOTATION_VALUE_PHRASE
-import com.aglushkov.wordteacher.androidApp.features.article.blueprints.RoundedBgAnnotations
 import com.aglushkov.wordteacher.androidApp.features.article.di.ViewContext
-import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.textroundedbg.BgRendererResolver
@@ -20,7 +19,6 @@ import com.aglushkov.wordteacher.androidApp.general.textroundedbg.TextRoundedBgR
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVMImpl
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
@@ -45,7 +43,7 @@ class ArticleModule {
     @FragmentComp
     @Provides
     fun viewModel(
-        definitionsVM: DefinitionsVMWrapper,
+        definitionsVM: DefinitionsAndroidVM,
         routerResolver: RouterResolver,
         articlesRepository: ArticleRepository,
         state: ArticleVM.State,

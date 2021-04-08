@@ -4,14 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.databinding.ItemArticleBinding
-import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesVMWrapper
+import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesAndroidVM
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
-import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import javax.inject.Inject
 
 class ArticleBlueprint @Inject constructor(
-    val vm: ArticlesVMWrapper
+    val vm: ArticlesAndroidVM
 ): Blueprint<ArticleItemViewHolder, ArticleViewItem> {
     override val type: Int = ArticleViewItem.Type
 
@@ -28,5 +27,15 @@ class ArticleBlueprint @Inject constructor(
         viewHolder.itemView.setOnClickListener {
             vm.vm.onArticleClicked(viewItem)
         }
+    }
+}
+
+class ArticleItemViewHolder(
+    private var binding: ItemArticleBinding
+) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(title: String, date: String) {
+        binding.title.text = title
+        binding.date.text = date
     }
 }

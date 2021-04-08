@@ -14,7 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentAddArticleBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComponent
-import com.aglushkov.wordteacher.androidApp.general.VMWrapper
+import com.aglushkov.wordteacher.androidApp.general.AndroidVM
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
@@ -24,19 +24,19 @@ import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class AddArticleVMWrapper(
+class AddArticleAndroidVM(
     application: Application
-): VMWrapper<AddArticleVM>(application)
+): AndroidVM<AddArticleVM>(application)
 
 class AddArticleFragment: DialogFragment() {
-    private lateinit var androidVM: AddArticleVMWrapper
+    private lateinit var androidVM: AddArticleAndroidVM
     private lateinit var addArticleVM: AddArticleVM
     private var binding: FragmentAddArticleBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         androidVM = ViewModelProvider(this)
-                .get(AddArticleVMWrapper::class.java)
+                .get(AddArticleAndroidVM::class.java)
 
         val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: AddArticleVM.State()
         val deps = (requireContext().applicationContext as AppComponentOwner).appComponent
@@ -124,14 +124,15 @@ class AddArticleFragment: DialogFragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            addArticleVM.eventFlow.collect {
-                handleEvent(it)
+            launch {
+                addArticleVM.eventFlow.collect {
+                    handleEvent(it)
+                }
             }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            addArticleVM.titleErrorFlow.collect { text ->
-                binding.titleInput.error = text?.toString(requireContext())
+            launch {
+                addArticleVM.titleErrorFlow.collect { text ->
+                    binding.titleInput.error = text?.toString(requireContext())
+                }
             }
         }
     }

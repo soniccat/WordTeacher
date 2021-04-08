@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import javax.inject.Inject
 
-open class VMWrapper<T: Any>(
+open class AndroidVM<T: Any>(
     application: Application
 ): AndroidViewModel(application) {
 

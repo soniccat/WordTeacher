@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentDefinitionsBinding
-import com.aglushkov.wordteacher.androidApp.general.VMWrapper
+import com.aglushkov.wordteacher.androidApp.general.AndroidVM
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.submit
 import com.aglushkov.wordteacher.androidApp.general.views.bind
@@ -24,17 +24,16 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeec
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DefinitionsVMWrapper(
+class DefinitionsAndroidVM(
     application: Application
-): VMWrapper<DefinitionsVM>(application)
+): AndroidVM<DefinitionsVM>(application)
 
 class DefinitionsFragment: Fragment() {
-    private lateinit var androidVM: DefinitionsVMWrapper
+    private lateinit var androidVM: DefinitionsAndroidVM
     private lateinit var definitionsVM: DefinitionsVM
     private var binding: FragmentDefinitionsBinding? = null
 
@@ -44,7 +43,7 @@ class DefinitionsFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         androidVM = ViewModelProvider(this)
-                .get(DefinitionsVMWrapper::class.java)
+                .get(DefinitionsAndroidVM::class.java)
 
         val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: DefinitionsVM.State()
         val deps = (requireContext().applicationContext as AppComponentOwner).appComponent
@@ -76,22 +75,23 @@ class DefinitionsFragment: Fragment() {
         bindView()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            definitionsVM.definitions.collect {
-                showDefinitions(it)
+            launch {
+                definitionsVM.definitions.collect {
+                    showDefinitions(it)
+                }
             }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            definitionsVM.eventFlow.collect {
-                when (it) {
-                    is ShowPartsOfSpeechFilterEvent -> {
-                        showPartsOfSpeechFilterChooser(
-                            requireContext(),
-                            idGenerator,
-                            definitionsVM,
-                            it.partsOfSpeech,
-                            it.selectedPartsOfSpeech
-                        )
+            launch {
+                definitionsVM.eventFlow.collect {
+                    when (it) {
+                        is ShowPartsOfSpeechFilterEvent -> {
+                            showPartsOfSpeechFilterChooser(
+                                requireContext(),
+                                idGenerator,
+                                definitionsVM,
+                                it.partsOfSpeech,
+                                it.selectedPartsOfSpeech
+                            )
+                        }
                     }
                 }
             }

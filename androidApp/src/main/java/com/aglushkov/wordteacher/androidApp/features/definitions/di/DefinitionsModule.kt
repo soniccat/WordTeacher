@@ -12,8 +12,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordSynonymBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTitleBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTranscriptionBlueprint
-import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsVMWrapper
-import com.aglushkov.wordteacher.androidApp.general.VMWrapper
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
@@ -68,12 +67,12 @@ class DefinitionsModule {
     @FragmentComp
     @Provides
     fun definitionsDisplayModeBlueprintListener(
-        vmWrapper: DefinitionsVMWrapper
+        androidVM: DefinitionsAndroidVM
     ): DefinitionsDisplayModeBlueprintListener {
         return object : DefinitionsDisplayModeBlueprintListener {
-            override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) = vmWrapper.vm.onPartOfSpeechFilterClicked(item)
-            override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) = vmWrapper.vm.onPartOfSpeechFilterCloseClicked(item)
-            override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) = vmWrapper.vm.onDisplayModeChanged(mode)
+            override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) = androidVM.vm.onPartOfSpeechFilterClicked(item)
+            override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) = androidVM.vm.onPartOfSpeechFilterCloseClicked(item)
+            override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) = androidVM.vm.onDisplayModeChanged(mode)
         }
     }
 }

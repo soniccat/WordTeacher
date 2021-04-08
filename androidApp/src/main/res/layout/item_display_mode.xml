@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/definitions_displayMode_horizontal_padding"
+    android:paddingTop="@dimen/definitions_displayMode_vertical_padding">
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/definitions_partOfSpeech_chip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/partOfSpeechChipText"
+        app:chipBackgroundColor="@color/partOfSpeechChipBg"
+        app:closeIconTint="@color/partOfSpeechChipText"/>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/definitions_displayMode_chipGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:selectionRequired="true"
+        app:singleSelection="true"
+        android:paddingLeft="@dimen/definitions_displayMode_horizontal_padding">
+
+        <com.google.android.material.chip.Chip
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"/>
+
+        <com.google.android.material.chip.Chip
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"/>
+    </com.google.android.material.chip.ChipGroup>
+</LinearLayout>
