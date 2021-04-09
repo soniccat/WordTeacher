@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/tab_definitions"
         android:title="@string/tab_definitions"
-        android:icon="@drawable/ic_baseline_search_24"/>
+        android:icon="@drawable/ic_baseline_field_24"/>
     <item android:id="@+id/tab_articles"
         android:title="@string/tab_articles"
         android:icon="@drawable/ic_baseline_article_24"/>

@@ -17,9 +17,10 @@
         <item name="colorOnPrimary">@color/primaryTextColor</item>
         <item name="colorOnSecondary">@color/secondaryTextColor</item>
         <item name="android:editTextColor">@android:color/black</item>
-        <item name="colorControlNormal">@color/primaryTextColor</item>
+        <item name="colorControlNormal">?colorOnPrimary</item>
 
         <!-- Styles -->
+        <item name="toolbarStyle">@style/MyToolbarStyle</item>
         <item name="android:searchViewStyle">@style/SearchViewStyle</item>
 
         <!-- Word Card Style -->
@@ -37,9 +38,15 @@
     </style>
 
     <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
-        <item name="android:searchIcon">@drawable/ic_baseline_search_24</item>
-        <item name="android:closeIcon">@drawable/ic_baseline_close_24</item>
+        <item name="android:searchIcon">@drawable/ic_baseline_field_24</item>
+        <item name="android:closeIcon">@drawable/ic_baseline_field_close_24</item>
         <item name="android:hint">@string/search</item>
+    </style>
+
+    <style name="MyToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
+        <!-- The base style relies on textColorPrimary and we just can't change it to white not to break
+         text color in EditText and so on -->
+        <item name="titleTextColor">?colorOnPrimary</item>
     </style>
 
     <style name="WordProvidedByTextAppearance" parent="TextAppearance.MaterialComponents.Body2">
@@ -62,5 +69,9 @@
         <!-- The same part we have in AppTheme, check the comment there -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/primaryDarkColor</item>
+
+        <!-- Styles -->
+        <item name="toolbarStyle">@style/MyToolbarStyle</item>
+        <item name="android:searchViewStyle">@style/SearchViewStyle</item>
     </style>
 </resources>
