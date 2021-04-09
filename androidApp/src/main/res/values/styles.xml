@@ -38,8 +38,8 @@
     </style>
 
     <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
-        <item name="android:searchIcon">@drawable/ic_baseline_field_24</item>
-        <item name="android:closeIcon">@drawable/ic_baseline_field_close_24</item>
+        <item name="android:searchIcon">@drawable/ic_field_search_24</item>
+        <item name="android:closeIcon">@drawable/ic_field_close_24</item>
         <item name="android:hint">@string/search</item>
     </style>
 

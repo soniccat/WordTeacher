@@ -101,7 +101,7 @@ class ArticlesFragment: Fragment() {
         val buttonBgColor = context.resolveThemeColor(R.attr.colorSecondary)
         val imageColor = context.resolveThemeColor(R.attr.colorOnSecondary)
         binding.speedDial.addActionItem(
-            SpeedDialActionItem.Builder(R.id.articles_action_add_text, R.drawable.ic_text_white_24dp)
+            SpeedDialActionItem.Builder(R.id.articles_action_add_text, R.drawable.ic_add_text_24dp)
                 .setFabBackgroundColor(buttonBgColor)
                 .setFabImageTintColor(imageColor)
                 .setLabel(R.string.articles_action_add_text)
