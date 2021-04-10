@@ -1,19 +1,18 @@
-package com.aglushkov.wordteacher.shared.features.articles.vm
+package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.model.Article
 
-class ArticleViewItem(
-    articleId: Long,
+class CardSetViewItem(
+    setId: Long,
     val name: String,
     val date: String
-): BaseViewItem<String>(name, Type, articleId) {
+): BaseViewItem<String>(name, Type, setId) {
     companion object {
-        const val Type = 200
+        const val Type = 400
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        other as ArticleViewItem
+        other as CardSetViewItem
         return super.equalsByContent(other) && date == other.date
     }
 }

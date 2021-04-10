@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.Time
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import dagger.Module
 import dagger.Provides
@@ -27,9 +28,9 @@ class ArticlesModule {
     fun viewModel(
         routerResolver: RouterResolver,
         articlesRepository: ArticlesRepository,
-        idGenerator: IdGenerator
+        time: Time
     ): ArticlesVM {
-        return ArticlesVM(articlesRepository, idGenerator, object : ArticlesRouter {
+        return ArticlesVM(articlesRepository, time, object : ArticlesRouter {
             override fun openAddArticle() {
                 routerResolver.router?.get()?.openAddArticle()
             }

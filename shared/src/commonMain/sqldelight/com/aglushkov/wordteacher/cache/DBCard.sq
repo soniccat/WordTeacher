@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS DBCard (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  date INTEGER NOT NULL,
+  term TEXT NOT NULL,
+  definition TEXT NOT NULL
+);
+
+insert:
+INSERT INTO DBCard(date, term, definition)
+VALUES (?, ?, ?);
+
+insertCard:
+INSERT INTO DBCard(date, term, definition)
+VALUES ?;
+
+lastInsertedRowId:
+SELECT last_insert_rowid();
+
+removeAll:
+DELETE
+FROM DBCard;

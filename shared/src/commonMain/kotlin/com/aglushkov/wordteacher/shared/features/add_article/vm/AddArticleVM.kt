@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.CompletionResult
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.general.Time
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -24,6 +25,7 @@ import kotlinx.datetime.Clock
 
 class AddArticleVM(
     private val articlesRepository: ArticlesRepository,
+    private val time: Time,
     val state: State
 ): ViewModel() {
 
@@ -73,7 +75,7 @@ class AddArticleVM(
         val article = Article(
             0,
             title.value,
-            Clock.System.now().toEpochMilliseconds(),
+            time.getTimeInMilliseconds(),
             text.value
         )
 

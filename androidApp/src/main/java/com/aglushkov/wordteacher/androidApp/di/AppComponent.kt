@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.androidApp.features.articles.di.ArticlesDepende
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.Time
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
@@ -41,6 +42,7 @@ public interface AppComponent:
     override fun articlesRepository(): ArticlesRepository
     override fun wordRepository(): WordDefinitionRepository
     override fun idGenerator(): IdGenerator
+    override fun time(): Time
     override fun connectivityManager(): ConnectivityManager
 
     fun injectApplication(app: GApp)

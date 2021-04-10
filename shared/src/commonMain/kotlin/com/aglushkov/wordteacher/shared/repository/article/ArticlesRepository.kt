@@ -51,6 +51,7 @@ class ArticlesRepository(
     private suspend fun createArticleInternal(article: Article) {
         nlpCore.waitUntilInitialized()
 
+        // TODO: support transaction here
         val articleId = database.articles.run {
             insert(article)
             insertedArticleId()

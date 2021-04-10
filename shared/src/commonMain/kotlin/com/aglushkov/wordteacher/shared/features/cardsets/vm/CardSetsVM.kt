@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.features.articles.vm
+package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
@@ -8,7 +8,9 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.ShortArticle
+import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -17,36 +19,36 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-class ArticlesVM(
-    articlesRepository: ArticlesRepository,
+class CardSetsVM(
+    cardSetsRepository: CardSetsRepository,
     private val time: Time,
-    private val router: ArticlesRouter
+    private val router: CardSetsRouter
 ): ViewModel() {
 
-    private val articlesFlow = articlesRepository.shortArticles
-    val articles = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+    private val cardSetsFlow = cardSetsRepository.cardSets
+    val cardSets = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
 
     init {
         viewModelScope.launch {
-            articlesFlow.map {
+            cardSetsFlow.map {
                 Logger.v("build view items")
                 it.copyWith(buildViewItems(it.data() ?: emptyList()))
-            }.forward(articles)
+            }.forward(cardSets)
         }
     }
 
-    fun onCreateTextArticleClicked() {
-        router.openAddArticle()
+    fun onCreateTextCardSetClicked() {
+        router.openAddCardSet()
     }
 
-    fun onArticleClicked(item: ArticleViewItem) {
-        router.openArticle(item.id)
+    fun onCardSetClicked(item: CardSetViewItem) {
+        router.openCardSet(item.id)
     }
 
-    private fun buildViewItems(articles: List<ShortArticle>): List<BaseViewItem<*>> {
+    private fun buildViewItems(cardSets: List<ShortCardSet>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
-        articles.forEach {
-            items.add(ArticleViewItem(it.id, it.name, time.stringDate(it.date)))
+        cardSets.forEach {
+            items.add(CardSetViewItem(it.id, it.name, time.stringDate(it.date)))
         }
 
         return items

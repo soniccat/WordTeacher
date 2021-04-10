@@ -6,7 +6,10 @@ import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.Article
+import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.ShortArticle
+import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +27,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
 
     val articles = Articles()
     val sentencesNLP = DBNLPSentences()
+    val cardSets = CardSets()
 
     val state = MutableStateFlow<Resource<AppDatabase>>(Resource.Uninitialized())
 
@@ -74,9 +78,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     inner class Articles {
         fun insert(article: Article) = db.dBArticleQueries.insert(article.name, article.date, article.text)
         fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong()
-        fun selectAll() = db.dBArticleQueries.selectAll { id, name, date, text ->
-            Article(id, name, date, text)
-        }
+        fun selectAll() = db.dBArticleQueries.selectAll(mapper = ::Article)
         fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date ->
             ShortArticle(id, name, date)
         }
@@ -86,6 +88,22 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         }
 
         fun removeAll() = db.dBArticleQueries.removeAll()
+    }
+
+    inner class CardSets {
+        fun insert(cardSet: CardSet) = db.dBCardSetQueries.insert(cardSet.name, cardSet.date)
+        fun selectAll() = db.dBCardSetQueries.selectAll(mapper = ::ShortCardSet)
+    }
+
+    inner class Cards {
+        fun insertCard(setId: Long, card: Card) {
+            db.transaction {
+                db.dBCardQueries.insert(card.date, card.term, card.definition)
+
+                val cardId = db.dBCardQueries.lastInsertedRowId().firstLong()!!
+                db.dBCardSetToCardRelationQueries.insert(setId, cardId)
+            }
+        }
     }
 
     companion object {

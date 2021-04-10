@@ -4,6 +4,7 @@ import com.github.aakira.napier.Napier
 import kotlinx.datetime.Clock
 
 expect class Logger {
+    // TODO: consider using a variable instead of a singleton
     companion object {}
 
     fun setupDebug()

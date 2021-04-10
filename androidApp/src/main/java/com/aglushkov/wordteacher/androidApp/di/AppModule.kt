@@ -5,6 +5,8 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.di.AppComp
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.Time
+import com.aglushkov.wordteacher.shared.general.TimeImpl
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
@@ -91,6 +93,12 @@ class AppModule {
     @Provides
     fun idGenerator(): IdGenerator {
         return IdGenerator()
+    }
+
+    @AppComp
+    @Provides
+    fun time(): Time {
+        return TimeImpl()
     }
 
     @AppComp

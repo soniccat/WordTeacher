@@ -1,0 +1,25 @@
+CREATE TABLE IF NOT EXISTS DBCardSetToCardRelation (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  setId INTEGER NOT NULL,
+  cardId INTEGER NOT NULL
+);
+
+selectCardCount:
+SELECT COUNT(id)
+FROM DBCardSetToCardRelation
+WHERE setId = ?;
+
+insert:
+INSERT INTO DBCardSetToCardRelation(setId, cardId)
+VALUES (?, ?);
+
+insertCardSetToCardRelation:
+INSERT INTO DBCardSetToCardRelation(setId, cardId)
+VALUES ?;
+
+lastInsertedRowId:
+SELECT last_insert_rowid();
+
+removeAll:
+DELETE
+FROM DBCardSetToCardRelation;

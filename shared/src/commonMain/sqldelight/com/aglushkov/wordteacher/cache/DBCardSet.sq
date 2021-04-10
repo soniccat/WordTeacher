@@ -1,0 +1,36 @@
+CREATE TABLE IF NOT EXISTS DBCardSet (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  name TEXT NOT NULL,
+  date INTEGER NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM DBCardSet;
+
+selectCardSet:
+SELECT *
+FROM DBCardSet
+WHERE id = ?;
+
+selectCardSetWithCards:
+SELECT *
+FROM DBCardSet
+    LEFT JOIN DBCardSetToCardRelation ON DBCardSet.id = DBCardSetToCardRelation.setId
+    LEFT JOIN DBCard ON DBCardSetToCardRelation.cardId = DBCard.id
+WHERE DBCardSet.id = ?;
+
+insert:
+INSERT INTO DBCardSet(name, date)
+VALUES (?, ?);
+
+insertCardSet:
+INSERT INTO DBCardSet(name, date)
+VALUES ?;
+
+lastInsertedRowId:
+SELECT last_insert_rowid();
+
+removeAll:
+DELETE
+FROM DBCardSet;

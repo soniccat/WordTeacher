@@ -1,7 +1,9 @@
 package com.aglushkov.wordteacher.shared.model
 
-open class ShortArticle(
-    var id: Long,
+class ShortCardSet (
+    val id: Long,
     val name: String,
     val date: Long
-)
+) {
+
+}

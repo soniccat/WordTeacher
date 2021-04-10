@@ -65,9 +65,8 @@ class ArticleModule {
     @FragmentComp
     @Provides
     fun articleRepository(
-        database: AppDatabase,
-        nlpCore: NLPCore
-    ) = ArticleRepository(database, nlpCore)
+        database: AppDatabase
+    ) = ArticleRepository(database)
 
     @FragmentComp
     @Provides

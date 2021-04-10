@@ -15,8 +15,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ArticleRepository(
-    private val database: AppDatabase,
-    private val nlpCore: NLPCore
+    private val database: AppDatabase
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlow = MutableStateFlow<Resource<Article>>(Resource.Uninitialized())
