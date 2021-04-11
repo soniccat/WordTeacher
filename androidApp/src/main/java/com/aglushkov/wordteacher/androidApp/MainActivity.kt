@@ -12,7 +12,9 @@ import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
+import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
+import com.aglushkov.wordteacher.shared.res.MR.strings.tab_cardsets
 import kotlin.reflect.KClass
 
 class MainActivity : AppCompatActivity(), Router {
@@ -92,12 +94,14 @@ class MainActivity : AppCompatActivity(), Router {
     private fun screenClassById(id: Int): KClass<*> = when(id) {
         R.id.tab_definitions -> DefinitionsFragment::class
         R.id.tab_articles -> ArticlesFragment::class
+        R.id.tab_cardsets -> CardSetsFragment::class
         else -> throw IllegalArgumentException("Wrong screen id $id")
     }
 
     private fun screenIdByClass(cl: KClass<*>): Int? = when(cl) {
         DefinitionsFragment::class -> R.id.tab_definitions
         ArticlesFragment::class -> R.id.tab_articles
+        CardSetsFragment::class -> R.id.tab_cardsets
         else -> null
     }
 
@@ -106,6 +110,7 @@ class MainActivity : AppCompatActivity(), Router {
         ArticlesFragment::class -> "articles"
         AddArticleFragment::class -> "addArticle"
         ArticleFragment::class -> "article"
+        CardSetsFragment::class -> "cardsets"
         else -> throw IllegalArgumentException("Wrong screen class $cl")
     }
 
@@ -131,5 +136,14 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun closeArticle() {
         supportFragmentManager.popBackStack()
+    }
+
+    override fun openAddCardSet() {
+        // TODO: need to support
+    }
+
+    override fun openCardSet(id: Long) {
+        // TODO: need to support
+        // openFragment(CardSetFragment::class, CardSetFragment.createArguments(id), true)
     }
 }

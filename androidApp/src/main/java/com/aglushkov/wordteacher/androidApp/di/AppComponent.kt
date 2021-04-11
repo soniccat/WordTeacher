@@ -5,14 +5,15 @@ import com.aglushkov.wordteacher.androidApp.di.AppComp
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.AddArticleDependencies
 import com.aglushkov.wordteacher.androidApp.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.androidApp.features.articles.di.ArticlesDependencies
+import com.aglushkov.wordteacher.androidApp.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.Time
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
-import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -28,7 +29,8 @@ public interface AppComponent:
     DefinitionsDependencies,
     ArticlesDependencies,
     AddArticleDependencies,
-    ArticleDependencies {
+    ArticleDependencies,
+    CardSetsDependencies {
 
     fun configService(): ConfigService
     fun configRepository(): ConfigRepository
@@ -40,9 +42,10 @@ public interface AppComponent:
 
     override fun routerResolver(): RouterResolver
     override fun articlesRepository(): ArticlesRepository
+    override fun cardSetsRepository(): CardSetsRepository
     override fun wordRepository(): WordDefinitionRepository
     override fun idGenerator(): IdGenerator
-    override fun time(): Time
+    override fun timeSource(): TimeSource
     override fun connectivityManager(): ConnectivityManager
 
     fun injectApplication(app: GApp)

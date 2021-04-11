@@ -37,11 +37,12 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <com.leinardi.android.speeddial.SpeedDialView
-        android:id="@+id/create_article_speed_dial"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/start_learning_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        app:sdMainFabClosedSrc="@drawable/ic_add_white_24dp" />
+        app:srcCompat="@drawable/ic_start_learning_24"
+        android:layout_margin="@dimen/cardsets_start_learn_button_padding"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

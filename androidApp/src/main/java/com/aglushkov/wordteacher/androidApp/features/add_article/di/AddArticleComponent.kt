@@ -5,7 +5,7 @@ import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticl
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleAndroidVM
 import com.aglushkov.wordteacher.di.AddArticleModule
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
-import com.aglushkov.wordteacher.shared.general.Time
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import dagger.BindsInstance
 import dagger.Component
@@ -31,5 +31,5 @@ interface AddArticleComponent {
 
 interface AddArticleDependencies {
     fun articlesRepository(): ArticlesRepository
-    fun time(): Time
+    fun timeSource(): TimeSource
 }

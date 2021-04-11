@@ -4,7 +4,7 @@ import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.CompletionResult
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.general.Time
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -21,11 +21,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 
 class AddArticleVM(
     private val articlesRepository: ArticlesRepository,
-    private val time: Time,
+    private val timeSource: TimeSource,
     val state: State
 ): ViewModel() {
 
@@ -75,7 +74,7 @@ class AddArticleVM(
         val article = Article(
             0,
             title.value,
-            time.getTimeInMilliseconds(),
+            timeSource.getTimeInMilliseconds(),
             text.value
         )
 

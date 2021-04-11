@@ -5,12 +5,13 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.di.AppComp
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.Time
-import com.aglushkov.wordteacher.shared.general.TimeImpl
+import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.TimeSourceImpl
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatFile
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
@@ -77,6 +78,14 @@ class AppModule {
 
     @AppComp
     @Provides
+    fun cardSetsRepository(
+        database: AppDatabase
+    ): CardSetsRepository {
+        return CardSetsRepository(database)
+    }
+
+    @AppComp
+    @Provides
     fun nlpSentenceProcessor(nlpCore: NLPCore) = NLPSentenceProcessor(nlpCore)
 
     @AppComp
@@ -97,8 +106,8 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun time(): Time {
-        return TimeImpl()
+    fun timeSource(): TimeSource {
+        return TimeSourceImpl()
     }
 
     @AppComp

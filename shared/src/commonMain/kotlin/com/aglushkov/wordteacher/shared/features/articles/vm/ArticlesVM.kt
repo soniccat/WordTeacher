@@ -1,8 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.articles.vm
 
-import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.Time
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -13,13 +12,10 @@ import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 class ArticlesVM(
     articlesRepository: ArticlesRepository,
-    private val time: Time,
+    private val timeSource: TimeSource,
     private val router: ArticlesRouter
 ): ViewModel() {
 
@@ -46,7 +42,7 @@ class ArticlesVM(
     private fun buildViewItems(articles: List<ShortArticle>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         articles.forEach {
-            items.add(ArticleViewItem(it.id, it.name, time.stringDate(it.date)))
+            items.add(ArticleViewItem(it.id, it.name, timeSource.stringDate(it.date)))
         }
 
         return items

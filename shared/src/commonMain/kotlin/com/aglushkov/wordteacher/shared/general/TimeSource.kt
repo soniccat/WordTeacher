@@ -5,12 +5,12 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-interface Time {
+interface TimeSource {
     fun stringDate(dateLong: Long): String
     fun getTimeInMilliseconds(): Long
 }
 
-class TimeImpl: Time {
+class TimeSourceImpl: TimeSource {
     override fun stringDate(dateLong: Long): String {
         val dateTime = Instant.fromEpochMilliseconds(dateLong).toLocalDateTime(
             TimeZone.currentSystemDefault()

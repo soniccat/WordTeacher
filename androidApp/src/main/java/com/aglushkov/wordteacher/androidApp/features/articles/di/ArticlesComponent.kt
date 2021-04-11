@@ -6,7 +6,7 @@ import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesAndr
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.di.ArticlesModule
 import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.Time
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import dagger.BindsInstance
 import dagger.Component
@@ -31,5 +31,5 @@ interface ArticlesDependencies {
     fun routerResolver(): RouterResolver
     fun articlesRepository(): ArticlesRepository
     fun idGenerator(): IdGenerator
-    fun time(): Time
+    fun timeSource(): TimeSource
 }

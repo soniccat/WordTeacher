@@ -6,4 +6,7 @@
     <item android:id="@+id/tab_articles"
         android:title="@string/tab_articles"
         android:icon="@drawable/ic_tab_article_24"/>
+    <item android:id="@+id/tab_cardsets"
+        android:title="@string/tab_cardsets"
+        android:icon="@drawable/ic_tab_cards_24"/>
 </menu>

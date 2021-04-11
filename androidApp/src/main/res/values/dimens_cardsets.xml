@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="cardsets_start_learn_button_padding">@dimen/content_padding</dimen>
+</resources>
