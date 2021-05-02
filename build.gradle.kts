@@ -29,5 +29,6 @@ allprojects {
     repositories {
         maven { url = Deps.mokoRepo }
         maven { url = Deps.kotlinxRepo }
+        google()
     }
 }

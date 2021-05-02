@@ -53,7 +53,7 @@ interface DefinitionsVM {
     ): Parcelable
 }
 
-class DefinitionsVMImpl(
+open class DefinitionsVMImpl(
     private val connectivityManager: ConnectivityManager,
     private val wordDefinitionRepository: WordDefinitionRepository,
     private val idGenerator: IdGenerator,

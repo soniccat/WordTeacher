@@ -21,6 +21,7 @@ repositories {
 
 android {
     compileSdkVersion(Versions.compileSdk)
+    buildToolsVersion = Versions.buildToolVersion
 
     defaultConfig {
         applicationId = "com.aglushkov.wordteacher.androidApp"
@@ -32,6 +33,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
     }
 
     compileOptions {
@@ -40,8 +42,14 @@ android {
     }
 
     kotlinOptions {
+        useIR = true
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = freeCompilerArgs + "-Xinline-classes"
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = Versions.compose_jetpack_version
+        kotlinCompilerVersion = Versions.kotlin
     }
 
     buildTypes {
@@ -62,7 +70,12 @@ dependencies {
     implementation(Deps.Google.coreKtx)
     implementation(Deps.Google.viewModelKtx)
     implementation(Deps.Google.lifecycleKtx)
-    implementation("com.github.leinardi:FloatingActionButtonSpeedDial:3.1.1")
+    implementation(Deps.floatingActionButtonSpeedDial)
+    implementation(Deps.Decompose.jetpack)
+    implementation(Deps.Compose.foundation)
+    implementation(Deps.Compose.material)
+    implementation(Deps.Compose.activity)
+//    kapt("androidx.compose:compose-compiler:${Versions.compose_jetpack_version}")
 
     implementation(Deps.Coroutines.common)
     implementation(Deps.Coroutines.android)

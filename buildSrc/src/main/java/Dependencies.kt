@@ -2,13 +2,14 @@ import java.net.URI
 
 object Versions {
     val minSdk = 21
-    val targetSdk = 29
-    val compileSdk = 29
+    val targetSdk = 30
+    val compileSdk = 30
+    val buildToolVersion = "30.0.2"
 
-    val kotlin = "1.4.30"
+    val kotlin = "1.4.32"
     val androidx_test = "1.2.0"
     val androidx_test_ext = "1.1.1"
-    val android_gradle_plugin = "4.1.0"
+    val android_gradle_plugin = "4.2.0-beta04"
     val junit = "4.13"
     val sqlDelight = "1.4.4"
     val ktor = "1.5.1"
@@ -16,7 +17,12 @@ object Versions {
     val serialization = "1.1.0-RC"
     val lifecycle = "2.2.0"
 
+    val compose_jetpack_version = "1.0.0-beta05"
+    val androidx_activity_compose_version = "1.3.0-alpha05"
+
     val mokoResources = "0.15.0"
+
+    val decompose = "0.2.4"
 }
 
 object Deps {
@@ -63,10 +69,17 @@ object Deps {
         val fragments = "androidx.fragment:fragment-ktx:1.2.5"
     }
 
+    object Compose {
+        val foundation = "androidx.compose.foundation:foundation:${Versions.compose_jetpack_version}"
+        val material = "androidx.compose.material:material:${Versions.compose_jetpack_version}"
+        val activity = "androidx.activity:activity-compose:${Versions.androidx_activity_compose_version}"
+    }
+
     val okio = "com.squareup.okio:okio-multiplatform:2.9.0"
     val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.1.0"
     val junit = "junit:junit:${Versions.junit}"
     val logger = "com.github.aakira:napier:1.4.1"
+    val floatingActionButtonSpeedDial = "com.github.leinardi:FloatingActionButtonSpeedDial:3.1.1"
 
     object AndroidXTest {
         val core = "androidx.test:core:${Versions.androidx_test}"
@@ -101,5 +114,10 @@ object Deps {
         val commonCore = "io.ktor:ktor-client-core:${Versions.ktor}"
         val androidClient = "io.ktor:ktor-client-android:${Versions.ktor}"
         val iOSClient = "io.ktor:ktor-client-ios:${Versions.ktor}"
+    }
+
+    object Decompose {
+        val decompose = "com.arkivanov.decompose:decompose:${Versions.decompose}"
+        val jetpack = "com.arkivanov.decompose:extensions-compose-jetpack:${Versions.decompose}"
     }
 }

@@ -2,12 +2,20 @@ package com.aglushkov.wordteacher.androidApp
 
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
@@ -15,6 +23,7 @@ import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFrag
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.shared.res.MR.strings.tab_cardsets
+import com.arkivanov.decompose.extensions.compose.jetpack.rememberRootComponent
 import kotlin.reflect.KClass
 
 class MainActivity : AppCompatActivity(), Router {
@@ -23,6 +32,24 @@ class MainActivity : AppCompatActivity(), Router {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        setupComposeLayout()
+        //setupViewLayout()
+    }
+
+    private fun setupComposeLayout() {
+        setContent {
+            ComposeAppTheme {
+                Surface(color = MaterialTheme.colors.background) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        //val component = rememberRootComponent(::CounterRootComponent)
+                        //CounterRootUi(component)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupViewLayout() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
