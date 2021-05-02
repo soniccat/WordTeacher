@@ -40,13 +40,13 @@ class ChooserDialog(
         setContentView(binding.root)
 
         window?.attributes?.let {
+            // TODO: adapt for tablets
             it.width = ViewGroup.LayoutParams.MATCH_PARENT//context.resolveThemeInt(android.R.attr.layout_width)
             it.height = ViewGroup.LayoutParams.MATCH_PARENT//context.resolveThemeInt(android.R.attr.layout_height)
             window?.attributes = it
         }
 
         binding.optionList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        behavior.peekHeight
     }
 
     fun showOptions(options: List<ChooserViewItem>) {

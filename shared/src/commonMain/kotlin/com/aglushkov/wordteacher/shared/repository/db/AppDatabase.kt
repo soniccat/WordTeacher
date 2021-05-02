@@ -76,6 +76,8 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 
     inner class Articles {
+        // TODO: looks strange that we pass a fake article to create an article,
+        //  replace with separate arguments (name, date, text)
         fun insert(article: Article) = db.dBArticleQueries.insert(article.name, article.date, article.text)
         fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong()
         fun selectAll() = db.dBArticleQueries.selectAll(mapper = ::Article)
@@ -91,7 +93,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 
     inner class CardSets {
-        fun insert(cardSet: CardSet) = db.dBCardSetQueries.insert(cardSet.name, cardSet.date)
+        fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
         fun selectAll() = db.dBCardSetQueries.selectAll(mapper = ::ShortCardSet)
     }
 

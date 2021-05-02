@@ -46,7 +46,6 @@ class ArticlesFragment: Fragment() {
 
         //val vmState = savedInstanceState?.getParcelable(VM_STATE) ?: DefinitionsVM.State()
         val deps = (requireContext().applicationContext as AppComponentOwner).appComponent
-        //val router = activity as ArticlesRouter
         val component = DaggerArticlesComponent.builder()
             .setDeps(deps)
             //.setVMState(vmState)

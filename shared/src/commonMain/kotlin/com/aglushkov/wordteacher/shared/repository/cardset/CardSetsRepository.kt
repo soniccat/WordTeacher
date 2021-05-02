@@ -35,11 +35,11 @@ class CardSetsRepository(
         }
     }
 
-    suspend fun createCardSet(cardSet: CardSet) = supervisorScope {
+    suspend fun createCardSet(name: String, date: Long) = supervisorScope {
         // Async in the scope to avoid retaining the parent coroutine and to cancel immediately
         // when it cancels (when corresponding ViewModel is cleared for example)
         scope.async(Dispatchers.Default) {
-            database.cardSets.insert(cardSet)
+            database.cardSets.insert(name, date)
         }.await()
     }
 }

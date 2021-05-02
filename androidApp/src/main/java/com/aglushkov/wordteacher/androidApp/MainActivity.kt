@@ -138,10 +138,6 @@ class MainActivity : AppCompatActivity(), Router {
         supportFragmentManager.popBackStack()
     }
 
-    override fun openAddCardSet() {
-        // TODO: need to support
-    }
-
     override fun openCardSet(id: Long) {
         // TODO: need to support
         // openFragment(CardSetFragment::class, CardSetFragment.createArguments(id), true)

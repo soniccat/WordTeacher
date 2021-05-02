@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
+import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.forward
@@ -9,16 +10,20 @@ import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class CardSetsVM(
-    cardSetsRepository: CardSetsRepository,
+    val cardSetsRepository: CardSetsRepository,
     private val timeSource: TimeSource,
     private val router: CardSetsRouter
 ): ViewModel() {
 
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    val eventFlow = eventChannel.receiveAsFlow()
     private val cardSetsFlow = cardSetsRepository.cardSets
     val cardSets = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
 
@@ -32,7 +37,13 @@ class CardSetsVM(
     }
 
     fun onCreateTextCardSetClicked() {
-        router.openAddCardSet()
+        eventChannel.offer(ShowCreateSetEvent)
+    }
+
+    fun onCardSetNameEntered(name: String) {
+        viewModelScope.launch {
+            cardSetsRepository.createCardSet(name, timeSource.getTimeInMilliseconds())
+        }
     }
 
     fun onCardSetClicked(item: CardSetViewItem) {
@@ -53,3 +64,5 @@ class CardSetsVM(
         return items
     }
 }
+
+object ShowCreateSetEvent: Event

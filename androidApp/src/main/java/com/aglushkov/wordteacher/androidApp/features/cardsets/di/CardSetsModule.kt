@@ -34,10 +34,6 @@ class CardSetsModule {
         time: TimeSource
     ): CardSetsVM {
         return CardSetsVM(cardSetsRepository, time, object : CardSetsRouter {
-            override fun openAddCardSet() {
-                routerResolver.router?.get()?.openAddArticle()
-            }
-
             override fun openCardSet(id: Long) {
                 routerResolver.router?.get()?.openArticle(id)
             }

@@ -40,3 +40,13 @@ class ChooserOptionBlueprint @Inject constructor(
         viewHolder.bind(viewItem.name, viewItem.isSelected)
     }
 }
+
+class ChooserOptionViewHolder(
+    private var binding: ItemChooserBinding
+) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(name: String, isChecked: Boolean) {
+        binding.name.text = name
+        binding.checkbox.isChecked = isChecked
+    }
+}
