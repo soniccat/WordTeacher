@@ -7,7 +7,7 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
 
-class DefinitionsComponent (
+open class DefinitionsComponent (
     componentContext: ComponentContext,
     connectivityManager: ConnectivityManager,
     wordDefinitionRepository: WordDefinitionRepository,

@@ -47,7 +47,7 @@ kotlin {
                 implementation(Deps.dateTime)
                 implementation(Deps.logger)
                 implementation(Deps.SqlDelight.runtime)
-                implementation(Deps.Decompose.decompose)
+                api(Deps.Decompose.decompose)
             }
         }
         val commonTest by getting {

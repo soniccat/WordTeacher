@@ -27,6 +27,7 @@ import dagger.Component
 @Component(modules = [AppModule::class, GeneralModule::class] )
 public interface AppComponent:
     DefinitionsDependencies,
+    DefinitionsComposeDependencies,
     ArticlesDependencies,
     AddArticleDependencies,
     ArticleDependencies,
