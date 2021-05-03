@@ -4,11 +4,10 @@ import android.content.Context
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleAndroidVM
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsModule
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
-import com.aglushkov.wordteacher.di.ArticleModule
-import com.aglushkov.wordteacher.di.DefinitionsDependencies
-import com.aglushkov.wordteacher.di.DefinitionsModule
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore

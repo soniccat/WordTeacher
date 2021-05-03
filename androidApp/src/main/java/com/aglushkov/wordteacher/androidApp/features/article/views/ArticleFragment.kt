@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentArticleBinding
+import com.aglushkov.wordteacher.androidApp.features.article.di.ArticleBinder
 import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComponent
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsBinder
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.showPartsOfSpeechFilterChooser
 import com.aglushkov.wordteacher.androidApp.general.AndroidVM
@@ -25,8 +27,6 @@ import com.aglushkov.wordteacher.androidApp.general.extensions.resolveThemeInt
 import com.aglushkov.wordteacher.androidApp.general.extensions.submit
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
-import com.aglushkov.wordteacher.di.ArticleBinder
-import com.aglushkov.wordteacher.di.DefinitionsBinder
 import com.aglushkov.wordteacher.shared.events.BackNavigationEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event

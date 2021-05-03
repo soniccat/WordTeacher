@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.di
+package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.DefinitionsDisplayModeBlueprint
@@ -63,17 +63,6 @@ class DefinitionsModule {
     ): DefinitionsVM {
         return DefinitionsVMImpl(connectivityManager, wordDefinitionRepository, idGenerator, state)
     }
-
-//    @FragmentComp
-//    @Provides
-//    fun definitionsComponent(
-//        connectivityManager: ConnectivityManager,
-//        wordDefinitionRepository: WordDefinitionRepository,
-//        idGenerator: IdGenerator,
-//        state: DefinitionsVM.State
-//    ): DefinitionsComponent {
-//        return DefinitionsComponent()
-//    }
 
     @FragmentComp
     @Provides

@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.di
+package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
@@ -12,7 +12,6 @@ import dagger.Provides
 @Module
 class DefinitionsComposeModule {
     @Provides
-    @FragmentComp
     fun definitionsComponent(
         componentContext: ComponentContext,
         word: String?,

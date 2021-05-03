@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.di
+package com.aglushkov.wordteacher.androidApp.features.article.di
 
 import android.content.Context
 import android.text.Annotation

@@ -1,6 +1,5 @@
-package com.aglushkov.wordteacher.di
+package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
-import com.aglushkov.wordteacher.androidApp.MainActivity
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM

@@ -12,13 +12,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aglushkov.wordteacher.androidApp.databinding.FragmentDefinitionsBinding
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComponent
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsBinder
 import com.aglushkov.wordteacher.androidApp.general.AndroidVM
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
 import com.aglushkov.wordteacher.androidApp.general.extensions.submit
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
-import com.aglushkov.wordteacher.di.DaggerDefinitionsComponent
-import com.aglushkov.wordteacher.di.DefinitionsBinder
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterEvent
 import com.aglushkov.wordteacher.shared.general.IdGenerator

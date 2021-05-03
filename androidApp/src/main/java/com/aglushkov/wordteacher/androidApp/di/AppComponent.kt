@@ -6,6 +6,8 @@ import com.aglushkov.wordteacher.androidApp.features.add_article.di.AddArticleDe
 import com.aglushkov.wordteacher.androidApp.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.androidApp.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.androidApp.features.cardsets.di.CardSetsDependencies
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeDependencies
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
