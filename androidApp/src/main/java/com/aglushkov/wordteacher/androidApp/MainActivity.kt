@@ -1,23 +1,20 @@
 package com.aglushkov.wordteacher.androidApp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.ViewModelProvider
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
@@ -27,8 +24,7 @@ import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFrag
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.di.DaggerDefinitionsComposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsComponent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
@@ -39,17 +35,6 @@ import kotlin.reflect.KClass
 class MainActivity : AppCompatActivity(), Router {
     lateinit var binding: ActivityMainBinding
 
-    // for testing compose
-//    private lateinit var androidVM: DefinitionsAndroidVM
-//    private lateinit var definitionsVM: DefinitionsVM
-
-    @Inject lateinit var connectivityManager: ConnectivityManager
-    @Inject lateinit var wordDefinitionRepository: WordDefinitionRepository
-    @Inject lateinit var idGenerator: IdGenerator
-    @Inject lateinit var state: DefinitionsVM.State
-
-    /////
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -58,32 +43,29 @@ class MainActivity : AppCompatActivity(), Router {
     }
 
     private fun setupComposeLayout() {
-//        androidVM = ViewModelProvider(this)
-//            .get(DefinitionsAndroidVM::class.java)
-
-        val vmState = /*savedInstanceState?.getParcelable(VM_STATE) ?:*/ DefinitionsVM.State()
         val deps = (applicationContext as AppComponentOwner).appComponent
-        val component = DaggerDefinitionsComposeComponent.builder()
-            .setDeps(deps)
-            .setVMState(vmState)
-//            .setVMWrapper(androidVM)
-            .build()
-//        if (!androidVM.isInitialized()) {
-//            component.injectViewModelWrapper(androidVM)
-//        }
-        component.injectActivity(this)
-
-//        definitionsVM = androidVM.vm
 
         setContent {
             ComposeAppTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         val component = rememberRootComponent {
-                            DefinitionsComponent(it, connectivityManager, wordDefinitionRepository, idGenerator, state)
+                            DaggerDefinitionsComposeComponent.builder()
+                                .setComponentContext(it)
+                                .setWord(null)
+                                .setDeps(deps)
+                                .build()
+                                .definitionsComponent()
                         }
+
+                        val defs = component.definitions.collectAsState()
+
                         //CounterRootUi(component)
-                        Text("hi ")
+                        Button(onClick = {
+                            component.onWordSubmitted("owl")
+                        }) {
+                            Text("hi " + defs.value.data().orEmpty().size)
+                        }
                     }
                 }
             }

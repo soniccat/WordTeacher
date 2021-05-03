@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
-import com.aglushkov.wordteacher.apiproviders.wordnik.service.WordnikService
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
@@ -18,10 +17,9 @@ import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
+import com.arkivanov.decompose.statekeeper.Parcelable
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import dev.icerock.moko.parcelize.Parcelable
 import dev.icerock.moko.parcelize.Parcelize
-import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -29,12 +27,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 interface DefinitionsVM {
+    fun restore(newState: State)
     fun onWordSubmitted(word: String?, filter: List<WordTeacherWord.PartOfSpeech> = emptyList())
     fun onTryAgainClicked()
     fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
@@ -57,7 +55,7 @@ open class DefinitionsVMImpl(
     private val connectivityManager: ConnectivityManager,
     private val wordDefinitionRepository: WordDefinitionRepository,
     private val idGenerator: IdGenerator,
-    override val state: DefinitionsVM.State
+    override var state: DefinitionsVM.State
 ): ViewModel(), DefinitionsVM {
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
@@ -99,6 +97,13 @@ open class DefinitionsVMImpl(
         } /*?: run {
             loadIfNeeded("owl")
         }*/
+    }
+
+    override fun restore(newState: DefinitionsVM.State) {
+        state = newState
+        word?.let {
+            loadIfNeeded(it)
+        }
     }
 
     // Events
