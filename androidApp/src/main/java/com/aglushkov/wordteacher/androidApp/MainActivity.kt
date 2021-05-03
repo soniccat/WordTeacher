@@ -10,6 +10,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,8 +25,10 @@ import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFrag
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
@@ -59,14 +62,7 @@ class MainActivity : AppCompatActivity(), Router {
                                 .definitionsComponent()
                         }
 
-                        val defs = component.definitions.collectAsState()
-
-                        //CounterRootUi(component)
-                        Button(onClick = {
-                            component.onWordSubmitted("owl")
-                        }) {
-                            Text("hi " + defs.value.data().orEmpty().size)
-                        }
+                        DefinitionsUI(component)
                     }
                 }
             }

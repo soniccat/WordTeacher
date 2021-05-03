@@ -75,7 +75,7 @@ dependencies {
     implementation(Deps.Compose.foundation)
     implementation(Deps.Compose.material)
     implementation(Deps.Compose.activity)
-//    kapt("androidx.compose:compose-compiler:${Versions.compose_jetpack_version}")
+//    implementation(Deps.Compose.tooling)
 
     implementation(Deps.Coroutines.common)
     implementation(Deps.Coroutines.android)

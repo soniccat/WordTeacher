@@ -2,7 +2,10 @@ package com.aglushkov.wordteacher.androidApp.compose
 
 import androidx.compose.ui.graphics.Color
 
-val purple200 = Color(0xFFBB86FC)
-val purple500 = Color(0xFF6200EE)
-val purple700 = Color(0xFF3700B3)
-val teal200 = Color(0xFF03DAC5)
+val primaryLight = Color(0xff50c4c4)
+val primaryVariantLight = Color(0xff87f7f7)
+val secondaryLight = Color(0xff6495ed)
+
+val primaryDark = Color(0xff009394)
+val primaryVariantDark = Color(0xff009394)
+val secondaryDark = Color(0xff2668ba)

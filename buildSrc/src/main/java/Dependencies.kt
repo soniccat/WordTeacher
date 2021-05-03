@@ -73,6 +73,7 @@ object Deps {
         val foundation = "androidx.compose.foundation:foundation:${Versions.compose_jetpack_version}"
         val material = "androidx.compose.material:material:${Versions.compose_jetpack_version}"
         val activity = "androidx.activity:activity-compose:${Versions.androidx_activity_compose_version}"
+        val tooling = "androidx.compose.ui:ui-tooling:${Versions.androidx_activity_compose_version}"
     }
 
     val okio = "com.squareup.okio:okio-multiplatform:2.9.0"
