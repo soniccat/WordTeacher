@@ -67,10 +67,12 @@ class LoadingStatusView: FrameLayout {
     }
 }
 
-fun <T> Resource<T>.bind(view: LoadingStatusView?,
-                         errorText: String? = null,
-                         loadingText: String? = null,
-                         emptyText: String?) where T : Collection<*> {
+fun <T> Resource<T>.bind(
+    view: LoadingStatusView?,
+    errorText: String? = null,
+    loadingText: String? = null,
+    emptyText: String?
+) where T : Collection<*> {
     if (view == null) return
 
     if (isLoadedAndEmpty() && emptyText != null) {
@@ -80,9 +82,11 @@ fun <T> Resource<T>.bind(view: LoadingStatusView?,
     }
 }
 
-fun <T> Resource<T>.bind(view: LoadingStatusView?,
-                         errorText: String? = null,
-                         loadingText: String? = null) {
+fun <T> Resource<T>.bind(
+    view: LoadingStatusView?,
+    errorText: String? = null,
+    loadingText: String? = null
+) {
     if (view == null) return
 
     val data = data()
