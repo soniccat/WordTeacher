@@ -34,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -91,6 +93,17 @@ fun DefinitionsUI(vm: DefinitionsVM) {
                                     isCloseIconVisible = item.canClearPartsOfSpeechFilter
                                 ) {
                                     vm.onPartOfSpeechFilterClicked(item)
+                                }
+
+                                // Group
+                                val selectedMode = item.items[item.selectedIndex]
+                                for (mode in item.items) {
+                                    Chip(
+                                        text = mode.toStringDesc().resolveString(),
+                                        isChecked = mode == selectedMode
+                                    ) {
+                                        vm.onDisplayModeChanged(mode)
+                                    }
                                 }
                             }
                         }
@@ -216,21 +229,25 @@ private fun Chip(
 //            else -> MaterialTheme.colors.onSurface
 //        },
         shape = CircleShape,
-        modifier = modifier.clickable {
+        modifier = modifier.clipToBounds().clickable {
             clickBlock?.invoke()
         }
     ) {
-        Row {
+        Row(
+            modifier = Modifier.padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             if (isChecked) {
                 Icon(
                     painter = painterResource(R.drawable.ic_check_24),
-                    contentDescription = null
+                    contentDescription = null,
+//                    tint = colors?.checkedTintColor ?: Color.White
                 )
             }
             Text(
                 text = text,
-                style = MaterialTheme.typography.body2,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                style = MaterialTheme.typography.button,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
             )
             if (isCloseIconVisible && closeBlock != null) {
                 Icon(
@@ -250,6 +267,7 @@ data class ChipColors(
     val contentColor: Color? = null,
     val bgColor: Color? = null,
     val checkedBgColor: Color? = bgColor,
+    val checkedTintColor: Color? = Color.White,
     val closeIconTint: Color? = contentColor
 )
 

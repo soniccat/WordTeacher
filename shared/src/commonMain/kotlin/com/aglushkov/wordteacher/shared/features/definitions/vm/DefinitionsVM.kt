@@ -94,15 +94,16 @@ open class DefinitionsVMImpl(
 
         word?.let {
             loadIfNeeded(it)
-        } /*?: run {
-            loadIfNeeded("owl")
-        }*/
+        }
     }
 
     override fun restore(newState: DefinitionsVM.State) {
         state = newState
         word?.let {
             loadIfNeeded(it)
+        } ?: run {
+            word = "owl"
+            loadIfNeeded("owl")
         }
     }
 
