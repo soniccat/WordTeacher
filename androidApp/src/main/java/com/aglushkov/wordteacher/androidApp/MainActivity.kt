@@ -42,8 +42,8 @@ class MainActivity : AppCompatActivity(), Router {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        setupComposeLayout()
-        setupViewLayout()
+        setupComposeLayout()
+        //setupViewLayout()
     }
 
     private fun setupComposeLayout() {

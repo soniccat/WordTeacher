@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 
@@ -57,10 +58,11 @@ fun Chip(
         Text(
             text = text,
             style = MaterialTheme.typography.body1.copy(
-                color = colors?.contentColor ?: MaterialTheme.colors.onSurface
+                color = colors?.contentColor ?: MaterialTheme.colors.onSurface,
+                fontSize = 14.sp
             ),
             modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 6.dp),
+                .padding(start = 8.dp, end = 8.dp, top = 5.dp, bottom = 7.dp),
             overflow = TextOverflow.Clip,
             softWrap = false,
             maxLines = 1

@@ -2,14 +2,18 @@ package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,14 +44,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
+import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.general.views.compose.Chip
 import com.aglushkov.wordteacher.androidApp.general.views.compose.ChipColors
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
 
 @Composable
@@ -74,37 +82,11 @@ fun DefinitionsUI(vm: DefinitionsVM) {
                 items(data) { item ->
                     when (item) {
                         is DefinitionsDisplayModeViewItem -> {
-                            val horizontalPadding = dimensionResource(R.dimen.definitions_displayMode_horizontal_padding)
-                            val topPadding = dimensionResource(R.dimen.definitions_displayMode_vertical_padding)
-                            Row(
-                                modifier = Modifier.padding(
-                                    start = horizontalPadding,
-                                    end = horizontalPadding,
-                                    top = topPadding
-                                )
-                            ) {
-                                Chip(
-                                    text = item.partsOfSpeechFilterText.resolveString(),
-                                    colors = ChipColors(
-                                        contentColor = MaterialTheme.colors.onSecondary,
-                                        bgColor = MaterialTheme.colors.secondary
-                                    ),
-                                    isCloseIconVisible = item.canClearPartsOfSpeechFilter
-                                ) {
-                                    vm.onPartOfSpeechFilterClicked(item)
-                                }
-
-                                // Group
-                                val selectedMode = item.items[item.selectedIndex]
-                                for (mode in item.items) {
-                                    Chip(
-                                        text = mode.toStringDesc().resolveString(),
-                                        isChecked = mode == selectedMode
-                                    ) {
-                                        vm.onDisplayModeChanged(mode)
-                                    }
-                                }
-                            }
+                            DefinitionsDisplayMode(
+                                item,
+                                { vm.onPartOfSpeechFilterClicked(item) },
+                                { mode -> vm.onDisplayModeChanged(mode) }
+                            )
                         }
                         else -> {
                             Text(
@@ -124,6 +106,77 @@ fun DefinitionsUI(vm: DefinitionsVM) {
                 vm.onTryAgainClicked()
             }
         }
+    }
+}
+
+@Composable
+private fun DefinitionsDisplayMode(
+    item: DefinitionsDisplayModeViewItem,
+    onPartOfSpeechFilterClicked: () -> Unit,
+    onDisplayModeChanged: (mode: DefinitionsDisplayMode) -> Unit
+) {
+    val horizontalPadding = dimensionResource(R.dimen.definitions_displayMode_horizontal_padding)
+    val topPadding = dimensionResource(R.dimen.definitions_displayMode_vertical_padding)
+    Row(
+        modifier = Modifier
+            .padding(
+                start = horizontalPadding,
+                end = horizontalPadding,
+                top = topPadding
+            )
+            .horizontalScroll(rememberScrollState())
+    ) {
+        Chip(
+            modifier = Modifier.padding(
+                top = 4.dp,
+                bottom = 4.dp
+            ),
+            text = item.partsOfSpeechFilterText.resolveString(),
+            colors = ChipColors(
+                contentColor = MaterialTheme.colors.onSecondary,
+                bgColor = MaterialTheme.colors.secondary
+            ),
+            isCloseIconVisible = item.canClearPartsOfSpeechFilter
+        ) {
+            onPartOfSpeechFilterClicked()
+        }
+
+        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.definitions_displayMode_horizontal_padding)))
+
+        // Group
+        val selectedMode = item.items[item.selectedIndex]
+        val firstMode = item.items.firstOrNull()
+        for (mode in item.items) {
+            Chip(
+                modifier = Modifier.padding(
+                    top = 4.dp,
+                    bottom = 4.dp,
+                    start = if (mode == firstMode) 0.dp else 4.dp,
+                    end = 4.dp
+                ),
+                text = mode.toStringDesc().resolveString(),
+                isChecked = mode == selectedMode
+            ) {
+                onDisplayModeChanged(mode)
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DefinitionsDisplayModePreview() {
+    ComposeAppTheme {
+        DefinitionsDisplayMode(
+            item = DefinitionsDisplayModeViewItem(
+                partsOfSpeechFilterText = StringDesc.Raw("Add Filter"),
+                canClearPartsOfSpeechFilter = true,
+                modes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged),
+                selectedIndex = 0
+            ),
+            {},
+            {}
+        )
     }
 }
 
