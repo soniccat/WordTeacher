@@ -18,7 +18,7 @@ repositories {
 }
 
 android {
-    // HACK: to solve "Configuration with name 'testApi' not found." and to support Arctic Fox with 7.0 gradle
+    // HACK: to solve "Configuration with name 'testApi' not found." and to support Arctic Fox
     // https://stackoverflow.com/questions/65372825/kotlin-multiplatform-configuration-issue
     configurations {
         create("androidTestApi")

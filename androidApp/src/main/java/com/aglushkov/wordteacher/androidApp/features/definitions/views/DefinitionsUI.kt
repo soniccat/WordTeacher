@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -34,8 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -43,10 +40,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
+import com.aglushkov.wordteacher.androidApp.general.views.compose.Chip
+import com.aglushkov.wordteacher.androidApp.general.views.compose.ChipColors
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
@@ -201,89 +199,15 @@ private fun CustomTopAppBar(
         modifier = modifier
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(contentPadding),
+            Modifier
+                .fillMaxWidth()
+                .padding(contentPadding),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
             content = content
         )
     }
 }
-
-@Preview
-@Composable
-fun ChipPreview() {
-    Chip(
-        text = "text text",
-        isChecked = true,
-        colors = null,
-        isCloseIconVisible = true,
-        closeBlock = {},
-        clickBlock = {}
-    )
-}
-
-@Composable
-private fun Chip(
-    modifier: Modifier = Modifier,
-    text: String,
-    isChecked: Boolean = false,
-    colors: ChipColors? = null,
-    isCloseIconVisible: Boolean = false,
-    closeBlock: (() -> Unit)? = null,
-    clickBlock: (() -> Unit)? = null
-) {
-    Surface(
-        color = when {
-            isChecked -> colors?.checkedBgColor ?: MaterialTheme.colors.onSurface.copy(alpha = 0.18f)
-            else -> colors?.bgColor ?: MaterialTheme.colors.onSurface.copy(alpha = 0.10f)
-        },
-        contentColor = colors?.contentColor ?: MaterialTheme.colors.onSurface,
-//        contentColor = when {
-//            isSelected -> MaterialTheme.colors.primary
-//            else -> MaterialTheme.colors.onSurface
-//        },
-        shape = CircleShape,
-        modifier = modifier.clipToBounds().clickable {
-            clickBlock?.invoke()
-        }
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (isChecked) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_check_24),
-                    contentDescription = null,
-//                    tint = colors?.checkedTintColor ?: Color.White
-                )
-            }
-            Text(
-                text = text,
-                style = MaterialTheme.typography.button,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-            )
-            if (isCloseIconVisible && closeBlock != null) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_close_18),
-                    contentDescription = null,
-                    modifier = Modifier.clickable {
-                        closeBlock()
-                    },
-                    tint = colors?.closeIconTint ?: MaterialTheme.colors.onSurface.copy(alpha = 0.87f)
-                )
-            }
-        }
-    }
-}
-
-data class ChipColors(
-    val contentColor: Color? = null,
-    val bgColor: Color? = null,
-    val checkedBgColor: Color? = bgColor,
-    val checkedTintColor: Color? = Color.White,
-    val closeIconTint: Color? = contentColor
-)
 
 @Composable
 fun StringDesc.resolveString() = toString(LocalContext.current)
