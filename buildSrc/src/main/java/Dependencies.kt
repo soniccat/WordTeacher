@@ -1,5 +1,3 @@
-import java.net.URI
-
 object Versions {
     val minSdk = 21
     val targetSdk = 30
@@ -9,9 +7,9 @@ object Versions {
     val kotlin = "1.4.32"
     val androidx_test = "1.2.0"
     val androidx_test_ext = "1.1.1"
-    val android_gradle_plugin = "4.2.0-beta04"
+    val android_gradle_plugin = "7.0.0-alpha12"
     val junit = "4.13"
-    val sqlDelight = "1.4.4"
+    val sqlDelight = "1.5.0"
     val ktor = "1.5.1"
     val coroutines = "1.4.2-native-mt"
     val serialization = "1.1.0-RC"
@@ -20,7 +18,7 @@ object Versions {
     val compose_jetpack_version = "1.0.0-beta05"
     val androidx_activity_compose_version = "1.3.0-alpha05"
 
-    val mokoResources = "0.15.0"
+    val mokoResources = "0.15.1"
 
     val decompose = "0.2.4"
 }
@@ -30,10 +28,6 @@ object Deps {
         val kotlinClasspath = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
         val androidClasspath = "com.android.tools.build:gradle:${Versions.android_gradle_plugin}"
     }
-
-    val kotlinxRepo = URI("https://kotlin.bintray.com/kotlinx/")
-    val mokoRepo = URI("https://dl.bintray.com/icerockdev/moko")
-    val mokoPluginsRepo = URI("https://dl.bintray.com/icerockdev/plugins")
 
     object MokoResources {
         val plugin = "dev.icerock.mobile.multiplatform-resources"
@@ -49,7 +43,7 @@ object Deps {
         val impl = "dev.icerock.moko:graphics:0.6.0"
     }
 
-    val mokoMvvmCore = "dev.icerock.moko:mvvm-core:0.9.1"
+    val mokoMvvmCore = "dev.icerock.moko:mvvm-core:0.10.1"
 
     object Mp {
         val serializationPlugin = "org.jetbrains.kotlin.plugin.serialization"
@@ -72,8 +66,8 @@ object Deps {
     object Compose {
         val foundation = "androidx.compose.foundation:foundation:${Versions.compose_jetpack_version}"
         val material = "androidx.compose.material:material:${Versions.compose_jetpack_version}"
+        val tooling = "androidx.compose.ui:ui-tooling:${Versions.compose_jetpack_version}"
         val activity = "androidx.activity:activity-compose:${Versions.androidx_activity_compose_version}"
-        val tooling = "androidx.compose.ui:ui-tooling:${Versions.androidx_activity_compose_version}"
     }
 
     val okio = "com.squareup.okio:okio-multiplatform:2.9.0"

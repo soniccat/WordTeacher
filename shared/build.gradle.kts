@@ -1,4 +1,3 @@
-
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -13,12 +12,35 @@ group = "com.aglushkov.wordteacher"
 version = "1.0-SNAPSHOT"
 
 repositories {
-    gradlePluginPortal()
     google()
-    jcenter()
     mavenCentral()
-    maven {
-        url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
+    gradlePluginPortal()
+}
+
+android {
+    // HACK: to solve "Configuration with name 'testApi' not found." and to support Arctic Fox with 7.0 gradle
+    // https://stackoverflow.com/questions/65372825/kotlin-multiplatform-configuration-issue
+    configurations {
+        create("androidTestApi")
+        create("androidTestDebugApi")
+        create("androidTestReleaseApi")
+        create("testApi")
+        create("testDebugApi")
+        create("testReleaseApi")
+    }
+
+    compileSdkVersion(Versions.compileSdk)
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    defaultConfig {
+        minSdkVersion(Versions.minSdk)
+        targetSdkVersion(Versions.targetSdk)
+    }
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
     }
 }
 
@@ -93,24 +115,6 @@ kotlin {
         pod("Reachability","3.2")
 
         ios.deploymentTarget = "11.0"
-    }
-}
-
-android {
-    compileSdkVersion(Versions.compileSdk)
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdkVersion(Versions.minSdk)
-        targetSdkVersion(Versions.targetSdk)
-        versionCode = 1
-        versionName = "1.0"
-    }
-
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
     }
 }
 

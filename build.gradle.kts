@@ -1,10 +1,8 @@
 buildscript {
     repositories {
-        gradlePluginPortal()
-        jcenter()
         google()
         mavenCentral()
-        maven { url = Deps.mokoPluginsRepo }
+        gradlePluginPortal()
     }
 
     dependencies {
@@ -22,13 +20,23 @@ group = "com.aglushkov.wordteacher"
 version = "1.0-SNAPSHOT"
 
 repositories {
+    google()
     mavenCentral()
+    gradlePluginPortal()
+}
+
+subprojects {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
 
 allprojects {
     repositories {
-        maven { url = Deps.mokoRepo }
-        maven { url = Deps.kotlinxRepo }
         google()
+        mavenCentral()
+        gradlePluginPortal()
     }
 }

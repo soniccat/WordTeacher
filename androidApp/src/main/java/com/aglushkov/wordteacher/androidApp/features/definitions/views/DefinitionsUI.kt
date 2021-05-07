@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
@@ -206,6 +207,19 @@ private fun CustomTopAppBar(
             content = content
         )
     }
+}
+
+@Preview
+@Composable
+fun ChipPreview() {
+    Chip(
+        text = "text text",
+        isChecked = true,
+        colors = null,
+        isCloseIconVisible = true,
+        closeBlock = {},
+        clickBlock = {}
+    )
 }
 
 @Composable

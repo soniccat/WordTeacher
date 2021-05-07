@@ -1,9 +1,8 @@
 //pluginManagement {
 //    repositories {
-//        gradlePluginPortal()
 //        google()
-//        jcenter()
 //        mavenCentral()
+//        gradlePluginPortal()
 //    }
 //    resolutionStrategy {
 //        eachPlugin {
@@ -13,6 +12,7 @@
 //        }
 //    }
 //}
+
 rootProject.name = "WordTeacher"
 
 

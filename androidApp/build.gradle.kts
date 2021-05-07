@@ -12,10 +12,9 @@ group = "com.aglushkov.wordteacher"
 version = "1.0-SNAPSHOT"
 
 repositories {
-    gradlePluginPortal()
     google()
-    jcenter()
     mavenCentral()
+    gradlePluginPortal()
     maven(url = "https://jitpack.io")
 }
 
@@ -75,7 +74,7 @@ dependencies {
     implementation(Deps.Compose.foundation)
     implementation(Deps.Compose.material)
     implementation(Deps.Compose.activity)
-//    implementation(Deps.Compose.tooling)
+    implementation(Deps.Compose.tooling)
 
     implementation(Deps.Coroutines.common)
     implementation(Deps.Coroutines.android)
@@ -85,6 +84,6 @@ dependencies {
 
     implementation(Deps.Ktor.androidClient)
 
-    implementation("com.google.dagger:dagger:2.27")
-    kapt("com.google.dagger:dagger-compiler:2.27")
+    implementation("com.google.dagger:dagger:2.35.1")
+    kapt("com.google.dagger:dagger-compiler:2.35.1")
 }
