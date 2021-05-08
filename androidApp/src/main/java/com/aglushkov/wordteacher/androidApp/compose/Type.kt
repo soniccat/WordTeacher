@@ -25,5 +25,6 @@ class AppTypography {
             @Composable get() = typography.body2.copy(
                 color = colorResource(id = R.color.word_provided_by)
             )
+        val wordDefinitionTranscripton = typography.body2
     }
 }

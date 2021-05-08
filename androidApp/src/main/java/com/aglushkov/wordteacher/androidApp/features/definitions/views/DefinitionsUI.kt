@@ -45,6 +45,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDispl
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTitleViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTranscriptionViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import dev.icerock.moko.resources.desc.Raw
@@ -74,20 +75,15 @@ fun DefinitionsUI(vm: DefinitionsVM) {
             LazyColumn {
                 items(data) { item ->
                     when (item) {
-                        is DefinitionsDisplayModeViewItem -> {
-                            DefinitionsDisplayModeView(
+                        is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
                                 item,
                                 { vm.onPartOfSpeechFilterClicked(item) },
                                 { vm.onPartOfSpeechFilterCloseClicked(item) },
                                 { mode -> vm.onDisplayModeChanged(mode) }
                             )
-                        }
-                        is WordDividerViewItem -> {
-                            WordDividerView()
-                        }
-                        is WordTitleViewItem -> {
-                            WordTitleView(item)
-                        }
+                        is WordDividerViewItem -> WordDividerView()
+                        is WordTitleViewItem -> WordTitleView(item)
+                        is WordTranscriptionViewItem -> WordTranscriptionView(item)
                         else -> {
                             Text(
                                 text = "unknown item $item"
@@ -205,6 +201,19 @@ private fun WordTitleView(
     }
 }
 
+@Composable
+fun WordTranscriptionView(viewItem: WordTranscriptionViewItem) {
+    Text(
+        text = viewItem.firstItem(),
+        modifier = Modifier
+            .padding(
+                start = dimensionResource(id = R.dimen.word_horizontalPadding),
+                end = dimensionResource(id = R.dimen.word_horizontalPadding)
+            ),
+        style = AppTypography.wordDefinitionTranscripton
+    )
+}
+
 // Previews
 
 @Preview
@@ -225,7 +234,8 @@ private fun DefinitionsUIPreviewWithResponse() {
                         WordTitleViewItem(
                             title = "Word",
                             providers = listOf(Config.Type.Yandex)
-                        )
+                        ),
+                        WordTranscriptionViewItem("[omg]")
                     )
                 )
             )
