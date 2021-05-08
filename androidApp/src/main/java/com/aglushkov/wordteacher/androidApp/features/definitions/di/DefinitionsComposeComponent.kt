@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -17,7 +18,7 @@ public interface DefinitionsComposeComponent {
 
     @Component.Builder
     interface Builder {
-        @BindsInstance fun setComponentContext(context: ComponentContext): Builder
+        @BindsInstance fun setComponentContext(context: ComponentContext?): Builder
         @BindsInstance fun setWord(word: String?): Builder
 
         fun setDeps(deps: DefinitionsComposeDependencies): Builder

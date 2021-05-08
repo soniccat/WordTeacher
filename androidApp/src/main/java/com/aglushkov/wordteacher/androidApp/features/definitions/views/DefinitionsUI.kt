@@ -1,62 +1,55 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.contentColorFor
-import androidx.compose.material.primarySurface
+import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.androidApp.R
+import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
+import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.Chip
 import com.aglushkov.wordteacher.androidApp.general.views.compose.ChipColors
+import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomTopAppBar
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
+import com.aglushkov.wordteacher.androidApp.general.views.compose.SearchView
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTitleViewItem
+import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.repository.config.Config
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
+import java.io.IOException
 
 @Composable
 fun DefinitionsUI(vm: DefinitionsVM) {
@@ -82,11 +75,18 @@ fun DefinitionsUI(vm: DefinitionsVM) {
                 items(data) { item ->
                     when (item) {
                         is DefinitionsDisplayModeViewItem -> {
-                            DefinitionsDisplayMode(
+                            DefinitionsDisplayModeView(
                                 item,
                                 { vm.onPartOfSpeechFilterClicked(item) },
+                                { vm.onPartOfSpeechFilterCloseClicked(item) },
                                 { mode -> vm.onDisplayModeChanged(mode) }
                             )
+                        }
+                        is WordDividerViewItem -> {
+                            WordDividerView()
+                        }
+                        is WordTitleViewItem -> {
+                            WordTitleView(item)
                         }
                         else -> {
                             Text(
@@ -110,9 +110,10 @@ fun DefinitionsUI(vm: DefinitionsVM) {
 }
 
 @Composable
-private fun DefinitionsDisplayMode(
+private fun DefinitionsDisplayModeView(
     item: DefinitionsDisplayModeViewItem,
     onPartOfSpeechFilterClicked: () -> Unit,
+    onPartOfSpeechFilterCloseClicked: () -> Unit,
     onDisplayModeChanged: (mode: DefinitionsDisplayMode) -> Unit
 ) {
     val horizontalPadding = dimensionResource(R.dimen.definitions_displayMode_horizontal_padding)
@@ -136,10 +137,14 @@ private fun DefinitionsDisplayMode(
                 contentColor = MaterialTheme.colors.onSecondary,
                 bgColor = MaterialTheme.colors.secondary
             ),
-            isCloseIconVisible = item.canClearPartsOfSpeechFilter
-        ) {
-            onPartOfSpeechFilterClicked()
-        }
+            isCloseIconVisible = item.canClearPartsOfSpeechFilter,
+            closeBlock = {
+                onPartOfSpeechFilterCloseClicked()
+            },
+            clickBlock = {
+                onPartOfSpeechFilterClicked()
+            }
+        )
 
         Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.definitions_displayMode_horizontal_padding)))
 
@@ -163,104 +168,92 @@ private fun DefinitionsDisplayMode(
     }
 }
 
-@Preview
 @Composable
-private fun DefinitionsDisplayModePreview() {
-    ComposeAppTheme {
-        DefinitionsDisplayMode(
-            item = DefinitionsDisplayModeViewItem(
-                partsOfSpeechFilterText = StringDesc.Raw("Add Filter"),
-                canClearPartsOfSpeechFilter = true,
-                modes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged),
-                selectedIndex = 0
-            ),
-            {},
-            {}
-        )
-    }
-}
-
-@Composable
-private fun SearchView(
-    text: String,
-    onTextChanged: (String) -> Unit,
-    onImeAction: () -> Unit
+private fun WordDividerView(
 ) {
-    TextField(
-        value = text,
-        onValueChange = onTextChanged,
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colors.surface,
-                shape = RoundedCornerShape(2.dp)
-            ),
-        textStyle = LocalTextStyle.current.copy(
-            color = MaterialTheme.colors.onSurface
-        ),
-        leadingIcon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_field_search_24),
-                contentDescription = null,
-                tint = LocalContentColor.current
-            )
-        },
-        trailingIcon = {
-            if (text.isNotEmpty()) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_field_close_24),
-                    contentDescription = null,
-                    modifier = Modifier.clickable {
-                        onTextChanged("")
-                    },
-                    tint = LocalContentColor.current
-                )
-            }
-        },
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(
-            onSearch = {
-                onImeAction()
-            }
-        ),
-        singleLine = true,
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+    Divider(
+        modifier = Modifier.padding(
+            top = dimensionResource(id = R.dimen.word_divider_topMargin),
+            bottom = dimensionResource(id = R.dimen.word_divider_bottomMargin)
         )
     )
 }
 
 @Composable
-// custom top app bar to get wrap content height
-private fun CustomTopAppBar(
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
-    contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = AppBarDefaults.TopAppBarElevation,
-    contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
-    shape: Shape = RectangleShape,
-    content: @Composable RowScope.() -> Unit
+private fun WordTitleView(
+    viewItem: WordTitleViewItem
 ) {
-    Surface(
-        color = backgroundColor,
-        contentColor = contentColor,
-        elevation = elevation,
-        shape = shape,
-        modifier = modifier
+    val providedByString = stringResource(R.string.word_providedBy_template, viewItem.providers.joinToString())
+    Row(
+        modifier = Modifier.padding(
+            start = dimensionResource(id = R.dimen.word_horizontalPadding),
+            end = dimensionResource(id = R.dimen.word_horizontalPadding)
+        )
     ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(contentPadding),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-            content = content
+        Text(
+            text = viewItem.firstItem(),
+            modifier = Modifier
+                .weight(1.0f, true),
+            style = AppTypography.wordDefinitionTitle
+        )
+        Text(
+            text = providedByString,
+            modifier = Modifier
+                .widthIn(max = dimensionResource(id = R.dimen.word_providedBy_maxWidth)),
+            style = AppTypography.wordDefinitionProvidedBy
         )
     }
 }
 
+// Previews
+
+@Preview
 @Composable
-fun StringDesc.resolveString() = toString(LocalContext.current)
+private fun DefinitionsUIPreviewWithResponse() {
+    ComposeAppTheme {
+        DefinitionsUI(
+            DefinitionsVMPreview(
+                Resource.Loaded(
+                    listOf(
+                        DefinitionsDisplayModeViewItem(
+                            partsOfSpeechFilterText = StringDesc.Raw("Noun"),
+                            canClearPartsOfSpeechFilter = true,
+                            modes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged),
+                            selectedIndex = 0
+                        ),
+                        WordDividerViewItem(),
+                        WordTitleViewItem(
+                            title = "Word",
+                            providers = listOf(Config.Type.Yandex)
+                        )
+                    )
+                )
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DefinitionsUIPreviewLoading() {
+    ComposeAppTheme {
+        DefinitionsUI(
+            DefinitionsVMPreview(Resource.Loading())
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DefinitionsUIPreviewError() {
+    ComposeAppTheme {
+        DefinitionsUI(
+            DefinitionsVMPreview(
+                Resource.Error(
+                    IOException("Sth went wrong"),
+                    true
+                )
+            )
+        )
+    }
+}
