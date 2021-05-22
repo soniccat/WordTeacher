@@ -38,6 +38,8 @@ class AppTypography {
                 )}
             }
         val wordDefinition = typography.body2
+        val wordSynonym = typography.body2
+        val wordExample = typography.body2
         val wordDefinitionSubHeader: TextStyle
             @Composable get() {
                 val color = colorResource(id = R.color.word_subheader)

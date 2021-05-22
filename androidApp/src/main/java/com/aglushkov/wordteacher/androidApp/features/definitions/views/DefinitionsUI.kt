@@ -50,8 +50,10 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTitleViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTranscriptionViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -117,6 +119,8 @@ private fun showViewItem(
     is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item)
     is WordDefinitionViewItem -> WordDefinitionView(item)
     is WordSubHeaderViewItem -> WordSubHeaderView(item)
+    is WordSynonymViewItem -> WordSynonymView(item)
+    is WordExampleViewItem -> WordExampleView(item)
     else -> {
         Text(
             text = "unknown item $item"
@@ -268,12 +272,37 @@ fun WordSubHeaderView(viewItem: WordSubHeaderViewItem) {
         text = viewItem.firstItem().resolveString(),
         modifier = Modifier
             .padding(
-                start = dimensionResource(id = R.dimen.word_horizontalPadding) + Dp(viewItem.indent.toDp(
-                    LocalContext.current.resources) / LocalDensity.current.density),
+                start = dimensionResource(id = R.dimen.word_horizontalPadding) + viewItem.indent.toDp(),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding),
                 top = dimensionResource(id = R.dimen.word_subHeader_topMargin)
             ),
         style = AppTypography.wordDefinitionSubHeader
+    )
+}
+
+@Composable
+fun WordSynonymView(viewItem: WordSynonymViewItem) {
+    Text(
+        text = viewItem.firstItem(),
+        modifier = Modifier
+            .padding(
+                start = dimensionResource(id = R.dimen.word_horizontalPadding) + viewItem.indent.toDp(),
+                end = dimensionResource(id = R.dimen.word_horizontalPadding)
+            ),
+        style = AppTypography.wordSynonym
+    )
+}
+
+@Composable
+fun WordExampleView(viewItem: WordExampleViewItem) {
+    Text(
+        text = viewItem.firstItem(),
+        modifier = Modifier
+            .padding(
+                start = dimensionResource(id = R.dimen.word_horizontalPadding) + viewItem.indent.toDp(),
+                end = dimensionResource(id = R.dimen.word_horizontalPadding)
+            ),
+        style = AppTypography.wordExample
     )
 }
 
@@ -306,6 +335,10 @@ private fun DefinitionsUIPreviewWithResponse() {
                         WordPartOfSpeechViewItem(StringDesc.Raw("Noun")),
                         WordDefinitionViewItem("* definition 1"),
                         WordDefinitionViewItem("* definition 2"),
+                        WordSynonymViewItem("synonym 1", Indent.NONE),
+                        WordSynonymViewItem("synonym 2", Indent.SMALL),
+                        WordExampleViewItem("synonym 1", Indent.NONE),
+                        WordExampleViewItem("synonym 2", Indent.SMALL),
                         WordSubHeaderViewItem(StringDesc.Raw("Subheader 1"), Indent.NONE),
                         WordSubHeaderViewItem(StringDesc.Raw("Subheader 2"), Indent.SMALL),
                     )

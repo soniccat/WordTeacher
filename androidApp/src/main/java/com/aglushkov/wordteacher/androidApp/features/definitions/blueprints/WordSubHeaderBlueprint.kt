@@ -28,7 +28,7 @@ class WordSubHeaderBlueprint @Inject constructor(): Blueprint<SimpleAdapter.View
         viewHolder.typedView.text = viewItem.firstItem().toString(view.context)
 
         val lp = view.layoutParams as RecyclerView.LayoutParams
-        lp.leftMargin = viewItem.indent.toDp(view.resources)
+        lp.leftMargin = viewItem.indent.toPx(view.resources)
         lp.topMargin = view.resources.getDimensionPixelSize(R.dimen.word_subHeader_topMargin)
     }
 }

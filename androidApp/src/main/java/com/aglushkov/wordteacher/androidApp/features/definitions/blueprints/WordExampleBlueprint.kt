@@ -25,6 +25,6 @@ class WordExampleBlueprint @Inject constructor(): Blueprint<SimpleAdapter.ViewHo
         viewHolder.typedView.text = viewItem.firstItem()
 
         val lp = viewHolder.typedView.layoutParams as RecyclerView.LayoutParams
-        lp.leftMargin = viewItem.indent.toDp(viewHolder.typedView.resources)
+        lp.leftMargin = viewItem.indent.toPx(viewHolder.typedView.resources)
     }
 }

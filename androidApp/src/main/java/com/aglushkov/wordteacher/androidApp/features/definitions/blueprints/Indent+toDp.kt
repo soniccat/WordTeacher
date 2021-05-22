@@ -1,10 +1,23 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.blueprints
 
 import android.content.res.Resources
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
 
-fun Indent.toDp(resources: Resources) = when (this) {
-    Indent.SMALL -> resources.getDimensionPixelOffset(R.dimen.indent_small)
+@Composable
+fun Indent.toDp(): Dp {
+    val px = when (this) {
+        Indent.SMALL -> LocalContext.current.resources.getDimensionPixelOffset(R.dimen.indent_small)
+        Indent.NONE -> 0
+    }
+    return Dp(px / LocalDensity.current.density)
+}
+
+fun Indent.toPx(res: Resources) = when (this) {
+    Indent.SMALL -> res.getDimensionPixelOffset(R.dimen.indent_small)
     Indent.NONE -> 0
 }
