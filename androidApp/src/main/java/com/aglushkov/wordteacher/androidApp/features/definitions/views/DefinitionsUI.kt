@@ -23,17 +23,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
+import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.toDp
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.Chip
 import com.aglushkov.wordteacher.androidApp.general.views.compose.ChipColors
@@ -43,14 +47,20 @@ import com.aglushkov.wordteacher.androidApp.general.views.compose.SearchView
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTitleViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTranscriptionViewItem
+import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
 import java.io.IOException
+import java.util.*
 
 @Composable
 fun DefinitionsUI(vm: DefinitionsVM) {
@@ -74,22 +84,7 @@ fun DefinitionsUI(vm: DefinitionsVM) {
         if (data?.isNotEmpty() == true) {
             LazyColumn {
                 items(data) { item ->
-                    when (item) {
-                        is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
-                                item,
-                                { vm.onPartOfSpeechFilterClicked(item) },
-                                { vm.onPartOfSpeechFilterCloseClicked(item) },
-                                { mode -> vm.onDisplayModeChanged(mode) }
-                            )
-                        is WordDividerViewItem -> WordDividerView()
-                        is WordTitleViewItem -> WordTitleView(item)
-                        is WordTranscriptionViewItem -> WordTranscriptionView(item)
-                        else -> {
-                            Text(
-                                text = "unknown item $item"
-                            )
-                        }
-                    }
+                    showViewItem(item, vm)
                 }
             }
         } else {
@@ -102,6 +97,30 @@ fun DefinitionsUI(vm: DefinitionsVM) {
                 vm.onTryAgainClicked()
             }
         }
+    }
+}
+
+@Composable
+private fun showViewItem(
+    item: BaseViewItem<*>,
+    vm: DefinitionsVM
+) = when (item) {
+    is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
+        item,
+        { vm.onPartOfSpeechFilterClicked(item) },
+        { vm.onPartOfSpeechFilterCloseClicked(item) },
+        { mode -> vm.onDisplayModeChanged(mode) }
+    )
+    is WordDividerViewItem -> WordDividerView()
+    is WordTitleViewItem -> WordTitleView(item)
+    is WordTranscriptionViewItem -> WordTranscriptionView(item)
+    is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item)
+    is WordDefinitionViewItem -> WordDefinitionView(item)
+    is WordSubHeaderViewItem -> WordSubHeaderView(item)
+    else -> {
+        Text(
+            text = "unknown item $item"
+        )
     }
 }
 
@@ -196,6 +215,7 @@ private fun WordTitleView(
             text = providedByString,
             modifier = Modifier
                 .widthIn(max = dimensionResource(id = R.dimen.word_providedBy_maxWidth)),
+            textAlign = TextAlign.End,
             style = AppTypography.wordDefinitionProvidedBy
         )
     }
@@ -211,6 +231,49 @@ fun WordTranscriptionView(viewItem: WordTranscriptionViewItem) {
                 end = dimensionResource(id = R.dimen.word_horizontalPadding)
             ),
         style = AppTypography.wordDefinitionTranscripton
+    )
+}
+
+@Composable
+fun WordPartOfSpeechView(viewItem: WordPartOfSpeechViewItem) {
+    Text(
+        text = viewItem.firstItem().resolveString().toUpperCase(Locale.getDefault()),
+        modifier = Modifier
+            .padding(
+                start = dimensionResource(id = R.dimen.word_horizontalPadding),
+                end = dimensionResource(id = R.dimen.word_horizontalPadding),
+                top = dimensionResource(id = R.dimen.word_partOfSpeech_topMargin)
+            ),
+        style = AppTypography.wordDefinitionPartOfSpeech
+    )
+}
+
+@Composable
+fun WordDefinitionView(viewItem: WordDefinitionViewItem) {
+    Text(
+        text = viewItem.firstItem(),
+        modifier = Modifier
+            .padding(
+                start = dimensionResource(id = R.dimen.word_horizontalPadding),
+                end = dimensionResource(id = R.dimen.word_horizontalPadding),
+                top = dimensionResource(id = R.dimen.word_header_topMargin)
+            ),
+        style = AppTypography.wordDefinition
+    )
+}
+
+@Composable
+fun WordSubHeaderView(viewItem: WordSubHeaderViewItem) {
+    Text(
+        text = viewItem.firstItem().resolveString(),
+        modifier = Modifier
+            .padding(
+                start = dimensionResource(id = R.dimen.word_horizontalPadding) + Dp(viewItem.indent.toDp(
+                    LocalContext.current.resources) / LocalDensity.current.density),
+                end = dimensionResource(id = R.dimen.word_horizontalPadding),
+                top = dimensionResource(id = R.dimen.word_subHeader_topMargin)
+            ),
+        style = AppTypography.wordDefinitionSubHeader
     )
 }
 
@@ -235,7 +298,16 @@ private fun DefinitionsUIPreviewWithResponse() {
                             title = "Word",
                             providers = listOf(Config.Type.Yandex)
                         ),
-                        WordTranscriptionViewItem("[omg]")
+                        WordTitleViewItem(
+                            title = "Word 2",
+                            providers = listOf(Config.Type.Yandex, Config.Type.Google, Config.Type.OwlBot)
+                        ),
+                        WordTranscriptionViewItem("[omg]"),
+                        WordPartOfSpeechViewItem(StringDesc.Raw("Noun")),
+                        WordDefinitionViewItem("* definition 1"),
+                        WordDefinitionViewItem("* definition 2"),
+                        WordSubHeaderViewItem(StringDesc.Raw("Subheader 1"), Indent.NONE),
+                        WordSubHeaderViewItem(StringDesc.Raw("Subheader 2"), Indent.SMALL),
                     )
                 )
             )
