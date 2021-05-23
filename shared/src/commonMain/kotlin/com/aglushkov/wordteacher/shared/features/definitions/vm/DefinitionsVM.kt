@@ -70,25 +70,27 @@ open class DefinitionsVMImpl(
     override val eventFlow = eventChannel.receiveAsFlow()
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
 
-    override var displayModeStateFlow = MutableStateFlow(DefinitionsDisplayMode.BySource)
-    override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(emptyList())
+    final override var displayModeStateFlow = MutableStateFlow(DefinitionsDisplayMode.BySource)
+    final override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(emptyList())
 
     override val definitions = combine(definitionWords, displayModeStateFlow, selectedPartsOfSpeechStateFlow) { a, b, c -> Triple(a, b, c) }
-        .map { (wordDefinitions, displayMode, partOfSpeachFilter) ->
+        .map { (wordDefinitions, displayMode, partOfSpeechFilter) ->
             Logger.v("build view items")
-            wordDefinitions.copyWith(buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeachFilter))
+            wordDefinitions.copyWith(
+                buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter)
+            )
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override val partsOfSpeechFilterStateFlow = definitionWords.map {
-        it.data().orEmpty().map {
-            it.definitions.keys
+        it.data().orEmpty().map { word ->
+            word.definitions.keys
         }.flatten().distinct()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
-    var loadJob: Job? = null
+    private val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
+    private var loadJob: Job? = null
 
-    var word: String?
+    private var word: String?
         get() {
             return state.word
         }
