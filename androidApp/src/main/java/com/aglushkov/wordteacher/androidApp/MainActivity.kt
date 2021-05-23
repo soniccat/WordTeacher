@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity(), Router {
         setContent {
             ComposeAppTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.fillMaxSize()) {
                         val component = rememberRootComponent {
                             DaggerDefinitionsComposeComponent.builder()
                                 .setComponentContext(it)

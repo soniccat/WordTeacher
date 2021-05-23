@@ -74,8 +74,8 @@ fun Chip(
                 modifier = Modifier
                     .padding(end = 2.dp)
                     .clickable {
-                    closeBlock()
-                },
+                        closeBlock()
+                    },
                 tint = colors?.closeIconTint ?: MaterialTheme.colors.onSurface.copy(alpha = 0.87f)
             )
         }

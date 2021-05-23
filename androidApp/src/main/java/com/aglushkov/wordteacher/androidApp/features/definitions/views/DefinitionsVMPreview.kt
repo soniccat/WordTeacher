@@ -11,9 +11,15 @@ import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 
-open class DefinitionsVMPreview(val defs: Resource<List<BaseViewItem<*>>>) : DefinitionsVM {
+open class DefinitionsVMPreview(
+    val defs: Resource<List<BaseViewItem<*>>>,
+    val displayMode: DefinitionsDisplayMode = DefinitionsDisplayMode.BySource,
+    val partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
+    val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech> = emptyList()
+) : DefinitionsVM {
     override fun restore(newState: DefinitionsVM.State) {
     }
 
@@ -42,6 +48,13 @@ open class DefinitionsVMPreview(val defs: Resource<List<BaseViewItem<*>>>) : Def
     override val state = DefinitionsVM.State(null)
     override val definitions: MutableStateFlow<Resource<List<BaseViewItem<*>>>>
         get() = MutableStateFlow(defs)
+
+    override val displayModeStateFlow: StateFlow<DefinitionsDisplayMode>
+        get() = MutableStateFlow(displayMode)
+    override val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
+        get() = MutableStateFlow(partsOfSpeechFilter)
+    override val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
+        get() = MutableStateFlow(selectedPartsOfSpeech)
     override val eventFlow: Flow<Event>
         get() = flow {  }
 }

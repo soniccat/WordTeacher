@@ -1,53 +1,54 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.Typography
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.toDp
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
+import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserUI
+import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.androidApp.general.views.compose.Chip
 import com.aglushkov.wordteacher.androidApp.general.views.compose.ChipColors
 import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomTopAppBar
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.androidApp.general.views.compose.SearchView
+import com.aglushkov.wordteacher.shared.events.EmptyEvent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterEvent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
@@ -58,14 +59,58 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTitleViewIte
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTranscriptionViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
 
+@SuppressLint("CoroutineCreationDuringComposition")
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DefinitionsUI(vm: DefinitionsVM) {
+    val scope = rememberCoroutineScope()
+    val partsOfSpeech by vm.partsOfSpeechFilterStateFlow.collectAsState()
+    val selectedPartsOfSpeeches by vm.selectedPartsOfSpeechStateFlow.collectAsState()
+    val event = vm.eventFlow.collectAsState(initial = EmptyEvent)
+    val eventValue = event.value
+
+    val partOfSpeechFilterBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    if (eventValue is ShowPartsOfSpeechFilterEvent) {
+        scope.launch {
+            if (partOfSpeechFilterBottomSheetState.currentValue == ModalBottomSheetValue.Hidden &&
+                !partOfSpeechFilterBottomSheetState.isAnimationRunning) {
+                partOfSpeechFilterBottomSheetState.show()
+            }
+        }
+    }
+
+    ChooserUI(
+        state = partOfSpeechFilterBottomSheetState,
+        items = partsOfSpeech.map { partOfSpeech ->
+            val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
+            ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
+        },
+        onSelected = { items ->
+            vm.onPartOfSpeechFilterUpdated(
+                items.filter { option ->
+                    option.isSelected
+                }.map { option ->
+                    option.obj as WordTeacherWord.PartOfSpeech
+                }
+            )
+        }
+    ) {
+        DefinitionsWordUI(vm)
+    }
+}
+
+@Composable
+private fun DefinitionsWordUI(
+    vm: DefinitionsVM
+) {
     val defs = vm.definitions.collectAsState()
     var searchText by remember { mutableStateOf("") }
 
@@ -337,8 +382,8 @@ private fun DefinitionsUIPreviewWithResponse() {
                         WordDefinitionViewItem("* definition 2"),
                         WordSynonymViewItem("synonym 1", Indent.NONE),
                         WordSynonymViewItem("synonym 2", Indent.SMALL),
-                        WordExampleViewItem("synonym 1", Indent.NONE),
-                        WordExampleViewItem("synonym 2", Indent.SMALL),
+                        WordExampleViewItem("example 1", Indent.NONE),
+                        WordExampleViewItem("example 2", Indent.SMALL),
                         WordSubHeaderViewItem(StringDesc.Raw("Subheader 1"), Indent.NONE),
                         WordSubHeaderViewItem(StringDesc.Raw("Subheader 2"), Indent.SMALL),
                     )

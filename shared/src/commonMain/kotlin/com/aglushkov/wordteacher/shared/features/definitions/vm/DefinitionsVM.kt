@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
+import com.aglushkov.wordteacher.shared.events.EmptyEvent
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
@@ -27,8 +28,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 interface DefinitionsVM {
@@ -42,7 +47,10 @@ interface DefinitionsVM {
     fun getErrorText(res: Resource<*>): StringDesc?
 
     val state: State
-    val definitions: MutableStateFlow<Resource<List<BaseViewItem<*>>>>
+    val definitions: StateFlow<Resource<List<BaseViewItem<*>>>>
+    val displayModeStateFlow: StateFlow<DefinitionsDisplayMode>
+    val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
+    val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
     val eventFlow: Flow<Event>
 
     @Parcelize
@@ -61,21 +69,25 @@ open class DefinitionsVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
-    override val definitions = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
 
-    var partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech> = emptyList()
+    override var displayModeStateFlow = MutableStateFlow(DefinitionsDisplayMode.BySource)
+    override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(emptyList())
+
+    override val definitions = combine(definitionWords, displayModeStateFlow, selectedPartsOfSpeechStateFlow) { a, b, c -> Triple(a, b, c) }
+        .map { (wordDefinitions, displayMode, partOfSpeachFilter) ->
+            Logger.v("build view items")
+            wordDefinitions.copyWith(buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeachFilter))
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+
+    override val partsOfSpeechFilterStateFlow = definitionWords.map {
+        it.data().orEmpty().map {
+            it.definitions.keys
+        }.flatten().distinct()
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
     val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     var loadJob: Job? = null
 
-    // State
-    var displayModeIndex: Int = 0
-    var displayMode: DefinitionsDisplayMode
-        set(value) {
-            displayModeIndex = displayModes.indexOf(value)
-        }
-        get() {
-            return displayModes[displayModeIndex]
-        }
     var word: String?
         get() {
             return state.word
@@ -85,13 +97,6 @@ open class DefinitionsVMImpl(
         }
 
     init {
-        viewModelScope.launch {
-            definitionWords.map {
-                Logger.v("build view items")
-                it.copyWith(buildViewItems(it.data() ?: emptyList()))
-            }.forward(definitions)
-        }
-
         word?.let {
             loadIfNeeded(it)
         }
@@ -110,7 +115,7 @@ open class DefinitionsVMImpl(
     // Events
 
     override fun onWordSubmitted(word: String?, filter: List<WordTeacherWord.PartOfSpeech>) {
-        this.partsOfSpeechFilter = filter
+        selectedPartsOfSpeechStateFlow.value = filter
         if (word == null) {
             this.word = null
         } else if (word.isNotEmpty()) {
@@ -119,40 +124,25 @@ open class DefinitionsVMImpl(
     }
 
     override fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>) {
-        partsOfSpeechFilter = filter
-        rebuildViewItems()
+        selectedPartsOfSpeechStateFlow.value = filter
     }
 
     override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
+        eventChannel.offer(EmptyEvent)
         eventChannel.offer(ShowPartsOfSpeechFilterEvent(
-            currentPartsOfSpeech(),
-            partsOfSpeechFilter
+            selectedPartsOfSpeechStateFlow.value,
+            partsOfSpeechFilterStateFlow.value
         ))
     }
 
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
-        partsOfSpeechFilter = emptyList()
-        rebuildViewItems()
-    }
-
-    private fun currentPartsOfSpeech(): List<WordTeacherWord.PartOfSpeech> {
-        return definitionWords.value.data()
-            ?.map {
-                it.definitions.keys
-            }?.flatten()?.distinct() ?: emptyList()
+        eventChannel.offer(EmptyEvent)
+        selectedPartsOfSpeechStateFlow.value = emptyList()
     }
 
     override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
-        if (this.displayMode == mode) return
-        this.displayMode = mode
-        rebuildViewItems()
-    }
-
-    private fun rebuildViewItems() {
-        val words = wordDefinitionRepository.obtainStateFlow(this.word!!).value
-        if (words.isLoaded()) {
-            definitions.value = Resource.Loaded(buildViewItems(words.data()!!))
-        }
+        if (displayModeStateFlow.value == mode) return
+        displayModeStateFlow.value = mode
     }
 
     override fun onTryAgainClicked() {
@@ -191,14 +181,18 @@ open class DefinitionsVMImpl(
         }
     }
 
-    private fun buildViewItems(words: List<WordTeacherWord>): List<BaseViewItem<*>> {
+    private fun buildViewItems(
+        words: List<WordTeacherWord>,
+        displayMode: DefinitionsDisplayMode,
+        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>
+    ): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         if (words.isNotEmpty()) {
             items.add(DefinitionsDisplayModeViewItem(
                 getPartOfSpeechChipText(partsOfSpeechFilter),
                 partsOfSpeechFilter.isNotEmpty(),
                 displayModes,
-                displayModeIndex
+                displayModes.indexOf(displayMode)
             ))
             items.add(WordDividerViewItem())
         }
