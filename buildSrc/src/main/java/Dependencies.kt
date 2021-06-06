@@ -10,13 +10,13 @@ object Versions {
     val android_gradle_plugin = "7.0.0-alpha12"
     val junit = "4.13"
     val sqlDelight = "1.5.0"
-    val ktor = "1.5.1"
+    val ktor = "1.5.4"
     val coroutines = "1.4.2-native-mt"
-    val serialization = "1.1.0-RC"
+    val serialization = "1.2.1"
     val lifecycle = "2.2.0"
 
     val compose_jetpack_version = "1.0.0-beta08"
-    val androidx_activity_compose_version = "1.3.0-alpha05"
+    val androidx_activity_compose_version = "1.3.0-beta01"
 
     val mokoResources = "0.15.1"
 
