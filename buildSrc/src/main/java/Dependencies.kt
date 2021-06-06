@@ -4,7 +4,7 @@ object Versions {
     val compileSdk = 30
     val buildToolVersion = "30.0.2"
 
-    val kotlin = "1.4.32"
+    val kotlin = "1.5.10"
     val androidx_test = "1.2.0"
     val androidx_test_ext = "1.1.1"
     val android_gradle_plugin = "7.0.0-alpha12"
@@ -15,12 +15,12 @@ object Versions {
     val serialization = "1.1.0-RC"
     val lifecycle = "2.2.0"
 
-    val compose_jetpack_version = "1.0.0-beta05"
+    val compose_jetpack_version = "1.0.0-beta08"
     val androidx_activity_compose_version = "1.3.0-alpha05"
 
     val mokoResources = "0.15.1"
 
-    val decompose = "0.2.4"
+    val decompose = "0.2.6"
 }
 
 object Deps {
