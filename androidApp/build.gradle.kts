@@ -16,6 +16,8 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     maven(url = "https://jitpack.io")
+    // to use SNAPSHOT versions of compose
+    maven(url = "https://androidx.dev/snapshots/builds/7454829/artifacts/repository")
 }
 
 android {
@@ -48,7 +50,6 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.compose_jetpack_version
-        kotlinCompilerVersion = Versions.kotlin
     }
 
     buildTypes {
@@ -71,10 +72,26 @@ dependencies {
     implementation(Deps.Google.lifecycleKtx)
     implementation(Deps.floatingActionButtonSpeedDial)
     implementation(Deps.Decompose.jetpack)
-    implementation(Deps.Compose.foundation)
-    implementation(Deps.Compose.material)
-    implementation(Deps.Compose.activity)
-    implementation(Deps.Compose.tooling)
+    implementation(Deps.Compose.foundation) {
+        version {
+            strictly("1.0.0-SNAPSHOT")
+        }
+    }
+    implementation(Deps.Compose.material) {
+        version {
+            strictly("1.0.0-SNAPSHOT")
+        }
+    }
+    implementation(Deps.Compose.activity) {
+        version {
+            strictly("1.3.0-SNAPSHOT")
+        }
+    }
+    implementation(Deps.Compose.tooling) {
+        version {
+            strictly("1.0.0-SNAPSHOT")
+        }
+    }
 
     implementation(Deps.Coroutines.common)
     implementation(Deps.Coroutines.android)
