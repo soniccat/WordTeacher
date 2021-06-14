@@ -26,6 +26,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,7 +44,7 @@ interface DefinitionsVM {
     fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
     fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem)
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
-    fun onPartOfSpeechFilterDialogCloseClicked()
+    fun onPartOfSpeechFilterDialogOpened()
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
 
@@ -131,19 +132,19 @@ open class DefinitionsVMImpl(
     }
 
     override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
-//        eventChannel.offer(EmptyEvent)
-        eventChannel.offer(ShowPartsOfSpeechFilterDialogEvent(
-            selectedPartsOfSpeechStateFlow.value,
-            partsOfSpeechFilterStateFlow.value
-        ))
+        eventChannel.offer(
+            ShowPartsOfSpeechFilterDialogEvent(
+                selectedPartsOfSpeechStateFlow.value,
+                partsOfSpeechFilterStateFlow.value
+            )
+        )
     }
 
-    override fun onPartOfSpeechFilterDialogCloseClicked() {
+    override fun onPartOfSpeechFilterDialogOpened() {
         eventChannel.offer(EmptyEvent)
     }
 
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
-        eventChannel.offer(EmptyEvent)
         selectedPartsOfSpeechStateFlow.value = emptyList()
     }
 

@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +19,9 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,21 +80,15 @@ fun DefinitionsUI(vm: DefinitionsVM) {
     val event = vm.eventFlow.collectAsState(initial = EmptyEvent)
     val eventValue = event.value
 
-    val partOfSpeechFilterBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        confirmStateChange = {
-            if (it == ModalBottomSheetValue.Hidden) {
-                vm.onPartOfSpeechFilterDialogCloseClicked()
-            }
-            true
-        }
-    )
-    if (eventValue is ShowPartsOfSpeechFilterDialogEvent) {
+    val partOfSpeechFilterBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val shouldShow = eventValue is ShowPartsOfSpeechFilterDialogEvent &&
+            partOfSpeechFilterBottomSheetState.currentValue == ModalBottomSheetValue.Hidden &&
+            !partOfSpeechFilterBottomSheetState.isAnimationRunning
+
+    if (shouldShow) {
         scope.launch {
-            if (partOfSpeechFilterBottomSheetState.currentValue == ModalBottomSheetValue.Hidden &&
-                !partOfSpeechFilterBottomSheetState.isAnimationRunning) {
-                partOfSpeechFilterBottomSheetState.show()
-            }
+            vm.onPartOfSpeechFilterDialogOpened()
+            partOfSpeechFilterBottomSheetState.show()
         }
     }
 
