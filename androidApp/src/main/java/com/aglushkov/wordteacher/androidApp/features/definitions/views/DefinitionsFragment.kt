@@ -20,7 +20,7 @@ import com.aglushkov.wordteacher.androidApp.general.extensions.submit
 import com.aglushkov.wordteacher.androidApp.general.views.bind
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterEvent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterDialogEvent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -83,7 +83,7 @@ class DefinitionsFragment: Fragment() {
             launch {
                 definitionsVM.eventFlow.collect {
                     when (it) {
-                        is ShowPartsOfSpeechFilterEvent -> {
+                        is ShowPartsOfSpeechFilterDialogEvent -> {
                             showPartsOfSpeechFilterChooser(
                                 requireContext(),
                                 idGenerator,

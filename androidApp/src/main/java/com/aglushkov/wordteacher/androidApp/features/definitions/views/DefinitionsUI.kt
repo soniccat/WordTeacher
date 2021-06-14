@@ -48,7 +48,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDispl
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterEvent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterDialogEvent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
@@ -77,8 +77,16 @@ fun DefinitionsUI(vm: DefinitionsVM) {
     val event = vm.eventFlow.collectAsState(initial = EmptyEvent)
     val eventValue = event.value
 
-    val partOfSpeechFilterBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-    if (eventValue is ShowPartsOfSpeechFilterEvent) {
+    val partOfSpeechFilterBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmStateChange = {
+            if (it == ModalBottomSheetValue.Hidden) {
+                vm.onPartOfSpeechFilterDialogCloseClicked()
+            }
+            true
+        }
+    )
+    if (eventValue is ShowPartsOfSpeechFilterDialogEvent) {
         scope.launch {
             if (partOfSpeechFilterBottomSheetState.currentValue == ModalBottomSheetValue.Hidden &&
                 !partOfSpeechFilterBottomSheetState.isAnimationRunning) {

@@ -32,7 +32,7 @@ import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterEvent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterDialogEvent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -258,7 +258,7 @@ class ArticleFragment: DialogFragment() {
             is ErrorEvent -> {
                 showError(it.text.toString(requireContext()))
             }
-            is ShowPartsOfSpeechFilterEvent -> {
+            is ShowPartsOfSpeechFilterDialogEvent -> {
                 showPartsOfSpeechFilterChooser(
                     requireContext(),
                     idGenerator,

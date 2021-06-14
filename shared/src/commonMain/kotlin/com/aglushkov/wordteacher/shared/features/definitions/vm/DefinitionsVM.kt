@@ -43,6 +43,7 @@ interface DefinitionsVM {
     fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
     fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem)
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
+    fun onPartOfSpeechFilterDialogCloseClicked()
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
 
@@ -130,11 +131,15 @@ open class DefinitionsVMImpl(
     }
 
     override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
-        eventChannel.offer(EmptyEvent)
-        eventChannel.offer(ShowPartsOfSpeechFilterEvent(
+//        eventChannel.offer(EmptyEvent)
+        eventChannel.offer(ShowPartsOfSpeechFilterDialogEvent(
             selectedPartsOfSpeechStateFlow.value,
             partsOfSpeechFilterStateFlow.value
         ))
+    }
+
+    override fun onPartOfSpeechFilterDialogCloseClicked() {
+        eventChannel.offer(EmptyEvent)
     }
 
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
@@ -384,7 +389,7 @@ open class DefinitionsVMImpl(
     }
 }
 
-data class ShowPartsOfSpeechFilterEvent(
+data class ShowPartsOfSpeechFilterDialogEvent(
     val partsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
     val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech>
 ): Event
