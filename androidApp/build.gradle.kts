@@ -16,8 +16,9 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     maven(url = "https://jitpack.io")
+
     // to use SNAPSHOT versions of compose
-    maven(url = "https://androidx.dev/snapshots/builds/7454829/artifacts/repository")
+    maven(url = "https://androidx.dev/snapshots/builds/7473952/artifacts/repository")
 }
 
 android {

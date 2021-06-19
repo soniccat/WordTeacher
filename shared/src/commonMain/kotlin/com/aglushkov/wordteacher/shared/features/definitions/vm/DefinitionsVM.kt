@@ -44,7 +44,6 @@ interface DefinitionsVM {
     fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
     fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem)
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
-    fun onPartOfSpeechFilterDialogOpened()
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
 
@@ -132,16 +131,14 @@ open class DefinitionsVMImpl(
     }
 
     override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
-        eventChannel.offer(
-            ShowPartsOfSpeechFilterDialogEvent(
-                selectedPartsOfSpeechStateFlow.value,
-                partsOfSpeechFilterStateFlow.value
+        viewModelScope.launch {
+            eventChannel.offer(
+                ShowPartsOfSpeechFilterDialogEvent(
+                    selectedPartsOfSpeechStateFlow.value,
+                    partsOfSpeechFilterStateFlow.value
+                )
             )
-        )
-    }
-
-    override fun onPartOfSpeechFilterDialogOpened() {
-        eventChannel.offer(EmptyEvent)
+        }
     }
 
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
@@ -392,5 +389,10 @@ open class DefinitionsVMImpl(
 
 data class ShowPartsOfSpeechFilterDialogEvent(
     val partsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
-    val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech>
-): Event
+    val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
+    override var isHandled: Boolean = false
+): Event {
+    override fun markAsHandled() {
+        isHandled = true
+    }
+}

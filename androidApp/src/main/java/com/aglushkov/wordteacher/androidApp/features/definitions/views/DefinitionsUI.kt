@@ -66,6 +66,7 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
@@ -78,19 +79,7 @@ fun DefinitionsUI(vm: DefinitionsVM) {
     val partsOfSpeech by vm.partsOfSpeechFilterStateFlow.collectAsState()
     val selectedPartsOfSpeeches by vm.selectedPartsOfSpeechStateFlow.collectAsState()
     val event = vm.eventFlow.collectAsState(initial = EmptyEvent)
-    val eventValue = event.value
-
     val partOfSpeechFilterBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val shouldShow = eventValue is ShowPartsOfSpeechFilterDialogEvent &&
-            partOfSpeechFilterBottomSheetState.currentValue == ModalBottomSheetValue.Hidden &&
-            !partOfSpeechFilterBottomSheetState.isAnimationRunning
-
-    if (shouldShow) {
-        scope.launch {
-            vm.onPartOfSpeechFilterDialogOpened()
-            partOfSpeechFilterBottomSheetState.show()
-        }
-    }
 
     ChooserUI(
         state = partOfSpeechFilterBottomSheetState,
@@ -108,13 +97,21 @@ fun DefinitionsUI(vm: DefinitionsVM) {
             )
         }
     ) {
-        DefinitionsWordUI(vm)
+        DefinitionsWordUI(
+            vm,
+            onPartOfSpeechFilterClicked = { items ->
+                scope.launch {
+                    partOfSpeechFilterBottomSheetState.show()
+                }
+            }
+        )
     }
 }
 
 @Composable
 private fun DefinitionsWordUI(
-    vm: DefinitionsVM
+    vm: DefinitionsVM,
+    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
     var searchText by remember { mutableStateOf("") }
@@ -136,7 +133,7 @@ private fun DefinitionsWordUI(
         if (data?.isNotEmpty() == true) {
             LazyColumn {
                 items(data) { item ->
-                    showViewItem(item, vm)
+                    showViewItem(item, vm, onPartOfSpeechFilterClicked)
                 }
             }
         } else {
@@ -155,11 +152,12 @@ private fun DefinitionsWordUI(
 @Composable
 private fun showViewItem(
     item: BaseViewItem<*>,
-    vm: DefinitionsVM
+    vm: DefinitionsVM,
+    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) = when (item) {
     is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
         item,
-        { vm.onPartOfSpeechFilterClicked(item) },
+        { onPartOfSpeechFilterClicked(item) },
         { vm.onPartOfSpeechFilterCloseClicked(item) },
         { mode -> vm.onDisplayModeChanged(mode) }
     )
