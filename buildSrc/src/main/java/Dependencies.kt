@@ -75,6 +75,7 @@ object Deps {
     val junit = "junit:junit:${Versions.junit}"
     val logger = "com.github.aakira:napier:1.4.1"
     val floatingActionButtonSpeedDial = "com.github.leinardi:FloatingActionButtonSpeedDial:3.1.1"
+    val uuid = "com.benasher44:uuid:0.3.0"
 
     object AndroidXTest {
         val core = "androidx.test:core:${Versions.androidx_test}"

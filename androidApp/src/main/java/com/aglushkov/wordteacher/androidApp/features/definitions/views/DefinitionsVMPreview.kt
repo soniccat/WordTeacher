@@ -38,9 +38,6 @@ open class DefinitionsVMPreview(
     override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
     }
 
-    override fun onPartOfSpeechFilterDialogOpened() {
-    }
-
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
     }
 

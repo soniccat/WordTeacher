@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
+import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
@@ -14,11 +15,12 @@ import org.jetbrains.annotations.Nullable
 @FragmentComp
 @Component(dependencies = [DefinitionsComposeDependencies::class], modules = [DefinitionsComposeModule::class])
 public interface DefinitionsComposeComponent {
-    fun definitionsComponent(): DefinitionsDecomposeComponent
+    fun rootDecomposeComponent(): RootDecomposeComponent
+//    fun definitionsDecomposeComponent(): DefinitionsDecomposeComponent
 
     @Component.Builder
     interface Builder {
-        @BindsInstance fun setComponentContext(context: ComponentContext?): Builder
+        @BindsInstance fun setComponentContext(context: ComponentContext): Builder
         @BindsInstance fun setWord(word: String?): Builder
 
         fun setDeps(deps: DefinitionsComposeDependencies): Builder

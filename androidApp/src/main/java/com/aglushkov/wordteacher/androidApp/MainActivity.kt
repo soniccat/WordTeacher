@@ -4,15 +4,12 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -27,13 +24,9 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefini
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.di.AppComponentOwner
-import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
+import com.arkivanov.decompose.extensions.compose.jetpack.Children
+import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.rememberRootComponent
-import javax.inject.Inject
 import kotlin.reflect.KClass
 
 class MainActivity : AppCompatActivity(), Router {
@@ -59,10 +52,19 @@ class MainActivity : AppCompatActivity(), Router {
                                 .setWord(null)
                                 .setDeps(deps)
                                 .build()
-                                .definitionsComponent()
+                                .rootDecomposeComponent()
                         }
 
-                        DefinitionsUI(component)
+                        Column {
+                            Button(onClick = {
+                                component.onNextChild()
+                            }) {
+                                Text("Open Next")
+                            }
+                            Children(routerState = component.routerState, animation = slide()) {
+                                DefinitionsUI(it.instance.inner)
+                            }
+                        }
                     }
                 }
             }

@@ -69,6 +69,7 @@ kotlin {
                 implementation(Deps.dateTime)
                 implementation(Deps.logger)
                 implementation(Deps.SqlDelight.runtime)
+                implementation(Deps.uuid)
                 api(Deps.Decompose.decompose)
             }
         }
