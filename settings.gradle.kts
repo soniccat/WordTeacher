@@ -18,4 +18,4 @@ rootProject.name = "WordTeacher"
 
 include(":androidApp")
 include(":shared")
-
+include(":desktopApp")

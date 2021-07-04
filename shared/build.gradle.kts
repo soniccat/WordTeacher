@@ -55,6 +55,8 @@ kotlin {
         iosX64("ios")
     }
 
+    jvm()
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -106,17 +108,23 @@ kotlin {
             }
         }
         val iosTest by getting
+
+        val jvmMain by getting {
+            dependencies {
+
+            }
+        }
     }
 
-    cocoapods {
-        summary = "Nothing"
-        homepage = "https://aglushkov.com"
-
-        podfile = project.file("../iosApp/Podfile")
-        pod("Reachability","3.2")
-
-        ios.deploymentTarget = "11.0"
-    }
+//    cocoapods {
+//        summary = "Nothing"
+//        homepage = "https://aglushkov.com"
+//
+//        podfile = project.file("../iosApp/Podfile")
+//        pod("Reachability","3.2")
+//
+//        ios.deploymentTarget = "11.0"
+//    }
 }
 
 multiplatformResources {
