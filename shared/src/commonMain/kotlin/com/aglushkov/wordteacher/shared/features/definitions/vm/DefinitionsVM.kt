@@ -1,17 +1,13 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
-import com.aglushkov.wordteacher.shared.events.EmptyEvent
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
@@ -19,7 +15,6 @@ import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.statekeeper.Parcelable
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.parcelize.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
@@ -113,6 +108,11 @@ open class DefinitionsVMImpl(
             word = "owl"
             loadIfNeeded("owl")
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        eventChannel.cancel()
     }
 
     // Events

@@ -98,7 +98,6 @@ dependencies {
     implementation(Deps.Coroutines.android)
 
     implementation(Deps.MokoResources.impl)
-    implementation(Deps.mokoMvvmCore)
 
     implementation(Deps.Ktor.androidClient)
 

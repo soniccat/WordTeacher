@@ -2,7 +2,7 @@ package com.aglushkov.wordteacher.androidApp.general
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import com.aglushkov.wordteacher.shared.general.ViewModel
 import javax.inject.Inject
 
 open class AndroidVM<T: Any>(

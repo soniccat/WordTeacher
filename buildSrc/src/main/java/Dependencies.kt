@@ -43,8 +43,6 @@ object Deps {
         val impl = "dev.icerock.moko:graphics:0.6.0"
     }
 
-    val mokoMvvmCore = "dev.icerock.moko:mvvm-core:0.10.1"
-
     object Mp {
         val serializationPlugin = "org.jetbrains.kotlin.plugin.serialization"
         val serializationClasspath = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}"

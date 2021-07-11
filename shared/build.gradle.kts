@@ -65,13 +65,11 @@ kotlin {
                 implementation(Deps.MokoResources.impl)
                 implementation(Deps.MokoParcelize.impl)
                 implementation(Deps.MokoGraphics.impl)
-                implementation(Deps.mokoMvvmCore)
                 implementation(Deps.okio)
                 implementation(Deps.dateTime)
                 implementation(Deps.logger)
                 implementation(Deps.SqlDelight.runtime)
                 implementation(Deps.uuid)
-                implementation("me.alexeyglushkov:FirstKMMLib:1.0")
                 api(Deps.Decompose.decompose)
             }
         }
