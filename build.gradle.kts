@@ -3,6 +3,7 @@ buildscript {
         google()
         mavenCentral()
         gradlePluginPortal()
+        mavenLocal()
     }
 
     dependencies {
@@ -23,6 +24,7 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
+    mavenLocal()
 }
 
 subprojects {
@@ -30,6 +32,7 @@ subprojects {
         google()
         mavenCentral()
         gradlePluginPortal()
+        mavenLocal()
     }
 }
 
@@ -38,5 +41,6 @@ allprojects {
         google()
         mavenCentral()
         gradlePluginPortal()
+        mavenLocal()
     }
 }
