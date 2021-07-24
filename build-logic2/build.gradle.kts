@@ -1,17 +1,26 @@
+import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
+
 plugins {
-    `kotlin-dsl`,
-    id("dependencies")
+    `kotlin-dsl`
+    id("com.aglushkov.plugins")
 }
 
 repositories {
+    google()
     mavenCentral()
+    gradlePluginPortal()
+    mavenLocal()
 }
 
-gradlePlugin {
-    plugins {
-        create("androiddeps") {
-            id = "com.aglushkov.plugins"
-            implementationClass = "com.aglushkov.plugins.DependenciesPlugin"
-        }
-    }
+dependencies {
+    implementation(Deps.SqlDelight)
 }
+
+//gradlePlugin {
+//    plugins {
+//        create("androiddeps") {
+//            id = "com.aglushkov.plugins"
+//            implementationClass = "com.aglushkov.plugins.DependenciesPlugin"
+//        }
+//    }
+//}

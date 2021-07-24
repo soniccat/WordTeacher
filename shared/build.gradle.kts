@@ -1,5 +1,5 @@
-import com.aglushkov.plugins.DependenciesPlugin.Companion.Versions
-import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
+//import com.aglushkov.plugins.DependenciesPlugin.Companion.Versions
+//import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
 
 //buildscript {
 //    plugins {
@@ -17,7 +17,8 @@ plugins {
     id("com.android.library")
     id("kotlin-parcelize")
     kotlin("native.cocoapods")
-    id("com.aglushkov.kmmplugins")
+//    id("com.aglushkov.kmmplugins")
+    id("android-convention")
 //    id(DependenciesPlugin)
 //    id(Deps.MokoResources.plugin)
 //    id(com.aglushkov.plugins.DependenciesPlugin.Companion.Deps.SqlDelight.plugin)
