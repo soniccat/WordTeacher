@@ -1,6 +1,11 @@
 plugins {
     `kotlin-dsl`
+    `java-gradle-plugin`
 }
+
+// To make it available as direct dependency
+group = "com.aglushkov.plugins.deps"
+version = "SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -9,12 +14,12 @@ repositories {
 gradlePlugin {
     plugins {
         create("dependencies") {
-            id = "com.aglushkov.plugins"
-            implementationClass = "com.aglushkov.plugins.DependenciesPlugin"
+            id = "dependencies"
+            implementationClass = "com.aglushkov.plugins.deps.DependenciesPlugin"
         }
-        create("kmmdependencies") {
-            id = "com.aglushkov.kmmplugins"
-            implementationClass = "com.aglushkov.plugins.MyKmmPlugin"
-        }
+//        create("kmmdependencies") {
+//            id = "com.aglushkov.kmmplugins"
+//            implementationClass = "com.aglushkov.plugins.deps.MyKmmPlugin"
+//        }
     }
 }

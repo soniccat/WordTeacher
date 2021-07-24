@@ -1,8 +1,9 @@
-import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
+import com.aglushkov.plugins.deps.Deps
 
 plugins {
-    `kotlin-dsl`
-    id("com.aglushkov.plugins")
+    `kotlin-dsl`// version "1.5.10"
+    `java-gradle-plugin`
+    id("dependencies")
 }
 
 repositories {
@@ -11,16 +12,19 @@ repositories {
     gradlePluginPortal()
     mavenLocal()
 }
-
 dependencies {
-    implementation(Deps.SqlDelight)
+    implementation(Deps.SqlDelight.runtime)
+    implementation("com.aglushkov.plugins.deps:dependencies:SNAPSHOT")
 }
 
-//gradlePlugin {
-//    plugins {
-//        create("androiddeps") {
-//            id = "com.aglushkov.plugins"
-//            implementationClass = "com.aglushkov.plugins.DependenciesPlugin"
-//        }
-//    }
-//}
+// HACK instead of implementation("com.aglushkov.plugins.deps:dependencies:SNAPSHOT") which doesn' work...
+kotlin.sourceSets.getByName("main").kotlin.srcDir("../build-logic/src/main/kotlin")
+
+gradlePlugin {
+    plugins {
+        create("androidplugin") {
+            id = "com.aglushkov.androidplugin"
+            implementationClass = "com.aglushkov.plugins.AndroidMyPlugin"
+        }
+    }
+}

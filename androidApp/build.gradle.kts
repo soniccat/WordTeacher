@@ -1,12 +1,12 @@
-import com.aglushkov.plugins.DependenciesPlugin.Companion.Versions
-import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
+import com.aglushkov.plugins.deps.Versions
+import com.aglushkov.plugins.deps.Deps
 
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
-    id("com.aglushkov.plugins")
+    id("dependencies")
 //    id(Deps.SqlDelight.plugin)
 }
 

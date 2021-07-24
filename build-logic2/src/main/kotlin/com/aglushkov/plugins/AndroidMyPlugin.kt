@@ -2,10 +2,11 @@ package com.aglushkov.plugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import com.aglushkov.plugins.deps.Deps
 
-class MyKmmPlugin : Plugin<Project> {
+class AndroidMyPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
-        target.pluginManager.apply(DependenciesPlugin.Companion.Deps.SqlDelight.plugin)
+        target.pluginManager.apply(Deps.SqlDelight.plugin)
     }
 }
