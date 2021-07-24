@@ -1,5 +1,6 @@
 plugins {
-    `kotlin-dsl`
+    `kotlin-dsl`,
+    id("dependencies")
 }
 
 repositories {
@@ -8,13 +9,9 @@ repositories {
 
 gradlePlugin {
     plugins {
-        create("dependencies") {
+        create("androiddeps") {
             id = "com.aglushkov.plugins"
             implementationClass = "com.aglushkov.plugins.DependenciesPlugin"
-        }
-        create("kmmdependencies") {
-            id = "com.aglushkov.kmmplugins"
-            implementationClass = "com.aglushkov.plugins.MyKmmPlugin"
         }
     }
 }

@@ -17,11 +17,11 @@ plugins {
     id("com.android.library")
     id("kotlin-parcelize")
     kotlin("native.cocoapods")
-    id("com.aglushkov.plugins")
+    id("com.aglushkov.kmmplugins")
 //    id(DependenciesPlugin)
 //    id(Deps.MokoResources.plugin)
 //    id(com.aglushkov.plugins.DependenciesPlugin.Companion.Deps.SqlDelight.plugin)
-    id("com.squareup.sqldelight")
+//    id("com.squareup.sqldelight")
 }
 
 group = "com.aglushkov.wordteacher"
