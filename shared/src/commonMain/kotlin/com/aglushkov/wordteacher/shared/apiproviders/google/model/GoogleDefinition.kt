@@ -2,8 +2,8 @@ package com.aglushkov.wordteacher.apiproviders.google.model
 
 
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.decompose.statekeeper.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

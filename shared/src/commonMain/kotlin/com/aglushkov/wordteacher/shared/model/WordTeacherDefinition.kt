@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.model
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.decompose.statekeeper.Parcelize
 
 
 @Parcelize

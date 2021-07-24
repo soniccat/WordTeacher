@@ -4,8 +4,8 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.fromString
 import com.aglushkov.wordteacher.shared.repository.config.Config
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.decompose.statekeeper.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

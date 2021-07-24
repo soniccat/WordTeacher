@@ -4,7 +4,7 @@ plugins {
     id("kotlin-parcelize")
     kotlin("native.cocoapods")
     id(Deps.Mp.serializationPlugin)
-    id(Deps.MokoResources.plugin)
+//    id(Deps.MokoResources.plugin)
     id(Deps.SqlDelight.plugin)
 }
 
@@ -62,9 +62,9 @@ kotlin {
                 implementation(Deps.Mp.serializationJson)
                 implementation(Deps.Ktor.commonCore)
                 implementation(Deps.Coroutines.common)
-                implementation(Deps.MokoResources.impl)
-                implementation(Deps.MokoParcelize.impl)
-                implementation(Deps.MokoGraphics.impl)
+//                implementation(Deps.MokoResources.impl)
+//                implementation(Deps.MokoParcelize.impl)
+//                implementation(Deps.MokoGraphics.impl)
                 implementation(Deps.okio)
                 implementation(Deps.dateTime)
                 implementation(Deps.logger)
@@ -119,10 +119,10 @@ kotlin {
     }
 }
 
-multiplatformResources {
-    multiplatformResourcesPackage = "com.aglushkov.wordteacher.shared.res" // required
-    iosBaseLocalizationRegion = "en" // optional, default "en"
-}
+//multiplatformResources {
+//    multiplatformResourcesPackage = "com.aglushkov.wordteacher.shared.res" // required
+//    iosBaseLocalizationRegion = "en" // optional, default "en"
+//}
 
 sqldelight {
     database("SQLDelightDatabase") {

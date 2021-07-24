@@ -5,8 +5,8 @@ import com.aglushkov.wordteacher.shared.general.extensions.merge
 import com.aglushkov.wordteacher.shared.general.extensions.runIfNotEmpty
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.decompose.statekeeper.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -15,7 +15,7 @@ import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.statekeeper.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import com.arkivanov.decompose.statekeeper.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CoroutineExceptionHandler

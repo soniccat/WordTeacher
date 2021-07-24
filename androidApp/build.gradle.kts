@@ -1,11 +1,12 @@
 import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 plugins {
+    id("deps")
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
-    id(Deps.SqlDelight.plugin)
+//    id(Deps.SqlDelight.plugin)
 }
 
 group = "com.aglushkov.wordteacher"
@@ -97,7 +98,7 @@ dependencies {
     implementation(Deps.Coroutines.common)
     implementation(Deps.Coroutines.android)
 
-    implementation(Deps.MokoResources.impl)
+//    implementation(Deps.MokoResources.impl)
 
     implementation(Deps.Ktor.androidClient)
 

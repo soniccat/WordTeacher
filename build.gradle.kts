@@ -1,4 +1,10 @@
+//plugins {
+//    id("deps")
+//}
+
 buildscript {
+//    apply(plugin="deps")
+
     repositories {
         google()
         mavenCentral()
@@ -7,11 +13,13 @@ buildscript {
     }
 
     dependencies {
-        classpath(Deps.Gradle.androidClasspath)
-        classpath(Deps.Gradle.kotlinClasspath)
-        classpath(Deps.Mp.serializationClasspath)
-        classpath(Deps.MokoResources.classpath)
-        classpath(Deps.SqlDelight.classpath)
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
+        classpath("com.android.tools.build:gradle:7.0.0-beta04")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
+        classpath("org.jetbrains.kotlin:kotlin-serialization:1.5.10")
+        classpath("com.squareup.sqldelight:gradle-plugin:1.5.0")
+        classpath(":build-logic")
+        classpath(":resources-plugin")
     }
 }
 
