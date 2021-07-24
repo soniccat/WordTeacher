@@ -1,11 +1,12 @@
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+import com.aglushkov.plugins.DependenciesPlugin.Companion.Versions
+import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
 
 plugins {
-    id("deps")
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
+    id("com.aglushkov.plugins")
 //    id(Deps.SqlDelight.plugin)
 }
 

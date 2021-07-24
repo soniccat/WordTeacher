@@ -1,11 +1,27 @@
+import com.aglushkov.plugins.DependenciesPlugin.Companion.Versions
+import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
+
+//buildscript {
+//    plugins {
+////        id("com.aglushkov.plugins")
+////        id(com.aglushkov.plugins.DependenciesPlugin.Companion.Deps.SqlDelight.plugin)
+//    }
+//
+//    dependencies {
+//        classpath(":build-logic")
+//    }
+//}
+
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
     id("kotlin-parcelize")
     kotlin("native.cocoapods")
-    id(Deps.Mp.serializationPlugin)
+    id("com.aglushkov.plugins")
+//    id(DependenciesPlugin)
 //    id(Deps.MokoResources.plugin)
-    id(Deps.SqlDelight.plugin)
+//    id(com.aglushkov.plugins.DependenciesPlugin.Companion.Deps.SqlDelight.plugin)
+    id("com.squareup.sqldelight")
 }
 
 group = "com.aglushkov.wordteacher"

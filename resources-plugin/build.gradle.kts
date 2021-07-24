@@ -1,3 +1,4 @@
+//import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
 
 buildscript {
     repositories {
@@ -8,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath(":build-logic")
+//        classpath(":build-logic")
     }
 }
 
@@ -16,8 +17,8 @@ group = "com.aglushkov.resources-plugin"
 version = "1.0.0"
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version ("1.5.20")
-    id("deps")
+//    id("org.jetbrains.kotlin.jvm") version ("1.5.20")
+    id("com.aglushkov.plugins")
 }
 
 repositories {
@@ -27,9 +28,9 @@ repositories {
 }
 
 dependencies {
-    implementation(gradleKotlinDsl())
-    compileOnly(Deps_gradle.MyDeps.Gradle.kotlinClasspath)
-    compileOnly(Deps_gradle.MyDeps.Gradle.androidClasspath)
+//    implementation(gradleKotlinDsl())
+//    implementation(Deps.Gradle.kotlinClasspath)
+//    compileOnly(Deps.Gradle.androidClasspath)
 //    implementation(libs.kotlinPoet)
 //    implementation(libs.kotlinxSerialization)
 //    implementation(libs.apacheCommonsText)

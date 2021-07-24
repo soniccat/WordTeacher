@@ -23,7 +23,7 @@
 //    val decompose = "0.2.6"
 //}
 //
-//object MyDeps {
+//object Deps {
 //    object Gradle {
 //        val kotlinClasspath = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
 //        val androidClasspath = "com.android.tools.build:gradle:${Versions.android_gradle_plugin}"

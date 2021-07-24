@@ -18,8 +18,8 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
         classpath("org.jetbrains.kotlin:kotlin-serialization:1.5.10")
         classpath("com.squareup.sqldelight:gradle-plugin:1.5.0")
-        classpath(":build-logic")
-        classpath(":resources-plugin")
+//        classpath(":build-logic")
+//        classpath(":resources-plugin")
     }
 }
 
