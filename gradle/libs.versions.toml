@@ -1,0 +1,8 @@
+[versions]
+kotlin = "1.5.10"
+sqlDelight = "1.5.0"
+
+[libraries]
+kotlinPlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+sqlDelightClassPath = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "kotlin" }
+sqlDelightPlugin = "com.squareup.sqldelight:gradle-plugin:1.5.0"
