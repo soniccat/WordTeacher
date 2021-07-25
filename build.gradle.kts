@@ -1,12 +1,9 @@
-import com.aglushkov.plugins.deps.Deps
 //plugins {
 //    id("deps")
 //}
 
 buildscript {
-    plugins {
-        id("kmmdeps")
-    }
+    apply(plugin="deps")
 
     repositories {
         google()
@@ -16,12 +13,10 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
         classpath("com.android.tools.build:gradle:7.0.0-beta05")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
         classpath("org.jetbrains.kotlin:kotlin-serialization:1.5.10")
-//        classpath(Deps.SqlDelight.classpath)
-//        classpath("com.squareup.sqldelight:gradle-plugin:1.5.0")
+        classpath("com.squareup.sqldelight:gradle-plugin:1.5.0")
 //        classpath(":build-logic")
 //        classpath(":resources-plugin")
     }

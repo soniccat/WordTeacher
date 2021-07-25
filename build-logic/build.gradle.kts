@@ -10,7 +10,10 @@ group = "com.aglushkov.plugins.deps"
 version = "SNAPSHOT"
 
 repositories {
+    google()
     mavenCentral()
+    gradlePluginPortal()
+    mavenLocal()
 }
 
 dependencies {
@@ -18,10 +21,6 @@ dependencies {
 }
 
 gradlePlugin {
-    plugins.register("deps") {
-        id = "deps"
-        implementationClass = "com.aglushkov.plugins.deps.DepsPlugin"
-    }
     plugins.register("kmmdeps") {
         id = "kmmdeps"
         implementationClass = "com.aglushkov.plugins.deps.KmmDepsPlugin"
