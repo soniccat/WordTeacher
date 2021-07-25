@@ -38,6 +38,7 @@ plugins {
 dependencies {
     implementation(com.aglushkov.plugins.deps.Deps.Gradle.kotlinClasspath)
     implementation(com.aglushkov.plugins.deps.Deps.SqlDelight.classpath)
+    implementation(com.aglushkov.plugins.deps.Deps.Mp.serializationClasspath)
     // TODO: return this:
 //    implementation("com.android.tools.build:gradle:7.0.0-beta05")
     /*
