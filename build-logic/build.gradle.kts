@@ -12,7 +12,7 @@ repositories {
     mavenCentral()
 }
 
-//kotlin.sourceSets.getByName("main").kotlin.srcDir("../depsSrc/main/kotlin")
+kotlin.sourceSets.getByName("main").kotlin.srcDir("../depsSrc/main/kotlin")
 
 dependencies {
     implementation(com.aglushkov.plugins.deps.Deps.SqlDelight.classpath)
