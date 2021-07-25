@@ -1,6 +1,7 @@
 
 plugins {
     `kotlin-dsl`
+    id("deps")
 }
 
 // To make it available as direct dependency
@@ -14,7 +15,8 @@ repositories {
 kotlin.sourceSets.getByName("main").kotlin.srcDir("../depsSrc/main/kotlin")
 
 dependencies {
-    implementation("com.squareup.sqldelight:gradle-plugin:1.5.0")
+    implementation(com.aglushkov.plugins.deps2.Deps.SqlDelight.classpath)
+    //implementation("com.squareup.sqldelight:gradle-plugin:1.5.0")
 //    implementation(com.aglushkov.plugins.deps.Deps.SqlDelight.classpath)
 }
 
