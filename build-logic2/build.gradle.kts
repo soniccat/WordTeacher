@@ -3,7 +3,7 @@ import com.aglushkov.plugins.deps.Deps
 plugins {
     `kotlin-dsl`// version "1.5.10"
     `java-gradle-plugin`
-    id("dependencies")
+//    id("dependencies")
 }
 
 repositories {
@@ -14,7 +14,7 @@ repositories {
 }
 dependencies {
     implementation(Deps.SqlDelight.runtime)
-    implementation("com.aglushkov.plugins.deps:dependencies:SNAPSHOT")
+//    implementation("com.aglushkov.plugins.deps:dependencies:SNAPSHOT")
 }
 
 // HACK instead of implementation("com.aglushkov.plugins.deps:dependencies:SNAPSHOT") which doesn' work...

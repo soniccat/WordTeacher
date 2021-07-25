@@ -18,7 +18,7 @@ plugins {
     id("kotlin-parcelize")
     kotlin("native.cocoapods")
 //    id("com.aglushkov.kmmplugins")
-    id("com.aglushkov.androidplugin")
+    id("kmmdeps")
 //    id(DependenciesPlugin)
 //    id(Deps.MokoResources.plugin)
 //    id(com.aglushkov.plugins.DependenciesPlugin.Companion.Deps.SqlDelight.plugin)

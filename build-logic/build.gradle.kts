@@ -1,6 +1,6 @@
+
 plugins {
     `kotlin-dsl`
-    `java-gradle-plugin`
 }
 
 // To make it available as direct dependency
@@ -11,15 +11,21 @@ repositories {
     mavenCentral()
 }
 
+kotlin.sourceSets.getByName("main").kotlin.srcDir("../depsSrc/main/kotlin")
+
+dependencies {
+    implementation("com.squareup.sqldelight:gradle-plugin:1.5.0")
+//    implementation(com.aglushkov.plugins.deps.Deps.SqlDelight.classpath)
+}
+
 gradlePlugin {
-    plugins {
-        create("dependencies") {
-            id = "dependencies"
-            implementationClass = "com.aglushkov.plugins.deps.DependenciesPlugin"
-        }
-//        create("kmmdependencies") {
-//            id = "com.aglushkov.kmmplugins"
-//            implementationClass = "com.aglushkov.plugins.deps.MyKmmPlugin"
+//    plugins {
+//        create("dependencies") {
+//            id = "dependencies"
+//            implementationClass = "com.aglushkov.plugins.deps.DependenciesPlugin"
 //        }
+    plugins.register("kmmdeps") {
+        id = "kmmdeps"
+        implementationClass = "com.aglushkov.plugins.deps.MyKmmPlugin"
     }
 }

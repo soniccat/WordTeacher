@@ -6,7 +6,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
-    id("dependencies")
+    id("kmmdeps")
 //    id(Deps.SqlDelight.plugin)
 }
 
@@ -66,6 +66,7 @@ android {
 dependencies {
     implementation(project(":shared"))
 
+    implementation(Deps.SqlDelight.classpath)
     implementation(Deps.Google.fragments)
     implementation(Deps.Google.material)
     implementation(Deps.Google.appcompat)

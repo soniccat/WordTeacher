@@ -18,7 +18,7 @@ version = "1.0.0"
 
 plugins {
 //    id("org.jetbrains.kotlin.jvm") version ("1.5.20")
-    id("dependencies")
+//    id("dependencies")
 }
 
 repositories {
