@@ -1,17 +1,17 @@
 //import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-        mavenLocal()
-    }
-
-    dependencies {
-//        classpath(":build-logic")
-    }
-}
+//buildscript {
+//    repositories {
+//        google()
+//        mavenCentral()
+//        gradlePluginPortal()
+//        mavenLocal()
+//    }
+//
+//    dependencies {
+////        classpath(":build-logic")
+//    }
+//}
 
 group = "com.aglushkov.resources-plugin"
 version = "1.0.0"
@@ -25,6 +25,7 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
+    mavenLocal()
 }
 
 dependencies {

@@ -1,16 +1,5 @@
-//plugins {
-//    id("deps")
-//}
-
-//plugins {
-//    `kotlin-dsl`
-//}
-
-//kotlin.sourceSets.getByName("main").kotlin.srcDir("../depsSrc/main/kotlin")
 
 buildscript {
-//    apply(plugin="deps")
-
     repositories {
         google()
         mavenCentral()
@@ -21,7 +10,7 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
         classpath("com.android.tools.build:gradle:7.0.0-beta05")
-//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
         classpath("org.jetbrains.kotlin:kotlin-serialization:1.5.10")
 //        classpath(com.aglushkov.plugins.deps.Deps.SqlDelight.classpath)
         //classpath("com.squareup.sqldelight:gradle-plugin:1.5.0")
@@ -30,28 +19,13 @@ buildscript {
     }
 }
 
-// TODO: add ktlint
+dependencyResolutionManagement {
+//    versionCatalogs {
+//        create("libs") {
+//            from(files("./gradle/libs.versions.toml"))
+//        }
+//    }
 
-group = "com.aglushkov.wordteacher"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    google()
-    mavenCentral()
-    gradlePluginPortal()
-    mavenLocal()
-}
-
-subprojects {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-        mavenLocal()
-    }
-}
-
-allprojects {
     repositories {
         google()
         mavenCentral()

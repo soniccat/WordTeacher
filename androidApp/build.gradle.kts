@@ -2,12 +2,11 @@ import com.aglushkov.plugins.deps.Versions
 import com.aglushkov.plugins.deps.Deps
 
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-kapt")
-    id("kotlin-parcelize")
+//    id("com.android.application")
+//    id("kotlin-android")
+//    id("kotlin-kapt")
+//    id("kotlin-parcelize")
     id("kmmdeps")
-//    id(Deps.SqlDelight.plugin)
 }
 
 group = "com.aglushkov.wordteacher"
@@ -17,6 +16,7 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
+    mavenLocal()
     maven(url = "https://jitpack.io")
 
     // to use SNAPSHOT versions of compose (https://androidx.dev/snapshots/builds)

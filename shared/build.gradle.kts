@@ -13,12 +13,12 @@ import com.aglushkov.plugins.deps.Versions
 //}
 
 plugins {
-    kotlin("multiplatform")
-    id("com.android.library")
-    id("kotlin-parcelize")
+//    kotlin("multiplatform")
+//    id("com.android.library")
+//    id("kotlin-parcelize")
     kotlin("native.cocoapods")
 //    id("com.aglushkov.kmmplugins")
-    id("kmmdeps")
+    id("kmmlibdeps")
 //    id(DependenciesPlugin)
 //    id(Deps.MokoResources.plugin)
 //    id(com.aglushkov.plugins.DependenciesPlugin.Companion.Deps.SqlDelight.plugin)
