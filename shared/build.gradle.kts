@@ -16,7 +16,7 @@ plugins {
 //    kotlin("multiplatform")
 //    id("com.android.library")
 //    id("kotlin-parcelize")
-    kotlin("native.cocoapods")
+//    kotlin("native.cocoapods")
 //    id("com.aglushkov.kmmplugins")
     id("kmmlibdeps")
 //    id(DependenciesPlugin)

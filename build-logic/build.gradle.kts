@@ -36,11 +36,12 @@ plugins {
 //}
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
+    implementation(com.aglushkov.plugins.deps.Deps.Gradle.kotlinClasspath)
     implementation(com.aglushkov.plugins.deps.Deps.SqlDelight.classpath)
+    // TODO: return this:
 //    implementation("com.android.tools.build:gradle:7.0.0-beta05")
     /*
-    gives
+    Not it gives that:
     A problem occurred configuring project ':androidApp'.
 > Could not resolve all artifacts for configuration ':androidApp:classpath'.
    > Could not find com.android.tools.build:gradle:7.0.0-beta05.
