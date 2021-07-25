@@ -6,8 +6,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
-    id("dependencies")
-//    id(Deps.SqlDelight.plugin)
+    id("kmmdeps")
 }
 
 group = "com.aglushkov.wordteacher"

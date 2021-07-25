@@ -1,12 +1,12 @@
-package com.aglushkov.plugins
+package com.aglushkov.plugins.deps
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import com.aglushkov.plugins.deps.Deps
 
-class AndroidMyPlugin : Plugin<Project> {
+class KmmDepsPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
+        target.pluginManager.apply(Deps.Mp.serializationPlugin)
         target.pluginManager.apply(Deps.SqlDelight.plugin)
     }
 }
