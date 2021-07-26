@@ -2,10 +2,6 @@ import com.aglushkov.plugins.deps.Versions
 import com.aglushkov.plugins.deps.Deps
 
 plugins {
-//    id("com.android.application")
-//    id("kotlin-android")
-//    id("kotlin-kapt")
-//    id("kotlin-parcelize")
     id("kmmdeps")
 }
 
@@ -16,7 +12,6 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
-    mavenLocal()
     maven(url = "https://jitpack.io")
 
     // to use SNAPSHOT versions of compose (https://androidx.dev/snapshots/builds)

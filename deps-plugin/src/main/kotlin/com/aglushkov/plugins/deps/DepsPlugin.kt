@@ -1,4 +1,4 @@
-package com.aglushkov.plugins.deps2
+package com.aglushkov.plugins.deps
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project

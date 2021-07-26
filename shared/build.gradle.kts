@@ -1,28 +1,8 @@
 import com.aglushkov.plugins.deps.Deps
 import com.aglushkov.plugins.deps.Versions
 
-//buildscript {
-//    plugins {
-////        id("com.aglushkov.plugins")
-////        id(com.aglushkov.plugins.DependenciesPlugin.Companion.Deps.SqlDelight.plugin)
-//    }
-//
-//    dependencies {
-//        classpath(":build-logic")
-//    }
-//}
-
 plugins {
-//    kotlin("multiplatform")
-//    id("com.android.library")
-//    id("kotlin-parcelize")
-//    kotlin("native.cocoapods")
-//    id("com.aglushkov.kmmplugins")
     id("kmmlibdeps")
-//    id(DependenciesPlugin)
-//    id(Deps.MokoResources.plugin)
-//    id(com.aglushkov.plugins.DependenciesPlugin.Companion.Deps.SqlDelight.plugin)
-//    id("com.squareup.sqldelight")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -32,7 +12,6 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
-    mavenLocal()
 }
 
 android {

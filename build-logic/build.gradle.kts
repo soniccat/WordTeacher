@@ -1,39 +1,14 @@
 
 plugins {
     `kotlin-dsl`
-    `java-gradle-plugin`
     id("deps")
 }
 
-// To make it available as direct dependency
-//group = "com.aglushkov.plugins.deps"
-//version = "SNAPSHOT"
-
-//
-//repositories {
-//    google()
-//    mavenCentral()
-//    gradlePluginPortal()
-//    mavenLocal()
-//}
-//
-//subprojects {
-//    repositories {
-//        google()
-//        mavenCentral()
-//        gradlePluginPortal()
-//        mavenLocal()
-//    }
-//}
-//
-//allprojects {
-//    repositories {
-//        google()
-//        mavenCentral()
-//        gradlePluginPortal()
-//        mavenLocal()
-//    }
-//}
+repositories {
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+}
 
 dependencies {
     implementation(com.aglushkov.plugins.deps.Deps.Gradle.kotlinClasspath)
@@ -54,6 +29,7 @@ dependencies {
      */
 }
 
+// To be able to access Deps in MyKmmLibPlugin
 kotlin.sourceSets.getByName("main").kotlin.srcDir("../depsSrc/main/kotlin")
 
 gradlePlugin {
