@@ -1,24 +1,9 @@
-//import com.aglushkov.plugins.DependenciesPlugin.Companion.Deps
-
-//buildscript {
-//    repositories {
-//        google()
-//        mavenCentral()
-//        gradlePluginPortal()
-//        mavenLocal()
-//    }
-//
-//    dependencies {
-////        classpath(":build-logic")
-//    }
-//}
 
 group = "com.aglushkov.resources-plugin"
 version = "1.0.0"
 
 plugins {
-//    id("org.jetbrains.kotlin.jvm") version ("1.5.20")
-//    id("dependencies")
+//    id("kmmlib")
 }
 
 repositories {
