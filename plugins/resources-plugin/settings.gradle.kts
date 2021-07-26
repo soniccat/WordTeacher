@@ -1,2 +1,2 @@
 
-includeBuild("../build-logic")
+includeBuild("../configure-plugin")
