@@ -1,9 +1,8 @@
 
 rootProject.name = "WordTeacher"
 
-includeBuild("deps-plugin")
-includeBuild("build-logic")
-//includeBuild("build-logic2")
-includeBuild("resources-plugin")
+includeBuild("plugins/deps-plugin")
+includeBuild("plugins/build-logic")
+includeBuild("plugins/resources-plugin")
 include(":androidApp")
 include(":shared")
