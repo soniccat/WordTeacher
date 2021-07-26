@@ -1,2 +1,0 @@
-
-includeBuild("../configure-plugin")

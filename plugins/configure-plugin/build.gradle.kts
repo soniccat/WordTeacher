@@ -33,13 +33,13 @@ dependencies {
 kotlin.sourceSets.getByName("main").kotlin.srcDir("../depsSrc/main/kotlin")
 
 gradlePlugin {
-    plugins.register("kmmdeps") {
-        id = "kmmdeps"
-        implementationClass = "com.aglushkov.plugins.deps.MyKmmPlugin"
+    plugins.register("androidapp") {
+        id = "androidapp"
+        implementationClass = "com.aglushkov.plugins.deps.AndroidAppPlugin"
     }
 
-    plugins.register("kmmlibdeps") {
-        id = "kmmlibdeps"
-        implementationClass = "com.aglushkov.plugins.deps.MyKmmLibPlugin"
+    plugins.register("kmmlib") {
+        id = "kmmlib"
+        implementationClass = "com.aglushkov.plugins.deps.KmmLibPlugin"
     }
 }

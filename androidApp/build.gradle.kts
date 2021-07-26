@@ -2,7 +2,7 @@ import com.aglushkov.plugins.deps.Versions
 import com.aglushkov.plugins.deps.Deps
 
 plugins {
-    id("kmmdeps")
+    id("androidapp")
 }
 
 group = "com.aglushkov.wordteacher"

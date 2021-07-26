@@ -2,7 +2,7 @@ import com.aglushkov.plugins.deps.Deps
 import com.aglushkov.plugins.deps.Versions
 
 plugins {
-    id("kmmlibdeps")
+    id("kmmlib")
 }
 
 group = "com.aglushkov.wordteacher"
