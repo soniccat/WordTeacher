@@ -37,7 +37,7 @@ kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serializati
 kotlinxDateTime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
 
 androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
-androidFragments = { module = "androidx.fragment:fragment-ktx", version = "androidFragments" }
+androidFragments = { module = "androidx.fragment:fragment-ktx", version.ref = "androidFragments" }
 androidMaterial = { module = "com.google.android.material:material", version.ref = "androidMaterial" }
 androidAppCompat = { module = "androidx.appcompat:appcompat", version.ref = "androidAppCompat" }
 androidConstraintLayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidConstraintLayout" }

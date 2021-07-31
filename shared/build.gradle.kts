@@ -1,6 +1,6 @@
 plugins {
     id("kmmlib-convention")
-    id("com.squareup.sqldelight")
+    //id("com.squareup.sqldelight")
 }
 
 group = "com.aglushkov.wordteacher"
