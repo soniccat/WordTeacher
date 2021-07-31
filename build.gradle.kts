@@ -1,14 +1,14 @@
 
 buildscript {
     repositories {
-        google()
         mavenCentral()
+        google()
+
         gradlePluginPortal()
     }
-
     dependencies {
-        // TODO: replace with Deps somehow...
-        classpath("com.android.tools.build:gradle:7.0.0-beta05")
+        //classpath("dev.icerock.moko:resources-generator")
+        classpath(":configure-plugin")
     }
 }
 

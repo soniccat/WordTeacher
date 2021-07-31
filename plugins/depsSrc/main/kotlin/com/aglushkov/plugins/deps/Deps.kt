@@ -9,7 +9,7 @@ object Versions {
     val kotlin = "1.5.10"
     val androidx_test = "1.2.0"
     val androidx_test_ext = "1.1.1"
-    val android_gradle_plugin = "7.0.0-beta05"
+    val android_gradle_plugin = "4.2.2"
     val junit = "4.13"
     val sqlDelight = "1.5.0"
     val ktor = "1.5.4"

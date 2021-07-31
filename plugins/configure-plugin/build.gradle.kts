@@ -1,7 +1,6 @@
 
 plugins {
     `kotlin-dsl`
-    id("deps")
 }
 
 repositories {
@@ -11,11 +10,12 @@ repositories {
 }
 
 dependencies {
-    implementation(com.aglushkov.plugins.deps.Deps.Gradle.kotlinClasspath)
-    implementation(com.aglushkov.plugins.deps.Deps.SqlDelight.classpath)
-    implementation(com.aglushkov.plugins.deps.Deps.Mp.serializationClasspath)
+    implementation(libs.androidGradlePlugin)
+    implementation(libs.kotlinGradlePlugin)
+//    implementation(com.aglushkov.plugins.deps.Deps.Gradle.kotlinClasspath)
+    implementation(libs.sqlDelight)
+    implementation(libs.kotlinxSerialization)
     // TODO: return this:
-//    implementation("com.android.tools.build:gradle:7.0.0-beta05")
     /*
     Not it gives that:
     A problem occurred configuring project ':androidApp'.
@@ -30,16 +30,16 @@ dependencies {
 }
 
 // To be able to access Deps in MyKmmLibPlugin
-kotlin.sourceSets.getByName("main").kotlin.srcDir("../depsSrc/main/kotlin")
+//kotlin.sourceSets.getByName("main").kotlin.srcDir("../depsSrc/main/kotlin")
 
-gradlePlugin {
-    plugins.register("androidapp") {
-        id = "androidapp"
-        implementationClass = "com.aglushkov.plugins.deps.AndroidAppPlugin"
-    }
-
-    plugins.register("kmmlib") {
-        id = "kmmlib"
-        implementationClass = "com.aglushkov.plugins.deps.KmmLibPlugin"
-    }
-}
+//gradlePlugin {
+//    plugins.register("androidapp") {
+//        id = "androidapp"
+//        implementationClass = "com.aglushkov.plugins.deps.AndroidAppPlugin"
+//    }
+//
+//    plugins.register("kmmlib") {
+//        id = "kmmlib"
+//        implementationClass = "com.aglushkov.plugins.deps.KmmLibPlugin"
+//    }
+//}

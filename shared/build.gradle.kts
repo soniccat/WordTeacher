@@ -1,8 +1,6 @@
-import com.aglushkov.plugins.deps.Deps
-import com.aglushkov.plugins.deps.Versions
-
 plugins {
-    id("kmmlib")
+    id("kmmlib-convention")
+    id("com.squareup.sqldelight")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -17,20 +15,22 @@ repositories {
 android {
     // HACK: to solve "Configuration with name 'testApi' not found." and to support Arctic Fox
     // https://stackoverflow.com/questions/65372825/kotlin-multiplatform-configuration-issue
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
+//    configurations {
+//        create("androidTestApi")
+//        create("androidTestDebugApi")
+//        create("androidTestReleaseApi")
+//        create("testApi")
+//        create("testDebugApi")
+//        create("testReleaseApi")
+//    }
 
-    compileSdkVersion(Versions.compileSdk)
+    compileSdkVersion(libs.versions.androidCompileSdk.get().toInt())
+    buildToolsVersion = libs.versions.androidBuildToolVersion.get()
+
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdkVersion(Versions.minSdk)
-        targetSdkVersion(Versions.targetSdk)
+        minSdkVersion(libs.versions.androidMinSdk.get().toInt())
+        targetSdkVersion(libs.versions.androidTargetSdk.get().toInt())
     }
 
     buildTypes {
@@ -55,50 +55,50 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(Deps.Mp.serializationJson)
-                implementation(Deps.Ktor.commonCore)
-                implementation(Deps.Coroutines.common)
+                implementation(libs.kotlinxSerializationJson)
+                implementation(libs.ktorCommonCore)
+                implementation(libs.coroutinesCommon)
 //                implementation(Deps.MokoResources.impl)
 //                implementation(Deps.MokoParcelize.impl)
 //                implementation(Deps.MokoGraphics.impl)
-                implementation(Deps.okio)
-                implementation(Deps.dateTime)
-                implementation(Deps.logger)
-                implementation(Deps.SqlDelight.runtime)
-                implementation(Deps.uuid)
-                api(Deps.Decompose.decompose)
+                implementation(libs.okio)
+                implementation(libs.kotlinxDateTime)
+                implementation(libs.logger)
+                implementation(libs.sqlDelightRuntime)
+                implementation(libs.uuid)
+                api(libs.decompose)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(Deps.KotlinTest.common)
-                implementation(Deps.KotlinTest.annotations)
+                implementation(libs.kotlinTest)
+                implementation(libs.kotlinTestAnnotations)
             }
         }
         val androidMain by getting {
             dependencies {
-                implementation(Deps.Google.material)
-                implementation(Deps.SqlDelight.androidDriver)
+                implementation(libs.androidMaterial)
+                implementation(libs.sqlDelightAndroidDriver)
                 implementation("org.apache.opennlp:opennlp-tools:1.9.2")
             }
         }
         val androidTest by getting {
             dependencies {
-                implementation(Deps.KotlinTest.junit)
-                implementation(Deps.junit)
+                implementation(libs.kotlinTestJUnit)
+                implementation(libs.junit)
             }
         }
         val iosMain by getting {
             dependencies {
-                implementation(Deps.Ktor.iOSClient)
-                implementation(Deps.Coroutines.common) {
+                implementation(libs.ktoriOSClient)
+                implementation(libs.coroutinesCommon) /*{
                     version {
                         // HACK: to fix InvalidMutabilityException: mutation attempt of frozen kotlinx.coroutines.ChildHandleNode
                         // during HttpClient initialization
-                        strictly(Versions.coroutines)
+                        strictly(libs.versions.coroutines.get())
                     }
-                }
-                implementation(Deps.SqlDelight.iOSDriver)
+                }*/
+                implementation(libs.sqlDelightiOSDriver)
             }
         }
         val iosTest by getting

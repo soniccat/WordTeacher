@@ -1,8 +1,5 @@
-import com.aglushkov.plugins.deps.Versions
-import com.aglushkov.plugins.deps.Deps
-
 plugins {
-    id("androidapp")
+    id("android-app-convention")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -19,13 +16,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion(Versions.compileSdk)
-    buildToolsVersion = Versions.buildToolVersion
+    compileSdkVersion(libs.versions.androidCompileSdk.get().toInt())
+    buildToolsVersion = libs.versions.androidBuildToolVersion.get()
 
     defaultConfig {
         applicationId = "com.aglushkov.wordteacher.androidApp"
-        minSdkVersion(Versions.minSdk)
-        targetSdkVersion(Versions.targetSdk)
+        minSdkVersion(libs.versions.androidMinSdk.get().toInt())
+        targetSdkVersion(libs.versions.androidTargetSdk.get().toInt())
         versionCode = 1
         versionName = "1.0"
     }
@@ -47,7 +44,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = Versions.compose_jetpack_version
+        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
     }
 
     buildTypes {
@@ -61,43 +58,44 @@ android {
 dependencies {
     implementation(project(":shared"))
 
-    implementation(Deps.SqlDelight.classpath)
-    implementation(Deps.Google.fragments)
-    implementation(Deps.Google.material)
-    implementation(Deps.Google.appcompat)
-    implementation(Deps.Google.constraintLayout)
-    implementation(Deps.Google.coreKtx)
-    implementation(Deps.Google.viewModelKtx)
-    implementation(Deps.Google.lifecycleKtx)
-    implementation(Deps.floatingActionButtonSpeedDial)
-    implementation(Deps.Decompose.jetpack)
-    implementation(Deps.Compose.foundation) {
+    implementation(libs.sqlDelight)
+//    implementation(libs.SqlDelight.classpath)
+    implementation(libs.androidFragments)
+    implementation(libs.androidMaterial)
+    implementation(libs.androidAppCompat)
+    implementation(libs.androidConstraintLayout)
+    implementation(libs.androidCoreKts)
+    implementation(libs.androidViewModelKtx)
+    implementation(libs.androidLifecycleKtx)
+    implementation(libs.floatingActionButtonSpeedDial)
+    implementation(libs.decomposeJetpack)
+    implementation(libs.androidComposeFoundation) {
         version {
-            strictly("1.0.0-SNAPSHOT")
+            strictly(libs.versions.composeJetpack.get())
         }
     }
-    implementation(Deps.Compose.material) {
+    implementation(libs.androidComposeMaterial) {
         version {
-            strictly("1.0.0-SNAPSHOT")
+            strictly(libs.versions.composeJetpack.get())
         }
     }
-    implementation(Deps.Compose.activity) {
+    implementation(libs.androidComposeActivity) {
         version {
-            strictly("1.3.0-SNAPSHOT")
+            strictly(libs.versions.androidComposeActivity.get())
         }
     }
-    implementation(Deps.Compose.tooling) {
+    implementation(libs.androidComposeUITooling) {
         version {
-            strictly("1.0.0-SNAPSHOT")
+            strictly(libs.versions.composeJetpack.get())
         }
     }
 
-    implementation(Deps.Coroutines.common)
-    implementation(Deps.Coroutines.android)
+    implementation(libs.coroutinesCommon)
+    implementation(libs.coroutinesAndroid)
 
 //    implementation(Deps.MokoResources.impl)
 
-    implementation(Deps.Ktor.androidClient)
+    implementation(libs.ktorAndroidClient)
 
     implementation("com.google.dagger:dagger:2.35.1")
     kapt("com.google.dagger:dagger-compiler:2.35.1")

@@ -1,0 +1,72 @@
+[versions]
+androidMinSdk = "21"
+androidTargetSdk = "30"
+androidCompileSdk = "30"
+androidBuildToolVersion = "30.0.3"
+kotlinVersion = "1.5.20"
+kotlinxSerializationVersion = "1.2.1"
+kotlinxDateTime = "0.1.0"
+sqlDelight = "1.5.0"
+androidGradlePlugin = "4.2.2"
+composeJetpack = "1.0.0-SNAPSHOT"
+androidComposeActivity = "1.3.0-SNAPSHOT"
+androidFragments = "1.2.5"
+androidMaterial = "1.2.1"
+androidAppCompat = "1.2.0"
+androidConstraintLayout = "2.0.2"
+androidCoreKts = "1.2.0"
+androidLifecycle = "2.2.0"
+
+floatingActionButtonSpeedDial = "3.1.1"
+decomposeVersion = "0.2.6"
+coroutines = "1.4.2-native-mt"
+ktor = "1.5.4"
+okio = "2.9.0"
+napier = "1.4.1"
+uuid = "0.3.0"
+junit = "4.13"
+
+[libraries]
+kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
+kotlinCompilerEmbeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlinVersion" }
+kotlinTest = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlinVersion" }
+kotlinTestAnnotations = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlinVersion" }
+kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlinVersion" }
+kotlinxSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlinVersion" }
+kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
+kotlinxDateTime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
+
+androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
+androidFragments = { module = "androidx.fragment:fragment-ktx", version = "androidFragments" }
+androidMaterial = { module = "com.google.android.material:material", version.ref = "androidMaterial" }
+androidAppCompat = { module = "androidx.appcompat:appcompat", version.ref = "androidAppCompat" }
+androidConstraintLayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidConstraintLayout" }
+androidCoreKts = { module = "androidx.core:core-ktx", version.ref = "androidCoreKts" }
+androidViewModelKtx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidLifecycle" }
+androidLifecycleKtx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidLifecycle" }
+androidComposeFoundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeJetpack" }
+androidComposeMaterial = { module = "androidx.compose.material:material", version.ref = "composeJetpack" }
+androidComposeActivity = {  module = "androidx.activity:activity-compose", version.ref = "androidComposeActivity" }
+androidComposeUITooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "composeJetpack" }
+
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decomposeVersion" }
+decomposeJetpack = { module = "com.arkivanov.decompose:extensions-compose-jetpack", version.ref = "decomposeVersion" }
+
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
+floatingActionButtonSpeedDial = { module = "com.github.leinardi:FloatingActionButtonSpeedDial", version.ref = "floatingActionButtonSpeedDial" }
+
+sqlDelight = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "sqlDelight" }
+sqlDelightRuntime = { module = "com.squareup.sqldelight:runtime", version.ref = "sqlDelight" }
+sqlDelightiOSDriver = { module = "com.squareup.sqldelight:native-driver", version.ref = "sqlDelight" }
+sqlDelightAndroidDriver = { module = "com.squareup.sqldelight:android-driver", version.ref = "sqlDelight" }
+
+coroutinesCommon = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+
+ktorCommonCore = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktorAndroidClient = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktoriOSClient = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
+
+okio = { module = "com.squareup.okio:okio-multiplatform", version.ref = "okio" }
+logger = { module = "com.github.aakira:napier", version.ref = "napier" }
+junit = { module = "junit:junit", version.ref = "junit" }
