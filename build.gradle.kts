@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 
 buildscript {
     repositories {
@@ -9,6 +10,7 @@ buildscript {
     dependencies {
         //classpath("dev.icerock.moko:resources-generator")
         classpath(":configure-plugin")
+        classpath(":resources-plugin")
     }
 }
 

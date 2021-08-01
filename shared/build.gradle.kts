@@ -1,6 +1,6 @@
 plugins {
     id("kmmlib-convention")
-    //id("com.squareup.sqldelight")
+    id("android-base-convention")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -24,14 +24,7 @@ android {
 //        create("testReleaseApi")
 //    }
 
-    compileSdkVersion(libs.versions.androidCompileSdk.get().toInt())
-    buildToolsVersion = libs.versions.androidBuildToolVersion.get()
-
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdkVersion(libs.versions.androidMinSdk.get().toInt())
-        targetSdkVersion(libs.versions.androidTargetSdk.get().toInt())
-    }
 
     buildTypes {
         getByName("release") {

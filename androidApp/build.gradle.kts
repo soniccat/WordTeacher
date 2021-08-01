@@ -1,5 +1,6 @@
 plugins {
     id("android-app-convention")
+    id("android-base-convention")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -16,13 +17,8 @@ repositories {
 }
 
 android {
-    compileSdkVersion(libs.versions.androidCompileSdk.get().toInt())
-    buildToolsVersion = libs.versions.androidBuildToolVersion.get()
-
     defaultConfig {
         applicationId = "com.aglushkov.wordteacher.androidApp"
-        minSdkVersion(libs.versions.androidMinSdk.get().toInt())
-        targetSdkVersion(libs.versions.androidTargetSdk.get().toInt())
         versionCode = 1
         versionName = "1.0"
     }

@@ -1,8 +1,4 @@
 [versions]
-androidMinSdk = "21"
-androidTargetSdk = "30"
-androidCompileSdk = "30"
-androidBuildToolVersion = "30.0.3"
 kotlinVersion = "1.5.20"
 kotlinxSerializationVersion = "1.2.1"
 kotlinxDateTime = "0.1.0"
