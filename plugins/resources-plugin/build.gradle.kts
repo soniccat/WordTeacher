@@ -4,7 +4,7 @@
 
 plugins {
     `kotlin-dsl`
-    id("org.jetbrains.kotlin.jvm") version ("1.5.20")
+//    id("org.jetbrains.kotlin.jvm") version ("1.5.20")
 //    id("org.jetbrains.kotlin.multiplatform")
 }
 
