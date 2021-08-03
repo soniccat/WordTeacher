@@ -12,7 +12,6 @@ repositories {
 dependencies {
     implementation(libs.androidGradlePlugin)
     implementation(libs.kotlinGradlePlugin)
-//    implementation(com.aglushkov.plugins.deps.Deps.Gradle.kotlinClasspath)
     implementation(libs.sqlDelight)
     implementation(libs.kotlinxSerialization)
     // TODO: return this:

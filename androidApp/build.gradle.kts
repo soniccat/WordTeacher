@@ -55,8 +55,7 @@ android {
 dependencies {
     implementation(project(":shared"))
 
-    implementation(libs.sqlDelight)
-//    implementation(libs.SqlDelight.classpath)
+    implementation(libs.sqlDelightRuntime)
     implementation(libs.androidFragments)
     implementation(libs.androidMaterial)
     implementation(libs.androidAppCompat)
