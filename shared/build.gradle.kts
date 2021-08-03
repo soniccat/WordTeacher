@@ -36,6 +36,7 @@ android {
 }
 
 kotlin {
+    jvm()
     android()
 
     // Block from https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
@@ -93,6 +94,10 @@ kotlin {
             }
         }
         val iosTest by getting
+        val jvmMain by getting {
+            dependencies {
+            }
+        }
     }
 
     cocoapods {

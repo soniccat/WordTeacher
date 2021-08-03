@@ -3,7 +3,17 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "WordTeacher"
 
+pluginManagement {
+    repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
+}
+
 includeBuild("plugins/configure-plugin")
 includeBuild("plugins/resources-plugin")
 include(":androidApp")
 include(":shared")
+include(":desktopApp")
