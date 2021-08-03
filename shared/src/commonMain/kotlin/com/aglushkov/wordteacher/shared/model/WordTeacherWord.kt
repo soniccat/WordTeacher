@@ -1,11 +1,11 @@
 package com.aglushkov.wordteacher.shared.model
 
+import com.aglushkov.resources.desc.Resource
+import com.aglushkov.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
 
 @Parcelize
 data class WordTeacherWord(

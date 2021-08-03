@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
+import com.aglushkov.resources.desc.Resource
+import com.aglushkov.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -16,8 +18,6 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel

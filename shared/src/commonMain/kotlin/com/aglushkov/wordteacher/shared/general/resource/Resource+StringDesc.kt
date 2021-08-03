@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.general.resource
 
+import com.aglushkov.resources.desc.Resource
+import com.aglushkov.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
 
 fun Resource<*>?.getErrorString(hasConnection: Boolean, hasResponse: Boolean): StringDesc? {
     if (this is Resource.Error) {

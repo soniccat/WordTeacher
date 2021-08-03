@@ -4,7 +4,7 @@
 
 plugins {
     `kotlin-dsl`
-    //id("org.jetbrains.kotlin.jvm") version ("1.5.20")
+    id("org.jetbrains.kotlin.jvm") version ("1.5.20")
 //    id("org.jetbrains.kotlin.multiplatform")
 }
 
@@ -18,9 +18,9 @@ dependencies {
     implementation(gradleKotlinDsl())
     compileOnly(libs.kotlinGradlePlugin)
     compileOnly(libs.androidGradlePlugin)
-//    implementation(libs.kotlinPoet)
+    implementation(libs.kotlinPoet)
     implementation(libs.kotlinxSerialization)
-//    implementation(libs.apacheCommonsText)
+    implementation(libs.apacheCommonsText)
     implementation(libs.kotlinCompilerEmbeddable)
 
 //    api("dev.icerock:mobile-multiplatform:0.12.0")

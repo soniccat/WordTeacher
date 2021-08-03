@@ -1,8 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
+import com.aglushkov.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import dev.icerock.moko.resources.desc.StringDesc
 
 class DefinitionsDisplayModeViewItem(
     val partsOfSpeechFilterText: StringDesc,
