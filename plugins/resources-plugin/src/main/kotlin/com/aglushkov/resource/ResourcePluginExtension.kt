@@ -2,7 +2,7 @@ package com.aglushkov.resource
 
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
-open class ResourcePluginExtension {
+open class ResourcesPluginExtension {
     var multiplatformResourcesPackage: String? = null
     var multiplatformResourcesSourceSet: String? = null
     var iosBaseLocalizationRegion: String = "en"

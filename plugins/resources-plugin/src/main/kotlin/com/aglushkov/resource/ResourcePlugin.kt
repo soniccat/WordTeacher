@@ -21,12 +21,12 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
-class MultiplatformResourcesPlugin : Plugin<Project> {
+class ResourcesPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val mrExtension =
             target.extensions.create(
                 "resourcesPlugin",
-                ResourcePluginExtension::class.java
+                ResourcesPluginExtension::class.java
             )
 
         target.plugins.withType(KotlinMultiplatformPluginWrapper::class.java) {
@@ -51,7 +51,7 @@ class MultiplatformResourcesPlugin : Plugin<Project> {
     @Suppress("LongMethod")
     private fun configureGenerators(
         target: Project,
-        mrExtension: ResourcePluginExtension,
+        mrExtension: ResourcesPluginExtension,
         multiplatformExtension: KotlinMultiplatformExtension,
         androidExtension: BaseExtension
     ) {

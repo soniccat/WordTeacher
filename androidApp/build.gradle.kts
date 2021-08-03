@@ -88,9 +88,6 @@ dependencies {
 
     implementation(libs.coroutinesCommon)
     implementation(libs.coroutinesAndroid)
-
-//    implementation(Deps.MokoResources.impl)
-
     implementation(libs.ktorAndroidClient)
 
     implementation("com.google.dagger:dagger:2.35.1")

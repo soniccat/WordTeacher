@@ -71,7 +71,7 @@ open class DefinitionsVMImpl(
 
     override val definitions = combine(definitionWords, displayModeStateFlow, selectedPartsOfSpeechStateFlow) { a, b, c -> Triple(a, b, c) }
         .map { (wordDefinitions, displayMode, partOfSpeechFilter) ->
-            Logger.v("build view items")
+            Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
             wordDefinitions.copyWith(
                 buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter)
             )
