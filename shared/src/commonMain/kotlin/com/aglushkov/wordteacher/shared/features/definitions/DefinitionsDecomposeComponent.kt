@@ -6,9 +6,9 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.instancekeeper.InstanceKeeper
-import com.arkivanov.decompose.instancekeeper.getOrCreate
-import com.arkivanov.essenty.parcelable.consume
+import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.arkivanov.essenty.statekeeper.consume
 
 class DefinitionsDecomposeComponent (
     componentContext: ComponentContext,

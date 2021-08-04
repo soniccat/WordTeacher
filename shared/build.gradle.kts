@@ -1,7 +1,7 @@
 plugins {
     id("kmmlib-convention")
     id("android-base-convention")
-//    id("resources")
+    id("resources")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -60,6 +60,8 @@ kotlin {
                 implementation(libs.uuid)
                 //implementation(kotlin("stdlib"))
                 api(libs.essentyParcelable)
+                api(libs.essentryInstanceKeeper)
+                api(libs.essentryStateKeeper)
                 api(libs.decompose)
             }
         }
@@ -117,10 +119,10 @@ kotlin {
     }
 }
 
-//resourcesPlugin {
-//    multiplatformResourcesPackage = "com.aglushkov.wordteacher.shared.res" // required
-//    iosBaseLocalizationRegion = "en" // optional, default "en"
-//}
+resourcesPlugin {
+    multiplatformResourcesPackage = "com.aglushkov.wordteacher.shared.res" // required
+    iosBaseLocalizationRegion = "en" // optional, default "en"
+}
 
 sqldelight {
     database("SQLDelightDatabase") {

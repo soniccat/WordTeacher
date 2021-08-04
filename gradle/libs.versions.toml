@@ -53,6 +53,8 @@ androidComposeDesktop = { module = "org.jetbrains.compose:compose-gradle-plugin"
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decomposeVersion" }
 decomposeJetpack = { module = "com.arkivanov.decompose:extensions-compose-jetpack", version.ref = "decomposeVersion" }
 essentyParcelable = { module = "com.arkivanov.essenty:parcelable", version.ref = "essenty" }
+essentryInstanceKeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
+essentryStateKeeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }
 
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 floatingActionButtonSpeedDial = { module = "com.github.leinardi:FloatingActionButtonSpeedDial", version.ref = "floatingActionButtonSpeedDial" }

@@ -28,4 +28,4 @@ dependencyResolutionManagement {
     }
 }
 
-includeBuild("../configure-plugin")
+//includeBuild("../configure-plugin")
