@@ -59,6 +59,7 @@ kotlin {
                 implementation(libs.sqlDelightRuntime)
                 implementation(libs.uuid)
                 //implementation(kotlin("stdlib"))
+                api(libs.essentyParcelable)
                 api(libs.decompose)
             }
         }

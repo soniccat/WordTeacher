@@ -4,8 +4,8 @@ import com.aglushkov.resources.desc.Resource
 import com.aglushkov.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
-import com.arkivanov.decompose.statekeeper.Parcelable
-import com.arkivanov.decompose.statekeeper.Parcelize
+import com.arkivanov.essenty.parcelable.Parcelable
+import com.arkivanov.essenty.parcelable.Parcelize
 
 @Parcelize
 data class WordTeacherWord(

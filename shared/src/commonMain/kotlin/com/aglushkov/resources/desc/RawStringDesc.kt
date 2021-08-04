@@ -4,8 +4,7 @@
 
 package com.aglushkov.resources.desc
 
-import com.arkivanov.decompose.statekeeper.Parcelable
-
+import com.arkivanov.essenty.parcelable.Parcelable
 
 expect class RawStringDesc(string: String) : StringDesc, Parcelable
 

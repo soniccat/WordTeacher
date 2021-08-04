@@ -8,7 +8,7 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.instancekeeper.InstanceKeeper
 import com.arkivanov.decompose.instancekeeper.getOrCreate
-import com.arkivanov.decompose.statekeeper.consume
+import com.arkivanov.essenty.parcelable.consume
 
 class DefinitionsDecomposeComponent (
     componentContext: ComponentContext,

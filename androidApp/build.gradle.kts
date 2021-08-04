@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidLifecycleKtx)
     implementation(libs.floatingActionButtonSpeedDial)
     implementation(libs.decomposeJetpack)
+    implementation(libs.essentyParcelable)
     implementation(libs.androidComposeFoundation) {
         version {
             strictly(libs.versions.composeJetpack.get())

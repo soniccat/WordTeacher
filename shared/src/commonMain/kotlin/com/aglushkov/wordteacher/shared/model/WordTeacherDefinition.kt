@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.model
 
-import com.arkivanov.decompose.statekeeper.Parcelable
-import com.arkivanov.decompose.statekeeper.Parcelize
+import com.arkivanov.essenty.parcelable.Parcelable
+import com.arkivanov.essenty.parcelable.Parcelize
 
 
 @Parcelize

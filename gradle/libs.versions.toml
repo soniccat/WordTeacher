@@ -16,6 +16,7 @@ androidLifecycle = "2.2.0"
 
 floatingActionButtonSpeedDial = "3.1.1"
 decomposeVersion = "0.3.0"
+essenty = "0.1.1"
 coroutines = "1.4.2-native-mt"
 ktor = "1.5.4"
 okio = "2.9.0"
@@ -51,6 +52,7 @@ androidComposeDesktop = { module = "org.jetbrains.compose:compose-gradle-plugin"
 
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decomposeVersion" }
 decomposeJetpack = { module = "com.arkivanov.decompose:extensions-compose-jetpack", version.ref = "decomposeVersion" }
+essentyParcelable = { module = "com.arkivanov.essenty:parcelable", version.ref = "essenty" }
 
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 floatingActionButtonSpeedDial = { module = "com.github.leinardi:FloatingActionButtonSpeedDial", version.ref = "floatingActionButtonSpeedDial" }

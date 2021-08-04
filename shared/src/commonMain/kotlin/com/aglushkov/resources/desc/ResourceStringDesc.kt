@@ -5,7 +5,7 @@
 package com.aglushkov.resources.desc
 
 import com.aglushkov.resources.StringResource
-import com.arkivanov.decompose.statekeeper.Parcelable
+import com.arkivanov.essenty.parcelable.Parcelable
 
 expect class ResourceStringDesc(stringRes: StringResource) : StringDesc, Parcelable
 
