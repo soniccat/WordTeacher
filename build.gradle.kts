@@ -7,8 +7,10 @@ buildscript {
     }
     dependencies {
         classpath(":configure-plugin")
-        classpath(":resources-plugin")
-        classpath("org.jetbrains.compose:compose-gradle-plugin:0.4.0")
+        //classpath(":resources-plugin")
+//        classpath("com.android.tools.build:gradle:4.2.2")
+//        classpath("org.jetbrains.compose:compose-gradle-plugin:1.0.0-alpha1-rc5")
+//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
     }
 }
 
