@@ -15,8 +15,14 @@ dependencies {
     implementation(libs.androidGradlePlugin)
     implementation(libs.androidComposeDesktop)
     implementation(libs.kotlinGradlePlugin)
-    implementation(libs.sqlDelight)
-    implementation(libs.kotlinxSerialization)
+//    implementation(libs.sqlDelight)
+//    implementation(libs.kotlinxSerialization)
+}
+
+kotlin {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
