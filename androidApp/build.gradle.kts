@@ -1,6 +1,7 @@
 plugins {
     id("android-app-convention")
     id("android-base-convention")
+    id("org.jetbrains.compose")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -14,6 +15,8 @@ repositories {
 
     // to use SNAPSHOT versions of compose (https://androidx.dev/snapshots/builds)
     maven(url = "https://androidx.dev/snapshots/builds/7473952/artifacts/repository")
+
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 android {
@@ -41,7 +44,7 @@ android {
 
     composeOptions {
         kotlinCompilerVersion = libs.versions.kotlinVersion.get()
-        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
+//        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
     }
 
     buildTypes {
@@ -65,27 +68,20 @@ dependencies {
     implementation(libs.androidLifecycleKtx)
     implementation(libs.floatingActionButtonSpeedDial)
     implementation(libs.decomposeJetpack)
+    implementation(compose.material)
 //    implementation(libs.essentyParcelable)
-    implementation(libs.androidComposeFoundation) {
-        version {
-            strictly(libs.versions.composeJetpack.get())
-        }
-    }
-    implementation(libs.androidComposeMaterial) {
-        version {
-            strictly(libs.versions.composeJetpack.get())
-        }
-    }
-    implementation(libs.androidComposeActivity) {
-        version {
-            strictly(libs.versions.androidComposeActivity.get())
-        }
-    }
-    implementation(libs.androidComposeUITooling) {
-        version {
-            strictly(libs.versions.composeJetpack.get())
-        }
-    }
+//    implementation(libs.androidComposeFoundation) {
+//        version {
+//            strictly(libs.versions.composeJetpack.get())
+//        }
+//    }
+//    implementation(libs.androidComposeMaterial) {
+//        version {
+//            strictly(libs.versions.composeJetpack.get())
+//        }
+//    }
+    implementation(libs.androidComposeActivity)
+    implementation(compose.uiTooling)
 
     implementation(libs.coroutinesCommon)
     implementation(libs.coroutinesAndroid)

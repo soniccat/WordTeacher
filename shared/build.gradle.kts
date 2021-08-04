@@ -2,6 +2,7 @@ plugins {
     id("kmmlib-convention")
     id("android-base-convention")
     id("resources")
+    id("org.jetbrains.compose")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -11,6 +12,8 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
+
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 android {
@@ -40,12 +43,12 @@ kotlin {
     android()
 
 //     Block from https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
-    val onPhone = System.getenv("SDK_NAME")?.startsWith("iphoneos") ?: false
-    if (onPhone) {
-        iosArm64("ios")
-    } else {
-        iosX64("ios")
-    }
+//    val onPhone = System.getenv("SDK_NAME")?.startsWith("iphoneos") ?: false
+//    if (onPhone) {
+//        iosArm64("ios")
+//    } else {
+//        iosX64("ios")
+//    }
 
     sourceSets {
         val commonMain by getting {
@@ -58,7 +61,13 @@ kotlin {
                 implementation(libs.logger)
                 implementation(libs.sqlDelightRuntime)
                 implementation(libs.uuid)
+
                 //implementation(kotlin("stdlib"))
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.uiTooling)
+
                 api(libs.essentyParcelable)
                 api(libs.essentryInstanceKeeper)
                 api(libs.essentryStateKeeper)
@@ -84,35 +93,35 @@ kotlin {
                 implementation(libs.junit)
             }
         }
-        val iosMain by getting {
-            dependencies {
-                implementation(libs.ktoriOSClient)
-                implementation(libs.coroutinesCommon) /*{
-                    version {
-                        // HACK: to fix InvalidMutabilityException: mutation attempt of frozen kotlinx.coroutines.ChildHandleNode
-                        // during HttpClient initialization
-                        strictly(libs.versions.coroutines.get())
-                    }
-                }*/
-                implementation(libs.sqlDelightiOSDriver)
-            }
-        }
-        val iosTest by getting
+//        val iosMain by getting {
+//            dependencies {
+//                implementation(libs.ktoriOSClient)
+//                implementation(libs.coroutinesCommon) /*{
+//                    version {
+//                        // HACK: to fix InvalidMutabilityException: mutation attempt of frozen kotlinx.coroutines.ChildHandleNode
+//                        // during HttpClient initialization
+//                        strictly(libs.versions.coroutines.get())
+//                    }
+//                }*/
+//                implementation(libs.sqlDelightiOSDriver)
+//            }
+//        }
+//        val iosTest by getting
         val desktopMain by getting {
             dependencies {
             }
         }
     }
 
-    cocoapods {
-        summary = "Nothing"
-        homepage = "https://aglushkov.com"
-
-        podfile = project.file("../iosApp/Podfile")
-        pod("Reachability","3.2")
-
-        ios.deploymentTarget = "11.0"
-    }
+//    cocoapods {
+//        summary = "Nothing"
+//        homepage = "https://aglushkov.com"
+//
+//        podfile = project.file("../iosApp/Podfile")
+//        pod("Reachability","3.2")
+//
+//        ios.deploymentTarget = "11.0"
+//    }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"

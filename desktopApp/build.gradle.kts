@@ -31,9 +31,6 @@ kotlin {
 
         named("jvmMain") {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material)
                 implementation(compose.desktop.common)
                 implementation(compose.desktop.currentOs)
                 implementation(project(":shared"))
