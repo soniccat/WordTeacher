@@ -15,8 +15,8 @@ dependencies {
     implementation(libs.androidGradlePlugin)
     implementation(libs.androidComposeDesktop)
     implementation(libs.kotlinGradlePlugin)
-//    implementation(libs.sqlDelight)
-//    implementation(libs.kotlinxSerialization)
+    implementation(libs.sqlDelight)
+    implementation(libs.kotlinxSerialization)
 }
 
 kotlin {

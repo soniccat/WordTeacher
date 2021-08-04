@@ -36,7 +36,7 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.desktop.common)
                 implementation(compose.desktop.currentOs)
-//                implementation(project(":shared"))
+                implementation(project(":shared"))
 //                implementation(project(":common"))
             }
         }
