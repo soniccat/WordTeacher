@@ -4,7 +4,7 @@ kotlinxSerializationVersion = "1.2.1"
 kotlinxDateTime = "0.1.0"
 sqlDelight = "1.5.1"
 androidGradlePlugin = "4.2.2"
-composeJetpack = "1.0.0-SNAPSHOT"
+composeJetpack = "1.0.1"
 androidComposeActivity = "1.3.0"
 androidComposeDesktop = "1.0.0-alpha2"
 androidFragments = "1.2.5"
@@ -48,6 +48,7 @@ androidComposeFoundation = { module = "androidx.compose.foundation:foundation", 
 androidComposeMaterial = { module = "androidx.compose.material:material", version.ref = "composeJetpack" }
 androidComposeActivity = {  module = "androidx.activity:activity-compose", version.ref = "androidComposeActivity" }
 androidComposeUITooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "composeJetpack" }
+androidComposeUIToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "composeJetpack" }
 androidComposeDesktop = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "androidComposeDesktop" }
 
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decomposeVersion" }

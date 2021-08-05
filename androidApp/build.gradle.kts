@@ -1,7 +1,10 @@
 plugins {
     id("android-app-convention")
     id("android-base-convention")
-    id("org.jetbrains.compose")
+
+    // for compose-jb - uncomment - start
+//    id("org.jetbrains.compose")
+    // for compose-jb - uncomment - end
 }
 
 group = "com.aglushkov.wordteacher"
@@ -44,7 +47,9 @@ android {
 
     composeOptions {
         kotlinCompilerVersion = libs.versions.kotlinVersion.get()
-//        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
+        // for compose-jb - comment - start
+        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
+        // for compose-jb - comment - end
     }
 
     buildTypes {
@@ -69,21 +74,21 @@ dependencies {
     implementation(libs.floatingActionButtonSpeedDial)
     implementation(libs.decompose)
     implementation(libs.decomposeJetpack)
-    implementation(compose.material)
-//    implementation(libs.essentyParcelable)
-//    implementation(libs.androidComposeFoundation) {
-//        version {
-//            strictly(libs.versions.composeJetpack.get())
-//        }
-//    }
-//    implementation(libs.androidComposeMaterial) {
-//        version {
-//            strictly(libs.versions.composeJetpack.get())
-//        }
-//    }
+
+    implementation(libs.essentyParcelable)
+
+    // for compose-jb - comment - start
+    implementation(libs.androidComposeFoundation)
+    implementation(libs.androidComposeMaterial)
     implementation(libs.androidComposeActivity)
-    implementation(compose.uiTooling)
-    implementation(compose.preview)
+    implementation(libs.androidComposeUITooling)
+    implementation(libs.androidComposeUIToolingPreview)
+    // for compose-jb - comment - end
+    // for compose-jb - uncomment - start
+//    implementation(compose.material)
+//    implementation(compose.uiTooling)
+//    implementation(compose.preview)
+    // for compose-jb - uncomment - end
 
     implementation(libs.coroutinesCommon)
     implementation(libs.coroutinesAndroid)

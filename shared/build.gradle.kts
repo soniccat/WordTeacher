@@ -2,7 +2,10 @@ plugins {
     id("kmmlib-convention")
     id("android-base-convention")
     id("resources")
-    id("org.jetbrains.compose")
+
+    // for compose-jb - uncomment - start
+//    id("org.jetbrains.compose")
+    // for compose-jb - uncomment - end
 
     kotlin("plugin.serialization")
     // TODO: resolve that issue somehow, probably with extracting api/model stuff in a gradle module
@@ -70,9 +73,11 @@ kotlin {
                 implementation(libs.uuid)
 
                 //implementation(kotlin("stdlib"))
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material)
+                // for compose-jb - uncomment - start
+//                implementation(compose.runtime)
+//                implementation(compose.foundation)
+//                implementation(compose.material)
+                // for compose-jb - uncomment - end
 
                 implementation(libs.essentyParcelable)
                 implementation(libs.essentryInstanceKeeper)
@@ -90,8 +95,10 @@ kotlin {
             dependencies {
                 implementation(libs.androidMaterial)
                 implementation(libs.sqlDelightAndroidDriver)
-                implementation(compose.uiTooling)
-                implementation(compose.preview)
+                // for compose-jb - uncomment - start
+//                implementation(compose.uiTooling)
+//                implementation(compose.preview)
+                // for compose-jb - uncomment - end
                 implementation("org.apache.opennlp:opennlp-tools:1.9.2")
             }
         }
