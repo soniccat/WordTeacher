@@ -5,6 +5,7 @@ import com.aglushkov.resource.generator.ResourceGeneratorFeature
 import com.aglushkov.resource.generator.SourceInfo
 import com.aglushkov.resource.generator.StringsGenerator
 import com.aglushkov.resource.generator.android.AndroidMRGenerator
+import com.aglushkov.resource.generator.desktop.DesktopMRGenerator
 import com.aglushkov.resource.generator.common.CommonMRGenerator
 import com.aglushkov.resource.generator.tasks.GenerateMultiplatformResourcesTask
 import com.android.build.gradle.BaseExtension
@@ -18,6 +19,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -57,6 +59,8 @@ class ResourcesPlugin : Plugin<Project> {
     ) {
         val androidMainSourceSet =
             androidExtension.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+        val desktopMainSourceSet = multiplatformExtension.sourceSets.getByName("desktopMain")
+        //multiplatformExtension.targets.findByName("desktopMain").project.exte
 
         val commonSourceSet = multiplatformExtension.sourceSets.getByName(mrExtension.sourceSetName)
         val commonResources = commonSourceSet.resources
@@ -91,6 +95,14 @@ class ResourcesPlugin : Plugin<Project> {
         setupAndroidGenerator(
             targets,
             androidMainSourceSet,
+            generatedDir,
+            mrClassPackage,
+            features,
+            target
+        )
+        setupDesktopGenerator(
+            targets,
+            desktopMainSourceSet,
             generatedDir,
             mrClassPackage,
             features,
@@ -155,6 +167,30 @@ class ResourcesPlugin : Plugin<Project> {
         ).apply(target)
     }
 
+    private fun setupDesktopGenerator(
+        targets: List<KotlinTarget>,
+        desktopMainSourceSet: KotlinSourceSet,
+        generatedDir: File,
+        mrClassPackage: String,
+        features: List<ResourceGeneratorFeature<out MRGenerator.Generator>>,
+        target: Project
+    ) {
+        val kotlinSourceSets: List<KotlinSourceSet> = targets
+            .filterIsInstance<KotlinJvmTarget>()
+            .flatMap { it.compilations }
+            .filterNot { it.name.endsWith("test") } // remove tests compilations
+            .map { it.defaultSourceSet }
+
+        val desktopSourceSet: MRGenerator.SourceSet =
+            createSourceSet(desktopMainSourceSet, kotlinSourceSets)
+        DesktopMRGenerator(
+            generatedDir,
+            desktopSourceSet,
+            mrClassPackage,
+            generators = features.map { it.createDesktopGenerator() }
+        ).apply(target)
+    }
+
     private fun getAndroidPackage(manifestFile: File): String {
         val dbFactory = DocumentBuilderFactory.newInstance()
         val dBuilder = dbFactory.newDocumentBuilder()
@@ -195,6 +231,24 @@ class ResourcesPlugin : Plugin<Project> {
 
             override fun addResourcesDir(directory: File) {
                 androidSourceSet.res.srcDir(directory)
+            }
+        }
+    }
+
+    private fun createSourceSet(
+        sourceSet: KotlinSourceSet,
+        kotlinSourceSets: List<KotlinSourceSet>
+    ): MRGenerator.SourceSet {
+        return object : MRGenerator.SourceSet {
+            override val name: String
+                get() = "desktop${sourceSet.name.capitalize()}"
+
+            override fun addSourceDir(directory: File) {
+                kotlinSourceSets.forEach { it.kotlin.srcDir(directory) }
+            }
+
+            override fun addResourcesDir(directory: File) {
+                sourceSet.resources.srcDir(directory)
             }
         }
     }

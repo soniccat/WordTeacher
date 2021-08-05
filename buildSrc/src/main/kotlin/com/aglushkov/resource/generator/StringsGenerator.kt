@@ -4,12 +4,12 @@
 
 package com.aglushkov.resource.generator
 
+import com.aglushkov.resource.generator.desktop.DesktopStringsGenerator
 import com.aglushkov.resource.generator.android.AndroidStringsGenerator
 import com.aglushkov.resource.generator.common.CommonStringsGenerator
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeSpec
 import org.gradle.api.file.FileTree
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.include
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -91,6 +91,13 @@ abstract class StringsGenerator(
 
         override fun createAndroidGenerator(): StringsGenerator {
             return AndroidStringsGenerator(
+                stringsFileTree,
+                info.androidRClassPackage
+            )
+        }
+
+        override fun createDesktopGenerator(): StringsGenerator {
+            return DesktopStringsGenerator(
                 stringsFileTree,
                 info.androidRClassPackage
             )
