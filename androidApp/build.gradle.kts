@@ -3,7 +3,7 @@ plugins {
     id("android-base-convention")
 
     // for compose-jb - uncomment - start
-//    id("org.jetbrains.compose")
+    id("org.jetbrains.compose")
     // for compose-jb - uncomment - end
 }
 
@@ -48,7 +48,7 @@ android {
     composeOptions {
         kotlinCompilerVersion = libs.versions.kotlinVersion.get()
         // for compose-jb - comment - start
-        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
+//        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
         // for compose-jb - comment - end
     }
 
@@ -74,20 +74,17 @@ dependencies {
     implementation(libs.floatingActionButtonSpeedDial)
     implementation(libs.decompose)
     implementation(libs.decomposeJetpack)
-
     implementation(libs.essentyParcelable)
-
-    // for compose-jb - comment - start
-    implementation(libs.androidComposeFoundation)
-    implementation(libs.androidComposeMaterial)
     implementation(libs.androidComposeActivity)
     implementation(libs.androidComposeUITooling)
     implementation(libs.androidComposeUIToolingPreview)
+
+    // for compose-jb - comment - start
+//    implementation(libs.androidComposeFoundation)
+//    implementation(libs.androidComposeMaterial)
     // for compose-jb - comment - end
     // for compose-jb - uncomment - start
-//    implementation(compose.material)
-//    implementation(compose.uiTooling)
-//    implementation(compose.preview)
+    implementation(compose.material)
     // for compose-jb - uncomment - end
 
     implementation(libs.coroutinesCommon)

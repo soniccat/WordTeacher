@@ -4,7 +4,7 @@ plugins {
     id("resources")
 
     // for compose-jb - uncomment - start
-//    id("org.jetbrains.compose")
+    id("org.jetbrains.compose")
     // for compose-jb - uncomment - end
 
     kotlin("plugin.serialization")
@@ -74,9 +74,9 @@ kotlin {
 
                 //implementation(kotlin("stdlib"))
                 // for compose-jb - uncomment - start
-//                implementation(compose.runtime)
-//                implementation(compose.foundation)
-//                implementation(compose.material)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
                 // for compose-jb - uncomment - end
 
                 implementation(libs.essentyParcelable)
@@ -95,10 +95,6 @@ kotlin {
             dependencies {
                 implementation(libs.androidMaterial)
                 implementation(libs.sqlDelightAndroidDriver)
-                // for compose-jb - uncomment - start
-//                implementation(compose.uiTooling)
-//                implementation(compose.preview)
-                // for compose-jb - uncomment - end
                 implementation("org.apache.opennlp:opennlp-tools:1.9.2")
             }
         }
@@ -124,6 +120,8 @@ kotlin {
 //        val iosTest by getting
         val desktopMain by getting {
             dependencies {
+//                implementation(compose.uiTooling)
+//                implementation(compose.preview)
             }
         }
     }
