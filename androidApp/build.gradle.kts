@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidViewModelKtx)
     implementation(libs.androidLifecycleKtx)
     implementation(libs.floatingActionButtonSpeedDial)
+    implementation(libs.decompose)
     implementation(libs.decomposeJetpack)
     implementation(compose.material)
 //    implementation(libs.essentyParcelable)

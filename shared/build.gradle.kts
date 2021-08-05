@@ -3,6 +3,13 @@ plugins {
     id("android-base-convention")
     id("resources")
     id("org.jetbrains.compose")
+
+    kotlin("plugin.serialization")
+    // TODO: resolve that issue somehow, probably with extracting api/model stuff in a gradle module
+//    >>> COMPOSE WARNING
+//    >>> Project `shared` has `compose` and `kotlinx.serialization` plugins applied!
+//    >>> Consider using these plugins in separate modules to avoid compilation errors
+//    >>> Check more details here: https://github.com/JetBrains/compose-jb/issues/738
 }
 
 group = "com.aglushkov.wordteacher"
@@ -68,10 +75,10 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.uiTooling)
 
-                api(libs.essentyParcelable)
-                api(libs.essentryInstanceKeeper)
-                api(libs.essentryStateKeeper)
-                api(libs.decompose)
+                implementation(libs.essentyParcelable)
+                implementation(libs.essentryInstanceKeeper)
+                implementation(libs.essentryStateKeeper)
+                implementation(libs.decompose)
             }
         }
         val commonTest by getting {
