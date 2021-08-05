@@ -83,6 +83,7 @@ dependencies {
 //    }
     implementation(libs.androidComposeActivity)
     implementation(compose.uiTooling)
+    implementation(compose.preview)
 
     implementation(libs.coroutinesCommon)
     implementation(libs.coroutinesAndroid)

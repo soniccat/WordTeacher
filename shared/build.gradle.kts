@@ -73,7 +73,6 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
-                implementation(compose.uiTooling)
 
                 implementation(libs.essentyParcelable)
                 implementation(libs.essentryInstanceKeeper)
@@ -91,6 +90,8 @@ kotlin {
             dependencies {
                 implementation(libs.androidMaterial)
                 implementation(libs.sqlDelightAndroidDriver)
+                implementation(compose.uiTooling)
+                implementation(compose.preview)
                 implementation("org.apache.opennlp:opennlp-tools:1.9.2")
             }
         }
