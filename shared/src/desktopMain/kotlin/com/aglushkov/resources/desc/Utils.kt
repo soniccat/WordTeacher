@@ -9,12 +9,12 @@ object Utils {
         return args.map { (it as? StringDesc)?.toResultString() ?: it }.toTypedArray()
     }
 
-    fun getString(resId: Int): String {
+    fun getString(resId: String): String {
         // TODO: support getting string by idRes
         return "string with id $resId"
     }
 
-    fun getString(resId: Int, vararg formatArgs: Any): String {
+    fun getString(resId: String, vararg formatArgs: Any): String {
         // TODO: support getting string by idRes
         return "varargs string with id $resId"
     }

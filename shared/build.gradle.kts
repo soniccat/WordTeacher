@@ -122,6 +122,7 @@ kotlin {
             dependencies {
 //                implementation(compose.uiTooling)
 //                implementation(compose.preview)
+                implementation(libs.sqlDelightJvmDriver)
             }
         }
     }

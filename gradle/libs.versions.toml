@@ -64,6 +64,7 @@ sqlDelight = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "
 sqlDelightRuntime = { module = "com.squareup.sqldelight:runtime", version.ref = "sqlDelight" }
 sqlDelightiOSDriver = { module = "com.squareup.sqldelight:native-driver", version.ref = "sqlDelight" }
 sqlDelightAndroidDriver = { module = "com.squareup.sqldelight:android-driver", version.ref = "sqlDelight" }
+sqlDelightJvmDriver = { module = "com.squareup.sqldelight:sqlite-driver", version.ref = "sqlDelight" }
 
 coroutinesCommon = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }

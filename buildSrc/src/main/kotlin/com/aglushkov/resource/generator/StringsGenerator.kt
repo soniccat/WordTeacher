@@ -99,7 +99,7 @@ abstract class StringsGenerator(
         override fun createDesktopGenerator(): StringsGenerator {
             return DesktopStringsGenerator(
                 stringsFileTree,
-                info.androidRClassPackage
+//                info.androidRClassPackage
             )
         }
     }

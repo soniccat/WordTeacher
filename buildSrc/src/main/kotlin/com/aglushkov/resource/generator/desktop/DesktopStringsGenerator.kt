@@ -15,7 +15,7 @@ import org.apache.commons.text.StringEscapeUtils
 
 class DesktopStringsGenerator(
     stringsFileTree: FileTree,
-    private val androidRClassPackage: String
+//    private val androidRClassPackage: String
 ) : StringsGenerator(
     stringsFileTree = stringsFileTree
 ) {
@@ -25,11 +25,11 @@ class DesktopStringsGenerator(
 
     override fun getPropertyInitializer(key: String): CodeBlock? {
         val processedKey = processKey(key)
-        return CodeBlock.of("StringResource(R.string.%L)", processedKey)
+        return CodeBlock.of("StringResource(\"%L\")", processedKey)
     }
 
     override fun getImports(): List<ClassName> = listOf(
-        ClassName(androidRClassPackage, "R")
+//        ClassName(androidRClassPackage, "R")
     )
 
     override fun generateResources(

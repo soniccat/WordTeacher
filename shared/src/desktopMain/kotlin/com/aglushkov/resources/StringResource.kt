@@ -5,5 +5,5 @@
 package com.aglushkov.resources
 
 actual class StringResource(
-    val resourceId: Int
+    val resourceId: String
 )
