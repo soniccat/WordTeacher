@@ -13,7 +13,7 @@ pluginManagement {
 }
 
 //includeBuild("plugins/configure-plugin")
-includeBuild("plugins/resources-plugin")
+//includeBuild("plugins/resources-plugin")
 include(":androidApp")
 include(":shared")
 include(":desktopApp")

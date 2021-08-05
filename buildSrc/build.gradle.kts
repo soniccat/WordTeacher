@@ -17,6 +17,12 @@ dependencies {
     implementation(libs.kotlinGradlePlugin)
     implementation(libs.sqlDelight)
     implementation(libs.kotlinxSerialization)
+
+    // for resoures plugin
+//    implementation(gradleKotlinDsl())
+    implementation(libs.kotlinPoet)
+    implementation(libs.apacheCommonsText)
+    implementation(libs.kotlinCompilerEmbeddable)
 }
 
 kotlin {
@@ -27,4 +33,11 @@ kotlin {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+gradlePlugin {
+    plugins.register("resources") {
+        id = "resources"
+        implementationClass = "com.aglushkov.resource.ResourcesPlugin"
+    }
 }
