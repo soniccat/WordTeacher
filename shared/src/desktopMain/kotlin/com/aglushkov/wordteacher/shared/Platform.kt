@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared
 
 actual class Platform actual constructor() {
-    actual val platform: String = "Desktop ${android.os.Build.VERSION.SDK_INT}"
+    // TODO: provide a real version
+    actual val platform: String = "Desktop <TODO>"
 }

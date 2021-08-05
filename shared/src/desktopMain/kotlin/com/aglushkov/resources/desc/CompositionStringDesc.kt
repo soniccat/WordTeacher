@@ -4,19 +4,17 @@
 
 package com.aglushkov.resources.desc
 
-import android.content.Context
-
 actual data class CompositionStringDesc actual constructor(
     val args: Iterable<StringDesc>,
     val separator: String?
 ) : StringDesc {
-    override fun toString(context: Context): String {
+    override fun toResultString(): String {
         return StringBuilder().apply {
             args.forEachIndexed { index, stringDesc ->
                 if (index != 0 && separator != null) {
                     append(separator)
                 }
-                append(stringDesc.toString(context))
+                append(stringDesc.toResultString())
             }
         }.toString()
     }

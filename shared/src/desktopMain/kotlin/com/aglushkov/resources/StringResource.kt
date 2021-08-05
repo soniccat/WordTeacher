@@ -4,11 +4,6 @@
 
 package com.aglushkov.resources
 
-import android.os.Parcelable
-import androidx.annotation.StringRes
-import kotlinx.parcelize.Parcelize
-
-@Parcelize
 actual class StringResource(
-    @StringRes val resourceId: Int
-) : Parcelable
+    val resourceId: Int
+)

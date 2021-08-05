@@ -4,18 +4,17 @@
 
 package com.aglushkov.resources.desc
 
-import android.content.Context
 import com.aglushkov.resources.StringResource
 
 actual data class ResourceFormattedStringDesc actual constructor(
     val stringRes: StringResource,
     val args: List<Any>
 ) : StringDesc {
-    override fun toString(context: Context): String {
+    override fun toResultString(): String {
         @Suppress("SpreadOperator")
-        return Utils.resourcesForContext(context).getString(
+        return Utils.getString(
             stringRes.resourceId,
-            *Utils.processArgs(args, context)
+            *Utils.processArgs(args)
         )
     }
 }

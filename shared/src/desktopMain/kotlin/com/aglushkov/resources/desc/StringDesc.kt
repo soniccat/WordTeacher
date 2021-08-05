@@ -4,11 +4,10 @@
 
 package com.aglushkov.resources.desc
 
-import android.content.Context
 import java.util.Locale
 
 actual interface StringDesc {
-    fun toString(context: Context): String
+    fun toResultString(): String
 
     actual sealed class LocaleType {
         actual object System : LocaleType() {
