@@ -10,6 +10,7 @@ repositories {
 
 plugins {
     kotlin("multiplatform") // kotlin("jvm") doesn't work well in IDEA/AndroidStudio (https://github.com/JetBrains/compose-jb/issues/22)
+    id("kotlin-kapt")
     id("org.jetbrains.compose")
 }
 
@@ -33,8 +34,10 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.common)
                 implementation(compose.desktop.currentOs)
+                implementation(libs.decompose)
+                implementation(libs.decomposeJetbrains)
+                implementation("com.google.dagger:dagger:2.35.1")
                 implementation(project(":shared"))
-//                implementation(project(":common"))
             }
         }
     }
@@ -90,6 +93,11 @@ compose.desktop {
             }
         }
     }
+}
+
+dependencies {
+    // TODO: replace with kapt("...")
+    add("kapt", "com.google.dagger:dagger-compiler:2.35.1")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
