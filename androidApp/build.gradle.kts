@@ -1,10 +1,6 @@
 plugins {
     id("android-app-convention")
     id("android-base-convention")
-
-    // for compose-jb - uncomment - start
-    id("org.jetbrains.compose")
-    // for compose-jb - uncomment - end
 }
 
 group = "com.aglushkov.wordteacher"

@@ -1,0 +1,1 @@
+./gradlew :androidApp:assembleDebug && ./gradlew :desktopApp:assemble
