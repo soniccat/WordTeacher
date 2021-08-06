@@ -1,9 +1,6 @@
 package com.aglushkov.wordteacher.desktopapp.features.definitions.di
 
 import com.aglushkov.wordteacher.desktopapp.di.FragmentComp
-import com.aglushkov.wordteacher.desktopapp.features.definitions.views.DefinitionsFragment
-import com.aglushkov.wordteacher.desktopapp.features.definitions.views.DefinitionsAndroidVM
-import com.aglushkov.wordteacher.desktopapp.di.FragmentComp
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator

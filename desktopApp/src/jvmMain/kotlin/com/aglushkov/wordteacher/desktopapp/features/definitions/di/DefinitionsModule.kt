@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.desktopapp.features.definitions.di
 
 import com.aglushkov.wordteacher.desktopapp.di.FragmentComp
-import com.aglushkov.wordteacher.desktopapp.features.definitions.views.DefinitionsAndroidVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository

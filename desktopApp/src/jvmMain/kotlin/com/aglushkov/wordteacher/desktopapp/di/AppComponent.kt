@@ -30,15 +30,15 @@ public interface AppComponent:
     fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
-    override fun database(): AppDatabase
-    override fun nlpCore(): NLPCore
+    fun database(): AppDatabase
+    fun nlpCore(): NLPCore
 
-    override fun routerResolver(): RouterResolver
-    override fun articlesRepository(): ArticlesRepository
-    override fun cardSetsRepository(): CardSetsRepository
+    fun routerResolver(): RouterResolver
+    fun articlesRepository(): ArticlesRepository
+    fun cardSetsRepository(): CardSetsRepository
     override fun wordRepository(): WordDefinitionRepository
     override fun idGenerator(): IdGenerator
-    override fun timeSource(): TimeSource
+    fun timeSource(): TimeSource
     override fun connectivityManager(): ConnectivityManager
 
     @Component.Builder
