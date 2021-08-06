@@ -18,25 +18,25 @@ fun main() {
     Window("WordTeacher") {
         Surface(color = MaterialTheme.colors.background) {
             Box(modifier = Modifier.fillMaxSize()) {
-//                val component = rememberRootComponent {
-//                    DaggerDefinitionsComposeComponent.builder()
-//                        .setComponentContext(it)
-//                        .setWord(null)
-//                        .setDeps(deps)
-//                        .build()
-//                        .rootDecomposeComponent()
-//                }
+                val component = rememberRootComponent {
+                    DaggerDefinitionsComposeComponent.builder()
+                        .setComponentContext(it)
+                        .setWord(null)
+                        .setDeps(deps)
+                        .build()
+                        .rootDecomposeComponent()
+                }
 
-//                Column {
-//                    Button(onClick = {
-//                        component.onNextChild()
-//                    }) {
-//                        Text("Open Next")
-//                    }
-//                    Children(routerState = component.routerState, animation = slide()) {
-//                        DefinitionsUI(it.instance.inner)
-//                    }
-//                }
+                Column {
+                    Button(onClick = {
+                        component.onNextChild()
+                    }) {
+                        Text("Open Next")
+                    }
+                    Children(routerState = component.routerState, animation = slide()) {
+                        DefinitionsUI(it.instance.inner)
+                    }
+                }
             }
         }
     }

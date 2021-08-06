@@ -36,9 +36,15 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.decompose)
                 implementation(libs.decomposeJetbrains)
-                implementation("com.google.dagger:dagger:2.35.1")
+                implementation("com.google.dagger:dagger:2.38.1")
                 implementation(project(":shared"))
             }
+        }
+    }
+
+    dependencies {
+        kapt {
+            annotationProcessor("com.google.dagger:dagger-compiler:2.38.1")
         }
     }
 
@@ -93,11 +99,6 @@ compose.desktop {
             }
         }
     }
-}
-
-dependencies {
-    // TODO: replace with kapt("...")
-    add("kapt", "com.google.dagger:dagger-compiler:2.35.1")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
