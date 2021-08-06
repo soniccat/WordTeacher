@@ -1,7 +1,7 @@
 plugins {
     id("kmmlib-convention")
     id("android-base-convention")
-    id("resources")
+    id("resources-convention")
 
     // for compose-jb - uncomment - start
     id("org.jetbrains.compose")
@@ -136,15 +136,6 @@ kotlin {
 //
 //        ios.deploymentTarget = "11.0"
 //    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-}
-
-resourcesPlugin {
-    multiplatformResourcesPackage = "com.aglushkov.wordteacher.shared.res" // required
-    iosBaseLocalizationRegion = "en" // optional, default "en"
 }
 
 sqldelight {

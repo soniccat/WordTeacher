@@ -41,17 +41,11 @@ kotlin {
             }
         }
     }
-
-    dependencies {
-        kapt {
-            annotationProcessor("com.google.dagger:dagger-compiler:2.38.1")
-        }
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
-    }
 }
+
+//dependencies {
+//    add("kapt", "com.google.dagger:dagger-compiler:2.38.1")
+//}
 
 //compose.desktop {
 //    application {
