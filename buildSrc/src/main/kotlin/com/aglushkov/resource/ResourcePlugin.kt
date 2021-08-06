@@ -16,10 +16,13 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -108,18 +111,18 @@ class ResourcesPlugin : Plugin<Project> {
             features,
             target
         )
-//        if (HostManager.hostIsMac) {
-//            setupAppleGenerator(
-//                targets,
-//                generatedDir,
-//                mrClassPackage,
-//                features,
-//                target,
-//                iosLocalizationRegion
-//            )
-//        } else {
-//            target.logger.warn("MR file generation for iOS is not supported on your system!")
-//        }
+        if (HostManager.hostIsMac) {
+            setupAppleGenerator(
+                targets,
+                generatedDir,
+                mrClassPackage,
+                features,
+                target,
+                iosLocalizationRegion
+            )
+        } else {
+            target.logger.warn("MR file generation for iOS is not supported on your system!")
+        }
 
         val generationTasks = target.tasks.filterIsInstance<GenerateMultiplatformResourcesTask>()
         generationTasks.filter { it != commonGenerationTask }
@@ -165,6 +168,40 @@ class ResourcesPlugin : Plugin<Project> {
             mrClassPackage,
             generators = features.map { it.createAndroidGenerator() }
         ).apply(target)
+    }
+
+    @Suppress("LongParameterList")
+    private fun setupAppleGenerator(
+        targets: List<KotlinTarget>,
+        generatedDir: File,
+        mrClassPackage: String,
+        features: List<ResourceGeneratorFeature<out MRGenerator.Generator>>,
+        target: Project,
+        iosLocalizationRegion: String
+    ) {
+        val compilations = targets
+            .filterIsInstance<KotlinNativeTarget>()
+            .filter { it.konanTarget.family.isAppleFamily }
+            .map { kotlinNativeTarget ->
+                kotlinNativeTarget.compilations
+                    .getByName(KotlinCompilation.MAIN_COMPILATION_NAME)
+            }
+
+        val defSourceSets = compilations.map { it.defaultSourceSet }
+        compilations.forEach { compilation ->
+            val kss = compilation.defaultSourceSet
+            val depend = kss.getDependedFrom(defSourceSets)
+
+            val sourceSet = createSourceSet(depend ?: kss)
+            AppleMRGenerator(
+                generatedDir,
+                sourceSet,
+                mrClassPackage,
+                generators = features.map { it.createIosGenerator() },
+                compilation = compilation,
+                baseLocalizationRegion = iosLocalizationRegion
+            ).apply(target)
+        }
     }
 
     private fun setupDesktopGenerator(

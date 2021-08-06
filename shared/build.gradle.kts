@@ -29,13 +29,6 @@ kotlin {
                 implementation(libs.sqlDelightRuntime)
                 implementation(libs.uuid)
 
-                //implementation(kotlin("stdlib"))
-                // for compose-jb - uncomment - start
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                // for compose-jb - uncomment - end
-
                 implementation(libs.essentyParcelable)
                 implementation(libs.essentryInstanceKeeper)
                 implementation(libs.essentryStateKeeper)
@@ -53,6 +46,12 @@ kotlin {
                 implementation(libs.androidMaterial)
                 implementation(libs.sqlDelightAndroidDriver)
                 implementation("org.apache.opennlp:opennlp-tools:1.9.2")
+
+                // for compose-jb - uncomment - start
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                // for compose-jb - uncomment - end
             }
         }
         val androidTest by getting {
@@ -61,22 +60,28 @@ kotlin {
                 implementation(libs.junit)
             }
         }
-//        val iosMain by getting {
-//            dependencies {
-//                implementation(libs.ktoriOSClient)
-//                implementation(libs.coroutinesCommon) /*{
-//                    version {
-//                        // HACK: to fix InvalidMutabilityException: mutation attempt of frozen kotlinx.coroutines.ChildHandleNode
-//                        // during HttpClient initialization
-//                        strictly(libs.versions.coroutines.get())
-//                    }
-//                }*/
-//                implementation(libs.sqlDelightiOSDriver)
-//            }
-//        }
-//        val iosTest by getting
+        val iosMain by getting {
+            dependencies {
+                implementation(libs.ktoriOSClient)
+                implementation(libs.coroutinesCommon)/* {
+                    version {
+                        // HACK: to fix InvalidMutabilityException: mutation attempt of frozen kotlinx.coroutines.ChildHandleNode
+                        // during HttpClient initialization
+                        strictly(libs.versions.coroutines.get())
+                    }
+                }*/
+                implementation(libs.sqlDelightiOSDriver)
+            }
+        }
+        val iosTest by getting
         val desktopMain by getting {
             dependencies {
+                // for compose-jb - uncomment - start
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                // for compose-jb - uncomment - end
+
 //                implementation(compose.uiTooling)
 //                implementation(compose.preview)
                 implementation(libs.sqlDelightJvmDriver)
