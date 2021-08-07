@@ -76,6 +76,7 @@ kotlin {
         val iosTest by getting
         val desktopMain by getting {
             dependencies {
+                implementation(libs.ktorDesktop)
                 // for compose-jb - uncomment - start
                 implementation(compose.runtime)
                 implementation(compose.foundation)

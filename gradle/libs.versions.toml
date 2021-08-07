@@ -74,6 +74,7 @@ coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android
 ktorCommonCore = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktorAndroidClient = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktoriOSClient = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
+ktorDesktop = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 okio = { module = "com.squareup.okio:okio-multiplatform", version.ref = "okio" }
 logger = { module = "com.github.aakira:napier", version.ref = "napier" }

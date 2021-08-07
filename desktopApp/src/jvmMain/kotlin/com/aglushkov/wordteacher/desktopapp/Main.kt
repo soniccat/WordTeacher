@@ -12,7 +12,23 @@ import androidx.compose.material.Text
 import androidx.compose.material.Button
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.aglushkov.wordteacher.desktopapp.features.definitions.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.ChildConfiguration
+import com.aglushkov.wordteacher.shared.features.RootDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
+import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatFile
+import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
+import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
+import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
+import com.aglushkov.wordteacher.shared.service.ConfigService
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
 
 val connectivityManager = ConnectivityManager()
 val wordDefinitionRepository = WordDefinitionRepository(
@@ -53,7 +69,7 @@ fun main() {
 //                }
 
                 val component = rememberRootComponent {
-                    com.aglushkov.wordteacher.shared.features.RootDecomposeComponentImpl(
+                    RootDecomposeComponentImpl(
                         it,
                         componentFactory
                     )

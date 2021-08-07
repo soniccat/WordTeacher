@@ -39,6 +39,10 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.decompose)
                 implementation(libs.decomposeJetbrains)
+                implementation(compose.runtime)
+                implementation(compose.preview)
+                implementation(compose.uiTooling)
+                implementation(compose.ui)
                 implementation("com.google.dagger:dagger:2.38.1")
                 implementation(project(":shared"))
             }
