@@ -14,13 +14,16 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 kotlin {
     jvm {
         withJava()
     }
-//    jvm {
-//        withJava()
-//    }
+
     sourceSets {
 //        named("commonMain") {
 //            dependencies {
@@ -84,7 +87,7 @@ compose.desktop {
             packageName = "WordTeacher"
             packageVersion = "1.0.0"
 
-            //modules("java.sql")
+            modules("java.sql")
 
             windows {
                 menuGroup = "Compose Examples"
@@ -95,6 +98,6 @@ compose.desktop {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
+//tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+//    kotlinOptions.jvmTarget = "1.8"
+//}
