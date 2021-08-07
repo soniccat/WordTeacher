@@ -7,7 +7,10 @@ package com.aglushkov.resources.desc
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.aglushkov.resources.StringResource
 
-expect class ResourceStringDesc(stringRes: StringResource) : StringDesc, Parcelable
-
-@Suppress("FunctionName")
-fun StringDesc.Companion.Resource(stringRes: StringResource) = ResourceStringDesc(stringRes)
+actual data class ResourceStringDesc actual constructor(
+    private val stringRes: StringResource
+) : StringDesc, Parcelable {
+    override fun localized(): String {
+        return Utils.localizedString(stringRes)
+    }
+}

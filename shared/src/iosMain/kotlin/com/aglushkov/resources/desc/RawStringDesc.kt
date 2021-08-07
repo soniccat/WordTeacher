@@ -6,7 +6,8 @@ package com.aglushkov.resources.desc
 
 import com.arkivanov.essenty.parcelable.Parcelable
 
-expect class RawStringDesc(string: String) : StringDesc, Parcelable
-
-@Suppress("FunctionName")
-fun StringDesc.Companion.Raw(string: String) = RawStringDesc(string)
+actual data class RawStringDesc actual constructor(
+    val string: String
+) : StringDesc, Parcelable {
+    override fun localized(): String = string
+}

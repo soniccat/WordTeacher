@@ -10,6 +10,9 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.aglushkov.resource.generator.MRGenerator
+import com.aglushkov.resource.ResourcesPluginExtension
+import com.aglushkov.resource.generator.tasks.CopyFrameworkResourcesToAppTask
+import com.aglushkov.resource.generator.tasks.CopyFrameworkResourcesToAppEntryPointTask
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -66,7 +69,7 @@ class AppleMRGenerator(
 
     override fun getImports(): List<ClassName> = listOf(
         bundleClassName,
-        ClassName("dev.icerock.moko.resources.utils", "loadableBundle")
+        ClassName("com.aglushkov.resources.utils", "loadableBundle")
     )
 
     override fun apply(generationTask: Task, project: Project) {
@@ -152,8 +155,8 @@ class AppleMRGenerator(
 
         kotlinNativeTarget.binaries
             .matching { it is Framework && it.compilation == compilation }
-            .configureEach { binary ->
-                val framework = binary as Framework
+            .configureEach {
+                val framework = this as Framework
 
                 val linkTask = framework.linkTask
 
@@ -169,7 +172,7 @@ class AppleMRGenerator(
 
                 if (framework.isStatic) {
                     val resourcesExtension =
-                        project.extensions.getByType(MultiplatformResourcesPluginExtension::class.java)
+                        project.extensions.getByType(ResourcesPluginExtension::class.java)
                     if (resourcesExtension.disableStaticFrameworkWarning.not()) {
                         project.logger.warn(
                             """
@@ -220,7 +223,7 @@ $linkTask produces static framework, Xcode should have Build Phase with copyFram
         val taskName = linkTask.name.replace("link", "copyResources")
 
         val copyTask = project.tasks.create(taskName, CopyFrameworkResourcesToAppTask::class.java) {
-            it.framework = framework
+            this.framework = framework
         }
         copyTask.dependsOn(linkTask)
 
@@ -243,7 +246,7 @@ $linkTask produces static framework, Xcode should have Build Phase with copyFram
         kotlinNativeTarget.binaries
             .matching { it is TestExecutable && it.compilation.associateWith.contains(compilation) }
             .configureEach {
-                val executable = it as TestExecutable
+                val executable = this as TestExecutable
 
                 val linkTask = executable.linkTask
 

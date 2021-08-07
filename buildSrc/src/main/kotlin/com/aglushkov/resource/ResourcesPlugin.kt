@@ -6,6 +6,7 @@ import com.aglushkov.resource.generator.SourceInfo
 import com.aglushkov.resource.generator.StringsGenerator
 import com.aglushkov.resource.generator.android.AndroidMRGenerator
 import com.aglushkov.resource.generator.desktop.DesktopMRGenerator
+import com.aglushkov.resource.generator.apple.AppleMRGenerator
 import com.aglushkov.resource.generator.common.CommonMRGenerator
 import com.aglushkov.resource.generator.tasks.GenerateMultiplatformResourcesTask
 import com.android.build.gradle.BaseExtension
@@ -288,5 +289,11 @@ class ResourcesPlugin : Plugin<Project> {
                 sourceSet.resources.srcDir(directory)
             }
         }
+    }
+
+    private fun KotlinSourceSet.getDependedFrom(sourceSets: Collection<KotlinSourceSet>): KotlinSourceSet? {
+        return sourceSets.firstOrNull { this.dependsOn.contains(it) } ?: this.dependsOn
+            .mapNotNull { it.getDependedFrom(sourceSets) }
+            .firstOrNull()
     }
 }

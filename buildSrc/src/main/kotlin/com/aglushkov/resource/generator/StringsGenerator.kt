@@ -6,6 +6,7 @@ package com.aglushkov.resource.generator
 
 import com.aglushkov.resource.generator.desktop.DesktopStringsGenerator
 import com.aglushkov.resource.generator.android.AndroidStringsGenerator
+import com.aglushkov.resource.generator.apple.AppleStringsGenerator
 import com.aglushkov.resource.generator.common.CommonStringsGenerator
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeSpec
@@ -82,11 +83,10 @@ abstract class StringsGenerator(
         }
 
         override fun createIosGenerator(): StringsGenerator {
-            TODO("isn't done")
-//            return AppleStringsGenerator(
-//                stringsFileTree,
-//                iosBaseLocalizationRegion
-//            )
+            return AppleStringsGenerator(
+                stringsFileTree,
+                iosBaseLocalizationRegion
+            )
         }
 
         override fun createAndroidGenerator(): StringsGenerator {

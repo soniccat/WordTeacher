@@ -4,10 +4,11 @@
 
 package com.aglushkov.resources.desc
 
-expect class CompositionStringDesc(args: Iterable<StringDesc>, separator: String? = null) : StringDesc
-
-@Suppress("FunctionName")
-fun StringDesc.Companion.Composition(
-    args: Iterable<StringDesc>,
-    separator: String? = null
-) = CompositionStringDesc(args, separator)
+actual data class CompositionStringDesc actual constructor(
+    val args: Iterable<StringDesc>,
+    val separator: String?
+) : StringDesc {
+    override fun localized(): String {
+        return args.joinToString(separator = separator ?: "") { it.localized() }
+    }
+}

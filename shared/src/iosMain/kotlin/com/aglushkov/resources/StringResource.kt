@@ -4,11 +4,9 @@
 
 package com.aglushkov.resources
 
-import com.aglushkov.resources.desc.ResourceFormatted
-import com.aglushkov.resources.desc.StringDesc
+import platform.Foundation.NSBundle
 
-expect class StringResource
-
-@Suppress("SpreadOperator")
-fun StringResource.format(vararg args: Any) = StringDesc.ResourceFormatted(this, *args)
-fun StringResource.format(args: List<Any>) = StringDesc.ResourceFormatted(this, args)
+actual class StringResource(
+    val resourceId: String,
+    val bundle: NSBundle = NSBundle.mainBundle
+)

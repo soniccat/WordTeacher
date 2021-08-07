@@ -6,16 +6,11 @@ package com.aglushkov.resources.desc
 
 import com.aglushkov.resources.StringResource
 
-expect class ResourceFormattedStringDesc(stringRes: StringResource, args: List<Any>) : StringDesc
-
-@Suppress("FunctionName")
-fun StringDesc.Companion.ResourceFormatted(
-    stringRes: StringResource,
-    args: List<Any>
-) = ResourceFormattedStringDesc(stringRes, args)
-
-@Suppress("FunctionName")
-fun StringDesc.Companion.ResourceFormatted(
-    stringRes: StringResource,
-    vararg args: Any
-) = ResourceFormattedStringDesc(stringRes, args.asList())
+actual data class ResourceFormattedStringDesc actual constructor(
+    val stringRes: StringResource,
+    val args: List<Any>
+) : StringDesc {
+    override fun localized(): String {
+        return Utils.stringWithFormat(Utils.localizedString(stringRes), Utils.processArgs(args))
+    }
+}

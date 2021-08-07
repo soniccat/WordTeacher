@@ -4,6 +4,8 @@
 
 package com.aglushkov.resources
 
-expect interface ResourceContainer<T>
+import platform.Foundation.NSBundle
 
-expect fun ResourceContainer<ImageResource>.getImageByFileName(fileName: String): ImageResource?
+actual interface ResourceContainer<T> {
+    val nsBundle: NSBundle
+}
