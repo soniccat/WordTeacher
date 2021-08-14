@@ -2,15 +2,17 @@ package com.aglushkov.wordteacher.androidApp
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
@@ -21,9 +23,13 @@ import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragme
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.di.AppComponentOwner
+import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.rememberRootComponent
@@ -31,6 +37,10 @@ import kotlin.reflect.KClass
 
 class MainActivity : AppCompatActivity(), Router {
     lateinit var binding: ActivityMainBinding
+    private val bottomBarTabs = listOf(
+        ScreenTab.Definitions,
+        ScreenTab.Articles
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,18 +65,60 @@ class MainActivity : AppCompatActivity(), Router {
                                 .rootDecomposeComponent()
                         }
 
-                        Column {
-                            Button(onClick = {
-                                component.onNextChild()
-                            }) {
-                                Text("Open Next")
+                        Scaffold(
+                            bottomBar = {
+                                bottomNavigationBar(component)
                             }
-                            Children(routerState = component.routerState, animation = slide()) {
-                                DefinitionsUI(it.instance.inner)
+                        ) { innerPadding ->
+                            Children(
+                                routerState = component.routerState,
+                                animation = slide()
+                            ) {
+                                val component = it.instance.inner
+                                if (component is DefinitionsDecomposeComponent) {
+                                    DefinitionsUI(
+                                        component,
+                                        modalModifier = Modifier.padding(innerPadding)
+                                    )
+                                }
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    private fun bottomNavigationBar(component: RootDecomposeComponent) {
+        BottomNavigation(
+            modifier = Modifier
+                .requiredHeight(56.dp)
+        ) {
+            bottomBarTabs.forEachIndexed { index, tab ->
+                BottomNavigationItem(
+                    selected = tab.decomposeChildConfigClass == component.routerState.value.activeChild.configuration::class.java,
+                    onClick = {
+                        when (tab) {
+                            is ScreenTab.Definitions -> {
+                                component.openDefinitions()
+                            }
+                            is ScreenTab.Articles -> {
+                                component.openArticles()
+                            }
+                        }
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(tab.iconRes),
+                            contentDescription = null,
+                            tint = LocalContentColor.current
+                        )
+                    },
+                    label = {
+                        Text(stringResource(id = tab.nameRes))
+                    }
+                )
             }
         }
     }
@@ -191,4 +243,9 @@ class MainActivity : AppCompatActivity(), Router {
         // TODO: need to support
         // openFragment(CardSetFragment::class, CardSetFragment.createArguments(id), true)
     }
+}
+
+sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
+    object Definitions : ScreenTab(R.string.tab_definitions, R.drawable.ic_field_search_24, RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+    object Articles : ScreenTab(R.string.tab_articles, R.drawable.ic_tab_article_24, RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
 }

@@ -16,42 +16,60 @@ import com.benasher44.uuid.uuid4
 interface RootDecomposeComponent {
     val routerState: Value<RouterState<*, Child>>
 
-    fun onNextChild()
-    fun onPrevChild()
+    fun openDefinitions()
+    fun openArticles()
+    fun back()
 
     class Child(
         val inner: DefinitionsDecomposeComponent
     )
 
+    sealed class ChildConfiguration: Parcelable {
+        @Parcelize data class DefinitionConfiguration(val word: String? = null) : RootDecomposeComponent.ChildConfiguration()
+        @Parcelize object ArticlesConfiguration : RootDecomposeComponent.ChildConfiguration()
+    }
 }
 
 class RootDecomposeComponentImpl(
     componentContext: ComponentContext,
-    val childComponentFactory: (context: ComponentContext, configuration: ChildConfiguration) -> DefinitionsDecomposeComponent
+    val childComponentFactory: (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> DefinitionsDecomposeComponent
 ) : RootDecomposeComponent, ComponentContext by componentContext {
 
-    private val router: Router<ChildConfiguration, RootDecomposeComponent.Child> =
+    private val router: Router<RootDecomposeComponent.ChildConfiguration, RootDecomposeComponent.Child> =
         router(
-            initialConfiguration = ChildConfiguration(),
+            initialConfiguration = RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration(),
             handleBackButton = true,
             childFactory = ::resolveChild
         )
 
     override val routerState: Value<RouterState<*, RootDecomposeComponent.Child>> = router.state
 
-    private fun resolveChild(configuration: ChildConfiguration, componentContext: ComponentContext): RootDecomposeComponent.Child =
-        RootDecomposeComponent.Child(
+    private fun resolveChild(
+        configuration: RootDecomposeComponent.ChildConfiguration,
+        componentContext: ComponentContext
+    ): RootDecomposeComponent.Child = RootDecomposeComponent.Child(
             inner = childComponentFactory(componentContext, configuration)
         )
 
-    override fun onNextChild() {
-        router.push(ChildConfiguration(word = "clear"))
+    override fun openDefinitions() {
+        router.navigate {
+            listOf(it.first())
+        }
     }
 
-    override fun onPrevChild() {
-        router.pop()
+    override fun openArticles() {
+        if (router.state.value.backStack.lastOrNull()?.configuration is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration) {
+            return
+        }
+
+        router.navigate {
+            listOf(RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
+        }
+    }
+
+    override fun back() {
+        if (router.state.value.backStack.size > 1) {
+            router.pop()
+        }
     }
 }
-
-@Parcelize
-data class ChildConfiguration(val word: String? = null, val id: String = uuid4().toString()) : Parcelable

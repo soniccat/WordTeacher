@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 fun ChooserUI(
     state: ModalBottomSheetState,
     items: List<ChooserViewItem>,
+    modifier: Modifier = Modifier,
     onSelected: (selected: List<ChooserViewItem>) -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -51,6 +52,7 @@ fun ChooserUI(
                 }
             }
         },
+        modifier = modifier,
         content = content
     )
 }

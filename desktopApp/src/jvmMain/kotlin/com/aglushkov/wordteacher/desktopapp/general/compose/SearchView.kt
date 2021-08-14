@@ -19,6 +19,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+
+
 
 @Composable
 fun SearchView(
@@ -30,6 +37,14 @@ fun SearchView(
         value = text,
         onValueChange = onTextChanged,
         modifier = Modifier
+//            .onPreviewKeyEvent {
+//                if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
+//                    onImeAction()
+//                    true
+//                } else {
+//                    false
+//                }
+//            }
             .padding(8.dp)
             .fillMaxWidth()
             .background(

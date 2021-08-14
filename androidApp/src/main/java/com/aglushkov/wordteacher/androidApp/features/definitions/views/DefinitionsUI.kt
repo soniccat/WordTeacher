@@ -3,21 +3,13 @@ package com.aglushkov.wordteacher.androidApp.features.definitions.views
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.*
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -75,7 +67,7 @@ import java.util.*
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun DefinitionsUI(vm: DefinitionsVM) {
+fun DefinitionsUI(vm: DefinitionsVM, modalModifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val partsOfSpeech by vm.partsOfSpeechFilterStateFlow.collectAsState()
     val selectedPartsOfSpeeches by vm.selectedPartsOfSpeechStateFlow.collectAsState()
@@ -88,6 +80,7 @@ fun DefinitionsUI(vm: DefinitionsVM) {
             val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
             ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
         },
+        modifier = modalModifier,
         onSelected = { items ->
             vm.onPartOfSpeechFilterUpdated(
                 items.filter { option ->
@@ -112,22 +105,21 @@ fun DefinitionsUI(vm: DefinitionsVM) {
 @Composable
 private fun DefinitionsWordUI(
     vm: DefinitionsVM,
+    modifier: Modifier = Modifier,
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
     var searchText by remember { mutableStateOf("") }
 
-    Scaffold(
-        topBar = {
-            CustomTopAppBar {
-                SearchView(searchText, { searchText = it }) {
-                    vm.onWordSubmitted(searchText)
-                }
-            }
-        },
-        bottomBar = {
-        }
+    Column(
+        modifier = modifier,
     ) {
+        CustomTopAppBar {
+            SearchView(searchText, { searchText = it }) {
+                vm.onWordSubmitted(searchText)
+            }
+        }
+
         val res = defs.value
         val data = res.data()
 

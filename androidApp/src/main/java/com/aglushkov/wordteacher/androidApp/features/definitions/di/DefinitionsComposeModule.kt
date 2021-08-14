@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
-import com.aglushkov.wordteacher.shared.features.ChildConfiguration
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponentImpl
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
@@ -18,22 +17,32 @@ class DefinitionsComposeModule {
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         idGenerator: IdGenerator,
-    ): (context: ComponentContext, configuration: ChildConfiguration) -> DefinitionsDecomposeComponent =
-        { context: ComponentContext, configuration: ChildConfiguration ->
-            DefinitionsDecomposeComponent(
-                context,
-                configuration.word,
-                connectivityManager,
-                wordDefinitionRepository,
-                idGenerator
-            )
+    ): (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> DefinitionsDecomposeComponent =
+        { context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration ->
+            when (configuration) {
+                is RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> DefinitionsDecomposeComponent(
+                    context,
+                    configuration.word,
+                    connectivityManager,
+                    wordDefinitionRepository,
+                    idGenerator
+                )
+                is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> DefinitionsDecomposeComponent(
+                    context,
+                    "fox",
+                    connectivityManager,
+                    wordDefinitionRepository,
+                    idGenerator
+                )
+            }
+
         }
 
     @JvmSuppressWildcards
     @Provides
     fun rootComponent(
         componentContext: ComponentContext,
-        definitionsDecomposeComponentFactory: (context: ComponentContext, configuration: ChildConfiguration) -> DefinitionsDecomposeComponent
+        definitionsDecomposeComponentFactory: (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> DefinitionsDecomposeComponent
     ) : RootDecomposeComponent {
         return RootDecomposeComponentImpl(
             componentContext,
