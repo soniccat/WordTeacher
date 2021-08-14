@@ -63,7 +63,7 @@ class RootDecomposeComponentImpl(
         }
 
         router.navigate {
-            listOf(RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
+            it + listOf(RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
         }
     }
 

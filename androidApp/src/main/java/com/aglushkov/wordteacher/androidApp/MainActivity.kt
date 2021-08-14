@@ -30,6 +30,7 @@ import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.rememberRootComponent
@@ -50,21 +51,20 @@ class MainActivity : AppCompatActivity(), Router {
     }
 
     private fun setupComposeLayout() {
+        val context = defaultComponentContext()
         val deps = (applicationContext as AppComponentOwner).appComponent
+
+        val component = DaggerDefinitionsComposeComponent.builder()
+            .setComponentContext(context)
+            .setWord(null)
+            .setDeps(deps)
+            .build()
+            .rootDecomposeComponent()
 
         setContent {
             ComposeAppTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        val component = rememberRootComponent {
-                            DaggerDefinitionsComposeComponent.builder()
-                                .setComponentContext(it)
-                                .setWord(null)
-                                .setDeps(deps)
-                                .build()
-                                .rootDecomposeComponent()
-                        }
-
                         Scaffold(
                             bottomBar = {
                                 bottomNavigationBar(component)
@@ -161,13 +161,13 @@ class MainActivity : AppCompatActivity(), Router {
         }
     }
 
-    override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount == 1) {
-            finish()
-        } else {
-            super.onBackPressed()
-        }
-    }
+//    override fun onBackPressed() {
+//        if (supportFragmentManager.backStackEntryCount == 1) {
+//            finish()
+//        } else {
+//            super.onBackPressed()
+//        }
+//    }
 
     private fun openFragment(cl: KClass<*>, arguments: Bundle? = null, isFullscreen: Boolean = false) {
         val tag = screenNameByClass(cl)
