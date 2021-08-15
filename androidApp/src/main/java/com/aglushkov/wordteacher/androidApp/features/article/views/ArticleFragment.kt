@@ -42,7 +42,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 class ArticleAndroidVM(
     application: Application
 ): AndroidVM<ArticleVM>(application)

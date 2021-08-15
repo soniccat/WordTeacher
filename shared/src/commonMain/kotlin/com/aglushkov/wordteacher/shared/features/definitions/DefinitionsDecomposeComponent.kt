@@ -16,8 +16,12 @@ class DefinitionsDecomposeComponent (
     connectivityManager: ConnectivityManager,
     wordDefinitionRepository: WordDefinitionRepository,
     idGenerator: IdGenerator
-) : DefinitionsVMImpl(connectivityManager, wordDefinitionRepository, idGenerator, DefinitionsVM.State(word = word)),
-    ComponentContext by componentContext {
+) : DefinitionsVMImpl(
+    connectivityManager,
+    wordDefinitionRepository,
+    idGenerator,
+    DefinitionsVM.State(word = word)
+), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: DefinitionsVM.State(word = word))

@@ -21,9 +21,9 @@ import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
+import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComponent
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerRootComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.di.AppComponentOwner
@@ -54,10 +54,13 @@ class MainActivity : AppCompatActivity(), Router {
         val context = defaultComponentContext()
         val deps = (applicationContext as AppComponentOwner).appComponent
 
-        val component = DaggerDefinitionsComposeComponent.builder()
+        val component = DaggerRootComposeComponent.builder()
             .setComponentContext(context)
             .setWord(null)
-            .setDeps(deps)
+            .setCommonDeps(deps)
+            .setDefinitionsDeps(deps)
+            .setArticlesDeps(deps)
+            .setArticlesRouter(this)
             .build()
             .rootDecomposeComponent()
 
@@ -74,11 +77,14 @@ class MainActivity : AppCompatActivity(), Router {
                                 routerState = component.routerState,
                                 animation = slide()
                             ) {
-                                val component = it.instance.inner
-                                if (component is DefinitionsDecomposeComponent) {
-                                    DefinitionsUI(
-                                        component,
+                                val instance = it.instance
+                                when (instance) {
+                                    is RootDecomposeComponent.Child.Definitions -> DefinitionsUI(
+                                        instance.inner,
                                         modalModifier = Modifier.padding(innerPadding)
+                                    )
+                                    is RootDecomposeComponent.Child.Articles -> ArticlesUI(
+                                        instance.inner
                                     )
                                 }
                             }

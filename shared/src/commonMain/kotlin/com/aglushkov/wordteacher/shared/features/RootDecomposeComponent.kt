@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features
 
+import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
@@ -20,9 +21,10 @@ interface RootDecomposeComponent {
     fun openArticles()
     fun back()
 
-    class Child(
-        val inner: DefinitionsDecomposeComponent
-    )
+    sealed class Child {
+        data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
+        data class Articles(val inner: ArticlesDecomposeComponent): Child()
+    }
 
     sealed class ChildConfiguration: Parcelable {
         @Parcelize data class DefinitionConfiguration(val word: String? = null) : RootDecomposeComponent.ChildConfiguration()
@@ -32,7 +34,7 @@ interface RootDecomposeComponent {
 
 class RootDecomposeComponentImpl(
     componentContext: ComponentContext,
-    val childComponentFactory: (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> DefinitionsDecomposeComponent
+    val childComponentFactory: (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> Any
 ) : RootDecomposeComponent, ComponentContext by componentContext {
 
     private val router: Router<RootDecomposeComponent.ChildConfiguration, RootDecomposeComponent.Child> =
@@ -47,9 +49,14 @@ class RootDecomposeComponentImpl(
     private fun resolveChild(
         configuration: RootDecomposeComponent.ChildConfiguration,
         componentContext: ComponentContext
-    ): RootDecomposeComponent.Child = RootDecomposeComponent.Child(
-            inner = childComponentFactory(componentContext, configuration)
+    ): RootDecomposeComponent.Child = when (configuration) {
+        is RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> RootDecomposeComponent.Child.Definitions(
+            inner = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
         )
+        is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> RootDecomposeComponent.Child.Articles(
+            inner = childComponentFactory(componentContext, configuration) as ArticlesDecomposeComponent
+        )
+    }
 
     override fun openDefinitions() {
         router.navigate {

@@ -9,33 +9,32 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class ArticlesVM(
+interface ArticlesVM {
+    val articles: StateFlow<Resource<List<BaseViewItem<*>>>>
+
+    fun onCreateTextArticleClicked()
+    fun onArticleClicked(item: ArticleViewItem)
+}
+
+open class ArticlesVMImpl(
     articlesRepository: ArticlesRepository,
     private val timeSource: TimeSource,
     private val router: ArticlesRouter
-): ViewModel() {
+): ViewModel(), ArticlesVM {
 
-    private val articlesFlow = articlesRepository.shortArticles
-    val articles = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+    override val articles = articlesRepository.shortArticles.map {
+        Logger.v("build view items")
+        it.copyWith(buildViewItems(it.data() ?: emptyList()))
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    init {
-        viewModelScope.launch {
-            articlesFlow.map {
-                Logger.v("build view items")
-                it.copyWith(buildViewItems(it.data() ?: emptyList()))
-            }.forward(articles)
-        }
-    }
-
-    fun onCreateTextArticleClicked() {
+    override fun onCreateTextArticleClicked() {
         router.openAddArticle()
     }
 
-    fun onArticleClicked(item: ArticleViewItem) {
+    override fun onArticleClicked(item: ArticleViewItem) {
         router.openArticle(item.id)
     }
 
