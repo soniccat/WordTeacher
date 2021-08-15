@@ -9,4 +9,7 @@
 
     <dimen name="word_divider_height">1dp</dimen>
     <dimen name="word_providedBy_maxWidth">150dp</dimen>
+
+    <dimen name="article_horizontalPadding">@dimen/definitions_search_horizontal_margin</dimen>
+    <dimen name="article_divider_topMargin">@dimen/definitions_search_vertical_margin</dimen>
 </resources>

@@ -43,5 +43,7 @@
     <string name="error_bad_connection">Couldn\'t establish connection to the network.\nTry to check your network settings and try again.</string>
     <string name="error_no_connection">No internet connection.\nPlease check your device network settings and try again.</string>
     <string name="error_no_definitions">No definitions were found</string>
+    <string name="articles_no_articles">To create a new article tap the button</string>
+    <string name="articles_error">Something went wrong :(</string>
     <string name="error_try_again">Try again</string>
 </resources>

@@ -65,7 +65,7 @@ class RootDecomposeComponentImpl(
     }
 
     override fun openArticles() {
-        if (router.state.value.backStack.lastOrNull()?.configuration is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration) {
+        if (router.state.value.activeChild.configuration is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration) {
             return
         }
 

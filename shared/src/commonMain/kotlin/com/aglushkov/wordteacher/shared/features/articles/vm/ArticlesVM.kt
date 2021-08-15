@@ -1,14 +1,18 @@
 package com.aglushkov.wordteacher.shared.features.articles.vm
 
+import com.aglushkov.resources.desc.Resource
+import com.aglushkov.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.res.MR
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -17,6 +21,9 @@ interface ArticlesVM {
 
     fun onCreateTextArticleClicked()
     fun onArticleClicked(item: ArticleViewItem)
+
+    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+    fun onTryAgainClicked()
 }
 
 open class ArticlesVMImpl(
@@ -45,5 +52,13 @@ open class ArticlesVMImpl(
         }
 
         return items
+    }
+
+    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
+        return StringDesc.Resource(MR.strings.articles_error)
+    }
+
+    override fun onTryAgainClicked() {
+        // TODO: do sth with articlesRepository
     }
 }

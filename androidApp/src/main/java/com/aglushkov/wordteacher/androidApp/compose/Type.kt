@@ -47,5 +47,11 @@ class AppTypography {
                     color = color
                 )}
             }
+
+        val articleTitle = wordDefinitionTitle
+        val articleDate: TextStyle
+            @Composable get() {
+                return wordDefinitionProvidedBy
+            }
     }
 }
