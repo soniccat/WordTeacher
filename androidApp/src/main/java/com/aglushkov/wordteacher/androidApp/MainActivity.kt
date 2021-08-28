@@ -57,10 +57,8 @@ class MainActivity : AppCompatActivity(), Router {
         val component = DaggerRootComposeComponent.builder()
             .setComponentContext(context)
             .setWord(null)
-            .setCommonDeps(deps)
             .setDefinitionsDeps(deps)
             .setArticlesDeps(deps)
-            .setArticlesRouter(this)
             .build()
             .rootDecomposeComponent()
 

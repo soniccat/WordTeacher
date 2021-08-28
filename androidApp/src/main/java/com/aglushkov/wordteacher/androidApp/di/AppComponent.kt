@@ -6,8 +6,6 @@ import com.aglushkov.wordteacher.androidApp.features.add_article.di.AddArticleDe
 import com.aglushkov.wordteacher.androidApp.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.androidApp.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.androidApp.features.cardsets.di.CardSetsDependencies
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.ArticlesComposeDependencies
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.CommonComposeDependencies
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
@@ -30,10 +28,8 @@ import dagger.Component
 @AppComp
 @Component(modules = [AppModule::class, GeneralModule::class] )
 public interface AppComponent:
-    CommonComposeDependencies,
     DefinitionsDependencies,
     ArticlesDependencies,
-    ArticlesComposeDependencies,
     AddArticleDependencies,
     ArticleDependencies,
     CardSetsDependencies {

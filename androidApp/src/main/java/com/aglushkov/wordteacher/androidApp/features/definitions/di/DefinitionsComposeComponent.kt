@@ -8,7 +8,7 @@ import dagger.BindsInstance
 import dagger.Component
 
 @FragmentComp
-@Component(dependencies = [DefinitionsDependencies::class], modules = [DaggerDefinitionsModule::class])
+@Component(dependencies = [DefinitionsDependencies::class], modules = [DefinitionsComposeModule::class])
 public interface DefinitionsComposeComponent {
     fun definitionsDecomposeComponent(): DefinitionsDecomposeComponent
 
