@@ -1,10 +1,11 @@
 package com.aglushkov.wordteacher.androidApp
 
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponentImpl
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
-import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -18,10 +19,7 @@ import dagger.Provides
 class RootComposeModule {
     @Provides
     fun rootDecomposeComponentFactory(
-        // for DefinitionsDecomposeComponent
-        connectivityManager: ConnectivityManager,
-        wordDefinitionRepository: WordDefinitionRepository,
-        idGenerator: IdGenerator,
+        definitionsDeps: DefinitionsDependencies,
 
         // for ArticlesDecomposeComponent
         articlesRepository: ArticlesRepository,
@@ -30,13 +28,19 @@ class RootComposeModule {
     ): (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> Any =
         { context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration ->
             when (configuration) {
-                is RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> DefinitionsDecomposeComponent(
+                is RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> /*DefinitionsDecomposeComponent(
                     context,
                     configuration.word,
-                    connectivityManager,
+                    deps.connectivityManager(),
                     wordDefinitionRepository,
                     idGenerator
-                )
+                )*/
+                    DaggerDefinitionsComposeComponent.builder()
+                        .setComponentContext(context)
+                        .setConfiguration(configuration)
+                        .setDeps(definitionsDeps)
+                        .build()
+                        .definitionsDecomposeComponent()
                 is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> ArticlesDecomposeComponent(
                     context,
                     articlesRepository,

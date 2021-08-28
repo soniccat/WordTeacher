@@ -18,13 +18,12 @@ import dagger.Component
 @Component(dependencies =
     [
         CommonComposeDependencies::class,
-        DefinitionsComposeDependencies::class,
+        DefinitionsDependencies::class,
         ArticlesComposeDependencies::class
     ],
     modules = [RootComposeModule::class])
 public interface RootComposeComponent {
     fun rootDecomposeComponent(): RootDecomposeComponent
-//    fun definitionsDecomposeComponent(): DefinitionsDecomposeComponent
 
     @Component.Builder
     interface Builder {
@@ -33,7 +32,7 @@ public interface RootComposeComponent {
         @BindsInstance fun setArticlesRouter(router: ArticlesRouter): Builder
 
         fun setCommonDeps(deps: CommonComposeDependencies): Builder
-        fun setDefinitionsDeps(deps: DefinitionsComposeDependencies): Builder
+        fun setDefinitionsDeps(deps: DefinitionsDependencies): Builder
         fun setArticlesDeps(deps: ArticlesComposeDependencies): Builder
         fun build(): RootComposeComponent
     }
@@ -41,12 +40,6 @@ public interface RootComposeComponent {
 
 interface CommonComposeDependencies {
     fun idGenerator(): IdGenerator
-}
-
-interface DefinitionsComposeDependencies {
-    fun wordRepository(): WordDefinitionRepository
-    fun connectivityManager(): ConnectivityManager
-
 }
 
 interface ArticlesComposeDependencies {

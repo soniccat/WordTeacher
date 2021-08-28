@@ -1,8 +1,6 @@
 enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-//rootProject.name = "WordTeacher"
-
 pluginManagement {
     repositories {
         mavenCentral()
@@ -16,4 +14,4 @@ pluginManagement {
 //includeBuild("plugins/resources-plugin")
 include(":androidApp")
 include(":shared")
-include(":desktopApp")
+//include(":desktopApp")

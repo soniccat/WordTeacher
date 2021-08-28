@@ -8,7 +8,6 @@ import com.aglushkov.wordteacher.androidApp.features.articles.di.ArticlesDepende
 import com.aglushkov.wordteacher.androidApp.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.ArticlesComposeDependencies
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.CommonComposeDependencies
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeDependencies
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
@@ -33,7 +32,6 @@ import dagger.Component
 public interface AppComponent:
     CommonComposeDependencies,
     DefinitionsDependencies,
-    DefinitionsComposeDependencies,
     ArticlesDependencies,
     ArticlesComposeDependencies,
     AddArticleDependencies,
