@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -28,12 +27,9 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.views.Definitio
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
-import com.arkivanov.decompose.extensions.compose.jetpack.rememberRootComponent
 import kotlin.reflect.KClass
 
 class MainActivity : AppCompatActivity(), Router {
@@ -57,8 +53,7 @@ class MainActivity : AppCompatActivity(), Router {
         val component = DaggerRootComposeComponent.builder()
             .setComponentContext(context)
             .setWord(null)
-            .setDefinitionsDeps(deps)
-            .setArticlesDeps(deps)
+            .setAppComponent(deps)
             .build()
             .rootDecomposeComponent()
 

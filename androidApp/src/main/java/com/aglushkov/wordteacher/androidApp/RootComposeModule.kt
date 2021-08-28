@@ -1,9 +1,8 @@
 package com.aglushkov.wordteacher.androidApp
 
-import com.aglushkov.wordteacher.androidApp.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
+import com.aglushkov.wordteacher.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponentImpl
 import com.arkivanov.decompose.ComponentContext
@@ -14,8 +13,7 @@ import dagger.Provides
 class RootComposeModule {
     @Provides
     fun rootDecomposeComponentFactory(
-        definitionsDeps: DefinitionsDependencies,
-        articlesDeps: ArticlesDependencies
+        appComponent: AppComponent
     ): (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> Any =
         { context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration ->
             when (configuration) {
@@ -23,14 +21,14 @@ class RootComposeModule {
                     DaggerDefinitionsComposeComponent.builder()
                         .setComponentContext(context)
                         .setConfiguration(configuration)
-                        .setDeps(definitionsDeps)
+                        .setDeps(appComponent)
                         .build()
                         .definitionsDecomposeComponent()
                 is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration ->
                     DaggerArticlesComposeComponent.builder()
                         .setComponentContext(context)
                         .setConfiguration(configuration)
-                        .setDeps(articlesDeps)
+                        .setDeps(appComponent)
                         .build()
                         .articlesDecomposeComponent()
             }
