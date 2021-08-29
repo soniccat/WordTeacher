@@ -1,34 +1,35 @@
 package com.aglushkov.wordteacher.shared.features
 
+import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.pop
-import com.arkivanov.decompose.push
 import com.arkivanov.decompose.router
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import com.arkivanov.decompose.value.Value
-import com.benasher44.uuid.Uuid
-import com.benasher44.uuid.uuid4
 
 interface RootDecomposeComponent {
     val routerState: Value<RouterState<*, Child>>
 
     fun openDefinitions()
     fun openArticles()
+    fun openAddArticle()
     fun back()
 
     sealed class Child {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
         data class Articles(val inner: ArticlesDecomposeComponent): Child()
+        data class AddArticle(val inner: AddArticleDecomposeComponent): Child()
     }
 
     sealed class ChildConfiguration: Parcelable {
         @Parcelize data class DefinitionConfiguration(val word: String? = null) : RootDecomposeComponent.ChildConfiguration()
         @Parcelize object ArticlesConfiguration : RootDecomposeComponent.ChildConfiguration()
+        @Parcelize object AddArticleConfiguration : RootDecomposeComponent.ChildConfiguration()
     }
 }
 
@@ -56,6 +57,9 @@ class RootDecomposeComponentImpl(
         is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> RootDecomposeComponent.Child.Articles(
             inner = childComponentFactory(componentContext, configuration) as ArticlesDecomposeComponent
         )
+        is RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> RootDecomposeComponent.Child.AddArticle(
+            inner = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
+        )
     }
 
     override fun openDefinitions() {
@@ -71,6 +75,16 @@ class RootDecomposeComponentImpl(
 
         router.navigate {
             it + listOf(RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
+        }
+    }
+
+    override fun openAddArticle() {
+        if (router.state.value.activeChild.configuration is RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration) {
+            return
+        }
+
+        router.navigate {
+            it + listOf(RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
         }
     }
 

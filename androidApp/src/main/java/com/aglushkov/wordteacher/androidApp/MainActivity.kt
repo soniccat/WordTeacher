@@ -41,6 +41,8 @@ class MainActivity : AppCompatActivity(), Router {
         ScreenTab.Articles
     )
 
+    private lateinit var rootDecomposeComponent: RootDecomposeComponent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,7 +55,7 @@ class MainActivity : AppCompatActivity(), Router {
         val deps = (applicationContext as AppComponentOwner).appComponent
         deps.routerResolver().setRouter(this)
 
-        val component = DaggerRootComposeComponent.builder()
+        rootDecomposeComponent = DaggerRootComposeComponent.builder()
             .setComponentContext(context)
             .setWord(null)
             .setAppComponent(deps)
@@ -66,11 +68,11 @@ class MainActivity : AppCompatActivity(), Router {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Scaffold(
                             bottomBar = {
-                                bottomNavigationBar(component)
+                                bottomNavigationBar(rootDecomposeComponent)
                             }
                         ) { innerPadding ->
                             Children(
-                                routerState = component.routerState,
+                                routerState = rootDecomposeComponent.routerState,
                                 animation = slide()
                             ) {
                                 val instance = it.instance
@@ -231,7 +233,8 @@ class MainActivity : AppCompatActivity(), Router {
     // Router
 
     override fun openAddArticle() {
-        openDialogFragment(AddArticleFragment::class)
+        rootDecomposeComponent.openAddArticle()
+//        openDialogFragment(AddArticleFragment::class)
     }
 
     override fun openArticle(id: Long) {

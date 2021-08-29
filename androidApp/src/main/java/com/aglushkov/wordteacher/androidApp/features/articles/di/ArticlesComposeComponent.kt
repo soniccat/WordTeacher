@@ -7,7 +7,6 @@ import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
 
-@FragmentComp
 @Component(dependencies = [ArticlesDependencies::class], modules = [ArticlesComposeModule::class])
 public interface ArticlesComposeComponent {
     fun articlesDecomposeComponent(): ArticlesDecomposeComponent

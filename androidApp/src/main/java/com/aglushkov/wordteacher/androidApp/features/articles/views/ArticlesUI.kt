@@ -99,87 +99,80 @@ fun ArticlesUI(
         }
 
         if (isAddDialogVisible) {
-            Dialog(
-                onDismissRequest = {
-                    isAddDialogVisible = false
-                },
-                properties = DialogProperties(
-                    usePlatformDefaultWidth = true
-                )
-            ) {
-                val p = LocalView.current
-                val p2 = p.parent
-                val windowProvider = p2 as DialogWindowProvider
-                val window = windowProvider.window
-                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-//                WindowCompat.setDecorFitsSystemWindows(windowProvider.window, true)
-
-//                window.setSoftInputMode(SOFT_INPUT_ADJUST_RESIZE)
-//                val wLp = window.decorView.layoutParams as WindowManager.LayoutParams
-//                wLp.softInputMode = SOFT_INPUT_ADJUST_RESIZE
-//                window.clearFlags(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
-//                window.clearFlags()
-
-//                window.decorView.layoutParams = wLp
-//                window.decorView.fitsSystemWindows = false
-
-                var topOffset by remember { mutableStateOf(0) }
-                var bottomOffset by remember { mutableStateOf(0) }
-                var leftOffset by remember { mutableStateOf(0) }
-                var rightOffset by remember { mutableStateOf(0) }
-                window.decorView.setOnApplyWindowInsetsListener { v, insets ->
-                    Log.d("hminsets", "" + insets.stableInsetBottom +
-                            " " + insets.systemWindowInsetBottom +
-                            " " + insets.stableInsetTop +
-                            " " + insets.systemWindowInsetTop +
-                            " " + insets.stableInsetLeft +
-                            " " + insets.systemWindowInsetLeft
-                    )
-                    topOffset = insets.systemWindowInsetTop
-                    bottomOffset = insets.systemWindowInsetBottom
-                    leftOffset = insets.systemWindowInsetLeft
-                    rightOffset = insets.systemWindowInsetRight
-
-                    window.decorView.requestLayout()
-
-                    insets.consumeSystemWindowInsets()
-                }
-
-//                val p3 = p2.parent
-//                val ctx = LocalView.current.context
-//                val pCtx = ctx as ContextThemeWrapper
-//                val pCtx2 = pCtx.baseContext as ContextThemeWrapper
-//                val activity = pCtx2.baseContext as Activity
-                //activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-                //ProvideWindowInsets {
-                //    val insets = LocalWindowInsets.current
-
-                    Surface(
-                        modifier = Modifier.fillMaxSize()
-                            .padding(
-                                start = Dp(leftOffset.toFloat()/3),
-                                end = Dp(rightOffset.toFloat()/3),
-                                top = Dp(topOffset.toFloat()/3),
-                                bottom = Dp(bottomOffset.toFloat()/3)
-                            ),
-                        color = MaterialTheme.colors.background
-                    ) {
-                        Column {
-                            TextField(
-                                value = "hmm",
-                                onValueChange = {},
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-
-                        Box(
-                            modifier = Modifier.matchParentSize(),
-                            contentAlignment = Alignment.BottomEnd
-                        ) {
-                            Text("that's me 2")
-                        }
+            //CompositionLocalProvider(LocalView provides LocalView.current) {
+                addDialog(
+                    onDismissRequest = {
+                        isAddDialogVisible = false
                     }
-                //}
+                )
+            //}
+        }
+    }
+}
+
+@ExperimentalComposeUiApi
+@Composable
+private fun addDialog(
+    onDismissRequest: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = true
+        )
+    ) {
+        val p = LocalView.current
+        val p2 = p.parent
+        val windowProvider = p2 as DialogWindowProvider
+        val window = windowProvider.window
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+
+        var topOffset by remember { mutableStateOf(0) }
+        var bottomOffset by remember { mutableStateOf(0) }
+        var leftOffset by remember { mutableStateOf(0) }
+        var rightOffset by remember { mutableStateOf(0) }
+        window.decorView.setOnApplyWindowInsetsListener { v, insets ->
+            Log.d("hminsets", "" + insets.stableInsetBottom +
+                    " " + insets.systemWindowInsetBottom +
+                    " " + insets.stableInsetTop +
+                    " " + insets.systemWindowInsetTop +
+                    " " + insets.stableInsetLeft +
+                    " " + insets.systemWindowInsetLeft
+            )
+            topOffset = insets.systemWindowInsetTop
+            bottomOffset = insets.systemWindowInsetBottom
+            leftOffset = insets.systemWindowInsetLeft
+            rightOffset = insets.systemWindowInsetRight
+
+            window.decorView.requestLayout()
+
+            insets.consumeSystemWindowInsets()
+        }
+
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    start = Dp(leftOffset.toFloat() / 3),
+                    end = Dp(rightOffset.toFloat() / 3),
+                    top = Dp(topOffset.toFloat() / 3),
+                    bottom = Dp(bottomOffset.toFloat() / 3)
+                ),
+            color = MaterialTheme.colors.background
+        ) {
+            Column {
+                TextField(
+                    value = "hmm",
+                    onValueChange = {},
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                Text("that's me 2")
             }
         }
     }

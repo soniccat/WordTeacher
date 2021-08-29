@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.androidApp
 
+import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.di.AppComponent
@@ -31,6 +32,13 @@ class RootComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .articlesDecomposeComponent()
+                is RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
+                    DaggerAddArticleComposeComponent.builder()
+                        .setComponentContext(context)
+                        .setConfiguration(configuration)
+                        .setDeps(appComponent)
+                        .build()
+                        .buildAddArticleDecomposeComponent()
             }
 
         }

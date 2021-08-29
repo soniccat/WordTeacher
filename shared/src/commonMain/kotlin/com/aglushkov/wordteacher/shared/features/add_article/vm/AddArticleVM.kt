@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,48 +23,72 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class AddArticleVM(
+interface AddArticleVM {
+    val eventFlow: Flow<Event>
+    val title: StateFlow<String>
+    val titleErrorFlow: Flow<StringDesc?>
+    val text: StateFlow<String>
+    var state: AddArticleVM.State
+
+    fun onTitleChanged(title: String)
+    fun onTextChanged(text: String)
+    fun onCancelPressed(): Job
+    fun onTitleFocusChanged(hasFocus: Boolean)
+    fun onCompletePressed()
+
+    @Parcelize
+    class State(
+        var title: String? = null,
+        var text: String? = null
+    ): Parcelable
+}
+
+open class AddArticleVMImpl(
     private val articlesRepository: ArticlesRepository,
     private val timeSource: TimeSource,
-    val state: State
-): ViewModel() {
+    override var state: AddArticleVM.State
+): ViewModel(), AddArticleVM {
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
-    val eventFlow = eventChannel.receiveAsFlow()
+    override val eventFlow = eventChannel.receiveAsFlow()
 
     private val mutableTitle = MutableStateFlow("")
-    val title: StateFlow<String> = mutableTitle
+    override val title: StateFlow<String> = mutableTitle
     private val mutableTitleErrorFlow = MutableStateFlow<StringDesc?>(null)
-    val titleErrorFlow: Flow<StringDesc?> = mutableTitleErrorFlow
+    override val titleErrorFlow: Flow<StringDesc?> = mutableTitleErrorFlow
 
     private val mutableText = MutableStateFlow("")
-    val text: StateFlow<String> = mutableText
+    override val text: StateFlow<String> = mutableText
 
     init {
+        restore(state)
+    }
+
+    fun restore(state: AddArticleVM.State) {
         mutableTitle.value = state.title.orEmpty()
         mutableText.value = state.text.orEmpty()
     }
 
-    fun onTitleChanged(title: String) {
+    override fun onTitleChanged(title: String) {
         mutableTitle.value = title
         updateTitleErrorFlow()
     }
 
-    fun onTextChanged(text: String) {
+    override fun onTextChanged(text: String) {
         mutableText.value = text
     }
 
-    fun onCancelPressed() = viewModelScope.launch {
+    override fun onCancelPressed() = viewModelScope.launch {
         eventChannel.offer(CompletionEvent(CompletionResult.CANCELLED))
     }
 
-    fun onTitleFocusChanged(hasFocus: Boolean) {
+    override fun onTitleFocusChanged(hasFocus: Boolean) {
         if (!hasFocus) {
             updateTitleErrorFlow()
         }
     }
 
-    fun onCompletePressed() {
+    override fun onCompletePressed() {
         updateTitleErrorFlow()
         if (mutableTitleErrorFlow.value == null) {
             createArticle()
@@ -105,10 +130,4 @@ class AddArticleVM(
         super.onCleared()
         eventChannel.cancel()
     }
-
-    @Parcelize
-    class State(
-        var title: String? = null,
-        var text: String? = null
-    ): Parcelable
 }
