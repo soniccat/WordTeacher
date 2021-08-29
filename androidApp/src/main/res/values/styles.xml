@@ -35,6 +35,20 @@
         <item name="wordSubHeaderTextAppearance">@style/TextAppearance.MaterialComponents.Subtitle2</item>
 
         <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView</item>
+
+        <!-- Compose -->
+        <item name="android:dialogTheme">@style/Theme.DialogFullScreen</item>
+    </style>
+
+    <style name="Theme.DialogFullScreen" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowIsFloating">false</item>
     </style>
 
     <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">

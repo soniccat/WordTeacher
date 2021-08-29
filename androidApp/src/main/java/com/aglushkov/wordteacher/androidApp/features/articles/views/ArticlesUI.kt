@@ -1,15 +1,36 @@
 package com.aglushkov.wordteacher.androidApp.features.articles.views
 
+import android.app.Activity
+import android.content.ContextWrapper
+import android.util.Log
+import android.view.ContextThemeWrapper
+import android.view.View
+import android.view.WindowManager
+import android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
+import androidx.core.view.WindowCompat
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
+import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomTopAppBar
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
@@ -17,41 +38,148 @@ import com.aglushkov.wordteacher.androidApp.general.views.compose.SearchView
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.imePadding
 
+@ExperimentalComposeUiApi
 @Composable
 fun ArticlesUI(
     vm: ArticlesVM,
     modifier: Modifier = Modifier
 ) {
-    val defs = vm.articles.collectAsState()
+    val articles by vm.articles.collectAsState()
     var searchText by remember { mutableStateOf("") }
+    var isAddDialogVisible by remember { mutableStateOf(false)}
 
-    Column(
-        modifier = modifier,
+    Box(
+        modifier = modifier.fillMaxSize(),
     ) {
-        CustomTopAppBar {
-            SearchView(searchText, { searchText = it }) {
-                //vm.onWordSubmitted(searchText)
+        Column{
+            CustomTopAppBar {
+                SearchView(searchText, { searchText = it }) {
+                    //vm.onWordSubmitted(searchText)
+                    isAddDialogVisible = true
+                }
+            }
+
+            val data = articles.data()
+
+            if (data?.isNotEmpty() == true) {
+                LazyColumn {
+                    items(data) { item ->
+                        articlesViewItem(item, vm)
+                    }
+                }
+            } else {
+                LoadingStatusView(
+                    resource = articles,
+                    loadingText = null,
+                    errorText = vm.getErrorText(articles)?.resolveString(),
+                    emptyText = LocalContext.current.getString(R.string.articles_no_articles)
+                ) {
+                    vm.onTryAgainClicked()
+                }
             }
         }
 
-        val res = defs.value
-        val data = res.data()
-
-        if (data?.isNotEmpty() == true) {
-            LazyColumn {
-                items(data) { item ->
-                    articlesViewItem(item, vm)
-                }
-            }
-        } else {
-            LoadingStatusView(
-                resource = res,
-                loadingText = null,
-                errorText = vm.getErrorText(res)?.resolveString(),
-                emptyText = LocalContext.current.getString(R.string.articles_no_articles)
+        Box(
+            modifier = Modifier.matchParentSize(),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            FloatingActionButton(
+                onClick = { vm.onCreateTextArticleClicked() },
+                modifier = Modifier.padding(
+                    dimensionResource(id = R.dimen.article_horizontalPadding)
+                )
             ) {
-                vm.onTryAgainClicked()
+                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+            }
+        }
+
+        if (isAddDialogVisible) {
+            Dialog(
+                onDismissRequest = {
+                    isAddDialogVisible = false
+                },
+                properties = DialogProperties(
+                    usePlatformDefaultWidth = true
+                )
+            ) {
+                val p = LocalView.current
+                val p2 = p.parent
+                val windowProvider = p2 as DialogWindowProvider
+                val window = windowProvider.window
+                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+//                WindowCompat.setDecorFitsSystemWindows(windowProvider.window, true)
+
+//                window.setSoftInputMode(SOFT_INPUT_ADJUST_RESIZE)
+//                val wLp = window.decorView.layoutParams as WindowManager.LayoutParams
+//                wLp.softInputMode = SOFT_INPUT_ADJUST_RESIZE
+//                window.clearFlags(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+//                window.clearFlags()
+
+//                window.decorView.layoutParams = wLp
+//                window.decorView.fitsSystemWindows = false
+
+                var topOffset by remember { mutableStateOf(0) }
+                var bottomOffset by remember { mutableStateOf(0) }
+                var leftOffset by remember { mutableStateOf(0) }
+                var rightOffset by remember { mutableStateOf(0) }
+                window.decorView.setOnApplyWindowInsetsListener { v, insets ->
+                    Log.d("hminsets", "" + insets.stableInsetBottom +
+                            " " + insets.systemWindowInsetBottom +
+                            " " + insets.stableInsetTop +
+                            " " + insets.systemWindowInsetTop +
+                            " " + insets.stableInsetLeft +
+                            " " + insets.systemWindowInsetLeft
+                    )
+                    topOffset = insets.systemWindowInsetTop
+                    bottomOffset = insets.systemWindowInsetBottom
+                    leftOffset = insets.systemWindowInsetLeft
+                    rightOffset = insets.systemWindowInsetRight
+
+                    window.decorView.requestLayout()
+
+                    insets.consumeSystemWindowInsets()
+                }
+
+//                val p3 = p2.parent
+//                val ctx = LocalView.current.context
+//                val pCtx = ctx as ContextThemeWrapper
+//                val pCtx2 = pCtx.baseContext as ContextThemeWrapper
+//                val activity = pCtx2.baseContext as Activity
+                //activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                //ProvideWindowInsets {
+                //    val insets = LocalWindowInsets.current
+
+                    Surface(
+                        modifier = Modifier.fillMaxSize()
+                            .padding(
+                                start = Dp(leftOffset.toFloat()/3),
+                                end = Dp(rightOffset.toFloat()/3),
+                                top = Dp(topOffset.toFloat()/3),
+                                bottom = Dp(bottomOffset.toFloat()/3)
+                            ),
+                        color = MaterialTheme.colors.background
+                    ) {
+                        Column {
+                            TextField(
+                                value = "hmm",
+                                onValueChange = {},
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier.matchParentSize(),
+                            contentAlignment = Alignment.BottomEnd
+                        ) {
+                            Text("that's me 2")
+                        }
+                    }
+                //}
             }
         }
     }
@@ -75,11 +203,13 @@ private fun articlesViewItem(
 private fun ArticleTitleView(
     articleViewItem: ArticleViewItem
 ) {
-    Column(
-        modifier = Modifier.padding(
-            start = dimensionResource(id = R.dimen.article_horizontalPadding),
-            end = dimensionResource(id = R.dimen.article_horizontalPadding)
-        )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = dimensionResource(id = R.dimen.article_horizontalPadding),
+                end = dimensionResource(id = R.dimen.article_horizontalPadding)
+            )
     ) {
         Text(
             text = articleViewItem.name,
@@ -90,6 +220,23 @@ private fun ArticleTitleView(
         Text(
             text = articleViewItem.date,
             style = AppTypography.articleDate
+        )
+    }
+}
+
+@ExperimentalComposeUiApi
+@Preview
+@Composable
+fun ArticlesUIPreviewWithArticles() {
+    ComposeAppTheme {
+        ArticlesUI(
+            vm = ArticlesVMPreview(
+                articles = Resource.Loaded(
+                    data = listOf(
+                        ArticleViewItem(1, "Article Name", "Today")
+                    )
+                )
+            )
         )
     }
 }

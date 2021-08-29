@@ -75,6 +75,8 @@ dependencies {
     implementation(libs.androidComposeUITooling)
     implementation(libs.androidComposeUIToolingPreview)
 
+    implementation("com.google.accompanist:accompanist-insets:0.17.0")
+
     // for compose-jb - comment - start
     implementation(libs.androidComposeFoundation)
     implementation(libs.androidComposeMaterial)

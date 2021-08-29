@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,6 +33,7 @@ import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
 import kotlin.reflect.KClass
 
+@ExperimentalComposeUiApi
 class MainActivity : AppCompatActivity(), Router {
     lateinit var binding: ActivityMainBinding
     private val bottomBarTabs = listOf(
@@ -78,7 +80,8 @@ class MainActivity : AppCompatActivity(), Router {
                                         modalModifier = Modifier.padding(innerPadding)
                                     )
                                     is RootDecomposeComponent.Child.Articles -> ArticlesUI(
-                                        instance.inner
+                                        instance.inner,
+                                        modifier = Modifier.padding(innerPadding)
                                     )
                                 }
                             }
