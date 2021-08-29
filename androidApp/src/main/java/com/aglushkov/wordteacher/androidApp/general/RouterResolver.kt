@@ -45,4 +45,8 @@ class RouterResolver @Inject constructor(private val application: Application) {
     fun detach() {
         application.unregisterActivityLifecycleCallbacks(callback)
     }
+
+    fun setRouter(router: Router) {
+        this.router = WeakReference(router)
+    }
 }

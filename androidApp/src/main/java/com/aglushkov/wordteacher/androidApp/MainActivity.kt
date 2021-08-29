@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity(), Router {
     private fun setupComposeLayout() {
         val context = defaultComponentContext()
         val deps = (applicationContext as AppComponentOwner).appComponent
+        deps.routerResolver().setRouter(this)
 
         val component = DaggerRootComposeComponent.builder()
             .setComponentContext(context)

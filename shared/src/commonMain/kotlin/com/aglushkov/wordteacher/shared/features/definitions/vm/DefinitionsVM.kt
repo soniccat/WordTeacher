@@ -69,13 +69,17 @@ open class DefinitionsVMImpl(
     final override var displayModeStateFlow = MutableStateFlow(DefinitionsDisplayMode.BySource)
     final override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(emptyList())
 
-    override val definitions = combine(definitionWords, displayModeStateFlow, selectedPartsOfSpeechStateFlow) { a, b, c -> Triple(a, b, c) }
-        .map { (wordDefinitions, displayMode, partOfSpeechFilter) ->
-            Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
-            wordDefinitions.copyWith(
-                buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter)
-            )
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    override val definitions = combine(
+        definitionWords,
+        displayModeStateFlow,
+        selectedPartsOfSpeechStateFlow
+    ) { a, b, c -> Triple(a, b, c) }
+    .map { (wordDefinitions, displayMode, partOfSpeechFilter) ->
+        Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
+        wordDefinitions.copyWith(
+            buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter)
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override val partsOfSpeechFilterStateFlow = definitionWords.map {
         it.data().orEmpty().map { word ->

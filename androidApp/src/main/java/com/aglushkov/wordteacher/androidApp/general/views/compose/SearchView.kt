@@ -14,8 +14,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -27,6 +31,8 @@ fun SearchView(
     onTextChanged: (String) -> Unit,
     onImeAction: () -> Unit
 ) {
+    val focusRequester = remember { FocusRequester() }
+
     TextField(
         value = text,
         onValueChange = onTextChanged,
@@ -36,7 +42,8 @@ fun SearchView(
             .background(
                 color = MaterialTheme.colors.surface,
                 shape = RoundedCornerShape(2.dp)
-            ),
+            )
+            .focusRequester(focusRequester),
         textStyle = LocalTextStyle.current.copy(
             color = MaterialTheme.colors.onSurface
         ),
@@ -54,6 +61,7 @@ fun SearchView(
                     contentDescription = null,
                     modifier = Modifier.clickable {
                         onTextChanged("")
+                        focusRequester.requestFocus()
                     },
                     tint = LocalContentColor.current
                 )

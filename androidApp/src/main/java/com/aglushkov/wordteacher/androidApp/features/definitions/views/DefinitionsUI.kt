@@ -21,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,12 +42,10 @@ import com.aglushkov.wordteacher.androidApp.general.views.compose.ChipColors
 import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomTopAppBar
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.androidApp.general.views.compose.SearchView
-import com.aglushkov.wordteacher.shared.events.EmptyEvent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.ShowPartsOfSpeechFilterDialogEvent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
@@ -71,8 +70,8 @@ fun DefinitionsUI(vm: DefinitionsVM, modalModifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val partsOfSpeech by vm.partsOfSpeechFilterStateFlow.collectAsState()
     val selectedPartsOfSpeeches by vm.selectedPartsOfSpeechStateFlow.collectAsState()
-    val event = vm.eventFlow.collectAsState(initial = EmptyEvent)
     val partOfSpeechFilterBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val focusManager = LocalFocusManager.current
 
     ChooserUI(
         state = partOfSpeechFilterBottomSheetState,
@@ -94,6 +93,7 @@ fun DefinitionsUI(vm: DefinitionsVM, modalModifier: Modifier = Modifier) {
         DefinitionsWordUI(
             vm,
             onPartOfSpeechFilterClicked = { items ->
+                focusManager.clearFocus() // consider showing choose in a window popup
                 scope.launch {
                     partOfSpeechFilterBottomSheetState.show()
                 }
@@ -109,7 +109,7 @@ private fun DefinitionsWordUI(
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
-    var searchText by remember { mutableStateOf("") }
+    var searchText by remember { mutableStateOf(vm.state.word.orEmpty()) }
 
     Column(
         modifier = modifier,
