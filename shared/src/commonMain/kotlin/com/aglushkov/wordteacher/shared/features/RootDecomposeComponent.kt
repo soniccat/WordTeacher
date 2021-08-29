@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features
 
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.add_article.EmptyDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.arkivanov.decompose.ComponentContext
@@ -14,6 +15,7 @@ import com.arkivanov.decompose.value.Value
 
 interface RootDecomposeComponent {
     val routerState: Value<RouterState<*, Child>>
+    val dialogRouterState: Value<RouterState<*, Child>>
 
     fun openDefinitions()
     fun openArticles()
@@ -24,12 +26,14 @@ interface RootDecomposeComponent {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
         data class Articles(val inner: ArticlesDecomposeComponent): Child()
         data class AddArticle(val inner: AddArticleDecomposeComponent): Child()
+        object EmptyDialog: Child()
     }
 
     sealed class ChildConfiguration: Parcelable {
         @Parcelize data class DefinitionConfiguration(val word: String? = null) : RootDecomposeComponent.ChildConfiguration()
         @Parcelize object ArticlesConfiguration : RootDecomposeComponent.ChildConfiguration()
         @Parcelize object AddArticleConfiguration : RootDecomposeComponent.ChildConfiguration()
+        @Parcelize object EmptyDialogConfiguration : RootDecomposeComponent.ChildConfiguration()
     }
 }
 
@@ -41,11 +45,21 @@ class RootDecomposeComponentImpl(
     private val router: Router<RootDecomposeComponent.ChildConfiguration, RootDecomposeComponent.Child> =
         router(
             initialConfiguration = RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration(),
+            key = "RootRouter",
+            handleBackButton = true,
+            childFactory = ::resolveChild
+        )
+
+    private val dialogRouter: Router<RootDecomposeComponent.ChildConfiguration, RootDecomposeComponent.Child> =
+        router(
+            initialConfiguration = RootDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration,
+            key = "DialogRouter",
             handleBackButton = true,
             childFactory = ::resolveChild
         )
 
     override val routerState: Value<RouterState<*, RootDecomposeComponent.Child>> = router.state
+    override val dialogRouterState: Value<RouterState<*, RootDecomposeComponent.Child>> = dialogRouter.state
 
     private fun resolveChild(
         configuration: RootDecomposeComponent.ChildConfiguration,
@@ -60,6 +74,7 @@ class RootDecomposeComponentImpl(
         is RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> RootDecomposeComponent.Child.AddArticle(
             inner = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
         )
+        is RootDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration -> RootDecomposeComponent.Child.EmptyDialog
     }
 
     override fun openDefinitions() {
@@ -79,11 +94,11 @@ class RootDecomposeComponentImpl(
     }
 
     override fun openAddArticle() {
-        if (router.state.value.activeChild.configuration is RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration) {
+        if (dialogRouter.state.value.activeChild.configuration is RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration) {
             return
         }
 
-        router.navigate {
+        dialogRouter.navigate {
             it + listOf(RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
         }
     }

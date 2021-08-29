@@ -39,6 +39,8 @@ class RootComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .buildAddArticleDecomposeComponent()
+                is RootDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
+                    Any()
             }
 
         }

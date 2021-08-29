@@ -5,11 +5,13 @@ import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -85,6 +87,20 @@ class MainActivity : AppCompatActivity(), Router {
                                         instance.inner,
                                         modifier = Modifier.padding(innerPadding)
                                     )
+                                }
+                            }
+                        }
+
+                        Children(
+                            routerState = rootDecomposeComponent.dialogRouterState,
+                            animation = slide()
+                        ) {
+                            val instance = it.instance
+                            when (instance) {
+                                is RootDecomposeComponent.Child.AddArticle -> Box(
+                                    modifier = Modifier.fillMaxSize().background(color = Color.Red)
+                                ) {
+                                    Text(text = "HOHOHOHOH")
                                 }
                             }
                         }
