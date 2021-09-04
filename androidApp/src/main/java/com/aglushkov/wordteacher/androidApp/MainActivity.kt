@@ -28,6 +28,7 @@ import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFrag
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerRootComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.androidApp.general.views.compose.slideUp
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
 import com.arkivanov.decompose.defaultComponentContext
@@ -65,53 +66,70 @@ class MainActivity : AppCompatActivity(), Router {
             .rootDecomposeComponent()
 
         setContent {
-            ComposeAppTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Scaffold(
-                            bottomBar = {
-                                bottomNavigationBar(rootDecomposeComponent)
-                            }
-                        ) { innerPadding ->
-                            Children(
-                                routerState = rootDecomposeComponent.routerState,
-                                animation = slide()
-                            ) {
-                                val instance = it.instance
-                                when (instance) {
-                                    is RootDecomposeComponent.Child.Definitions -> DefinitionsUI(
-                                        instance.inner,
-                                        modalModifier = Modifier.padding(innerPadding)
-                                    )
-                                    is RootDecomposeComponent.Child.Articles -> ArticlesUI(
-                                        instance.inner,
-                                        modifier = Modifier.padding(innerPadding)
-                                    )
-                                }
-                            }
-                        }
+            ComposeUI()
+        }
+    }
 
-                        Children(
-                            routerState = rootDecomposeComponent.dialogRouterState,
-                            animation = slide()
-                        ) {
-                            val instance = it.instance
-                            when (instance) {
-                                is RootDecomposeComponent.Child.AddArticle -> Box(
-                                    modifier = Modifier.fillMaxSize().background(color = Color.Red)
-                                ) {
-                                    Text(text = "HOHOHOHOH")
-                                }
-                            }
-                        }
-                    }
+    @Composable
+    private fun ComposeUI() {
+        ComposeAppTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                mainUI()
+                dialogUI()
+            }
+        }
+    }
+
+    @Composable
+    private fun mainUI() {
+        Scaffold(
+            bottomBar = {
+                BottomNavigationBarUI(rootDecomposeComponent)
+            }
+        ) { innerPadding ->
+            Children(
+                routerState = rootDecomposeComponent.routerState,
+                animation = slide()
+            ) {
+                val instance = it.instance
+                when (instance) {
+                    is RootDecomposeComponent.Child.Definitions -> DefinitionsUI(
+                        instance.inner,
+                        modalModifier = Modifier.padding(innerPadding)
+                    )
+                    is RootDecomposeComponent.Child.Articles -> ArticlesUI(
+                        instance.inner,
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 }
             }
         }
     }
 
     @Composable
-    private fun bottomNavigationBar(component: RootDecomposeComponent) {
+    private fun dialogUI() {
+        Children(
+            routerState = rootDecomposeComponent.dialogRouterState,
+            animation = slideUp()
+        ) {
+            val instance = it.instance
+            when (instance) {
+                is RootDecomposeComponent.Child.AddArticle -> Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = Color.Red)
+                ) {
+                    Text(text = "HOHOHOHOH")
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun BottomNavigationBarUI(component: RootDecomposeComponent) {
         BottomNavigation(
             modifier = Modifier
                 .requiredHeight(56.dp)
