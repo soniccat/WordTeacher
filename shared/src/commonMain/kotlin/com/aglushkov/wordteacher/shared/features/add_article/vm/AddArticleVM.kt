@@ -28,7 +28,7 @@ interface AddArticleVM {
     val title: StateFlow<String>
     val titleErrorFlow: Flow<StringDesc?>
     val text: StateFlow<String>
-    var state: AddArticleVM.State
+    var state: State
 
     fun onTitleChanged(title: String)
     fun onTextChanged(text: String)

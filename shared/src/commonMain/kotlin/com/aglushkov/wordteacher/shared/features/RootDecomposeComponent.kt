@@ -21,6 +21,7 @@ interface RootDecomposeComponent {
     fun openArticles()
     fun openAddArticle()
     fun back()
+    fun popDialog()
 
     sealed class Child {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
@@ -104,8 +105,14 @@ class RootDecomposeComponentImpl(
     }
 
     override fun back() {
-        if (router.state.value.backStack.size > 1) {
+        if (router.state.value.backStack.isNotEmpty()) {
             router.pop()
+        }
+    }
+
+    override fun popDialog() {
+        if (dialogRouter.state.value.backStack.isNotEmpty()) {
+            dialogRouter.pop()
         }
     }
 }

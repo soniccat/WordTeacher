@@ -21,6 +21,7 @@ import androidx.fragment.app.FragmentFactory
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
+import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesUI
@@ -28,6 +29,7 @@ import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFrag
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerRootComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomDialogUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideUp
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
@@ -97,11 +99,11 @@ class MainActivity : AppCompatActivity(), Router {
                 val instance = it.instance
                 when (instance) {
                     is RootDecomposeComponent.Child.Definitions -> DefinitionsUI(
-                        instance.inner,
+                        vm = instance.inner,
                         modalModifier = Modifier.padding(innerPadding)
                     )
                     is RootDecomposeComponent.Child.Articles -> ArticlesUI(
-                        instance.inner,
+                        vm = instance.inner,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -113,17 +115,16 @@ class MainActivity : AppCompatActivity(), Router {
     private fun dialogUI() {
         Children(
             routerState = rootDecomposeComponent.dialogRouterState,
-            animation = slideUp()
         ) {
             val instance = it.instance
             when (instance) {
-                is RootDecomposeComponent.Child.AddArticle -> Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = Color.Red)
-                ) {
-                    Text(text = "HOHOHOHOH")
-                }
+                is RootDecomposeComponent.Child.AddArticle ->
+                    AddArticleUI(
+                        vm = instance.inner,
+                        onDismissRequest = {
+                            rootDecomposeComponent.popDialog()
+                        }
+                    )
             }
         }
     }
