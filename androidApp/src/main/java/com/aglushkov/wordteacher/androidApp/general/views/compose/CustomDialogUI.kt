@@ -8,6 +8,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -27,27 +28,26 @@ import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 @Composable
 fun CustomDialogUI(
     onDismissRequest: () -> Unit = {},
-    content: @Composable () -> Unit
+    content: @Composable BoxScope.() -> Unit
 ) {
     Dialog(
         onDismissRequest = onDismissRequest
     ) {
         val window = findDialogWindow() ?: throw Resources.NotFoundException("Window isn't found")
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
-//        window.decorView.requestLayout()
 
         var windowInsets by remember { mutableStateOf(WindowInsets()) }
 
-//        ComposeAppTheme {
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .applyWindowInsetsAsPaddings(windowInsets),
-                color = MaterialTheme.colors.background
+        Surface(
+            modifier = Modifier.fillMaxSize().applyWindowInsetsAsPaddings(windowInsets),
+            color = MaterialTheme.colors.background
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
                 content()
             }
-//        }
+        }
 
         DisposableEffect("WindowInsets") {
             window.decorView.setOnApplyWindowInsetsListener { v, insets ->
@@ -58,7 +58,6 @@ fun CustomDialogUI(
                     right = insets.systemWindowInsetRight
                 )
 
-//                window.decorView.requestLayout()
                 insets.consumeSystemWindowInsets()
             }
 

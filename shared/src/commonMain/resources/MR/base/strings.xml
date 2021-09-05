@@ -31,11 +31,11 @@
     <string name="definitions_displayMode_bySource">By Source</string>
     <string name="definitions_displayMode_merge">Combined</string>
 
-    <string name="articles_action_add_text">Add Text</string>
+    <string name="articles_action_add_text">New Article</string>
     <string name="add_article_title">@string/articles_action_add_text</string>
     <string name="add_article_field_title_hint">Title</string>
     <string name="add_article_field_text_hint">Text</string>
-    <string name="add_article_done">Add</string>
+    <string name="add_article_done">ADD</string>
     <string name="add_article_error_empty_title">Title is required</string>
 
     <string name="error_default">Something went wrong :(</string>
