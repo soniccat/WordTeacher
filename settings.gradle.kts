@@ -10,6 +10,12 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
 //includeBuild("plugins/configure-plugin")
 //includeBuild("plugins/resources-plugin")
 include(":androidApp")
