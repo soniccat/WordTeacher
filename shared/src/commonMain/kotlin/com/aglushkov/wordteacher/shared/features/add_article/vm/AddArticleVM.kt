@@ -70,11 +70,13 @@ open class AddArticleVMImpl(
     }
 
     override fun onTitleChanged(title: String) {
+        state.title = title
         mutableTitle.value = title
         updateTitleErrorFlow()
     }
 
     override fun onTextChanged(text: String) {
+        state.text = text
         mutableText.value = text
     }
 

@@ -5,13 +5,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
@@ -74,7 +74,10 @@ fun ArticlesUI(
                     dimensionResource(id = R.dimen.article_horizontalPadding)
                 )
             ) {
-                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add_white_24dp),
+                    contentDescription = null
+                )
             }
         }
     }

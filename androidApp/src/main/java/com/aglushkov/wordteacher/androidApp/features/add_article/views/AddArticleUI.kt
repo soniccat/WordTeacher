@@ -12,6 +12,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomDialogUI
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
@@ -39,15 +41,8 @@ fun AddArticleUI(
     ) {
         val context = LocalContext.current
 
-        val title by vm.title.collectAsState()
-        val titleError by vm.titleErrorFlow.collectAsState(initial = null)
-        val text by vm.text.collectAsState()
-
-        val scrollableState = rememberScrollState()
         val snackbarHostState = remember { SnackbarHostState() }
-        var wasTitleFocused by remember { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
-        val focusManager = LocalFocusManager.current
 
         Column {
             TopAppBar(
@@ -65,68 +60,17 @@ fun AddArticleUI(
                 }
             )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollableState)
-                    .padding(
-                        top = dimensionResource(id = R.dimen.content_padding),
-                        start = dimensionResource(id = R.dimen.content_padding),
-                        end = dimensionResource(id = R.dimen.content_padding),
-                        bottom = 88.dp,
-                    )
-            ) {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { vm.onTitleChanged(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester)
-                        .onFocusChanged {
-                            if (it.isFocused) {
-                                wasTitleFocused = true
-                            }
-
-                            if (wasTitleFocused) {
-                                vm.onTitleFocusChanged(it.isFocused)
-                            }
-                        },
-                    label = { Text(stringResource(id = R.string.add_article_field_title_hint)) },
-                    isError = titleError != null,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            focusManager.moveFocus(FocusDirection.Down)
-                        }
-                    ),
-                    singleLine = true
-                )
-
-                Box(
-                    modifier = Modifier.height(30.dp)
-                ) {
-                    val titleErrorDesc = titleError
-                    if (titleErrorDesc != null) {
-                        Text(
-                            titleErrorDesc.toString(LocalContext.current),
-                            color = MaterialTheme.colors.error
-                        )
-                    }
-                }
-
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = { vm.onTextChanged(it) },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(id = R.string.add_article_field_text_hint)) }
-                )
-            }
+            AddArticlesFieldsUI(
+                vm = vm,
+                focusRequester = focusRequester
+            )
         }
 
         ExtendedFloatingActionButton(
             text = {
                 Text(
                     text = stringResource(id = R.string.add_article_done),
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
                 )
            },
             onClick = { vm.onCompletePressed() },
@@ -158,5 +102,94 @@ fun AddArticleUI(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AddArticlesFieldsUI(
+    vm: AddArticleVM,
+    focusRequester: FocusRequester
+) {
+    val title by vm.title.collectAsState()
+    val titleError by vm.titleErrorFlow.collectAsState(initial = null)
+    val text by vm.text.collectAsState()
+
+    val hasTitleError by remember(titleError) {
+        derivedStateOf { titleError != null }
+    }
+    val scrollableState = rememberScrollState()
+    var wasTitleFocused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollableState)
+            .padding(
+                top = dimensionResource(id = R.dimen.content_padding),
+                start = dimensionResource(id = R.dimen.content_padding),
+                end = dimensionResource(id = R.dimen.content_padding),
+                bottom = 88.dp,
+            )
+    ) {
+        OutlinedTextField(
+            value = title,
+            onValueChange = { vm.onTitleChanged(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                    if (it.isFocused) {
+                        wasTitleFocused = true
+                    }
+
+                    if (wasTitleFocused) {
+                        vm.onTitleFocusChanged(it.isFocused)
+                    }
+                },
+            label = { Text(stringResource(id = R.string.add_article_field_title_hint)) },
+            isError = hasTitleError,
+            trailingIcon = {
+                if (hasTitleError) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_error_24),
+                        contentDescription = null
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            ),
+            singleLine = true
+        )
+
+        Box(
+            modifier = Modifier
+                .height(15.dp)
+                .padding(horizontal = 16.dp)
+        ) {
+            val titleErrorDesc = titleError
+            if (titleErrorDesc != null) {
+                Text(
+                    titleErrorDesc.toString(LocalContext.current),
+                    color = MaterialTheme.colors.error,
+                    style = MaterialTheme.typography.caption
+                )
+            }
+        }
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = { vm.onTextChanged(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .sizeIn(minHeight = with(LocalDensity.current) {
+                    (42 * 2).sp.toDp()
+                }),
+            label = { Text(stringResource(id = R.string.add_article_field_text_hint)) }
+        )
     }
 }
