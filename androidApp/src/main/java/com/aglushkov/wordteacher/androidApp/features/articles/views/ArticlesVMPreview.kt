@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.androidApp.features.articles.views
 
-import com.aglushkov.resources.desc.Raw
-import com.aglushkov.resources.desc.StringDesc
+import dev.icerock.moko.resources.desc.Raw
+import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem

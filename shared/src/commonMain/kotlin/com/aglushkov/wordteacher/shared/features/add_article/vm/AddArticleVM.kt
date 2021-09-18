@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.add_article.vm
 
-import com.aglushkov.resources.desc.Raw
-import com.aglushkov.resources.desc.Resource
-import com.aglushkov.resources.desc.StringDesc
+import dev.icerock.moko.resources.desc.Raw
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.CompletionResult
 import com.aglushkov.wordteacher.shared.events.ErrorEvent

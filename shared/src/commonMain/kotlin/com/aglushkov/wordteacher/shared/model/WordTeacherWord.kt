@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.model
 
-import com.aglushkov.resources.desc.Resource
-import com.aglushkov.resources.desc.StringDesc
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable

@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.articles.vm
 
-import com.aglushkov.resources.desc.Resource
-import com.aglushkov.resources.desc.StringDesc
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel

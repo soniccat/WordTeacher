@@ -17,12 +17,8 @@ dependencies {
     implementation(libs.kotlinGradlePlugin)
     implementation(libs.sqlDelight)
     implementation(libs.kotlinxSerialization)
-
-    // for resoures plugin
-//    implementation(gradleKotlinDsl())
-    implementation(libs.kotlinPoet)
-    implementation(libs.apacheCommonsText)
-    implementation(libs.kotlinCompilerEmbeddable)
+    implementation(libs.mokoResourcesGenerator)
+    implementation(libs.mokoResourcesLib)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

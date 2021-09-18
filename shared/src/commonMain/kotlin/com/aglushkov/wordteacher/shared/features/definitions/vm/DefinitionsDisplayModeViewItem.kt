@@ -1,6 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
-import com.aglushkov.resources.desc.StringDesc
+import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 
 class DefinitionsDisplayModeViewItem(

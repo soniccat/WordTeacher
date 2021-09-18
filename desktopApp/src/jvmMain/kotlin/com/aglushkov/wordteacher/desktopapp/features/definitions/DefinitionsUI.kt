@@ -30,9 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
-import com.aglushkov.resources.desc.Raw
-import com.aglushkov.resources.desc.Resource
-import com.aglushkov.resources.desc.StringDesc
+import dev.icerock.moko.resources.desc.Raw
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.desktopapp.compose.AppTypography
 import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.general.views.compose.Chip

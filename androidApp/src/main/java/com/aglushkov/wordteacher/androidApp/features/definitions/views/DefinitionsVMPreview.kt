@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
-import com.aglushkov.resources.desc.Raw
-import com.aglushkov.resources.desc.Resource
-import com.aglushkov.resources.desc.StringDesc
+import dev.icerock.moko.resources.desc.Raw
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem

@@ -3,6 +3,7 @@ plugins {
     id("android-base-convention")
     id("resources-convention")
     id("sqldelight-convention")
+    id("dev.icerock.mobile.multiplatform-resources")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -33,6 +34,8 @@ kotlin {
                 implementation(libs.essentryInstanceKeeper)
                 implementation(libs.essentryStateKeeper)
                 implementation(libs.decompose)
+
+                api(libs.mokoResourcesLib)
             }
         }
         val commonTest by getting {
