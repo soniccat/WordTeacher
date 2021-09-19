@@ -124,7 +124,9 @@ private fun DefinitionsWordUI(
         val data = res.data()
 
         if (data?.isNotEmpty() == true) {
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
                 items(data) { item ->
                     showViewItem(item, vm, onPartOfSpeechFilterClicked)
                 }

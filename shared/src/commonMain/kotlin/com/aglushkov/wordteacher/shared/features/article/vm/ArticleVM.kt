@@ -15,11 +15,7 @@ import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
@@ -52,18 +48,14 @@ class ArticleVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
     override val article: StateFlow<Resource<Article>> = articleRepository.article
-    override val paragraphs = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+    override val paragraphs = article.map {
+        Logger.v("build view items")
+        it.copyWith(buildViewItems(it))
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     init {
         viewModelScope.launch {
             articleRepository.loadArticle(state.id)
-        }
-
-        viewModelScope.launch {
-            article.map {
-                Logger.v("build view items")
-                it.copyWith(buildViewItems(it))
-            }.forward(paragraphs)
         }
     }
 
