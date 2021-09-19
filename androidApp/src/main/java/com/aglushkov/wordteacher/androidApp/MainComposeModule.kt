@@ -38,6 +38,15 @@ class MainComposeModule {
                         .setWord("owl")
                         .build()
                         .tabDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
+                    DaggerAddArticleComposeComponent.builder()
+                        .setComponentContext(context)
+                        .setConfiguration(configuration)
+                        .setDeps(appComponent)
+                        .build()
+                        .buildAddArticleDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
+                    Any()
             }
 
         }

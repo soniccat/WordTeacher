@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.di
 
+import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -14,7 +15,7 @@ class AddArticleComposeModule {
     @Provides
     fun viewModel(
         componentContext: ComponentContext,
-        configuration: TabDecomposeComponent.ChildConfiguration.AddArticleConfiguration,
+        configuration: MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration,
         articlesRepository: ArticlesRepository,
         timeSource: TimeSource
     ): AddArticleDecomposeComponent {

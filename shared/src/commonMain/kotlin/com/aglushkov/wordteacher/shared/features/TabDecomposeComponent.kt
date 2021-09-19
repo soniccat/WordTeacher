@@ -14,26 +14,19 @@ import com.arkivanov.decompose.value.Value
 
 interface TabDecomposeComponent {
     val routerState: Value<RouterState<*, Child>>
-    val dialogRouterState: Value<RouterState<*, Child>>
 
     fun openDefinitions()
     fun openArticles()
-    fun openAddArticle()
     fun back()
-    fun popDialog()
 
     sealed class Child {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
         data class Articles(val inner: ArticlesDecomposeComponent): Child()
-        data class AddArticle(val inner: AddArticleDecomposeComponent): Child()
-        object EmptyDialog: Child()
     }
 
     sealed class ChildConfiguration: Parcelable {
         @Parcelize data class DefinitionConfiguration(val word: String? = null) : ChildConfiguration()
         @Parcelize object ArticlesConfiguration : ChildConfiguration()
-        @Parcelize object AddArticleConfiguration : ChildConfiguration()
-        @Parcelize object EmptyDialogConfiguration : ChildConfiguration()
     }
 }
 
@@ -50,16 +43,7 @@ class TabDecomposeComponentImpl(
             childFactory = ::resolveChild
         )
 
-    private val dialogRouter: Router<TabDecomposeComponent.ChildConfiguration, TabDecomposeComponent.Child> =
-        router(
-            initialConfiguration = TabDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration,
-            key = "DialogRouter",
-            handleBackButton = true,
-            childFactory = ::resolveChild
-        )
-
     override val routerState: Value<RouterState<*, TabDecomposeComponent.Child>> = router.state
-    override val dialogRouterState: Value<RouterState<*, TabDecomposeComponent.Child>> = dialogRouter.state
 
     private fun resolveChild(
         configuration: TabDecomposeComponent.ChildConfiguration,
@@ -71,10 +55,6 @@ class TabDecomposeComponentImpl(
         is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> TabDecomposeComponent.Child.Articles(
             inner = childComponentFactory(componentContext, configuration) as ArticlesDecomposeComponent
         )
-        is TabDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> TabDecomposeComponent.Child.AddArticle(
-            inner = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
-        )
-        is TabDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration -> TabDecomposeComponent.Child.EmptyDialog
     }
 
     override fun openDefinitions() {
@@ -93,25 +73,11 @@ class TabDecomposeComponentImpl(
         }
     }
 
-    override fun openAddArticle() {
-        if (dialogRouter.state.value.activeChild.configuration is TabDecomposeComponent.ChildConfiguration.AddArticleConfiguration) {
-            return
-        }
-
-        dialogRouter.navigate {
-            it + listOf(TabDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
-        }
-    }
-
     override fun back() {
         if (router.state.value.backStack.isNotEmpty()) {
             router.pop()
         }
     }
 
-    override fun popDialog() {
-        if (dialogRouter.state.value.backStack.isNotEmpty()) {
-            dialogRouter.pop()
-        }
-    }
+
 }

@@ -32,15 +32,6 @@ class TabComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .articlesDecomposeComponent()
-                is TabDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
-                    DaggerAddArticleComposeComponent.builder()
-                        .setComponentContext(context)
-                        .setConfiguration(configuration)
-                        .setDeps(appComponent)
-                        .build()
-                        .buildAddArticleDecomposeComponent()
-                is TabDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
-                    Any()
             }
 
         }

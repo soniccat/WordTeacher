@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity(), Router {
                 color = MaterialTheme.colors.background
             ) {
                 mainUI()
-//                dialogUI() // TODO: uncomment (support dialog here)
+                dialogUI() // TODO: uncomment (support dialog here)
             }
         }
     }
@@ -132,21 +132,20 @@ class MainActivity : AppCompatActivity(), Router {
                 }
             }
         }
-        dialogUI(component)
     }
 
     @Composable
-    private fun dialogUI(component: TabDecomposeComponent) {
+    private fun dialogUI() {
         Children(
-            routerState = component.dialogRouterState,
+            routerState = mainDecomposeComponent.dialogRouterState,
         ) {
             val instance = it.instance
             when (instance) {
-                is TabDecomposeComponent.Child.AddArticle ->
+                is MainDecomposeComponent.Child.AddArticle ->
                     AddArticleUI(
                         vm = instance.inner,
                         onDismissRequest = {
-                            component.popDialog()
+                            mainDecomposeComponent.popDialog()
                         }
                     )
             }
@@ -292,7 +291,7 @@ class MainActivity : AppCompatActivity(), Router {
     // Router
 
     override fun openAddArticle() {
-        //tabDecomposeComponent.openAddArticle() // TODO: fix it with dialog
+        mainDecomposeComponent.openAddArticle()
 //        openDialogFragment(AddArticleFragment::class)
     }
 
