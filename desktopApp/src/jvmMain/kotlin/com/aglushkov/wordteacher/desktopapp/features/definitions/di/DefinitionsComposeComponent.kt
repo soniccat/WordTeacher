@@ -1,21 +1,18 @@
 package com.aglushkov.wordteacher.desktopapp.features.definitions.di
 
 import com.aglushkov.wordteacher.desktopapp.di.FragmentComp
-import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
-import org.jetbrains.annotations.Nullable
 
 @FragmentComp
 @Component(dependencies = [DefinitionsComposeDependencies::class], modules = [DefinitionsComposeModule::class])
 public interface DefinitionsComposeComponent {
-    fun rootDecomposeComponent(): RootDecomposeComponent
+    fun rootDecomposeComponent(): TabDecomposeComponent
 //    fun definitionsDecomposeComponent(): DefinitionsDecomposeComponent
 
     @Component.Builder

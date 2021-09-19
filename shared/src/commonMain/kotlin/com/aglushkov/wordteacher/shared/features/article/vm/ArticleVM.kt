@@ -30,17 +30,17 @@ interface ArticleVM {
     fun onTextClicked(index: Int, sentence: NLPSentence)
 
     @Parcelize
-    class State(
+    data class State(
         var id: Long,
         var definitionsState: DefinitionsVM.State
     ) : Parcelable
 }
 
 
-class ArticleVMImpl(
+open class ArticleVMImpl(
     private val definitionsVM: DefinitionsVM,
     private val articleRepository: ArticleRepository,
-    override val state: ArticleVM.State,
+    override var state: ArticleVM.State,
     private val router: ArticleRouter,
     private val idGenerator: IdGenerator,
 ): ViewModel(), ArticleVM {
@@ -53,7 +53,14 @@ class ArticleVMImpl(
         it.copyWith(buildViewItems(it))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    init {
+//    init {
+//        viewModelScope.launch {
+//            articleRepository.loadArticle(state.id)
+//        }
+//    }
+
+    fun restore(newState: ArticleVM.State) {
+        state = newState
         viewModelScope.launch {
             articleRepository.loadArticle(state.id)
         }

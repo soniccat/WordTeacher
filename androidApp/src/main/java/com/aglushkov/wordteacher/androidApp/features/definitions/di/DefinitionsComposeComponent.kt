@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
-import com.aglushkov.wordteacher.androidApp.di.FragmentComp
-import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
@@ -14,7 +13,7 @@ public interface DefinitionsComposeComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
-        @BindsInstance fun setConfiguration(configuration: RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration): Builder
+        @BindsInstance fun setConfiguration(configuration: TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration): Builder
 
         fun setDeps(deps: DefinitionsDependencies): Builder
         fun build(): DefinitionsComposeComponent

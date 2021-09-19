@@ -98,11 +98,11 @@ open class DefinitionsVMImpl(
             state.word = value
         }
 
-    init {
-        word?.let {
-            loadIfNeeded(it)
-        }
-    }
+//    init {
+//        word?.let {
+//            loadIfNeeded(it)
+//        }
+//    }
 
     override fun restore(newState: DefinitionsVM.State) {
         state = newState

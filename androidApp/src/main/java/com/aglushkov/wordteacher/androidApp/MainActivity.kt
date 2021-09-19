@@ -24,16 +24,17 @@ import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
+import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerRootComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerTabComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
-import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomDialogUI
-import com.aglushkov.wordteacher.androidApp.general.views.compose.slideUp
 import com.aglushkov.wordteacher.di.AppComponentOwner
-import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
@@ -48,7 +49,8 @@ class MainActivity : AppCompatActivity(), Router {
         ScreenTab.Articles
     )
 
-    private lateinit var rootDecomposeComponent: RootDecomposeComponent
+    private lateinit var mainDecomposeComponent: MainDecomposeComponent
+//    private lateinit var tabDecomposeComponent: TabDecomposeComponent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,12 +64,18 @@ class MainActivity : AppCompatActivity(), Router {
         val deps = (applicationContext as AppComponentOwner).appComponent
         deps.routerResolver().setRouter(this)
 
-        rootDecomposeComponent = DaggerRootComposeComponent.builder()
+        mainDecomposeComponent = DaggerMainComposeComponent.builder()
             .setComponentContext(context)
-            .setWord(null)
             .setAppComponent(deps)
             .build()
-            .rootDecomposeComponent()
+            .mainDecomposeComponent()
+
+//        tabDecomposeComponent = DaggerTabComposeComponent.builder()
+//            .setComponentContext(context)
+//            .setWord(null)
+//            .setAppComponent(deps)
+//            .build()
+//            .tabDecomposeComponent()
 
         setContent {
             ComposeUI()
@@ -82,49 +90,69 @@ class MainActivity : AppCompatActivity(), Router {
                 color = MaterialTheme.colors.background
             ) {
                 mainUI()
-                dialogUI()
+//                dialogUI() // TODO: uncomment (support dialog here)
             }
         }
     }
 
     @Composable
     private fun mainUI() {
-        Scaffold(
-            bottomBar = {
-                BottomNavigationBarUI(rootDecomposeComponent)
-            }
-        ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color.Black)
+        ) {
             Children(
-                routerState = rootDecomposeComponent.routerState,
-                animation = slide()
+                routerState = mainDecomposeComponent.routerState
             ) {
                 val instance = it.instance
                 when (instance) {
-                    is RootDecomposeComponent.Child.Definitions -> DefinitionsUI(
-                        vm = instance.inner,
-                        modalModifier = Modifier.padding(innerPadding)
-                    )
-                    is RootDecomposeComponent.Child.Articles -> ArticlesUI(
-                        vm = instance.inner,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.inner)
+                    is MainDecomposeComponent.Child.Article -> ArticleUI(vm = instance.inner)
                 }
             }
         }
     }
 
     @Composable
-    private fun dialogUI() {
+    private fun TabsUI(component: TabDecomposeComponent) {
+        Scaffold(
+            bottomBar = {
+                BottomNavigationBarUI(component)
+            }
+        ) { innerPadding ->
+            Children(
+                routerState = component.routerState,
+                animation = slide()
+            ) {
+                val instance = it.instance
+                when (instance) {
+                    is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
+                        vm = instance.inner,
+                        modalModifier = Modifier.padding(innerPadding)
+                    )
+                    is TabDecomposeComponent.Child.Articles -> ArticlesUI(
+                        vm = instance.inner,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+            }
+        }
+        dialogUI(component)
+    }
+
+    @Composable
+    private fun dialogUI(component: TabDecomposeComponent) {
         Children(
-            routerState = rootDecomposeComponent.dialogRouterState,
+            routerState = component.dialogRouterState,
         ) {
             val instance = it.instance
             when (instance) {
-                is RootDecomposeComponent.Child.AddArticle ->
+                is TabDecomposeComponent.Child.AddArticle ->
                     AddArticleUI(
                         vm = instance.inner,
                         onDismissRequest = {
-                            rootDecomposeComponent.popDialog()
+                            component.popDialog()
                         }
                     )
             }
@@ -132,7 +160,7 @@ class MainActivity : AppCompatActivity(), Router {
     }
 
     @Composable
-    private fun BottomNavigationBarUI(component: RootDecomposeComponent) {
+    private fun BottomNavigationBarUI(component: TabDecomposeComponent) {
         BottomNavigation(
             modifier = Modifier
                 .requiredHeight(56.dp)
@@ -270,7 +298,7 @@ class MainActivity : AppCompatActivity(), Router {
     // Router
 
     override fun openAddArticle() {
-        rootDecomposeComponent.openAddArticle()
+        //tabDecomposeComponent.openAddArticle() // TODO: fix it with dialog
 //        openDialogFragment(AddArticleFragment::class)
     }
 
@@ -289,6 +317,6 @@ class MainActivity : AppCompatActivity(), Router {
 }
 
 sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
-    object Definitions : ScreenTab(R.string.tab_definitions, R.drawable.ic_field_search_24, RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
-    object Articles : ScreenTab(R.string.tab_articles, R.drawable.ic_tab_article_24, RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
+    object Definitions : ScreenTab(R.string.tab_definitions, R.drawable.ic_field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+    object Articles : ScreenTab(R.string.tab_articles, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
 }

@@ -1,14 +1,13 @@
 package com.aglushkov.wordteacher.desktopapp.features.definitions.di
 
 import com.aglushkov.wordteacher.shared.features.ChildConfiguration
-import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.RootDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
-import dagger.Module
 import dagger.Provides
 
 @Module
@@ -34,8 +33,8 @@ class DefinitionsComposeModule {
     fun rootComponent(
         componentContext: ComponentContext,
         definitionsDecomposeComponentFactory: (context: ComponentContext, configuration: ChildConfiguration) -> DefinitionsDecomposeComponent
-    ) : RootDecomposeComponent {
-        return RootDecomposeComponentImpl(
+    ) : TabDecomposeComponent {
+        return TabDecomposeComponentImpl(
             componentContext,
             childComponentFactory = definitionsDecomposeComponentFactory
         )

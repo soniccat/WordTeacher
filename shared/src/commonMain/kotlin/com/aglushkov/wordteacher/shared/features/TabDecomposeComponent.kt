@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.shared.features
 
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.add_article.EmptyDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.arkivanov.decompose.ComponentContext
@@ -13,7 +12,7 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import com.arkivanov.decompose.value.Value
 
-interface RootDecomposeComponent {
+interface TabDecomposeComponent {
     val routerState: Value<RouterState<*, Child>>
     val dialogRouterState: Value<RouterState<*, Child>>
 
@@ -31,51 +30,51 @@ interface RootDecomposeComponent {
     }
 
     sealed class ChildConfiguration: Parcelable {
-        @Parcelize data class DefinitionConfiguration(val word: String? = null) : RootDecomposeComponent.ChildConfiguration()
-        @Parcelize object ArticlesConfiguration : RootDecomposeComponent.ChildConfiguration()
-        @Parcelize object AddArticleConfiguration : RootDecomposeComponent.ChildConfiguration()
-        @Parcelize object EmptyDialogConfiguration : RootDecomposeComponent.ChildConfiguration()
+        @Parcelize data class DefinitionConfiguration(val word: String? = null) : ChildConfiguration()
+        @Parcelize object ArticlesConfiguration : ChildConfiguration()
+        @Parcelize object AddArticleConfiguration : ChildConfiguration()
+        @Parcelize object EmptyDialogConfiguration : ChildConfiguration()
     }
 }
 
-class RootDecomposeComponentImpl(
+class TabDecomposeComponentImpl(
     componentContext: ComponentContext,
-    val childComponentFactory: (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> Any
-) : RootDecomposeComponent, ComponentContext by componentContext {
+    val childComponentFactory: (context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration) -> Any
+) : TabDecomposeComponent, ComponentContext by componentContext {
 
-    private val router: Router<RootDecomposeComponent.ChildConfiguration, RootDecomposeComponent.Child> =
+    private val router: Router<TabDecomposeComponent.ChildConfiguration, TabDecomposeComponent.Child> =
         router(
-            initialConfiguration = RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration(),
-            key = "RootRouter",
+            initialConfiguration = TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration(),
+            key = "TabRouter",
             handleBackButton = true,
             childFactory = ::resolveChild
         )
 
-    private val dialogRouter: Router<RootDecomposeComponent.ChildConfiguration, RootDecomposeComponent.Child> =
+    private val dialogRouter: Router<TabDecomposeComponent.ChildConfiguration, TabDecomposeComponent.Child> =
         router(
-            initialConfiguration = RootDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration,
+            initialConfiguration = TabDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration,
             key = "DialogRouter",
             handleBackButton = true,
             childFactory = ::resolveChild
         )
 
-    override val routerState: Value<RouterState<*, RootDecomposeComponent.Child>> = router.state
-    override val dialogRouterState: Value<RouterState<*, RootDecomposeComponent.Child>> = dialogRouter.state
+    override val routerState: Value<RouterState<*, TabDecomposeComponent.Child>> = router.state
+    override val dialogRouterState: Value<RouterState<*, TabDecomposeComponent.Child>> = dialogRouter.state
 
     private fun resolveChild(
-        configuration: RootDecomposeComponent.ChildConfiguration,
+        configuration: TabDecomposeComponent.ChildConfiguration,
         componentContext: ComponentContext
-    ): RootDecomposeComponent.Child = when (configuration) {
-        is RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> RootDecomposeComponent.Child.Definitions(
+    ): TabDecomposeComponent.Child = when (configuration) {
+        is TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> TabDecomposeComponent.Child.Definitions(
             inner = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
         )
-        is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> RootDecomposeComponent.Child.Articles(
+        is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> TabDecomposeComponent.Child.Articles(
             inner = childComponentFactory(componentContext, configuration) as ArticlesDecomposeComponent
         )
-        is RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> RootDecomposeComponent.Child.AddArticle(
+        is TabDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> TabDecomposeComponent.Child.AddArticle(
             inner = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
         )
-        is RootDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration -> RootDecomposeComponent.Child.EmptyDialog
+        is TabDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration -> TabDecomposeComponent.Child.EmptyDialog
     }
 
     override fun openDefinitions() {
@@ -85,22 +84,22 @@ class RootDecomposeComponentImpl(
     }
 
     override fun openArticles() {
-        if (router.state.value.activeChild.configuration is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration) {
+        if (router.state.value.activeChild.configuration is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration) {
             return
         }
 
         router.navigate {
-            it + listOf(RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
+            it + listOf(TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
         }
     }
 
     override fun openAddArticle() {
-        if (dialogRouter.state.value.activeChild.configuration is RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration) {
+        if (dialogRouter.state.value.activeChild.configuration is TabDecomposeComponent.ChildConfiguration.AddArticleConfiguration) {
             return
         }
 
         dialogRouter.navigate {
-            it + listOf(RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
+            it + listOf(TabDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
         }
     }
 

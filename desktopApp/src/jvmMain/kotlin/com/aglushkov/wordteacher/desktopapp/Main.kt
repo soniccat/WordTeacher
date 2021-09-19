@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.desktopapp
 
-import androidx.compose.desktop.DesktopTheme
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,10 +10,9 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.Button
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.aglushkov.wordteacher.desktopapp.features.definitions.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.ChildConfiguration
-import com.aglushkov.wordteacher.shared.features.RootDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -69,7 +67,7 @@ fun main() {
 //                }
 
                 val component = rememberRootComponent {
-                    RootDecomposeComponentImpl(
+                    TabDecomposeComponentImpl(
                         it,
                         componentFactory
                     )

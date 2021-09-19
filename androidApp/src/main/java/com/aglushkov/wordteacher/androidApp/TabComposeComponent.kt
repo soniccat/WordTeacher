@@ -1,15 +1,15 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
-import com.aglushkov.wordteacher.androidApp.RootComposeModule
+import com.aglushkov.wordteacher.androidApp.TabComposeModule
 import com.aglushkov.wordteacher.di.AppComponent
-import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
 
-@Component(modules = [RootComposeModule::class])
-interface RootComposeComponent {
-    fun rootDecomposeComponent(): RootDecomposeComponent
+@Component(modules = [TabComposeModule::class])
+interface TabComposeComponent {
+    fun tabDecomposeComponent(): TabDecomposeComponent
 
     @Component.Builder
     interface Builder {
@@ -17,6 +17,6 @@ interface RootComposeComponent {
         @BindsInstance fun setWord(word: String?): Builder
         @BindsInstance fun setAppComponent(appComponent: AppComponent): Builder
 
-        fun build(): RootComposeComponent
+        fun build(): TabComposeComponent
     }
 }

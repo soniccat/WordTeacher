@@ -4,42 +4,42 @@ import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArt
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.di.AppComponent
-import com.aglushkov.wordteacher.shared.features.RootDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.RootDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
 
 @Module
-class RootComposeModule {
+class TabComposeModule {
     @Provides
-    fun rootDecomposeComponentFactory(
+    fun tabDecomposeComponentFactory(
         appComponent: AppComponent
-    ): (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> Any =
-        { context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration ->
+    ): (context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration) -> Any =
+        { context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration ->
             when (configuration) {
-                is RootDecomposeComponent.ChildConfiguration.DefinitionConfiguration ->
+                is TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration ->
                     DaggerDefinitionsComposeComponent.builder()
                         .setComponentContext(context)
                         .setConfiguration(configuration)
                         .setDeps(appComponent)
                         .build()
                         .definitionsDecomposeComponent()
-                is RootDecomposeComponent.ChildConfiguration.ArticlesConfiguration ->
+                is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration ->
                     DaggerArticlesComposeComponent.builder()
                         .setComponentContext(context)
                         .setConfiguration(configuration)
                         .setDeps(appComponent)
                         .build()
                         .articlesDecomposeComponent()
-                is RootDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
+                is TabDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
                     DaggerAddArticleComposeComponent.builder()
                         .setComponentContext(context)
                         .setConfiguration(configuration)
                         .setDeps(appComponent)
                         .build()
                         .buildAddArticleDecomposeComponent()
-                is RootDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
+                is TabDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
                     Any()
             }
 
@@ -47,13 +47,13 @@ class RootComposeModule {
 
     @JvmSuppressWildcards
     @Provides
-    fun rootComponent(
+    fun tabDecomposeComponent(
         componentContext: ComponentContext,
-        rootDecomposeComponentFactory: (context: ComponentContext, configuration: RootDecomposeComponent.ChildConfiguration) -> Any
-    ) : RootDecomposeComponent {
-        return RootDecomposeComponentImpl(
+        tabDecomposeComponentFactory: (context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration) -> Any
+    ) : TabDecomposeComponent {
+        return TabDecomposeComponentImpl(
             componentContext,
-            childComponentFactory = rootDecomposeComponentFactory
+            childComponentFactory = tabDecomposeComponentFactory
         )
     }
 }
