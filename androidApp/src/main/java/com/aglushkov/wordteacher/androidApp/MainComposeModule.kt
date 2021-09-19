@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.androidApp
 
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComponent
+import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerTabComposeComponent
@@ -22,7 +24,13 @@ class MainComposeModule {
         { context: ComponentContext, configuration: MainDecomposeComponent.ChildConfiguration ->
             when (configuration) {
                 is MainDecomposeComponent.ChildConfiguration.ArticleConfiguration ->
-                    Unit
+                    DaggerArticleComposeComponent.builder()
+                        .setComponentContext(context)
+                        .setDeps(appComponent)
+                        .setDefinitionsDeps(appComponent)
+                        .setConfiguration(configuration)
+                        .build()
+                        .articleDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.TabsConfiguration ->
                     DaggerTabComposeComponent.builder()
                         .setComponentContext(context)

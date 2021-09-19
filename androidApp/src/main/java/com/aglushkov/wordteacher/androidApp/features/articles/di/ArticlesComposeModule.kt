@@ -12,7 +12,7 @@ import dagger.Provides
 @Module
 class ArticlesComposeModule {
     @Provides
-    fun createItemViewBinder(
+    fun articleDecomposeComponent(
         componentContext: ComponentContext,
         configuration: TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration,
         articlesRepository: ArticlesRepository,

@@ -13,7 +13,7 @@ import com.arkivanov.decompose.extensions.compose.jetpack.animation.page.PageArr
 internal val defaultChildAnimationSpec: FiniteAnimationSpec<Float> = tween()
 
 @ExperimentalDecomposeApi
-fun <C : Any, T : Any> slideUp(
+fun <C : Any, T : Any> slideFromBottom(
     animationSpec: FiniteAnimationSpec<Float> = defaultChildAnimationSpec,
 ): ChildAnimation<C, T> =
     childAnimation(animationSpec = animationSpec) { _, factor, arrangement, _, content ->
@@ -22,6 +22,21 @@ fun <C : Any, T : Any> slideUp(
                 y = when (arrangement) {
                     PageArrangement.PREVIOUS -> 0.dp
                     PageArrangement.FOLLOWING -> maxHeight * (1F - factor)
+                }
+            )
+        )
+    }
+
+@ExperimentalDecomposeApi
+fun <C : Any, T : Any> slideFromRight(
+    animationSpec: FiniteAnimationSpec<Float> = defaultChildAnimationSpec,
+): ChildAnimation<C, T> =
+    childAnimation(animationSpec = animationSpec) { _, factor, arrangement, _, content ->
+        content(
+            Modifier.offset(
+                x = when (arrangement) {
+                    PageArrangement.PREVIOUS -> 0.dp
+                    PageArrangement.FOLLOWING -> maxWidth * (1F - factor)
                 }
             )
         )

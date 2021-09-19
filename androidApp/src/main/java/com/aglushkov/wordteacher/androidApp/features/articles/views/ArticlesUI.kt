@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.features.articles.views
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -88,7 +89,9 @@ private fun articlesViewItem(
     item: BaseViewItem<*>,
     vm: ArticlesVM
 ) = when (item) {
-    is ArticleViewItem -> ArticleTitleView(item)
+    is ArticleViewItem -> ArticleTitleView(item) {
+        vm.onArticleClicked(item)
+    }
     else -> {
         Text(
             text = "unknown item $item"
@@ -99,11 +102,15 @@ private fun articlesViewItem(
 
 @Composable
 private fun ArticleTitleView(
-    articleViewItem: ArticleViewItem
+    articleViewItem: ArticleViewItem,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
             .padding(
                 start = dimensionResource(id = R.dimen.article_horizontalPadding),
                 end = dimensionResource(id = R.dimen.article_horizontalPadding)

@@ -32,6 +32,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainCo
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerTabComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
@@ -50,7 +51,6 @@ class MainActivity : AppCompatActivity(), Router {
     )
 
     private lateinit var mainDecomposeComponent: MainDecomposeComponent
-//    private lateinit var tabDecomposeComponent: TabDecomposeComponent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,13 +69,6 @@ class MainActivity : AppCompatActivity(), Router {
             .setAppComponent(deps)
             .build()
             .mainDecomposeComponent()
-
-//        tabDecomposeComponent = DaggerTabComposeComponent.builder()
-//            .setComponentContext(context)
-//            .setWord(null)
-//            .setAppComponent(deps)
-//            .build()
-//            .tabDecomposeComponent()
 
         setContent {
             ComposeUI()
@@ -103,7 +96,8 @@ class MainActivity : AppCompatActivity(), Router {
                 .background(color = Color.Black)
         ) {
             Children(
-                routerState = mainDecomposeComponent.routerState
+                routerState = mainDecomposeComponent.routerState,
+                animation = slideFromRight()
             ) {
                 val instance = it.instance
                 when (instance) {
@@ -303,7 +297,8 @@ class MainActivity : AppCompatActivity(), Router {
     }
 
     override fun openArticle(id: Long) {
-        openFragment(ArticleFragment::class, ArticleFragment.createArguments(id), true)
+        mainDecomposeComponent.openArticle(id)
+//        openFragment(ArticleFragment::class, ArticleFragment.createArguments(id), true)
     }
 
     override fun closeArticle() {
