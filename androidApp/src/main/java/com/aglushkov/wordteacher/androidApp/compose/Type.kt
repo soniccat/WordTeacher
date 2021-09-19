@@ -53,5 +53,9 @@ class AppTypography {
             @Composable get() {
                 return wordDefinitionProvidedBy
             }
+        val articleText: TextStyle
+            @Composable get() {
+                return typography.body1
+            }
     }
 }

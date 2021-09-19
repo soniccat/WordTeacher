@@ -17,9 +17,10 @@ interface MainDecomposeComponent {
     val routerState: Value<RouterState<*, Child>>
     val dialogRouterState: Value<RouterState<*, Child>>
 
-    fun openAddArticle()
-    fun openArticle(id: Long)
+    fun openAddArticleDialog()
     fun popDialog()
+    fun openArticle(id: Long)
+    fun back()
 
     sealed class Child {
         data class Article(val inner: ArticleVM): Child()
@@ -91,7 +92,13 @@ class MainDecomposeComponentImpl(
         }
     }
 
-    override fun openAddArticle() {
+    override fun back() {
+        if (router.state.value.backStack.isNotEmpty()) {
+            router.pop()
+        }
+    }
+
+    override fun openAddArticleDialog() {
         if (dialogRouter.state.value.activeChild.configuration is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration) {
             return
         }

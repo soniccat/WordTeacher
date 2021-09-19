@@ -29,7 +29,6 @@ import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFrag
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainComposeComponent
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerTabComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
@@ -93,7 +92,6 @@ class MainActivity : AppCompatActivity(), Router {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color.Black)
         ) {
             Children(
                 routerState = mainDecomposeComponent.routerState,
@@ -291,7 +289,7 @@ class MainActivity : AppCompatActivity(), Router {
     // Router
 
     override fun openAddArticle() {
-        mainDecomposeComponent.openAddArticle()
+        mainDecomposeComponent.openAddArticleDialog()
 //        openDialogFragment(AddArticleFragment::class)
     }
 
@@ -301,7 +299,8 @@ class MainActivity : AppCompatActivity(), Router {
     }
 
     override fun closeArticle() {
-        supportFragmentManager.popBackStack()
+        mainDecomposeComponent.back()
+//        supportFragmentManager.popBackStack()
     }
 
     override fun openCardSet(id: Long) {

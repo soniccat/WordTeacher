@@ -12,8 +12,11 @@ import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -28,6 +31,9 @@ interface ArticleVM {
     fun onWordDefinitionHidden()
     fun onBackPressed()
     fun onTextClicked(index: Int, sentence: NLPSentence)
+    fun onTryAgainClicked()
+
+    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
     @Parcelize
     data class State(
@@ -103,6 +109,14 @@ open class ArticleVMImpl(
                 )
             }
         }
+    }
+
+    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
+        return StringDesc.Resource(MR.strings.article_error)
+    }
+
+    override fun onTryAgainClicked() {
+        // TODO: do sth with articlesRepository
     }
 
     override fun onWordDefinitionHidden() {
