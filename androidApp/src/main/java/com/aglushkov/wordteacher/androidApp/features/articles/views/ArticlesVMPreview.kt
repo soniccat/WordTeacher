@@ -17,6 +17,8 @@ class ArticlesVMPreview(
 
     override fun onArticleClicked(item: ArticleViewItem) {}
 
+    override fun onArticleRemoved(item: ArticleViewItem) {}
+
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc {
         return StringDesc.Raw("Error Text")
     }

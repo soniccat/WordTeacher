@@ -36,6 +36,9 @@ import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
@@ -61,7 +64,10 @@ fun ArticlesUI(
 
             if (data?.isNotEmpty() == true) {
                 LazyColumn {
-                    items(data) { item ->
+                    items(
+                        data,
+                        key = { it.id }
+                    ) { item ->
                         articlesViewItem(item, vm)
                     }
                 }
@@ -102,9 +108,11 @@ private fun articlesViewItem(
     item: BaseViewItem<*>,
     vm: ArticlesVM
 ) = when (item) {
-    is ArticleViewItem -> ArticleTitleView(item) {
-        vm.onArticleClicked(item)
-    }
+    is ArticleViewItem -> ArticleTitleView(
+        item,
+        onClick = { vm.onArticleClicked(item) },
+        onDeleted = { vm.onArticleRemoved(item) }
+    )
     else -> {
         Text(
             text = "unknown item $item"
@@ -117,17 +125,24 @@ private fun articlesViewItem(
 @Composable
 private fun ArticleTitleView(
     articleViewItem: ArticleViewItem,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDeleted: () -> Unit
 ) {
-
     val dismissState = rememberDismissState(
 //        confirmStateChange = {
-//            if (it == DismissValue.DismissedToEnd) unread = !unread
-//            it != DismissValue.DismissedToEnd
+//            //Log.d("test", "state ${it}")
+//            if (it == DismissValue.DismissedToStart) {
+//                //onDeleted()
+//            }
+//            true
 //        }
     )
+
     SwipeToDismiss(
         state = dismissState,
+        modifier = Modifier.clickable {
+            onClick()
+        },
         directions = setOf(DismissDirection.EndToStart),
         background = {
             Box(
@@ -171,6 +186,17 @@ private fun ArticleTitleView(
             text = articleViewItem.date,
             style = AppTypography.articleDate
         )
+    }
+
+    LaunchedEffect(dismissState) {
+        snapshotFlow { dismissState.progress }
+            .distinctUntilChanged()
+            .collect {
+                if (it.to == DismissValue.DismissedToStart && it.fraction == 1.0f) {
+                    Log.d("test", "state ${dismissState.progress}")
+                    //onDeleted()
+                }
+            }
     }
 }
 

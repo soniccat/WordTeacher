@@ -1,5 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.articles.vm
 
+import com.aglushkov.wordteacher.shared.events.CompletionEvent
+import com.aglushkov.wordteacher.shared.events.CompletionResult
+import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.Logger
@@ -13,6 +16,8 @@ import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.desc.Raw
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -21,13 +26,14 @@ interface ArticlesVM {
 
     fun onCreateTextArticleClicked()
     fun onArticleClicked(item: ArticleViewItem)
+    fun onArticleRemoved(item: ArticleViewItem)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onTryAgainClicked()
 }
 
 open class ArticlesVMImpl(
-    articlesRepository: ArticlesRepository,
+    val articlesRepository: ArticlesRepository,
     private val timeSource: TimeSource,
     private val router: ArticlesRouter
 ): ViewModel(), ArticlesVM {
@@ -43,6 +49,23 @@ open class ArticlesVMImpl(
 
     override fun onArticleClicked(item: ArticleViewItem) {
         router.openArticle(item.id)
+    }
+
+    override fun onArticleRemoved(item: ArticleViewItem) {
+        viewModelScope.launch {
+            try {
+                articlesRepository.removeArticle(item.id)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                val errorText = e.message?.let {
+                    StringDesc.Raw(it)
+                } ?: StringDesc.Resource(MR.strings.error_default)
+
+                // TODO: pass an error message
+                //eventChannel.offer(ErrorEvent(errorText))
+            }
+        }
     }
 
     private fun buildViewItems(articles: List<ShortArticle>): List<BaseViewItem<*>> {

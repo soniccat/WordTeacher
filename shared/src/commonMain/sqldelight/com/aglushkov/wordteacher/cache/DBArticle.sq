@@ -32,3 +32,8 @@ SELECT last_insert_rowid();
 removeAll:
 DELETE
 FROM DBArticle;
+
+removeArticle:
+DELETE
+FROM DBArticle
+WHERE id = ?;

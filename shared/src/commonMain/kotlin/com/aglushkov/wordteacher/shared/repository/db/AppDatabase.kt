@@ -89,6 +89,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             Article(id, name, date, text, sentences)
         }
 
+        fun removeArticle(anId: Long) = db.dBArticleQueries.removeArticle(anId)
         fun removeAll() = db.dBArticleQueries.removeAll()
     }
 

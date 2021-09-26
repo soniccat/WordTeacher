@@ -48,6 +48,12 @@ class ArticlesRepository(
         }.await()
     }
 
+    suspend fun removeArticle(articleId: Long) = supervisorScope {
+        scope.async(Dispatchers.Default) {
+            removeArticleInternal(articleId)
+        }.await()
+    }
+
     private suspend fun createArticleInternal(article: Article) {
         nlpCore.waitUntilInitialized()
 
@@ -64,6 +70,12 @@ class ArticlesRepository(
             val nlpSentence = NLPSentence(articleId, index.toLong(), s)
             nlpSentenceProcessor.process(nlpSentence)
             database.sentencesNLP.insert(nlpSentence)
+        }
+    }
+
+    private fun removeArticleInternal(articleId: Long) {
+        database.articles.run {
+            removeArticle(articleId)
         }
     }
 
