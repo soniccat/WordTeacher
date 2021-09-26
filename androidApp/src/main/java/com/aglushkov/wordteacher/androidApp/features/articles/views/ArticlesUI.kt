@@ -128,6 +128,9 @@ private fun ArticleTitleView(
     onClick: () -> Unit,
     onDeleted: () -> Unit
 ) {
+    var isSwipedAway by remember {
+        mutableStateOf(false)
+    }
     val dismissState = rememberDismissState(
 //        confirmStateChange = {
 //            //Log.d("test", "state ${it}")
@@ -138,9 +141,12 @@ private fun ArticleTitleView(
 //        }
     )
 
+    val heightMultiplier: Float by animateFloatAsState(if (isSwipedAway) 0.0f else 1.0f)
+
     SwipeToDismiss(
         state = dismissState,
-        modifier = Modifier.clickable {
+        modifier = Modifier
+            .clickable {
             onClick()
         },
         directions = setOf(DismissDirection.EndToStart),
@@ -160,15 +166,16 @@ private fun ArticleTitleView(
                         )
                     }
                 ) { measurables, constraints ->
-                    val text = measurables[0].measure(constraints)
+                    val resultConstraints = constraints.copy(maxHeight = (constraints.maxHeight * heightMultiplier).toInt())
+                    val text = measurables[0].measure(resultConstraints)
                     val resultFraction = when (dismissState.progress.to) {
                         DismissValue.DismissedToStart -> dismissState.progress.fraction * 2.0f
                         else -> 0f
                     }.roundToMax(1.0f)
 
-                    layout(constraints.maxWidth, constraints.maxHeight) {
+                    layout(resultConstraints.maxWidth, resultConstraints.maxHeight) {
                         text.placeRelative(
-                            x = constraints.maxWidth - (constraints.maxHeight * resultFraction).toInt(),
+                            x = resultConstraints.maxWidth - (resultConstraints.maxHeight * resultFraction).toInt(),
                             y = 0
                         )
                     }
@@ -194,6 +201,7 @@ private fun ArticleTitleView(
             .collect {
                 if (it.to == DismissValue.DismissedToStart && it.fraction == 1.0f) {
                     Log.d("test", "state ${dismissState.progress}")
+                    isSwipedAway = true
                     //onDeleted()
                 }
             }
