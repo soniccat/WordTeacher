@@ -1,7 +1,12 @@
 package com.aglushkov.wordteacher.androidApp.features.articles.views
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -40,6 +45,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @Composable
@@ -102,6 +108,7 @@ fun ArticlesUI(
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 private fun articlesViewItem(
@@ -121,6 +128,7 @@ private fun articlesViewItem(
 }
 
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 private fun ArticleTitleView(
@@ -141,58 +149,73 @@ private fun ArticleTitleView(
 //        }
     )
 
-    val heightMultiplier: Float by animateFloatAsState(if (isSwipedAway) 0.0f else 1.0f)
+    //val heightMultiplier: Float by animateFloatAsState(if (isSwipedAway) 0.0f else 1.0f)
 
-    SwipeToDismiss(
-        state = dismissState,
-        modifier = Modifier
-            .clickable {
-            onClick()
-        },
-        directions = setOf(DismissDirection.EndToStart),
-        background = {
-            Box(
-                Modifier.fillMaxSize()
-            ) {
-                Layout(
-                    content = {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .aspectRatio(1.0f, matchHeightConstraintsFirst = true)
-                                .background(androidx.compose.ui.graphics.Color.Red)
-                                .padding(horizontal = 10.dp)
-                        )
-                    }
-                ) { measurables, constraints ->
-                    val resultConstraints = constraints.copy(maxHeight = (constraints.maxHeight * heightMultiplier).toInt())
-                    val text = measurables[0].measure(resultConstraints)
-                    val resultFraction = when (dismissState.progress.to) {
-                        DismissValue.DismissedToStart -> dismissState.progress.fraction * 2.0f
-                        else -> 0f
-                    }.roundToMax(1.0f)
+    AnimatedVisibility(
+        visible = !isSwipedAway,
+        enter = expandVertically(),
+        exit = shrinkVertically(
+            animationSpec = tween(
+                durationMillis = 1000,
+            )
+        )
+    ) {
+        SwipeToDismiss(
+            state = dismissState,
+            modifier = Modifier
+                //.fillMaxHeight(heightMultiplier)
+                .clickable {
+                    onClick()
+                },
+            directions = setOf(DismissDirection.EndToStart),
+            background = {
+                Box(
+                    Modifier.fillMaxSize()//.fillMaxHeight(heightMultiplier)
+                ) {
+                    Layout(
+                        content = {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .aspectRatio(1.0f, matchHeightConstraintsFirst = true)
+                                    .background(androidx.compose.ui.graphics.Color.Red)
+                                    .padding(horizontal = 10.dp)
+                            )
+                        }
+                    ) { measurables, constraints ->
+                        val resultConstraints =
+                            constraints//.copy(maxHeight = (constraints.maxHeight * heightMultiplier).toInt())
+                        val text = measurables[0].measure(resultConstraints)
+                        val resultFraction = when (dismissState.progress.to) {
+                            DismissValue.DismissedToStart -> dismissState.progress.fraction * 2.0f
+                            else -> 0f
+                        }.roundToMax(1.0f)
 
-                    layout(resultConstraints.maxWidth, resultConstraints.maxHeight) {
-                        text.placeRelative(
-                            x = resultConstraints.maxWidth - (resultConstraints.maxHeight * resultFraction).toInt(),
-                            y = 0
-                        )
+                        layout(resultConstraints.maxWidth, resultConstraints.maxHeight) {
+                            text.placeRelative(
+                                x = resultConstraints.maxWidth - (resultConstraints.maxHeight * resultFraction).toInt(),
+                                y = 0
+                            )
+                        }
                     }
                 }
             }
+        ) {
+            Text(
+                text = articleViewItem.name,
+                modifier = Modifier
+                    .weight(1.0f, true),
+                    //.fillMaxHeight(heightMultiplier),
+                style = AppTypography.articleTitle
+            )
+            Text(
+                text = articleViewItem.date,
+                modifier = Modifier,
+                    //.fillMaxHeight(heightMultiplier),
+                style = AppTypography.articleDate
+            )
         }
-    ) {
-        Text(
-            text = articleViewItem.name,
-            modifier = Modifier
-                .weight(1.0f, true),
-            style = AppTypography.articleTitle
-        )
-        Text(
-            text = articleViewItem.date,
-            style = AppTypography.articleDate
-        )
     }
 
     LaunchedEffect(dismissState) {
@@ -208,6 +231,7 @@ private fun ArticleTitleView(
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @Preview
