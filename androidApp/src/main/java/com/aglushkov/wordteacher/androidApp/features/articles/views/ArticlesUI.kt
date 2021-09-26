@@ -1,19 +1,30 @@
 package com.aglushkov.wordteacher.androidApp.features.articles.views
 
+import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.BlendMode.Companion.Color
+import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
@@ -26,6 +37,7 @@ import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 
+@ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @Composable
 fun ArticlesUI(
@@ -84,6 +96,7 @@ fun ArticlesUI(
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 private fun articlesViewItem(
     item: BaseViewItem<*>,
@@ -100,21 +113,53 @@ private fun articlesViewItem(
 }
 
 
+@ExperimentalMaterialApi
 @Composable
 private fun ArticleTitleView(
     articleViewItem: ArticleViewItem,
     onClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick()
+
+    val dismissState = rememberDismissState(
+//        confirmStateChange = {
+//            if (it == DismissValue.DismissedToEnd) unread = !unread
+//            it != DismissValue.DismissedToEnd
+//        }
+    )
+    SwipeToDismiss(
+        state = dismissState,
+        directions = setOf(DismissDirection.EndToStart),
+        background = {
+            Box(
+                Modifier.fillMaxSize()
+            ) {
+                Layout(
+                    content = {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .aspectRatio(1.0f, matchHeightConstraintsFirst = true)
+                                .background(androidx.compose.ui.graphics.Color.Red)
+                                .padding(horizontal = 10.dp)
+                        )
+                    }
+                ) { measurables, constraints ->
+                    val text = measurables[0].measure(constraints)
+                    val resultFraction = when (dismissState.progress.to) {
+                        DismissValue.DismissedToStart -> dismissState.progress.fraction * 2.0f
+                        else -> 0f
+                    }.roundToMax(1.0f)
+
+                    layout(constraints.maxWidth, constraints.maxHeight) {
+                        text.placeRelative(
+                            x = constraints.maxWidth - (constraints.maxHeight * resultFraction).toInt(),
+                            y = 0
+                        )
+                    }
+                }
             }
-            .padding(
-                start = dimensionResource(id = R.dimen.article_horizontalPadding),
-                end = dimensionResource(id = R.dimen.article_horizontalPadding)
-            )
+        }
     ) {
         Text(
             text = articleViewItem.name,
@@ -129,6 +174,7 @@ private fun ArticleTitleView(
     }
 }
 
+@ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @Preview
 @Composable
@@ -145,3 +191,5 @@ fun ArticlesUIPreviewWithArticles() {
         )
     }
 }
+
+fun Float.roundToMax(value: Float) = kotlin.math.min(this, value)
