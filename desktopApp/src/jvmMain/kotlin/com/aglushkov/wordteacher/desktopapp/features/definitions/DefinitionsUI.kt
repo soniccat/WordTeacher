@@ -131,7 +131,7 @@ private fun DefinitionsWordUI(
             LoadingStatusView(
                 resource = res,
                 loadingText = null,
-                errorText = vm.getErrorText(res)?.toResultString(),
+                errorText = vm.getErrorText(res)?.localized(),
                 emptyText = "R.string.error_no_definitions"
             ) {
                 vm.onTryAgainClicked()
@@ -190,7 +190,7 @@ private fun DefinitionsDisplayModeView(
                 top = 4.dp,
                 bottom = 4.dp
             ),
-            text = item.partsOfSpeechFilterText.toResultString(),
+            text = item.partsOfSpeechFilterText.localized(),
             colors = ChipColors(
                 contentColor = MaterialTheme.colors.onSecondary,
                 bgColor = MaterialTheme.colors.secondary
@@ -217,7 +217,7 @@ private fun DefinitionsDisplayModeView(
                     start = if (mode == firstMode) 0.dp else 4.dp,
                     end = 4.dp
                 ),
-                text = mode.toStringDesc().toResultString(),
+                text = mode.toStringDesc().localized(),
                 isChecked = mode == selectedMode
             ) {
                 onDisplayModeChanged(mode)
@@ -280,7 +280,7 @@ fun WordTranscriptionView(viewItem: WordTranscriptionViewItem) {
 @Composable
 fun WordPartOfSpeechView(viewItem: WordPartOfSpeechViewItem) {
     Text(
-        text = viewItem.firstItem().toResultString().toUpperCase(Locale.getDefault()),
+        text = viewItem.firstItem().localized().toUpperCase(Locale.getDefault()),
         modifier = Modifier
             .padding(
                 start = Dp(15.0f),
@@ -308,7 +308,7 @@ fun WordDefinitionView(viewItem: WordDefinitionViewItem) {
 @Composable
 fun WordSubHeaderView(viewItem: WordSubHeaderViewItem) {
     Text(
-        text = viewItem.firstItem().toResultString(),
+        text = viewItem.firstItem().localized(),
         modifier = Modifier
             .padding(
                 start = Dp(15.0f) + viewItem.indent.toDp(),

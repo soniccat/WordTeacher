@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -40,6 +41,8 @@ import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
 import kotlin.reflect.KClass
 
+@ExperimentalMaterialApi
+@ExperimentalAnimationApi
 @ExperimentalUnitApi
 @ExperimentalComposeUiApi
 class MainActivity : AppCompatActivity(), Router {

@@ -140,38 +140,36 @@ private fun ArticleTitleView(
         mutableStateOf(false)
     }
     val dismissState = rememberDismissState(
-//        confirmStateChange = {
-//            //Log.d("test", "state ${it}")
-//            if (it == DismissValue.DismissedToStart) {
-//                //onDeleted()
-//            }
-//            true
-//        }
+        confirmStateChange = {
+            if (it == DismissValue.DismissedToStart) {
+                isSwipedAway = true
+                //onDeleted()
+            }
+            true
+        }
     )
-
-    //val heightMultiplier: Float by animateFloatAsState(if (isSwipedAway) 0.0f else 1.0f)
 
     AnimatedVisibility(
         visible = !isSwipedAway,
         enter = expandVertically(),
         exit = shrinkVertically(
             animationSpec = tween(
-                durationMillis = 1000,
+                durationMillis = 300,
             )
         )
     ) {
         SwipeToDismiss(
             state = dismissState,
             modifier = Modifier
-                //.fillMaxHeight(heightMultiplier)
                 .clickable {
                     onClick()
                 },
             directions = setOf(DismissDirection.EndToStart),
             background = {
                 Box(
-                    Modifier.fillMaxSize()//.fillMaxHeight(heightMultiplier)
+                    Modifier.fillMaxSize()
                 ) {
+                    // To support icon sliding from the right edge
                     Layout(
                         content = {
                             Icon(
@@ -184,17 +182,15 @@ private fun ArticleTitleView(
                             )
                         }
                     ) { measurables, constraints ->
-                        val resultConstraints =
-                            constraints//.copy(maxHeight = (constraints.maxHeight * heightMultiplier).toInt())
-                        val text = measurables[0].measure(resultConstraints)
+                        val text = measurables[0].measure(constraints)
                         val resultFraction = when (dismissState.progress.to) {
                             DismissValue.DismissedToStart -> dismissState.progress.fraction * 2.0f
                             else -> 0f
                         }.roundToMax(1.0f)
 
-                        layout(resultConstraints.maxWidth, resultConstraints.maxHeight) {
+                        layout(constraints.maxWidth, constraints.maxHeight) {
                             text.placeRelative(
-                                x = resultConstraints.maxWidth - (resultConstraints.maxHeight * resultFraction).toInt(),
+                                x = constraints.maxWidth - (constraints.maxHeight * resultFraction).toInt(),
                                 y = 0
                             )
                         }
@@ -206,28 +202,13 @@ private fun ArticleTitleView(
                 text = articleViewItem.name,
                 modifier = Modifier
                     .weight(1.0f, true),
-                    //.fillMaxHeight(heightMultiplier),
                 style = AppTypography.articleTitle
             )
             Text(
                 text = articleViewItem.date,
-                modifier = Modifier,
-                    //.fillMaxHeight(heightMultiplier),
                 style = AppTypography.articleDate
             )
         }
-    }
-
-    LaunchedEffect(dismissState) {
-        snapshotFlow { dismissState.progress }
-            .distinctUntilChanged()
-            .collect {
-                if (it.to == DismissValue.DismissedToStart && it.fraction == 1.0f) {
-                    Log.d("test", "state ${dismissState.progress}")
-                    isSwipedAway = true
-                    //onDeleted()
-                }
-            }
     }
 }
 

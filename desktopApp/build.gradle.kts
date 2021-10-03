@@ -43,16 +43,17 @@ kotlin {
                 implementation(compose.preview)
                 implementation(compose.uiTooling)
                 implementation(compose.ui)
-                implementation("com.google.dagger:dagger:2.38.1")
                 implementation(project(":shared"))
+
+                implementation("com.google.dagger:dagger:2.38.1")
             }
         }
     }
 }
 
-//dependencies {
-//    add("kapt", "com.google.dagger:dagger-compiler:2.38.1")
-//}
+dependencies {
+    add("kapt", "com.google.dagger:dagger-compiler:2.38.1")
+}
 
 //compose.desktop {
 //    application {

@@ -29,8 +29,8 @@ class AppModule {
     @AppComp
     @Provides
     fun configService(): ConfigService {
-        val baseUrl = StringDesc.Resource(MR.strings.config_base_url).toResultString()
-        return ConfigService(baseUrl)
+        val baseUrl = StringDesc.Resource(MR.strings.config_base_url)
+        return ConfigService(baseUrl.localized())
     }
 
     @AppComp
