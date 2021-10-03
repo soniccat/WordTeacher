@@ -20,4 +20,4 @@ dependencyResolutionManagement {
 //includeBuild("plugins/resources-plugin")
 include(":androidApp")
 include(":shared")
-include(":desktopApp")
+//include(":desktopApp")

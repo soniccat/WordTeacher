@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.native.cocoapods")
 
     // for compose-jb - uncomment - start
-    id("org.jetbrains.compose")
+//    id("org.jetbrains.compose")
     // for compose-jb - uncomment - end
 
     kotlin("plugin.serialization")

@@ -7,6 +7,6 @@ plugins {
     id("kotlin-parcelize")
 
     // for compose-jb - uncomment - start
-    id("org.jetbrains.compose")
+//    id("org.jetbrains.compose")
     // for compose-jb - uncomment - end
 }

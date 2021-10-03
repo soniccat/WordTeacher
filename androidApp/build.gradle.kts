@@ -44,7 +44,7 @@ android {
     composeOptions {
         kotlinCompilerVersion = libs.versions.kotlinVersion.get()
         // for compose-jb - comment - start
-//        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
+        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
         // for compose-jb - comment - end
     }
 
@@ -78,11 +78,11 @@ dependencies {
     implementation("com.google.accompanist:accompanist-insets:0.17.0")
 
     // for compose-jb - comment - start
-//    implementation(libs.androidComposeFoundation)
-//    implementation(libs.androidComposeMaterial)
+    implementation(libs.androidComposeFoundation)
+    implementation(libs.androidComposeMaterial)
     // for compose-jb - comment - end
     // for compose-jb - uncomment - start
-    implementation(compose.material)
+//    implementation(compose.material)
     // for compose-jb - uncomment - end
 
     implementation(libs.coroutinesCommon)
