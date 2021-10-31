@@ -17,17 +17,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
-import com.aglushkov.wordteacher.androidApp.ScreenTab
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
-import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleUI
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerTabComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.androidApp.features.textaction.di.DaggerTextActionComponent
 import com.aglushkov.wordteacher.androidApp.features.textaction.di.TextActionComponent
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
-import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponent
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
@@ -99,8 +94,7 @@ class TextActionActivity: AppCompatActivity() {
     @Composable
     private fun BottomNavigationBarUI(component: TextActionDecomposeComponent) {
         BottomNavigation(
-            modifier = Modifier
-                .requiredHeight(56.dp)
+            modifier = Modifier.requiredHeight(56.dp)
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
                 BottomNavigationItem(

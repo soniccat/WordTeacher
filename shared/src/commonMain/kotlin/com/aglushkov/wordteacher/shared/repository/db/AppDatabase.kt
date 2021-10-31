@@ -5,11 +5,7 @@ import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
-import com.aglushkov.wordteacher.shared.model.Article
-import com.aglushkov.wordteacher.shared.model.Card
-import com.aglushkov.wordteacher.shared.model.CardSet
-import com.aglushkov.wordteacher.shared.model.ShortArticle
-import com.aglushkov.wordteacher.shared.model.ShortCardSet
+import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +24,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     val articles = Articles()
     val sentencesNLP = DBNLPSentences()
     val cardSets = CardSets()
+    val notes = Notes()
 
     val state = MutableStateFlow<Resource<AppDatabase>>(Resource.Uninitialized())
 
@@ -107,6 +104,14 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 db.dBCardSetToCardRelationQueries.insert(setId, cardId)
             }
         }
+    }
+
+    inner class Notes {
+        fun insert(date: Long, text: String) = db.dBNoteQueries.insert(date, text)
+        fun insertedNoteId() = db.dBNoteQueries.lastInsertedRowId().firstLong()
+        fun selectAll() = db.dBNoteQueries.selectAll(mapper = ::Note)
+        fun removeNote(id: Long) = db.dBNoteQueries.removeNote(id)
+        fun removeAll() = db.dBNoteQueries.removeAll()
     }
 
     companion object {

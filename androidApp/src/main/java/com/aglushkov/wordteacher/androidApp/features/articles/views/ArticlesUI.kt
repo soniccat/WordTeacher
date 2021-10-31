@@ -170,7 +170,7 @@ private fun ArticleTitleView(
                     Modifier.fillMaxSize()
                 ) {
                     // To support icon sliding from the right edge
-                    Layout(
+                    Layout( // TODO: it works but looks scary, need to simplify with constraint layout probably
                         content = {
                             Icon(
                                 Icons.Default.Delete,

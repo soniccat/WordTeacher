@@ -57,5 +57,14 @@ class AppTypography {
             @Composable get() {
                 return typography.body1
             }
+
+        val noteDate: TextStyle
+            @Composable get() {
+                return wordDefinitionProvidedBy
+            }
+        val noteText: TextStyle
+            @Composable get() {
+                return typography.body1
+            }
     }
 }

@@ -1,0 +1,25 @@
+CREATE TABLE IF NOT EXISTS DBNote (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  date INTEGER NOT NULL,
+  text TEXT NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM DBNote;
+
+insert:
+INSERT INTO DBNote(date, text)
+VALUES (?, ?);
+
+lastInsertedRowId:
+SELECT last_insert_rowid();
+
+removeAll:
+DELETE
+FROM DBNote;
+
+removeNote:
+DELETE
+FROM DBNote
+WHERE id = ?;

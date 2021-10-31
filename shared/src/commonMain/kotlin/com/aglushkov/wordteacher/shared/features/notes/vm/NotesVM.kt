@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.features.articles.vm
+package com.aglushkov.wordteacher.shared.features.notes.vm
 
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.CompletionResult
@@ -13,48 +13,47 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.v
+import com.aglushkov.wordteacher.shared.model.Note
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Raw
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-interface ArticlesVM {
-    val articles: StateFlow<Resource<List<BaseViewItem<*>>>>
+interface NotesVM {
+    val notes: StateFlow<Resource<List<BaseViewItem<*>>>>
 
-    fun onCreateTextArticleClicked()
-    fun onArticleClicked(item: ArticleViewItem)
-    fun onArticleRemoved(item: ArticleViewItem)
+    fun onStartNewNoteClicked()
+    fun onNoteClicked(item: NoteViewItem)
+    fun onNoteRemoved(item: NoteViewItem)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onTryAgainClicked()
 }
 
-open class ArticlesVMImpl(
-    val articlesRepository: ArticlesRepository,
-    private val timeSource: TimeSource,
-    private val router: ArticlesRouter
-): ViewModel(), ArticlesVM {
+open class NotesVMImpl(
+    val notesRepository: NotesRepository,
+    private val timeSource: TimeSource
+): ViewModel(), NotesVM {
 
-    override val articles = articlesRepository.shortArticles.map {
+    override val notes = notesRepository.notes.map {
         Logger.v("build view items")
         it.copyWith(buildViewItems(it.data() ?: emptyList()))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    override fun onCreateTextArticleClicked() {
-        router.openAddArticle()
+    override fun onStartNewNoteClicked() {
     }
 
-    override fun onArticleClicked(item: ArticleViewItem) {
-        router.openArticle(item.id)
+    override fun onNoteClicked(item: NoteViewItem) {
     }
 
-    override fun onArticleRemoved(item: ArticleViewItem) {
+    override fun onNoteRemoved(item: NoteViewItem) {
         viewModelScope.launch {
             try {
-                articlesRepository.removeArticle(item.id)
+                notesRepository.removeNote(item.id)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -68,17 +67,17 @@ open class ArticlesVMImpl(
         }
     }
 
-    private fun buildViewItems(articles: List<ShortArticle>): List<BaseViewItem<*>> {
+    private fun buildViewItems(articles: List<Note>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         articles.forEach {
-            items.add(ArticleViewItem(it.id, it.name, timeSource.stringDate(it.date)))
+            items.add(NoteViewItem(it.id, timeSource.stringDate(it.date), it.text))
         }
 
         return items
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
-        return StringDesc.Resource(MR.strings.articles_error)
+        return StringDesc.Resource(MR.strings.notes_error)
     }
 
     override fun onTryAgainClicked() {

@@ -12,4 +12,7 @@
 
     <dimen name="article_horizontalPadding">@dimen/definitions_search_horizontal_margin</dimen>
     <dimen name="article_divider_topMargin">@dimen/definitions_search_vertical_margin</dimen>
+
+    <dimen name="note_horizontalPadding">@dimen/definitions_search_horizontal_margin</dimen>
+    <dimen name="note_divider_topMargin">@dimen/definitions_search_vertical_margin</dimen>
 </resources>
