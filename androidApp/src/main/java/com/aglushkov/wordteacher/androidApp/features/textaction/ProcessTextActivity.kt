@@ -43,7 +43,9 @@ class TextActionActivity: AppCompatActivity() {
 
         val context = defaultComponentContext()
         val deps = (applicationContext as AppComponentOwner).appComponent
-        val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT) ?: ""
+        val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT) // from action.PROCESS_TEXT
+            ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT) // from action.ACTION_SEND
+        ?: ""
 
         textActionDecomposeComponent = DaggerTextActionComponent.builder()
             .setAppComponent(deps)
@@ -64,13 +66,13 @@ class TextActionActivity: AppCompatActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
-                mainUI()
+                MainUI()
             }
         }
     }
 
     @Composable
-    private fun mainUI() {
+    private fun MainUI() {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
