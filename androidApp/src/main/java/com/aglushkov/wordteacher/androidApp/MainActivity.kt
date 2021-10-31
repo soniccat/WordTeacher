@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), Router {
                 color = MaterialTheme.colors.background
             ) {
                 mainUI()
-                dialogUI() // TODO: uncomment (support dialog here)
+                dialogUI()
             }
         }
     }
@@ -93,8 +93,7 @@ class MainActivity : AppCompatActivity(), Router {
     @Composable
     private fun mainUI() {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             Children(
                 routerState = mainDecomposeComponent.routerState,

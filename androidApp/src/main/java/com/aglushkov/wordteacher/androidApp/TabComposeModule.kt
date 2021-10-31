@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.androidApp
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
@@ -21,7 +22,11 @@ class TabComposeModule {
                 is TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration ->
                     DaggerDefinitionsComposeComponent.builder()
                         .setComponentContext(context)
-                        .setConfiguration(configuration)
+                        .setConfiguration(
+                            DefinitionsComposeComponent.DefinitionConfiguration(
+                                word = configuration.word
+                            )
+                        )
                         .setDeps(appComponent)
                         .build()
                         .definitionsDecomposeComponent()

@@ -14,7 +14,7 @@ class DefinitionsComposeModule {
     @Provides
     fun definitionsDecomposeComponent(
         componentContext: ComponentContext,
-        configuration: TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration,
+        configuration: DefinitionsComposeComponent.DefinitionConfiguration,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         idGenerator: IdGenerator,

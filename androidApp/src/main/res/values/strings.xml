@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="android_text_selection_action">@string/app_name</string>
+</resources>

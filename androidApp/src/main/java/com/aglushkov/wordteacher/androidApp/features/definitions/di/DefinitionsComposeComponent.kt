@@ -13,9 +13,11 @@ public interface DefinitionsComposeComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
-        @BindsInstance fun setConfiguration(configuration: TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration): Builder
+        @BindsInstance fun setConfiguration(configuration: DefinitionConfiguration): Builder
 
         fun setDeps(deps: DefinitionsDependencies): Builder
         fun build(): DefinitionsComposeComponent
     }
+
+    data class DefinitionConfiguration(val word: String? = null)
 }

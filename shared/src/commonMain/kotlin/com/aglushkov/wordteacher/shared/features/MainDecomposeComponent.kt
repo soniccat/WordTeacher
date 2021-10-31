@@ -4,6 +4,8 @@ import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecompose
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
+import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.RouterState
@@ -82,35 +84,17 @@ class MainDecomposeComponentImpl(
 
     }
 
-    override fun openArticle(id: Long) {
-        if (router.state.value.activeChild.configuration is MainDecomposeComponent.ChildConfiguration.ArticleConfiguration) {
-            return
-        }
+    override fun openArticle(id: Long) =
+        router.pushChildConfigurationIfNotAtTop(
+            MainDecomposeComponent.ChildConfiguration.ArticleConfiguration(id)
+        )
 
-        router.navigate {
-            it + listOf(MainDecomposeComponent.ChildConfiguration.ArticleConfiguration(id))
-        }
-    }
+    override fun back() = router.popIfNotEmpty()
 
-    override fun back() {
-        if (router.state.value.backStack.isNotEmpty()) {
-            router.pop()
-        }
-    }
+    override fun openAddArticleDialog() =
+        dialogRouter.pushChildConfigurationIfNotAtTop(
+            MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration
+        )
 
-    override fun openAddArticleDialog() {
-        if (dialogRouter.state.value.activeChild.configuration is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration) {
-            return
-        }
-
-        dialogRouter.navigate {
-            it + listOf(MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
-        }
-    }
-
-    override fun popDialog() {
-        if (dialogRouter.state.value.backStack.isNotEmpty()) {
-            dialogRouter.pop()
-        }
-    }
+    override fun popDialog() = dialogRouter.popIfNotEmpty()
 }

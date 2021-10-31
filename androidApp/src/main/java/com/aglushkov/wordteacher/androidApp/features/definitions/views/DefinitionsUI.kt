@@ -73,6 +73,7 @@ fun DefinitionsUI(vm: DefinitionsVM, modalModifier: Modifier = Modifier) {
     val partOfSpeechFilterBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val focusManager = LocalFocusManager.current
 
+    // TODO: consider moving chooser outside...
     ChooserUI(
         state = partOfSpeechFilterBottomSheetState,
         items = partsOfSpeech.map { partOfSpeech ->
