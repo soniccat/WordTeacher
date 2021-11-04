@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.androidApp.features.notes.di.NotesComponent
 import com.aglushkov.wordteacher.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -42,7 +43,7 @@ class TabComposeModule {
                 is TabDecomposeComponent.ChildConfiguration.NotesConfiguration ->
                     DaggerNotesComponent.builder()
                         .setComponentContext(context)
-                        .setConfiguration(NotesComponent.NotesConfiguration)
+                        .setState(NotesVM.State())
                         .setDeps(appComponent)
                         .build()
                         .notesDecomposeComponent()

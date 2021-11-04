@@ -12,7 +12,7 @@ import com.arkivanov.essenty.statekeeper.consume
 
 class DefinitionsDecomposeComponent (
     componentContext: ComponentContext,
-    word: String?,
+    word: String?, // TODO: replace with DefinitionsVM.State
     connectivityManager: ConnectivityManager,
     wordDefinitionRepository: WordDefinitionRepository,
     idGenerator: IdGenerator

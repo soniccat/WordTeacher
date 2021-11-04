@@ -98,12 +98,6 @@ open class DefinitionsVMImpl(
             state.word = value
         }
 
-//    init {
-//        word?.let {
-//            loadIfNeeded(it)
-//        }
-//    }
-
     override fun restore(newState: DefinitionsVM.State) {
         state = newState
         word?.let {
@@ -295,7 +289,6 @@ open class DefinitionsVMImpl(
             items.add(WordPartOfSpeechViewItem(partOfSpeech.toStringDesc()))
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
-                //items.add(WordHeaderViewItem(StringDesc.Resource(MR.strings.word_section_definition)))
                 for (d in def.definitions) {
                     items.add(WordDefinitionViewItem("• $d"))
                 }

@@ -1,23 +1,18 @@
 package com.aglushkov.wordteacher.shared.features.notes.vm
 
-import com.aglushkov.wordteacher.shared.events.CompletionEvent
-import com.aglushkov.wordteacher.shared.events.CompletionResult
-import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
-import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Note
-import com.aglushkov.wordteacher.shared.model.ShortArticle
-import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.res.MR
+import com.arkivanov.essenty.parcelable.Parcelable
+import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Raw
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
@@ -25,26 +20,54 @@ import kotlinx.coroutines.launch
 
 interface NotesVM {
     val notes: StateFlow<Resource<List<BaseViewItem<*>>>>
+    val stateFlow: StateFlow<State>
+
+    fun restore(newState: State)
 
     fun onNoteAdded(text: String)
+    fun onNewNoteTextChange(text: String)
+
     fun onNoteRemoved(item: NoteViewItem)
     fun onNoteClicked(item: NoteViewItem)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onTryAgainClicked()
+
+    @Parcelize
+    data class State(
+        var newNoteText: String? = null
+    ): Parcelable
 }
 
 open class NotesVMImpl(
     val notesRepository: NotesRepository,
-    private val timeSource: TimeSource
+    private val timeSource: TimeSource,
+    var state: NotesVM.State
 ): ViewModel(), NotesVM {
+    final override val stateFlow = MutableStateFlow(state)
 
-    override val notes = notesRepository.notes.map {
+    override val notes = combine(notesRepository.notes, stateFlow) { a, b -> a to b }
+    .map { (notes, state) ->
         Logger.v("build view items")
-        it.copyWith(buildViewItems(it.data() ?: emptyList()))
+        notes.copyWith(buildViewItems(notes.data() ?: emptyList(), state.newNoteText))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
+    override fun restore(newState: NotesVM.State) {
+        updateState(newState)
+    }
+
+    private fun updateState(newState: NotesVM.State) {
+        state = newState
+        stateFlow.value = state
+    }
+
+    override fun onNewNoteTextChange(text: String) {
+        updateState(state.copy(newNoteText = text))
+    }
+
     override fun onNoteAdded(text: String) {
+        updateState(state.copy(newNoteText = null))
+
         viewModelScope.launch {
             try {
                 notesRepository.createNote(timeSource.getTimeInMilliseconds(), text)
@@ -78,13 +101,18 @@ open class NotesVMImpl(
         //eventChannel.offer(ErrorEvent(errorText))
     }
 
-    private fun buildViewItems(articles: List<Note>): List<BaseViewItem<*>> {
+    private fun buildViewItems(articles: List<Note>, newNoteText: String?): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         articles.forEach {
             items.add(NoteViewItem(it.id, timeSource.stringDate(it.date), it.text))
         }
 
-        return listOf(CreateNoteViewItem(StringDesc.Resource(MR.strings.notes_create_note)), *items.toTypedArray())
+        return listOf(
+            CreateNoteViewItem(
+                placeholder = StringDesc.Resource(MR.strings.notes_create_note),
+                text = newNoteText.orEmpty()
+            ),
+            *items.toTypedArray())
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {

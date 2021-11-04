@@ -19,5 +19,5 @@ public interface DefinitionsComposeComponent {
         fun build(): DefinitionsComposeComponent
     }
 
-    data class DefinitionConfiguration(val word: String? = null)
+    data class DefinitionConfiguration(val word: String? = null) // TODO: replace with DefinitionsVM.State
 }

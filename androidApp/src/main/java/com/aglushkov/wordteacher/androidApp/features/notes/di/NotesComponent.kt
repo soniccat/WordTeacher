@@ -2,10 +2,12 @@ package com.aglushkov.wordteacher.androidApp.features.notes.di
 
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.arkivanov.decompose.ComponentContext
+import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
 
@@ -16,13 +18,11 @@ public interface NotesComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
-        @BindsInstance fun setConfiguration(configuration: NotesConfiguration): Builder
+        @BindsInstance fun setState(configuration: NotesVM.State): Builder
 
         fun setDeps(deps: NotesDependencies): Builder
         fun build(): NotesComponent
     }
-
-    object NotesConfiguration
 }
 
 interface NotesDependencies {

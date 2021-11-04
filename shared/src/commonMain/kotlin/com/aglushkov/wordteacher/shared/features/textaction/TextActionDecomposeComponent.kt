@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.textaction
 
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.RouterDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.popToRoot
@@ -25,7 +26,7 @@ interface TextActionDecomposeComponent
     sealed class Child {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
         data class AddArticle(val inner: Any): Child()
-        data class AddNote(val inner: Any): Child()
+        data class AddNote(val inner: NotesDecomposeComponent): Child()
     }
 
     sealed class ChildConfiguration: Parcelable {
@@ -60,7 +61,7 @@ class TextActionDecomposeComponentImpl(
             inner = childComponentFactory(componentContext, configuration)
         )
         is TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration -> TextActionDecomposeComponent.Child.AddNote(
-            inner = childComponentFactory(componentContext, configuration)
+            inner = childComponentFactory(componentContext, configuration) as NotesDecomposeComponent
         )
     }
 

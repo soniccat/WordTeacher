@@ -49,7 +49,7 @@ fun AddArticleUI(
                 title = { Text(stringResource(id = R.string.add_article_title)) },
                 actions = {
                     IconButton(
-                        onClick = {vm.onCancelPressed()}
+                        onClick = { vm.onCancelPressed() }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_close_24),

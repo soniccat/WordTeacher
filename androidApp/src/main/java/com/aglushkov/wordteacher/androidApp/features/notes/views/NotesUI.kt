@@ -12,7 +12,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +34,7 @@ import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import kotlinx.coroutines.flow.collect
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -40,7 +43,14 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     val notes by vm.notes.collectAsState()
     var searchText by remember { mutableStateOf("") }
-    val createNoteState = remember { mutableStateOf(EmptyTextFieldValue) }
+    val newNoteText = remember { mutableStateOf(
+        vm.stateFlow.value.newNoteText?.let { newNoteText ->
+            TextFieldValue(newNoteText)
+        } ?: run {
+            EmptyTextFieldValue
+        }
+    ) }
+    val newNoteFocusRequester = remember { FocusRequester() }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -62,7 +72,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
                         data,
                         key = { it.id }
                     ) { item ->
-                        NoteViews(item, vm, createNoteState)
+                        NoteViews(item, vm, newNoteText, newNoteFocusRequester)
                     }
                 }
             } else {
@@ -75,23 +85,12 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
                 }
             }
         }
+    }
 
-//        Box(
-//            modifier = Modifier.matchParentSize(),
-//            contentAlignment = Alignment.BottomEnd
-//        ) {
-//            FloatingActionButton(
-//                onClick = { vm.onStartNewNoteClicked() },
-//                modifier = Modifier.padding(
-//                    dimensionResource(id = R.dimen.note_horizontalPadding)
-//                )
-//            ) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.ic_add_white_24dp),
-//                    contentDescription = null
-//                )
-//            }
-//        }
+    LaunchedEffect(key1 = "focus") {
+        if (vm.stateFlow.value.newNoteText != null) {
+            newNoteFocusRequester.requestFocus()
+        }
     }
 }
 
@@ -102,14 +101,20 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
 private fun NoteViews(
     item: BaseViewItem<*>,
     vm: NotesVM,
-    createNoteViewState: MutableState<TextFieldValue>
+    textFieldValue: MutableState<TextFieldValue>,
+    focusRequester: FocusRequester
 ) = when (item) {
     is CreateNoteViewItem -> CreateNoteView(
         noteViewItem = item,
-        createNoteViewState = createNoteViewState,
+        textFieldValue = textFieldValue.value,
+        focusRequester = focusRequester,
+        onTextChanged = {
+            //vm.onNewNoteTextChange(it.text)
+            textFieldValue.value = it
+        },
         onNoteCreated = {
-            vm.onNoteAdded(createNoteViewState.value.text)
-            createNoteViewState.value = EmptyTextFieldValue
+            vm.onNoteAdded(it)
+            textFieldValue.value = EmptyTextFieldValue
         }
     )
     is NoteViewItem -> NoteView(
@@ -126,7 +131,9 @@ private fun NoteViews(
 @Composable
 private fun CreateNoteView(
     noteViewItem: CreateNoteViewItem,
-    createNoteViewState: MutableState<TextFieldValue>,
+    textFieldValue: TextFieldValue,
+    focusRequester: FocusRequester,
+    onTextChanged: (text: TextFieldValue) -> Unit,
     onNoteCreated: (text: String) -> Unit
 ) {
     var focusState by remember { mutableStateOf<FocusState>(object : FocusState {
@@ -136,16 +143,16 @@ private fun CreateNoteView(
     }) }
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.focusRequester(focusRequester).fillMaxWidth()
     ) {
         TextField(
-            value = createNoteViewState.value,
-            onValueChange = {
-                createNoteViewState.value = it
-            },
-            modifier = Modifier.fillMaxWidth().onFocusChanged {
-                focusState = it
-            },
+            value = textFieldValue,
+            onValueChange = onTextChanged,
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged {
+                    focusState = it
+                },
             placeholder = {
                 if (!focusState.isFocused) {
                     Row {
@@ -165,7 +172,7 @@ private fun CreateNoteView(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    onNoteCreated(createNoteViewState.value.text)
+                    onNoteCreated(textFieldValue.text)
                 }
             ),
             singleLine = true,
@@ -182,9 +189,11 @@ private fun NoteView(
     onClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier.clickable {
-            onClick()
-        }.fillMaxWidth()
+        modifier = Modifier
+            .clickable {
+                onClick()
+            }
+            .fillMaxWidth()
     ) {
         Text(
             text = noteViewItem.text,
