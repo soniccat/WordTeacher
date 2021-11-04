@@ -3,6 +3,10 @@ package com.aglushkov.wordteacher.shared.features
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
+import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
+import com.aglushkov.wordteacher.shared.general.popToRoot
+import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.RouterState
@@ -17,16 +21,19 @@ interface TabDecomposeComponent {
 
     fun openDefinitions()
     fun openArticles()
+    fun openNotes()
     fun back()
 
     sealed class Child {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
         data class Articles(val inner: ArticlesDecomposeComponent): Child()
+        data class Notes(val inner: NotesDecomposeComponent): Child()
     }
 
     sealed class ChildConfiguration: Parcelable {
         @Parcelize data class DefinitionConfiguration(val word: String? = null) : ChildConfiguration()
         @Parcelize object ArticlesConfiguration : ChildConfiguration()
+        @Parcelize object NotesConfiguration : ChildConfiguration()
     }
 }
 
@@ -49,35 +56,27 @@ class TabDecomposeComponentImpl(
         configuration: TabDecomposeComponent.ChildConfiguration,
         componentContext: ComponentContext
     ): TabDecomposeComponent.Child = when (configuration) {
+        // TODO: refactor
         is TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> TabDecomposeComponent.Child.Definitions(
             inner = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
         )
         is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> TabDecomposeComponent.Child.Articles(
             inner = childComponentFactory(componentContext, configuration) as ArticlesDecomposeComponent
         )
+        is TabDecomposeComponent.ChildConfiguration.NotesConfiguration -> TabDecomposeComponent.Child.Notes(
+            inner = childComponentFactory(componentContext, configuration) as NotesDecomposeComponent
+        )
     }
 
-    override fun openDefinitions() {
-        router.navigate {
-            listOf(it.first())
-        }
+    override fun openDefinitions() = router.popToRoot()
+
+    override fun openArticles() =
+        router.pushChildConfigurationIfNotAtTop(TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
+
+    override fun openNotes() {
+        router.pushChildConfigurationIfNotAtTop(TabDecomposeComponent.ChildConfiguration.NotesConfiguration)
     }
 
-    override fun openArticles() {
-        if (router.state.value.activeChild.configuration is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration) {
-            return
-        }
-
-        router.navigate {
-            it + listOf(TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
-        }
-    }
-
-    override fun back() {
-        if (router.state.value.backStack.isNotEmpty()) {
-            router.pop()
-        }
-    }
-
+    override fun back() = router.popIfNotEmpty()
 
 }

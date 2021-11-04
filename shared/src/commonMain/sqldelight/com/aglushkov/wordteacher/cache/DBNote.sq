@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS DBNote (
 
 selectAll:
 SELECT *
-FROM DBNote;
+FROM DBNote
+ORDER BY date DESC;
 
 insert:
 INSERT INTO DBNote(date, text)

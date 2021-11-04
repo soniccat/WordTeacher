@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.androidApp.R
@@ -44,7 +45,8 @@ class AppTypography {
             @Composable get() {
                 val color = colorResource(id = R.color.word_subheader)
                 return remember(color) { typography.subtitle2.copy(
-                    color = color
+                    color = color,
+                    fontStyle = FontStyle.Italic
                 )}
             }
 
@@ -62,9 +64,9 @@ class AppTypography {
             @Composable get() {
                 return wordDefinitionProvidedBy
             }
-        val noteText: TextStyle
-            @Composable get() {
-                return typography.body1
-            }
+        val noteText: TextStyle = typography.body1
+        val notePlaceholder = noteText.copy(
+            color = noteText.color.copy(alpha = 0.5f)
+        )
     }
 }

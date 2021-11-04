@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.androidApp.features.article.di.ArticleDependenc
 import com.aglushkov.wordteacher.androidApp.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.androidApp.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
+import com.aglushkov.wordteacher.androidApp.features.notes.di.NotesDependencies
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
@@ -19,6 +20,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.service.ConfigService
@@ -32,7 +34,8 @@ public interface AppComponent:
     ArticlesDependencies,
     AddArticleDependencies,
     ArticleDependencies,
-    CardSetsDependencies {
+    CardSetsDependencies,
+    NotesDependencies {
 
     fun configService(): ConfigService
     fun configRepository(): ConfigRepository
@@ -46,6 +49,8 @@ public interface AppComponent:
     override fun articlesRepository(): ArticlesRepository
     override fun cardSetsRepository(): CardSetsRepository
     override fun wordRepository(): WordDefinitionRepository
+    override fun notesRepository(): NotesRepository
+
     override fun idGenerator(): IdGenerator
     override fun timeSource(): TimeSource
     override fun connectivityManager(): ConnectivityManager

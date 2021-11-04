@@ -17,6 +17,7 @@ import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsSt
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
+import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.service.ConfigService
@@ -82,6 +83,15 @@ class AppModule {
         database: AppDatabase
     ): CardSetsRepository {
         return CardSetsRepository(database)
+    }
+
+    @AppComp
+    @Provides
+    fun notesRepository(
+        database: AppDatabase,
+        nlpCore: NLPCore,
+    ): NotesRepository {
+        return NotesRepository(database, nlpCore)
     }
 
     @AppComp

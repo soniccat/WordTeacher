@@ -6,6 +6,7 @@
     <string name="tab_definitions">Words</string>
     <string name="tab_articles">Articles</string>
     <string name="tab_cardsets">Card Sets</string>
+    <string name="tab_notes">Notes</string>
     <string name="search">Search</string>
     <string name="close">Close</string>
 
@@ -50,6 +51,7 @@
 
     <string name="notes_no_notes">To create a new note tap the button</string>
     <string name="notes_error">@string/error_default</string>
+    <string name="notes_create_note">Create a new note</string>
 
     <string name="error_try_again">Try again</string>
 </resources>

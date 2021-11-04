@@ -26,9 +26,9 @@ import kotlinx.coroutines.launch
 interface NotesVM {
     val notes: StateFlow<Resource<List<BaseViewItem<*>>>>
 
-    fun onStartNewNoteClicked()
-    fun onNoteClicked(item: NoteViewItem)
+    fun onNoteAdded(text: String)
     fun onNoteRemoved(item: NoteViewItem)
+    fun onNoteClicked(item: NoteViewItem)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onTryAgainClicked()
@@ -44,10 +44,14 @@ open class NotesVMImpl(
         it.copyWith(buildViewItems(it.data() ?: emptyList()))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    override fun onStartNewNoteClicked() {
-    }
-
-    override fun onNoteClicked(item: NoteViewItem) {
+    override fun onNoteAdded(text: String) {
+        viewModelScope.launch {
+            try {
+                notesRepository.createNote(timeSource.getTimeInMilliseconds(), text)
+            } catch (e: Exception) {
+                showError(e)
+            }
+        }
     }
 
     override fun onNoteRemoved(item: NoteViewItem) {
@@ -57,14 +61,21 @@ open class NotesVMImpl(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                val errorText = e.message?.let {
-                    StringDesc.Raw(it)
-                } ?: StringDesc.Resource(MR.strings.error_default)
-
-                // TODO: pass an error message
-                //eventChannel.offer(ErrorEvent(errorText))
+                showError(e)
             }
         }
+    }
+
+    override fun onNoteClicked(item: NoteViewItem) {
+    }
+
+    private fun showError(e: Exception) {
+        val errorText = e.message?.let {
+            StringDesc.Raw(it)
+        } ?: StringDesc.Resource(MR.strings.error_default)
+
+        // TODO: pass an error message
+        //eventChannel.offer(ErrorEvent(errorText))
     }
 
     private fun buildViewItems(articles: List<Note>): List<BaseViewItem<*>> {
@@ -73,7 +84,7 @@ open class NotesVMImpl(
             items.add(NoteViewItem(it.id, timeSource.stringDate(it.date), it.text))
         }
 
-        return items
+        return listOf(CreateNoteViewItem(StringDesc.Resource(MR.strings.notes_create_note)), *items.toTypedArray())
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
@@ -81,6 +92,6 @@ open class NotesVMImpl(
     }
 
     override fun onTryAgainClicked() {
-        // TODO: do sth with articlesRepository
+        // TODO: do sth with notesRepository
     }
 }
