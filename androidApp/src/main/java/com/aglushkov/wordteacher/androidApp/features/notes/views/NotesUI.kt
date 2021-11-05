@@ -44,6 +44,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     val notes by vm.notes.collectAsState()
     var searchText by remember { mutableStateOf("") }
     val newNoteText = vm.stateFlow.collectAsState()
+    val newNoteState by remember { mutableStateOf(NewNoteState(newNoteText)) }
     val newNoteFocusRequester = remember { FocusRequester() }
 
     Box(
@@ -66,7 +67,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
                         data,
                         key = { it.id }
                     ) { item ->
-                        NoteViews(item, vm, newNoteText, newNoteFocusRequester)
+                        NoteViews(item, vm, newNoteState, newNoteFocusRequester)
                     }
                 }
             } else {
@@ -95,24 +96,16 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
 private fun NoteViews(
     item: BaseViewItem<*>,
     vm: NotesVM,
-    state: State<NotesVM.State>,
+    state: NewNoteState,
     focusRequester: FocusRequester
 ) = when (item) {
     is CreateNoteViewItem -> {
-        var fieldValue by remember {
-            mutableStateOf(TextFieldValue(text = state.value.newNoteText.orEmpty()))
-        }
-
-        if (vm.stateFlow.value.newNoteText.orEmpty() != fieldValue.text) {
-            fieldValue = fieldValue.copy(text = vm.stateFlow.value.newNoteText.orEmpty())
-        }
-
         CreateNoteView(
             noteViewItem = item,
-            textFieldValue = fieldValue,
+            textFieldValue = state.textFieldValue,
             focusRequester = focusRequester,
             onTextChanged = {
-                fieldValue = it
+                state.textFieldValue = it
                 vm.onNewNoteTextChange(it.text)
             },
             onNoteCreated = {
@@ -209,6 +202,25 @@ private fun NoteView(
             style = AppTypography.noteDate
         )
     }
+}
+
+@Stable
+private class NewNoteState(
+    private val vmState: State<NotesVM.State>
+) {
+    private var innerTextFieldValue = mutableStateOf(EmptyTextFieldValue)
+
+    var textFieldValue: TextFieldValue
+        get() {
+            if (vmState.value.newNoteText.orEmpty() != innerTextFieldValue.value.text) {
+                innerTextFieldValue.value = innerTextFieldValue.value.copy(text = vmState.value.newNoteText.orEmpty())
+            }
+
+            return innerTextFieldValue.value
+        }
+        set(value) {
+            innerTextFieldValue.value = value
+        }
 }
 
 private val EmptyTextFieldValue = TextFieldValue()
