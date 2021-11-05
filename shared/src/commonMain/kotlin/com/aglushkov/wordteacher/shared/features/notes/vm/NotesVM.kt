@@ -35,7 +35,7 @@ interface NotesVM {
 
     @Parcelize
     data class State(
-        var newNoteText: String? = null
+        val newNoteText: String? = null
     ): Parcelable
 }
 

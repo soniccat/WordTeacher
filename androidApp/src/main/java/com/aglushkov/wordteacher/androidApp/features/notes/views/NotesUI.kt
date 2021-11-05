@@ -43,13 +43,7 @@ import kotlinx.coroutines.flow.collect
 fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     val notes by vm.notes.collectAsState()
     var searchText by remember { mutableStateOf("") }
-    val newNoteText = remember { mutableStateOf(
-        vm.stateFlow.value.newNoteText?.let { newNoteText ->
-            TextFieldValue(newNoteText)
-        } ?: run {
-            EmptyTextFieldValue
-        }
-    ) }
+    val newNoteText = vm.stateFlow.collectAsState()
     val newNoteFocusRequester = remember { FocusRequester() }
 
     Box(
@@ -101,22 +95,31 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
 private fun NoteViews(
     item: BaseViewItem<*>,
     vm: NotesVM,
-    textFieldValue: MutableState<TextFieldValue>,
+    state: State<NotesVM.State>,
     focusRequester: FocusRequester
 ) = when (item) {
-    is CreateNoteViewItem -> CreateNoteView(
-        noteViewItem = item,
-        textFieldValue = textFieldValue.value,
-        focusRequester = focusRequester,
-        onTextChanged = {
-            //vm.onNewNoteTextChange(it.text)
-            textFieldValue.value = it
-        },
-        onNoteCreated = {
-            vm.onNoteAdded(it)
-            textFieldValue.value = EmptyTextFieldValue
+    is CreateNoteViewItem -> {
+        var fieldValue by remember {
+            mutableStateOf(TextFieldValue(text = state.value.newNoteText.orEmpty()))
         }
-    )
+
+        if (vm.stateFlow.value.newNoteText.orEmpty() != fieldValue.text) {
+            fieldValue = fieldValue.copy(text = vm.stateFlow.value.newNoteText.orEmpty())
+        }
+
+        CreateNoteView(
+            noteViewItem = item,
+            textFieldValue = fieldValue,
+            focusRequester = focusRequester,
+            onTextChanged = {
+                fieldValue = it
+                vm.onNewNoteTextChange(it.text)
+            },
+            onNoteCreated = {
+                vm.onNoteAdded(it)
+            }
+        )
+    }
     is NoteViewItem -> NoteView(
         item,
         onClick = { vm.onNoteClicked(item) }
@@ -143,7 +146,9 @@ private fun CreateNoteView(
     }) }
 
     Column(
-        modifier = Modifier.focusRequester(focusRequester).fillMaxWidth()
+        modifier = Modifier
+            .focusRequester(focusRequester)
+            .fillMaxWidth()
     ) {
         TextField(
             value = textFieldValue,
