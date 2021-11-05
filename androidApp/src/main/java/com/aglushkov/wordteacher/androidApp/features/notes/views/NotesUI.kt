@@ -89,7 +89,6 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     }
 }
 
-
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
@@ -100,12 +99,13 @@ private fun NoteViews(
     focusRequester: FocusRequester
 ) = when (item) {
     is CreateNoteViewItem -> {
+        val textFieldValueState by state.textFieldValueState()
         CreateNoteView(
             noteViewItem = item,
-            textFieldValue = state.textFieldValue,
+            textFieldValue = textFieldValueState,
             focusRequester = focusRequester,
             onTextChanged = {
-                state.textFieldValue = it
+                state.updateTextFieldValue(it)
                 vm.onNewNoteTextChange(it.text)
             },
             onNoteCreated = {
@@ -205,22 +205,28 @@ private fun NoteView(
 }
 
 @Stable
-private class NewNoteState(
+class NewNoteState(
     private val vmState: State<NotesVM.State>
 ) {
     private var innerTextFieldValue = mutableStateOf(EmptyTextFieldValue)
 
-    var textFieldValue: TextFieldValue
-        get() {
-            if (vmState.value.newNoteText.orEmpty() != innerTextFieldValue.value.text) {
-                innerTextFieldValue.value = innerTextFieldValue.value.copy(text = vmState.value.newNoteText.orEmpty())
-            }
+    fun updateTextFieldValue(value: TextFieldValue) {
+        innerTextFieldValue.value = value
+    }
 
-            return innerTextFieldValue.value
+    @Composable
+    fun textFieldValueState(): State<TextFieldValue> {
+        return remember(vmState, innerTextFieldValue) {
+            derivedStateOf {
+                if (vmState.value.newNoteText.orEmpty() != innerTextFieldValue.value.text) {
+                    innerTextFieldValue.value = innerTextFieldValue.value.copy(text = vmState.value.newNoteText.orEmpty())
+                    innerTextFieldValue.value
+                } else {
+                    innerTextFieldValue.value
+                }
+            }
         }
-        set(value) {
-            innerTextFieldValue.value = value
-        }
+    }
 }
 
 private val EmptyTextFieldValue = TextFieldValue()
