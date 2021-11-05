@@ -28,6 +28,7 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomTopAppBar
+import com.aglushkov.wordteacher.androidApp.general.views.compose.DeletableCell
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.androidApp.general.views.compose.SearchView
 import com.aglushkov.wordteacher.shared.features.notes.vm.CreateNoteViewItem
@@ -110,7 +111,8 @@ private fun NoteViews(
     }
     is NoteViewItem -> NoteView(
         item,
-        onClick = { vm.onNoteClicked(item) }
+        onClick = { vm.onNoteClicked(item) },
+        onDeleted = { vm.onNoteRemoved(item) }
     )
     else -> {
         Text(
@@ -176,26 +178,34 @@ private fun CreateNoteView(
     }
 }
 
+@ExperimentalMaterialApi
+@ExperimentalAnimationApi
 @Composable
 private fun NoteView(
     noteViewItem: NoteViewItem,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDeleted: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .clickable {
-                onClick()
-            }
-            .fillMaxWidth()
+    DeletableCell(
+        onClick,
+        onDeleted
     ) {
-        Text(
-            text = noteViewItem.text,
-            style = AppTypography.noteText
-        )
-        Text(
-            text = noteViewItem.date,
-            style = AppTypography.noteDate
-        )
+        Column(
+            modifier = Modifier
+                .clickable {
+                    onClick()
+                }
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = noteViewItem.text,
+                style = AppTypography.noteText
+            )
+            Text(
+                text = noteViewItem.date,
+                style = AppTypography.noteDate
+            )
+        }
     }
 }
 
