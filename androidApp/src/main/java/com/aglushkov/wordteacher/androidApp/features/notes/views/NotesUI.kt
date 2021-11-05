@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.features.notes
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -45,7 +46,6 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     var searchText by remember { mutableStateOf("") }
     val newNoteText = vm.stateFlow.collectAsState()
     val newNoteState by remember { mutableStateOf(NewNoteState(newNoteText)) }
-    val newNoteFocusRequester = remember { FocusRequester() }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -67,7 +67,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
                         data,
                         key = { it.id }
                     ) { item ->
-                        NoteViews(item, vm, newNoteState, newNoteFocusRequester)
+                        NoteViews(item, vm, newNoteState)
                     }
                 }
             } else {
@@ -81,12 +81,6 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
             }
         }
     }
-
-    LaunchedEffect(key1 = "focus") {
-        if (vm.stateFlow.value.newNoteText != null) {
-            newNoteFocusRequester.requestFocus()
-        }
-    }
 }
 
 @ExperimentalAnimationApi
@@ -95,23 +89,24 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
 private fun NoteViews(
     item: BaseViewItem<*>,
     vm: NotesVM,
-    state: NewNoteState,
-    focusRequester: FocusRequester
+    state: NewNoteState
 ) = when (item) {
     is CreateNoteViewItem -> {
         val textFieldValueState by state.textFieldValueState()
         CreateNoteView(
             noteViewItem = item,
             textFieldValue = textFieldValueState,
-            focusRequester = focusRequester,
+            focusRequester = state.focusRequester,
             onTextChanged = {
-                state.updateTextFieldValue(it)
-                vm.onNewNoteTextChange(it.text)
+                state.updateTextFieldValue(it)  // update UI text field state
+                vm.onNewNoteTextChange(it.text) // update VM text state
             },
             onNoteCreated = {
                 vm.onNoteAdded(it)
             }
         )
+
+        state.requestFocusIfNeeded()
     }
     is NoteViewItem -> NoteView(
         item,
@@ -209,6 +204,7 @@ class NewNoteState(
     private val vmState: State<NotesVM.State>
 ) {
     private var innerTextFieldValue = mutableStateOf(EmptyTextFieldValue)
+    val focusRequester = FocusRequester()
 
     fun updateTextFieldValue(value: TextFieldValue) {
         innerTextFieldValue.value = value
@@ -218,12 +214,23 @@ class NewNoteState(
     fun textFieldValueState(): State<TextFieldValue> {
         return remember(vmState, innerTextFieldValue) {
             derivedStateOf {
+                // merge textField UI state with VM text state, VM state always wins
                 if (vmState.value.newNoteText.orEmpty() != innerTextFieldValue.value.text) {
                     innerTextFieldValue.value = innerTextFieldValue.value.copy(text = vmState.value.newNoteText.orEmpty())
                     innerTextFieldValue.value
                 } else {
                     innerTextFieldValue.value
                 }
+            }
+        }
+    }
+
+    @SuppressLint("ComposableNaming")
+    @Composable
+    fun requestFocusIfNeeded() {
+        LaunchedEffect(key1 = "focus") {
+            if (vmState.value.newNoteText?.isNotEmpty() == true) {
+                focusRequester.requestFocus()
             }
         }
     }
