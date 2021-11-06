@@ -26,14 +26,15 @@ fun EditableCell(
     onTextChanged: (text: TextFieldValue) -> Unit,
     onDonePressed: (text: String) -> Unit,
     placeholder: @Composable (() -> Unit)? = null,
-    aFocusRequester: FocusRequester? = null,
+    aFocusRequester: FocusRequester = remember { FocusRequester() },
     focusState: MutableState<FocusState> = remember { mutableStateOf(EmptyFocusState) }
 ) {
     TextField(
         value = textFieldValue,
         onValueChange = onTextChanged,
         modifier = Modifier
-            .apply { aFocusRequester?.let { focusRequester(it) } }
+            //.apply { aFocusRequester?.let { focusRequester(it) } }
+            .focusRequester(aFocusRequester)
             .fillMaxWidth()
             .onFocusChanged {
                 focusState.value = it

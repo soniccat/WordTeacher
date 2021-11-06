@@ -1,11 +1,17 @@
 package com.aglushkov.wordteacher.androidApp.features.notes
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -17,27 +23,41 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
+import com.aglushkov.wordteacher.androidApp.features.articles.views.roundToMax
+import com.aglushkov.wordteacher.androidApp.features.articles.views.roundToMin
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.CreateNoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.lang.Math.min
+import java.lang.StrictMath.max
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @Composable
 fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
+    val scope = rememberCoroutineScope()
     val notes by vm.notes.collectAsState()
     var searchText by remember { mutableStateOf("") }
 
@@ -45,6 +65,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     val editingState = vm.editingStateFlow.collectAsState()
     val newNoteState by remember { mutableStateOf(NewNoteState(newNoteText)) }
     val notesState by remember { mutableStateOf(NotesState(editingState)) }
+    val lazyColumnState = rememberLazyListState()
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -60,13 +81,15 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
 
             if (notes.isLoaded() && data != null) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    state = lazyColumnState,
+                    contentPadding = PaddingValues(bottom = 300.dp)
                 ) {
                     items(
-                        data,
-                        key = { it.id }
-                    ) { item ->
-                        NoteViews(item, vm, notesState, newNoteState)
+                        data.size,
+                        key = { data[it].id }
+                    ) { index ->
+                        NoteViews(scope, index, data[index], vm, notesState, newNoteState, lazyColumnState)
                     }
                 }
             } else {
@@ -86,10 +109,13 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
 @ExperimentalMaterialApi
 @Composable
 private fun NoteViews(
+    scope: CoroutineScope,
+    index: Int,
     item: BaseViewItem<*>,
     vm: NotesVM,
     notesState: NotesState,
-    state: NewNoteState
+    state: NewNoteState,
+    lazyListState: LazyListState
 ) = when (item) {
     is CreateNoteViewItem -> {
         CreateNoteView(
@@ -107,20 +133,68 @@ private fun NoteViews(
 
         state.requestFocusIfNeeded()
     }
-    is NoteViewItem -> NoteView(
-        item,
-        isEditing = notesState.editingNote.value.item?.id == item.id,
-        rememberTextFieldValue = { notesState.rememberTextFieldValueState() },
-        onTextChanged = {
-            notesState.updateTextFieldValue(it)
-            vm.onEditingTextChanged(it.text)
-        },
-        onDoneEditing = {
-            vm.onEditingCompleted()
-        },
-        onClick = { vm.onNoteClicked(item) },
-        onDeleted = { vm.onNoteRemoved(item) }
-    )
+    is NoteViewItem -> {
+        val configuration = LocalConfiguration.current
+        val isEditing = { notesState.editingNote.value.item?.id == item.id }
+        NoteView(
+            item,
+            isEditing = isEditing(),
+            rememberTextFieldValue = notesState.rememberTextFieldValueState(),
+            onTextChanged = {
+                if (isEditing()) {
+                    notesState.updateTextFieldValue(it)
+                    vm.onEditingTextChanged(it.text)
+                }
+            },
+            onDoneEditing = {
+                vm.onEditingCompleted()
+            },
+            onClick = {
+                val handleClick = {
+                    notesState.updateTextFieldValue(
+                        TextFieldValue(
+                            text = item.text,
+                            selection = TextRange(item.text.length)
+                        )
+                    )
+                    vm.onNoteClicked(item)
+                }
+
+                val topOffset = lazyListState.layoutInfo.viewportStartOffset
+                val bottomOffset = lazyListState.layoutInfo.viewportEndOffset
+                val isWideList = configuration.screenWidthDp > configuration.screenHeightDp
+                var currentOffset = 0
+
+                lazyListState.layoutInfo.visibleItemsInfo.onEach {
+                    if (it.index == index) {
+                        currentOffset = it.offset
+                    }
+                }
+
+                val middleOffset = topOffset + (bottomOffset - topOffset)/2.5
+                val needAnimate = if (isWideList) {
+                    currentOffset != 0
+                } else {
+                    currentOffset > middleOffset
+                }
+
+                if (needAnimate) {
+                    scope.launch {
+                        lazyListState.animateScrollBy(if (isWideList) {
+                            currentOffset.toFloat()
+                        } else {
+                            currentOffset.toFloat() - middleOffset.toFloat()
+                        })
+                        handleClick()
+                    }
+                } else {
+                    handleClick()
+                }
+            },
+            onDeleted = { vm.onNoteRemoved(item) },
+            focusRequester = notesState.focusRequester
+        )
+    }
     else -> {
         Text(
             text = "unknown item $item"
@@ -134,7 +208,8 @@ private fun CreateNoteView(
     textFieldValue: TextFieldValue,
     focusRequester: FocusRequester,
     onTextChanged: (text: TextFieldValue) -> Unit,
-    onNoteCreated: (text: String) -> Unit
+    onNoteCreated: (text: String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var focusState by remember { mutableStateOf<FocusState>(object : FocusState {
         override val hasFocus: Boolean = false
@@ -143,7 +218,7 @@ private fun CreateNoteView(
     }) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .focusRequester(focusRequester)
             .fillMaxWidth()
     ) {
@@ -191,18 +266,24 @@ private fun CreateNoteView(
 private fun NoteView(
     noteViewItem: NoteViewItem,
     isEditing: Boolean,
-    rememberTextFieldValue: @Composable () -> TextFieldValue,
+    rememberTextFieldValue: TextFieldValue,
     onTextChanged: (text: TextFieldValue) -> Unit,
     onDoneEditing: (String) -> Unit,
     onClick: () -> Unit,
     onDeleted: () -> Unit,
+    focusRequester: FocusRequester,
 ) {
     if (isEditing) {
         EditableCell(
-            textFieldValue = rememberTextFieldValue(), //notesState.rememberTextFieldValueState(),
+            textFieldValue = rememberTextFieldValue, //notesState.rememberTextFieldValueState(),
             onTextChanged = onTextChanged,
-            onDonePressed = onDoneEditing
+            onDonePressed = onDoneEditing,
+            aFocusRequester = focusRequester
         )
+
+        LaunchedEffect(key1 = "editing") {
+            focusRequester?.requestFocus()
+        }
     } else {
         DeletableCell(
             onClick,
@@ -258,7 +339,7 @@ class NewNoteState(
     @SuppressLint("ComposableNaming")
     @Composable
     fun requestFocusIfNeeded() {
-        LaunchedEffect("focus") {
+        LaunchedEffect("new note focus") {
             if (vmState.value.newNoteText?.isNotEmpty() == true) {
                 focusRequester.requestFocus()
             }
@@ -271,6 +352,7 @@ class NotesState(
     val editingNote: State<NotesVM.EditingState>
 ) {
     private var innerTextFieldValue = mutableStateOf(EmptyTextFieldValue)
+    val focusRequester = FocusRequester()
 
     fun updateTextFieldValue(value: TextFieldValue) {
         innerTextFieldValue.value = value
@@ -280,14 +362,23 @@ class NotesState(
     fun rememberTextFieldValueState(): TextFieldValue {
         return remember(editingNote.value, innerTextFieldValue.value) {
             if (editingNote.value.item?.text.orEmpty() != innerTextFieldValue.value.text) {
+                Log.d("editing", "vm: ${editingNote.value.item?.text.orEmpty()} innerTextField: ${innerTextFieldValue.value.text}")
                 innerTextFieldValue.value = innerTextFieldValue.value.copy(text = editingNote.value.item?.text.orEmpty())
                 innerTextFieldValue.value
             } else {
+                Log.d("editing", "innerTextField: ${innerTextFieldValue.value.text}")
                 innerTextFieldValue.value
             }
         }
     }
-}
 
+    @SuppressLint("ComposableNaming")
+    @Composable
+    fun requestFocusIfNeeded() {
+        LaunchedEffect("editing focus") {
+            focusRequester.requestFocus()
+        }
+    }
+}
 
 private val EmptyTextFieldValue = TextFieldValue()
