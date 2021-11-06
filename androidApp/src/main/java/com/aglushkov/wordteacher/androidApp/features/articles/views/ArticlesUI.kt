@@ -121,15 +121,22 @@ private fun ArticleTitleView(
         onClick,
         onDeleted
     ) {
-        Text(
-            text = articleViewItem.name,
-            modifier = Modifier.weight(1.0f, true),
-            style = AppTypography.articleTitle
-        )
-        Text(
-            text = articleViewItem.date,
-            style = AppTypography.articleDate
-        )
+        Row(
+            modifier = Modifier.padding(
+                start = dimensionResource(id = R.dimen.article_horizontalPadding),
+                end = dimensionResource(id = R.dimen.article_horizontalPadding)
+            )
+        ) {
+            Text(
+                text = articleViewItem.name,
+                modifier = Modifier.weight(1.0f, true),
+                style = AppTypography.articleTitle
+            )
+            Text(
+                text = articleViewItem.date,
+                style = AppTypography.articleDate
+            )
+        }
     }
 }
 

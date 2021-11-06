@@ -23,6 +23,24 @@ inline fun <reified C: Any, reified C2: C>
     }
 }
 
+inline fun <reified C: Any, reified C2: C>
+        Router<C,*>.pushChildConfigurationOrPopIfExists(configuration: C2) {
+    if (state.value.activeChild.configuration is C2) {
+        return
+    }
+
+    val i = state.value.backStack.indexOfFirst { it.configuration is C2 }
+    if (i >= 0) {
+        navigate {
+            it.take(i + 1)
+        }
+    } else {
+        navigate {
+            it + listOf(configuration)
+        }
+    }
+}
+
 fun Router<*, *>.popIfNotEmpty() {
     if (state.value.backStack.isNotEmpty()) {
         pop()

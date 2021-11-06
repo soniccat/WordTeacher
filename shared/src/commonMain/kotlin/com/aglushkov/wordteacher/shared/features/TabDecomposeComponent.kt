@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.popToRoot
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
+import com.aglushkov.wordteacher.shared.general.pushChildConfigurationOrPopIfExists
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.RouterState
@@ -71,10 +72,10 @@ class TabDecomposeComponentImpl(
     override fun openDefinitions() = router.popToRoot()
 
     override fun openArticles() =
-        router.pushChildConfigurationIfNotAtTop(TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
+        router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
 
     override fun openNotes() {
-        router.pushChildConfigurationIfNotAtTop(TabDecomposeComponent.ChildConfiguration.NotesConfiguration)
+        router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.NotesConfiguration)
     }
 
     override fun back() = router.popIfNotEmpty()

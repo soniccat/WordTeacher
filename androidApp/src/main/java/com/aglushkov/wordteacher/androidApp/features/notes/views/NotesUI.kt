@@ -195,6 +195,10 @@ private fun NoteView(
                     onClick()
                 }
                 .fillMaxWidth()
+                .padding(
+                    start = dimensionResource(id = R.dimen.note_horizontalPadding),
+                    end = dimensionResource(id = R.dimen.note_horizontalPadding)
+                )
         ) {
             Text(
                 text = noteViewItem.text,

@@ -49,9 +49,8 @@
     <string name="article_error">@string/articles_error</string>
     <string name="article_empty">There\'s an empty article</string>
 
-    <string name="notes_no_notes">To create a new note tap the button</string>
     <string name="notes_error">@string/error_default</string>
-    <string name="notes_create_note">Create a new note</string>
+    <string name="notes_create_note">Create a note</string>
 
     <string name="error_try_again">Try again</string>
 </resources>
