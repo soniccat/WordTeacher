@@ -6,7 +6,7 @@ import com.aglushkov.wordteacher.shared.model.Article
 class NoteViewItem(
     noteId: Long,
     val date: String,
-    val text: String,
+    var text: String,
 ): BaseViewItem<String>(text, Type, noteId) {
     companion object {
         const val Type = 500

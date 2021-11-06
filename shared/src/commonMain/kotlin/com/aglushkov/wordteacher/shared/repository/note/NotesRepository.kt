@@ -70,4 +70,16 @@ class NotesRepository(
             removeNote(noteId)
         }
     }
+
+    suspend fun updateNote(noteId: Long, text: String) = supervisorScope {
+        scope.async(Dispatchers.Default) {
+            updateNoteInternal(noteId, text)
+        }.await()
+    }
+
+    private fun updateNoteInternal(noteId: Long, text: String) {
+        database.notes.run {
+            updateNote(noteId, text)
+        }
+    }
 }

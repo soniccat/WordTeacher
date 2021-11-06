@@ -112,6 +112,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         fun selectAll() = db.dBNoteQueries.selectAll(mapper = ::Note)
         fun removeNote(id: Long) = db.dBNoteQueries.removeNote(id)
         fun removeAll() = db.dBNoteQueries.removeAll()
+        fun updateNote(id: Long, text: String) = db.dBNoteQueries.update(text, id)
     }
 
     companion object {

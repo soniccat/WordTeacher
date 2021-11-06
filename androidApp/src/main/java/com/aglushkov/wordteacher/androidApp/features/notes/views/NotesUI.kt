@@ -10,7 +10,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -27,16 +26,12 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
-import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomTopAppBar
-import com.aglushkov.wordteacher.androidApp.general.views.compose.DeletableCell
-import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
-import com.aglushkov.wordteacher.androidApp.general.views.compose.SearchView
+import com.aglushkov.wordteacher.androidApp.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.notes.vm.CreateNoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
-import kotlinx.coroutines.flow.collect
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -45,8 +40,11 @@ import kotlinx.coroutines.flow.collect
 fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     val notes by vm.notes.collectAsState()
     var searchText by remember { mutableStateOf("") }
+
     val newNoteText = vm.stateFlow.collectAsState()
+    val editingState = vm.editingStateFlow.collectAsState()
     val newNoteState by remember { mutableStateOf(NewNoteState(newNoteText)) }
+    val notesState by remember { mutableStateOf(NotesState(editingState)) }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -68,7 +66,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
                         data,
                         key = { it.id }
                     ) { item ->
-                        NoteViews(item, vm, newNoteState)
+                        NoteViews(item, vm, notesState, newNoteState)
                     }
                 }
             } else {
@@ -90,6 +88,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
 private fun NoteViews(
     item: BaseViewItem<*>,
     vm: NotesVM,
+    notesState: NotesState,
     state: NewNoteState
 ) = when (item) {
     is CreateNoteViewItem -> {
@@ -110,6 +109,15 @@ private fun NoteViews(
     }
     is NoteViewItem -> NoteView(
         item,
+        isEditing = notesState.editingNote.value.item?.id == item.id,
+        rememberTextFieldValue = { notesState.rememberTextFieldValueState() },
+        onTextChanged = {
+            notesState.updateTextFieldValue(it)
+            vm.onEditingTextChanged(it.text)
+        },
+        onDoneEditing = {
+            vm.onEditingCompleted()
+        },
         onClick = { vm.onNoteClicked(item) },
         onDeleted = { vm.onNoteRemoved(item) }
     )
@@ -182,32 +190,44 @@ private fun CreateNoteView(
 @Composable
 private fun NoteView(
     noteViewItem: NoteViewItem,
+    isEditing: Boolean,
+    rememberTextFieldValue: @Composable () -> TextFieldValue,
+    onTextChanged: (text: TextFieldValue) -> Unit,
+    onDoneEditing: (String) -> Unit,
     onClick: () -> Unit,
     onDeleted: () -> Unit,
 ) {
-    DeletableCell(
-        onClick,
-        onDeleted
-    ) {
-        Column(
-            modifier = Modifier
-                .clickable {
-                    onClick()
-                }
-                .fillMaxWidth()
-                .padding(
-                    start = dimensionResource(id = R.dimen.note_horizontalPadding),
-                    end = dimensionResource(id = R.dimen.note_horizontalPadding)
-                )
+    if (isEditing) {
+        EditableCell(
+            textFieldValue = rememberTextFieldValue(), //notesState.rememberTextFieldValueState(),
+            onTextChanged = onTextChanged,
+            onDonePressed = onDoneEditing
+        )
+    } else {
+        DeletableCell(
+            onClick,
+            onDeleted
         ) {
-            Text(
-                text = noteViewItem.text,
-                style = AppTypography.noteText
-            )
-            Text(
-                text = noteViewItem.date,
-                style = AppTypography.noteDate
-            )
+            Column(
+                modifier = Modifier
+                    .clickable {
+                        onClick()
+                    }
+                    .fillMaxWidth()
+                    .padding(
+                        start = dimensionResource(id = R.dimen.note_horizontalPadding),
+                        end = dimensionResource(id = R.dimen.note_horizontalPadding)
+                    )
+            ) {
+                Text(
+                    text = noteViewItem.text,
+                    style = AppTypography.noteText
+                )
+                Text(
+                    text = noteViewItem.date,
+                    style = AppTypography.noteDate
+                )
+            }
         }
     }
 }
@@ -245,5 +265,29 @@ class NewNoteState(
         }
     }
 }
+
+@Stable
+class NotesState(
+    val editingNote: State<NotesVM.EditingState>
+) {
+    private var innerTextFieldValue = mutableStateOf(EmptyTextFieldValue)
+
+    fun updateTextFieldValue(value: TextFieldValue) {
+        innerTextFieldValue.value = value
+    }
+
+    @Composable
+    fun rememberTextFieldValueState(): TextFieldValue {
+        return remember(editingNote.value, innerTextFieldValue.value) {
+            if (editingNote.value.item?.text.orEmpty() != innerTextFieldValue.value.text) {
+                innerTextFieldValue.value = innerTextFieldValue.value.copy(text = editingNote.value.item?.text.orEmpty())
+                innerTextFieldValue.value
+            } else {
+                innerTextFieldValue.value
+            }
+        }
+    }
+}
+
 
 private val EmptyTextFieldValue = TextFieldValue()

@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 interface NotesVM {
     val notes: StateFlow<Resource<List<BaseViewItem<*>>>>
     val stateFlow: StateFlow<State>
+    val editingStateFlow: StateFlow<EditingState>
 
     fun restore(newState: State)
 
@@ -30,6 +31,8 @@ interface NotesVM {
 
     fun onNoteRemoved(item: NoteViewItem)
     fun onNoteClicked(item: NoteViewItem)
+    fun onEditingTextChanged(text: String)
+    fun onEditingCompleted()
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onTryAgainClicked()
@@ -38,6 +41,10 @@ interface NotesVM {
     data class State(
         val newNoteText: String? = null
     ): Parcelable
+
+    data class EditingState(
+        val item: NoteViewItem? = null
+    )
 }
 
 open class NotesVMImpl(
@@ -46,6 +53,7 @@ open class NotesVMImpl(
     var state: NotesVM.State
 ): ViewModel(), NotesVM {
     final override val stateFlow = MutableStateFlow(state)
+    final override val editingStateFlow = MutableStateFlow(EmptyEditingState)
 
     override val notes = combine(notesRepository.notes, stateFlow) { a, b -> a to b }
     .map { (notes, state) ->
@@ -91,6 +99,42 @@ open class NotesVMImpl(
     }
 
     override fun onNoteClicked(item: NoteViewItem) {
+        if (editingStateFlow.value.item != item) {
+            editingStateFlow.value = editingStateFlow.value.copy(
+                item = item
+            )
+        }
+    }
+
+    override fun onEditingTextChanged(text: String) {
+        editingStateFlow.value.item?.let { item ->
+            val originalText = item.text
+
+            editingStateFlow.value = editingStateFlow.value.copy(
+                item = item.apply {
+                    this.text = text
+                }
+            )
+
+            viewModelScope.launch {
+                try {
+                    notesRepository.updateNote(item.id, text)
+                } catch (e: Exception) {
+                    showError(e)
+
+                    // rollback the changes
+                    editingStateFlow.value = editingStateFlow.value.copy(
+                        item = item.apply {
+                            this.text = originalText
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onEditingCompleted() {
+        editingStateFlow.value = EmptyEditingState
     }
 
     private fun showError(e: Exception) {
@@ -124,3 +168,5 @@ open class NotesVMImpl(
         // TODO: do sth with notesRepository
     }
 }
+
+private val EmptyEditingState = NotesVM.EditingState()

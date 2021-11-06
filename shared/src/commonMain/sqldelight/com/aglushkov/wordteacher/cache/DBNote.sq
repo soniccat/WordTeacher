@@ -16,6 +16,11 @@ VALUES (?, ?);
 lastInsertedRowId:
 SELECT last_insert_rowid();
 
+update:
+UPDATE DBNote
+SET text = ?
+WHERE id = ?;
+
 removeAll:
 DELETE
 FROM DBNote;
