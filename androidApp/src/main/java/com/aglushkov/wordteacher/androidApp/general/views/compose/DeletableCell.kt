@@ -59,6 +59,7 @@ fun DeletableCell(
             }
         }
 
+        val deleteButtonWidth = (DeleteButtonWidth.value * LocalDensity.current.density).toInt()
         val dismissThreshold: (DismissDirection) -> ThresholdConfig = { FractionalThreshold(threshold) }
         SwipeToDismiss(
             state = dismissState,
@@ -77,7 +78,7 @@ fun DeletableCell(
                                 painter = rememberVectorPainter(image = Icons.Default.Delete),
                                 contentDescription = null,
                                 modifier = Modifier.background(Color.Red).fillMaxSize(),
-                                alignment = DeleteIconAlignment(density),
+                                alignment = DeleteIconAlignment(deleteButtonWidth),
                                 contentScale = ContentScale.None
                             )
                         }
@@ -87,7 +88,7 @@ fun DeletableCell(
                             else -> 0f
                         }.roundToMax(1.0f)
 
-                        val iconWidth = (constraints.maxHeight.toDeleteButtonWidth(density) * resultFraction).toInt()
+                        val iconWidth = (deleteButtonWidth * resultFraction).toInt()
                         val icon = measurables[0].measure(
                             constraints.constrain(
                                 Constraints(
@@ -113,7 +114,7 @@ fun DeletableCell(
 }
 
 private class DeleteIconAlignment(
-    private val density: Density
+    private val deleteButtonWidth: Int
 ) : Alignment {
     private val innerAlignment = Alignment.CenterStart
 
@@ -123,15 +124,10 @@ private class DeleteIconAlignment(
         layoutDirection: LayoutDirection
     ): IntOffset {
         // shift icon right to center horizontally in the result container
-        val leftOffset = (space.height.toDeleteButtonWidth(density) - size.width)/2
+        val leftOffset = (deleteButtonWidth - size.width)/2
         return innerAlignment.align(size, space, layoutDirection).plus(
             IntOffset(leftOffset, 0))
     }
 }
 
-@Composable
-private fun Int.toDeleteButtonWidth() = toDeleteButtonWidth(LocalDensity.current)
-
-private fun Int.toDeleteButtonWidth(density: Density) = this.roundToMax(
-    with(density) { 40.dp.toPx().toInt() }
-)
+private val DeleteButtonWidth = 40.dp

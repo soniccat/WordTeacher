@@ -93,10 +93,9 @@ private fun NoteViews(
     state: NewNoteState
 ) = when (item) {
     is CreateNoteViewItem -> {
-        val textFieldValueState by state.textFieldValueState()
         CreateNoteView(
             noteViewItem = item,
-            textFieldValue = textFieldValueState,
+            textFieldValue = state.rememberTextFieldValueState(),
             focusRequester = state.focusRequester,
             onTextChanged = {
                 state.updateTextFieldValue(it)  // update UI text field state
@@ -221,16 +220,13 @@ class NewNoteState(
     }
 
     @Composable
-    fun textFieldValueState(): State<TextFieldValue> {
-        return remember(vmState, innerTextFieldValue) {
-            derivedStateOf {
-                // merge textField UI state with VM text state, VM state always wins
-                if (vmState.value.newNoteText.orEmpty() != innerTextFieldValue.value.text) {
-                    innerTextFieldValue.value = innerTextFieldValue.value.copy(text = vmState.value.newNoteText.orEmpty())
-                    innerTextFieldValue.value
-                } else {
-                    innerTextFieldValue.value
-                }
+    fun rememberTextFieldValueState(): TextFieldValue {
+        return remember(vmState.value, innerTextFieldValue.value) {
+            if (vmState.value.newNoteText.orEmpty() != innerTextFieldValue.value.text) {
+                innerTextFieldValue.value = innerTextFieldValue.value.copy(text = vmState.value.newNoteText.orEmpty())
+                innerTextFieldValue.value
+            } else {
+                innerTextFieldValue.value
             }
         }
     }
@@ -238,7 +234,7 @@ class NewNoteState(
     @SuppressLint("ComposableNaming")
     @Composable
     fun requestFocusIfNeeded() {
-        LaunchedEffect(key1 = "focus") {
+        LaunchedEffect("focus") {
             if (vmState.value.newNoteText?.isNotEmpty() == true) {
                 focusRequester.requestFocus()
             }
