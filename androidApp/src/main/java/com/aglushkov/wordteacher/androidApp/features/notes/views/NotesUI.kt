@@ -150,7 +150,9 @@ private fun NoteViews(
                 vm.onEditingCompleted()
             },
             onClick = {
-                val handleClick = {
+                scope.launch {
+                    lazyListState.liftCell(index, configuration)
+
                     notesState.updateTextFieldValue(
                         TextFieldValue(
                             text = item.text,
@@ -158,37 +160,6 @@ private fun NoteViews(
                         )
                     )
                     vm.onNoteClicked(item)
-                }
-
-                val topOffset = lazyListState.layoutInfo.viewportStartOffset
-                val bottomOffset = lazyListState.layoutInfo.viewportEndOffset
-                val isWideList = configuration.screenWidthDp > configuration.screenHeightDp
-                var currentOffset = 0
-
-                lazyListState.layoutInfo.visibleItemsInfo.onEach {
-                    if (it.index == index) {
-                        currentOffset = it.offset
-                    }
-                }
-
-                val middleOffset = topOffset + (bottomOffset - topOffset)/2.5
-                val needAnimate = if (isWideList) {
-                    currentOffset != 0
-                } else {
-                    currentOffset > middleOffset
-                }
-
-                if (needAnimate) {
-                    scope.launch {
-                        lazyListState.animateScrollBy(if (isWideList) {
-                            currentOffset.toFloat()
-                        } else {
-                            currentOffset.toFloat() - middleOffset.toFloat()
-                        })
-                        handleClick()
-                    }
-                } else {
-                    handleClick()
                 }
             },
             onDeleted = { vm.onNoteRemoved(item) },
@@ -282,7 +253,7 @@ private fun NoteView(
         )
 
         LaunchedEffect(key1 = "editing") {
-            focusRequester?.requestFocus()
+            focusRequester.requestFocus()
         }
     } else {
         DeletableCell(
@@ -378,6 +349,39 @@ class NotesState(
         LaunchedEffect("editing focus") {
             focusRequester.requestFocus()
         }
+    }
+}
+
+// For a wide screen scrolls the cell at the index to the top
+// For a narrow screen lift the cell a bit above the list center
+suspend fun LazyListState.liftCell(
+    index: Int,
+    configuration: Configuration,
+) {
+    val topOffset = layoutInfo.viewportStartOffset
+    val bottomOffset = layoutInfo.viewportEndOffset
+    val isWideList = configuration.screenWidthDp > configuration.screenHeightDp
+    var currentOffset = 0
+
+    layoutInfo.visibleItemsInfo.onEach {
+        if (it.index == index) {
+            currentOffset = it.offset
+        }
+    }
+
+    val middleOffset = topOffset + (bottomOffset - topOffset)/2.5
+    val needAnimate = if (isWideList) {
+        currentOffset != 0
+    } else {
+        currentOffset > middleOffset
+    }
+
+    if (needAnimate) {
+        animateScrollBy(if (isWideList) {
+            currentOffset.toFloat()
+        } else {
+            currentOffset.toFloat() - middleOffset.toFloat()
+        })
     }
 }
 

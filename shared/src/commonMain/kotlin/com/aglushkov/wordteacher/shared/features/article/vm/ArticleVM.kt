@@ -5,7 +5,6 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.ViewModel
-import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
@@ -28,9 +27,11 @@ interface ArticleVM {
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
     val eventFlow: Flow<Event>
 
+    val definitionsVM: DefinitionsVM
+
     fun onWordDefinitionHidden()
     fun onBackPressed()
-    fun onTextClicked(index: Int, sentence: NLPSentence)
+    fun onTextClicked(sentence: NLPSentence, offset: Int): Boolean
     fun onTryAgainClicked()
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
@@ -44,7 +45,7 @@ interface ArticleVM {
 
 
 open class ArticleVMImpl(
-    private val definitionsVM: DefinitionsVM,
+    override val definitionsVM: DefinitionsVM,
     private val articleRepository: ArticleRepository,
     override var state: ArticleVM.State,
     private val router: ArticleRouter,
@@ -67,6 +68,8 @@ open class ArticleVMImpl(
 
     fun restore(newState: ArticleVM.State) {
         state = newState
+        definitionsVM.restore(state.definitionsState)
+
         viewModelScope.launch {
             articleRepository.loadArticle(state.id)
         }
@@ -100,15 +103,16 @@ open class ArticleVMImpl(
         return paragraphList
     }
 
-    override fun onTextClicked(index: Int, sentence: NLPSentence) {
-        viewModelScope.launch {
-            sentence.sliceFromTextIndex(index)?.let {
-                definitionsVM.onWordSubmitted(
-                    it.tokenString,
-                    listOf(it.partOfSpeech())
-                )
-            }
+    override fun onTextClicked(sentence: NLPSentence, offset: Int): Boolean {
+        val slice = sentence.sliceFromTextIndex(offset)
+        if (slice != null) {
+            definitionsVM.onWordSubmitted(
+                slice.tokenString,
+                listOf(slice.partOfSpeech())
+            )
         }
+
+        return slice != null
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {

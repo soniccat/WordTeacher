@@ -66,7 +66,13 @@ import java.util.*
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun DefinitionsUI(vm: DefinitionsVM, modalModifier: Modifier = Modifier) {
+fun DefinitionsUI(
+    vm: DefinitionsVM,
+    contentModifier: Modifier = Modifier,
+    modalModifier: Modifier = Modifier,
+    withSearchBar: Boolean = true,
+    contentHeader: @Composable () -> Unit = {}
+) {
     val scope = rememberCoroutineScope()
     val partsOfSpeech by vm.partsOfSpeechFilterStateFlow.collectAsState()
     val selectedPartsOfSpeeches by vm.selectedPartsOfSpeechStateFlow.collectAsState()
@@ -93,6 +99,9 @@ fun DefinitionsUI(vm: DefinitionsVM, modalModifier: Modifier = Modifier) {
     ) {
         DefinitionsWordUI(
             vm,
+            contentModifier,
+            withSearchBar,
+            contentHeader,
             onPartOfSpeechFilterClicked = { items ->
                 focusManager.clearFocus() // consider showing choose in a window popup
                 scope.launch {
@@ -107,6 +116,8 @@ fun DefinitionsUI(vm: DefinitionsVM, modalModifier: Modifier = Modifier) {
 private fun DefinitionsWordUI(
     vm: DefinitionsVM,
     modifier: Modifier = Modifier,
+    withSearchBar: Boolean,
+    contentHeader: @Composable () -> Unit,
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
@@ -115,18 +126,22 @@ private fun DefinitionsWordUI(
     Column(
         modifier = modifier,
     ) {
-        CustomTopAppBar {
-            SearchView(searchText, { searchText = it }) {
-                vm.onWordSubmitted(searchText)
+        if (withSearchBar) {
+            CustomTopAppBar {
+                SearchView(searchText, { searchText = it }) {
+                    vm.onWordSubmitted(searchText)
+                }
             }
         }
+
+        contentHeader()
 
         val res = defs.value
         val data = res.data()
 
         if (data?.isNotEmpty() == true) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 items(data) { item ->
                     showViewItem(item, vm, onPartOfSpeechFilterClicked)

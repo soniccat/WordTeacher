@@ -1,14 +1,11 @@
 package com.aglushkov.wordteacher.androidApp.features.article.blueprints
 
 import android.text.Annotation
-import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.core.text.set
-import androidx.core.text.toSpannable
-import androidx.core.text.toSpanned
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.features.Design.createCustomTextView
 import com.aglushkov.wordteacher.androidApp.general.Blueprint
@@ -22,7 +19,6 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
-import com.aglushkov.wordteacher.shared.model.nlp.Tag
 import javax.inject.Inject
 
 class ParagraphBlueprint @Inject constructor(
@@ -107,7 +103,7 @@ class ParagraphBlueprint @Inject constructor(
 
         if (sentenceIndex < viewItem.items.size) {
             val sentence = viewItem.items[sentenceIndex]
-            vm.onTextClicked(index - textIndex, sentence)
+            vm.onTextClicked(sentence, index - textIndex)
         }
     }
 
