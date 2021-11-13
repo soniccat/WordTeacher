@@ -41,6 +41,7 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
@@ -52,13 +53,6 @@ fun ArticleUI(
     val coroutineScope = rememberCoroutineScope()
     val paragraphs by vm.paragraphs.collectAsState()
 
-    val swipeableState = rememberSwipeableState(
-        "expanded",
-        confirmStateChange = {
-            Log.d("articleUI", "state $it")
-            true
-        }
-    )
     val bottomSheetState = rememberBottomSheetState(
         initialValue = BottomSheetValue.Collapsed,
         confirmStateChange = {
@@ -68,92 +62,113 @@ fun ArticleUI(
             true
         }
     )
+
+    val swipeableState = rememberSwipeableState(
+        "expanded",
+        confirmStateChange = {
+            Log.d("articleUI", "state $it")
+            if (it == "collapsed") {
+                coroutineScope.launch {
+                    delay(100)
+                    bottomSheetState.collapse()
+                }
+            }
+            true
+        }
+    )
+
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = bottomSheetState
     )
 
 //    val fraction = remember { mutableStateOf(0.5f) }
-    val anchors = mapOf(0f to "expanded", -200f to "full", 200f to "collapsed")
 
     Log.d("articleUI", "offset ${swipeableState.offset.value}")
 
-    BottomSheetScaffold(
-        sheetContent = {
-            DefinitionsUI(
-                vm = vm.definitionsVM,
-                modalModifier = Modifier.fillMaxHeight(
-                    //if (swipeableState.currentValue == "expanded") fraction.value else 1.0f
-                    0.5f - (swipeableState.offset.value / 100.0f).roundToMin(-0.5f).roundToMax(0.3f)
-                ),
-                withSearchBar = false,
-                contentHeader = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(30.dp)
-                            .swipeable(
-                                swipeableState,
-                                anchors,
-                                thresholds = { _, _ -> FractionalThreshold(0.1f) },
-                                orientation = Orientation.Vertical
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
+    BoxWithConstraints {
+        val screenHeight = constraints.maxHeight
+        val halfHeight = screenHeight/2.0f
+        val anchors = mapOf(0f to "expanded", -halfHeight to "full", halfHeight to "collapsed")
+
+        BottomSheetScaffold(
+            sheetContent = {
+                DefinitionsUI(
+                    vm = vm.definitionsVM,
+                    modalModifier = Modifier.fillMaxHeight(
+                        //if (swipeableState.currentValue == "expanded") fraction.value else 1.0f
+                        0.5f - (swipeableState.offset.value / screenHeight).roundToMin(-0.5f)
+                            .roundToMax(0.3f)
+                    ),
+                    withSearchBar = false,
+                    contentHeader = {
                         Box(
                             modifier = Modifier
-                                .width(100.dp)
-                                .height(4.dp)
-                                .background(Color.LightGray, shapes.small)
-                        )
+                                .fillMaxWidth()
+                                .height(30.dp)
+                                .swipeable(
+                                    swipeableState,
+                                    anchors,
+                                    thresholds = { _, _ -> FractionalThreshold(0.1f) },
+                                    orientation = Orientation.Vertical
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .width(100.dp)
+                                    .height(4.dp)
+                                    .background(Color.LightGray, shapes.small)
+                            )
+                        }
                     }
-                }
-            )
-        },
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp
-    ) { innerPadding ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colors.background),
-        ) {
-            TopAppBar(
-                title = { Text(stringResource(id = R.string.add_article_title)) },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { vm.onBackPressed() }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_back_24),
-                            contentDescription = null,
-                            tint = LocalContentColor.current
-                        )
+                )
+            },
+            scaffoldState = scaffoldState,
+            sheetPeekHeight = 0.dp
+        ) { innerPadding ->
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(color = MaterialTheme.colors.background),
+            ) {
+                TopAppBar(
+                    title = { Text(stringResource(id = R.string.add_article_title)) },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { vm.onBackPressed() }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_arrow_back_24),
+                                contentDescription = null,
+                                tint = LocalContentColor.current
+                            )
+                        }
                     }
-                }
-            )
+                )
 
-            val data = paragraphs.data()
-            if (data != null) {
-                LazyColumn {
-                    items(data) { item ->
-                        ParagraphViewItem(item) { sentence, offset ->
-                            val isHandled = vm.onTextClicked(sentence, offset)
-                            if (isHandled) {
-                                coroutineScope.launch {
-                                    scaffoldState.bottomSheetState.expand()
+                val data = paragraphs.data()
+                if (data != null) {
+                    LazyColumn {
+                        items(data) { item ->
+                            ParagraphViewItem(item) { sentence, offset ->
+                                val isHandled = vm.onTextClicked(sentence, offset)
+                                if (isHandled) {
+                                    coroutineScope.launch {
+                                        scaffoldState.bottomSheetState.expand()
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            } else {
-                LoadingStatusView(
-                    resource = paragraphs,
-                    loadingText = null,
-                    errorText = vm.getErrorText(paragraphs)?.resolveString(),
-                    emptyText = LocalContext.current.getString(R.string.article_empty)
-                ) {
-                    vm.onTryAgainClicked()
+                } else {
+                    LoadingStatusView(
+                        resource = paragraphs,
+                        loadingText = null,
+                        errorText = vm.getErrorText(paragraphs)?.resolveString(),
+                        emptyText = LocalContext.current.getString(R.string.article_empty)
+                    ) {
+                        vm.onTryAgainClicked()
+                    }
                 }
             }
         }
