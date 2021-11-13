@@ -160,5 +160,6 @@ fun ArticlesUIPreviewWithArticles() {
 }
 
 fun Float.roundToMax(value: Float) = kotlin.math.min(this, value)
+fun Float.roundToMin(value: Float) = kotlin.math.max(this, value)
 fun Int.roundToMax(value: Int) = kotlin.math.min(this, value)
 fun Int.roundToMin(value: Int) = kotlin.math.max(this, value)

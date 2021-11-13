@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.androidApp.features.article.views
 
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +21,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,6 +32,8 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.compose.shapes
 import com.aglushkov.wordteacher.androidApp.features.article.blueprints.*
+import com.aglushkov.wordteacher.androidApp.features.articles.views.roundToMax
+import com.aglushkov.wordteacher.androidApp.features.articles.views.roundToMin
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
@@ -46,17 +51,52 @@ fun ArticleUI(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val paragraphs by vm.paragraphs.collectAsState()
-    val scaffoldState = rememberBottomSheetScaffoldState()
+
+    val swipeableState = rememberSwipeableState(
+        "expanded",
+        confirmStateChange = {
+            Log.d("articleUI", "state $it")
+            true
+        }
+    )
+    val bottomSheetState = rememberBottomSheetState(
+        initialValue = BottomSheetValue.Collapsed,
+        confirmStateChange = {
+            if (it == BottomSheetValue.Collapsed) {
+                //swipeableState.
+            }
+            true
+        }
+    )
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = bottomSheetState
+    )
+
+//    val fraction = remember { mutableStateOf(0.5f) }
+    val anchors = mapOf(0f to "expanded", -200f to "full", 200f to "collapsed")
+
+    Log.d("articleUI", "offset ${swipeableState.offset.value}")
 
     BottomSheetScaffold(
         sheetContent = {
             DefinitionsUI(
                 vm = vm.definitionsVM,
-                modalModifier = Modifier.fillMaxHeight(0.5f),
+                modalModifier = Modifier.fillMaxHeight(
+                    //if (swipeableState.currentValue == "expanded") fraction.value else 1.0f
+                    0.5f - (swipeableState.offset.value / 100.0f).roundToMin(-0.5f).roundToMax(0.3f)
+                ),
                 withSearchBar = false,
                 contentHeader = {
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(30.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(30.dp)
+                            .swipeable(
+                                swipeableState,
+                                anchors,
+                                thresholds = { _, _ -> FractionalThreshold(0.1f) },
+                                orientation = Orientation.Vertical
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Box(
