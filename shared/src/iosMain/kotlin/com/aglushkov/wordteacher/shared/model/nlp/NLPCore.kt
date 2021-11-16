@@ -3,7 +3,8 @@ package com.aglushkov.wordteacher.shared.model.nlp
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 
 actual class NLPCore {
-    actual fun sentences(text: String): List<String> {
+
+    actual fun sentenceSpans(text: String): List<SentenceSpan> {
         TODO("not implemented")
     }
 

@@ -2,8 +2,13 @@ CREATE TABLE IF NOT EXISTS DBArticle (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT NOT NULL,
   date INTEGER NOT NULL,
-  text TEXT NOT NULL
+  style TEXT NOT NULL
 );
+
+/**
+ * Text is in DBNLPSentences
+ * style is json encoding paddings, colors, images etc
+ */
 
 selectAll:
 SELECT *
@@ -19,11 +24,11 @@ FROM DBArticle
 WHERE id = ?;
 
 insert:
-INSERT INTO DBArticle(name, date, text)
+INSERT INTO DBArticle(name, date, style)
 VALUES (?, ?, ?);
 
 insertArticle:
-INSERT INTO DBArticle(name, date, text)
+INSERT INTO DBArticle(name, date, style)
 VALUES ?;
 
 lastInsertedRowId:

@@ -6,6 +6,6 @@ class Article(
     id: Long,
     name: String,
     date: Long,
-    val text: String,
-    var sentences: List<NLPSentence> = emptyList()
+    var sentences: List<NLPSentence> = emptyList(),
+    var style: ArticleStyle = ArticleStyle()
 ): ShortArticle(id, name, date)

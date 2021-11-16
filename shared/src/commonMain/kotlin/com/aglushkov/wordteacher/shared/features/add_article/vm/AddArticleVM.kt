@@ -98,16 +98,9 @@ open class AddArticleVMImpl(
     }
 
     private fun createArticle() = viewModelScope.launch {
-        val article = Article(
-            0,
-            title.value,
-            timeSource.getTimeInMilliseconds(),
-            text.value
-        )
-
         try {
             // TODO: show loading, adding might take for a while
-            articlesRepository.createArticle(article)
+            articlesRepository.createArticle(title.value, text.value)
             eventChannel.offer(CompletionEvent(CompletionResult.COMPLETED))
         } catch (e: CancellationException) {
             throw e

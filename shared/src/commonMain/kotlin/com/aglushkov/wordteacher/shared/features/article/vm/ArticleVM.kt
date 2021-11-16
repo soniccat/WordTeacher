@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
+import com.aglushkov.wordteacher.shared.model.nlp.split
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
@@ -85,21 +86,17 @@ open class ArticleVMImpl(
     }
 
     private fun makeParagraphs(article: Resource.Loaded<Article>): MutableList<BaseViewItem<*>> {
-        // TODO: write proper paragraph separation
-        val paragraphSize = 5
-        var sentenceIndex = 0
         val paragraphList = mutableListOf<BaseViewItem<*>>()
 
-        while (sentenceIndex < article.data.sentences.size) {
-            val nextSentenceIndex = min(article.data.sentences.size, sentenceIndex + paragraphSize)
+        article.data.style.paragraphs.onEach { paragraph ->
             paragraphList.add(
                 ParagraphViewItem(
                     idGenerator.nextId(),
-                    article.data.sentences.subList(sentenceIndex, nextSentenceIndex)
+                    article.data.sentences.split(paragraph)
                 )
             )
-            sentenceIndex = nextSentenceIndex
         }
+
         return paragraphList
     }
 

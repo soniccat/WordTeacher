@@ -5,7 +5,7 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 actual class NLPCore {
     actual suspend fun waitUntilInitialized(): Resource<NLPCore> = Resource.Uninitialized()
 
-    actual fun sentences(text: String) = emptyList<String>()
+    actual fun sentenceSpans(text: String) = emptyList<SentenceSpan>()
     actual fun tokenSpans(sentence: String) = emptyList<TokenSpan>()
     actual fun tag(tokens: List<String>) = emptyList<String>()
     actual fun lemmatize(tokens: List<String>, tags: List<String>) = emptyList<String>()

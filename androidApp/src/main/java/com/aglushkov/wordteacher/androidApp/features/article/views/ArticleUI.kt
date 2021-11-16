@@ -70,13 +70,13 @@ fun ArticleUI(
     BoxWithConstraints {
         val screenHeight = constraints.maxHeight
         val halfHeight = screenHeight/2.0f
-        val anchors = mapOf(0f to "expanded", -halfHeight to "full", halfHeight to "collapsed")
+        val anchors = mapOf(halfHeight.toFloat() to "expanded", 0f to "full", screenHeight.toFloat() to "collapsed")
 
         val nestedScrollConnection = remember {
             object : NestedScrollConnection {
                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                     val delta = available.y
-                    return if (delta < 0 && source == NestedScrollSource.Drag && swipeableState.currentValue != "expanded") {
+                    return if (delta < 0 && source == NestedScrollSource.Drag) {
                         val consumed = swipeableState.performDrag(delta)
                         Offset(0f, consumed)
                     } else {
@@ -108,7 +108,7 @@ fun ArticleUI(
 
                 override suspend fun onPreFling(available: Velocity): Velocity {
                     val toFling = Offset(available.x, available.y).y
-                    return if (/*toFling < 0 && */swipeableState.offset.value > -halfHeight && swipeableState.offset.value < halfHeight) {
+                    return if (/*toFling < 0 && */swipeableState.offset.value > 0 && swipeableState.offset.value < screenHeight) {
                         swipeableState.performFling(velocity = toFling)
                         // since we go to the anchor with tween settling, consume all for the best UX
                         available
@@ -146,7 +146,11 @@ fun ArticleUI(
 
             val data = paragraphs.data()
             if (data != null) {
-                LazyColumn {
+                LazyColumn(
+                    contentPadding = PaddingValues(
+                        bottom = dimensionResource(id = R.dimen.article_horizontalPadding)
+                    )
+                ) {
                     items(data) { item ->
                         ParagraphViewItem(item) { sentence, offset ->
                             val isHandled = vm.onTextClicked(sentence, offset)
@@ -180,12 +184,12 @@ fun ArticleUI(
                     .fillMaxWidth()
                     .layout { measurable, constraints ->
                         val placeable = measurable.measure(
-                            constraints.copy(
+                            constraints/*.copy(
                                 maxHeight = constraints.maxHeight / 2 - swipeableState.offset.value
                                     .toInt()
                                     .coerceIn(-constraints.maxHeight / 2, 0),
                                 minHeight = 0
-                            )
+                            )*/
                         )
 
                         layout(constraints.maxWidth, placeable.height) {
@@ -193,7 +197,7 @@ fun ArticleUI(
                                 0,
                                 swipeableState.offset.value
                                     .toInt()
-                                    .coerceIn(0, constraints.maxHeight / 2)
+                                    //.coerceIn(0, constraints.maxHeight / 2)
                             )
                         }
                     }
@@ -215,7 +219,7 @@ fun ArticleUI(
                     .swipeable(
                         swipeableState,
                         anchors,
-                        thresholds = { _, _ -> FractionalThreshold(0.1f) },
+                        thresholds = { _, _ -> FractionalThreshold(0.2f) },
                         orientation = Orientation.Vertical
                     )
             ) {
@@ -294,6 +298,7 @@ private fun ArticleParagraphView(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
+                top = dimensionResource(id = R.dimen.article_horizontalPadding),
                 start = dimensionResource(id = R.dimen.article_horizontalPadding),
                 end = dimensionResource(id = R.dimen.article_horizontalPadding)
             )

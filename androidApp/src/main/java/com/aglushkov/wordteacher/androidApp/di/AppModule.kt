@@ -72,9 +72,10 @@ class AppModule {
     fun articleRepository(
         database: AppDatabase,
         nlpCore: NLPCore,
-        processor: NLPSentenceProcessor
+        processor: NLPSentenceProcessor,
+        timeSource: TimeSource,
     ): ArticlesRepository {
-        return ArticlesRepository(database, nlpCore, processor)
+        return ArticlesRepository(database, nlpCore, processor, timeSource)
     }
 
     @AppComp

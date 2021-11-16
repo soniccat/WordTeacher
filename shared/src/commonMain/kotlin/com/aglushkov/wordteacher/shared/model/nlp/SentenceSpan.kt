@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
-data class PhraseSpan(
+data class SentenceSpan(
     override val start: Int,
-    override val end: Int,
-    val type: ChunkType
+    override val end: Int
 ): NLPSpan

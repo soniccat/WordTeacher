@@ -55,7 +55,9 @@ actual class NLPCore(
 
     actual suspend fun waitUntilInitialized(): Resource<NLPCore> = state.first { it.isLoaded() }
 
-    actual fun sentences(text: String) = sentenceDetector?.sentDetect(text).orEmpty().asList()
+    actual fun sentenceSpans(text: String): List<SentenceSpan> = sentenceDetector?.sentPosDetect(text).orEmpty().map {
+        SentenceSpan(it.start, it. end)
+    }
     actual fun tokenSpans(sentence: String) = tokenizer?.tokenizePos(sentence).orEmpty().asList().map {
         createTokenSpan(it)
     }

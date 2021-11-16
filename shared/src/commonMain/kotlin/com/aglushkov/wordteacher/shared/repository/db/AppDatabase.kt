@@ -14,6 +14,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class AppDatabase(driverFactory: DatabaseDriverFactory) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -73,21 +76,32 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 
     inner class Articles {
-        // TODO: looks strange that we pass a fake article to create an article,
-        //  replace with separate arguments (name, date, text)
-        fun insert(article: Article) = db.dBArticleQueries.insert(article.name, article.date, article.text)
+        fun insert(name: String, date: Long, style: ArticleStyle) =
+            db.dBArticleQueries.insert(name, date, encodeStyle(style))
         fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong()
-        fun selectAll() = db.dBArticleQueries.selectAll(mapper = ::Article)
+//        fun selectAll() = db.dBArticleQueries.selectAll { id, name, date, style ->
+//            Article(id,name, date, style = decodeStyle(style))
+//        }
         fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date ->
             ShortArticle(id, name, date)
         }
-        fun selectArticle(anId: Long) = db.dBArticleQueries.selectArticle(anId) { id, name, date, text ->
+        fun selectArticle(anId: Long) = db.dBArticleQueries.selectArticle(anId) { id, name, date, style ->
             val sentences = sentencesNLP.selectForArticle(anId)
-            Article(id, name, date, text, sentences)
+            Article(id, name, date, sentences, decodeStyle(style))
         }
-
         fun removeArticle(anId: Long) = db.dBArticleQueries.removeArticle(anId)
         fun removeAll() = db.dBArticleQueries.removeAll()
+
+        private fun decodeStyle(style: String): ArticleStyle =
+            Json {
+                ignoreUnknownKeys = true
+            }.decodeFromString<ArticleStyle>(style)
+
+        private fun encodeStyle(style: ArticleStyle): String =
+            Json {
+                ignoreUnknownKeys = true
+            }.encodeToString(style)
+
     }
 
     inner class CardSets {
