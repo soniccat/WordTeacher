@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.androidApp.features.article.views
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.awaitVerticalTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,13 +20,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.androidApp.R
@@ -41,6 +49,7 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -53,36 +62,9 @@ fun ArticleUI(
     val coroutineScope = rememberCoroutineScope()
     val paragraphs by vm.paragraphs.collectAsState()
 
-    val bottomSheetState = rememberBottomSheetState(
-        initialValue = BottomSheetValue.Collapsed,
-        confirmStateChange = {
-            if (it == BottomSheetValue.Collapsed) {
-                //swipeableState.
-            }
-            true
-        }
-    )
+    val swipeableState = rememberSwipeableState("collapsed")
 
-    val swipeableState = rememberSwipeableState(
-        "expanded",
-        confirmStateChange = {
-            Log.d("articleUI", "state $it")
-            if (it == "collapsed") {
-                coroutineScope.launch {
-                    delay(100)
-                    bottomSheetState.collapse()
-                }
-            }
-            true
-        }
-    )
-
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = bottomSheetState
-    )
-
-//    val fraction = remember { mutableStateOf(0.5f) }
-
+    val nestedScrollDispatcher = remember { NestedScrollDispatcher() }
     Log.d("articleUI", "offset ${swipeableState.offset.value}")
 
     BoxWithConstraints {
@@ -90,85 +72,179 @@ fun ArticleUI(
         val halfHeight = screenHeight/2.0f
         val anchors = mapOf(0f to "expanded", -halfHeight to "full", halfHeight to "collapsed")
 
-        BottomSheetScaffold(
-            sheetContent = {
-                DefinitionsUI(
-                    vm = vm.definitionsVM,
-                    modalModifier = Modifier.fillMaxHeight(
-                        //if (swipeableState.currentValue == "expanded") fraction.value else 1.0f
-                        0.5f - (swipeableState.offset.value / screenHeight).roundToMin(-0.5f)
-                            .roundToMax(0.3f)
-                    ),
-                    withSearchBar = false,
-                    contentHeader = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(30.dp)
-                                .swipeable(
-                                    swipeableState,
-                                    anchors,
-                                    thresholds = { _, _ -> FractionalThreshold(0.1f) },
-                                    orientation = Orientation.Vertical
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .width(100.dp)
-                                    .height(4.dp)
-                                    .background(Color.LightGray, shapes.small)
-                            )
-                        }
+        val nestedScrollConnection = remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    val delta = available.y
+                    return if (delta < 0 && source == NestedScrollSource.Drag && swipeableState.currentValue != "expanded") {
+                        val consumed = swipeableState.performDrag(delta)
+                        Offset(0f, consumed)
+                    } else {
+                        Offset.Zero
                     }
-                )
-            },
-            scaffoldState = scaffoldState,
-            sheetPeekHeight = 0.dp
-        ) { innerPadding ->
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colors.background),
-            ) {
-                TopAppBar(
-                    title = { Text(stringResource(id = R.string.add_article_title)) },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = { vm.onBackPressed() }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_arrow_back_24),
-                                contentDescription = null,
-                                tint = LocalContentColor.current
-                            )
-                        }
-                    }
-                )
+                }
 
-                val data = paragraphs.data()
-                if (data != null) {
-                    LazyColumn {
-                        items(data) { item ->
-                            ParagraphViewItem(item) { sentence, offset ->
-                                val isHandled = vm.onTextClicked(sentence, offset)
-                                if (isHandled) {
+                override fun onPostScroll(
+                    consumed: Offset,
+                    available: Offset,
+                    source: NestedScrollSource
+                ): Offset {
+                    //val vertical = available.y
+                    if (source == NestedScrollSource.Drag) {
+                        //if (vertical > 0 || swipeableState.offset.value > 0) {
+//                        swipeableState.performDrag(vertical)
+                        val consumed = swipeableState.performDrag(available.y)
+                        Log.d(
+                            "articleUI",
+                            "swipeableState: ${swipeableState.currentValue} target:${swipeableState.targetValue}"
+                        )
+
+                        return Offset(x = 0f, y = consumed)
+                        //}
+                    }
+
+                    return Offset.Zero//Offset(x = 0f, y = vertical)
+                }
+
+                override suspend fun onPreFling(available: Velocity): Velocity {
+                    val toFling = Offset(available.x, available.y).y
+                    return if (/*toFling < 0 && */swipeableState.offset.value > -halfHeight && swipeableState.offset.value < halfHeight) {
+                        swipeableState.performFling(velocity = toFling)
+                        // since we go to the anchor with tween settling, consume all for the best UX
+                        available
+                    } else {
+                        Velocity.Zero
+                    }
+                }
+
+                override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                    swipeableState.performFling(velocity = Offset(available.x, available.y).y)
+                    return available
+                }
+            }
+        }
+
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colors.background),
+        ) {
+            TopAppBar(
+                title = { Text(stringResource(id = R.string.add_article_title)) },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { vm.onBackPressed() }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_back_24),
+                            contentDescription = null,
+                            tint = LocalContentColor.current
+                        )
+                    }
+                }
+            )
+
+            val data = paragraphs.data()
+            if (data != null) {
+                LazyColumn {
+                    items(data) { item ->
+                        ParagraphViewItem(item) { sentence, offset ->
+                            val isHandled = vm.onTextClicked(sentence, offset)
+                            if (isHandled) {
+                                coroutineScope.launch {
+                                    swipeableState.animateTo("expanded")
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                LoadingStatusView(
+                    resource = paragraphs,
+                    loadingText = null,
+                    errorText = vm.getErrorText(paragraphs)?.resolveString(),
+                    emptyText = LocalContext.current.getString(R.string.article_empty)
+                ) {
+                    vm.onTryAgainClicked()
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .layout { measurable, constraints ->
+                        val placeable = measurable.measure(
+                            constraints.copy(
+                                maxHeight = constraints.maxHeight / 2 - swipeableState.offset.value
+                                    .toInt()
+                                    .coerceIn(-constraints.maxHeight / 2, 0),
+                                minHeight = 0
+                            )
+                        )
+
+                        layout(constraints.maxWidth, placeable.height) {
+                            placeable.place(
+                                0,
+                                swipeableState.offset.value
+                                    .toInt()
+                                    .coerceIn(0, constraints.maxHeight / 2)
+                            )
+                        }
+                    }
+                    .nestedScroll(nestedScrollConnection, nestedScrollDispatcher)
+                    .pointerInput("touchUpDetector") {
+                        this.awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                if (event.type == PointerEventType.Release) {
+                                    // TODO: handle multiple touches
+                                    val targetValue = swipeableState.targetValue
                                     coroutineScope.launch {
-                                        scaffoldState.bottomSheetState.expand()
+                                        swipeableState.animateTo(targetValue)
                                     }
                                 }
                             }
                         }
                     }
-                } else {
-                    LoadingStatusView(
-                        resource = paragraphs,
-                        loadingText = null,
-                        errorText = vm.getErrorText(paragraphs)?.resolveString(),
-                        emptyText = LocalContext.current.getString(R.string.article_empty)
-                    ) {
-                        vm.onTryAgainClicked()
-                    }
+                    .swipeable(
+                        swipeableState,
+                        anchors,
+                        thresholds = { _, _ -> FractionalThreshold(0.1f) },
+                        orientation = Orientation.Vertical
+                    )
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    elevation = BottomSheetScaffoldDefaults.SheetElevation,
+                ) {
+                    DefinitionsUI(
+                        vm = vm.definitionsVM,
+                        modalModifier = Modifier.fillMaxHeight(),
+                        withSearchBar = false,
+                        contentHeader = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(30.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(100.dp)
+                                        .height(4.dp)
+                                        .background(Color.LightGray, shapes.small)
+                                )
+                            }
+                        }
+                    )
                 }
             }
         }
