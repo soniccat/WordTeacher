@@ -13,25 +13,31 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
-import com.aglushkov.wordteacher.androidApp.ScreenTab
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
+import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUI
+import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.androidApp.features.notes.NotesUI
 import com.aglushkov.wordteacher.androidApp.features.textaction.di.DaggerTextActionComponent
 import com.aglushkov.wordteacher.androidApp.features.textaction.di.TextActionComponent
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
-import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponent
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
+import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
+@ExperimentalUnitApi
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
@@ -39,6 +45,7 @@ class TextActionActivity: AppCompatActivity() {
     private lateinit var textActionDecomposeComponent: TextActionDecomposeComponent
     private val bottomBarTabs = listOf(
         ScreenTab.Definitions,
+        ScreenTab.AddArticle,
         ScreenTab.Notes
     )
 
@@ -77,6 +84,8 @@ class TextActionActivity: AppCompatActivity() {
 
     @Composable
     private fun MainUI() {
+        val coroutineScope = rememberCoroutineScope()
+
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -87,13 +96,25 @@ class TextActionActivity: AppCompatActivity() {
             ) { innerPadding ->
                 Children(
                     routerState = textActionDecomposeComponent.routerState,
-                    animation = slideFromRight()
+                    animation = slide()
                 ) {
                     when (val instance = it.instance) {
                         is TextActionDecomposeComponent.Child.Definitions -> DefinitionsUI(
                             vm = instance.inner,
                             modalModifier = Modifier.padding(innerPadding)
                         )
+                        is TextActionDecomposeComponent.Child.AddArticle -> {
+                            val articleCreatedString = stringResource(id = R.string.articles_action_article_created)
+                            AddArticleUI(
+                                vm = instance.inner,
+                                modifier = Modifier.padding(innerPadding),
+                                onArticleCreated = {
+                                    coroutineScope.launch {
+                                        showSnackbar(articleCreatedString)
+                                    }
+                                }
+                            )
+                        }
                         is TextActionDecomposeComponent.Child.AddNote -> NotesUI(
                             vm = instance.inner,
                             modifier = Modifier.padding(innerPadding)
@@ -115,6 +136,7 @@ class TextActionActivity: AppCompatActivity() {
                     onClick = {
                         when (tab) {
                             is ScreenTab.Definitions -> component.openDefinitions()
+                            is ScreenTab.AddArticle -> component.openAddArticle()
                             is ScreenTab.Notes -> component.openAddNote()
                         }
                     },
@@ -135,6 +157,7 @@ class TextActionActivity: AppCompatActivity() {
 
     sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
         object Definitions : ScreenTab(R.string.tab_definitions, R.drawable.ic_field_search_24, TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
-        object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
+        object AddArticle : ScreenTab(R.string.tab_add_article, R.drawable.ic_create_note, TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration::class.java)
+        object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration::class.java)
     }
 }

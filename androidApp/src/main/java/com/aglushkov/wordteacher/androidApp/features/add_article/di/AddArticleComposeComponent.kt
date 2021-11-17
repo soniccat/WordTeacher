@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.di.AddArticleComposeModule
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -15,7 +16,7 @@ interface AddArticleComposeComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
-        @BindsInstance fun setConfiguration(configuration: MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration): Builder
+        @BindsInstance fun setConfiguration(configuration: AddArticleVM.State): Builder
 
         fun setDeps(deps: AddArticleDependencies): Builder
         fun build(): AddArticleComposeComponent

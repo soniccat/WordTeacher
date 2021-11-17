@@ -32,32 +32,51 @@ import kotlinx.coroutines.launch
 @ExperimentalUnitApi
 @ExperimentalComposeUiApi
 @Composable
-fun AddArticleUI(
+fun AddArticleUIDialog(
     vm: AddArticleVM,
-    onDismissRequest: () -> Unit
+    modifier: Modifier = Modifier,
+    onArticleCreated: () -> Unit
 ) {
     CustomDialogUI(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = { onArticleCreated() }
     ) {
-        val context = LocalContext.current
+        AddArticleUI(
+            vm = vm,
+            modifier = modifier,
+            actions = {
+                IconButton(
+                    onClick = { vm.onCancelPressed() }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_close_24),
+                        contentDescription = null,
+                        tint = LocalContentColor.current
+                    )
+                }
+            },
+            { onArticleCreated() }
+        )
+    }
+}
 
-        val snackbarHostState = remember { SnackbarHostState() }
-        val focusRequester = remember { FocusRequester() }
+@Composable
+fun AddArticleUI(
+    vm: AddArticleVM,
+    modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {},
+    onArticleCreated: SnackbarHostState.() -> Unit
+) {
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val focusRequester = remember { FocusRequester() }
 
+    Box(
+        modifier = Modifier.fillMaxSize().then(modifier)
+    ) {
         Column {
             TopAppBar(
                 title = { Text(stringResource(id = R.string.add_article_title)) },
-                actions = {
-                    IconButton(
-                        onClick = { vm.onCancelPressed() }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_close_24),
-                            contentDescription = null,
-                            tint = LocalContentColor.current
-                        )
-                    }
-                }
+                actions = actions
             )
 
             AddArticlesFieldsUI(
@@ -72,32 +91,32 @@ fun AddArticleUI(
                     text = stringResource(id = R.string.add_article_done),
                     modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
                 )
-           },
+            },
             onClick = { vm.onCompletePressed() },
-            modifier = Modifier
+            modifier = Modifier.Companion
                 .align(Alignment.BottomEnd)
                 .padding(dimensionResource(id = R.dimen.content_padding))
         )
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier.Companion.align(Alignment.BottomCenter)
         ) {
             Snackbar(
                 snackbarData = it
             )
         }
+    }
 
-        LaunchedEffect("focus") {
-            focusRequester.requestFocus()
+    LaunchedEffect("focus") {
+        focusRequester.requestFocus()
 
-            vm.eventFlow.collect {
-                when (it) {
-                    is CompletionEvent -> onDismissRequest()
-                    is ErrorEvent -> {
-                        launch {
-                            snackbarHostState.showSnackbar(it.text.toString(context))
-                        }
+        vm.eventFlow.collect {
+            when (it) {
+                is CompletionEvent -> with(snackbarHostState) { onArticleCreated() }
+                is ErrorEvent -> {
+                    launch {
+                        snackbarHostState.showSnackbar(it.text.toString(context))
                     }
                 }
             }

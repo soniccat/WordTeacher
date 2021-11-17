@@ -33,9 +33,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
-import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.compose.shapes
@@ -53,6 +51,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@ExperimentalUnitApi
 @ExperimentalMaterialApi
 @Composable
 fun ArticleUI(
@@ -148,7 +147,7 @@ fun ArticleUI(
             if (data != null) {
                 LazyColumn(
                     contentPadding = PaddingValues(
-                        bottom = dimensionResource(id = R.dimen.article_horizontalPadding)
+                        bottom = dimensionResource(id = R.dimen.article_horizontalPadding) + this@BoxWithConstraints.maxHeight/2
                     )
                 ) {
                     items(data) { item ->
@@ -255,6 +254,7 @@ fun ArticleUI(
     }
 }
 
+@ExperimentalUnitApi
 @Composable
 fun ParagraphViewItem(
     item: BaseViewItem<*>,
@@ -269,6 +269,7 @@ fun ParagraphViewItem(
 }
 
 
+@ExperimentalUnitApi
 @Composable
 private fun ArticleParagraphView(
     paragraphViewItem: ParagraphViewItem,
@@ -277,7 +278,7 @@ private fun ArticleParagraphView(
     val text = buildAnnotatedString {
         withStyle(
             style = ParagraphStyle(
-                lineHeight = 25.sp
+                //lineHeight = 25.sp
             )
         ) {
             paragraphViewItem.items.forEach { sentence ->
@@ -346,6 +347,7 @@ private fun ArticleParagraphView(
 //                    )
                     }
                 },
+            fontSize = TextUnit(16f, TextUnitType.Sp),
             style = AppTypography.wordDefinition,
             onTextLayout = {
                 textLayoutResult = TextLayoutResultOrNothing.TextLayoutResultOption(it)
@@ -387,13 +389,13 @@ private fun AnnotatedString.Builder.addAnnotations(
     tokenSpans.forEachIndexed { index, tokenSpan ->
         val tag = tagEnums[index]
         when {
-            tag.isAdj() ->
-                addStringAnnotation(
-                    ROUNDED_ANNOTATION_KEY,
-                    ROUNDED_ANNOTATION_VALUE_ADJECTIVE,
-                    annotationStartIndex + tokenSpan.start,
-                    annotationStartIndex + tokenSpan.end
-                )
+//            tag.isAdj() ->
+//                addStringAnnotation(
+//                    ROUNDED_ANNOTATION_KEY,
+//                    ROUNDED_ANNOTATION_VALUE_ADJECTIVE,
+//                    annotationStartIndex + tokenSpan.start,
+//                    annotationStartIndex + tokenSpan.end
+//                )
             tag.isAdverb() ->
                 addStringAnnotation(
                     ROUNDED_ANNOTATION_KEY,
@@ -420,8 +422,8 @@ private fun DrawScope.drawAnnotation(
         val lb = layoutResult.getLineBottom(lineStart)
         val ll = layoutResult.getHorizontalPosition(it.start, true)
         val lr = layoutResult.getHorizontalPosition(it.end, true)
-        val bgOffset = 5.dp.toPx()
-        val cornerRadius = 8.dp.toPx()
+        val bgOffset = 2.dp.toPx()
+        val cornerRadius = 4.dp.toPx()
 
         drawRoundRect(
             color = Color.Yellow,

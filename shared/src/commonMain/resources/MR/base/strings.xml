@@ -4,6 +4,7 @@
 
     <string name="app_name">WordTeacher</string>
     <string name="tab_definitions">Words</string>
+    <string name="tab_add_article">@string/add_article_title</string>
     <string name="tab_articles">Articles</string>
     <string name="tab_cardsets">Card Sets</string>
     <string name="tab_notes">Notes</string>
@@ -33,6 +34,7 @@
     <string name="definitions_displayMode_merge">Combined</string>
 
     <string name="articles_action_add_text">New Article</string>
+    <string name="articles_action_article_created">Added!</string>
     <string name="add_article_title">@string/articles_action_add_text</string>
     <string name="add_article_field_title_hint">Title</string>
     <string name="add_article_field_text_hint">Text</string>

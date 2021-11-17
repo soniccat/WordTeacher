@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponentImpl
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -41,7 +42,7 @@ class MainComposeModule {
                 is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
                     DaggerAddArticleComposeComponent.builder()
                         .setComponentContext(context)
-                        .setConfiguration(configuration)
+                        .setConfiguration(AddArticleVM.State())
                         .setDeps(appComponent)
                         .build()
                         .buildAddArticleDecomposeComponent()

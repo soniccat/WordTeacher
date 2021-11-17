@@ -16,7 +16,8 @@ FROM DBArticle;
 
 selectShort:
 SELECT id, name, date
-FROM DBArticle;
+FROM DBArticle
+ORDER BY date DESC;
 
 selectArticle:
 SELECT *

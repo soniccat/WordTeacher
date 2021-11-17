@@ -6,13 +6,11 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -23,7 +21,7 @@ import androidx.fragment.app.FragmentFactory
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
-import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUI
+import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
@@ -147,9 +145,9 @@ class MainActivity : AppCompatActivity(), Router {
             val instance = it.instance
             when (instance) {
                 is MainDecomposeComponent.Child.AddArticle ->
-                    AddArticleUI(
+                    AddArticleUIDialog(
                         vm = instance.inner,
-                        onDismissRequest = {
+                        onArticleCreated = {
                             mainDecomposeComponent.popDialog()
                         }
                     )
