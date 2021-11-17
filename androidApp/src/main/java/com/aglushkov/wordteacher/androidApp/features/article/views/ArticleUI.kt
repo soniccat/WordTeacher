@@ -1,9 +1,7 @@
 package com.aglushkov.wordteacher.androidApp.features.article.views
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.awaitVerticalTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,7 +26,6 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,17 +35,16 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.compose.shapes
 import com.aglushkov.wordteacher.androidApp.features.article.blueprints.*
-import com.aglushkov.wordteacher.androidApp.features.articles.views.roundToMax
-import com.aglushkov.wordteacher.androidApp.features.articles.views.roundToMin
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.BottomSheet
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.BottomSheetStates
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.androidApp.features.definitions.views.HandleUI
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @ExperimentalUnitApi
@@ -60,18 +56,12 @@ fun ArticleUI(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val paragraphs by vm.paragraphs.collectAsState()
-
-    val swipeableState = rememberSwipeableState("collapsed")
-
-    val nestedScrollDispatcher = remember { NestedScrollDispatcher() }
-    Log.d("articleUI", "offset ${swipeableState.offset.value}")
+    val data = paragraphs.data()
 
     BoxWithConstraints {
+        val swipeableState = rememberSwipeableState(BottomSheetStates.Collapsed)
         val screenHeight = constraints.maxHeight
         val halfHeight = screenHeight/2.0f
-        val anchors = mapOf(halfHeight to "expanded", 0f to "full", screenHeight.toFloat() to "collapsed")
-
-        val nestedScrollConnection = rememberNestedScrollConnection(swipeableState, screenHeight)
 
         Column(
             modifier = modifier
@@ -79,7 +69,9 @@ fun ArticleUI(
                 .background(color = MaterialTheme.colors.background),
         ) {
             TopAppBar(
-                title = { Text(stringResource(id = R.string.add_article_title)) },
+                title = {
+                    Text(stringResource(id = R.string.add_article_title))
+                },
                 navigationIcon = {
                     IconButton(
                         onClick = { vm.onBackPressed() }
@@ -93,7 +85,6 @@ fun ArticleUI(
                 }
             )
 
-            val data = paragraphs.data()
             if (data != null) {
                 LazyColumn(
                     contentPadding = PaddingValues(
@@ -105,7 +96,7 @@ fun ArticleUI(
                             val isHandled = vm.onTextClicked(sentence, offset)
                             if (isHandled) {
                                 coroutineScope.launch {
-                                    swipeableState.animateTo("expanded")
+                                    swipeableState.animateTo(BottomSheetStates.Expanded)
                                 }
                             }
                         }
@@ -123,118 +114,24 @@ fun ArticleUI(
             }
         }
 
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter,
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .layout { measurable, constraints ->
-                        val placeable = measurable.measure(constraints)
-
-                        layout(constraints.maxWidth, placeable.height) {
-                            placeable.place(0, swipeableState.offset.value.toInt())
-                        }
+        BottomSheet(
+            swipeableState = swipeableState,
+            anchors = mapOf(
+                halfHeight to BottomSheetStates.Expanded,
+                0f to BottomSheetStates.Full,
+                screenHeight.toFloat() to BottomSheetStates.Collapsed
+            ),
+            sheetContent = {
+                DefinitionsUI(
+                    vm = vm.definitionsVM,
+                    modalModifier = Modifier.fillMaxHeight(),
+                    withSearchBar = false,
+                    contentHeader = {
+                        HandleUI()
                     }
-                    .nestedScroll(nestedScrollConnection, nestedScrollDispatcher)
-                    .pointerInput("touchUpDetector") {
-                        this.awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                if (event.type == PointerEventType.Release) {
-                                    // TODO: handle multiple touches
-                                    val targetValue = swipeableState.targetValue
-                                    coroutineScope.launch {
-                                        swipeableState.animateTo(targetValue)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .swipeable(
-                        swipeableState,
-                        anchors,
-                        thresholds = { _, _ -> FractionalThreshold(0.2f) },
-                        orientation = Orientation.Vertical
-                    )
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    elevation = BottomSheetScaffoldDefaults.SheetElevation,
-                ) {
-                    DefinitionsUI(
-                        vm = vm.definitionsVM,
-                        modalModifier = Modifier.fillMaxHeight(),
-                        withSearchBar = false,
-                        contentHeader = {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(30.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(100.dp)
-                                        .height(4.dp)
-                                        .background(Color.LightGray, shapes.small)
-                                )
-                            }
-                        }
-                    )
-                }
+                )
             }
-        }
-    }
-}
-
-@ExperimentalMaterialApi
-@Composable
-private fun rememberNestedScrollConnection(
-    swipeableState: SwipeableState<String>,
-    screenHeight: Int
-) = remember {
-    object : NestedScrollConnection {
-        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-            val delta = available.y
-            return if (delta < 0 && source == NestedScrollSource.Drag) {
-                val consumed = swipeableState.performDrag(delta)
-                Offset(0f, consumed)
-            } else {
-                Offset.Zero
-            }
-        }
-
-        override fun onPostScroll(
-            consumed: Offset,
-            available: Offset,
-            source: NestedScrollSource
-        ): Offset {
-            if (source == NestedScrollSource.Drag) {
-                val consumed = swipeableState.performDrag(available.y)
-                return Offset(x = 0f, y = consumed)
-            }
-
-            return Offset.Zero
-        }
-
-        override suspend fun onPreFling(available: Velocity): Velocity {
-            val toFling = Offset(available.x, available.y).y
-            return if (swipeableState.offset.value > 0 && swipeableState.offset.value < screenHeight) {
-                swipeableState.performFling(velocity = toFling)
-                // since we go to the anchor with tween settling, consume all for the best UX
-                available
-            } else {
-                Velocity.Zero
-            }
-        }
-
-        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-            swipeableState.performFling(velocity = Offset(available.x, available.y).y)
-            return available
-        }
+        )
     }
 }
 
@@ -261,9 +158,7 @@ private fun ArticleParagraphView(
 ) {
     val text = buildAnnotatedString {
         withStyle(
-            style = ParagraphStyle(
-                //lineHeight = 25.sp
-            )
+            style = ParagraphStyle()
         ) {
             paragraphViewItem.items.forEach { sentence ->
                 val annotationStartIndex = this.length
