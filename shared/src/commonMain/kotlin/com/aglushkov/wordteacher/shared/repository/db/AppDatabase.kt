@@ -107,6 +107,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
         fun selectAll() = db.dBCardSetQueries.selectAll(mapper = ::ShortCardSet)
+        fun removeCardSet(anId: Long) = db.dBCardSetQueries.removeCardSet(anId)
     }
 
     inner class Cards {

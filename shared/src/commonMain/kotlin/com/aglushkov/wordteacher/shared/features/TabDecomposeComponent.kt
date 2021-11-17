@@ -1,17 +1,15 @@
 package com.aglushkov.wordteacher.shared.features
 
-import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.popToRoot
-import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationOrPopIfExists
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.RouterState
-import com.arkivanov.decompose.pop
 import com.arkivanov.decompose.router
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -21,18 +19,21 @@ interface TabDecomposeComponent {
     val routerState: Value<RouterState<*, Child>>
 
     fun openDefinitions()
+    fun openCardSets()
     fun openArticles()
     fun openNotes()
     fun back()
 
     sealed class Child {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
+        data class CardSets(val inner: CardSetsDecomposeComponent): Child()
         data class Articles(val inner: ArticlesDecomposeComponent): Child()
         data class Notes(val inner: NotesDecomposeComponent): Child()
     }
 
     sealed class ChildConfiguration: Parcelable {
         @Parcelize data class DefinitionConfiguration(val word: String? = null) : ChildConfiguration()
+        @Parcelize object CardSetsConfiguration : ChildConfiguration()
         @Parcelize object ArticlesConfiguration : ChildConfiguration()
         @Parcelize object NotesConfiguration : ChildConfiguration()
     }
@@ -61,6 +62,9 @@ class TabDecomposeComponentImpl(
         is TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> TabDecomposeComponent.Child.Definitions(
             inner = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
         )
+        is TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration -> TabDecomposeComponent.Child.CardSets(
+            inner = childComponentFactory(componentContext, configuration) as CardSetsDecomposeComponent
+        )
         is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> TabDecomposeComponent.Child.Articles(
             inner = childComponentFactory(componentContext, configuration) as ArticlesDecomposeComponent
         )
@@ -70,6 +74,9 @@ class TabDecomposeComponentImpl(
     }
 
     override fun openDefinitions() = router.popToRoot()
+
+    override fun openCardSets() =
+        router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration)
 
     override fun openArticles() =
         router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration)

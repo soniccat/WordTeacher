@@ -1,14 +1,14 @@
 package com.aglushkov.wordteacher.androidApp
 
-import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.cardsets.di.DaggerCardSetsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.notes.di.DaggerNotesComponent
-import com.aglushkov.wordteacher.androidApp.features.notes.di.NotesComponent
 import com.aglushkov.wordteacher.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
@@ -33,6 +33,13 @@ class TabComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .definitionsDecomposeComponent()
+                is TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
+                    DaggerCardSetsComposeComponent.builder()
+                        .setComponentContext(context)
+                        .setState(CardSetsVM.State())
+                        .setDeps(appComponent)
+                        .build()
+                        .cardSetsDecomposeComponent()
                 is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration ->
                     DaggerArticlesComposeComponent.builder()
                         .setComponentContext(context)
@@ -50,7 +57,6 @@ class TabComposeModule {
                 else ->
                     throw RuntimeException("Unsupported configuration $configuration")
             }
-
         }
 
     @JvmSuppressWildcards

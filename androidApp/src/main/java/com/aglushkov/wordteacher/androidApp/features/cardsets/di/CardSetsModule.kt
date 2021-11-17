@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVMImpl
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -33,10 +34,14 @@ class CardSetsModule {
         cardSetsRepository: CardSetsRepository,
         time: TimeSource
     ): CardSetsVM {
-        return CardSetsVM(cardSetsRepository, time, object : CardSetsRouter {
+        return CardSetsVMImpl(CardSetsVM.State(), cardSetsRepository, object : CardSetsRouter {
             override fun openCardSet(id: Long) {
                 routerResolver.router?.get()?.openArticle(id)
             }
-        })
+
+            override fun openStartLearning() {
+                routerResolver.router?.get()?.openStartLearning()
+            }
+        }, time)
     }
 }

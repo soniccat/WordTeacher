@@ -31,6 +31,11 @@ VALUES ?;
 lastInsertedRowId:
 SELECT last_insert_rowid();
 
+removeCardSet:
+DELETE
+FROM DBCardSet
+WHERE id = ?;
+
 removeAll:
 DELETE
 FROM DBCardSet;

@@ -42,4 +42,16 @@ class CardSetsRepository(
             database.cardSets.insert(name, date)
         }.await()
     }
+
+    suspend fun removeCardSet(cardSetId: Long) = supervisorScope {
+        scope.async(Dispatchers.Default) {
+            removeArticleInternal(cardSetId)
+        }.await()
+    }
+
+    private fun removeArticleInternal(cardSetId: Long) {
+        database.cardSets.run {
+            removeCardSet(cardSetId)
+        }
+    }
 }

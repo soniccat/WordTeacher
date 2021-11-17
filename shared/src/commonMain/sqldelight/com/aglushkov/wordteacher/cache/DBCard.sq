@@ -16,6 +16,11 @@ VALUES ?;
 lastInsertedRowId:
 SELECT last_insert_rowid();
 
+removeCardsBySetId:
+DELETE
+FROM DBCard
+WHERE id IN (SELECT cardId FROM DBCardSetToCardRelation WHERE setId = ?);
+
 removeAll:
 DELETE
 FROM DBCard;

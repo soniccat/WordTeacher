@@ -27,6 +27,7 @@ import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
+import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity(), Router {
     lateinit var binding: ActivityMainBinding
     private val bottomBarTabs = listOf(
         ScreenTab.Definitions,
+        ScreenTab.CardSets,
         ScreenTab.Articles,
         ScreenTab.Notes
     )
@@ -124,6 +126,10 @@ class MainActivity : AppCompatActivity(), Router {
                         vm = instance.inner,
                         modalModifier = Modifier.padding(innerPadding)
                     )
+                    is TabDecomposeComponent.Child.CardSets -> CardSetsUI(
+                        vm = instance.inner,
+                        modifier = Modifier.padding(innerPadding)
+                    )
                     is TabDecomposeComponent.Child.Articles -> ArticlesUI(
                         vm = instance.inner,
                         modifier = Modifier.padding(innerPadding)
@@ -167,6 +173,7 @@ class MainActivity : AppCompatActivity(), Router {
                     onClick = {
                         when (tab) {
                             is ScreenTab.Definitions -> component.openDefinitions()
+                            is ScreenTab.CardSets -> component.openCardSets()
                             is ScreenTab.Articles -> component.openArticles()
                             is ScreenTab.Notes -> component.openNotes()
                         }
@@ -309,10 +316,15 @@ class MainActivity : AppCompatActivity(), Router {
         // TODO: need to support
         // openFragment(CardSetFragment::class, CardSetFragment.createArguments(id), true)
     }
+
+    override fun openStartLearning() {
+        TODO("Not yet implemented")
+    }
 }
 
 sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
     object Definitions : ScreenTab(R.string.tab_definitions, R.drawable.ic_field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+    object CardSets : ScreenTab(R.string.tab_learning, R.drawable.ic_learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
     object Articles : ScreenTab(R.string.tab_articles, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
     object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }

@@ -6,6 +6,7 @@
     <string name="tab_definitions">Words</string>
     <string name="tab_add_article">@string/add_article_title</string>
     <string name="tab_articles">Articles</string>
+    <string name="tab_learning">Learning</string>
     <string name="tab_cardsets">Card Sets</string>
     <string name="tab_notes">Notes</string>
     <string name="search">Search</string>
@@ -47,6 +48,7 @@
     <string name="error_no_connection">No internet connection.\nPlease check your device network settings and try again.</string>
     <string name="error_no_definitions">No definitions were found</string>
     <string name="articles_no_articles">To create a new article tap the button</string>
+    <string name="cardsets_error">@string/error_default</string>
     <string name="articles_error">@string/error_default</string>
     <string name="article_error">@string/articles_error</string>
     <string name="article_empty">There\'s an empty article</string>
