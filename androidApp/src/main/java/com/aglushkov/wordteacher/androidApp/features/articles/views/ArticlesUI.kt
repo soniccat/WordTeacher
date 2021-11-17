@@ -108,7 +108,6 @@ private fun ArticlesViewItem(
     }
 }
 
-
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable

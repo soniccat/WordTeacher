@@ -17,16 +17,15 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
-import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomTopAppBar
-import com.aglushkov.wordteacher.androidApp.general.views.compose.DeletableCell
-import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
-import com.aglushkov.wordteacher.androidApp.general.views.compose.SearchView
+import com.aglushkov.wordteacher.androidApp.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -40,6 +39,9 @@ fun CardSetsUI(
     var searchText by remember { mutableStateOf("") }
     val data = cardSets.data()
 
+    val newCardSetTextState = vm.stateFlow.collectAsState()
+    val newCardSetState by remember { mutableStateOf(NewCellState { newCardSetTextState.value.newCardSetText }) }
+
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -50,13 +52,13 @@ fun CardSetsUI(
                 }
             }
 
-            if (data?.isNotEmpty() == true) {
+            if (cardSets.isLoaded() && data != null) {
                 LazyColumn {
                     items(
                         data,
                         key = { it.id }
                     ) { item ->
-                        ArticlesViewItem(item, vm)
+                        CardSetsViewItem(item, vm, newCardSetState)
                     }
                 }
             } else {
@@ -92,10 +94,23 @@ fun CardSetsUI(
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
-private fun ArticlesViewItem(
+private fun CardSetsViewItem(
     item: BaseViewItem<*>,
-    vm: CardSetsVM
+    vm: CardSetsVM,
+    newCardSetState: NewCellState,
 ) = when (item) {
+    is CreateCardSetViewItem -> CreateNewCellView(
+        placeholder = item.placeholder.toString(LocalContext.current),
+        textFieldValue = newCardSetState.rememberTextFieldValueState(),
+        focusRequester = newCardSetState.focusRequester,
+        onTextChanged = {
+            newCardSetState.updateTextFieldValue(it)  // update UI text field state
+            vm.onNewCardSetTextChange(it.text) // update VM text state
+        },
+        onCreated = {
+            vm.onCardSetAdded(it)
+        }
+    )
     is CardSetViewItem -> CardSetTitleView(
         item,
         onClick = { vm.onCardSetClicked(item) },

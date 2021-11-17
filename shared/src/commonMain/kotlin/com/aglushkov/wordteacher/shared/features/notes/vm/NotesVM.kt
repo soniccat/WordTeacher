@@ -50,7 +50,7 @@ interface NotesVM {
 open class NotesVMImpl(
     val notesRepository: NotesRepository,
     private val timeSource: TimeSource,
-    var state: NotesVM.State
+    var state: NotesVM.State // TODO: remove as we already have stateFlow
 ): ViewModel(), NotesVM {
     final override val stateFlow = MutableStateFlow(state)
     final override val editingStateFlow = MutableStateFlow(EmptyEditingState)

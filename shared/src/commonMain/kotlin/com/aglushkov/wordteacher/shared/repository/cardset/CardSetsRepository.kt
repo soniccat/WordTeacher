@@ -45,11 +45,11 @@ class CardSetsRepository(
 
     suspend fun removeCardSet(cardSetId: Long) = supervisorScope {
         scope.async(Dispatchers.Default) {
-            removeArticleInternal(cardSetId)
+            removeCardSetInternal(cardSetId)
         }.await()
     }
 
-    private fun removeArticleInternal(cardSetId: Long) {
+    private fun removeCardSetInternal(cardSetId: Long) {
         database.cardSets.run {
             removeCardSet(cardSetId)
         }

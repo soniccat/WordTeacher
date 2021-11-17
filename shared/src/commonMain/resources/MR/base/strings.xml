@@ -55,6 +55,7 @@
 
     <string name="notes_error">@string/error_default</string>
     <string name="notes_create_note">Create a note</string>
+    <string name="cardsets_create_cardset">Create a card set</string>
 
     <string name="error_try_again">Try again</string>
 </resources>

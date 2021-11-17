@@ -2,6 +2,9 @@ package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.notes.vm.CreateNoteViewItem
+import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
+import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -14,6 +17,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.channels.Channel
@@ -21,11 +25,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 interface CardSetsVM {
-    val state: State
+    val stateFlow: StateFlow<State>
     val eventFlow: Flow<Event>
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
 
     fun restore(newState: State)
+    fun onCardSetAdded(text: String)
+    fun onNewCardSetTextChange(text: String)
     fun onStartLearningClicked()
     fun onCardSetClicked(item: CardSetViewItem)
     fun onCardSetRemoved(item: CardSetViewItem)
@@ -33,17 +39,19 @@ interface CardSetsVM {
     fun onTryAgainClicked()
 
     @Parcelize
-    class State: Parcelable {
-    }
+    data class State (
+        val newCardSetText: String? = null
+    ): Parcelable
 }
 
 open class CardSetsVMImpl(
-    override var state: CardSetsVM.State = CardSetsVM.State(),
+    var state: CardSetsVM.State = CardSetsVM.State(),
     val cardSetsRepository: CardSetsRepository,
     private val router: CardSetsRouter,
     private val timeSource: TimeSource
 ): ViewModel(), CardSetsVM {
 
+    final override val stateFlow = MutableStateFlow(state)
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
     private val cardSetsFlow = cardSetsRepository.cardSets
@@ -53,7 +61,7 @@ open class CardSetsVMImpl(
         viewModelScope.launch {
             cardSetsFlow.map {
                 Logger.v("build view items")
-                it.copyWith(buildViewItems(it.data() ?: emptyList()))
+                it.copyWith(buildViewItems(it.data() ?: emptyList(), state.newCardSetText))
             }.forward(cardSets)
         }
     }
@@ -65,6 +73,28 @@ open class CardSetsVMImpl(
     override fun onCleared() {
         super.onCleared()
         eventChannel.cancel()
+    }
+
+
+    override fun onNewCardSetTextChange(text: String) {
+        updateState(state.copy(newCardSetText = text))
+    }
+
+    override fun onCardSetAdded(name: String) {
+        updateState(state.copy(newCardSetText = null))
+
+        viewModelScope.launch {
+            try {
+                cardSetsRepository.createCardSet(name, timeSource.getTimeInMilliseconds())
+            } catch (e: Exception) {
+                showError(e)
+            }
+        }
+    }
+
+    private fun updateState(newState: CardSetsVM.State) {
+        state = newState
+        stateFlow.value = state
     }
 
     fun onCreateTextCardSetClicked() {
@@ -89,13 +119,19 @@ open class CardSetsVMImpl(
         router.openStartLearning()
     }
 
-    private fun buildViewItems(cardSets: List<ShortCardSet>): List<BaseViewItem<*>> {
+    private fun buildViewItems(cardSets: List<ShortCardSet>, newCardSetText: String?): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
+
         cardSets.forEach {
             items.add(CardSetViewItem(it.id, it.name, timeSource.stringDate(it.date)))
         }
 
-        return items
+        return listOf(
+            CreateCardSetViewItem(
+                placeholder = StringDesc.Resource(MR.strings.cardsets_create_cardset),
+                text = newCardSetText.orEmpty()
+            ),
+            *items.toTypedArray())
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
@@ -104,6 +140,15 @@ open class CardSetsVMImpl(
 
     override fun onTryAgainClicked() {
         // TODO: do sth with articlesRepository
+    }
+
+    private fun showError(e: Exception) {
+        val errorText = e.message?.let {
+            StringDesc.Raw(it)
+        } ?: StringDesc.Resource(MR.strings.error_default)
+
+        // TODO: pass an error message
+        //eventChannel.offer(ErrorEvent(errorText))
     }
 }
 
