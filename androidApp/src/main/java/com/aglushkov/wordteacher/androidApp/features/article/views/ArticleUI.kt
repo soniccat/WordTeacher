@@ -69,59 +69,9 @@ fun ArticleUI(
     BoxWithConstraints {
         val screenHeight = constraints.maxHeight
         val halfHeight = screenHeight/2.0f
-        val anchors = mapOf(halfHeight.toFloat() to "expanded", 0f to "full", screenHeight.toFloat() to "collapsed")
+        val anchors = mapOf(halfHeight to "expanded", 0f to "full", screenHeight.toFloat() to "collapsed")
 
-        val nestedScrollConnection = remember {
-            object : NestedScrollConnection {
-                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                    val delta = available.y
-                    return if (delta < 0 && source == NestedScrollSource.Drag) {
-                        val consumed = swipeableState.performDrag(delta)
-                        Offset(0f, consumed)
-                    } else {
-                        Offset.Zero
-                    }
-                }
-
-                override fun onPostScroll(
-                    consumed: Offset,
-                    available: Offset,
-                    source: NestedScrollSource
-                ): Offset {
-                    //val vertical = available.y
-                    if (source == NestedScrollSource.Drag) {
-                        //if (vertical > 0 || swipeableState.offset.value > 0) {
-//                        swipeableState.performDrag(vertical)
-                        val consumed = swipeableState.performDrag(available.y)
-                        Log.d(
-                            "articleUI",
-                            "swipeableState: ${swipeableState.currentValue} target:${swipeableState.targetValue}"
-                        )
-
-                        return Offset(x = 0f, y = consumed)
-                        //}
-                    }
-
-                    return Offset.Zero//Offset(x = 0f, y = vertical)
-                }
-
-                override suspend fun onPreFling(available: Velocity): Velocity {
-                    val toFling = Offset(available.x, available.y).y
-                    return if (/*toFling < 0 && */swipeableState.offset.value > 0 && swipeableState.offset.value < screenHeight) {
-                        swipeableState.performFling(velocity = toFling)
-                        // since we go to the anchor with tween settling, consume all for the best UX
-                        available
-                    } else {
-                        Velocity.Zero
-                    }
-                }
-
-                override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-                    swipeableState.performFling(velocity = Offset(available.x, available.y).y)
-                    return available
-                }
-            }
-        }
+        val nestedScrollConnection = rememberNestedScrollConnection(swipeableState, screenHeight)
 
         Column(
             modifier = modifier
@@ -182,22 +132,10 @@ fun ArticleUI(
                 modifier = Modifier
                     .fillMaxWidth()
                     .layout { measurable, constraints ->
-                        val placeable = measurable.measure(
-                            constraints/*.copy(
-                                maxHeight = constraints.maxHeight / 2 - swipeableState.offset.value
-                                    .toInt()
-                                    .coerceIn(-constraints.maxHeight / 2, 0),
-                                minHeight = 0
-                            )*/
-                        )
+                        val placeable = measurable.measure(constraints)
 
                         layout(constraints.maxWidth, placeable.height) {
-                            placeable.place(
-                                0,
-                                swipeableState.offset.value
-                                    .toInt()
-                                    //.coerceIn(0, constraints.maxHeight / 2)
-                            )
+                            placeable.place(0, swipeableState.offset.value.toInt())
                         }
                     }
                     .nestedScroll(nestedScrollConnection, nestedScrollDispatcher)
@@ -223,9 +161,7 @@ fun ArticleUI(
                     )
             ) {
                 Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
+                    modifier = Modifier.fillMaxSize(),
                     elevation = BottomSheetScaffoldDefaults.SheetElevation,
                 ) {
                     DefinitionsUI(
@@ -250,6 +186,54 @@ fun ArticleUI(
                     )
                 }
             }
+        }
+    }
+}
+
+@ExperimentalMaterialApi
+@Composable
+private fun rememberNestedScrollConnection(
+    swipeableState: SwipeableState<String>,
+    screenHeight: Int
+) = remember {
+    object : NestedScrollConnection {
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+            val delta = available.y
+            return if (delta < 0 && source == NestedScrollSource.Drag) {
+                val consumed = swipeableState.performDrag(delta)
+                Offset(0f, consumed)
+            } else {
+                Offset.Zero
+            }
+        }
+
+        override fun onPostScroll(
+            consumed: Offset,
+            available: Offset,
+            source: NestedScrollSource
+        ): Offset {
+            if (source == NestedScrollSource.Drag) {
+                val consumed = swipeableState.performDrag(available.y)
+                return Offset(x = 0f, y = consumed)
+            }
+
+            return Offset.Zero
+        }
+
+        override suspend fun onPreFling(available: Velocity): Velocity {
+            val toFling = Offset(available.x, available.y).y
+            return if (swipeableState.offset.value > 0 && swipeableState.offset.value < screenHeight) {
+                swipeableState.performFling(velocity = toFling)
+                // since we go to the anchor with tween settling, consume all for the best UX
+                available
+            } else {
+                Velocity.Zero
+            }
+        }
+
+        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+            swipeableState.performFling(velocity = Offset(available.x, available.y).y)
+            return available
         }
     }
 }
