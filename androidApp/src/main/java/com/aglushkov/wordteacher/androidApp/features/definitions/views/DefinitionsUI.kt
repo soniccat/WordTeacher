@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -63,6 +64,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
 
+@ExperimentalFoundationApi
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -112,6 +114,7 @@ fun DefinitionsUI(
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 private fun DefinitionsWordUI(
     vm: DefinitionsVM,
@@ -143,8 +146,8 @@ private fun DefinitionsWordUI(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(data) { item ->
-                    showViewItem(item, vm, onPartOfSpeechFilterClicked)
+                items(data, key = { it.id }) { item ->
+                    showViewItem(item, Modifier.animateItemPlacement(), vm, onPartOfSpeechFilterClicked)
                 }
             }
         } else {
@@ -163,26 +166,29 @@ private fun DefinitionsWordUI(
 @Composable
 private fun showViewItem(
     item: BaseViewItem<*>,
+    modifier: Modifier,
     vm: DefinitionsVM,
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) = when (item) {
     is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
         item,
+        modifier,
         { onPartOfSpeechFilterClicked(item) },
         { vm.onPartOfSpeechFilterCloseClicked(item) },
         { mode -> vm.onDisplayModeChanged(mode) }
     )
-    is WordDividerViewItem -> WordDividerView()
-    is WordTitleViewItem -> WordTitleView(item)
-    is WordTranscriptionViewItem -> WordTranscriptionView(item)
-    is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item)
-    is WordDefinitionViewItem -> WordDefinitionView(item)
-    is WordSubHeaderViewItem -> WordSubHeaderView(item)
-    is WordSynonymViewItem -> WordSynonymView(item)
-    is WordExampleViewItem -> WordExampleView(item)
+    is WordDividerViewItem -> WordDividerView(modifier)
+    is WordTitleViewItem -> WordTitleView(item, modifier)
+    is WordTranscriptionViewItem -> WordTranscriptionView(item, modifier)
+    is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier)
+    is WordDefinitionViewItem -> WordDefinitionView(item, modifier)
+    is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
+    is WordSynonymViewItem -> WordSynonymView(item, modifier)
+    is WordExampleViewItem -> WordExampleView(item, modifier)
     else -> {
         Text(
-            text = "unknown item $item"
+            text = "unknown item $item",
+            modifier = modifier
         )
     }
 }
@@ -190,6 +196,7 @@ private fun showViewItem(
 @Composable
 private fun DefinitionsDisplayModeView(
     item: DefinitionsDisplayModeViewItem,
+    modifier: Modifier,
     onPartOfSpeechFilterClicked: () -> Unit,
     onPartOfSpeechFilterCloseClicked: () -> Unit,
     onDisplayModeChanged: (mode: DefinitionsDisplayMode) -> Unit
@@ -198,6 +205,7 @@ private fun DefinitionsDisplayModeView(
     val topPadding = dimensionResource(R.dimen.definitions_displayMode_vertical_padding)
     Row(
         modifier = Modifier
+            .then(modifier)
             .padding(
                 start = horizontalPadding,
                 end = horizontalPadding,
@@ -248,25 +256,30 @@ private fun DefinitionsDisplayModeView(
 
 @Composable
 private fun WordDividerView(
+    modifier: Modifier
 ) {
     Divider(
-        modifier = Modifier.padding(
-            top = dimensionResource(id = R.dimen.word_divider_topMargin),
-            bottom = dimensionResource(id = R.dimen.word_divider_bottomMargin)
-        )
+        modifier = Modifier.then(modifier)
+            .padding(
+                top = dimensionResource(id = R.dimen.word_divider_topMargin),
+                bottom = dimensionResource(id = R.dimen.word_divider_bottomMargin)
+            )
     )
 }
 
 @Composable
 private fun WordTitleView(
-    viewItem: WordTitleViewItem
+    viewItem: WordTitleViewItem,
+    modifier: Modifier
 ) {
     val providedByString = stringResource(R.string.word_providedBy_template, viewItem.providers.joinToString())
     Row(
-        modifier = Modifier.padding(
-            start = dimensionResource(id = R.dimen.word_horizontalPadding),
-            end = dimensionResource(id = R.dimen.word_horizontalPadding)
-        )
+        modifier = Modifier
+            .then(modifier)
+            .padding(
+                start = dimensionResource(id = R.dimen.word_horizontalPadding),
+                end = dimensionResource(id = R.dimen.word_horizontalPadding)
+            )
     ) {
         Text(
             text = viewItem.firstItem(),
@@ -285,10 +298,14 @@ private fun WordTitleView(
 }
 
 @Composable
-fun WordTranscriptionView(viewItem: WordTranscriptionViewItem) {
+fun WordTranscriptionView(
+    viewItem: WordTranscriptionViewItem,
+    modifier: Modifier
+) {
     Text(
         text = viewItem.firstItem(),
         modifier = Modifier
+            .then(modifier)
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding)
@@ -298,10 +315,14 @@ fun WordTranscriptionView(viewItem: WordTranscriptionViewItem) {
 }
 
 @Composable
-fun WordPartOfSpeechView(viewItem: WordPartOfSpeechViewItem) {
+fun WordPartOfSpeechView(
+    viewItem: WordPartOfSpeechViewItem,
+    modifier: Modifier
+) {
     Text(
         text = viewItem.firstItem().resolveString().toUpperCase(Locale.getDefault()),
         modifier = Modifier
+            .then(modifier)
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding),
@@ -312,10 +333,14 @@ fun WordPartOfSpeechView(viewItem: WordPartOfSpeechViewItem) {
 }
 
 @Composable
-fun WordDefinitionView(viewItem: WordDefinitionViewItem) {
+fun WordDefinitionView(
+    viewItem: WordDefinitionViewItem,
+    modifier: Modifier
+) {
     Text(
         text = viewItem.firstItem(),
         modifier = Modifier
+            .then(modifier)
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding),
@@ -326,10 +351,14 @@ fun WordDefinitionView(viewItem: WordDefinitionViewItem) {
 }
 
 @Composable
-fun WordSubHeaderView(viewItem: WordSubHeaderViewItem) {
+fun WordSubHeaderView(
+    viewItem: WordSubHeaderViewItem,
+    modifier: Modifier
+) {
     Text(
         text = viewItem.firstItem().resolveString(),
         modifier = Modifier
+            .then(modifier)
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding) + viewItem.indent.toDp(),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding),
@@ -340,10 +369,14 @@ fun WordSubHeaderView(viewItem: WordSubHeaderViewItem) {
 }
 
 @Composable
-fun WordSynonymView(viewItem: WordSynonymViewItem) {
+fun WordSynonymView(
+    viewItem: WordSynonymViewItem,
+    modifier: Modifier
+) {
     Text(
         text = viewItem.firstItem(),
         modifier = Modifier
+            .then(modifier)
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding) + viewItem.indent.toDp(),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding)
@@ -353,10 +386,14 @@ fun WordSynonymView(viewItem: WordSynonymViewItem) {
 }
 
 @Composable
-fun WordExampleView(viewItem: WordExampleViewItem) {
+fun WordExampleView(
+    viewItem: WordExampleViewItem,
+    modifier: Modifier
+) {
     Text(
         text = viewItem.firstItem(),
         modifier = Modifier
+            .then(modifier)
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding) + viewItem.indent.toDp(),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding)
@@ -367,6 +404,7 @@ fun WordExampleView(viewItem: WordExampleViewItem) {
 
 // Previews
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 private fun DefinitionsUIPreviewWithResponse() {
@@ -407,6 +445,7 @@ private fun DefinitionsUIPreviewWithResponse() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 private fun DefinitionsUIPreviewLoading() {
@@ -417,6 +456,7 @@ private fun DefinitionsUIPreviewLoading() {
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 private fun DefinitionsUIPreviewError() {
