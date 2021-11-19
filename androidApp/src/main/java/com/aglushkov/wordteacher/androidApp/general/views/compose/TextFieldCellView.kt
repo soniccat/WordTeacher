@@ -105,9 +105,10 @@ class TextFieldCellStateImpl(
 
     @Composable
     override fun rememberTextFieldValueState(): TextFieldValue {
-        return remember(getValue, innerTextFieldValue.value) {
-            if (getValue().orEmpty() != innerTextFieldValue.value.text) {
-                innerTextFieldValue.value = innerTextFieldValue.value.copy(text = getValue().orEmpty())
+        val value = getValue()
+        return remember(value, innerTextFieldValue.value) {
+            if (value.orEmpty() != innerTextFieldValue.value.text) {
+                innerTextFieldValue.value = innerTextFieldValue.value.copy(text = value.orEmpty())
                 innerTextFieldValue.value
             } else {
                 innerTextFieldValue.value
