@@ -2,16 +2,25 @@ CREATE TABLE IF NOT EXISTS DBCard (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   date INTEGER NOT NULL,
   term TEXT NOT NULL,
-  definition TEXT NOT NULL
+  partOfSpeech TEXT NOT NULL,
+  transcription TEXT,
+  definition TEXT NOT NULL,
+  synonyms TEXT,
+  examples TEXT
 );
 
 insert:
-INSERT INTO DBCard(date, term, definition)
-VALUES (?, ?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definition, synonyms, examples)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, definition)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definition, synonyms, examples)
 VALUES ?;
+
+updateCard:
+UPDATE DBCard
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definition = ?, synonyms = ?, examples = ?
+WHERE id = ?;
 
 lastInsertedRowId:
 SELECT last_insert_rowid();

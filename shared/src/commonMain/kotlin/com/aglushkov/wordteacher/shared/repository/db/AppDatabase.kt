@@ -58,10 +58,10 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             nlpSentence.articleId,
             nlpSentence.orderId,
             nlpSentence.text,
-            nlpSentence.tokenStrings().joinToString(nlpSeparator),
-            nlpSentence.tags.joinToString(nlpSeparator),
-            nlpSentence.lemmas.joinToString(nlpSeparator),
-            nlpSentence.chunks.joinToString(nlpSeparator)
+            nlpSentence.tokenStrings().joinToString(NLP_SEPARATOR),
+            nlpSentence.tags.joinToString(NLP_SEPARATOR),
+            nlpSentence.lemmas.joinToString(NLP_SEPARATOR),
+            nlpSentence.chunks.joinToString(NLP_SEPARATOR)
         )
 
         fun selectAll() = db.dBNLPSentenceQueries.selectAll()
@@ -101,12 +101,30 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             Json {
                 ignoreUnknownKeys = true
             }.encodeToString(style)
-
     }
 
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
         fun selectAll() = db.dBCardSetQueries.selectAll(mapper = ::ShortCardSet)
+        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(
+            id,
+            mapper = { id, name, date, id_, setId, cardId, id__, date_, term, partOfSpeech, transcription, definition, synonyms, examples ->
+                val splitSynonyms = synonyms?.split(CARD_SEPARATOR).orEmpty()
+                val splitExamples = examples?.split(CARD_SEPARATOR).orEmpty()
+                val parsedPartOfSpeech = WordTeacherWord.PartOfSpeech.fromString(partOfSpeech)
+
+                Card(
+                    cardId!!,
+                    date,
+                    term.orEmpty(),
+                    definition.orEmpty(),
+                    parsedPartOfSpeech,
+                    transcription,
+                    splitSynonyms,
+                    splitExamples
+                )
+            }
+        )
         fun removeCardSet(cardSetId: Long) {
             db.transaction {
                 db.dBCardQueries.removeCardsBySetId(cardSetId)
@@ -117,14 +135,50 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 
     inner class Cards {
-        fun insertCard(setId: Long, card: Card) {
+        fun insertCard(
+            setId: Long,
+            date: Long,
+            term: String,
+            definition: String,
+            partOfSpeech: WordTeacherWord.PartOfSpeech,
+            transcription: String?,
+            synonyms: List<String>,
+            examples: List<String>
+        ) {
             db.transaction {
-                db.dBCardQueries.insert(card.date, card.term, card.definition)
+                db.dBCardQueries.insert(
+                    date,
+                    term,
+                    partOfSpeech.toStringDesc().toString(),
+                    transcription,
+                    definition,
+                    synonyms.joinToString(CARD_SEPARATOR),
+                    examples.joinToString(CARD_SEPARATOR)
+                )
 
                 val cardId = db.dBCardQueries.lastInsertedRowId().firstLong()!!
                 db.dBCardSetToCardRelationQueries.insert(setId, cardId)
             }
         }
+        fun updateCard(
+            cardId: Long,
+            date: Long,
+            term: String,
+            definition: String,
+            partOfSpeech: WordTeacherWord.PartOfSpeech,
+            transcription: String?,
+            synonyms: List<String>,
+            examples: List<String>
+        ) = db.dBCardQueries.updateCard(
+            date,
+            term,
+            partOfSpeech.toStringDesc().toString(),
+            transcription,
+            definition,
+            synonyms.joinToString(CARD_SEPARATOR),
+            examples.joinToString(CARD_SEPARATOR),
+            cardId
+        )
     }
 
     inner class Notes {
@@ -137,15 +191,16 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 
     companion object {
-        const val nlpSeparator = "&&"
+        const val NLP_SEPARATOR = "&&"
+        const val CARD_SEPARATOR = "$$"
     }
 }
 
 fun DBNLPSentence.toNLPSentence(): NLPSentence {
-    val tokens = tokens.split(AppDatabase.nlpSeparator)
-    val tags = tags.split(AppDatabase.nlpSeparator)
-    val lemmas = lemmas.split(AppDatabase.nlpSeparator)
-    val chunks = chunks.split(AppDatabase.nlpSeparator)
+    val tokens = tokens.split(AppDatabase.NLP_SEPARATOR)
+    val tags = tags.split(AppDatabase.NLP_SEPARATOR)
+    val lemmas = lemmas.split(AppDatabase.NLP_SEPARATOR)
+    val chunks = chunks.split(AppDatabase.NLP_SEPARATOR)
 
     return NLPSentence(
         articleId,
