@@ -11,7 +11,8 @@ FROM DBCardSet;
 selectCardSet:
 SELECT *
 FROM DBCardSet
-WHERE id = ?;
+WHERE id = ?
+ORDER BY date DESC;
 
 selectCardSetWithCards:
 SELECT *

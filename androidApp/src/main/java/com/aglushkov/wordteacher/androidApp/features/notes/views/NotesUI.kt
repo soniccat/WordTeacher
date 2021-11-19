@@ -2,7 +2,6 @@ package com.aglushkov.wordteacher.androidApp.features.notes
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
@@ -10,23 +9,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
@@ -52,7 +43,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
 
     val newNoteTextState = vm.stateFlow.collectAsState()
     val editingState = vm.editingStateFlow.collectAsState()
-    val newNoteState by remember { mutableStateOf(NewCellState { newNoteTextState.value.newNoteText }) }
+    val newNoteState by remember { mutableStateOf(TextFieldCellStateImpl { newNoteTextState.value.newNoteText }) }
     val notesState by remember { mutableStateOf(NotesState(editingState)) }
     val lazyColumnState = rememberLazyListState()
 
@@ -103,11 +94,11 @@ private fun NoteViews(
     item: BaseViewItem<*>,
     vm: NotesVM,
     notesState: NotesState,
-    state: NewCellState,
+    state: TextFieldCellState,
     lazyListState: LazyListState
 ) = when (item) {
     is CreateNoteViewItem -> {
-        CreateNewCellView(
+        TextFieldCellView(
             placeholder = item.placeholder.toString(LocalContext.current),
             textFieldValue = state.rememberTextFieldValueState(),
             focusRequester = state.focusRequester,
@@ -218,34 +209,9 @@ private fun NoteView(
 // TODO: replace with NewCellState
 @Stable
 class NotesState(
-    val editingNote: State<NotesVM.EditingState>
-) {
-    private var innerTextFieldValue = mutableStateOf(EmptyTextFieldValue)
-    val focusRequester = FocusRequester()
-
-    fun updateTextFieldValue(value: TextFieldValue) {
-        innerTextFieldValue.value = value
-    }
-
-    @Composable
-    fun rememberTextFieldValueState(): TextFieldValue {
-        return remember(editingNote.value, innerTextFieldValue.value) {
-            if (editingNote.value.item?.text.orEmpty() != innerTextFieldValue.value.text) {
-                innerTextFieldValue.value = innerTextFieldValue.value.copy(text = editingNote.value.item?.text.orEmpty())
-                innerTextFieldValue.value
-            } else {
-                innerTextFieldValue.value
-            }
-        }
-    }
-
-    @SuppressLint("ComposableNaming")
-    @Composable
-    fun requestFocusIfNeeded() {
-        LaunchedEffect("editing focus") {
-            focusRequester.requestFocus()
-        }
-    }
+    val editingNote: State<NotesVM.EditingState>,
+    private val textFieldState: TextFieldCellState = TextFieldCellStateImpl { editingNote.value.item?.text }
+): TextFieldCellState by textFieldState {
 }
 
 // For a wide screen scrolls the cell at the index to the top

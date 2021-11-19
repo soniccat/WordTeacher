@@ -27,7 +27,7 @@ import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 
 
 @Composable
-fun CreateNewCellView(
+fun TextFieldCellView(
     placeholder: String,
     textFieldValue: TextFieldValue,
     focusRequester: FocusRequester,
@@ -84,19 +84,27 @@ fun CreateNewCellView(
     }
 }
 
-@Stable
-class NewCellState(
-    val getValue: () -> String?
-) {
-    private var innerTextFieldValue = mutableStateOf(EmptyTextFieldValue)
-    val focusRequester = FocusRequester()
+interface TextFieldCellState {
+    val focusRequester: FocusRequester
 
-    fun updateTextFieldValue(value: TextFieldValue) {
+    fun updateTextFieldValue(value: TextFieldValue)
+    @Composable fun rememberTextFieldValueState(): TextFieldValue
+    @Composable fun requestFocusIfNeeded()
+}
+
+@Stable
+class TextFieldCellStateImpl(
+    val getValue: () -> String?
+): TextFieldCellState {
+    private var innerTextFieldValue = mutableStateOf(EmptyTextFieldValue)
+    override val focusRequester = FocusRequester()
+
+    override fun updateTextFieldValue(value: TextFieldValue) {
         innerTextFieldValue.value = value
     }
 
     @Composable
-    fun rememberTextFieldValueState(): TextFieldValue {
+    override fun rememberTextFieldValueState(): TextFieldValue {
         return remember(getValue, innerTextFieldValue.value) {
             if (getValue().orEmpty() != innerTextFieldValue.value.text) {
                 innerTextFieldValue.value = innerTextFieldValue.value.copy(text = getValue().orEmpty())
@@ -109,7 +117,7 @@ class NewCellState(
 
     @SuppressLint("ComposableNaming")
     @Composable
-    fun requestFocusIfNeeded() {
+    override fun requestFocusIfNeeded() {
         LaunchedEffect("new note focus") {
             if (getValue()?.isNotEmpty() == true) {
                 focusRequester.requestFocus()

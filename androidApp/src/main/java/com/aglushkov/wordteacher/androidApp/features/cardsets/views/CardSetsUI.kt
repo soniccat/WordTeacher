@@ -12,19 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
-import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
-import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
-import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 
 @ExperimentalAnimationApi
@@ -40,7 +35,7 @@ fun CardSetsUI(
     val data = cardSets.data()
 
     val newCardSetTextState = vm.stateFlow.collectAsState()
-    val newCardSetState by remember { mutableStateOf(NewCellState { newCardSetTextState.value.newCardSetText }) }
+    val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { newCardSetTextState.value.newCardSetText }) }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -97,9 +92,9 @@ fun CardSetsUI(
 private fun CardSetsViewItem(
     item: BaseViewItem<*>,
     vm: CardSetsVM,
-    newCardSetState: NewCellState,
+    newCardSetState: TextFieldCellState,
 ) = when (item) {
-    is CreateCardSetViewItem -> CreateNewCellView(
+    is CreateCardSetViewItem -> TextFieldCellView(
         placeholder = item.placeholder.toString(LocalContext.current),
         textFieldValue = newCardSetState.rememberTextFieldValueState(),
         focusRequester = newCardSetState.focusRequester,
