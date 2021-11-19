@@ -9,6 +9,12 @@ SELECT COUNT(id)
 FROM DBCardSetToCardRelation
 WHERE setId = ?;
 
+selectCards:
+SELECT DBCard.*
+FROM DBCardSetToCardRelation
+    LEFT JOIN DBCard ON DBCardSetToCardRelation.cardId = DBCard.id
+WHERE DBCardSetToCardRelation.setId = ?;
+
 insert:
 INSERT INTO DBCardSetToCardRelation(setId, cardId)
 VALUES (?, ?);

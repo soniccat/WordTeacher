@@ -69,7 +69,7 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun articleRepository(
+    fun articlesRepository(
         database: AppDatabase,
         nlpCore: NLPCore,
         processor: NLPSentenceProcessor,

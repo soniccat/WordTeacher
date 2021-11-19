@@ -6,6 +6,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragme
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesUI
+import com.aglushkov.wordteacher.androidApp.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainComposeComponent
@@ -105,11 +107,13 @@ class MainActivity : AppCompatActivity(), Router {
                 when (instance) {
                     is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.inner)
                     is MainDecomposeComponent.Child.Article -> ArticleUI(vm = instance.inner)
+                    is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.inner)
                 }
             }
         }
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun TabsUI(component: TabDecomposeComponent) {
         Scaffold(
@@ -313,12 +317,19 @@ class MainActivity : AppCompatActivity(), Router {
     }
 
     override fun openCardSet(id: Long) {
-        // TODO: need to support
-        // openFragment(CardSetFragment::class, CardSetFragment.createArguments(id), true)
+        mainDecomposeComponent.openCardSet(id)
     }
 
     override fun openStartLearning() {
-        TODO("Not yet implemented")
+//        TODO("Not yet implemented")
+    }
+
+    override fun openLearning() {
+//        TODO("Not yet implemented")
+    }
+
+    override fun closeCardSet() {
+        mainDecomposeComponent.back()
     }
 }
 

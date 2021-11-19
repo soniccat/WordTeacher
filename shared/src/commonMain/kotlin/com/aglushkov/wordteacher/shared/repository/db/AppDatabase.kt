@@ -27,6 +27,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     val articles = Articles()
     val sentencesNLP = DBNLPSentences()
     val cardSets = CardSets()
+    val cards = Cards()
     val notes = Notes()
 
     val state = MutableStateFlow<Resource<AppDatabase>>(Resource.Uninitialized())
@@ -106,25 +107,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
         fun selectAll() = db.dBCardSetQueries.selectAll(mapper = ::ShortCardSet)
-        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(
-            id,
-            mapper = { id, name, date, id_, setId, cardId, id__, date_, term, partOfSpeech, transcription, definition, synonyms, examples ->
-                val splitSynonyms = synonyms?.split(CARD_SEPARATOR).orEmpty()
-                val splitExamples = examples?.split(CARD_SEPARATOR).orEmpty()
-                val parsedPartOfSpeech = WordTeacherWord.PartOfSpeech.fromString(partOfSpeech)
-
-                Card(
-                    cardId!!,
-                    date,
-                    term.orEmpty(),
-                    definition.orEmpty(),
-                    parsedPartOfSpeech,
-                    transcription,
-                    splitSynonyms,
-                    splitExamples
-                )
-            }
-        )
+        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id, mapper = ::CardSet)
         fun removeCardSet(cardSetId: Long) {
             db.transaction {
                 db.dBCardQueries.removeCardsBySetId(cardSetId)
@@ -135,6 +118,21 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 
     inner class Cards {
+        fun selectCards(setId: Long) = db.dBCardSetToCardRelationQueries.selectCards(
+            setId,
+            mapper = { id, date, term, partOfSpeech, transcription, definition, synonyms, examples ->
+                Card(
+                    id!!,
+                    date!!,
+                    term!!,
+                    definition!!,
+                    WordTeacherWord.PartOfSpeech.fromString(partOfSpeech!!),
+                    transcription,
+                    synonyms?.split(CARD_SEPARATOR).orEmpty(),
+                    examples?.split(CARD_SEPARATOR).orEmpty()
+                )
+            }
+        )
         fun insertCard(
             setId: Long,
             date: Long,

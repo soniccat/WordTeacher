@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.androidApp.di.AppComp
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.AddArticleDependencies
 import com.aglushkov.wordteacher.androidApp.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.androidApp.features.articles.di.ArticlesDependencies
+import com.aglushkov.wordteacher.androidApp.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.androidApp.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.androidApp.features.notes.di.NotesDependencies
@@ -16,6 +17,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
@@ -35,6 +37,7 @@ public interface AppComponent:
     AddArticleDependencies,
     ArticleDependencies,
     CardSetsDependencies,
+    CardSetDependencies,
     NotesDependencies {
 
     fun configService(): ConfigService

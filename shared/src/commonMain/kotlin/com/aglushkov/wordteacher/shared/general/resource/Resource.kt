@@ -105,21 +105,24 @@ fun Resource<*>?.isLoadedOrError(): Boolean {
     return if (this == null) false else (this is Resource.Loaded || this is Resource.Error)
 }
 
-fun <T, D> Resource<T>.merge(res2: Resource<D>): Resource<Pair<T?, D?>> {
+fun <T, D> Resource<T>.merge(res2: Resource<D>): Resource<Pair<T?, D?>> =
+    merge(res2, transform = { a, b -> a to b })
+
+fun <T, D, O> Resource<T>.merge(res2: Resource<D>, transform: (T?, D?) -> O?): Resource<O> {
     if (isUninitialized() || res2.isUninitialized()) {
         return Resource.Uninitialized()
     }
 
     if (isLoading() || res2.isLoading()) {
-        return Resource.Loading(toPair(res2))
+        return Resource.Loading(transform(data(), res2.data()))
     }
 
     if (isError() || res2.isError()) {
         val throwable = getErrorThrowable(res2)
-        return Resource.Error(throwable!!, getErrorTryAgain(res2), toPair(res2))
+        return Resource.Error(throwable!!, getErrorTryAgain(res2), transform(data(), res2.data()))
     }
 
-    return Resource.Loaded(toPair(res2))
+    return Resource.Loaded(transform(data()!!, res2.data()!!)!!)
 }
 
 fun <D, T> Resource<T>.getErrorThrowable(res2: Resource<D>): Throwable? {
@@ -133,3 +136,11 @@ fun <D, T> Resource<T>.getErrorTryAgain(res2: Resource<D>): Boolean {
 fun <D, T> Resource<T>.toPair(res2: Resource<D>) = Pair(data(), res2.data())
 
 fun <D, T, P> Resource<T>.toTriple(res2: Resource<D>, res3: Resource<P>) = Triple(data(), res2.data(), res3.data())
+
+fun <T> tryInResource(canTryAgain: Boolean = false, code: () -> T): Resource<T> {
+    try {
+        return Resource.Loaded(code())
+    } catch (e: Throwable) {
+        return Resource.Error(throwable = e, canTryAgain)
+    }
+}
