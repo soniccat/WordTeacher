@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.general.item
 
+import com.aglushkov.wordteacher.shared.general.IdGenerator
+
 abstract class BaseViewItem<T> {
     var id = 0L // a unique id, required for NSDiffableDataSourceSnapshot
     var type = 0
@@ -51,4 +53,40 @@ abstract class BaseViewItem<T> {
     fun itemsEquals(items: List<T>) = this.items.equals(items)
 
     companion object {}
+}
+
+// Set unique id taking into account that for the same items id shouldn't change
+fun generateViewItemIds(
+    items: List<BaseViewItem<*>>,
+    prevItems: List<BaseViewItem<*>> = emptyList(),
+    idGenerator: IdGenerator
+) {
+    val map: MutableMap<Int, MutableList<BaseViewItem<*>>> = mutableMapOf()
+
+    // Put items with ids in map
+    prevItems.forEach {
+        val itemsHashCode = it.itemsHashCode()
+
+        // Obtain mutable list
+        val listOfViewItems: MutableList<BaseViewItem<*>> = map[itemsHashCode]
+            ?: mutableListOf<BaseViewItem<*>>().also { list ->
+                map[itemsHashCode] = list
+            }
+
+        listOfViewItems.add(it)
+    }
+
+    // set ids for item not in the map
+    items.forEach {
+        val itemsHashCode = it.itemsHashCode()
+        val mapListOfViewItems = map[itemsHashCode]
+        val item = mapListOfViewItems?.firstOrNull { listItem -> listItem.items == it.items }
+
+        if (item != null) {
+            it.id = item.id
+            mapListOfViewItems.remove(item)
+        } else {
+            it.id = idGenerator.nextId()
+        }
+    }
 }

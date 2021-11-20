@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
@@ -220,37 +221,8 @@ open class DefinitionsVMImpl(
         }
     }
 
-    // Set unique id taking into account that for the same items id shouldn't change
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
-        val prevItems = definitions.value.data() ?: emptyList()
-        val map: MutableMap<Int, MutableList<BaseViewItem<*>>> = mutableMapOf()
-
-        // Put items with ids in map
-        prevItems.forEach {
-            val itemsHashCode = it.itemsHashCode()
-
-            // Obtain mutable list
-            val listOfViewItems: MutableList<BaseViewItem<*>> = map[itemsHashCode]
-                ?: mutableListOf<BaseViewItem<*>>().also { list ->
-                    map[itemsHashCode] = list
-                }
-
-            listOfViewItems.add(it)
-        }
-
-        // set ids for item not in the map
-        items.forEach {
-            val itemsHashCode = it.itemsHashCode()
-            val mapListOfViewItems = map[itemsHashCode]
-            val item = mapListOfViewItems?.firstOrNull { listItem -> listItem.items == it.items }
-
-            if (item != null) {
-                it.id = item.id
-                mapListOfViewItems.remove(item)
-            } else {
-                it.id = idGenerator.nextId()
-            }
-        }
+        generateViewItemIds(items, definitions.value.data().orEmpty(), idGenerator)
     }
 
     private fun addMergedWords(
@@ -290,7 +262,7 @@ open class DefinitionsVMImpl(
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
                 for (d in def.definitions) {
-                    items.add(WordDefinitionViewItem("• $d"))
+                    items.add(WordDefinitionViewItem(indentDefinitionString(d)))
                 }
 
                 if (def.examples.isNotEmpty()) {
@@ -393,3 +365,5 @@ data class ShowPartsOfSpeechFilterDialogEvent(
         isHandled = true
     }
 }
+
+fun indentDefinitionString(def: String) = "• $def"

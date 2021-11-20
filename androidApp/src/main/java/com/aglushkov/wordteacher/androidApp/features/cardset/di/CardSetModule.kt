@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
@@ -20,8 +21,9 @@ class CardSetModule {
 
     @Provides
     fun cardSetRepository(
-        database: AppDatabase
-    ) = CardSetRepository(database)
+        database: AppDatabase,
+        timeSource: TimeSource
+    ) = CardSetRepository(database, timeSource)
 
     @Provides
     fun cardSetDecomposeComponent(
@@ -29,12 +31,14 @@ class CardSetModule {
         routerResolver: RouterResolver,
         notesRepository: CardSetRepository,
         componentContext: ComponentContext,
-        timeSource: TimeSource
+        timeSource: TimeSource,
+        idGenerator: IdGenerator
     ) = CardSetDecomposeComponent(
         state,
         routerResolver.router!!.get()!!,
         notesRepository,
         componentContext,
-        timeSource
+        timeSource,
+        idGenerator
     )
 }

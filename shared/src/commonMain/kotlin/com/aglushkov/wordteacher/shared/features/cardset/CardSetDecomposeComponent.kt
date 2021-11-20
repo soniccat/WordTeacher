@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.cardset
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.arkivanov.decompose.ComponentContext
@@ -15,12 +16,14 @@ class CardSetDecomposeComponent (
     router: CardSetRouter,
     cardSetsRepository: CardSetRepository,
     componentContext: ComponentContext,
-    timeSource: TimeSource
+    timeSource: TimeSource,
+    idGenerator: IdGenerator
 ) : CardSetVMImpl(
     initialState,
     router,
     cardSetsRepository,
-    timeSource
+    timeSource,
+    idGenerator
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {

@@ -1,17 +1,13 @@
 package com.aglushkov.wordteacher.shared.features.cardset.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
-import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.TimeSource
-import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.features.definitions.vm.*
+import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.v
-import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
@@ -28,6 +24,7 @@ interface CardSetVM {
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val eventFlow: Flow<Event>
 
+    fun onCardSetCreatePressed()
     fun onBackPressed()
     fun onTryAgainClicked()
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
@@ -42,7 +39,8 @@ open class CardSetVMImpl(
     override var state: CardSetVM.State,
     private val router: CardSetRouter,
     private val repository: CardSetRepository,
-    private val timeSource: TimeSource
+    private val timeSource: TimeSource,
+    private val idGenerator: IdGenerator
 ): ViewModel(), CardSetVM {
     override val cardSet: StateFlow<Resource<CardSet>> = repository.cardSet
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
@@ -71,11 +69,58 @@ open class CardSetVMImpl(
     }
 
     private fun makeViewItems(loadedRes: Resource.Loaded<CardSet>): List<BaseViewItem<*>>  {
-        return emptyList()
+        val result = mutableListOf<BaseViewItem<*>>()
+
+        loadedRes.data.cards.onEach { card ->
+            result += WordTitleViewItem(card.term, providers = emptyList())
+            result += WordTranscriptionViewItem(card.transcription.orEmpty())
+            result += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc())
+
+            card.definitions.onEach { def ->
+                result += WordDefinitionViewItem(indentDefinitionString(def))
+            }
+
+            // Examples
+            result += WordSubHeaderViewItem(
+                StringDesc.Resource(MR.strings.word_section_examples),
+                Indent.SMALL
+            )
+
+            card.examples.onEach { example ->
+                result += WordExampleViewItem(example, Indent.SMALL)
+            }
+
+            // Synonyms
+            result += WordSubHeaderViewItem(
+                StringDesc.Resource(MR.strings.word_section_synonyms),
+                Indent.SMALL
+            )
+
+            card.synonyms.onEach { synonym ->
+                result += WordSynonymViewItem(synonym, Indent.SMALL)
+            }
+
+            result += WordDividerViewItem()
+        }
+
+        result += CreateCardViewItem()
+
+        generateIds(result)
+        return result
+    }
+
+    private fun generateIds(items: MutableList<BaseViewItem<*>>) {
+        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator)
     }
 
     override fun onTryAgainClicked() {
         // TODO: do sth with articlesRepository
+    }
+
+    override fun onCardSetCreatePressed() {
+        viewModelScope.launch {
+            repository.createCard()
+        }
     }
 
     override fun onBackPressed() {

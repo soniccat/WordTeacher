@@ -4,22 +4,22 @@ CREATE TABLE IF NOT EXISTS DBCard (
   term TEXT NOT NULL,
   partOfSpeech TEXT NOT NULL,
   transcription TEXT,
-  definition TEXT NOT NULL,
+  definitions TEXT NOT NULL,
   synonyms TEXT,
   examples TEXT
 );
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definition, synonyms, examples)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples)
 VALUES (?, ?, ?, ?, ?, ?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definition, synonyms, examples)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples)
 VALUES ?;
 
 updateCard:
 UPDATE DBCard
-SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definition = ?, synonyms = ?, examples = ?
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?
 WHERE id = ?;
 
 lastInsertedRowId:

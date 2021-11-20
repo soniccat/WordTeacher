@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -9,12 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.desc.Raw
-import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
@@ -59,7 +53,6 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
@@ -147,7 +140,12 @@ private fun DefinitionsWordUI(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(data, key = { it.id }) { item ->
-                    showViewItem(item, Modifier.animateItemPlacement(), vm, onPartOfSpeechFilterClicked)
+                    showViewItem(
+                        Modifier.animateItemPlacement(),
+                        item,
+                        vm,
+                        onPartOfSpeechFilterClicked
+                    )
                 }
             }
         } else {
@@ -165,8 +163,8 @@ private fun DefinitionsWordUI(
 
 @Composable
 private fun showViewItem(
-    item: BaseViewItem<*>,
     modifier: Modifier,
+    item: BaseViewItem<*>,
     vm: DefinitionsVM,
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) = when (item) {
@@ -255,7 +253,7 @@ private fun DefinitionsDisplayModeView(
 }
 
 @Composable
-private fun WordDividerView(
+fun WordDividerView(
     modifier: Modifier
 ) {
     Divider(
@@ -268,7 +266,7 @@ private fun WordDividerView(
 }
 
 @Composable
-private fun WordTitleView(
+fun WordTitleView(
     viewItem: WordTitleViewItem,
     modifier: Modifier
 ) {

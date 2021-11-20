@@ -1,20 +1,20 @@
 package com.aglushkov.wordteacher.shared.repository.cardset
 
 import com.aglushkov.extensions.asFlow
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
+import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 class CardSetRepository(
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val timeSource: TimeSource
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlow = MutableStateFlow<Resource<CardSet>>(Resource.Uninitialized())
@@ -46,5 +46,24 @@ class CardSetRepository(
                 stateFlow.value = it
             }
         }
+    }
+
+    suspend fun createCard(): Card? {
+        val loadedCardSet = cardSet.value.data() ?: return null
+        return scope.async(Dispatchers.Default) {
+            val newCard = Card(
+                id = -1,
+                date = timeSource.getTimeInMilliseconds(),
+                term = "",
+                definitions = emptyList(),
+                partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
+                transcription = "",
+                synonyms = emptyList(),
+                examples = emptyList()
+            )
+
+            database.cards.insertCard(loadedCardSet.id, newCard)
+            newCard.copy(id = database.cards.insertedCardId()!!)
+        }.await()
     }
 }

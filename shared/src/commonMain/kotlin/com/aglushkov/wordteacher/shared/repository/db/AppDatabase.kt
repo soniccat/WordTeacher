@@ -120,12 +120,12 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     inner class Cards {
         fun selectCards(setId: Long) = db.dBCardSetToCardRelationQueries.selectCards(
             setId,
-            mapper = { id, date, term, partOfSpeech, transcription, definition, synonyms, examples ->
+            mapper = { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples ->
                 Card(
                     id!!,
                     date!!,
                     term!!,
-                    definition!!,
+                    definitions?.split(CARD_SEPARATOR).orEmpty(),
                     WordTeacherWord.PartOfSpeech.fromString(partOfSpeech!!),
                     transcription,
                     synonyms?.split(CARD_SEPARATOR).orEmpty(),
@@ -133,11 +133,25 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 )
             }
         )
+
+        fun insertCard(setId: Long, newCard: Card) {
+            cards.insertCard(
+                setId = setId,
+                date = newCard.date,
+                term = newCard.term,
+                definitions = newCard.definitions,
+                partOfSpeech = newCard.partOfSpeech,
+                transcription = newCard.transcription,
+                synonyms = newCard.synonyms,
+                examples = newCard.examples
+            )
+        }
+
         fun insertCard(
             setId: Long,
             date: Long,
             term: String,
-            definition: String,
+            definitions: List<String>,
             partOfSpeech: WordTeacherWord.PartOfSpeech,
             transcription: String?,
             synonyms: List<String>,
@@ -149,7 +163,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     term,
                     partOfSpeech.toStringDesc().toString(),
                     transcription,
-                    definition,
+                    definitions.joinToString(CARD_SEPARATOR),
                     synonyms.joinToString(CARD_SEPARATOR),
                     examples.joinToString(CARD_SEPARATOR)
                 )
@@ -158,6 +172,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 db.dBCardSetToCardRelationQueries.insert(setId, cardId)
             }
         }
+
         fun updateCard(
             cardId: Long,
             date: Long,
@@ -177,6 +192,8 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             examples.joinToString(CARD_SEPARATOR),
             cardId
         )
+
+        fun insertedCardId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
     }
 
     inner class Notes {
