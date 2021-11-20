@@ -1,24 +1,22 @@
 package com.aglushkov.wordteacher.androidApp.general.views.compose
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -82,6 +80,68 @@ fun TextFieldCellView(
             )
         )
     }
+}
+
+//@Composable
+//fun EditableText(
+//    modifier: Modifier,
+//    value: TextFieldValue,
+//    placeholder: String,
+//    textStyle: TextStyle,
+//    isEditable: Boolean,
+//    onValueChange: (TextFieldValue) -> Unit,
+//) {
+//    if (isEditable) {
+//        TestTextField(
+//            modifier = modifier,
+//            value = value,
+//        )
+//    } else {
+//        Text(
+//            modifier = modifier,
+//            text = value.text,
+//
+//        )
+//    }
+//}
+
+@Composable
+fun TestTextField(
+    modifier: Modifier,
+    value: TextFieldValue,
+    placeholder: String,
+    textStyle: TextStyle,
+    onValueChange: (TextFieldValue) -> Unit,
+) {
+    BasicTextField(
+        value = value,
+//            .defaultMinSize(
+//                minWidth = TextFieldDefaults.MinWidth,
+//                minHeight = TextFieldDefaults.MinHeight
+//            ),
+        onValueChange = onValueChange,
+        textStyle = textStyle,
+//        cursorBrush = SolidColor(cursorColor),
+//        visualTransformation = visualTransformation,
+//        keyboardOptions = keyboardOptions,
+//        keyboardActions = keyboardActions,
+//        interactionSource = interactionSource,
+//        singleLine = singleLine,
+//        maxLines = maxLines,
+        decorationBox = @Composable { coreTextField ->
+            Box(
+                contentAlignment = Alignment.CenterStart
+            ) {
+                coreTextField()
+                if (value.text.isEmpty()) {
+                    Text(
+                        text = placeholder,
+                        color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
+                    )
+                }
+            }
+        }
+    )
 }
 
 interface TextFieldCellState {

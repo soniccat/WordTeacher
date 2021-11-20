@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -254,7 +255,7 @@ private fun DefinitionsDisplayModeView(
 
 @Composable
 fun WordDividerView(
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Divider(
         modifier = Modifier.then(modifier)
@@ -268,9 +269,17 @@ fun WordDividerView(
 @Composable
 fun WordTitleView(
     viewItem: WordTitleViewItem,
-    modifier: Modifier
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = AppTypography.wordDefinitionTitle,
+    textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
+        Text(
+            text = text,
+            modifier = Modifier
+                .weight(1.0f, true),
+            style = ts
+        )
+    }
 ) {
-    val providedByString = stringResource(R.string.word_providedBy_template, viewItem.providers.joinToString())
     Row(
         modifier = Modifier
             .then(modifier)
@@ -279,43 +288,50 @@ fun WordTitleView(
                 end = dimensionResource(id = R.dimen.word_horizontalPadding)
             )
     ) {
-        Text(
-            text = viewItem.firstItem(),
-            modifier = Modifier
-                .weight(1.0f, true),
-            style = AppTypography.wordDefinitionTitle
-        )
-        Text(
-            text = providedByString,
-            modifier = Modifier
-                .widthIn(max = dimensionResource(id = R.dimen.word_providedBy_maxWidth)),
-            textAlign = TextAlign.End,
-            style = AppTypography.wordDefinitionProvidedBy
-        )
+        textContent(viewItem.firstItem(), textStyle)
+        if (viewItem.providers.isNotEmpty()) {
+            Text(
+                text = stringResource(
+                    R.string.word_providedBy_template,
+                    viewItem.providers.joinToString()
+                ),
+                modifier = Modifier
+                    .widthIn(max = dimensionResource(id = R.dimen.word_providedBy_maxWidth)),
+                textAlign = TextAlign.End,
+                style = AppTypography.wordDefinitionProvidedBy
+            )
+        }
     }
 }
 
 @Composable
 fun WordTranscriptionView(
     viewItem: WordTranscriptionViewItem,
-    modifier: Modifier
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = AppTypography.wordDefinitionTranscripton,
+    textContent: @Composable BoxScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
+        Text(
+            text = text,
+            style = ts
+        )
+    }
 ) {
-    Text(
-        text = viewItem.firstItem(),
+    Box(
         modifier = Modifier
             .then(modifier)
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding)
-            ),
-        style = AppTypography.wordDefinitionTranscripton
-    )
+            )
+    ) {
+        textContent(viewItem.firstItem(), textStyle)
+    }
 }
 
 @Composable
 fun WordPartOfSpeechView(
     viewItem: WordPartOfSpeechViewItem,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = viewItem.firstItem().resolveString().toUpperCase(Locale.getDefault()),
@@ -333,7 +349,7 @@ fun WordPartOfSpeechView(
 @Composable
 fun WordDefinitionView(
     viewItem: WordDefinitionViewItem,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = viewItem.firstItem(),
@@ -351,7 +367,7 @@ fun WordDefinitionView(
 @Composable
 fun WordSubHeaderView(
     viewItem: WordSubHeaderViewItem,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = viewItem.firstItem().resolveString(),
@@ -369,7 +385,7 @@ fun WordSubHeaderView(
 @Composable
 fun WordSynonymView(
     viewItem: WordSynonymViewItem,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = viewItem.firstItem(),
@@ -386,7 +402,7 @@ fun WordSynonymView(
 @Composable
 fun WordExampleView(
     viewItem: WordExampleViewItem,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = viewItem.firstItem(),

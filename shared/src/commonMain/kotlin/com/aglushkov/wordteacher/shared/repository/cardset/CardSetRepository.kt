@@ -21,6 +21,7 @@ class CardSetRepository(
 
     val cardSet: StateFlow<Resource<CardSet>> = stateFlow
     private var loadJob: Job? = null
+    private var updateCardJob: Job? = null
 
     suspend fun loadCardSet(id: Long) {
         loadJob?.cancel()
@@ -63,7 +64,16 @@ class CardSetRepository(
             )
 
             database.cards.insertCard(loadedCardSet.id, newCard)
-            newCard.copy(id = database.cards.insertedCardId()!!)
+            newCard.id = database.cards.insertedCardId()!!
+            newCard
         }.await()
+    }
+
+    suspend fun updateCard(card: Card) {
+        updateCardJob?.cancel()
+        updateCardJob = scope.launch(Dispatchers.Default) {
+            delay(200)
+            database.cards.updateCard(card)
+        }
     }
 }

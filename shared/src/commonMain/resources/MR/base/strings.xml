@@ -57,5 +57,8 @@
     <string name="notes_create_note">Create a note</string>
     <string name="cardsets_create_cardset">Create a card set</string>
 
+    <string name="card_title_placeholder">Enter name</string>
+    <string name="card_transcription_placeholder">Enter transcription</string>
+
     <string name="error_try_again">Try again</string>
 </resources>

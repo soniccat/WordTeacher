@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.general.resource
 
+import kotlinx.coroutines.CancellationException
 import kotlin.js.JsName
 
 
@@ -140,6 +141,8 @@ fun <D, T, P> Resource<T>.toTriple(res2: Resource<D>, res3: Resource<P>) = Tripl
 fun <T> tryInResource(canTryAgain: Boolean = false, code: () -> T): Resource<T> {
     try {
         return Resource.Loaded(code())
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Throwable) {
         return Resource.Error(throwable = e, canTryAgain)
     }

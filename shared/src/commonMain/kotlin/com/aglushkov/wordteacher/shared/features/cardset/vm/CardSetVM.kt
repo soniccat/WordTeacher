@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
@@ -25,9 +26,12 @@ interface CardSetVM {
     val eventFlow: Flow<Event>
 
     fun onCardSetCreatePressed()
+    fun onTermChanged(term: String, card: Card)
+    fun onTranscriptionChanged(transcription: String, card: Card)
     fun onBackPressed()
     fun onTryAgainClicked()
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+    fun getPlaceholder(viewItem: BaseViewItem<*>): StringDesc?
 
     @Parcelize
     data class State (
@@ -72,33 +76,39 @@ open class CardSetVMImpl(
         val result = mutableListOf<BaseViewItem<*>>()
 
         loadedRes.data.cards.onEach { card ->
-            result += WordTitleViewItem(card.term, providers = emptyList())
-            result += WordTranscriptionViewItem(card.transcription.orEmpty())
-            result += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc())
+            val cardViewItems = mutableListOf<BaseViewItem<*>>()
+            cardViewItems += WordTitleViewItem(card.term, providers = emptyList())
+            cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty())
+            cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc())
 
             card.definitions.onEach { def ->
-                result += WordDefinitionViewItem(indentDefinitionString(def))
+                cardViewItems += WordDefinitionViewItem(indentDefinitionString(def))
             }
 
             // Examples
-            result += WordSubHeaderViewItem(
+            cardViewItems += WordSubHeaderViewItem(
                 StringDesc.Resource(MR.strings.word_section_examples),
                 Indent.SMALL
             )
 
             card.examples.onEach { example ->
-                result += WordExampleViewItem(example, Indent.SMALL)
+                cardViewItems += WordExampleViewItem(example, Indent.SMALL)
             }
 
             // Synonyms
-            result += WordSubHeaderViewItem(
+            cardViewItems += WordSubHeaderViewItem(
                 StringDesc.Resource(MR.strings.word_section_synonyms),
                 Indent.SMALL
             )
 
             card.synonyms.onEach { synonym ->
-                result += WordSynonymViewItem(synonym, Indent.SMALL)
+                cardViewItems += WordSynonymViewItem(synonym, Indent.SMALL)
             }
+
+            result += CardViewItem(
+                card = card,
+                innerViewItems = cardViewItems
+            )
 
             result += WordDividerViewItem()
         }
@@ -123,11 +133,33 @@ open class CardSetVMImpl(
         }
     }
 
+    override fun onTermChanged(term: String, card: Card) {
+        card.term = term
+        viewModelScope.launch {
+            repository.updateCard(card)
+        }
+    }
+
+    override fun onTranscriptionChanged(transcription: String, card: Card) {
+        card.transcription = transcription
+        viewModelScope.launch {
+            repository.updateCard(card)
+        }
+    }
+
     override fun onBackPressed() {
         router.closeCardSet()
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
         return StringDesc.Resource(MR.strings.article_error)
+    }
+
+    override fun getPlaceholder(viewItem: BaseViewItem<*>): StringDesc? {
+        return when (val v = viewItem) {
+            is WordTitleViewItem -> StringDesc.Resource(MR.strings.card_title_placeholder)
+            is WordTranscriptionViewItem -> StringDesc.Resource(MR.strings.card_transcription_placeholder)
+            else -> null
+        }
     }
 }

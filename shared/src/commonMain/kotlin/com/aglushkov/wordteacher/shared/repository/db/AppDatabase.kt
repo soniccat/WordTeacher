@@ -126,7 +126,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     date!!,
                     term!!,
                     definitions?.split(CARD_SEPARATOR).orEmpty(),
-                    WordTeacherWord.PartOfSpeech.fromString(partOfSpeech!!),
+                    if (partOfSpeech != null) WordTeacherWord.PartOfSpeech.valueOf(partOfSpeech) else WordTeacherWord.PartOfSpeech.Undefined,
                     transcription,
                     synonyms?.split(CARD_SEPARATOR).orEmpty(),
                     examples?.split(CARD_SEPARATOR).orEmpty()
@@ -161,7 +161,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 db.dBCardQueries.insert(
                     date,
                     term,
-                    partOfSpeech.toStringDesc().toString(),
+                    partOfSpeech.toString(),
                     transcription,
                     definitions.joinToString(CARD_SEPARATOR),
                     synonyms.joinToString(CARD_SEPARATOR),
@@ -174,10 +174,25 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         }
 
         fun updateCard(
+            card: Card
+        ) {
+            updateCard(
+                cardId = card.id,
+                date = card.date,
+                term = card.term,
+                definitions = card.definitions,
+                partOfSpeech = card.partOfSpeech,
+                transcription = card.transcription,
+                synonyms = card.synonyms,
+                examples = card.examples
+            )
+        }
+
+        fun updateCard(
             cardId: Long,
             date: Long,
             term: String,
-            definition: String,
+            definitions: List<String>,
             partOfSpeech: WordTeacherWord.PartOfSpeech,
             transcription: String?,
             synonyms: List<String>,
@@ -185,9 +200,9 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         ) = db.dBCardQueries.updateCard(
             date,
             term,
-            partOfSpeech.toStringDesc().toString(),
+            partOfSpeech.toString(),
             transcription,
-            definition,
+            definitions.joinToString(CARD_SEPARATOR),
             synonyms.joinToString(CARD_SEPARATOR),
             examples.joinToString(CARD_SEPARATOR),
             cardId
