@@ -106,7 +106,7 @@ fun TextFieldCellView(
 //}
 
 @Composable
-fun TestTextField(
+fun InlineTextField(
     modifier: Modifier,
     value: TextFieldValue,
     placeholder: String,
@@ -120,6 +120,7 @@ fun TestTextField(
 //                minHeight = TextFieldDefaults.MinHeight
 //            ),
         onValueChange = onValueChange,
+        modifier = modifier,
         textStyle = textStyle,
 //        cursorBrush = SolidColor(cursorColor),
 //        visualTransformation = visualTransformation,

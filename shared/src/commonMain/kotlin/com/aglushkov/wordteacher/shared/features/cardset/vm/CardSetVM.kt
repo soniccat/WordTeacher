@@ -25,9 +25,11 @@ interface CardSetVM {
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val eventFlow: Flow<Event>
 
-    fun onCardSetCreatePressed()
-    fun onTermChanged(term: String, card: Card)
-    fun onTranscriptionChanged(transcription: String, card: Card)
+    fun onCardCreatePressed()
+    fun onCardDeleted(card: Card)
+    fun onItemTextChanged(text: String, item: BaseViewItem<*>, card: Card)
+    fun onAddDefinitionPressed(card: Card)
+    fun onDefinitionRemoved(item: WordDefinitionViewItem, card: Card)
     fun onBackPressed()
     fun onTryAgainClicked()
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
@@ -81,8 +83,8 @@ open class CardSetVMImpl(
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty())
             cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc())
 
-            card.definitions.onEach { def ->
-                cardViewItems += WordDefinitionViewItem(indentDefinitionString(def))
+            card.definitions.onEachIndexed { index, def ->
+                cardViewItems += WordDefinitionViewItem(def, index)
             }
 
             // Examples
@@ -120,28 +122,62 @@ open class CardSetVMImpl(
     }
 
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
-        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator)
+        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator) { newItem, oldItem ->
+            if (newItem is CardViewItem && (oldItem is CardViewItem?)) {
+                if (newItem.innerViewItems.size != oldItem?.innerViewItems?.size) {
+                    // set ids depending on the item content to handle adding/deleting right
+                    generateViewItemIds(
+                        newItem.innerViewItems,
+                        oldItem?.innerViewItems.orEmpty(),
+                        idGenerator
+                    )
+                } else {
+                    // keep ids not to alter them after content changing
+                    newItem.innerViewItems.onEachIndexed { index, baseViewItem ->
+                        baseViewItem.id = oldItem.innerViewItems[index].id
+                    }
+                }
+            }
+        }
     }
 
     override fun onTryAgainClicked() {
         // TODO: do sth with articlesRepository
     }
 
-    override fun onCardSetCreatePressed() {
+    override fun onItemTextChanged(text: String, item: BaseViewItem<*>, card: Card) {
+        when (item) {
+            is WordTitleViewItem -> card.term = text
+            is WordTranscriptionViewItem -> card.transcription = text
+            is WordDefinitionViewItem -> card.definitions[item.index] = text
+        }
+
+        updateCard(card)
+    }
+
+    override fun onAddDefinitionPressed(card: Card) {
+        card.definitions += ""
+        updateCard(card)
+    }
+
+    override fun onDefinitionRemoved(item: WordDefinitionViewItem, card: Card) {
+        card.definitions.removeAt(item.index)
+        updateCard(card)
+    }
+
+    override fun onCardCreatePressed() {
         viewModelScope.launch {
             repository.createCard()
         }
     }
 
-    override fun onTermChanged(term: String, card: Card) {
-        card.term = term
+    override fun onCardDeleted(card: Card) {
         viewModelScope.launch {
-            repository.updateCard(card)
+            repository.deleteCard(card)
         }
     }
 
-    override fun onTranscriptionChanged(transcription: String, card: Card) {
-        card.transcription = transcription
+    private fun updateCard(card: Card) {
         viewModelScope.launch {
             repository.updateCard(card)
         }

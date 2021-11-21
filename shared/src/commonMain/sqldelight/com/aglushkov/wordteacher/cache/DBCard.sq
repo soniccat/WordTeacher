@@ -25,6 +25,11 @@ WHERE id = ?;
 lastInsertedRowId:
 SELECT last_insert_rowid();
 
+removeCard:
+DELETE
+FROM DBCard
+WHERE id = ?;
+
 removeCardsBySetId:
 DELETE
 FROM DBCard

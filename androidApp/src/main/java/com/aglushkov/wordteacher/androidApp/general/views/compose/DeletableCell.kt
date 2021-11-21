@@ -27,88 +27,94 @@ import com.aglushkov.wordteacher.androidApp.features.articles.views.roundToMax
 @ExperimentalMaterialApi
 @Composable
 fun DeletableCell(
+    stateKey: Any,
     onClick: () -> Unit,
     onDeleted: () -> Unit,
     threshold: Float = 0.3f,
     content: @Composable RowScope.() -> Unit
 ) {
-    var isSwipedAway by remember { mutableStateOf(false) }
-    val dismissState = rememberDismissState(
-        confirmStateChange = {
-            if (it == DismissValue.DismissedToStart) {
-                isSwipedAway = true
-            }
-            true
-        }
-    )
-
-    AnimatedVisibility(
-        visible = !isSwipedAway,
-        enter = expandVertically(),
-        exit = shrinkVertically(
-            animationSpec = tween(
-                durationMillis = 300,
-            )
-        )
-    ) {
-        DisposableEffect("Wait until a disappear animation completes") {
-            onDispose {
-                if (isSwipedAway) {
-                    onDeleted()
+    key(stateKey) {
+        var isSwipedAway by remember { mutableStateOf(false) }
+        val dismissState = rememberDismissState(
+            confirmStateChange = {
+                if (it == DismissValue.DismissedToStart) {
+                    isSwipedAway = true
                 }
+                true
             }
-        }
+        )
 
-        val deleteButtonWidth = (DeleteButtonWidth.value * LocalDensity.current.density).toInt()
-        val dismissThreshold: (DismissDirection) -> ThresholdConfig = { FractionalThreshold(threshold) }
-        SwipeToDismiss(
-            state = dismissState,
-            modifier = Modifier.clickable { onClick() },
-            directions = setOf(DismissDirection.EndToStart),
-            dismissThresholds = dismissThreshold,
-            background = {
-                Box(
-                    Modifier.fillMaxSize()
-                ) {
-                    val density = LocalDensity.current
-                    // To support icon sliding from the right edge
-                    Layout(
-                        content = {
-                            Image(
-                                painter = rememberVectorPainter(image = Icons.Default.Delete),
-                                contentDescription = null,
-                                modifier = Modifier.background(Color.Red).fillMaxSize(),
-                                alignment = DeleteIconAlignment(deleteButtonWidth),
-                                contentScale = ContentScale.None
-                            )
-                        }
-                    ) { measurables, constraints ->
-                        val resultFraction = when (dismissState.progress.to) {
-                            DismissValue.DismissedToStart -> dismissState.progress.fraction * (1.0f/threshold)
-                            else -> 0f
-                        }.roundToMax(1.0f)
-
-                        val iconWidth = (deleteButtonWidth * resultFraction).toInt()
-                        val icon = measurables[0].measure(
-                            constraints.constrain(
-                                Constraints(
-                                    maxWidth = iconWidth,
-                                    maxHeight = constraints.maxHeight,
-                                )
-                            )
-                        )
-
-                        layout(constraints.maxWidth, constraints.maxHeight) {
-                            icon.placeRelative(
-                                x = constraints.maxWidth - iconWidth,
-                                y = 0
-                            )
-                        }
+        AnimatedVisibility(
+            visible = !isSwipedAway,
+            enter = expandVertically(),
+            exit = shrinkVertically(
+                animationSpec = tween(
+                    durationMillis = 300,
+                )
+            )
+        ) {
+            DisposableEffect("Wait until a disappear animation completes") {
+                onDispose {
+                    if (isSwipedAway) {
+                        onDeleted()
                     }
                 }
             }
-        ) {
-            content()
+
+            val deleteButtonWidth = (DeleteButtonWidth.value * LocalDensity.current.density).toInt()
+            val dismissThreshold: (DismissDirection) -> ThresholdConfig =
+                { FractionalThreshold(threshold) }
+            SwipeToDismiss(
+                state = dismissState,
+                modifier = Modifier.clickable { onClick() },
+                directions = setOf(DismissDirection.EndToStart),
+                dismissThresholds = dismissThreshold,
+                background = {
+                    Box(
+                        Modifier.fillMaxSize()
+                    ) {
+                        val density = LocalDensity.current
+                        // To support icon sliding from the right edge
+                        Layout(
+                            content = {
+                                Image(
+                                    painter = rememberVectorPainter(image = Icons.Default.Delete),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .background(Color.Red.copy(alpha = 0.8f))
+                                        .fillMaxSize(),
+                                    alignment = DeleteIconAlignment(deleteButtonWidth),
+                                    contentScale = ContentScale.None
+                                )
+                            }
+                        ) { measurables, constraints ->
+                            val resultFraction = when (dismissState.progress.to) {
+                                DismissValue.DismissedToStart -> dismissState.progress.fraction * (1.0f / threshold)
+                                else -> 0f
+                            }.roundToMax(1.0f)
+
+                            val iconWidth = (deleteButtonWidth * resultFraction).toInt()
+                            val icon = measurables[0].measure(
+                                constraints.constrain(
+                                    Constraints(
+                                        maxWidth = iconWidth,
+                                        maxHeight = constraints.maxHeight,
+                                    )
+                                )
+                            )
+
+                            layout(constraints.maxWidth, constraints.maxHeight) {
+                                icon.placeRelative(
+                                    x = constraints.maxWidth - iconWidth,
+                                    y = 0
+                                )
+                            }
+                        }
+                    }
+                }
+            ) {
+                content()
+            }
         }
     }
 }

@@ -111,7 +111,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         fun removeCardSet(cardSetId: Long) {
             db.transaction {
                 db.dBCardQueries.removeCardsBySetId(cardSetId)
-                db.dBCardSetToCardRelationQueries.removeByCardSet(cardSetId)
+                db.dBCardSetToCardRelationQueries.removeCardSet(cardSetId)
                 db.dBCardSetQueries.removeCardSet(cardSetId)
             }
         }
@@ -125,11 +125,11 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     id!!,
                     date!!,
                     term!!,
-                    definitions?.split(CARD_SEPARATOR).orEmpty(),
+                    definitions?.split(CARD_SEPARATOR).orEmpty().toMutableList(),
                     if (partOfSpeech != null) WordTeacherWord.PartOfSpeech.valueOf(partOfSpeech) else WordTeacherWord.PartOfSpeech.Undefined,
                     transcription,
-                    synonyms?.split(CARD_SEPARATOR).orEmpty(),
-                    examples?.split(CARD_SEPARATOR).orEmpty()
+                    synonyms?.split(CARD_SEPARATOR).orEmpty().toMutableList(),
+                    examples?.split(CARD_SEPARATOR).orEmpty().toMutableList()
                 )
             }
         )
@@ -209,6 +209,13 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         )
 
         fun insertedCardId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
+
+        fun removeCard(cardId: Long) {
+            db.transaction {
+                db.dBCardSetToCardRelationQueries.removeCard(cardId)
+                db.dBCardQueries.removeCard(cardId)
+            }
+        }
     }
 
     inner class Notes {

@@ -128,6 +128,7 @@ private fun CardSetTitleView(
     onDeleted: () -> Unit
 ) {
     DeletableCell(
+        stateKey = cardSetViewItem.id,
         onClick,
         onDeleted
     ) {

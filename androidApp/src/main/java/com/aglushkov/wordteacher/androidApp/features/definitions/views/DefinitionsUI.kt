@@ -349,10 +349,16 @@ fun WordPartOfSpeechView(
 @Composable
 fun WordDefinitionView(
     viewItem: WordDefinitionViewItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = AppTypography.wordDefinition,
+    textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
+        Text(
+            text = text,
+            style = ts
+        )
+    }
 ) {
-    Text(
-        text = viewItem.firstItem(),
+    Row(
         modifier = Modifier
             .then(modifier)
             .padding(
@@ -360,8 +366,10 @@ fun WordDefinitionView(
                 end = dimensionResource(id = R.dimen.word_horizontalPadding),
                 top = dimensionResource(id = R.dimen.word_header_topMargin)
             ),
-        style = AppTypography.wordDefinition
-    )
+    ) {
+        Text(" • ")
+        textContent(viewItem.firstItem(), textStyle)
+    }
 }
 
 @Composable

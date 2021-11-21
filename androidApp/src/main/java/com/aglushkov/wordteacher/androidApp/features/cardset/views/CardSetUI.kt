@@ -1,25 +1,23 @@
 package com.aglushkov.wordteacher.androidApp.features.cardset.views
 
-import androidx.cardview.widget.CardView
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
-import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.*
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
@@ -29,7 +27,6 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.Card
-import java.time.format.TextStyle
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -95,7 +92,7 @@ fun CardSetViewItems(
             item,
             modifier,
             onClicked = {
-                vm.onCardSetCreatePressed()
+                vm.onCardCreatePressed()
             }
         )
         is WordDividerViewItem -> WordDividerView()
@@ -111,24 +108,25 @@ fun CardSetViewItems(
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun CardView(
-    item: CardViewItem,
+    cardItem: CardViewItem,
     vm: CardSetVM
 ) {
-    val card = item.card
+    val card = cardItem.card
     DeletableCell(
+        stateKey = cardItem.id,
         onClick = { /*TODO*/ },
-        onDeleted = { /*TODO*/ }
+        onDeleted = { vm.onCardDeleted(cardItem.card) }
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            item.innerViewItems.onEach {
+            cardItem.innerViewItems.onEach {
                 when (val item = it) {
                     is WordTitleViewItem -> {
                         WordTitleView(
                             viewItem = item,
                             textContent = { text, textStyle ->
-                                CardTextField(text, textStyle, item, card, vm)
+                                CardTextField(Modifier, text, textStyle, item, card, vm)
                             }
                         )
                     }
@@ -136,12 +134,44 @@ private fun CardView(
                         WordTranscriptionView(
                             item,
                             textContent = { text, textStyle ->
-                                CardTextField(text, textStyle, item, card, vm)
+                                CardTextField(Modifier, text, textStyle, item, card, vm)
                             }
                         )
                     }
                     is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item)
-                    is WordDefinitionViewItem -> WordDefinitionView(item)
+                    is WordDefinitionViewItem -> DeletableCell(
+                            stateKey = item.id,
+                            onClick = { /*TODO*/ },
+                            onDeleted = { vm.onDefinitionRemoved(item, card) }
+                        ) {
+                            WordDefinitionView(
+                                item,
+                                textContent = { text, textStyle ->
+                                    CardTextField(
+                                        modifier = Modifier.weight(1.0f),
+                                        text,
+                                        textStyle,
+                                        item,
+                                        card,
+                                        vm
+                                    )
+
+                                    val needShowAddIcon = item.index == card.definitions.size - 1
+                                    if (needShowAddIcon) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_plus_small),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .clickable {
+                                                    vm.onAddDefinitionPressed(card)
+                                                }
+                                                .padding(4.dp),
+                                            tint = MaterialTheme.colors.secondary
+                                        )
+                                    }
+                                }
+                            )
+                        }
                     is WordSubHeaderViewItem -> WordSubHeaderView(item)
                     is WordSynonymViewItem -> WordSynonymView(item)
                     is WordExampleViewItem -> WordExampleView(item)
@@ -153,6 +183,7 @@ private fun CardView(
 
 @Composable
 private fun CardTextField(
+    modifier: Modifier = Modifier,
     text: String,
     textStyle: androidx.compose.ui.text.TextStyle,
     item: BaseViewItem<*>,
@@ -160,14 +191,14 @@ private fun CardTextField(
     vm: CardSetVM
 ) {
     var textState by remember { mutableStateOf(TextFieldValue(text)) }
-    TestTextField(
-        modifier = Modifier,
+    InlineTextField(
+        modifier = modifier,
         value = textState,
         placeholder = vm.getPlaceholder(item)?.toString(LocalContext.current).orEmpty(),
         textStyle = textStyle,
         onValueChange = {
             textState = it
-            vm.onTermChanged(it.text, card)
+            vm.onItemTextChanged(it.text, item, card)
         }
     )
 }

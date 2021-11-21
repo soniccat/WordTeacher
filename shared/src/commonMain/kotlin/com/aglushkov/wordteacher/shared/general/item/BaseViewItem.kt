@@ -59,7 +59,8 @@ abstract class BaseViewItem<T> {
 fun generateViewItemIds(
     items: List<BaseViewItem<*>>,
     prevItems: List<BaseViewItem<*>> = emptyList(),
-    idGenerator: IdGenerator
+    idGenerator: IdGenerator,
+    onIdSet: (newItem: BaseViewItem<*>, oldItem: BaseViewItem<*>?) -> Unit = { a, b -> }
 ) {
     val map: MutableMap<Int, MutableList<BaseViewItem<*>>> = mutableMapOf()
 
@@ -88,5 +89,6 @@ fun generateViewItemIds(
         } else {
             it.id = idGenerator.nextId()
         }
+        onIdSet(it, item)
     }
 }

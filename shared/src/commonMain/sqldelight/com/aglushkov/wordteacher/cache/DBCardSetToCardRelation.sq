@@ -26,10 +26,15 @@ VALUES ?;
 lastInsertedRowId:
 SELECT last_insert_rowid();
 
-removeByCardSet:
+removeCardSet:
 DELETE
 FROM DBCardSetToCardRelation
 WHERE setId = ?;
+
+removeCard:
+DELETE
+FROM DBCardSetToCardRelation
+WHERE cardId = ?;
 
 removeAll:
 DELETE

@@ -56,16 +56,22 @@ class CardSetRepository(
                 id = -1,
                 date = timeSource.getTimeInMilliseconds(),
                 term = "",
-                definitions = emptyList(),
+                definitions = mutableListOf(),
                 partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
                 transcription = "",
-                synonyms = emptyList(),
-                examples = emptyList()
+                synonyms = mutableListOf(),
+                examples = mutableListOf()
             )
 
             database.cards.insertCard(loadedCardSet.id, newCard)
             newCard.id = database.cards.insertedCardId()!!
             newCard
+        }.await()
+    }
+
+    suspend fun deleteCard(card: Card) {
+        scope.async(Dispatchers.Default) {
+            database.cards.removeCard(card.id)
         }.await()
     }
 

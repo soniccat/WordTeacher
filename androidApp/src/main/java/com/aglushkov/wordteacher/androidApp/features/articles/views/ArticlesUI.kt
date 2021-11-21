@@ -117,6 +117,7 @@ private fun ArticleTitleView(
     onDeleted: () -> Unit
 ) {
     DeletableCell(
+        stateKey = articleViewItem.id,
         onClick,
         onDeleted
     ) {

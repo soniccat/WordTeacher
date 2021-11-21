@@ -262,7 +262,7 @@ open class DefinitionsVMImpl(
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
                 for (d in def.definitions) {
-                    items.add(WordDefinitionViewItem(indentDefinitionString(d)))
+                    items.add(WordDefinitionViewItem(d))
                 }
 
                 if (def.examples.isNotEmpty()) {
@@ -365,5 +365,3 @@ data class ShowPartsOfSpeechFilterDialogEvent(
         isHandled = true
     }
 }
-
-fun indentDefinitionString(def: String) = "• $def"

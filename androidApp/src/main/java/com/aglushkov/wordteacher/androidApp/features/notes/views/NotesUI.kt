@@ -179,6 +179,7 @@ private fun NoteView(
         }
     } else {
         DeletableCell(
+            stateKey = noteViewItem.id,
             onClick,
             onDeleted
         ) {
