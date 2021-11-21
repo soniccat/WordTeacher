@@ -75,11 +75,13 @@ class CardSetRepository(
         }.await()
     }
 
-    suspend fun updateCard(card: Card) {
+    suspend fun updateCard(card: Card, delay: Long = UPDATE_DELAY) {
         updateCardJob?.cancel()
         updateCardJob = scope.launch(Dispatchers.Default) {
-            delay(200)
+            delay(delay)
             database.cards.updateCard(card)
         }
     }
 }
+
+const val UPDATE_DELAY = 200L

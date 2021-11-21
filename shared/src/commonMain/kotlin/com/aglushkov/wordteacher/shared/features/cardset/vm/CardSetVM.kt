@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.UPDATE_DELAY
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -48,7 +49,7 @@ open class CardSetVMImpl(
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator
 ): ViewModel(), CardSetVM {
-    override val cardSet: StateFlow<Resource<CardSet>> = repository.cardSet
+    final override val cardSet: StateFlow<Resource<CardSet>> = repository.cardSet
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
 
@@ -74,6 +75,9 @@ open class CardSetVMImpl(
         }
     }
 
+    // TODO: consider storing only CardViewItem and separate UI parts in UI layer to leverage
+    // all the Android Compose profit of diffing UI changes instead of what's going on in generateIds
+    // (kinda hacky diffing with manual id management)
     private fun makeViewItems(loadedRes: Resource.Loaded<CardSet>): List<BaseViewItem<*>>  {
         val result = mutableListOf<BaseViewItem<*>>()
 
@@ -157,12 +161,12 @@ open class CardSetVMImpl(
 
     override fun onAddDefinitionPressed(card: Card) {
         card.definitions += ""
-        updateCard(card)
+        updateCard(card, delay = 0)
     }
 
     override fun onDefinitionRemoved(item: WordDefinitionViewItem, card: Card) {
         card.definitions.removeAt(item.index)
-        updateCard(card)
+        updateCard(card, delay = 0)
     }
 
     override fun onCardCreatePressed() {
@@ -177,9 +181,9 @@ open class CardSetVMImpl(
         }
     }
 
-    private fun updateCard(card: Card) {
+    private fun updateCard(card: Card, delay: Long = UPDATE_DELAY) {
         viewModelScope.launch {
-            repository.updateCard(card)
+            repository.updateCard(card, delay)
         }
     }
 
