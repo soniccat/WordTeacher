@@ -225,22 +225,6 @@ private fun CardView(
 }
 
 @Composable
-private fun AddIcon(
-    onClicked: () -> Unit
-) {
-    Icon(
-        painter = painterResource(id = R.drawable.ic_plus_small),
-        contentDescription = null,
-        modifier = Modifier
-            .clickable {
-                onClicked()
-            }
-            .padding(4.dp),
-        tint = MaterialTheme.colors.secondary
-    )
-}
-
-@Composable
 private fun CardTextField(
     modifier: Modifier = Modifier,
     text: String,

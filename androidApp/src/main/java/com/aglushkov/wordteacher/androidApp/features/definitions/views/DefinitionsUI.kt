@@ -33,11 +33,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.toDp
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserViewItem
-import com.aglushkov.wordteacher.androidApp.general.views.compose.Chip
-import com.aglushkov.wordteacher.androidApp.general.views.compose.ChipColors
-import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomTopAppBar
-import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
-import com.aglushkov.wordteacher.androidApp.general.views.compose.SearchView
+import com.aglushkov.wordteacher.androidApp.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
@@ -180,7 +176,30 @@ private fun showViewItem(
     is WordTitleViewItem -> WordTitleView(item, modifier)
     is WordTranscriptionViewItem -> WordTranscriptionView(item, modifier)
     is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier)
-    is WordDefinitionViewItem -> WordDefinitionView(item, modifier)
+    is WordDefinitionViewItem -> WordDefinitionView(
+        item,
+        modifier,
+        textContent = { text, ts ->
+            Text(
+                text = text,
+                style = ts
+            )
+
+            var expanded by remember { mutableStateOf(false) }
+            AddIcon { expanded = true }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
+                    Text("Refresh")
+                }
+                DropdownMenuItem(onClick = { /* Handle settings! */ }) {
+                    Text("Settings")
+                }
+            }
+        }
+    )
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
     is WordSynonymViewItem -> WordSynonymView(item, modifier)
     is WordExampleViewItem -> WordExampleView(item, modifier)
@@ -258,7 +277,8 @@ fun WordDividerView(
     modifier: Modifier = Modifier
 ) {
     Divider(
-        modifier = Modifier.then(modifier)
+        modifier = Modifier
+            .then(modifier)
             .padding(
                 top = dimensionResource(id = R.dimen.word_divider_topMargin),
                 bottom = dimensionResource(id = R.dimen.word_divider_bottomMargin)
