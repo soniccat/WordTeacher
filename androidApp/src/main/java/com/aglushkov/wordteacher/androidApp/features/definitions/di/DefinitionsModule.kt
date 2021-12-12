@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
@@ -58,10 +59,11 @@ class DefinitionsModule {
     fun viewModel(
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
+        cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
         state: DefinitionsVM.State
     ): DefinitionsVM {
-        return DefinitionsVMImpl(connectivityManager, wordDefinitionRepository, idGenerator, state)
+        return DefinitionsVMImpl(connectivityManager, wordDefinitionRepository, cardSetsRepository, idGenerator, state)
     }
 
     @FragmentComp

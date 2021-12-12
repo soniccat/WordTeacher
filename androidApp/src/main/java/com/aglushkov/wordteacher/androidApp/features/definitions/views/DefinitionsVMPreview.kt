@@ -61,4 +61,7 @@ open class DefinitionsVMPreview(
         get() = MutableStateFlow(selectedPartsOfSpeech)
     override val eventFlow: Flow<Event>
         get() = events.asFlow()
+
+    override val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
+        get() = MutableStateFlow(Resource.Uninitialized())
 }

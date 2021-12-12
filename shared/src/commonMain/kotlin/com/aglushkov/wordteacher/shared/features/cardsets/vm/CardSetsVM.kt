@@ -54,17 +54,10 @@ open class CardSetsVMImpl(
     final override val stateFlow = MutableStateFlow(state)
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
-    private val cardSetsFlow = cardSetsRepository.cardSets
-    override val cardSets = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
-
-    init {
-        viewModelScope.launch {
-            cardSetsFlow.map {
-                Logger.v("build view items")
-                it.copyWith(buildViewItems(it.data() ?: emptyList(), state.newCardSetText))
-            }.forward(cardSets)
-        }
-    }
+    override val cardSets = cardSetsRepository.cardSets.map {
+        Logger.v("build view items")
+        it.copyWith(buildViewItems(it.data() ?: emptyList(), state.newCardSetText))
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override fun restore(newState: CardSetsVM.State) {
         state = newState
@@ -74,7 +67,6 @@ open class CardSetsVMImpl(
         super.onCleared()
         eventChannel.cancel()
     }
-
 
     override fun onNewCardSetTextChange(text: String) {
         updateState(state.copy(newCardSetText = text))

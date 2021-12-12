@@ -4,6 +4,8 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
@@ -15,10 +17,12 @@ class DefinitionsDecomposeComponent (
     word: String?, // TODO: replace with DefinitionsVM.State
     connectivityManager: ConnectivityManager,
     wordDefinitionRepository: WordDefinitionRepository,
+    cardSetsRepository: CardSetsRepository,
     idGenerator: IdGenerator
 ) : DefinitionsVMImpl(
     connectivityManager,
     wordDefinitionRepository,
+    cardSetsRepository,
     idGenerator,
     DefinitionsVM.State(word = word)
 ), ComponentContext by componentContext {

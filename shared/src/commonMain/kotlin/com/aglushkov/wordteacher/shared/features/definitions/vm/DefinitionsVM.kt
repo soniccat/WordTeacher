@@ -3,6 +3,8 @@ package com.aglushkov.wordteacher.shared.features.definitions.vm
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.extensions.forward
@@ -11,9 +13,11 @@ import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -50,6 +54,8 @@ interface DefinitionsVM {
     val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
     val eventFlow: Flow<Event>
 
+    val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
+
     @Parcelize
     class State(
         var word: String? = null
@@ -59,6 +65,7 @@ interface DefinitionsVM {
 open class DefinitionsVMImpl(
     private val connectivityManager: ConnectivityManager,
     private val wordDefinitionRepository: WordDefinitionRepository,
+    private val cardSetsRepository: CardSetsRepository,
     private val idGenerator: IdGenerator,
     override var state: DefinitionsVM.State
 ): ViewModel(), DefinitionsVM {
@@ -353,6 +360,28 @@ open class DefinitionsVMImpl(
         val hasConnection = connectivityManager.isDeviceOnline
         val hasResponse = true // TODO: handle error server response
         return res.getErrorString(hasConnection, hasResponse)
+    }
+
+    // card sets
+
+    override val cardSets = cardSetsRepository.cardSets.map {
+        Logger.v("build view items")
+        it.copyWith(buildCardSetViewItems(it.data() ?: emptyList()))
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+
+    private fun buildCardSetViewItems(cardSets: List<ShortCardSet>): List<BaseViewItem<*>> {
+        val items = mutableListOf<BaseViewItem<*>>()
+
+        cardSets.forEach {
+            items.add(CardSetViewItem(it.id, it.name, ""))
+        }
+
+        return listOf(
+            *items.toTypedArray(),
+            OpenCardSetViewItem(
+                text = StringDesc.Resource(MR.strings.definitions_open_cardsets)
+            )
+        )
     }
 }
 

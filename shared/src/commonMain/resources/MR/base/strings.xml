@@ -33,6 +33,7 @@
     <string name="definitions_add_filter">Add Filter</string>
     <string name="definitions_displayMode_bySource">By Source</string>
     <string name="definitions_displayMode_merge">Combined</string>
+    <string name="definitions_open_cardsets">Open card sets</string>
 
     <string name="articles_action_add_text">New Article</string>
     <string name="articles_action_article_created">Added!</string>

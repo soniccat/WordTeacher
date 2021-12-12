@@ -34,22 +34,14 @@ import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDividerViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTitleViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTranscriptionViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
@@ -191,11 +183,27 @@ private fun showViewItem(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
-                    Text("Refresh")
+                val sets = vm.cardSets.collectAsState()
+
+                if (sets.value.isLoading()) {
+                    CircularProgressIndicator()
                 }
-                DropdownMenuItem(onClick = { /* Handle settings! */ }) {
-                    Text("Settings")
+
+                sets.value.data()?.let { items ->
+                    items.onEach {
+                        when (it) {
+                            is CardSetViewItem -> DropdownMenuItem(
+                                onClick = {  }
+                            ) {
+                                Text(it.name)
+                            }
+                            is OpenCardSetViewItem -> DropdownMenuItem(
+                                onClick = {  }
+                            ) {
+                                Text(it.text.toString(LocalContext.current))
+                            }
+                        }
+                    }
                 }
             }
         }

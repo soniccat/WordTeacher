@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImp
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
@@ -31,10 +32,12 @@ class ArticleComposeModule {
         configuration: MainDecomposeComponent.ChildConfiguration.ArticleConfiguration,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
+        cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
     ): DefinitionsVM = DefinitionsVMImpl(
         connectivityManager,
         wordDefinitionRepository,
+        cardSetsRepository,
         idGenerator,
         DefinitionsVM.State()
     )

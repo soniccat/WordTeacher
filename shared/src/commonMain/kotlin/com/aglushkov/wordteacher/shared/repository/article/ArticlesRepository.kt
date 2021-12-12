@@ -33,7 +33,7 @@ class ArticlesRepository(
     private val timeSource: TimeSource
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val stateFlow = MutableStateFlow<Resource<List<ShortArticle>>>(Resource.Uninitialized())
+    private val stateFlow = MutableStateFlow<Resource<List<ShortArticle>>>(Resource.Loading())
 
     val shortArticles: StateFlow<Resource<List<ShortArticle>>> = stateFlow
 

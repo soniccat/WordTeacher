@@ -21,7 +21,7 @@ class CardSetsRepository(
     private val database: AppDatabase
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val stateFlow = MutableStateFlow<Resource<List<ShortCardSet>>>(Resource.Uninitialized())
+    private val stateFlow = MutableStateFlow<Resource<List<ShortCardSet>>>(Resource.Loading())
 
     val cardSets: StateFlow<Resource<List<ShortCardSet>>> = stateFlow
 
