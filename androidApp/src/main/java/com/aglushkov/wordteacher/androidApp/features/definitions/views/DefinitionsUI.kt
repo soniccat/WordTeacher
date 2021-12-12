@@ -393,35 +393,50 @@ fun WordSubHeaderView(
 @Composable
 fun WordSynonymView(
     viewItem: WordSynonymViewItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = AppTypography.wordSynonym,
+    textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
+        Text(
+            text = text,
+            style = ts
+        )
+    }
 ) {
-    Text(
-        text = viewItem.firstItem(),
+    Row(
         modifier = Modifier
             .then(modifier)
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding) + viewItem.indent.toDp(),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding)
             ),
-        style = AppTypography.wordSynonym
-    )
+    ) {
+        textContent(viewItem.firstItem(), textStyle)
+    }
 }
 
 @Composable
 fun WordExampleView(
     viewItem: WordExampleViewItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = AppTypography.wordExample,
+    textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
+        Text(
+            text = text,
+            style = ts
+        )
+    }
 ) {
-    Text(
-        text = viewItem.firstItem(),
+    Row(
         modifier = Modifier
             .then(modifier)
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding) + viewItem.indent.toDp(),
-                end = dimensionResource(id = R.dimen.word_horizontalPadding)
+                end = dimensionResource(id = R.dimen.word_horizontalPadding),
+//                top = dimensionResource(id = R.dimen.word_header_topMargin)
             ),
-        style = AppTypography.wordExample
-    )
+    ) {
+        textContent(viewItem.firstItem(), textStyle)
+    }
 }
 
 // Previews

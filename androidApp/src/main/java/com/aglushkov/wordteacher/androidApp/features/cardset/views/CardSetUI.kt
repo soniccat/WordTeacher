@@ -158,27 +158,86 @@ private fun CardView(
 
                                     val needShowAddIcon = item.index == card.definitions.size - 1
                                     if (needShowAddIcon) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_plus_small),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .clickable {
-                                                    vm.onAddDefinitionPressed(card)
-                                                }
-                                                .padding(4.dp),
-                                            tint = MaterialTheme.colors.secondary
-                                        )
+                                        AddIcon {
+                                            vm.onAddDefinitionPressed(card)
+                                        }
                                     }
                                 }
                             )
                         }
                     is WordSubHeaderViewItem -> WordSubHeaderView(item)
-                    is WordSynonymViewItem -> WordSynonymView(item)
-                    is WordExampleViewItem -> WordExampleView(item)
+                    is WordSynonymViewItem -> DeletableCell(
+                        stateKey = item.id,
+                        onClick = { /*TODO*/ },
+                        onDeleted = { vm.onSynonymRemoved(item, card) }
+                    ) {
+                        WordSynonymView(
+                            item,
+                            textContent = { text, textStyle ->
+                                CardTextField(
+                                    modifier = Modifier.weight(1.0f),
+                                    text,
+                                    textStyle,
+                                    item,
+                                    card,
+                                    vm
+                                )
+
+                                val needShowAddIcon = item.index == card.synonyms.size - 1
+                                if (needShowAddIcon) {
+                                    AddIcon {
+                                        vm.onAddSynonymPressed(card)
+                                    }
+                                }
+                            }
+                        )
+                    }
+                    is WordExampleViewItem -> DeletableCell(
+                        stateKey = item.id,
+                        onClick = { /*TODO*/ },
+                        onDeleted = { vm.onExampleRemoved(item, card) }
+                    ) {
+                        WordExampleView(
+                            item,
+                            textContent = { text, textStyle ->
+                                CardTextField(
+                                    modifier = Modifier.weight(1.0f),
+                                    text,
+                                    textStyle,
+                                    item,
+                                    card,
+                                    vm
+                                )
+
+                                val needShowAddIcon = item.index == card.examples.size - 1
+                                if (needShowAddIcon) {
+                                    AddIcon {
+                                        vm.onAddExamplePressed(card)
+                                    }
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun AddIcon(
+    onClicked: () -> Unit
+) {
+    Icon(
+        painter = painterResource(id = R.drawable.ic_plus_small),
+        contentDescription = null,
+        modifier = Modifier
+            .clickable {
+                onClicked()
+            }
+            .padding(4.dp),
+        tint = MaterialTheme.colors.secondary
+    )
 }
 
 @Composable

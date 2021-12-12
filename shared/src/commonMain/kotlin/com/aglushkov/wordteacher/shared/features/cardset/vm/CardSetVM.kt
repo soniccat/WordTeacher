@@ -31,6 +31,10 @@ interface CardSetVM {
     fun onItemTextChanged(text: String, item: BaseViewItem<*>, card: Card)
     fun onAddDefinitionPressed(card: Card)
     fun onDefinitionRemoved(item: WordDefinitionViewItem, card: Card)
+    fun onAddExamplePressed(card: Card)
+    fun onExampleRemoved(item: WordExampleViewItem, card: Card)
+    fun onAddSynonymPressed(card: Card)
+    fun onSynonymRemoved(item: WordSynonymViewItem, card: Card)
     fun onBackPressed()
     fun onTryAgainClicked()
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
@@ -97,8 +101,8 @@ open class CardSetVMImpl(
                 Indent.SMALL
             )
 
-            card.examples.onEach { example ->
-                cardViewItems += WordExampleViewItem(example, Indent.SMALL)
+            card.examples.onEachIndexed { index, example ->
+                cardViewItems += WordExampleViewItem(example, Indent.SMALL, index)
             }
 
             // Synonyms
@@ -107,8 +111,8 @@ open class CardSetVMImpl(
                 Indent.SMALL
             )
 
-            card.synonyms.onEach { synonym ->
-                cardViewItems += WordSynonymViewItem(synonym, Indent.SMALL)
+            card.synonyms.onEachIndexed { index, synonym ->
+                cardViewItems += WordSynonymViewItem(synonym, Indent.SMALL, index)
             }
 
             result += CardViewItem(
@@ -154,6 +158,8 @@ open class CardSetVMImpl(
             is WordTitleViewItem -> card.term = text
             is WordTranscriptionViewItem -> card.transcription = text
             is WordDefinitionViewItem -> card.definitions[item.index] = text
+            is WordExampleViewItem -> card.examples[item.index] = text
+            is WordSynonymViewItem -> card.synonyms[item.index] = text
         }
 
         updateCard(card)
@@ -166,6 +172,26 @@ open class CardSetVMImpl(
 
     override fun onDefinitionRemoved(item: WordDefinitionViewItem, card: Card) {
         card.definitions.removeAt(item.index)
+        updateCard(card, delay = 0)
+    }
+
+    override fun onAddExamplePressed(card: Card) {
+        card.examples += ""
+        updateCard(card, delay = 0)
+    }
+
+    override fun onExampleRemoved(item: WordExampleViewItem, card: Card) {
+        card.examples.removeAt(item.index)
+        updateCard(card, delay = 0)
+    }
+
+    override fun onAddSynonymPressed(card: Card) {
+        card.synonyms += ""
+        updateCard(card, delay = 0)
+    }
+
+    override fun onSynonymRemoved(item: WordSynonymViewItem, card: Card) {
+        card.synonyms.removeAt(item.index)
         updateCard(card, delay = 0)
     }
 

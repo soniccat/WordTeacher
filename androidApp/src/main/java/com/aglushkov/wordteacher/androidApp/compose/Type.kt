@@ -45,8 +45,7 @@ class AppTypography {
             @Composable get() {
                 val color = colorResource(id = R.color.word_subheader)
                 return remember(color) { typography.subtitle2.copy(
-                    color = color,
-                    fontStyle = FontStyle.Italic
+                    color = color
                 )}
             }
 

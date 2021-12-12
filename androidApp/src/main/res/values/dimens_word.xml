@@ -3,9 +3,9 @@
     <dimen name="word_horizontalPadding">@dimen/definitions_search_horizontal_margin</dimen>
     <dimen name="word_divider_topMargin">@dimen/definitions_search_vertical_margin</dimen>
     <dimen name="word_divider_bottomMargin">12dp</dimen>
-    <dimen name="word_partOfSpeech_topMargin">6dp</dimen>
-    <dimen name="word_header_topMargin">6dp</dimen>
-    <dimen name="word_subHeader_topMargin">4dp</dimen>
+    <dimen name="word_partOfSpeech_topMargin">20dp</dimen>
+    <dimen name="word_header_topMargin">12dp</dimen>
+    <dimen name="word_subHeader_topMargin">2dp</dimen>
 
     <dimen name="word_divider_height">1dp</dimen>
     <dimen name="word_providedBy_maxWidth">150dp</dimen>

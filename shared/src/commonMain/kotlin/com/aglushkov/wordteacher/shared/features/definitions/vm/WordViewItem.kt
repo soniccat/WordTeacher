@@ -40,13 +40,13 @@ class WordDefinitionViewItem(definition: String, val index: Int = -1): BaseViewI
     }
 }
 
-class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE): BaseViewItem<String>(example, Type) {
+class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE, val index: Int = -1): BaseViewItem<String>(example, Type) {
     companion object {
         const val Type = 105
     }
 }
 
-class WordSynonymViewItem(synonym: String, val indent: Indent = Indent.NONE): BaseViewItem<String>(synonym, Type) {
+class WordSynonymViewItem(synonym: String, val indent: Indent = Indent.NONE, val index: Int = -1): BaseViewItem<String>(synonym, Type) {
     companion object {
         const val Type = 106
     }

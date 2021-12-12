@@ -4,6 +4,6 @@
     <color name="partOfSpeechChipBg">@color/secondaryColor</color>
     <color name="partOfSpeechChipText">@color/secondaryTextColor</color>
 
-    <color name="word_partOfSpeech">#6E6E6E</color>
-    <color name="word_subheader">#6E6E6E</color>
+    <color name="word_partOfSpeech">@color/secondaryColor</color>
+    <color name="word_subheader">@color/secondaryColor</color>
 </resources>
