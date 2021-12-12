@@ -104,7 +104,9 @@ open class CardSetsVMImpl(
     }
 
     override fun onCardSetRemoved(item: CardSetViewItem) {
-
+        viewModelScope.launch {
+            cardSetsRepository.removeCardSet(item.id)
+        }
     }
 
     override fun onStartLearningClicked() {

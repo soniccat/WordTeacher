@@ -176,36 +176,7 @@ private fun showViewItem(
                 text = text,
                 style = ts
             )
-
-            var expanded by remember { mutableStateOf(false) }
-            AddIcon { expanded = true }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                val sets = vm.cardSets.collectAsState()
-
-                if (sets.value.isLoading()) {
-                    CircularProgressIndicator()
-                }
-
-                sets.value.data()?.let { items ->
-                    items.onEach {
-                        when (it) {
-                            is CardSetViewItem -> DropdownMenuItem(
-                                onClick = {  }
-                            ) {
-                                Text(it.name)
-                            }
-                            is OpenCardSetViewItem -> DropdownMenuItem(
-                                onClick = {  }
-                            ) {
-                                Text(it.text.toString(LocalContext.current))
-                            }
-                        }
-                    }
-                }
-            }
+            AddToSet(vm)
         }
     )
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
@@ -216,6 +187,39 @@ private fun showViewItem(
             text = "unknown item $item",
             modifier = modifier
         )
+    }
+}
+
+@Composable
+private fun AddToSet(vm: DefinitionsVM) {
+    var expanded by remember { mutableStateOf(false) }
+    AddIcon { expanded = true }
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false }
+    ) {
+        val sets = vm.cardSets.collectAsState()
+
+        if (sets.value.isLoading()) {
+            CircularProgressIndicator()
+        }
+
+        sets.value.data()?.let { items ->
+            items.onEach {
+                when (it) {
+                    is CardSetViewItem -> DropdownMenuItem(
+                        onClick = { }
+                    ) {
+                        Text(it.name)
+                    }
+                    is OpenCardSetViewItem -> DropdownMenuItem(
+                        onClick = { }
+                    ) {
+                        Text(it.text.toString(LocalContext.current))
+                    }
+                }
+            }
+        }
     }
 }
 
