@@ -115,20 +115,9 @@ fun InlineTextField(
 ) {
     BasicTextField(
         value = value,
-//            .defaultMinSize(
-//                minWidth = TextFieldDefaults.MinWidth,
-//                minHeight = TextFieldDefaults.MinHeight
-//            ),
         onValueChange = onValueChange,
         modifier = modifier,
         textStyle = textStyle,
-//        cursorBrush = SolidColor(cursorColor),
-//        visualTransformation = visualTransformation,
-//        keyboardOptions = keyboardOptions,
-//        keyboardActions = keyboardActions,
-//        interactionSource = interactionSource,
-//        singleLine = singleLine,
-//        maxLines = maxLines,
         decorationBox = @Composable { coreTextField ->
             Box(
                 contentAlignment = Alignment.CenterStart

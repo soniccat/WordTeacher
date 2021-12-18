@@ -4,6 +4,8 @@ plugins {
     id("resources-convention")
     id("sqldelight-convention")
     id("dev.icerock.mobile.multiplatform-resources")
+
+    kotlin("plugin.serialization") version "1.6.10"
 }
 
 group = "com.aglushkov.wordteacher"
@@ -51,9 +53,9 @@ kotlin {
                 implementation("org.apache.opennlp:opennlp-tools:1.9.2")
 
                 // for compose-jb - uncomment - start
-//                implementation(compose.runtime)
-//                implementation(compose.foundation)
-//                implementation(compose.material)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
                 // for compose-jb - uncomment - end
             }
         }
@@ -81,9 +83,9 @@ kotlin {
             dependencies {
                 implementation(libs.ktorDesktop)
                 // for compose-jb - uncomment - start
-//                implementation(compose.runtime)
-//                implementation(compose.foundation)
-//                implementation(compose.material)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
                 // for compose-jb - uncomment - end
 
 //                implementation(compose.uiTooling)

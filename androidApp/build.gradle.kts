@@ -36,7 +36,7 @@ android {
     }
 
     kotlinOptions {
-        useIR = true
+//        useIR = true
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = freeCompilerArgs + "-Xinline-classes"
     }
@@ -44,7 +44,7 @@ android {
     composeOptions {
         kotlinCompilerVersion = libs.versions.kotlinVersion.get()
         // for compose-jb - comment - start
-        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
+//        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
         // for compose-jb - comment - end
     }
 
@@ -78,17 +78,17 @@ dependencies {
     implementation("com.google.accompanist:accompanist-insets:0.17.0")
 
     // for compose-jb - comment - start
-    implementation(libs.androidComposeFoundation)
-    implementation(libs.androidComposeMaterial)
+//    implementation(libs.androidComposeFoundation)
+//    implementation(libs.androidComposeMaterial)
     // for compose-jb - comment - end
     // for compose-jb - uncomment - start
-//    implementation(compose.material)
+    implementation(compose.material)
     // for compose-jb - uncomment - end
 
     implementation(libs.coroutinesCommon)
     implementation(libs.coroutinesAndroid)
     implementation(libs.ktorAndroidClient)
 
-    implementation("com.google.dagger:dagger:2.35.1")
-    kapt("com.google.dagger:dagger-compiler:2.35.1")
+    implementation("com.google.dagger:dagger:2.40.5")
+    kapt("com.google.dagger:dagger-compiler:2.40.5")
 }
