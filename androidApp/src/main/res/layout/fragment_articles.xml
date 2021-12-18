@@ -37,11 +37,4 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <com.leinardi.android.speeddial.SpeedDialView
-        android:id="@+id/create_article_speed_dial"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        app:sdMainFabClosedSrc="@drawable/ic_add_white_24dp" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

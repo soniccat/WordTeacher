@@ -8,14 +8,9 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     google()
-    mavenCentral()
-    gradlePluginPortal()
-    maven(url = "https://jitpack.io")
-
+    jcenter()
     // to use SNAPSHOT versions of compose (https://androidx.dev/snapshots/builds)
-//    maven(url = "https://androidx.dev/snapshots/builds/7473952/artifacts/repository")
-
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven(url = "https://androidx.dev/snapshots/builds/8003490/artifacts/repository")
 }
 
 android {
@@ -44,7 +39,7 @@ android {
     composeOptions {
         kotlinCompilerVersion = libs.versions.kotlinVersion.get()
         // for compose-jb - comment - start
-//        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
+        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
         // for compose-jb - comment - end
     }
 
@@ -67,7 +62,6 @@ dependencies {
     implementation(libs.androidCoreKts)
     implementation(libs.androidViewModelKtx)
     implementation(libs.androidLifecycleKtx)
-    implementation(libs.floatingActionButtonSpeedDial)
     implementation(libs.decompose)
     implementation(libs.decomposeJetpack)
     implementation(libs.essentyParcelable)
@@ -78,11 +72,12 @@ dependencies {
     implementation("com.google.accompanist:accompanist-insets:0.17.0")
 
     // for compose-jb - comment - start
-//    implementation(libs.androidComposeFoundation)
-//    implementation(libs.androidComposeMaterial)
+    implementation(libs.androidComposeFoundation)
+    implementation(libs.androidComposeMaterial)
+    implementation(libs.androidComposeCompiler)
     // for compose-jb - comment - end
     // for compose-jb - uncomment - start
-    implementation(compose.material)
+//    implementation(compose.material)
     // for compose-jb - uncomment - end
 
     implementation(libs.coroutinesCommon)
