@@ -118,19 +118,19 @@ fun InlineTextField(
         onValueChange = onValueChange,
         modifier = modifier,
         textStyle = textStyle,
-        decorationBox = @Composable { coreTextField ->
-            Box(
-                contentAlignment = Alignment.CenterStart
-            ) {
-                coreTextField()
-                if (value.text.isEmpty()) {
-                    Text(
-                        text = placeholder,
-                        color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
-                    )
-                }
-            }
-        }
+//        decorationBox = @Composable { coreTextField ->
+//            Box(
+//                contentAlignment = Alignment.CenterStart
+//            ) {
+//                coreTextField()
+//                if (value.text.isEmpty()) {
+//                    Text(
+//                        text = placeholder,
+//                        color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
+//                    )
+//                }
+//            }
+//        }
     )
 }
 
