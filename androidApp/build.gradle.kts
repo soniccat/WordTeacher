@@ -8,9 +8,12 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     google()
-    jcenter()
+    mavenCentral()
+    gradlePluginPortal()
     // to use SNAPSHOT versions of compose (https://androidx.dev/snapshots/builds)
-    maven(url = "https://androidx.dev/snapshots/builds/8003490/artifacts/repository")
+//    maven(url = "https://androidx.dev/snapshots/builds/8003490/artifacts/repository")
+
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 android {
@@ -31,7 +34,6 @@ android {
     }
 
     kotlinOptions {
-//        useIR = true
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = freeCompilerArgs + "-Xinline-classes"
     }
@@ -39,7 +41,7 @@ android {
     composeOptions {
         kotlinCompilerVersion = libs.versions.kotlinVersion.get()
         // for compose-jb - comment - start
-        kotlinCompilerExtensionVersion = libs.versions.composeJetpack.get()
+        kotlinCompilerExtensionVersion = libs.versions.composeJetpackCompiler.get()
         // for compose-jb - comment - end
     }
 

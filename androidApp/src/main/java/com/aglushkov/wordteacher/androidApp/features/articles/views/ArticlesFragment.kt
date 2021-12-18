@@ -22,8 +22,6 @@ import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.leinardi.android.speeddial.SpeedDialActionItem
-import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -90,23 +88,23 @@ class ArticlesFragment: Fragment() {
         val context = requireContext()
         val buttonBgColor = context.resolveThemeColor(R.attr.colorSecondary)
         val imageColor = context.resolveThemeColor(R.attr.colorOnSecondary)
-        binding.createArticleSpeedDial.addActionItem(
-            SpeedDialActionItem.Builder(R.id.articles_action_add_text, R.drawable.ic_add_text_24dp)
-                .setFabBackgroundColor(buttonBgColor)
-                .setFabImageTintColor(imageColor)
-                .setLabel(R.string.articles_action_add_text)
-                .create())
-
-        binding.createArticleSpeedDial.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
-            when (actionItem.id) {
-                R.id.articles_action_add_text -> {
-                    articlesVM.onCreateTextArticleClicked()
-                    binding.createArticleSpeedDial.close()
-                    return@OnActionSelectedListener true
-                }
-            }
-            false
-        })
+//        binding.createArticleSpeedDial.addActionItem(
+//            SpeedDialActionItem.Builder(R.id.articles_action_add_text, R.drawable.ic_add_text_24dp)
+//                .setFabBackgroundColor(buttonBgColor)
+//                .setFabImageTintColor(imageColor)
+//                .setLabel(R.string.articles_action_add_text)
+//                .create())
+//
+//        binding.createArticleSpeedDial.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
+//            when (actionItem.id) {
+//                R.id.articles_action_add_text -> {
+//                    articlesVM.onCreateTextArticleClicked()
+//                    binding.createArticleSpeedDial.close()
+//                    return@OnActionSelectedListener true
+//                }
+//            }
+//            false
+//        })
     }
 
     override fun onDestroyView() {
