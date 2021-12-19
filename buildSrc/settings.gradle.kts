@@ -9,6 +9,10 @@ pluginManagement {
         gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
+
+    plugins {
+        kotlin("plugin.serialization") version "1.6.10"
+    }
 }
 
 dependencyResolutionManagement {
