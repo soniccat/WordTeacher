@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.androidApp.features.cardsets.views
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,7 +39,8 @@ fun CardSetsUI(
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { newCardSetTextState.value.newCardSetText }) }
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+            .background(color = MaterialTheme.colors.background),
     ) {
         Column{
             CustomTopAppBar {

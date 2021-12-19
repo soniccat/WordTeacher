@@ -41,7 +41,6 @@ interface ArticleComponent {
 }
 
 interface ArticleDependencies {
-    fun routerResolver(): RouterResolver
     fun database(): AppDatabase
     fun nlpCore(): NLPCore
 }

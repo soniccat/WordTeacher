@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.androidApp.features.definitions.di
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
+import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -28,6 +29,7 @@ public interface DefinitionsComponent {
 }
 
 interface DefinitionsDependencies {
+    fun routerResolver(): RouterResolver
     fun wordRepository(): WordDefinitionRepository
     fun connectivityManager(): ConnectivityManager
     fun idGenerator(): IdGenerator

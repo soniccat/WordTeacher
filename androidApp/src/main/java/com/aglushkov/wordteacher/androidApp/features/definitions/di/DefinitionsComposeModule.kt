@@ -1,7 +1,9 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
+import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -16,6 +18,7 @@ class DefinitionsComposeModule {
     fun definitionsDecomposeComponent(
         componentContext: ComponentContext,
         configuration: DefinitionsComposeComponent.DefinitionConfiguration,
+        router: RouterResolver,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         cardSetsRepository: CardSetsRepository,
@@ -23,6 +26,7 @@ class DefinitionsComposeModule {
     ) = DefinitionsDecomposeComponent(
         componentContext,
         configuration.word,
+        router.router!!.get()!!,
         connectivityManager,
         wordDefinitionRepository,
         cardSetsRepository,

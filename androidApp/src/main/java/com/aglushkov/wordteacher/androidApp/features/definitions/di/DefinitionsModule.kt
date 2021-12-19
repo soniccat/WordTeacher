@@ -13,12 +13,10 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.Word
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTitleBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.WordTranscriptionBlueprint
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
+import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -57,13 +55,21 @@ class DefinitionsModule {
     @FragmentComp
     @Provides
     fun viewModel(
+        state: DefinitionsVM.State,
+        router: RouterResolver,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
-        state: DefinitionsVM.State
     ): DefinitionsVM {
-        return DefinitionsVMImpl(connectivityManager, wordDefinitionRepository, cardSetsRepository, idGenerator, state)
+        return DefinitionsVMImpl(
+            state,
+            router.router!!.get()!!,
+            connectivityManager,
+            wordDefinitionRepository,
+            cardSetsRepository,
+            idGenerator,
+        )
     }
 
     @FragmentComp

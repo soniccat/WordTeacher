@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -30,16 +31,18 @@ class ArticleComposeModule {
     @Provides
     fun definitionsVM(
         configuration: MainDecomposeComponent.ChildConfiguration.ArticleConfiguration,
+        router: RouterResolver,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
     ): DefinitionsVM = DefinitionsVMImpl(
+        DefinitionsVM.State(),
+        router.router!!.get()!!,
         connectivityManager,
         wordDefinitionRepository,
         cardSetsRepository,
-        idGenerator,
-        DefinitionsVM.State()
+        idGenerator
     )
 
     @Provides

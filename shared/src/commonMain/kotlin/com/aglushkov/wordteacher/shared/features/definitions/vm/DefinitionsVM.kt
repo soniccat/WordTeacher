@@ -54,7 +54,11 @@ interface DefinitionsVM {
     val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
     val eventFlow: Flow<Event>
 
+    // Card Sets
+
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
+
+    fun onOpenCardSetsclicked(item: OpenCardSetViewItem)
 
     @Parcelize
     class State(
@@ -63,11 +67,12 @@ interface DefinitionsVM {
 }
 
 open class DefinitionsVMImpl(
+    override var state: DefinitionsVM.State,
+    private val router: DefinitionsRouter,
     private val connectivityManager: ConnectivityManager,
     private val wordDefinitionRepository: WordDefinitionRepository,
     private val cardSetsRepository: CardSetsRepository,
-    private val idGenerator: IdGenerator,
-    override var state: DefinitionsVM.State
+    private val idGenerator: IdGenerator
 ): ViewModel(), DefinitionsVM {
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
@@ -382,6 +387,10 @@ open class DefinitionsVMImpl(
                 text = StringDesc.Resource(MR.strings.definitions_open_cardsets)
             )
         )
+    }
+
+    override fun onOpenCardSetsclicked(item: OpenCardSetViewItem) {
+        router.openCardSets()
     }
 }
 

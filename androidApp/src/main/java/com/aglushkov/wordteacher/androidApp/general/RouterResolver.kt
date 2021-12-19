@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.androidApp.di.AppComp
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
+// TODO: rethink the solution as we've switched to compose already
 @AppComp
 class RouterResolver @Inject constructor(private val application: Application) {
     var router: WeakReference<Router>? = null

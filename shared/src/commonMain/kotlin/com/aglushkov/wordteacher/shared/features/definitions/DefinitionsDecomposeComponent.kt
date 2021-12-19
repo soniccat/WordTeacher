@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.definitions
 
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -15,16 +16,18 @@ import com.arkivanov.essenty.statekeeper.consume
 class DefinitionsDecomposeComponent (
     componentContext: ComponentContext,
     word: String?, // TODO: replace with DefinitionsVM.State
+    router: DefinitionsRouter,
     connectivityManager: ConnectivityManager,
     wordDefinitionRepository: WordDefinitionRepository,
     cardSetsRepository: CardSetsRepository,
     idGenerator: IdGenerator
 ) : DefinitionsVMImpl(
+    DefinitionsVM.State(word = word),
+    router,
     connectivityManager,
     wordDefinitionRepository,
     cardSetsRepository,
-    idGenerator,
-    DefinitionsVM.State(word = word)
+    idGenerator
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {

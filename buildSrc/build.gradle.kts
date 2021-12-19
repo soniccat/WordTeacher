@@ -24,10 +24,3 @@ dependencies {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
-
-gradlePlugin {
-    plugins.register("resources") {
-        id = "resources"
-        implementationClass = "com.aglushkov.resource.ResourcesPlugin"
-    }
-}

@@ -5,6 +5,8 @@ import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeCompone
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
+import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
@@ -25,11 +27,13 @@ interface MainDecomposeComponent {
     fun popDialog()
     fun openArticle(id: Long)
     fun openCardSet(id: Long)
+    fun openCardSets()
     fun back()
 
     sealed class Child {
         data class Article(val inner: ArticleVM): Child()
         data class CardSet(val inner: CardSetVM): Child()
+        data class CardSets(val inner: CardSetsVM): Child()
         data class Tabs(val inner: TabDecomposeComponent): Child()
 
         data class AddArticle(val inner: AddArticleDecomposeComponent): Child()
@@ -39,6 +43,7 @@ interface MainDecomposeComponent {
     sealed class ChildConfiguration: Parcelable {
         @Parcelize data class ArticleConfiguration(val id: Long) : ChildConfiguration()
         @Parcelize data class CardSetConfiguration(val id: Long) : ChildConfiguration()
+        @Parcelize object CardSetsConfiguration : ChildConfiguration()
         @Parcelize object TabsConfiguration : ChildConfiguration()
 
         @Parcelize object AddArticleConfiguration : ChildConfiguration()
@@ -82,6 +87,10 @@ class MainDecomposeComponentImpl(
             MainDecomposeComponent.Child.CardSet(
                 inner = childComponentFactory(componentContext, configuration) as CardSetDecomposeComponent
             )
+        is MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
+            MainDecomposeComponent.Child.CardSets(
+                inner = childComponentFactory(componentContext, configuration) as CardSetsDecomposeComponent
+            )
         is MainDecomposeComponent.ChildConfiguration.TabsConfiguration ->
             MainDecomposeComponent.Child.Tabs(
                 inner = childComponentFactory(componentContext, configuration) as TabDecomposeComponent
@@ -101,6 +110,12 @@ class MainDecomposeComponentImpl(
     override fun openCardSet(id: Long) {
         router.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.CardSetConfiguration(id)
+        )
+    }
+
+    override fun openCardSets() {
+        router.pushChildConfigurationIfNotAtTop(
+            MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration
         )
     }
 

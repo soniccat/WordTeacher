@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.OpenCardSetViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -62,6 +63,11 @@ open class DefinitionsVMPreview(
     override val eventFlow: Flow<Event>
         get() = events.asFlow()
 
+    // Card Sets
+
     override val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
         get() = MutableStateFlow(Resource.Uninitialized())
+
+    override fun onOpenCardSetsclicked(item: OpenCardSetViewItem) {
+    }
 }

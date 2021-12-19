@@ -213,7 +213,7 @@ private fun AddToSet(vm: DefinitionsVM) {
                         Text(it.name)
                     }
                     is OpenCardSetViewItem -> DropdownMenuItem(
-                        onClick = { }
+                        onClick = { vm.onOpenCardSetsclicked(it) }
                     ) {
                         Text(it.text.toString(LocalContext.current))
                     }

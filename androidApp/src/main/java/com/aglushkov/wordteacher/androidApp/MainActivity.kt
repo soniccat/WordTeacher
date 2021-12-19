@@ -103,11 +103,12 @@ class MainActivity : AppCompatActivity(), Router {
                 routerState = mainDecomposeComponent.routerState,
                 animation = slideFromRight()
             ) {
-                val instance = it.instance
-                when (instance) {
+                when (val instance = it.instance) {
                     is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.inner)
                     is MainDecomposeComponent.Child.Article -> ArticleUI(vm = instance.inner)
                     is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.inner)
+                    is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.inner)
+                    else -> throw RuntimeException("mainUI: Not implemented ${instance}")
                 }
             }
         }
@@ -330,6 +331,10 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun closeCardSet() {
         mainDecomposeComponent.back()
+    }
+
+    override fun openCardSets() {
+        mainDecomposeComponent.openCardSets()
     }
 }
 
