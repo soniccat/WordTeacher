@@ -41,7 +41,6 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
@@ -173,10 +172,11 @@ private fun showViewItem(
         modifier,
         textContent = { text, ts ->
             Text(
+                modifier = Modifier.weight(1.0f),
                 text = text,
                 style = ts
             )
-            AddToSet(vm)
+            AddToSet(vm, item)
         }
     )
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
@@ -191,31 +191,39 @@ private fun showViewItem(
 }
 
 @Composable
-private fun AddToSet(vm: DefinitionsVM) {
-    var expanded by remember { mutableStateOf(false) }
-    AddIcon { expanded = true }
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false }
-    ) {
-        val sets = vm.cardSets.collectAsState()
+private fun AddToSet(vm: DefinitionsVM, wordDefinitionViewItem: WordDefinitionViewItem) {
+    Box {
+        var expanded by remember { mutableStateOf(false) }
+        AddIcon { expanded = true }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            val sets = vm.cardSets.collectAsState()
 
-        if (sets.value.isLoading()) {
-            CircularProgressIndicator()
-        }
+            if (sets.value.isLoading()) {
+                CircularProgressIndicator()
+            }
 
-        sets.value.data()?.let { items ->
-            items.onEach {
-                when (it) {
-                    is CardSetViewItem -> DropdownMenuItem(
-                        onClick = { }
-                    ) {
-                        Text(it.name)
-                    }
-                    is OpenCardSetViewItem -> DropdownMenuItem(
-                        onClick = { vm.onOpenCardSetsclicked(it) }
-                    ) {
-                        Text(it.text.toString(LocalContext.current))
+            sets.value.data()?.let { items ->
+                items.onEach {
+                    when (it) {
+                        is CardSetViewItem -> DropdownMenuItem(
+                            onClick = {
+                                vm.onAddDefinitionInSet(wordDefinitionViewItem, it)
+                                expanded = false
+                            }
+                        ) {
+                            Text(it.name)
+                        }
+                        is OpenCardSetViewItem -> DropdownMenuItem(
+                            onClick = {
+                                vm.onOpenCardSets(it)
+                                expanded = false
+                            }
+                        ) {
+                            Text(it.text.toString(LocalContext.current))
+                        }
                     }
                 }
             }

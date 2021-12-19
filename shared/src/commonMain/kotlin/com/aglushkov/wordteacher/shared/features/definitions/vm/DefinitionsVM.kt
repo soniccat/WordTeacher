@@ -58,7 +58,8 @@ interface DefinitionsVM {
 
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
 
-    fun onOpenCardSetsclicked(item: OpenCardSetViewItem)
+    fun onOpenCardSets(item: OpenCardSetViewItem)
+    fun onAddDefinitionInSet(wordDefinitionViewItem: WordDefinitionViewItem, cardSetViewItem: CardSetViewItem)
 
     @Parcelize
     class State(
@@ -274,7 +275,16 @@ open class DefinitionsVMImpl(
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
                 for (d in def.definitions) {
-                    items.add(WordDefinitionViewItem(d))
+                    items.add(
+                        WordDefinitionViewItem(
+                            definition = d,
+                            data = WordDefinitionViewData(
+                                word = word,
+                                partOfSpeech = partOfSpeech,
+                                def = def
+                            )
+                        )
+                    )
                 }
 
                 if (def.examples.isNotEmpty()) {
@@ -389,8 +399,26 @@ open class DefinitionsVMImpl(
         )
     }
 
-    override fun onOpenCardSetsclicked(item: OpenCardSetViewItem) {
+    override fun onOpenCardSets(item: OpenCardSetViewItem) {
         router.openCardSets()
+    }
+
+    override fun onAddDefinitionInSet(
+        wordDefinitionViewItem: WordDefinitionViewItem,
+        cardSetViewItem: CardSetViewItem
+    ) {
+        val viewData = wordDefinitionViewItem.data as WordDefinitionViewData
+        viewModelScope.launch {
+            cardSetsRepository.addCard(
+                setId = cardSetViewItem.id,
+                term = viewData.word.word,
+                definitions = viewData.def.definitions,
+                partOfSpeech = viewData.partOfSpeech,
+                transcription = viewData.word.transcription,
+                synonyms = viewData.def.synonyms,
+                examples = viewData.def.examples
+            )
+        }
     }
 }
 
@@ -403,3 +431,9 @@ data class ShowPartsOfSpeechFilterDialogEvent(
         isHandled = true
     }
 }
+
+private data class WordDefinitionViewData(
+    val word: WordTeacherWord,
+    val partOfSpeech: WordTeacherWord.PartOfSpeech,
+    val def: WordTeacherDefinition
+)

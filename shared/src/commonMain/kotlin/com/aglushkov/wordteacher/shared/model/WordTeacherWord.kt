@@ -10,7 +10,7 @@ import com.arkivanov.essenty.parcelable.Parcelize
 @Parcelize
 data class WordTeacherWord(
     val word: String,
-    val transcription: String?,
+    val transcription: String?, // TODO: a transcription should be per definition (in WordTeacherDefinition)
     val definitions: Map<PartOfSpeech, List<WordTeacherDefinition>>,
     val types: List<Config.Type>
 ) : Parcelable {

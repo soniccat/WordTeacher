@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.aglushkov.wordteacher.shared.model.ImmutableCard
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import kotlinx.coroutines.*
@@ -21,7 +22,7 @@ class CardSetRepository(
 
     val cardSet: StateFlow<Resource<CardSet>> = stateFlow
     private var loadJob: Job? = null
-    private var updateCardJob: Job? = null
+    private var updateCardJob: Job? = null // TODO: looks extremely error prone...
 
     suspend fun loadCardSet(id: Long) {
         loadJob?.cancel()
@@ -49,23 +50,26 @@ class CardSetRepository(
         }
     }
 
-    suspend fun createCard(): Card? {
+    suspend fun createCard(
+        term: String = "",
+        definitions: MutableList<String> = mutableListOf(),
+        partOfSpeech: WordTeacherWord.PartOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
+        transcription: String = "",
+        synonyms: MutableList<String> = mutableListOf(),
+        examples: MutableList<String> = mutableListOf()
+    ): ImmutableCard? {
         val loadedCardSet = cardSet.value.data() ?: return null
         return scope.async(Dispatchers.Default) {
-            val newCard = Card(
-                id = -1,
+            database.cards.insertCard(
+                setId = loadedCardSet.id,
                 date = timeSource.getTimeInMilliseconds(),
-                term = "",
-                definitions = mutableListOf(),
-                partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
-                transcription = "",
-                synonyms = mutableListOf(),
-                examples = mutableListOf()
+                term = term,
+                definitions = definitions,
+                partOfSpeech = partOfSpeech,
+                transcription = transcription,
+                synonyms = synonyms,
+                examples = examples
             )
-
-            database.cards.insertCard(loadedCardSet.id, newCard)
-            newCard.id = database.cards.insertedCardId()!!
-            newCard
         }.await()
     }
 

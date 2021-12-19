@@ -4,10 +4,8 @@ import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayMode
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsDisplayModeViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.OpenCardSetViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -68,6 +66,12 @@ open class DefinitionsVMPreview(
     override val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
         get() = MutableStateFlow(Resource.Uninitialized())
 
-    override fun onOpenCardSetsclicked(item: OpenCardSetViewItem) {
+    override fun onOpenCardSets(item: OpenCardSetViewItem) {
+    }
+
+    override fun onAddDefinitionInSet(
+        wordDefinitionViewItem: WordDefinitionViewItem,
+        cardSetViewItem: CardSetViewItem
+    ) {
     }
 }

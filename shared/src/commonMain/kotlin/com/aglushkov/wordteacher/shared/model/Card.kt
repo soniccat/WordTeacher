@@ -12,3 +12,16 @@ data class Card (
 ) {
 
 }
+
+data class ImmutableCard (
+    var id: Long,
+    var date: Long,
+    var term: String,
+    var definitions: List<String>,
+    var partOfSpeech: WordTeacherWord.PartOfSpeech,
+    var transcription: String?,
+    var synonyms: List<String>,
+    var examples: List<String>
+) {
+
+}

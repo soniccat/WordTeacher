@@ -34,7 +34,11 @@ class WordPartOfSpeechViewItem(partOfSpeech: StringDesc): BaseViewItem<StringDes
     }
 }
 
-class WordDefinitionViewItem(definition: String, val index: Int = -1): BaseViewItem<String>(definition, Type) {
+class WordDefinitionViewItem(
+    definition: String,
+    val data: Any? = null,
+    val index: Int = -1
+): BaseViewItem<String>(definition, Type) {
     companion object {
         const val Type = 104
     }

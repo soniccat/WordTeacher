@@ -134,8 +134,34 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             }
         )
 
-        fun insertCard(setId: Long, newCard: Card) {
-            cards.insertCard(
+        fun insertCard(
+            setId: Long,
+            term: String = "",
+            date: Long = 0,
+            definitions: List<String> = listOf(),
+            partOfSpeech: WordTeacherWord.PartOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
+            transcription: String? = "",
+            synonyms: List<String> = mutableListOf(),
+            examples: List<String> = mutableListOf()
+        ): ImmutableCard {
+            val newCard = ImmutableCard(
+                id = -1,
+                date = date,
+                term = term,
+                definitions = definitions,
+                partOfSpeech = partOfSpeech,
+                transcription = transcription,
+                synonyms = synonyms,
+                examples = examples
+            )
+
+            cards.insertCardInternal(setId, newCard)
+            newCard.id = cards.insertedCardId()!!
+            return newCard
+        }
+
+        private fun insertCardInternal(setId: Long, newCard: ImmutableCard) {
+            cards.insertCardInternal(
                 setId = setId,
                 date = newCard.date,
                 term = newCard.term,
@@ -147,7 +173,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             )
         }
 
-        fun insertCard(
+        private fun insertCardInternal(
             setId: Long,
             date: Long,
             term: String,

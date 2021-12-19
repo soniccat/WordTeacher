@@ -81,9 +81,10 @@ class AppModule {
     @AppComp
     @Provides
     fun cardSetsRepository(
-        database: AppDatabase
+        database: AppDatabase,
+        timeSource: TimeSource,
     ): CardSetsRepository {
-        return CardSetsRepository(database)
+        return CardSetsRepository(database, timeSource)
     }
 
     @AppComp
