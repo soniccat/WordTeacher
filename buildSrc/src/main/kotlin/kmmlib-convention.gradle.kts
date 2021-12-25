@@ -10,7 +10,7 @@ plugins {
 //    id("org.jetbrains.compose")
     // for compose-jb - uncomment - end
 
-//    kotlin("plugin.serialization")
+    kotlin("plugin.serialization")
     // TODO: resolve that issue somehow, probably with extracting api/model stuff in a gradle module
 //    >>> COMPOSE WARNING
 //    >>> Project `shared` has `compose` and `kotlinx.serialization` plugins applied!

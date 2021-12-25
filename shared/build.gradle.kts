@@ -4,8 +4,6 @@ plugins {
     id("resources-convention")
     id("sqldelight-convention")
     id("dev.icerock.mobile.multiplatform-resources")
-
-    kotlin("plugin.serialization") version "1.6.10"
 }
 
 group = "com.aglushkov.wordteacher"
