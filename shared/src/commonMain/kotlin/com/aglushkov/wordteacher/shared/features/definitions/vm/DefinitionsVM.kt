@@ -39,7 +39,11 @@ import kotlinx.coroutines.launch
 
 interface DefinitionsVM {
     fun restore(newState: State)
-    fun onWordSubmitted(word: String?, filter: List<WordTeacherWord.PartOfSpeech> = emptyList())
+    fun onWordSubmitted(
+        word: String?,
+        filter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
+        definitionsContext: DefinitionsContext? = null
+    )
     fun onTryAgainClicked()
     fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
     fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem)
@@ -103,6 +107,7 @@ open class DefinitionsVMImpl(
 
     private val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     private var loadJob: Job? = null
+    private var definitionsContext: DefinitionsContext? = null
 
     private var word: String?
         get() {
@@ -129,8 +134,14 @@ open class DefinitionsVMImpl(
 
     // Events
 
-    override fun onWordSubmitted(word: String?, filter: List<WordTeacherWord.PartOfSpeech>) {
+    override fun onWordSubmitted(
+        word: String?,
+        filter: List<WordTeacherWord.PartOfSpeech>,
+        definitionsContext: DefinitionsContext?
+    ) {
         selectedPartsOfSpeechStateFlow.value = filter
+        this.definitionsContext = definitionsContext
+
         if (word == null) {
             this.word = null
         } else if (word.isNotEmpty()) {
@@ -408,6 +419,8 @@ open class DefinitionsVMImpl(
         cardSetViewItem: CardSetViewItem
     ) {
         val viewData = wordDefinitionViewItem.data as WordDefinitionViewData
+        val contextExamples = definitionsContext?.wordContexts?.get(viewData.partOfSpeech)?.examples.orEmpty()
+
         viewModelScope.launch {
             cardSetsRepository.addCard(
                 setId = cardSetViewItem.id,
@@ -416,7 +429,7 @@ open class DefinitionsVMImpl(
                 partOfSpeech = viewData.partOfSpeech,
                 transcription = viewData.word.transcription,
                 synonyms = viewData.def.synonyms,
-                examples = viewData.def.examples
+                examples = viewData.def.examples + contextExamples
             )
         }
     }
@@ -436,4 +449,12 @@ private data class WordDefinitionViewData(
     val word: WordTeacherWord,
     val partOfSpeech: WordTeacherWord.PartOfSpeech,
     val def: WordTeacherDefinition
+)
+
+data class DefinitionsContext(
+    val wordContexts: Map<WordTeacherWord.PartOfSpeech, DefinitionsWordContext>
+)
+
+data class DefinitionsWordContext(
+    val examples: List<String>
 )

@@ -1,7 +1,9 @@
 package com.aglushkov.wordteacher.shared.features.article.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsContext
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsWordContext
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -105,7 +107,14 @@ open class ArticleVMImpl(
         if (slice != null) {
             definitionsVM.onWordSubmitted(
                 slice.tokenString,
-                listOf(slice.partOfSpeech())
+                listOf(slice.partOfSpeech()),
+                DefinitionsContext(
+                    wordContexts = mapOf(
+                        slice.partOfSpeech() to DefinitionsWordContext(
+                            examples = listOf(sentence.text)
+                        )
+                    )
+                )
             )
         }
 

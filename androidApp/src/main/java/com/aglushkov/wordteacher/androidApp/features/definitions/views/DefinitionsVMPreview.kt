@@ -26,7 +26,11 @@ open class DefinitionsVMPreview(
     override fun restore(newState: DefinitionsVM.State) {
     }
 
-    override fun onWordSubmitted(word: String?, filter: List<WordTeacherWord.PartOfSpeech>) {
+    override fun onWordSubmitted(
+        word: String?,
+        filter: List<WordTeacherWord.PartOfSpeech>,
+        definitionsContext: DefinitionsContext?
+    ) {
     }
 
     override fun onTryAgainClicked() {

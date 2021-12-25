@@ -62,6 +62,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
             LazyColumn(
                 contentPadding = PaddingValues(
                     top = dimensionResource(id = R.dimen.word_horizontalPadding),
+                    bottom = 300.dp
                 )
             ) {
                 items(data, key = { it.id }) { item ->

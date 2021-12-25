@@ -92,7 +92,7 @@ open class CardSetVMImpl(
             cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc())
 
             card.definitions.onEachIndexed { index, def ->
-                cardViewItems += WordDefinitionViewItem(def, index)
+                cardViewItems += WordDefinitionViewItem(def, index = index)
             }
 
             // Examples

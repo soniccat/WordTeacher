@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS DBCardSet (
 
 selectAll:
 SELECT *
-FROM DBCardSet;
+FROM DBCardSet
+ORDER BY date DESC;
 
 selectCardSet:
 SELECT *
