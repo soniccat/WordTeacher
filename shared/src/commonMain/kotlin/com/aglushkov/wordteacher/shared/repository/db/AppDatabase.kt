@@ -4,6 +4,7 @@ import com.aglushkov.extensions.firstLong
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
 import com.aglushkov.wordteacher.shared.features.learning.cardteacher.CardProgress
+import com.aglushkov.wordteacher.shared.features.learning.cardteacher.ImmutableCardProgress
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.*
@@ -131,7 +132,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     transcription,
                     synonyms?.split(CARD_SEPARATOR).orEmpty().toMutableList(),
                     examples?.split(CARD_SEPARATOR).orEmpty().toMutableList(),
-                    progress = CardProgress(
+                    progress = ImmutableCardProgress(
                         progressLevel ?: 0,
                         progressLastMistakeCount ?: 0,
                         progressLastLessonDate ?: 0L
@@ -160,7 +161,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 transcription = transcription,
                 synonyms = synonyms,
                 examples = examples,
-                progress = progress
+                progress = progress.toImmutableCardProgress()
             )
 
             cards.insertCardInternal(setId, newCard)

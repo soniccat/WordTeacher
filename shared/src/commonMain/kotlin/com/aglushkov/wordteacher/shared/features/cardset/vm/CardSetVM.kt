@@ -8,9 +8,10 @@ import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.aglushkov.wordteacher.shared.model.MutableCard
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
-import com.aglushkov.wordteacher.shared.repository.cardset.UPDATE_DELAY
+import com.aglushkov.wordteacher.shared.repository.db.UPDATE_DELAY
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -28,13 +29,13 @@ interface CardSetVM {
 
     fun onCardCreatePressed()
     fun onCardDeleted(card: Card)
-    fun onItemTextChanged(text: String, item: BaseViewItem<*>, card: Card)
-    fun onAddDefinitionPressed(card: Card)
-    fun onDefinitionRemoved(item: WordDefinitionViewItem, card: Card)
-    fun onAddExamplePressed(card: Card)
-    fun onExampleRemoved(item: WordExampleViewItem, card: Card)
-    fun onAddSynonymPressed(card: Card)
-    fun onSynonymRemoved(item: WordSynonymViewItem, card: Card)
+    fun onItemTextChanged(text: String, item: BaseViewItem<*>, card: MutableCard)
+    fun onAddDefinitionPressed(card: MutableCard)
+    fun onDefinitionRemoved(item: WordDefinitionViewItem, card: MutableCard)
+    fun onAddExamplePressed(card: MutableCard)
+    fun onExampleRemoved(item: WordExampleViewItem, card: MutableCard)
+    fun onAddSynonymPressed(card: MutableCard)
+    fun onSynonymRemoved(item: WordSynonymViewItem, card: MutableCard)
     fun onBackPressed()
     fun onTryAgainClicked()
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
@@ -86,6 +87,8 @@ open class CardSetVMImpl(
         val result = mutableListOf<BaseViewItem<*>>()
 
         loadedRes.data.cards.onEach { card ->
+            val mutableCard = card.toMutableCard()
+
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
             cardViewItems += WordTitleViewItem(card.term, providers = emptyList())
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty())
@@ -116,7 +119,7 @@ open class CardSetVMImpl(
             }
 
             result += CardViewItem(
-                card = card,
+                card = mutableCard,
                 innerViewItems = cardViewItems
             )
 
@@ -153,7 +156,7 @@ open class CardSetVMImpl(
         // TODO: do sth with articlesRepository
     }
 
-    override fun onItemTextChanged(text: String, item: BaseViewItem<*>, card: Card) {
+    override fun onItemTextChanged(text: String, item: BaseViewItem<*>, card: MutableCard) {
         when (item) {
             is WordTitleViewItem -> card.term = text
             is WordTranscriptionViewItem -> card.transcription = text
@@ -165,32 +168,32 @@ open class CardSetVMImpl(
         updateCard(card)
     }
 
-    override fun onAddDefinitionPressed(card: Card) {
+    override fun onAddDefinitionPressed(card: MutableCard) {
         card.definitions += ""
         updateCard(card, delay = 0)
     }
 
-    override fun onDefinitionRemoved(item: WordDefinitionViewItem, card: Card) {
+    override fun onDefinitionRemoved(item: WordDefinitionViewItem, card: MutableCard) {
         card.definitions.removeAt(item.index)
         updateCard(card, delay = 0)
     }
 
-    override fun onAddExamplePressed(card: Card) {
+    override fun onAddExamplePressed(card: MutableCard) {
         card.examples += ""
         updateCard(card, delay = 0)
     }
 
-    override fun onExampleRemoved(item: WordExampleViewItem, card: Card) {
+    override fun onExampleRemoved(item: WordExampleViewItem, card: MutableCard) {
         card.examples.removeAt(item.index)
         updateCard(card, delay = 0)
     }
 
-    override fun onAddSynonymPressed(card: Card) {
+    override fun onAddSynonymPressed(card: MutableCard) {
         card.synonyms += ""
         updateCard(card, delay = 0)
     }
 
-    override fun onSynonymRemoved(item: WordSynonymViewItem, card: Card) {
+    override fun onSynonymRemoved(item: WordSynonymViewItem, card: MutableCard) {
         card.synonyms.removeAt(item.index)
         updateCard(card, delay = 0)
     }

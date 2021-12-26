@@ -22,6 +22,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
@@ -46,6 +47,8 @@ public interface AppComponent:
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
     override fun database(): AppDatabase
+    override fun databaseWorker(): DatabaseWorker
+
     override fun nlpCore(): NLPCore
 
     override fun routerResolver(): RouterResolver

@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
@@ -22,8 +23,9 @@ class CardSetModule {
     @Provides
     fun cardSetRepository(
         database: AppDatabase,
+        databaseWorker: DatabaseWorker,
         timeSource: TimeSource
-    ) = CardSetRepository(database, timeSource)
+    ) = CardSetRepository(database, databaseWorker, timeSource)
 
     @Provides
     fun cardSetDecomposeComponent(

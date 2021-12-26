@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.features.learning.cardteacher.CardProgress
+import com.aglushkov.wordteacher.shared.features.learning.cardteacher.ImmutableCardProgress
+import com.aglushkov.wordteacher.shared.features.learning.cardteacher.MutableCardProgress
 
 data class MutableCard (
     override var id: Long,
@@ -11,9 +13,19 @@ data class MutableCard (
     override var transcription: String?,
     override var synonyms: MutableList<String>,
     override var examples: MutableList<String>,
-    override val progress: CardProgress,
+    override val progress: MutableCardProgress,
 ) : Card {
-
+    fun set(card: Card) {
+        id = card.id
+        date = card.date
+        term = card.term
+        definitions = card.definitions.toMutableList()
+        partOfSpeech = card.partOfSpeech
+        transcription = card.transcription
+        synonyms = card.synonyms.toMutableList()
+        examples = card.examples.toMutableList()
+        progress.set(card.progress)
+    }
 }
 
 data class ImmutableCard (
@@ -25,7 +37,7 @@ data class ImmutableCard (
     override val transcription: String?,
     override val synonyms: List<String>,
     override val examples: List<String>,
-    override val progress: CardProgress,
+    override val progress: ImmutableCardProgress,
 ) : Card {
 
 }
@@ -40,4 +52,34 @@ interface Card {
     val synonyms: List<String>
     val examples: List<String>
     val progress: CardProgress
+
+    fun toMutableCard() =
+        MutableCard(
+            id = id,
+            date = date,
+            term = term,
+            definitions = definitions.toMutableList(),
+            partOfSpeech = partOfSpeech,
+            transcription = transcription,
+            synonyms = synonyms.toMutableList(),
+            examples = examples.toMutableList(),
+            progress = progress.toMutableCardProgress()
+        )
+
+    fun toImmutableCard() =
+        if (this is ImmutableCard) {
+            this
+        } else {
+            ImmutableCard(
+                id = id,
+                date = date,
+                term = term,
+                definitions = definitions.toMutableList(),
+                partOfSpeech = partOfSpeech,
+                transcription = transcription,
+                synonyms = synonyms.toMutableList(),
+                examples = examples.toMutableList(),
+                progress = progress.toImmutableCardProgress()
+            )
+        }
 }

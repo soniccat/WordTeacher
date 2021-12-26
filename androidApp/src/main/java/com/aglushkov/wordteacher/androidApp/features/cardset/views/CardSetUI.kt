@@ -27,6 +27,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.MutableCard
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -231,7 +232,7 @@ private fun CardTextField(
     text: String,
     textStyle: androidx.compose.ui.text.TextStyle,
     item: BaseViewItem<*>,
-    card: Card,
+    card: MutableCard,
     vm: CardSetVM
 ) {
     var textState by remember { mutableStateOf(TextFieldValue(text)) }

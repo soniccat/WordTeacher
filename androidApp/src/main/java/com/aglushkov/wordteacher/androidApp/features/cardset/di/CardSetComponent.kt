@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.Binds
@@ -31,6 +32,7 @@ public interface CardSetComponent {
 
 interface CardSetDependencies {
     fun database(): AppDatabase
+    fun databaseWorker(): DatabaseWorker
     fun routerResolver(): RouterResolver
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource

@@ -1,9 +1,10 @@
 package com.aglushkov.wordteacher.shared.features.learning.cardteacher
 
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.MutableCard
 
 class LearnSession(
-    private val cards: List<Card>
+    private val cards: List<MutableCard>
 ) {
     val results: List<SessionCardResult> = cards.map { card ->
         SessionCardResult(card.id, card.progress.progress())
@@ -11,7 +12,7 @@ class LearnSession(
 
     private var currentIndex = 0
 
-    val currentCard: Card?
+    val currentCard: MutableCard?
         get() = if (currentIndex < cards.size) cards[currentIndex] else null
 
     val size: Int

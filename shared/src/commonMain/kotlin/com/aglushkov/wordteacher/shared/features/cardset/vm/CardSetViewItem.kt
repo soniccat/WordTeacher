@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.features.cardset.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.MutableCard
 
 class CreateCardViewItem(
 ): BaseViewItem<Unit>(Unit, Type, -1) {
@@ -11,7 +12,7 @@ class CreateCardViewItem(
 }
 
 class CardViewItem(
-    val card: Card,
+    val card: MutableCard,
     val innerViewItems: List<BaseViewItem<*>>
 ): BaseViewItem<Card>(card, Type, -1) {
     companion object {

@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.model.ImmutableCard
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
+import com.aglushkov.wordteacher.shared.repository.db.UPDATE_DELAY
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -24,7 +25,6 @@ class CardSetRepository(
 
     val cardSet: StateFlow<Resource<CardSet>> = stateFlow
     private var loadJob: Job? = null
-    private var updateCardJob: Job? = null // TODO: looks extremely error prone...
 
     suspend fun loadCardSet(id: Long) {
         loadJob?.cancel()
@@ -81,11 +81,13 @@ class CardSetRepository(
         }.await()
     }
 
-    suspend fun updateCard(card: Card, delay: Long = UPDATE_DELAY) {
-        updateCardJob?.cancel()
-        updateCardJob = scope.launch(Dispatchers.Default) {
-            delay(delay)
-            database.cards.updateCard(card)
-        }
+    suspend fun updateCard(card: Card, delay: Long) {
+        databaseWorker.runCancellable(
+            id = card.id.toString(),
+            runnable = {
+                database.cards.updateCard(card)
+            },
+            delay
+        )
     }
 }

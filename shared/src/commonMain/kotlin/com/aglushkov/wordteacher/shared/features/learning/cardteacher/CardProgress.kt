@@ -2,13 +2,13 @@ package com.aglushkov.wordteacher.shared.features.learning.cardteacher
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
 
-class CardProgress(
-    var currentLevel: Int = 0,
-    var lastMistakeCount: Int = 0,
-    var lastLessonDate: Long = 0
-) {
+interface CardProgress {
+    val currentLevel: Int
+    val lastMistakeCount: Int
+    val lastLessonDate: Long
+
     companion object {
-        val EMPTY = CardProgress()
+        val EMPTY = ImmutableCardProgress()
     }
 
     fun progress(): Float {
@@ -49,6 +49,37 @@ class CardProgress(
     fun isCompleted(): Boolean =
         currentLevel >= CardProgressTable.lastLevel
 
+    fun toMutableCardProgress(): MutableCardProgress =
+        MutableCardProgress(
+            currentLevel = currentLevel,
+            lastMistakeCount = lastMistakeCount,
+            lastLessonDate = lastLessonDate
+        )
+
+    fun toImmutableCardProgress(): ImmutableCardProgress =
+        if (this is ImmutableCardProgress) {
+            this
+        } else {
+            ImmutableCardProgress(
+                currentLevel = currentLevel,
+                lastMistakeCount = lastMistakeCount,
+                lastLessonDate = lastLessonDate
+            )
+        }
+}
+
+data class ImmutableCardProgress (
+    override val currentLevel: Int = 0,
+    override val lastMistakeCount: Int = 0,
+    override val lastLessonDate: Long = 0
+) : CardProgress
+
+data class MutableCardProgress(
+    override var currentLevel: Int = 0,
+    override var lastMistakeCount: Int = 0,
+    override var lastLessonDate: Long = 0
+) : CardProgress {
+
     fun applyRightAnswer(timeSource: TimeSource) {
         ++currentLevel
         lastMistakeCount = 0
@@ -72,6 +103,12 @@ class CardProgress(
 
     private fun updateLastLessonDate(timeSource: TimeSource) {
         lastLessonDate = timeSource.getTimeInMilliseconds()
+    }
+
+    fun set(progress: CardProgress) {
+        currentLevel = progress.currentLevel
+        lastMistakeCount = progress.lastMistakeCount
+        lastLessonDate = progress.lastLessonDate
     }
 }
 
