@@ -81,7 +81,7 @@ open class AddArticleVMImpl(
     }
 
     override fun onCancelPressed() = viewModelScope.launch {
-        eventChannel.offer(CompletionEvent(CompletionResult.CANCELLED))
+        eventChannel.trySend(CompletionEvent(CompletionResult.CANCELLED))
     }
 
     override fun onTitleFocusChanged(hasFocus: Boolean) {
@@ -101,7 +101,7 @@ open class AddArticleVMImpl(
         try {
             // TODO: show loading, adding might take for a while
             articlesRepository.createArticle(title.value, text.value)
-            eventChannel.offer(CompletionEvent(CompletionResult.COMPLETED))
+            eventChannel.trySend(CompletionEvent(CompletionResult.COMPLETED))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -109,7 +109,7 @@ open class AddArticleVMImpl(
                 StringDesc.Raw(it)
             } ?: StringDesc.Resource(MR.strings.error_default)
 
-            eventChannel.offer(ErrorEvent(errorText))
+            eventChannel.trySend(ErrorEvent(errorText))
         }
     }
 

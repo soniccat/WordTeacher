@@ -90,7 +90,7 @@ open class CardSetsVMImpl(
     }
 
     fun onCreateTextCardSetClicked() {
-        eventChannel.offer(ShowCreateSetEvent)
+        eventChannel.trySend(ShowCreateSetEvent)
     }
 
     fun onCardSetNameEntered(name: String) {

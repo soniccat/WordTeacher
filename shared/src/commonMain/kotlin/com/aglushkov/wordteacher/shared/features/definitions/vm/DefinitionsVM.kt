@@ -155,7 +155,7 @@ open class DefinitionsVMImpl(
 
     override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
         viewModelScope.launch {
-            eventChannel.offer(
+            eventChannel.trySend(
                 ShowPartsOfSpeechFilterDialogEvent(
                     selectedPartsOfSpeechStateFlow.value,
                     partsOfSpeechFilterStateFlow.value
