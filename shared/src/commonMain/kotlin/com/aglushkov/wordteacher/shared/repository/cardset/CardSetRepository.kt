@@ -39,8 +39,7 @@ class CardSetRepository(
                 transform = { cardSetRes, cardsRes ->
                     cardSetRes.merge(cardsRes) { cardSet, cards ->
                         if (cardSet != null && cards != null) {
-                            cardSet.cards = cards.orEmpty()
-                            cardSet
+                            cardSet.copy(cards = cards.orEmpty())
                         } else {
                             cardSet
                         }
@@ -61,7 +60,7 @@ class CardSetRepository(
         examples: MutableList<String> = mutableListOf()
     ): ImmutableCard? {
         val loadedCardSet = cardSet.value.data() ?: return null
-        return scope.async(Dispatchers.Default) {
+        return databaseWorker.run {
             database.cards.insertCard(
                 setId = loadedCardSet.id,
                 date = timeSource.getTimeInMilliseconds(),
@@ -72,18 +71,18 @@ class CardSetRepository(
                 synonyms = synonyms,
                 examples = examples
             )
-        }.await()
+        }
     }
 
     suspend fun deleteCard(card: Card) {
-        scope.async(Dispatchers.Default) {
+        databaseWorker.run {
             database.cards.removeCard(card.id)
-        }.await()
+        }
     }
 
     suspend fun updateCard(card: Card, delay: Long) {
         databaseWorker.runCancellable(
-            id = card.id.toString(),
+            id = "updateCard_" + card.id.toString(),
             runnable = {
                 database.cards.updateCard(card)
             },

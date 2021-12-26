@@ -14,8 +14,12 @@ class CreateCardViewItem(
 class CardViewItem(
     val card: MutableCard,
     val innerViewItems: List<BaseViewItem<*>>
-): BaseViewItem<Card>(card, Type, -1) {
+): BaseViewItem<Card>(card, Type, card.id) {
     companion object {
         const val Type = 701
     }
+
+//    override fun equalsByIds(item: BaseViewItem<*>): Boolean {
+//        return item is CardViewItem && item.type == type && item.card.id == card.id
+//    }
 }

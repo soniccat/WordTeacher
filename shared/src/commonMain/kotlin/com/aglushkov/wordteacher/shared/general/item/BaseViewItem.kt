@@ -49,6 +49,7 @@ abstract class BaseViewItem<T> {
         return result
     }
 
+//    fun contentId(): Int? = null
     fun itemsHashCode(): Int = this.items.hashCode()
     fun itemsEquals(items: List<T>) = this.items.equals(items)
 
@@ -79,16 +80,28 @@ fun generateViewItemIds(
 
     // set ids for item not in the map
     items.forEach {
-        val itemsHashCode = it.itemsHashCode()
-        val mapListOfViewItems = map[itemsHashCode]
-        val item = mapListOfViewItems?.firstOrNull { listItem -> listItem.items == it.items }
-
-        if (item != null) {
-            it.id = item.id
-            mapListOfViewItems.remove(item)
-        } else {
-            it.id = idGenerator.nextId()
+        val equalByIdItem = prevItems.firstOrNull { prevItem ->
+            prevItem.equalsByIds(it)
         }
-        onIdSet(it, item)
+
+        if (equalByIdItem != null) {
+            onIdSet(it, equalByIdItem)
+
+        } else if (it.id != 0L) {
+            onIdSet(it, null)
+
+        } else {
+            val itemsHashCode = it.itemsHashCode()
+            val mapListOfViewItems = map[itemsHashCode]
+            val item = mapListOfViewItems?.firstOrNull { listItem -> listItem.items == it.items }
+
+            if (item != null) {
+                it.id = item.id
+                mapListOfViewItems.remove(item)
+            } else {
+                it.id = idGenerator.nextId()
+            }
+            onIdSet(it, item)
+        }
     }
 }

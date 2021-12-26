@@ -2,22 +2,22 @@ package com.aglushkov.wordteacher.shared.repository.db
 
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
-import kotlin.coroutines.suspendCoroutine
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-typealias WorkerRunnable = () -> Unit
+typealias WorkerRunnable<T> = () -> T
 
-private data class WorkerRunnableInternal(
-    val work: () -> Unit,
-    var completion: () -> Unit = {}
+private data class WorkerRunnableInternal<T>(
+    val work: () -> T,
+    var completion: (value: T?, e: Throwable?) -> Unit = { _, _ -> }
 )
 
 // TODO: import TaskManager with a custom DB pool
@@ -28,114 +28,116 @@ class DatabaseWorker {
     // if one is non empty then we fill the pending of another
     // We switch queues only when one becomes empty
 
-    private val cancellableJobMap = mutableMapOf<String, Job>()
-    private val pendingCancellableRunnable = mutableMapOf<String, CancellableRunnable>()
+    private val cancellableDeferredMap = mutableMapOf<String, Deferred<*>>()
+    private val pendingCancellableRunnable = mutableMapOf<String, CancellableRunnable<*>>()
 
-    private val jobSet = mutableSetOf<Job>()
-    private val pendingRunnable = mutableListOf<WorkerRunnableInternal>()
+    private val deferredSet = mutableSetOf<Deferred<*>>()
+    private val pendingRunnable = mutableListOf<WorkerRunnableInternal<*>>()
 
-    suspend fun runCancellable(id: String, runnable: WorkerRunnable, delay: Long = UPDATE_DELAY) {
-        runCancellableInternal(id, WorkerRunnableInternal(runnable), delay, true)
+    suspend fun <T> runCancellable(id: String, runnable: WorkerRunnable<T>, delay: Long = UPDATE_DELAY): T {
+        return runCancellableInternal(id, WorkerRunnableInternal(runnable), delay, true)
     }
 
-    private suspend fun runCancellableInternal(id: String, runnable: WorkerRunnableInternal, delay: Long = UPDATE_DELAY, shouldRunNext: Boolean) {
-        if (jobSet.isNotEmpty() || !cancellableJobMap.containsKey(id) && cancellableJobMap.isNotEmpty()) {
+    private suspend fun <T> runCancellableInternal(
+        id: String,
+        runnable: WorkerRunnableInternal<T>,
+        delay: Long = UPDATE_DELAY,
+        shouldRunNext: Boolean
+    ) : T = supervisorScope {
+        if (deferredSet.isNotEmpty() || !cancellableDeferredMap.containsKey(id) && cancellableDeferredMap.isNotEmpty()) {
+            pendingCancellableRunnable[id]?.let {
+                it.runnable.completion(null, RuntimeException("Cancelled"))
+            }
+
             pendingCancellableRunnable[id] = CancellableRunnable(runnable, delay)
-            suspendCoroutine<Unit> {
-                runnable.completion = {
-                    it.resumeWith(Result.success(Unit))
+            return@supervisorScope suspendCancellableCoroutine <T> {
+                runnable.completion = { v, e ->
+                    if (v != null) {
+                        it.resumeWith(Result.success(v))
+                    } else {
+                        it.resumeWith(Result.failure(e ?: RuntimeException("Unknown result")))
+                    }
                 }
             }
-            return
         }
 
-        cancellableJobMap[id]?.cancelAndJoin()
-        if (cancellableJobMap.containsKey(id)) {
-            Logger.e("DatabaseWorker.runCancellable", "expect empty cancellableJobMap")
-        }
+        cancellableDeferredMap[id]?.cancelAndJoin()
 
-        val job = scope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, throwable ->
-            Logger.e("DatabaseWorker.runCancellable", throwable.toString())
-        }) {
+        val deferred = scope.async(Dispatchers.Default) {
             delay(delay)
             runnable.work.invoke()
-
-//            try {
-//                delay(delay)
-//                runnable.run()
-//            } catch (ex: CancellationException) {
-//                throw ex
-//            } catch (ex: Throwable) {
-//                Logger.e("DatabaseWorker.runCancellable", ex.toString())
-//            }
         }
 
-        cancellableJobMap[id] = job
-        job.join()
+        cancellableDeferredMap[id] = deferred
+        try {
+            val result = deferred.await()
+            runnable.completion.invoke(result, null)
 
-//        try {
-//            job.join()
-//        } catch (ex: CancellationException) {
-//            throw ex
-//        }
-
-        cancellableJobMap.remove(id)
-        runnable.completion.invoke()
-
-        if (shouldRunNext) {
-            scope.launch {
-                launchPendingIfNeeded()
+            return@supervisorScope result
+        } catch (e: Throwable) {
+            runnable.completion.invoke(null, e)
+            throw e
+        } finally {
+            if (cancellableDeferredMap[id] == deferred) {
+                cancellableDeferredMap.remove(id)
             }
-        }
-    }
 
-    suspend fun run(runnable: WorkerRunnable) {
-        runInternal(WorkerRunnableInternal(runnable), shouldRunNext = true)
-    }
-
-    private suspend fun runInternal(runnable: WorkerRunnableInternal, shouldRunNext: Boolean) {
-        if (cancellableJobMap.isNotEmpty() || jobSet.isNotEmpty()) {
-            pendingRunnable.add(runnable)
-            suspendCoroutine<Unit> {
-                runnable.completion = {
-                    it.resumeWith(Result.success(Unit))
+            if (shouldRunNext) {
+                scope.launch {
+                    launchPendingIfNeeded()
                 }
             }
-            return
+        }
+    }
+
+    suspend fun <T> run(runnable: WorkerRunnable<T>) : T {
+        return runInternal(WorkerRunnableInternal(runnable), shouldRunNext = true)
+    }
+
+    private suspend fun <T> runInternal(
+        runnable: WorkerRunnableInternal<T>,
+        shouldRunNext: Boolean
+    ): T = supervisorScope {
+        if (cancellableDeferredMap.isNotEmpty() || deferredSet.isNotEmpty()) {
+            pendingRunnable.add(runnable)
+            return@supervisorScope suspendCancellableCoroutine<T> {
+                runnable.completion = { v, e ->
+                    if (v != null) {
+                        it.resumeWith(Result.success(v))
+                    } else {
+                        it.resumeWith(Result.failure(e ?: RuntimeException("Unknown result")))
+                    }
+                }
+            }
         }
 
-        val job = scope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, throwable ->
-            Logger.e("DatabaseWorker.run", throwable.toString())
-        }) {
+        val deferred = scope.async(Dispatchers.Default) {
             runnable.work.invoke()
-//            try {
-//                runnable.run()
-//            } catch (ex: CancellationException) {
-//                throw ex
-//            } catch (ex: Throwable) {
-//                Logger.e("DatabaseWorker.run", ex.toString())
-//            }
         }
 
-        jobSet.add(job)
-        job.join()
-//        try {
-//            job.join()
-//        } catch (ex: CancellationException) {
-//            throw ex
-//        }
-        jobSet.remove(job)
-        runnable.completion.invoke()
+        deferredSet.add(deferred)
 
-        if (shouldRunNext) {
-            scope.launch {
-                launchPendingIfNeeded()
+        try {
+            val result = deferred.await()
+            runnable.completion.invoke(result, null)
+
+            return@supervisorScope result
+        } catch (e: Throwable) {
+            runnable.completion.invoke(null, e)
+            throw e
+        } finally {
+            deferredSet.remove(deferred)
+
+            if (shouldRunNext) {
+                scope.launch {
+                    launchPendingIfNeeded()
+                }
             }
         }
     }
 
     private suspend fun launchPendingIfNeeded() {
-        if (jobSet.isNotEmpty() || cancellableJobMap.isNotEmpty()) {
+        if (deferredSet.isNotEmpty() || cancellableDeferredMap.isNotEmpty()) {
             // wait until they both becomes empty
             return
         }
@@ -173,8 +175,8 @@ class DatabaseWorker {
     }
 }
 
-private data class CancellableRunnable(
-    val runnable: WorkerRunnableInternal,
+private data class CancellableRunnable<T>(
+    val runnable: WorkerRunnableInternal<T>,
     val delay: Long,
 )
 
