@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.repository.db
 import com.aglushkov.extensions.firstLong
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
+import com.aglushkov.wordteacher.shared.features.learning.cardteacher.CardProgress
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.*
@@ -120,8 +121,8 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     inner class Cards {
         fun selectCards(setId: Long) = db.dBCardSetToCardRelationQueries.selectCards(
             setId,
-            mapper = { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples ->
-                Card(
+            mapper = { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
+                ImmutableCard(
                     id!!,
                     date!!,
                     term!!,
@@ -129,7 +130,12 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     if (partOfSpeech != null) WordTeacherWord.PartOfSpeech.valueOf(partOfSpeech) else WordTeacherWord.PartOfSpeech.Undefined,
                     transcription,
                     synonyms?.split(CARD_SEPARATOR).orEmpty().toMutableList(),
-                    examples?.split(CARD_SEPARATOR).orEmpty().toMutableList()
+                    examples?.split(CARD_SEPARATOR).orEmpty().toMutableList(),
+                    progress = CardProgress(
+                        progressLevel ?: 0,
+                        progressLastMistakeCount ?: 0,
+                        progressLastLessonDate ?: 0L
+                    )
                 )
             }
         )
@@ -142,9 +148,10 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             partOfSpeech: WordTeacherWord.PartOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
             transcription: String? = "",
             synonyms: List<String> = mutableListOf(),
-            examples: List<String> = mutableListOf()
+            examples: List<String> = mutableListOf(),
+            progress: CardProgress = CardProgress.EMPTY
         ): ImmutableCard {
-            val newCard = ImmutableCard(
+            var newCard = ImmutableCard(
                 id = -1,
                 date = date,
                 term = term,
@@ -152,11 +159,12 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 partOfSpeech = partOfSpeech,
                 transcription = transcription,
                 synonyms = synonyms,
-                examples = examples
+                examples = examples,
+                progress = progress
             )
 
             cards.insertCardInternal(setId, newCard)
-            newCard.id = cards.insertedCardId()!!
+            newCard = newCard.copy(id = cards.insertedCardId()!!)
             return newCard
         }
 
@@ -169,7 +177,8 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 partOfSpeech = newCard.partOfSpeech,
                 transcription = newCard.transcription,
                 synonyms = newCard.synonyms,
-                examples = newCard.examples
+                examples = newCard.examples,
+                progress = newCard.progress
             )
         }
 
@@ -181,7 +190,8 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             partOfSpeech: WordTeacherWord.PartOfSpeech,
             transcription: String?,
             synonyms: List<String>,
-            examples: List<String>
+            examples: List<String>,
+            progress: CardProgress
         ) {
             db.transaction {
                 db.dBCardQueries.insert(
@@ -191,7 +201,10 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     transcription,
                     definitions.joinToString(CARD_SEPARATOR),
                     synonyms.joinToString(CARD_SEPARATOR),
-                    examples.joinToString(CARD_SEPARATOR)
+                    examples.joinToString(CARD_SEPARATOR),
+                    progress.currentLevel,
+                    progress.lastMistakeCount,
+                    progress.lastLessonDate
                 )
 
                 val cardId = db.dBCardQueries.lastInsertedRowId().firstLong()!!
@@ -210,7 +223,10 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 partOfSpeech = card.partOfSpeech,
                 transcription = card.transcription,
                 synonyms = card.synonyms,
-                examples = card.examples
+                examples = card.examples,
+                progressLevel = card.progress.currentLevel,
+                progressLastMistakeCount = card.progress.lastMistakeCount,
+                progressLastLessonDate = card.progress.lastLessonDate,
             )
         }
 
@@ -222,7 +238,10 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             partOfSpeech: WordTeacherWord.PartOfSpeech,
             transcription: String?,
             synonyms: List<String>,
-            examples: List<String>
+            examples: List<String>,
+            progressLevel: Int,
+            progressLastMistakeCount: Int,
+            progressLastLessonDate: Long
         ) = db.dBCardQueries.updateCard(
             date,
             term,
@@ -231,6 +250,9 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             definitions.joinToString(CARD_SEPARATOR),
             synonyms.joinToString(CARD_SEPARATOR),
             examples.joinToString(CARD_SEPARATOR),
+            progressLevel,
+            progressLastMistakeCount,
+            progressLastLessonDate,
             cardId
         )
 
@@ -254,6 +276,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 
     companion object {
+        // TODO: replace with SQLDelight adapters: https://cashapp.github.io/sqldelight/android_sqlite/types/
         const val NLP_SEPARATOR = "&&"
         const val CARD_SEPARATOR = "$$"
     }

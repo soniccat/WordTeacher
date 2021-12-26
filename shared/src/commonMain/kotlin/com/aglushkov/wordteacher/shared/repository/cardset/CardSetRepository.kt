@@ -10,11 +10,13 @@ import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.ImmutableCard
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class CardSetRepository(
     private val database: AppDatabase,
+    private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -87,5 +89,3 @@ class CardSetRepository(
         }
     }
 }
-
-const val UPDATE_DELAY = 200L

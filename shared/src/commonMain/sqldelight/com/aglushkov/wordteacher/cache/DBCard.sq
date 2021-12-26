@@ -6,20 +6,24 @@ CREATE TABLE IF NOT EXISTS DBCard (
   transcription TEXT,
   definitions TEXT NOT NULL,
   synonyms TEXT,
-  examples TEXT
+  examples TEXT,
+-- Progress
+  progressLevel INTEGER AS Int DEFAULT 0,
+  progressLastMistakeCount INTEGER AS Int DEFAULT 0,
+  progressLastLessonDate INTEGER DEFAULT 0
 );
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
 VALUES ?;
 
 updateCard:
 UPDATE DBCard
-SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?
 WHERE id = ?;
 
 lastInsertedRowId:
@@ -38,3 +42,8 @@ WHERE id IN (SELECT cardId FROM DBCardSetToCardRelation WHERE setId = ?);
 removeAll:
 DELETE
 FROM DBCard;
+
+setProgress:
+UPDATE DBCard
+SET progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?
+WHERE id = ?;
