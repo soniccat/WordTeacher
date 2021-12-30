@@ -113,11 +113,11 @@ private fun CardView(
     cardItem: CardViewItem,
     vm: CardSetVM
 ) {
-    val card = cardItem.card
+    val cardId = cardItem.card.id
     DeletableCell(
         stateKey = cardItem.id,
         onClick = { /*TODO*/ },
-        onDeleted = { vm.onCardDeleted(cardItem.card) }
+        onDeleted = { vm.onCardDeleted(cardId) }
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -128,7 +128,7 @@ private fun CardView(
                         WordTitleView(
                             viewItem = item,
                             textContent = { text, textStyle ->
-                                CardTextField(Modifier, text, textStyle, item, card, vm)
+                                CardTextField(Modifier, text, textStyle, item, cardId, vm)
                             }
                         )
                     }
@@ -136,7 +136,7 @@ private fun CardView(
                         WordTranscriptionView(
                             item,
                             textContent = { text, textStyle ->
-                                CardTextField(Modifier, text, textStyle, item, card, vm)
+                                CardTextField(Modifier, text, textStyle, item, cardId, vm)
                             }
                         )
                     }
@@ -144,7 +144,7 @@ private fun CardView(
                     is WordDefinitionViewItem -> DeletableCell(
                             stateKey = item.id,
                             onClick = { /*TODO*/ },
-                            onDeleted = { vm.onDefinitionRemoved(item, card) }
+                            onDeleted = { vm.onDefinitionRemoved(item, cardId) }
                         ) {
                             WordDefinitionView(
                                 item,
@@ -154,14 +154,13 @@ private fun CardView(
                                         text,
                                         textStyle,
                                         item,
-                                        card,
+                                        cardId,
                                         vm
                                     )
 
-                                    val needShowAddIcon = item.index == card.definitions.size - 1
-                                    if (needShowAddIcon) {
+                                    if (item.isLast) {
                                         AddIcon {
-                                            vm.onAddDefinitionPressed(card)
+                                            vm.onAddDefinitionPressed(cardId)
                                         }
                                     }
                                 }
@@ -171,7 +170,7 @@ private fun CardView(
                     is WordSynonymViewItem -> DeletableCell(
                         stateKey = item.id,
                         onClick = { /*TODO*/ },
-                        onDeleted = { vm.onSynonymRemoved(item, card) }
+                        onDeleted = { vm.onSynonymRemoved(item, cardId) }
                     ) {
                         WordSynonymView(
                             item,
@@ -181,14 +180,13 @@ private fun CardView(
                                     text,
                                     textStyle,
                                     item,
-                                    card,
+                                    cardId,
                                     vm
                                 )
 
-                                val needShowAddIcon = item.index == card.synonyms.size - 1
-                                if (needShowAddIcon) {
+                                if (item.isLast) {
                                     AddIcon {
-                                        vm.onAddSynonymPressed(card)
+                                        vm.onAddSynonymPressed(cardId)
                                     }
                                 }
                             }
@@ -197,7 +195,7 @@ private fun CardView(
                     is WordExampleViewItem -> DeletableCell(
                         stateKey = item.id,
                         onClick = { /*TODO*/ },
-                        onDeleted = { vm.onExampleRemoved(item, card) }
+                        onDeleted = { vm.onExampleRemoved(item, cardId) }
                     ) {
                         WordExampleView(
                             item,
@@ -207,14 +205,13 @@ private fun CardView(
                                     text,
                                     textStyle,
                                     item,
-                                    card,
+                                    cardId,
                                     vm
                                 )
 
-                                val needShowAddIcon = item.index == card.examples.size - 1
-                                if (needShowAddIcon) {
+                                if (item.isLast) {
                                     AddIcon {
-                                        vm.onAddExamplePressed(card)
+                                        vm.onAddExamplePressed(cardId)
                                     }
                                 }
                             }
@@ -232,7 +229,7 @@ private fun CardTextField(
     text: String,
     textStyle: androidx.compose.ui.text.TextStyle,
     item: BaseViewItem<*>,
-    card: MutableCard,
+    cardId: Long,
     vm: CardSetVM
 ) {
     var textState by remember { mutableStateOf(TextFieldValue(text)) }
@@ -243,7 +240,7 @@ private fun CardTextField(
         textStyle = textStyle,
         onValueChange = {
             textState = it
-            vm.onItemTextChanged(it.text, item, card)
+            vm.onItemTextChanged(it.text, item, cardId)
         }
     )
 }

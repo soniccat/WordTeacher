@@ -80,6 +80,7 @@ fun generateViewItemIds(
 
     // set ids for item not in the map
     items.forEach {
+        // TODO: refactor, probably we should check equality by ids first, before creating the map
         val equalByIdItem = prevItems.firstOrNull { prevItem ->
             prevItem.equalsByIds(it)
         }

@@ -37,20 +37,21 @@ class WordPartOfSpeechViewItem(partOfSpeech: StringDesc): BaseViewItem<StringDes
 class WordDefinitionViewItem(
     definition: String,
     val data: Any? = null,
-    val index: Int = -1
+    val index: Int = -1,
+    val isLast: Boolean = false
 ): BaseViewItem<String>(definition, Type) {
     companion object {
         const val Type = 104
     }
 }
 
-class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE, val index: Int = -1): BaseViewItem<String>(example, Type) {
+class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false): BaseViewItem<String>(example, Type) {
     companion object {
         const val Type = 105
     }
 }
 
-class WordSynonymViewItem(synonym: String, val indent: Indent = Indent.NONE, val index: Int = -1): BaseViewItem<String>(synonym, Type) {
+class WordSynonymViewItem(synonym: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false): BaseViewItem<String>(synonym, Type) {
     companion object {
         const val Type = 106
     }

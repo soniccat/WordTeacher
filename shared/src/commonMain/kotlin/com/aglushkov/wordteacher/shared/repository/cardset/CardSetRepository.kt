@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.resource.tryInResource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.ImmutableCard
+import com.aglushkov.wordteacher.shared.model.ImmutableCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
@@ -21,9 +22,9 @@ class CardSetRepository(
     private val timeSource: TimeSource
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val stateFlow = MutableStateFlow<Resource<CardSet>>(Resource.Uninitialized())
+    private val stateFlow = MutableStateFlow<Resource<ImmutableCardSet>>(Resource.Uninitialized())
 
-    val cardSet: StateFlow<Resource<CardSet>> = stateFlow
+    val cardSet: StateFlow<Resource<ImmutableCardSet>> = stateFlow
     private var loadJob: Job? = null
 
     suspend fun loadCardSet(id: Long) {
@@ -88,5 +89,8 @@ class CardSetRepository(
             },
             delay
         )
+//        databaseWorker.run {
+//            database.cards.updateCard(card)
+//        }
     }
 }
