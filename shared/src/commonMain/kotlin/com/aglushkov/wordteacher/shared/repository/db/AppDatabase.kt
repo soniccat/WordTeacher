@@ -3,8 +3,8 @@ package com.aglushkov.wordteacher.shared.repository.db
 import com.aglushkov.extensions.firstLong
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
-import com.aglushkov.wordteacher.shared.features.learning.cardteacher.CardProgress
-import com.aglushkov.wordteacher.shared.features.learning.cardteacher.ImmutableCardProgress
+import com.aglushkov.wordteacher.shared.model.CardProgress
+import com.aglushkov.wordteacher.shared.model.ImmutableCardProgress
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.*

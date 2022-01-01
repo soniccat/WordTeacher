@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.features.learning.cardteacher
+package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
 

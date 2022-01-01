@@ -13,13 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-typealias WorkerRunnable<T> = () -> T
-
-private data class WorkerRunnableInternal<T>(
-    val work: () -> T,
-    var completion: (value: T?, e: Throwable?) -> Unit = { _, _ -> }
-)
-
+// TODO: write tests
 // TODO: import TaskManager with a custom DB pool
 class DatabaseWorker {
     val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -179,5 +173,12 @@ private data class CancellableRunnable<T>(
     val runnable: WorkerRunnableInternal<T>,
     val delay: Long,
 )
+
+private data class WorkerRunnableInternal<T>(
+    val work: () -> T,
+    var completion: (value: T?, e: Throwable?) -> Unit = { _, _ -> }
+)
+
+typealias WorkerRunnable<T> = () -> T
 
 const val UPDATE_DELAY = 200L

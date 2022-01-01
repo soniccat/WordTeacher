@@ -18,8 +18,4 @@ class CardViewItem(
     companion object {
         const val Type = 701
     }
-
-//    override fun equalsByIds(item: BaseViewItem<*>): Boolean {
-//        return item is CardViewItem && item.type == type && item.card.id == card.id
-//    }
 }

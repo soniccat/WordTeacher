@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.v
+import com.aglushkov.wordteacher.shared.model.MutableCard
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -95,6 +96,8 @@ private suspend fun <T> applyResValueIfNeeded(
         }
     }
 }
+
+fun <T> StateFlow<T?>.takeWhileNonNull() = takeWhile { it != null } as Flow<T>
 
 class AbortFlowException constructor(
     val owner: FlowCollector<*>

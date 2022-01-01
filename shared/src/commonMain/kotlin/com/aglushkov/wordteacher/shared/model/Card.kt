@@ -1,9 +1,5 @@
 package com.aglushkov.wordteacher.shared.model
 
-import com.aglushkov.wordteacher.shared.features.learning.cardteacher.CardProgress
-import com.aglushkov.wordteacher.shared.features.learning.cardteacher.ImmutableCardProgress
-import com.aglushkov.wordteacher.shared.features.learning.cardteacher.MutableCardProgress
-
 data class MutableCard (
     override var id: Long,
     override var date: Long,

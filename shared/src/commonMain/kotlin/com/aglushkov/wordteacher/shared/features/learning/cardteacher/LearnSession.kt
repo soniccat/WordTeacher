@@ -1,7 +1,16 @@
 package com.aglushkov.wordteacher.shared.features.learning.cardteacher
 
+import com.aglushkov.wordteacher.shared.general.extensions.asCommonFlow
+import com.aglushkov.wordteacher.shared.general.extensions.takeWhileNonNull
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.MutableCard
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.takeWhile
 
 class LearnSession(
     private val cards: List<MutableCard>
@@ -12,8 +21,11 @@ class LearnSession(
 
     private var currentIndex = 0
 
+    private val currentCardStateFlow = MutableStateFlow<MutableCard?>(null)
     val currentCard: MutableCard?
-        get() = if (currentIndex < cards.size) cards[currentIndex] else null
+        get() = currentCardStateFlow.value
+    val currentCardFlow: Flow<MutableCard>
+        get() = currentCardStateFlow.takeWhileNonNull()
 
     val size: Int
         get() = cards.size
@@ -25,14 +37,15 @@ class LearnSession(
             result.isRight = isRight
         }
 
-    fun nextCard(): Card? {
-        var result: Card? = null
+    fun switchToNextCard(): Card? {
+        var result: MutableCard? = null
         ++currentIndex
 
         if (currentIndex < cards.size) {
             result = cards[currentIndex]
         }
 
+        currentCardStateFlow.value = result
         return result
     }
 
