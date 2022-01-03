@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -21,6 +22,7 @@ import kotlinx.coroutines.supervisorScope
 
 class CardSetsRepository(
     private val database: AppDatabase,
+    private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -79,5 +81,11 @@ class CardSetsRepository(
                 examples = examples
             )
         }.await()
+    }
+
+    suspend fun allCardIds(): List<Long> {
+        return databaseWorker.run {
+            database.cards.selectAllCardIds().executeAsList()
+        }
     }
 }

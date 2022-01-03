@@ -1,23 +1,20 @@
-package com.aglushkov.wordteacher.shared.features.learning.cardteacher
+package com.aglushkov.wordteacher.shared.features.learning.vm
 
-import com.aglushkov.wordteacher.shared.general.extensions.asCommonFlow
 import com.aglushkov.wordteacher.shared.general.extensions.takeWhileNonNull
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.MutableCard
+import com.arkivanov.essenty.parcelable.Parcelable
+import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectIndexed
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.takeWhile
 
-class LearnSession(
+class LearningSession(
     private val cards: List<MutableCard>
 ) {
-    val results: List<SessionCardResult> = cards.map { card ->
+    var results: List<SessionCardResult> = cards.map { card ->
         SessionCardResult(card.id, card.progress.progress())
     }
+        private set
 
     private var currentIndex = 0
 
@@ -30,6 +27,9 @@ class LearnSession(
     val size: Int
         get() = cards.size
 
+    init {
+        currentCardStateFlow.value = cards.getOrNull(currentIndex)
+    }
 
     fun updateProgress(card: Card, isRight: Boolean) =
         getCardResult(card.id)?.let { result ->
@@ -62,4 +62,23 @@ class LearnSession(
 
     fun cardResult(i: Int) =
         results[i]
+
+    fun save() = State(
+        cardIds = cards.map { it.id },
+        currentIndex = currentIndex,
+        results = results
+    )
+
+    fun restore(state: State) {
+        currentIndex = state.currentIndex
+        results = state.results
+        currentCardStateFlow.value = cards[currentIndex]
+    }
+
+    @Parcelize
+    data class State(
+        val cardIds: List<Long>,
+        val currentIndex: Int,
+        val results: List<SessionCardResult>
+    ) : Parcelable
 }

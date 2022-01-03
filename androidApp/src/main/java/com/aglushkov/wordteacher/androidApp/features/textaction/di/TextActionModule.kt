@@ -41,7 +41,7 @@ class TextActionModule {
                         .setConfiguration(AddArticleVM.State(text = config.text.toString()))
                         .setDeps(appComponent)
                         .build()
-                        .buildAddArticleDecomposeComponent()
+                        .addArticleDecomposeComponent()
                 is TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration ->
                     DaggerNotesComponent.builder()
                         .setComponentContext(context)

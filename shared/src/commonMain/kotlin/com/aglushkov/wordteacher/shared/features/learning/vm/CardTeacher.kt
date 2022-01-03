@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.features.learning.cardteacher
+package com.aglushkov.wordteacher.shared.features.learning.vm
 
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -8,6 +8,8 @@ import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.MutableCard
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
+import com.arkivanov.essenty.parcelable.Parcelable
+import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,14 +22,10 @@ class CardTeacher(
     private val timeSource: TimeSource,
     private val scope: CoroutineScope
 ) {
-    private var sessions = mutableListOf<LearnSession>()
-    private var currentSessionStateFlow = MutableStateFlow<LearnSession?>(null)
+    private var sessions = mutableListOf<LearningSession>()
+    private var currentSession: LearningSession? = null
     private var currentCardStateFlow = MutableStateFlow<MutableCard?>(null)
 
-    val currentSession: LearnSession?
-        get() = currentSessionStateFlow.value
-    val currentSessionFlow: Flow<LearnSession>
-        get() = currentSessionStateFlow.takeWhileNonNull()
     val currentCard: Card?
         get() = currentCardStateFlow.value
     val currentCardFlow: Flow<Card>
@@ -38,7 +36,16 @@ class CardTeacher(
     var isWrongAnswerCounted = false
         private set
 
-    fun buildCourseSession() {
+    suspend fun runSession(block: suspend (cards: Flow<Card>) -> Unit): List<SessionCardResult>? {
+        val session = buildLearnSession()
+        if (session != null) {
+            block(currentCardFlow)
+        }
+
+        return session?.results
+    }
+
+    private fun buildLearnSession(): LearningSession? {
         val rightAnsweredCardSet = sessions.map { session ->
             session.rightAnsweredCards().map { it.id }
         }.flatten().toSet()
@@ -48,15 +55,19 @@ class CardTeacher(
         }.shuffled().take(CARD_PER_SESSION)
 
         if (sessionCards.isEmpty()) {
-            currentSessionStateFlow.value = null
+            currentSession = null
         } else {
-            val session = LearnSession(sessionCards.map { it.toMutableCard() })
-            currentSessionStateFlow.value = session
+            val session = LearningSession(sessionCards.map { it.toMutableCard() })
+            currentSession = session
 
             scope.launch {
-                session.currentCardFlow.collect(currentCardStateFlow)
+                session.currentCardFlow.collect {
+                    currentCardStateFlow.value = it
+                }//.collect(currentCardStateFlow)
             }
         }
+
+        return currentSession
     }
 
     private fun prepareToNewCard() {
@@ -105,8 +116,9 @@ class CardTeacher(
                 }
             }
 
-            if (currentCardSnapshot == currentCard?.toImmutableCard()) {
-                currentSessionStateFlow.value!!.updateProgress(mutableCard, false)
+            val safeSession = currentSession
+            if (safeSession != null && currentCardSnapshot == currentCard?.toImmutableCard()) {
+                safeSession.updateProgress(mutableCard, false)
                 isWrongAnswerCounted = true
             }
 
@@ -130,9 +142,10 @@ class CardTeacher(
                 }
             }
 
-            if (currentCardSnapshot == currentCard?.toImmutableCard()) {
+            val safeSession = currentSession
+            if (safeSession != null && currentCardSnapshot == currentCard?.toImmutableCard()) {
                 currentCardStateFlow.value?.set(mutableCard)
-                currentSessionStateFlow.value!!.updateProgress(mutableCard, true)
+                safeSession.updateProgress(mutableCard, true)
             }
 
             switchToNextCard()
@@ -141,13 +154,50 @@ class CardTeacher(
 
     private fun switchToNextCard(): Card? {
         prepareToNewCard()
-        val nextCard = currentSessionStateFlow.value?.switchToNextCard()
-        if (nextCard == null) {
-            sessions.add(currentSessionStateFlow.value!!)
-            currentSessionStateFlow.value = null
+        val nextCard = currentSession?.switchToNextCard()
+        val safeSession = currentSession
+
+        if (safeSession != null && nextCard == null) {
+            sessions.add(safeSession)
+            currentSession = null
         }
+
         return nextCard
     }
+
+    fun save() = State(
+        sessionStates = sessions.map { it.save() },
+        currentSessionState = currentSession?.save(),
+        checkCount = checkCount,
+        hintShowCount = hintShowCount,
+        isWrongAnswerCounted = isWrongAnswerCounted
+    )
+
+    fun restore(state: State) {
+        sessions = state.sessionStates.map(::createLearningSession).toMutableList()
+        currentSession = state.currentSessionState?.let(::createLearningSession)
+        checkCount = state.checkCount
+        hintShowCount = state.hintShowCount
+        isWrongAnswerCounted = state.isWrongAnswerCounted
+    }
+
+    private fun createLearningSession(sessionState: LearningSession.State) =
+        LearningSession(
+            cards = sessionState.cardIds.mapNotNull { cardId ->
+                cards.firstOrNull { it.id == cardId }?.toMutableCard()
+            }
+        ).also {
+            it.restore(sessionState)
+        }
+
+    @Parcelize
+    data class State(
+        val sessionStates: List<LearningSession.State>,
+        val currentSessionState: LearningSession.State?,
+        val checkCount: Int,
+        val hintShowCount: Int,
+        val isWrongAnswerCounted: Boolean
+    ) : Parcelable
 }
 
 private const val CARD_PER_SESSION = 10

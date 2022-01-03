@@ -33,6 +33,7 @@ import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.androidApp.features.learning.views.LearningUI
 import com.aglushkov.wordteacher.androidApp.features.notes.NotesUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
@@ -108,6 +109,7 @@ class MainActivity : AppCompatActivity(), Router {
                     is MainDecomposeComponent.Child.Article -> ArticleUI(vm = instance.inner)
                     is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.inner)
                     is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.inner)
+                    is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.inner)
                     else -> throw RuntimeException("mainUI: Not implemented ${instance}")
                 }
             }
@@ -321,12 +323,8 @@ class MainActivity : AppCompatActivity(), Router {
         mainDecomposeComponent.openCardSet(id)
     }
 
-    override fun openStartLearning() {
-//        TODO("Not yet implemented")
-    }
-
-    override fun openLearning() {
-//        TODO("Not yet implemented")
+    override fun openLearning(ids: List<Long>) {
+        mainDecomposeComponent.openLearning(ids)
     }
 
     override fun closeCardSet() {
@@ -335,6 +333,10 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun openCardSets() {
         mainDecomposeComponent.openCardSets()
+    }
+
+    override fun closeLearning() {
+        mainDecomposeComponent.back()
     }
 }
 

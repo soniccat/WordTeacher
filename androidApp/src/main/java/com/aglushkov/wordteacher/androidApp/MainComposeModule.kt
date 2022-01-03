@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.androidApp.features.cardset.di.DaggerCardSetCom
 import com.aglushkov.wordteacher.androidApp.features.cardsets.di.DaggerCardSetsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerTabComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.learning.di.DaggerLearningComponent
 import com.aglushkov.wordteacher.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponentImpl
@@ -16,6 +17,7 @@ import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -63,7 +65,14 @@ class MainComposeModule {
                         .setConfiguration(AddArticleVM.State())
                         .setDeps(appComponent)
                         .build()
-                        .buildAddArticleDecomposeComponent()
+                        .addArticleDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.LearningConfiguration ->
+                    DaggerLearningComponent.builder()
+                        .setState(LearningVM.State(configuration.ids, teacherState = null))
+                        .setComponentContext(context)
+                        .setDeps(appComponent)
+                        .build()
+                        .learningDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
                     Any()
             }

@@ -1,14 +1,9 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.notes.vm.CreateNoteViewItem
-import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
-import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
-import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
@@ -110,7 +105,14 @@ open class CardSetsVMImpl(
     }
 
     override fun onStartLearningClicked() {
-        router.openStartLearning()
+        viewModelScope.launch {
+            try {
+                val allCardIds = cardSetsRepository.allCardIds()
+                router.openLearning(allCardIds)
+            } catch (e: Throwable) {
+                // TODO: handle error
+            }
+        }
     }
 
     private fun buildViewItems(cardSets: List<ShortCardSet>, newCardSetText: String?): List<BaseViewItem<*>> {

@@ -3,7 +3,7 @@ package com.aglushkov.wordteacher.shared.general.item
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 
 abstract class BaseViewItem<T> {
-    var id = 0L // a unique id, required for NSDiffableDataSourceSnapshot
+    var id = 0L // a unique id, required for NSDiffableDataSourceSnapshot and Compose LazyList key
     var type = 0
     var items = listOf<T>()
 
@@ -49,7 +49,6 @@ abstract class BaseViewItem<T> {
         return result
     }
 
-//    fun contentId(): Int? = null
     fun itemsHashCode(): Int = this.items.hashCode()
     fun itemsEquals(items: List<T>) = this.items.equals(items)
 

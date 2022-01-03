@@ -1,17 +1,13 @@
 package com.aglushkov.wordteacher.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
-import com.aglushkov.wordteacher.androidApp.features.articles.blueprints.ArticleBlueprint
 import com.aglushkov.wordteacher.androidApp.features.cardsets.blueprints.CardSetBlueprint
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.androidApp.general.ViewItemBinder
-import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
-import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVMImpl
 import com.aglushkov.wordteacher.shared.general.TimeSource
-import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import dagger.Module
 import dagger.Provides
@@ -39,8 +35,8 @@ class CardSetsModule {
                 routerResolver.router?.get()?.openArticle(id)
             }
 
-            override fun openStartLearning() {
-                routerResolver.router?.get()?.openStartLearning()
+            override fun openLearning(ids: List<Long>) {
+                routerResolver.router?.get()?.openLearning(ids)
             }
         }, time)
     }

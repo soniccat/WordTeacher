@@ -11,7 +11,7 @@ import dagger.Component
 
 @Component(dependencies = [AddArticleDependencies::class], modules = [AddArticleComposeModule::class])
 interface AddArticleComposeComponent {
-    fun buildAddArticleDecomposeComponent(): AddArticleDecomposeComponent
+    fun addArticleDecomposeComponent(): AddArticleDecomposeComponent
 
     @Component.Builder
     interface Builder {

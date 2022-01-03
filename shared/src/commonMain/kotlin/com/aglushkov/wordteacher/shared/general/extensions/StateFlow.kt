@@ -5,16 +5,16 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.v
-import com.aglushkov.wordteacher.shared.model.MutableCard
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.takeWhile
 
+// TODO: replace with simple .collect(stateFlow)
 suspend fun <T> Flow<T>.forward(stateFlow: MutableStateFlow<T>) {
     collect { newRes ->
         stateFlow.value = newRes
@@ -33,13 +33,14 @@ suspend fun <T> Flow<Resource<T>>.forward(version: Int, stateFlow: MutableStateF
     }
 }
 
-suspend fun <T> StateFlow<Resource<T>>.collectUntilLoaded() {
-    takeWhile { !it.isLoaded() }.collect()
+suspend fun <T> StateFlow<Resource<T>>.collectUntilLoaded(): T {
+    return first { it.isLoaded() }.data()!!
 }
 
 // Take until a resource operation is completed, the last state is emitted
-fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(): Flow<Resource<T>> {
-    val version = value.version
+fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(
+    version: Int = value.version
+): Flow<Resource<T>> {
     return flow {
         try {
             collect { newRes ->
@@ -97,7 +98,21 @@ private suspend fun <T> applyResValueIfNeeded(
     }
 }
 
-fun <T> StateFlow<T?>.takeWhileNonNull() = takeWhile { it != null } as Flow<T>
+fun <T> StateFlow<T?>.takeWhileNonNull(
+    consumeCurrentNull: Boolean = true,
+    takeCurrentValue: Boolean = true,
+) = flow {
+        var v = value
+        if (v == null && consumeCurrentNull) {
+            v = first { it != null }
+        }
+
+        if (takeCurrentValue && v != null) {
+            emit(v)
+        }
+
+        takeWhile { it != null } as Flow<T>
+    }
 
 class AbortFlowException constructor(
     val owner: FlowCollector<*>

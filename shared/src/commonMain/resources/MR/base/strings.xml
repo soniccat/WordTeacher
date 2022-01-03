@@ -43,6 +43,9 @@
     <string name="add_article_done">ADD</string>
     <string name="add_article_error_empty_title">Title is required</string>
 
+    <string name="learning_title">Learning</string>
+    <string name="learning_error">@string/error_default</string>
+
     <string name="error_default">Something went wrong :(</string>
     <string name="error_bad_response">Something went wrong, sorry :(.\nPlease try again later.</string>
     <string name="error_bad_connection">Couldn\'t establish connection to the network.\nTry to check your network settings and try again.</string>
@@ -51,7 +54,7 @@
     <string name="articles_no_articles">To create a new article tap the button</string>
     <string name="cardsets_error">@string/error_default</string>
     <string name="articles_error">@string/error_default</string>
-    <string name="article_error">@string/articles_error</string>
+    <string name="article_error">@string/error_default</string>
     <string name="article_empty">There\'s an empty article</string>
 
     <string name="notes_error">@string/error_default</string>

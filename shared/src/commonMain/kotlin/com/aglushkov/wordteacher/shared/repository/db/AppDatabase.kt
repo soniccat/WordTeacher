@@ -120,9 +120,32 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     }
 
     inner class Cards {
+        fun selectAllCardIds() = db.dBCardQueries.selectAllCardIds()
+
+        fun selectCards(ids: List<Long>) = db.dBCardQueries.selectCards(
+            ids,
+            cardMapper()
+        )
+
         fun selectCards(setId: Long) = db.dBCardSetToCardRelationQueries.selectCards(
             setId,
-            mapper = { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
+            mapper = cardMapper()
+        )
+
+        private fun cardMapper() : (
+            id: Long?,
+            date: Long?,
+            term: String?,
+            partOfSpeech: String?,
+            transcription: String?,
+            definitions: String?,
+            synonyms: String?,
+            examples: String?,
+            progressLevel: Int?,
+            progressLastMistakeCount: Int?,
+            progressLastLessonDate: Long?
+        ) -> ImmutableCard =
+            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
                 ImmutableCard(
                     id!!,
                     date!!,
@@ -139,7 +162,6 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     )
                 )
             }
-        )
 
         fun insertCard(
             setId: Long,
