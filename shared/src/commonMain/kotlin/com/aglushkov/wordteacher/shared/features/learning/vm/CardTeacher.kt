@@ -144,7 +144,7 @@ class CardTeacher(
 
             val safeSession = currentSession
             if (safeSession != null && currentCardSnapshot == currentCard?.toImmutableCard()) {
-                currentCardStateFlow.value?.set(mutableCard)
+                //currentCardStateFlow.value?.set(mutableCard)
                 safeSession.updateProgress(mutableCard, true)
             }
 

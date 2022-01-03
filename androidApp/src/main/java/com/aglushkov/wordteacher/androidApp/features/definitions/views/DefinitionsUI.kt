@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
@@ -371,7 +372,8 @@ fun WordTranscriptionView(
 @Composable
 fun WordPartOfSpeechView(
     viewItem: WordPartOfSpeechViewItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    topPadding: Dp = dimensionResource(id = R.dimen.word_partOfSpeech_topMargin)
 ) {
     Text(
         text = viewItem.firstItem().resolveString().toUpperCase(Locale.getDefault()),
@@ -380,7 +382,7 @@ fun WordPartOfSpeechView(
             .padding(
                 start = dimensionResource(id = R.dimen.word_horizontalPadding),
                 end = dimensionResource(id = R.dimen.word_horizontalPadding),
-                top = dimensionResource(id = R.dimen.word_partOfSpeech_topMargin)
+                top = topPadding
             ),
         style = AppTypography.wordDefinitionPartOfSpeech
     )

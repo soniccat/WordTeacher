@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CancellationException
@@ -33,8 +34,9 @@ import kotlinx.coroutines.launch
 
 interface LearningVM {
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
+    val titleErrorFlow: StateFlow<StringDesc?>
 
-    suspend fun onCheckPressed(answer: String)
+    fun onCheckPressed(answer: String)
     fun onTextChanged()
     fun onShowNextLetterPressed()
     fun onShowRandomLetterPressed()
@@ -61,21 +63,23 @@ open class LearningVMImpl(
     private val idGenerator: IdGenerator
 ) : ViewModel(), LearningVM {
 
-    private val retryStatFlow = MutableStateFlow(0)
     override val viewItems = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+    private val retryStatFlow = MutableStateFlow(0)
+    override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
 
     private var teacher: CardTeacher? = null
 
     fun restore(newState: LearningVM.State) {
         state = newState
 
-        startLearning(state.cardIds)
+        startLearning(state.cardIds, state.teacherState)
     }
 
-    fun startLearning(id: List<Long>) {
+    // Screen state flow
+    private fun startLearning(cardIds: List<Long>, teacherState: CardTeacher.State?) {
         viewModelScope.launch {
             val cards = loadCardsUntilLoaded(
-                cardIds = state.cardIds,
+                cardIds = cardIds,
                 onLoading = {
                     viewItems.value = Resource.Loading()
                 },
@@ -83,7 +87,7 @@ open class LearningVMImpl(
                     viewItems.value = Resource.Error(it, canTryAgain = true)
                 }
             )
-            val teacher = createTeacher(cards, state.teacherState)
+            val teacher = createTeacher(cards, teacherState)
             val result = teacher.runSession { sessionCards ->
                 sessionCards.collect { card ->
                     viewItems.value = Resource.Loaded(buildCardItem(card))
@@ -192,8 +196,21 @@ open class LearningVMImpl(
         generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator)
     }
 
-    override suspend fun onCheckPressed(answer: String) {
-        teacher?.onCheckInput(answer)
+    override fun onCheckPressed(answer: String) {
+        viewModelScope.launch {
+            checkInput(answer)
+        }
+    }
+
+    private suspend fun checkInput(answer: String) {
+        val teacher = teacher ?: return
+
+        val isRight = teacher.onCheckInput(answer)
+        titleErrorFlow.value = if (isRight) {
+            null
+        } else {
+            StringDesc.Resource(MR.strings.learning_wrong_input)
+        }
     }
 
     override fun onTextChanged() {

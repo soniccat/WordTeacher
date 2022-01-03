@@ -45,6 +45,8 @@
 
     <string name="learning_title">Learning</string>
     <string name="learning_error">@string/error_default</string>
+    <string name="learning_wrong_input">Something is wrong</string>
+    <string name="learning_term_title_hint">Term</string>
 
     <string name="error_default">Something went wrong :(</string>
     <string name="error_bad_response">Something went wrong, sorry :(.\nPlease try again later.</string>

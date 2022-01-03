@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.takeWhile
@@ -43,6 +44,7 @@ fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(
 ): Flow<Resource<T>> {
     return flow {
         try {
+            // TODO: replace with takeWhile/transformWhile
             collect { newRes ->
                 Logger.v("got value.version(${value.version}) with version(${version}) " + value)
                 applyResValueIfNeeded(
@@ -99,19 +101,16 @@ private suspend fun <T> applyResValueIfNeeded(
 }
 
 fun <T> StateFlow<T?>.takeWhileNonNull(
-    consumeCurrentNull: Boolean = true,
-    takeCurrentValue: Boolean = true,
-) = flow {
-        var v = value
+    consumeCurrentNull: Boolean = true
+) = flow<T> {
+        val v = value
         if (v == null && consumeCurrentNull) {
-            v = first { it != null }
+            first { it != null }
         }
 
-        if (takeCurrentValue && v != null) {
-            emit(v)
+        takeWhile { it != null }.collect {
+            emit(it!!)
         }
-
-        takeWhile { it != null } as Flow<T>
     }
 
 class AbortFlowException constructor(

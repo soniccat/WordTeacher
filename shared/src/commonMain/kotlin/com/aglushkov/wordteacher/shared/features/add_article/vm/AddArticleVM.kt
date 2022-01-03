@@ -52,6 +52,7 @@ open class AddArticleVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
 
+    // TODO: consider creating a dingle UIState object
     private val mutableTitle = MutableStateFlow("")
     override val title: StateFlow<String> = mutableTitle
     private val mutableTitleErrorFlow = MutableStateFlow<StringDesc?>(null)
