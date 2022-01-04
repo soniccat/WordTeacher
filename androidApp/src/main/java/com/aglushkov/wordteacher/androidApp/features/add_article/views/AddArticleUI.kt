@@ -133,9 +133,7 @@ private fun AddArticlesFieldsUI(
     val titleError by vm.titleErrorFlow.collectAsState(initial = null)
     val text by vm.text.collectAsState()
 
-    val hasTitleError by remember(titleError) {
-        derivedStateOf { titleError != null }
-    }
+    val hasTitleError = remember(titleError) { titleError != null }
     val scrollableState = rememberScrollState()
     var wasTitleFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current

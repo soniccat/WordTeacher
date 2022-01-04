@@ -61,9 +61,7 @@ class CardTeacher(
             currentSession = session
 
             scope.launch {
-                session.currentCardFlow.collect {
-                    currentCardStateFlow.value = it
-                }//.collect(currentCardStateFlow)
+                session.currentCardFlow.collect(currentCardStateFlow)
             }
         }
 

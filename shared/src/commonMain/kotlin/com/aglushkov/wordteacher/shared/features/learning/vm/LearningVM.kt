@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 interface LearningVM {
+    val term: StateFlow<String>
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val titleErrorFlow: StateFlow<StringDesc?>
 
@@ -63,6 +64,7 @@ open class LearningVMImpl(
     private val idGenerator: IdGenerator
 ) : ViewModel(), LearningVM {
 
+    override val term = MutableStateFlow<String>("")
     override val viewItems = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
     private val retryStatFlow = MutableStateFlow(0)
     override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
@@ -90,6 +92,7 @@ open class LearningVMImpl(
             val teacher = createTeacher(cards, teacherState)
             val result = teacher.runSession { sessionCards ->
                 sessionCards.collect { card ->
+                    term.value = card.term
                     viewItems.value = Resource.Loaded(buildCardItem(card))
                 }
             }

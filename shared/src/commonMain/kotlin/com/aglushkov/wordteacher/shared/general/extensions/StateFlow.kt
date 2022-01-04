@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.takeWhile
@@ -101,16 +100,13 @@ private suspend fun <T> applyResValueIfNeeded(
 }
 
 fun <T> StateFlow<T?>.takeWhileNonNull(
-    consumeCurrentNull: Boolean = true
+    collectCurrentNull: Boolean = true
 ) = flow<T> {
-        val v = value
-        if (v == null && consumeCurrentNull) {
+        if (value == null && collectCurrentNull) {
             first { it != null }
         }
 
-        takeWhile { it != null }.collect {
-            emit(it!!)
-        }
+        takeWhile { it != null }.collect(this as FlowCollector<T?>)
     }
 
 class AbortFlowException constructor(

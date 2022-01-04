@@ -26,7 +26,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,6 +70,7 @@ fun LearningUI(
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val term by vm.term.collectAsState()
     val errorString by vm.titleErrorFlow.collectAsState()
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
@@ -100,6 +100,7 @@ fun LearningUI(
 
         if (data != null) {
             TermInput(
+                term = term,
                 errorString = errorString?.resolveString(),
                 focusRequester = focusRequester,
                 onDone = { value ->
@@ -135,15 +136,13 @@ fun LearningUI(
 @Composable
 fun TermInput(
     modifier: Modifier = Modifier,
+    term: String,
     errorString: String?,
     focusRequester: FocusRequester,
     onDone: (value: String) -> Unit,
 ) {
-    var textValue by remember { mutableStateOf("") }
-    val hasError by remember(errorString) {
-        derivedStateOf { errorString != null }
-    }
-    val focusManager = LocalFocusManager.current
+    var textValue by remember(term) { mutableStateOf("") }
+    val hasError = remember(errorString) { errorString != null }
 
     Column(
         modifier
