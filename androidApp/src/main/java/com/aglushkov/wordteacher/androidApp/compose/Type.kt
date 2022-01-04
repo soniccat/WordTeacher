@@ -67,5 +67,8 @@ class AppTypography {
         val notePlaceholder = noteText.copy(
             color = noteText.color.copy(alpha = 0.5f)
         )
+
+        val learningSessionTerm = wordDefinitionTitle
+        val learningSessionProgress = wordDefinitionTitle
     }
 }

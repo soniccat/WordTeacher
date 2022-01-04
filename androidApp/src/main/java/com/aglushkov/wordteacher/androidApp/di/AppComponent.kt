@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.androidApp.features.cardset.di.CardSetDependenc
 import com.aglushkov.wordteacher.androidApp.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.androidApp.features.learning.di.LearningDependencies
+import com.aglushkov.wordteacher.androidApp.features.learning_session_result.di.LearningSessionResultDependencies
 import com.aglushkov.wordteacher.androidApp.features.notes.di.NotesDependencies
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
@@ -41,7 +42,8 @@ public interface AppComponent:
     CardSetsDependencies,
     CardSetDependencies,
     NotesDependencies,
-    LearningDependencies {
+    LearningDependencies,
+    LearningSessionResultDependencies {
 
     fun configService(): ConfigService
     fun configRepository(): ConfigRepository

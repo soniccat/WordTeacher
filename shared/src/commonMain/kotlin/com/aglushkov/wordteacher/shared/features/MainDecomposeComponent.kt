@@ -10,6 +10,9 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
+import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
+import com.aglushkov.wordteacher.shared.features.learning_session_result.LearningSessionResultDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
 import com.arkivanov.decompose.ComponentContext
@@ -31,6 +34,7 @@ interface MainDecomposeComponent {
     fun openCardSet(id: Long)
     fun openCardSets()
     fun openLearning(ids: List<Long>)
+    fun openLearningSessionResult(results: List<SessionCardResult>)
     fun back()
 
     sealed class Child {
@@ -38,6 +42,7 @@ interface MainDecomposeComponent {
         data class CardSet(val inner: CardSetVM): Child()
         data class CardSets(val inner: CardSetsVM): Child()
         data class Learning(val inner: LearningVM): Child()
+        data class LearningSessionResult(val vm: LearningSessionResultVM): Child()
         data class Tabs(val inner: TabDecomposeComponent): Child()
 
         data class AddArticle(val inner: AddArticleDecomposeComponent): Child()
@@ -48,6 +53,7 @@ interface MainDecomposeComponent {
         @Parcelize data class ArticleConfiguration(val id: Long) : ChildConfiguration()
         @Parcelize data class CardSetConfiguration(val id: Long) : ChildConfiguration()
         @Parcelize data class LearningConfiguration(val ids: List<Long>) : ChildConfiguration()
+        @Parcelize data class LearningSessionResultConfiguration(val results: List<SessionCardResult>) : ChildConfiguration()
         @Parcelize object CardSetsConfiguration : ChildConfiguration()
         @Parcelize object TabsConfiguration : ChildConfiguration()
 
@@ -106,6 +112,9 @@ class MainDecomposeComponentImpl(
         is MainDecomposeComponent.ChildConfiguration.LearningConfiguration -> MainDecomposeComponent.Child.Learning(
             inner = childComponentFactory(componentContext, configuration) as LearningDecomposeComponent
         )
+        is MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration -> MainDecomposeComponent.Child.LearningSessionResult(
+            vm = childComponentFactory(componentContext, configuration) as LearningSessionResultDecomposeComponent
+        )
         is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration -> MainDecomposeComponent.Child.EmptyDialog
 
     }
@@ -130,6 +139,12 @@ class MainDecomposeComponentImpl(
     override fun openLearning(ids: List<Long>) {
         router.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningConfiguration(ids)
+        )
+    }
+
+    override fun openLearningSessionResult(results: List<SessionCardResult>) {
+        router.pushChildConfigurationIfNotAtTop(
+            MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration(results)
         )
     }
 

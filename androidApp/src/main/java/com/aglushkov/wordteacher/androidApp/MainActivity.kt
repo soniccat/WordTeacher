@@ -34,11 +34,13 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainCo
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.androidApp.features.learning.views.LearningUI
+import com.aglushkov.wordteacher.androidApp.features.learning_session_result.views.LearningSessionResultUI
 import com.aglushkov.wordteacher.androidApp.features.notes.NotesUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
@@ -110,6 +112,7 @@ class MainActivity : AppCompatActivity(), Router {
                     is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.inner)
                     is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.inner)
                     is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.inner)
+                    is MainDecomposeComponent.Child.LearningSessionResult -> LearningSessionResultUI(vm = instance.vm)
                     else -> throw RuntimeException("mainUI: Not implemented ${instance}")
                 }
             }
@@ -336,6 +339,14 @@ class MainActivity : AppCompatActivity(), Router {
     }
 
     override fun closeLearning() {
+        mainDecomposeComponent.back()
+    }
+
+    override fun openSessionResult(results: List<SessionCardResult>) {
+        mainDecomposeComponent.openLearningSessionResult(results)
+    }
+
+    override fun closeSessionResult() {
         mainDecomposeComponent.back()
     }
 }

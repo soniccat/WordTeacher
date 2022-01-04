@@ -1,34 +1,25 @@
-package com.aglushkov.wordteacher.shared.features.learning
+package com.aglushkov.wordteacher.shared.features.learning_session_result
 
-import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
-import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
-import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVMImpl
+import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
+import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
+import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
-import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
-import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.statekeeper.consume
 
-class LearningDecomposeComponent (
-    state: LearningVM.State,
-    router: LearningRouter,
+class LearningSessionResultDecomposeComponent (
+    state: LearningSessionResultVM.State,
+    router: LearningSessionResultRouter,
     componentContext: ComponentContext,
     cardLoader: CardLoader,
-    database: AppDatabase,
-    databaseWorker: DatabaseWorker,
-    timeSource: TimeSource,
     idGenerator: IdGenerator
-) : LearningVMImpl(
+) : LearningSessionResultVMImpl(
     state,
     router,
     cardLoader,
-    database,
-    databaseWorker,
-    timeSource,
     idGenerator
 ), ComponentContext by componentContext {
 
@@ -38,13 +29,13 @@ class LearningDecomposeComponent (
 
     init {
         stateKeeper.register(KEY_STATE) {
-            save()
+            state
         }
 
         restore(instanceState.state)
     }
 
-    private class Handler(val state: LearningVM.State) : InstanceKeeper.Instance {
+    private class Handler(val state: LearningSessionResultVM.State) : InstanceKeeper.Instance {
         override fun onDestroy() {}
     }
 
