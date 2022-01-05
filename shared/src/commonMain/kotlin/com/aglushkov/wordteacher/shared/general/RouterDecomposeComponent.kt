@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.general
 
-import com.arkivanov.decompose.Router
-import com.arkivanov.decompose.RouterState
-import com.arkivanov.decompose.pop
+import com.arkivanov.decompose.router.Router
+import com.arkivanov.decompose.router.RouterState
+import com.arkivanov.decompose.router.pop
 import com.arkivanov.decompose.value.Value
 
 interface RouterDecomposeComponent<TChildConfiguration: Any, TChild: Any> {

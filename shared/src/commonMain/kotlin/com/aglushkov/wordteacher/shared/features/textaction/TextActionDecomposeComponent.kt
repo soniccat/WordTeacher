@@ -8,8 +8,8 @@ import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.popToRoot
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.Router
-import com.arkivanov.decompose.router
+import com.arkivanov.decompose.router.Router
+import com.arkivanov.decompose.router.router
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 

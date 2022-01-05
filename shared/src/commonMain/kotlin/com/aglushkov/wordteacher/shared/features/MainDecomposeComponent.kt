@@ -17,14 +17,15 @@ import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
 import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.Router
-import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.childContext
-import com.arkivanov.decompose.pop
-import com.arkivanov.decompose.router
+import com.arkivanov.decompose.router.Router
+import com.arkivanov.decompose.router.RouterState
+import com.arkivanov.decompose.router.router
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.arkivanov.essenty.lifecycle.destroy
+import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlin.properties.Delegates
@@ -101,20 +102,20 @@ class MainDecomposeComponentImpl(
     }
 
     private fun holder(config: MainDecomposeComponent.ChildConfiguration): DialogHolder {
-        //val lifecycle = LifecycleRegistry() // An instance of LifecycleRegistry associated with the new child
-        val childContext = childContext(key = config::class.toString() /*, lifecycle = lifecycle*/)
+        val lifecycle = LifecycleRegistry() // An instance of LifecycleRegistry associated with the new child
+        val childContext = childContext(key = config::class.toString() , lifecycle = lifecycle)
         val child = Child.Created(configuration = config, instance = resolveChild(config, childContext))
-        //lifecycle.resume()
+        lifecycle.resume()
 
         return DialogHolder(
             child = child,
-            //lifecycle = lifecycle,
+            lifecycle = lifecycle,
         )
     }
 
     private class DialogHolder(
         val child: Child.Created<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child>,
-        //val lifecycle: LifecycleRegistry,
+        val lifecycle: LifecycleRegistry,
     )
 
     private fun resolveChild(
@@ -202,6 +203,7 @@ class MainDecomposeComponentImpl(
     }
 
     override fun popDialog() {
+        dialogHolders.last().lifecycle.destroy()
         dialogHolders = dialogHolders.take(dialogHolders.size - 1)
     } // = dialogRouter.popIfNotEmpty()
 
