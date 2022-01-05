@@ -10,6 +10,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -157,43 +159,40 @@ class MainActivity : AppCompatActivity(), Router {
 
     @Composable
     private fun dialogUI() {
-        Children(
-            routerState = mainDecomposeComponent.dialogRouterState,
-        ) {
-            mainDecomposeComponent.dialogRouterState.value.backStack.onEach {
-                val instance = it.configuration
-                showDialogChild(it.in)
-            }
-            val instance = it.instance
-            showDialogChild(instance)
-        }
-    }
+        val dialogs = mainDecomposeComponent.dialogsStateFlow.collectAsState()
 
-    @Composable
-    private fun showDialogChild(instance: MainDecomposeComponent.Child) {
-        when (instance) {
-            is MainDecomposeComponent.Child.AddArticle ->
-                AddArticleUIDialog(
-                    vm = instance.inner,
-                    onArticleCreated = {
-                        mainDecomposeComponent.popDialog()
-                    }
-                )
-            is MainDecomposeComponent.Child.Learning ->
-                LearningUIDialog(
-                    vm = instance.inner,
-                    onDismissRequest = {
-                        mainDecomposeComponent.popDialog()
-                    }
-                )
-            is MainDecomposeComponent.Child.LearningSessionResult ->
-                LearningSessionResultUIDialog(
-                    vm = instance.vm,
-                    onDismissRequest = {
-                        mainDecomposeComponent.popDialog()
-                    }
-                )
+        dialogs.value.onEach { instance ->
+            when (val instance = instance.instance) {
+                is MainDecomposeComponent.Child.AddArticle ->
+                    AddArticleUIDialog(
+                        vm = instance.inner,
+                        onArticleCreated = {
+                            mainDecomposeComponent.popDialog()
+                        }
+                    )
+                is MainDecomposeComponent.Child.Learning ->
+                    LearningUIDialog(
+                        vm = instance.inner,
+                        onDismissRequest = {
+                            mainDecomposeComponent.popDialog()
+                        }
+                    )
+                is MainDecomposeComponent.Child.LearningSessionResult ->
+                    LearningSessionResultUIDialog(
+                        vm = instance.vm,
+                        onDismissRequest = {
+                            mainDecomposeComponent.popDialog()
+                        }
+                    )
+            }
         }
+
+//        Children(
+//            routerState = mainDecomposeComponent.dialogRouterState,
+//        ) {
+//            val instance = it.instance
+//
+//        }
     }
 
     @Composable

@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.childContext
 import dagger.Module
 import dagger.Provides
 

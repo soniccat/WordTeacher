@@ -15,18 +15,26 @@ import com.aglushkov.wordteacher.shared.features.learning_session_result.Learnin
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
+import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.Router
 import com.arkivanov.decompose.RouterState
+import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.pop
 import com.arkivanov.decompose.router
+import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import kotlin.properties.Delegates
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface MainDecomposeComponent {
     val routerState: Value<RouterState<*, Child>>
-    val dialogRouterState: Value<RouterState<*, Child>>
+//    val dialogRouterState: Value<RouterState<*, Child>>
+    val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
     fun openAddArticleDialog()
     fun popDialog()
@@ -75,16 +83,39 @@ class MainDecomposeComponentImpl(
             childFactory = ::resolveChild
         )
 
-    private val dialogRouter: Router<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child> =
-        router(
-            initialConfiguration = MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration,
-            key = "DialogRouter",
-            handleBackButton = true,
-            childFactory = ::resolveChild
-        )
+//    private val dialogRouter: Router<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child> =
+//        router(
+//            initialConfiguration = MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration,
+//            key = "DialogRouter",
+//            handleBackButton = true,
+//            childFactory = ::resolveChild
+//        )
 
     override val routerState: Value<RouterState<*, MainDecomposeComponent.Child>> = router.state
-    override val dialogRouterState: Value<RouterState<*, MainDecomposeComponent.Child>> = dialogRouter.state
+//    override val dialogRouterState: Value<RouterState<*, MainDecomposeComponent.Child>> = dialogRouter.state
+
+    override val dialogsStateFlow = MutableStateFlow<List<Child.Created<*, MainDecomposeComponent.Child>>>(emptyList())
+//    private val dialogs = MutableValue<List<com.arkivanov.decompose.Child.Created<*, MainDecomposeComponent.Child>>>(emptyList())
+    private var dialogHolders: List<DialogHolder> by Delegates.observable(emptyList()) { _, _, newValue ->
+        dialogsStateFlow.value = newValue.map { it.child }
+    }
+
+    private fun holder(config: MainDecomposeComponent.ChildConfiguration): DialogHolder {
+        //val lifecycle = LifecycleRegistry() // An instance of LifecycleRegistry associated with the new child
+        val childContext = childContext(key = config::class.toString() /*, lifecycle = lifecycle*/)
+        val child = Child.Created(configuration = config, instance = resolveChild(config, childContext))
+        //lifecycle.resume()
+
+        return DialogHolder(
+            child = child,
+            //lifecycle = lifecycle,
+        )
+    }
+
+    private class DialogHolder(
+        val child: Child.Created<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child>,
+        //val lifecycle: LifecycleRegistry,
+    )
 
     private fun resolveChild(
         configuration: MainDecomposeComponent.ChildConfiguration,
@@ -137,23 +168,41 @@ class MainDecomposeComponentImpl(
     }
 
     override fun openLearning(ids: List<Long>) {
+        addDialogConfig(
+            MainDecomposeComponent.ChildConfiguration.LearningConfiguration(ids)
+        )
+    } /*{
         dialogRouter.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningConfiguration(ids)
         )
-    }
+    }*/
 
     override fun openLearningSessionResult(results: List<SessionCardResult>) {
+        addDialogConfig(
+            MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration(results)
+        )
+    } /*{
         dialogRouter.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration(results)
         )
-    }
+    }*/
 
     override fun back() = router.popIfNotEmpty()
 
-    override fun openAddArticleDialog() =
+    override fun openAddArticleDialog() {
+        addDialogConfig(MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
+    } /* =
         dialogRouter.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration
         )
+        */
 
-    override fun popDialog() = dialogRouter.popIfNotEmpty()
+    private fun addDialogConfig(config: MainDecomposeComponent.ChildConfiguration) {
+        dialogHolders = dialogHolders + holder(config)
+    }
+
+    override fun popDialog() {
+        dialogHolders = dialogHolders.take(dialogHolders.size - 1)
+    } // = dialogRouter.popIfNotEmpty()
+
 }
