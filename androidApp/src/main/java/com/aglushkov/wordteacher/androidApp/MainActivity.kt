@@ -34,7 +34,9 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainCo
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.androidApp.features.learning.views.LearningUI
+import com.aglushkov.wordteacher.androidApp.features.learning.views.LearningUIDialog
 import com.aglushkov.wordteacher.androidApp.features.learning_session_result.views.LearningSessionResultUI
+import com.aglushkov.wordteacher.androidApp.features.learning_session_result.views.LearningSessionResultUIDialog
 import com.aglushkov.wordteacher.androidApp.features.notes.NotesUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
@@ -158,16 +160,39 @@ class MainActivity : AppCompatActivity(), Router {
         Children(
             routerState = mainDecomposeComponent.dialogRouterState,
         ) {
-            val instance = it.instance
-            when (instance) {
-                is MainDecomposeComponent.Child.AddArticle ->
-                    AddArticleUIDialog(
-                        vm = instance.inner,
-                        onArticleCreated = {
-                            mainDecomposeComponent.popDialog()
-                        }
-                    )
+            mainDecomposeComponent.dialogRouterState.value.backStack.onEach {
+                val instance = it.configuration
+                showDialogChild(it.in)
             }
+            val instance = it.instance
+            showDialogChild(instance)
+        }
+    }
+
+    @Composable
+    private fun showDialogChild(instance: MainDecomposeComponent.Child) {
+        when (instance) {
+            is MainDecomposeComponent.Child.AddArticle ->
+                AddArticleUIDialog(
+                    vm = instance.inner,
+                    onArticleCreated = {
+                        mainDecomposeComponent.popDialog()
+                    }
+                )
+            is MainDecomposeComponent.Child.Learning ->
+                LearningUIDialog(
+                    vm = instance.inner,
+                    onDismissRequest = {
+                        mainDecomposeComponent.popDialog()
+                    }
+                )
+            is MainDecomposeComponent.Child.LearningSessionResult ->
+                LearningSessionResultUIDialog(
+                    vm = instance.vm,
+                    onDismissRequest = {
+                        mainDecomposeComponent.popDialog()
+                    }
+                )
         }
     }
 

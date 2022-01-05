@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,27 +20,62 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
+import com.aglushkov.wordteacher.androidApp.features.learning.views.LearningUI
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
+import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomDialogUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionTermResultViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import java.util.*
 
+@ExperimentalUnitApi
+@ExperimentalComposeUiApi
+@Composable
+fun LearningSessionResultUIDialog(
+    vm: LearningSessionResultVM,
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit
+) {
+    CustomDialogUI(
+        onDismissRequest = { onDismissRequest() }
+    ) {
+        LearningSessionResultUI(
+            vm = vm,
+            modifier = modifier,
+            actions = {
+                IconButton(
+                    onClick = { onDismissRequest() }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_close_24),
+                        contentDescription = null,
+                        tint = LocalContentColor.current
+                    )
+                }
+            }
+        )
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LearningSessionResultUI(
     vm: LearningSessionResultVM,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
@@ -53,17 +89,7 @@ fun LearningSessionResultUI(
             title = {
                 Text(text = stringResource(id = R.string.learning_session_result_title))
             },
-            navigationIcon = {
-                IconButton(
-                    onClick = { vm.onBackPressed() }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_back_24),
-                        contentDescription = null,
-                        tint = LocalContentColor.current
-                    )
-                }
-            }
+            actions = actions
         )
 
         if (data != null) {

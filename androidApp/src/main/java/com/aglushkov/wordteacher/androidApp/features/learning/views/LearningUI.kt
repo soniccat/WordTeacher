@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -36,15 +38,19 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
+import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.WordDefinitionView
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.WordExampleView
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.WordPartOfSpeechView
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.WordSubHeaderView
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.WordSynonymView
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
+import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomDialogUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
@@ -53,14 +59,44 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 
+@ExperimentalUnitApi
+@ExperimentalComposeUiApi
+@Composable
+fun LearningUIDialog(
+    vm: LearningVM,
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit
+) {
+    CustomDialogUI(
+        onDismissRequest = { onDismissRequest() }
+    ) {
+        LearningUI(
+            vm = vm,
+            modifier = modifier,
+            actions = {
+                IconButton(
+                    onClick = { onDismissRequest() }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_close_24),
+                        contentDescription = null,
+                        tint = LocalContentColor.current
+                    )
+                }
+            }
+        )
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LearningUI(
     vm: LearningVM,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val term by vm.term.collectAsState()
+    val termState by vm.termState.collectAsState()
     val errorString by vm.titleErrorFlow.collectAsState()
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
@@ -73,24 +109,30 @@ fun LearningUI(
     ) {
         TopAppBar(
             title = {
-                Text(text = stringResource(id = R.string.learning_title))
-            },
-            navigationIcon = {
-                IconButton(
-                    onClick = { vm.onBackPressed() }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_back_24),
-                        contentDescription = null,
-                        tint = LocalContentColor.current
+                if (termState.term.isNotEmpty()) {
+                    Text(
+                        text = stringResource(id = R.string.learning_title)
+                            .format(termState.index + 1, termState.count)
                     )
                 }
-            }
+            },
+            actions = actions
+//            navigationIcon = {
+//                IconButton(
+//                    onClick = { vm.onBackPressed() }
+//                ) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.ic_arrow_back_24),
+//                        contentDescription = null,
+//                        tint = LocalContentColor.current
+//                    )
+//                }
+//            }
         )
 
         if (data != null) {
             TermInput(
-                term = term,
+                term = termState.term,
                 errorString = errorString?.resolveString(),
                 focusRequester = focusRequester,
                 onDone = { value ->

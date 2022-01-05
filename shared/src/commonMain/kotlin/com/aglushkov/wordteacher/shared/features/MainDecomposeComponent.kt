@@ -137,13 +137,13 @@ class MainDecomposeComponentImpl(
     }
 
     override fun openLearning(ids: List<Long>) {
-        router.pushChildConfigurationIfNotAtTop(
+        dialogRouter.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningConfiguration(ids)
         )
     }
 
     override fun openLearningSessionResult(results: List<SessionCardResult>) {
-        router.pushChildConfigurationIfNotAtTop(
+        dialogRouter.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration(results)
         )
     }

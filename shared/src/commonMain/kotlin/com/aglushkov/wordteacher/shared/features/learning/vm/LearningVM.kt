@@ -27,10 +27,12 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 interface LearningVM {
-    val term: StateFlow<String>
+    val termState: StateFlow<TermState>
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val titleErrorFlow: StateFlow<StringDesc?>
 
@@ -44,6 +46,12 @@ interface LearningVM {
 
     fun save(): State
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+
+    data class TermState(
+        val term: String = "",
+        val index: Int = 0,
+        val count: Int = 0
+    )
 
     @Parcelize
     data class State (
@@ -62,7 +70,7 @@ open class LearningVMImpl(
     private val idGenerator: IdGenerator
 ) : ViewModel(), LearningVM {
 
-    override val term = MutableStateFlow("")
+    override val termState = MutableStateFlow(LearningVM.TermState())
     override val viewItems = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
     override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
 
@@ -90,9 +98,13 @@ open class LearningVMImpl(
             val teacher = createTeacher(cards, teacherState)
             var sessionResults: List<SessionCardResult>? = null
             do {
-                sessionResults = teacher.runSession { sessionCards ->
-                    sessionCards.collect { card ->
-                        term.value = card.term
+                sessionResults = teacher.runSession { cardCount, sessionCards ->
+                    sessionCards.collectIndexed { index, card ->
+                        termState.update { it.copy(
+                            term = card.term,
+                            index = index,
+                            count = cardCount
+                        ) }
                         viewItems.value = Resource.Loaded(buildCardItem(card))
                     }
                 }

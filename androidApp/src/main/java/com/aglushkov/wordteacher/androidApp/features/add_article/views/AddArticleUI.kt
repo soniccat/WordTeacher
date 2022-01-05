@@ -113,7 +113,10 @@ fun AddArticleUI(
 
         vm.eventFlow.collect {
             when (it) {
-                is CompletionEvent -> with(snackbarHostState) { onArticleCreated() }
+                is CompletionEvent -> with(snackbarHostState) {
+                // TODO: handle cancellation
+                    onArticleCreated()
+                }
                 is ErrorEvent -> {
                     launch {
                         snackbarHostState.showSnackbar(it.text.toString(context))

@@ -37,10 +37,10 @@ class CardTeacher(
     var isWrongAnswerCounted = false
         private set
 
-    suspend fun runSession(block: suspend (cards: Flow<Card>) -> Unit): List<SessionCardResult>? {
+    suspend fun runSession(block: suspend (count:Int, cards: Flow<Card>) -> Unit): List<SessionCardResult>? {
         val session = buildLearnSession()
         if (session != null) {
-            block(currentCardFlow)
+            block(session.size, currentCardFlow)
         }
 
         return session?.results
