@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.learning.vm
 
-interface LearningRouter {
+import com.aglushkov.wordteacher.shared.general.SimpleRouter
+
+interface LearningRouter: SimpleRouter {
     fun openSessionResult(results: List<SessionCardResult>)
-    fun closeLearning()
 }

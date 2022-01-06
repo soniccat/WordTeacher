@@ -64,18 +64,17 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 @Composable
 fun LearningUIDialog(
     vm: LearningVM,
-    modifier: Modifier = Modifier,
-    onDismissRequest: () -> Unit
+    modifier: Modifier = Modifier
 ) {
     CustomDialogUI(
-        onDismissRequest = { onDismissRequest() }
+        onDismissRequest = { vm.onClosePressed() }
     ) {
         LearningUI(
             vm = vm,
             modifier = modifier,
             actions = {
                 IconButton(
-                    onClick = { onDismissRequest() }
+                    onClick = { vm.onClosePressed() }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_close_24),

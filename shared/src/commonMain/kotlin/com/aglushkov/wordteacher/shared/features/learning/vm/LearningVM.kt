@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderVie
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.extensions.addElements
@@ -32,6 +33,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 interface LearningVM {
+    var router: LearningRouter?
+
     val termState: StateFlow<TermState>
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val titleErrorFlow: StateFlow<StringDesc?>
@@ -42,7 +45,7 @@ interface LearningVM {
     fun onShowRandomLetterPressed()
     fun onTryAgainClicked()
     suspend fun onGiveUpPressed()
-//    fun onBackPressed()
+    fun onClosePressed()
 
     fun save(): State
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
@@ -62,13 +65,13 @@ interface LearningVM {
 
 open class LearningVMImpl(
     private var state: LearningVM.State,
-    private val router: LearningRouter,
     private val cardLoader: CardLoader,
     private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator
 ) : ViewModel(), LearningVM {
+    override var router: LearningRouter? = null
 
     override val termState = MutableStateFlow(LearningVM.TermState())
     override val viewItems = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
@@ -110,11 +113,11 @@ open class LearningVMImpl(
                 }
 
                 if (sessionResults != null) {
-                    router.openSessionResult(sessionResults)
+                    router?.openSessionResult(sessionResults)
                 }
             } while (sessionResults != null)
 
-            router.closeLearning()
+            onLearningCompleted()
         }
     }
 
@@ -215,9 +218,13 @@ open class LearningVMImpl(
         cardLoader.tryLoadCardsAgain()
     }
 
-//    override fun onBackPressed() {
-//        router.closeLearning()
-//    }
+    override fun onClosePressed() {
+        router?.onScreenFinished(this, SimpleRouter.Result(true))
+    }
+
+    private fun onLearningCompleted() {
+        router?.onScreenFinished(this, SimpleRouter.Result(false))
+    }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
         return StringDesc.Resource(MR.strings.learning_error)

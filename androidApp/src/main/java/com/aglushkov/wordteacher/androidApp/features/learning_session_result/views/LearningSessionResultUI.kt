@@ -46,18 +46,17 @@ import java.util.*
 @Composable
 fun LearningSessionResultUIDialog(
     vm: LearningSessionResultVM,
-    modifier: Modifier = Modifier,
-    onDismissRequest: () -> Unit
+    modifier: Modifier = Modifier
 ) {
     CustomDialogUI(
-        onDismissRequest = { onDismissRequest() }
+        onDismissRequest = { vm.onCloseClicked() }
     ) {
         LearningSessionResultUI(
             vm = vm,
             modifier = modifier,
             actions = {
                 IconButton(
-                    onClick = { onDismissRequest() }
+                    onClick = { vm.onCloseClicked() }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_close_24),

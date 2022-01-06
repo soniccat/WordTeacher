@@ -15,7 +15,6 @@ import com.arkivanov.essenty.statekeeper.consume
 
 class LearningDecomposeComponent (
     state: LearningVM.State,
-    router: LearningRouter,
     componentContext: ComponentContext,
     cardLoader: CardLoader,
     database: AppDatabase,
@@ -24,7 +23,6 @@ class LearningDecomposeComponent (
     idGenerator: IdGenerator
 ) : LearningVMImpl(
     state,
-    router,
     cardLoader,
     database,
     databaseWorker,

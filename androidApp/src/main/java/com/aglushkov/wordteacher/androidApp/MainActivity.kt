@@ -12,10 +12,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -51,7 +49,10 @@ import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
+import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
+import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
@@ -137,11 +138,11 @@ class MainActivity : AppCompatActivity(), Router {
                 animation = slideFromRight()
             ) {
                 when (val instance = it.instance) {
-                    is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.inner)
-                    is MainDecomposeComponent.Child.Article -> ArticleUI(vm = instance.inner)
-                    is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.inner)
-                    is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.inner)
-                    is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.inner)
+                    is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)
+                    is MainDecomposeComponent.Child.Article -> ArticleUI(vm = instance.vm)
+                    is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.vm)
+                    is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.vm)
+                    is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.vm)
                     is MainDecomposeComponent.Child.LearningSessionResult -> LearningSessionResultUI(vm = instance.vm)
                     else -> throw RuntimeException("mainUI: Not implemented ${instance}")
                 }
@@ -191,34 +192,45 @@ class MainActivity : AppCompatActivity(), Router {
             when (val instance = instance.instance) {
                 is MainDecomposeComponent.Child.AddArticle ->
                     AddArticleUIDialog(
-                        vm = instance.inner,
+                        vm = instance.vm,
                         onArticleCreated = {
                             mainDecomposeComponent.popDialog(instance)
                         }
                     )
                 is MainDecomposeComponent.Child.Learning ->
                     LearningUIDialog(
-                        vm = instance.inner,
-                        onDismissRequest = {
-                            mainDecomposeComponent.popDialog(instance)
+                        vm = instance.vm.apply {
+                            router = object : LearningRouter {
+                                override val isDialog: Boolean = true
+
+                                override fun openSessionResult(results: List<SessionCardResult>) {
+                                    mainDecomposeComponent.openLearningSessionResult(results)
+                                }
+
+                                override fun onScreenFinished(
+                                    inner: Any,
+                                    result: SimpleRouter.Result
+                                ) {
+                                    mainDecomposeComponent.popDialog(instance)
+                                }
+                            }
                         }
                     )
-                is MainDecomposeComponent.Child.LearningSessionResult ->
+                is MainDecomposeComponent.Child.LearningSessionResult -> {
                     LearningSessionResultUIDialog(
-                        vm = instance.vm,
-                        onDismissRequest = {
-                            mainDecomposeComponent.popDialog(instance)
+                        vm = instance.vm.apply {
+                            router = object : LearningSessionResultRouter {
+                                override val isDialog: Boolean = true
+
+                                override fun onScreenFinished(inner: Any, result: SimpleRouter.Result) {
+                                    mainDecomposeComponent.popDialog(instance)
+                                }
+                            }
                         }
                     )
+                }
             }
         }
-
-//        Children(
-//            routerState = mainDecomposeComponent.dialogRouterState,
-//        ) {
-//            val instance = it.instance
-//
-//        }
     }
 
     @Composable
@@ -386,18 +398,6 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun openCardSets() {
         mainDecomposeComponent.openCardSets()
-    }
-
-    override fun closeLearning() {
-        mainDecomposeComponent.back()
-    }
-
-    override fun openSessionResult(results: List<SessionCardResult>) {
-        mainDecomposeComponent.openLearningSessionResult(results)
-    }
-
-    override fun closeSessionResult() {
-        mainDecomposeComponent.back()
     }
 }
 

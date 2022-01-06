@@ -22,12 +22,10 @@ class LearningSessionResultModule {
     fun learningDecomposeComponent(
         state: LearningSessionResultVM.State,
         componentContext: ComponentContext,
-        routerResolver: RouterResolver,
         cardLoader: CardLoader,
         idGenerator: IdGenerator
     ) = LearningSessionResultDecomposeComponent(
         state,
-        routerResolver.router!!.get()!!,
         componentContext,
         cardLoader,
         idGenerator,

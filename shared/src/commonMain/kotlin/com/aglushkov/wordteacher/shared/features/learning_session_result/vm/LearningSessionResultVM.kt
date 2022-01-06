@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.features.learning_session_result.vm
 
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
@@ -18,10 +19,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 interface LearningSessionResultVM {
+    var router: LearningSessionResultRouter?
+
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
 
     fun onTryAgainClicked()
-//    fun onBackPressed()
+    fun onCloseClicked()
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
@@ -33,10 +36,11 @@ interface LearningSessionResultVM {
 
 open class LearningSessionResultVMImpl(
     private var state: LearningSessionResultVM.State,
-    private val router: LearningSessionResultRouter,
     private val cardLoader: CardLoader,
     private val idGenerator: IdGenerator
 ) : ViewModel(), LearningSessionResultVM {
+
+    override var router: LearningSessionResultRouter? = null
 
     override val viewItems = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
 
@@ -98,7 +102,9 @@ open class LearningSessionResultVMImpl(
 
     override fun onTryAgainClicked() = cardLoader.tryLoadCardsAgain()
 
-//    override fun onBackPressed() = router.closeSessionResult()
+    override fun onCloseClicked() {
+        router?.onScreenFinished(this, SimpleRouter.Result(true))
+    }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
         return StringDesc.Resource(MR.strings.learning_session_result_error)

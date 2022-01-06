@@ -12,6 +12,4 @@ interface Router: ArticlesRouter,
     ArticleRouter,
     CardSetsRouter,
     CardSetRouter,
-    DefinitionsRouter,
-    LearningRouter,
-    LearningSessionResultRouter
+    DefinitionsRouter

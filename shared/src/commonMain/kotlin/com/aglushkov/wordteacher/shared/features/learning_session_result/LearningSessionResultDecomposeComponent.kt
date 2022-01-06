@@ -12,13 +12,11 @@ import com.arkivanov.essenty.statekeeper.consume
 
 class LearningSessionResultDecomposeComponent (
     state: LearningSessionResultVM.State,
-    router: LearningSessionResultRouter,
     componentContext: ComponentContext,
     cardLoader: CardLoader,
     idGenerator: IdGenerator
 ) : LearningSessionResultVMImpl(
     state,
-    router,
     cardLoader,
     idGenerator
 ), ComponentContext by componentContext {

@@ -35,6 +35,7 @@ interface MainDecomposeComponent {
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
     fun openAddArticleDialog()
+    fun popDialog(inner: Any)
     fun popDialog(child: Child)
     fun openArticle(id: Long)
     fun openCardSet(id: Long)
@@ -43,16 +44,18 @@ interface MainDecomposeComponent {
     fun openLearningSessionResult(results: List<SessionCardResult>)
     fun back()
 
-    sealed class Child {
-        data class Article(val inner: ArticleVM): Child()
-        data class CardSet(val inner: CardSetVM): Child()
-        data class CardSets(val inner: CardSetsVM): Child()
-        data class Learning(val inner: LearningVM): Child()
-        data class LearningSessionResult(val vm: LearningSessionResultVM): Child()
-        data class Tabs(val inner: TabDecomposeComponent): Child()
+    sealed class Child(
+        val inner: Any?
+    ) {
+        data class Article(val vm: ArticleVM): Child(vm)
+        data class CardSet(val vm: CardSetVM): Child(vm)
+        data class CardSets(val vm: CardSetsVM): Child(vm)
+        data class Learning(val vm: LearningVM): Child(vm)
+        data class LearningSessionResult(val vm: LearningSessionResultVM): Child(vm)
+        data class Tabs(val vm: TabDecomposeComponent): Child(vm)
 
-        data class AddArticle(val inner: AddArticleDecomposeComponent): Child()
-        object EmptyDialog: Child()
+        data class AddArticle(val vm: AddArticleDecomposeComponent): Child(vm)
+        object EmptyDialog: Child(null)
     }
 
     sealed class ChildConfiguration: Parcelable {
@@ -93,25 +96,25 @@ class MainDecomposeComponentImpl(
     ): MainDecomposeComponent.Child = when (configuration) {
         is MainDecomposeComponent.ChildConfiguration.ArticleConfiguration ->
             MainDecomposeComponent.Child.Article(
-                inner = childComponentFactory(componentContext, configuration) as ArticleDecomposeComponent
+                vm = childComponentFactory(componentContext, configuration) as ArticleDecomposeComponent
             )
         is MainDecomposeComponent.ChildConfiguration.CardSetConfiguration ->
             MainDecomposeComponent.Child.CardSet(
-                inner = childComponentFactory(componentContext, configuration) as CardSetDecomposeComponent
+                vm = childComponentFactory(componentContext, configuration) as CardSetDecomposeComponent
             )
         is MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
             MainDecomposeComponent.Child.CardSets(
-                inner = childComponentFactory(componentContext, configuration) as CardSetsDecomposeComponent
+                vm = childComponentFactory(componentContext, configuration) as CardSetsDecomposeComponent
             )
         is MainDecomposeComponent.ChildConfiguration.TabsConfiguration ->
             MainDecomposeComponent.Child.Tabs(
-                inner = childComponentFactory(componentContext, configuration) as TabDecomposeComponent
+                vm = childComponentFactory(componentContext, configuration) as TabDecomposeComponent
             )
         is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> MainDecomposeComponent.Child.AddArticle(
-            inner = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
+            vm = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
         )
         is MainDecomposeComponent.ChildConfiguration.LearningConfiguration -> MainDecomposeComponent.Child.Learning(
-            inner = childComponentFactory(componentContext, configuration) as LearningDecomposeComponent
+            vm = childComponentFactory(componentContext, configuration) as LearningDecomposeComponent
         )
         is MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration -> MainDecomposeComponent.Child.LearningSessionResult(
             vm = childComponentFactory(componentContext, configuration) as LearningSessionResultDecomposeComponent
@@ -165,6 +168,12 @@ class MainDecomposeComponentImpl(
         dialogHolders = dialogHolders + dialogHolder(config)
     }
 
+    override fun popDialog(inner: Any) {
+        findChildByInner(inner)?.let { child ->
+            popDialog(child)
+        }
+    }
+
     override fun popDialog(child: MainDecomposeComponent.Child) {
         val index = dialogHolders.indexOfLast { it.child.instance == child }
         if (index != -1) {
@@ -172,6 +181,10 @@ class MainDecomposeComponentImpl(
             holder.lifecycle.destroy()
             dialogHolders = dialogHolders.filterIndexed { i, dialogHolder -> i != index }
         }
+    }
+
+    private fun findChildByInner(inner: Any): Child<*, *>? {
+        return dialogHolders.lastOrNull { it.child.instance.inner == inner }?.child
     }
 
     private fun dialogHolder(config: MainDecomposeComponent.ChildConfiguration): DialogHolder {
