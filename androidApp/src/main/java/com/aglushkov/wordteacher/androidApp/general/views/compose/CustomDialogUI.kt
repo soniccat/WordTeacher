@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import com.aglushkov.wordteacher.androidApp.LocalWindowInset
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 
 @ExperimentalComposeUiApi
@@ -36,7 +37,8 @@ fun CustomDialogUI(
         val window = findDialogWindow() ?: throw Resources.NotFoundException("Window isn't found")
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
 
-        var windowInsets by remember { mutableStateOf(WindowInsets()) }
+        val initialInset = LocalWindowInset.current
+        var windowInsets by remember { mutableStateOf(initialInset) }
 
         Surface(
             modifier = Modifier.fillMaxSize().applyWindowInsetsAsPaddings(windowInsets),

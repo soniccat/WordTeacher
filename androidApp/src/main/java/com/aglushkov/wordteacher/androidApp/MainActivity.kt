@@ -10,8 +10,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -40,6 +46,7 @@ import com.aglushkov.wordteacher.androidApp.features.learning.views.LearningUIDi
 import com.aglushkov.wordteacher.androidApp.features.learning_session_result.views.LearningSessionResultUI
 import com.aglushkov.wordteacher.androidApp.features.learning_session_result.views.LearningSessionResultUIDialog
 import com.aglushkov.wordteacher.androidApp.features.notes.NotesUI
+import com.aglushkov.wordteacher.androidApp.general.views.compose.WindowInsets
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
@@ -65,8 +72,22 @@ class MainActivity : AppCompatActivity(), Router {
 
     private lateinit var mainDecomposeComponent: MainDecomposeComponent
 
+    private var windowInsets by mutableStateOf(WindowInsets())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.decorView.setOnApplyWindowInsetsListener { v, insets ->
+            windowInsets = WindowInsets(
+                top = insets.systemWindowInsetTop,
+                bottom = insets.systemWindowInsetBottom,
+                left = insets.systemWindowInsetLeft,
+                right = insets.systemWindowInsetRight
+            )
+
+            // call default logic
+            v.onApplyWindowInsets(insets)
+        }
 
         setupComposeLayout()
         //setupViewLayout()
@@ -96,7 +117,12 @@ class MainActivity : AppCompatActivity(), Router {
                 color = MaterialTheme.colors.background
             ) {
                 mainUI()
-                dialogUI()
+
+                CompositionLocalProvider(
+                    LocalWindowInset provides windowInsets,
+                ) {
+                    dialogUI()
+                }
             }
         }
     }
@@ -167,21 +193,21 @@ class MainActivity : AppCompatActivity(), Router {
                     AddArticleUIDialog(
                         vm = instance.inner,
                         onArticleCreated = {
-                            mainDecomposeComponent.popDialog()
+                            mainDecomposeComponent.popDialog(instance)
                         }
                     )
                 is MainDecomposeComponent.Child.Learning ->
                     LearningUIDialog(
                         vm = instance.inner,
                         onDismissRequest = {
-                            mainDecomposeComponent.popDialog()
+                            mainDecomposeComponent.popDialog(instance)
                         }
                     )
                 is MainDecomposeComponent.Child.LearningSessionResult ->
                     LearningSessionResultUIDialog(
                         vm = instance.vm,
                         onDismissRequest = {
-                            mainDecomposeComponent.popDialog()
+                            mainDecomposeComponent.popDialog(instance)
                         }
                     )
             }
@@ -381,3 +407,5 @@ sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: In
     object Articles : ScreenTab(R.string.tab_articles, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
     object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }
+
+val LocalWindowInset = staticCompositionLocalOf { WindowInsets() }

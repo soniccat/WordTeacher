@@ -21,7 +21,7 @@ interface LearningSessionResultVM {
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
 
     fun onTryAgainClicked()
-    fun onBackPressed()
+//    fun onBackPressed()
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
@@ -98,7 +98,7 @@ open class LearningSessionResultVMImpl(
 
     override fun onTryAgainClicked() = cardLoader.tryLoadCardsAgain()
 
-    override fun onBackPressed() = router.closeSessionResult()
+//    override fun onBackPressed() = router.closeSessionResult()
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
         return StringDesc.Resource(MR.strings.learning_session_result_error)

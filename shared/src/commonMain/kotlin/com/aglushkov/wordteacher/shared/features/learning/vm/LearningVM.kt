@@ -42,7 +42,7 @@ interface LearningVM {
     fun onShowRandomLetterPressed()
     fun onTryAgainClicked()
     suspend fun onGiveUpPressed()
-    fun onBackPressed()
+//    fun onBackPressed()
 
     fun save(): State
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
@@ -215,9 +215,9 @@ open class LearningVMImpl(
         cardLoader.tryLoadCardsAgain()
     }
 
-    override fun onBackPressed() {
-        router.closeLearning()
-    }
+//    override fun onBackPressed() {
+//        router.closeLearning()
+//    }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
         return StringDesc.Resource(MR.strings.learning_error)

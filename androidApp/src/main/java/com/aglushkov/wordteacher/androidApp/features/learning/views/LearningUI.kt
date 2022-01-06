@@ -117,17 +117,6 @@ fun LearningUI(
                 }
             },
             actions = actions
-//            navigationIcon = {
-//                IconButton(
-//                    onClick = { vm.onBackPressed() }
-//                ) {
-//                    Icon(
-//                        painter = painterResource(R.drawable.ic_arrow_back_24),
-//                        contentDescription = null,
-//                        tint = LocalContentColor.current
-//                    )
-//                }
-//            }
         )
 
         if (data != null) {

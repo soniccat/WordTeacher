@@ -7,7 +7,6 @@ import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeCompone
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
-import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
@@ -21,7 +20,6 @@ import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.router.Router
 import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.router.router
-import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.destroy
@@ -34,11 +32,10 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface MainDecomposeComponent {
     val routerState: Value<RouterState<*, Child>>
-//    val dialogRouterState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
     fun openAddArticleDialog()
-    fun popDialog()
+    fun popDialog(child: Child)
     fun openArticle(id: Long)
     fun openCardSet(id: Long)
     fun openCardSets()
@@ -84,39 +81,11 @@ class MainDecomposeComponentImpl(
             childFactory = ::resolveChild
         )
 
-//    private val dialogRouter: Router<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child> =
-//        router(
-//            initialConfiguration = MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration,
-//            key = "DialogRouter",
-//            handleBackButton = true,
-//            childFactory = ::resolveChild
-//        )
-
     override val routerState: Value<RouterState<*, MainDecomposeComponent.Child>> = router.state
-//    override val dialogRouterState: Value<RouterState<*, MainDecomposeComponent.Child>> = dialogRouter.state
-
     override val dialogsStateFlow = MutableStateFlow<List<Child.Created<*, MainDecomposeComponent.Child>>>(emptyList())
-//    private val dialogs = MutableValue<List<com.arkivanov.decompose.Child.Created<*, MainDecomposeComponent.Child>>>(emptyList())
     private var dialogHolders: List<DialogHolder> by Delegates.observable(emptyList()) { _, _, newValue ->
         dialogsStateFlow.value = newValue.map { it.child }
     }
-
-    private fun holder(config: MainDecomposeComponent.ChildConfiguration): DialogHolder {
-        val lifecycle = LifecycleRegistry() // An instance of LifecycleRegistry associated with the new child
-        val childContext = childContext(key = config::class.toString() , lifecycle = lifecycle)
-        val child = Child.Created(configuration = config, instance = resolveChild(config, childContext))
-        lifecycle.resume()
-
-        return DialogHolder(
-            child = child,
-            lifecycle = lifecycle,
-        )
-    }
-
-    private class DialogHolder(
-        val child: Child.Created<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child>,
-        val lifecycle: LifecycleRegistry,
-    )
 
     private fun resolveChild(
         configuration: MainDecomposeComponent.ChildConfiguration,
@@ -169,42 +138,56 @@ class MainDecomposeComponentImpl(
     }
 
     override fun openLearning(ids: List<Long>) {
-        addDialogConfig(
+        addDialogConfigIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningConfiguration(ids)
         )
-    } /*{
-        dialogRouter.pushChildConfigurationIfNotAtTop(
-            MainDecomposeComponent.ChildConfiguration.LearningConfiguration(ids)
-        )
-    }*/
+    }
 
     override fun openLearningSessionResult(results: List<SessionCardResult>) {
-        addDialogConfig(
+        addDialogConfigIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration(results)
         )
-    } /*{
-        dialogRouter.pushChildConfigurationIfNotAtTop(
-            MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration(results)
-        )
-    }*/
+    }
 
     override fun back() = router.popIfNotEmpty()
 
-    override fun openAddArticleDialog() {
-        addDialogConfig(MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
-    } /* =
-        dialogRouter.pushChildConfigurationIfNotAtTop(
-            MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration
-        )
-        */
+    // Dialogs
 
-    private fun addDialogConfig(config: MainDecomposeComponent.ChildConfiguration) {
-        dialogHolders = dialogHolders + holder(config)
+    override fun openAddArticleDialog() {
+        addDialogConfigIfNotAtTop(MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
     }
 
-    override fun popDialog() {
-        dialogHolders.last().lifecycle.destroy()
-        dialogHolders = dialogHolders.take(dialogHolders.size - 1)
-    } // = dialogRouter.popIfNotEmpty()
+    private inline fun <reified C: MainDecomposeComponent.ChildConfiguration> addDialogConfigIfNotAtTop(config: C) {
+        if (dialogHolders.lastOrNull()?.child?.configuration is C) {
+            return
+        }
 
+        dialogHolders = dialogHolders + dialogHolder(config)
+    }
+
+    override fun popDialog(child: MainDecomposeComponent.Child) {
+        val index = dialogHolders.indexOfLast { it.child.instance == child }
+        if (index != -1) {
+            val holder = dialogHolders[index]
+            holder.lifecycle.destroy()
+            dialogHolders = dialogHolders.filterIndexed { i, dialogHolder -> i != index }
+        }
+    }
+
+    private fun dialogHolder(config: MainDecomposeComponent.ChildConfiguration): DialogHolder {
+        val lifecycle = LifecycleRegistry() // An instance of LifecycleRegistry associated with the new child
+        val childContext = childContext(key = config::class.toString() , lifecycle = lifecycle)
+        val child = Child.Created(configuration = config, instance = resolveChild(config, childContext))
+        lifecycle.resume()
+
+        return DialogHolder(
+            child = child,
+            lifecycle = lifecycle,
+        )
+    }
+
+    private class DialogHolder(
+        val child: Child.Created<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child>,
+        val lifecycle: LifecycleRegistry,
+    )
 }
