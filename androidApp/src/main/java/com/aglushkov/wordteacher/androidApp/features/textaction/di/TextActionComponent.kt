@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeC
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
+import java.net.URL
 import kotlinx.parcelize.Parcelize
 
 @Component(modules = [TextActionModule::class])
@@ -23,6 +24,7 @@ interface TextActionComponent {
 
     @Parcelize
     data class Config(
-        val text: CharSequence
+        val text: CharSequence,
+        val url: URL?
     ): Parcelable
 }

@@ -96,7 +96,6 @@ class MainActivity : AppCompatActivity(), Router {
         }
 
         setupComposeLayout()
-        //setupViewLayout()
 
         lifecycleScope.launch {
             val buffer = 100 * 1024

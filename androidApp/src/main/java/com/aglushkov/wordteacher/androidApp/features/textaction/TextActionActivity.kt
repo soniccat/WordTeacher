@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.androidApp.features.textaction
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -35,6 +37,7 @@ import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeC
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
+import java.net.URL
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
@@ -59,26 +62,41 @@ class TextActionActivity: AppCompatActivity() {
             ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT) // from action.ACTION_SEND
         ?: ""
 
+        var url: URL? = null
+        val matcher = Patterns.WEB_URL.matcher(text)
+        if (matcher.find()) {
+            try {
+                url = URL(text.subSequence(matcher.start(), matcher.end()).toString())
+            } catch (e: Throwable) {
+            }
+        }
+
         textActionDecomposeComponent = DaggerTextActionComponent.builder()
             .setAppComponent(deps)
             .setComponentContext(context)
-            .setConfig(TextActionComponent.Config(text))
+            .setConfig(TextActionComponent.Config(text, url))
             .build()
             .textActionDecomposeComponent()
 
         setContent {
-            ComposeUI()
+            ComposeUI(url)
         }
     }
 
     @Composable
-    private fun ComposeUI() {
+    private fun ComposeUI(url: URL?) {
         ComposeAppTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
                 MainUI()
+            }
+        }
+
+        LaunchedEffect(key1 = "UrlImport") {
+            url?.let {
+                textActionDecomposeComponent.openImportDialog(it)
             }
         }
     }

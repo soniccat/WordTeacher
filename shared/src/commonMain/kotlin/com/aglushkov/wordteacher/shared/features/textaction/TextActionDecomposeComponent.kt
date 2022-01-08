@@ -12,6 +12,7 @@ import com.arkivanov.decompose.router.Router
 import com.arkivanov.decompose.router.router
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import io.ktor.http.Url
 
 interface TextActionDecomposeComponent
     : RouterDecomposeComponent<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child> {
@@ -24,16 +25,20 @@ interface TextActionDecomposeComponent
     fun openAddNote()
     fun back()
 
+    fun openImportDialog(url: String)
+
     sealed class Child {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
         data class AddArticle(val inner: AddArticleDecomposeComponent): Child()
         data class AddNote(val inner: NotesDecomposeComponent): Child()
+        data class ArticleImport(val inner: ArticleImportDecomposeComponent): Child()
     }
 
     sealed class ChildConfiguration: Parcelable {
         @Parcelize object DefinitionConfiguration : ChildConfiguration()
         @Parcelize object AddArticleConfiguration : ChildConfiguration()
         @Parcelize object AddNoteConfiguration : ChildConfiguration()
+        @Parcelize data class ArticleImport(val url: String) : ChildConfiguration()
     }
 }
 
@@ -77,6 +82,13 @@ class TextActionDecomposeComponentImpl(
         router.pushChildConfigurationIfNotAtTop(
             TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration
         )
+
+    override fun openImportDialog(url: String) {
+        // TODO: open a dialog
+        router.pushChildConfigurationIfNotAtTop(
+            TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration
+        )
+    }
 
     override fun back() = router.popIfNotEmpty()
 }
