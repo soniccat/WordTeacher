@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
@@ -52,11 +53,15 @@ import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
+import com.aglushkov.wordteacher.shared.general.article_parser.ArticleParser
+import com.aglushkov.wordteacher.shared.general.v
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
 import kotlin.reflect.KClass
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -92,6 +97,18 @@ class MainActivity : AppCompatActivity(), Router {
 
         setupComposeLayout()
         //setupViewLayout()
+
+        lifecycleScope.launch {
+            val buffer = 100 * 1024
+            val text = resources.openRawResource(R.raw.sample).buffered(buffer).use { stream ->
+                stream.bufferedReader().readText()
+            }
+
+            val parser = ArticleParser()
+            val article = parser.parse(text)
+            Logger.v(article.title.orEmpty())
+            Logger.v(article.text.orEmpty())
+        }
     }
 
     private fun setupComposeLayout() {

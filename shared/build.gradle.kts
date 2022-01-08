@@ -49,6 +49,7 @@ kotlin {
                 implementation(libs.androidMaterial)
                 implementation(libs.sqlDelightAndroidDriver)
                 implementation("org.apache.opennlp:opennlp-tools:1.9.2")
+                implementation("org.jsoup:jsoup:1.14.3")
 
                 // for compose-jb - uncomment - start
 //                implementation(compose.runtime)
