@@ -1,12 +1,14 @@
+import kotlin.collections.List;
+
 CREATE TABLE IF NOT EXISTS DBNLPSentence (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   articleId INTEGER NOT NULL,
   orderId INTEGER NOT NULL,
   text TEXT NOT NULL,
-  tokens TEXT NOT NULL,
-  tags TEXT NOT NULL,
-  lemmas TEXT NOT NULL,
-  chunks TEXT NOT NULL
+  tokens TEXT AS List<String> NOT NULL,
+  tags TEXT AS List<String> NOT NULL,
+  lemmas TEXT AS List<String> NOT NULL,
+  chunks TEXT AS List<String> NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS DBNLPSentence_id ON DBNLPSentence(id);

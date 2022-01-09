@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
+import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.TransactionWithoutReturn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,12 +21,13 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull.content
 
 class AppDatabase(driverFactory: DatabaseDriverFactory) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private val driver = driverFactory.createDriver()
-    private var db = SQLDelightDatabase(driver)
+    private var db = SQLDelightDatabase(driver, DBNLPSentence.Adapter())
 
     val articles = Articles()
     val sentencesNLP = DBNLPSentences()
@@ -67,10 +69,10 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             nlpSentence.articleId,
             nlpSentence.orderId,
             nlpSentence.text,
-            nlpSentence.tokenStrings().joinToString(NLP_SEPARATOR),
-            nlpSentence.tags.joinToString(NLP_SEPARATOR),
-            nlpSentence.lemmas.joinToString(NLP_SEPARATOR),
-            nlpSentence.chunks.joinToString(NLP_SEPARATOR)
+            nlpSentence.tokenStrings(),
+            nlpSentence.tags,
+            nlpSentence.lemmas,
+            nlpSentence.chunks
         )
 
         fun selectAll() = db.dBNLPSentenceQueries.selectAll()
@@ -304,11 +306,11 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         fun updateNote(id: Long, text: String) = db.dBNoteQueries.update(text, id)
     }
 
-    companion object {
-        // TODO: replace with SQLDelight adapters: https://cashapp.github.io/sqldelight/android_sqlite/types/
-        const val NLP_SEPARATOR = "&&"
-        const val CARD_SEPARATOR = "$$"
-    }
+//    companion object {
+//        // TODO: replace with SQLDelight adapters: https://cashapp.github.io/sqldelight/android_sqlite/types/
+//        const val NLP_SEPARATOR = "&&"
+//        const val CARD_SEPARATOR = "$$"
+//    }
 }
 
 fun DBNLPSentence.toNLPSentence(): NLPSentence {
@@ -354,3 +356,69 @@ private fun tokensToTokenSpans(text: String, tokenStrings: List<String>): List<T
 
     return resultTokens
 }
+
+private class StringListAdapter: ColumnAdapter<List<String>, String> {
+
+    override fun decode(databaseValue: String): List<String> {
+        val resultList = mutableListOf<String>()
+
+        var charIndex = 0
+        val len = databaseValue.length
+        var value = StringBuilder()
+
+        while (charIndex < len) {
+            var ch = databaseValue[charIndex]
+            if (ch == LIST_DIVIDER) {
+                resultList.add(value.toString())
+                value = StringBuilder()
+
+                ++charIndex
+                continue
+
+            } else if (ch == LIST_ESCAPE) {
+                if (charIndex + 1 < len) {
+                    val nextCh = databaseValue[charIndex + 1]
+                    if (nextCh == LIST_ESCAPE) {
+                        ch = nextCh
+                        ++charIndex
+                    } else if (nextCh == LIST_DIVIDER) {
+                        ch = nextCh
+                        ++charIndex
+                    }
+                }
+            }
+
+            value.append(ch)
+            ++charIndex
+        }
+
+        return resultList
+    }
+
+    override fun encode(value: List<String>): String {
+        return value.joinToString(LIST_DIVIDER.toString()) { str ->
+            val sb = StringBuilder(str)
+            var charIndex = 0
+            var len = sb.length
+
+            while (charIndex < len) {
+                val ch = sb[charIndex]
+                if (ch == LIST_DIVIDER) {
+                    sb.insert(charIndex, LIST_ESCAPE)
+                    ++charIndex
+                    ++len
+                } else if (ch == LIST_ESCAPE) {
+                    sb.insert(charIndex, LIST_ESCAPE)
+                    ++charIndex
+                    ++len
+                }
+
+                ++charIndex
+            }
+            sb
+        }
+    }
+}
+
+private const val LIST_DIVIDER = '|'
+private const val LIST_ESCAPE = '\\'
