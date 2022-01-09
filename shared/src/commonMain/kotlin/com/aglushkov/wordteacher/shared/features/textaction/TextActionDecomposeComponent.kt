@@ -21,24 +21,20 @@ interface TextActionDecomposeComponent
     override val router: Router<ChildConfiguration, Child>
 
     fun openDefinitions()
-    fun openAddArticle()
+    fun openAddArticle(url: String? = null)
     fun openAddNote()
     fun back()
-
-    fun openImportDialog(url: String)
 
     sealed class Child {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
         data class AddArticle(val inner: AddArticleDecomposeComponent): Child()
         data class AddNote(val inner: NotesDecomposeComponent): Child()
-        data class ArticleImport(val inner: ArticleImportDecomposeComponent): Child()
     }
 
     sealed class ChildConfiguration: Parcelable {
         @Parcelize object DefinitionConfiguration : ChildConfiguration()
-        @Parcelize object AddArticleConfiguration : ChildConfiguration()
+        @Parcelize data class AddArticleConfiguration(val url: String? = null) : ChildConfiguration()
         @Parcelize object AddNoteConfiguration : ChildConfiguration()
-        @Parcelize data class ArticleImport(val url: String) : ChildConfiguration()
     }
 }
 
@@ -73,22 +69,15 @@ class TextActionDecomposeComponentImpl(
 
     override fun openDefinitions() = router.popToRoot()
 
-    override fun openAddArticle() =
+    override fun openAddArticle(url: String?) =
         router.pushChildConfigurationIfNotAtTop(
-            TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration
+            TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration(url = url)
         )
 
     override fun openAddNote() =
         router.pushChildConfigurationIfNotAtTop(
             TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration
         )
-
-    override fun openImportDialog(url: String) {
-        // TODO: open a dialog
-        router.pushChildConfigurationIfNotAtTop(
-            TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration
-        )
-    }
 
     override fun back() = router.popIfNotEmpty()
 }

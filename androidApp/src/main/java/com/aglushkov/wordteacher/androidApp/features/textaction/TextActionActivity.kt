@@ -62,11 +62,11 @@ class TextActionActivity: AppCompatActivity() {
             ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT) // from action.ACTION_SEND
         ?: ""
 
-        var url: URL? = null
+        var urlString: String? = null
         val matcher = Patterns.WEB_URL.matcher(text)
         if (matcher.find()) {
             try {
-                url = URL(text.subSequence(matcher.start(), matcher.end()).toString())
+                urlString = URL(text.subSequence(matcher.start(), matcher.end()).toString()).toString()
             } catch (e: Throwable) {
             }
         }
@@ -74,29 +74,23 @@ class TextActionActivity: AppCompatActivity() {
         textActionDecomposeComponent = DaggerTextActionComponent.builder()
             .setAppComponent(deps)
             .setComponentContext(context)
-            .setConfig(TextActionComponent.Config(text, url))
+            .setConfig(TextActionComponent.Config(text, urlString))
             .build()
             .textActionDecomposeComponent()
 
         setContent {
-            ComposeUI(url)
+            ComposeUI()
         }
     }
 
     @Composable
-    private fun ComposeUI(url: URL?) {
+    private fun ComposeUI() {
         ComposeAppTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
                 MainUI()
-            }
-        }
-
-        LaunchedEffect(key1 = "UrlImport") {
-            url?.let {
-                textActionDecomposeComponent.openImportDialog(it)
             }
         }
     }

@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
@@ -14,15 +15,20 @@ import dagger.Provides
 class AddArticleComposeModule {
 
     @Provides
+    fun articleParserRepository(): ArticleParserRepository = ArticleParserRepository()
+
+    @Provides
     fun viewModel(
         componentContext: ComponentContext,
         state: AddArticleVM.State,
         articlesRepository: ArticlesRepository,
+        articleParserRepository: ArticleParserRepository,
         timeSource: TimeSource
     ): AddArticleDecomposeComponent {
         return AddArticleDecomposeComponent(
             componentContext,
             articlesRepository,
+            articleParserRepository,
             timeSource,
             state
         )

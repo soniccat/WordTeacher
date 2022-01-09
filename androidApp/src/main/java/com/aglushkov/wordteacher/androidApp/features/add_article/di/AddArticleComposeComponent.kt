@@ -5,6 +5,8 @@ import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
+import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -21,4 +23,9 @@ interface AddArticleComposeComponent {
         fun setDeps(deps: AddArticleDependencies): Builder
         fun build(): AddArticleComposeComponent
     }
+}
+
+interface AddArticleDependencies {
+    fun articlesRepository(): ArticlesRepository
+    fun timeSource(): TimeSource
 }

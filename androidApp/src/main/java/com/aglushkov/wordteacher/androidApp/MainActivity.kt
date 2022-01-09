@@ -28,7 +28,6 @@ import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
-import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleUI
@@ -297,8 +296,6 @@ class MainActivity : AppCompatActivity(), Router {
                     return DefinitionsFragment()
                 } else if (ArticlesFragment::class.java.name == className) {
                     return ArticlesFragment()
-                } else if (AddArticleFragment::class.java.name == className) {
-                    return AddArticleFragment()
                 } else if (ArticlesFragment::class.java.name == className) {
                     return ArticlesFragment()
                 }
@@ -367,7 +364,6 @@ class MainActivity : AppCompatActivity(), Router {
     private fun screenNameByClass(cl: KClass<*>): String = when(cl) {
         DefinitionsFragment::class -> "definitions"
         ArticlesFragment::class -> "articles"
-        AddArticleFragment::class -> "addArticle"
         ArticleFragment::class -> "article"
         CardSetsFragment::class -> "cardsets"
         else -> throw IllegalArgumentException("Wrong screen class $cl")

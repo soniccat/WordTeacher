@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
+import com.squareup.sqldelight.TransactionWithoutReturn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -55,6 +56,11 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     private fun createDb() {
         SQLDelightDatabase.Schema.create(driver)
     }
+
+    fun transaction(
+        noEnclosing: Boolean = false,
+        body: TransactionWithoutReturn.() -> Unit
+    ) = db.transaction(noEnclosing, body)
 
     inner class DBNLPSentences {
         fun insert(nlpSentence: NLPSentence) = db.dBNLPSentenceQueries.insert(

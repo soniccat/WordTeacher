@@ -38,7 +38,9 @@ class TextActionModule {
                 is TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
                     DaggerAddArticleComposeComponent.builder()
                         .setComponentContext(context)
-                        .setConfiguration(AddArticleVM.State(text = config.text.toString()))
+                        .setConfiguration(
+                            AddArticleVM.State(text = config.text.toString(), url = config.url)
+                        )
                         .setDeps(appComponent)
                         .build()
                         .addArticleDecomposeComponent()

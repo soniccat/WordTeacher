@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.model.Article
+import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
@@ -39,12 +40,14 @@ interface AddArticleVM {
     @Parcelize
     class State(
         var title: String? = null,
-        var text: String? = null
+        var text: String? = null,
+        var url: String? = null
     ): Parcelable
 }
 
 open class AddArticleVMImpl(
     private val articlesRepository: ArticlesRepository,
+    private val articleParseRepository: ArticleParserRepository,
     private val timeSource: TimeSource,
     override var state: AddArticleVM.State
 ): ViewModel(), AddArticleVM {
@@ -61,13 +64,24 @@ open class AddArticleVMImpl(
     private val mutableText = MutableStateFlow("")
     override val text: StateFlow<String> = mutableText
 
-    init {
-        restore(state)
-    }
-
     fun restore(state: AddArticleVM.State) {
         mutableTitle.value = state.title.orEmpty()
         mutableText.value = state.text.orEmpty()
+
+        state.url?.let {
+            viewModelScope.launch {
+                val parsedArticleRes = articleParseRepository.parse(it)
+                parsedArticleRes.data()?.let {
+                    it.title?.let {
+                        mutableTitle.value = it
+                    }
+
+                    it.text?.let {
+                        mutableText.value = it
+                    }
+                }
+            }
+        }
     }
 
     override fun onTitleChanged(title: String) {

@@ -89,26 +89,31 @@ class ArticlesRepository(
             paragraphs = paragraphs
         )
 
-        // TODO: support transaction here
-        val articleId = database.articles.run {
-            insert(title, timeSource.getTimeInMilliseconds(), style)
-            insertedArticleId()
-        } ?: 0L
+        var article: Article? = null
+        database.transaction {
+            val articleId = database.articles.run {
+                insert(title, timeSource.getTimeInMilliseconds(), style)
+                insertedArticleId()
+            } ?: 0L
 
-        val article = Article(
-            articleId,
-            title,
-            timeSource.getTimeInMilliseconds(),
-            style = style
-        )
+            val sentences = mutableListOf<NLPSentence>()
+            resultText.split(sentenceSpans).forEachIndexed { index, s ->
+                val nlpSentence = NLPSentence(articleId, index.toLong(), s.toString())
+                nlpSentenceProcessor.process(nlpSentence)
+                database.sentencesNLP.insert(nlpSentence)
+                sentences += nlpSentence
+            }
 
-        resultText.split(sentenceSpans).forEachIndexed { index, s ->
-            val nlpSentence = NLPSentence(articleId, index.toLong(), s.toString())
-            nlpSentenceProcessor.process(nlpSentence)
-            database.sentencesNLP.insert(nlpSentence)
+            article = Article(
+                articleId,
+                title,
+                timeSource.getTimeInMilliseconds(),
+                sentences = sentences,
+                style = style
+            )
         }
 
-        return article
+        return article ?: throw ArticleInsertException("Article is null")
     }
 
     private fun removeArticleInternal(articleId: Long) {
@@ -128,3 +133,5 @@ class ArticlesRepository(
         .replace("''", "\"")
         .trim()
 }
+
+class ArticleInsertException(message: String): RuntimeException(message)
