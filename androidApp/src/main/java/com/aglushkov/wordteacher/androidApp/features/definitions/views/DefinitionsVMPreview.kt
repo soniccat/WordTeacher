@@ -23,6 +23,9 @@ open class DefinitionsVMPreview(
     val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech> = emptyList(),
     val events: List<Event> = emptyList()
 ) : DefinitionsVM {
+
+    override var router: DefinitionsRouter? = null
+
     override fun restore(newState: DefinitionsVM.State) {
     }
 

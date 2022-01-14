@@ -56,7 +56,6 @@ class DefinitionsModule {
     @Provides
     fun viewModel(
         state: DefinitionsVM.State,
-        router: RouterResolver,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         cardSetsRepository: CardSetsRepository,
@@ -64,7 +63,6 @@ class DefinitionsModule {
     ): DefinitionsVM {
         return DefinitionsVMImpl(
             state,
-            router.router!!.get()!!,
             connectivityManager,
             wordDefinitionRepository,
             cardSetsRepository,

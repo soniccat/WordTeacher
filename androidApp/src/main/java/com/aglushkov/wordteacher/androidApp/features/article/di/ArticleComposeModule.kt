@@ -31,14 +31,12 @@ class ArticleComposeModule {
     @Provides
     fun definitionsVM(
         configuration: MainDecomposeComponent.ChildConfiguration.ArticleConfiguration,
-        router: RouterResolver,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
     ): DefinitionsVM = DefinitionsVMImpl(
         DefinitionsVM.State(),
-        router.router!!.get()!!,
         connectivityManager,
         wordDefinitionRepository,
         cardSetsRepository,

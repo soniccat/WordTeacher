@@ -11,5 +11,4 @@ import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.Lear
 interface Router: ArticlesRouter,
     ArticleRouter,
     CardSetsRouter,
-    CardSetRouter,
-    DefinitionsRouter
+    CardSetRouter

@@ -49,6 +49,7 @@ import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
@@ -154,7 +155,15 @@ class MainActivity : AppCompatActivity(), Router {
             ) {
                 when (val instance = it.instance) {
                     is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)
-                    is MainDecomposeComponent.Child.Article -> ArticleUI(vm = instance.vm)
+                    is MainDecomposeComponent.Child.Article -> ArticleUI(
+                        vm = instance.vm.apply {
+                            definitionsVM.router = object : DefinitionsRouter {
+                                override fun openCardSets() {
+                                    mainDecomposeComponent.openCardSets()
+                                }
+                            }
+                        }
+                    )
                     is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.vm)
                     is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.vm)
                     is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.vm)
@@ -179,7 +188,13 @@ class MainActivity : AppCompatActivity(), Router {
             ) {
                 when (val instance = it.instance) {
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
-                        vm = instance.inner,
+                        vm = instance.inner.apply {
+                            router = object : DefinitionsRouter {
+                                override fun openCardSets() {
+                                    mainDecomposeComponent.openCardSets()
+                                }
+                            }
+                        },
                         modalModifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.CardSets -> CardSetsUI(
@@ -406,10 +421,6 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun closeCardSet() {
         mainDecomposeComponent.back()
-    }
-
-    override fun openCardSets() {
-        mainDecomposeComponent.openCardSets()
     }
 }
 

@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.textaction
 
+import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
@@ -24,6 +25,8 @@ interface TextActionDecomposeComponent
     fun openAddArticle(url: String? = null)
     fun openAddNote()
     fun back()
+
+    fun openCardSets()
 
     sealed class Child {
         data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
@@ -78,6 +81,13 @@ class TextActionDecomposeComponentImpl(
         router.pushChildConfigurationIfNotAtTop(
             TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration
         )
+
+    override fun openCardSets() {
+        // TODO: support opening set list
+//        router.pushChildConfigurationIfNotAtTop(
+//            TextActionDecomposeComponent.ChildConfiguration.CardSetsConfiguration
+//        )
+    }
 
     override fun back() = router.popIfNotEmpty()
 }

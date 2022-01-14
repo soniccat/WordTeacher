@@ -18,7 +18,6 @@ class DefinitionsComposeModule {
     fun definitionsDecomposeComponent(
         componentContext: ComponentContext,
         configuration: DefinitionsComposeComponent.DefinitionConfiguration,
-        router: RouterResolver,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         cardSetsRepository: CardSetsRepository,
@@ -26,7 +25,6 @@ class DefinitionsComposeModule {
     ) = DefinitionsDecomposeComponent(
         componentContext,
         configuration.word,
-        router.router!!.get()!!,
         connectivityManager,
         wordDefinitionRepository,
         cardSetsRepository,

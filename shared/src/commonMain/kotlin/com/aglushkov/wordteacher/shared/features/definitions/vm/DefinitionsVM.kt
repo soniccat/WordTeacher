@@ -5,6 +5,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.extensions.forward
@@ -38,6 +39,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 interface DefinitionsVM {
+    var router: DefinitionsRouter?
+
     fun restore(newState: State)
     fun onWordSubmitted(
         word: String?,
@@ -73,12 +76,13 @@ interface DefinitionsVM {
 
 open class DefinitionsVMImpl(
     override var state: DefinitionsVM.State,
-    private val router: DefinitionsRouter,
     private val connectivityManager: ConnectivityManager,
     private val wordDefinitionRepository: WordDefinitionRepository,
     private val cardSetsRepository: CardSetsRepository,
     private val idGenerator: IdGenerator
 ): ViewModel(), DefinitionsVM {
+
+    override var router: DefinitionsRouter? = null
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
@@ -411,7 +415,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onOpenCardSets(item: OpenCardSetViewItem) {
-        router.openCardSets()
+        router?.openCardSets()
     }
 
     override fun onAddDefinitionInSet(

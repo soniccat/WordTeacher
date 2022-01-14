@@ -33,6 +33,7 @@ import com.aglushkov.wordteacher.androidApp.features.textaction.di.DaggerTextAct
 import com.aglushkov.wordteacher.androidApp.features.textaction.di.TextActionComponent
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponent
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
@@ -78,6 +79,10 @@ class TextActionActivity: AppCompatActivity() {
             .build()
             .textActionDecomposeComponent()
 
+        if (urlString != null) {
+            textActionDecomposeComponent.openAddArticle()
+        }
+
         setContent {
             ComposeUI()
         }
@@ -114,7 +119,13 @@ class TextActionActivity: AppCompatActivity() {
                 ) {
                     when (val instance = it.instance) {
                         is TextActionDecomposeComponent.Child.Definitions -> DefinitionsUI(
-                            vm = instance.inner,
+                            vm = instance.inner.apply {
+                                router = object : DefinitionsRouter {
+                                    override fun openCardSets() {
+                                        textActionDecomposeComponent.openCardSets()
+                                    }
+                                }
+                            },
                             modalModifier = Modifier.padding(innerPadding)
                         )
                         is TextActionDecomposeComponent.Child.AddArticle -> {
