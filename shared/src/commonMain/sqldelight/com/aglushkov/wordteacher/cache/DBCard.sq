@@ -1,12 +1,14 @@
+import kotlin.collections.List;
+
 CREATE TABLE IF NOT EXISTS DBCard (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   date INTEGER NOT NULL,
   term TEXT NOT NULL,
   partOfSpeech TEXT NOT NULL,
   transcription TEXT,
-  definitions TEXT NOT NULL,
-  synonyms TEXT,
-  examples TEXT,
+  definitions TEXT AS List<String> NOT NULL,
+  synonyms TEXT AS List<String> NOT NULL,
+  examples TEXT AS List<String> NOT NULL,
 -- Progress
   progressLevel INTEGER AS Int DEFAULT 0,
   progressLastMistakeCount INTEGER AS Int DEFAULT 0,

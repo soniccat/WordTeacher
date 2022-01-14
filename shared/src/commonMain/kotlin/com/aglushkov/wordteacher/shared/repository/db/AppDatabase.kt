@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.db
 
 import com.aglushkov.extensions.firstLong
+import com.aglushkov.wordteacher.cache.DBCard
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
 import com.aglushkov.wordteacher.shared.model.CardProgress
@@ -27,7 +28,20 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private val driver = driverFactory.createDriver()
-    private var db = SQLDelightDatabase(driver, DBNLPSentence.Adapter())
+    private var db = SQLDelightDatabase(
+        driver,
+        DBCardAdapter = DBCard.Adapter(
+            StringListAdapter(),
+            StringListAdapter(),
+            StringListAdapter(),
+        ),
+        DBNLPSentenceAdapter = DBNLPSentence.Adapter(
+            StringListAdapter(),
+            StringListAdapter(),
+            StringListAdapter(),
+            StringListAdapter(),
+        )
+    )
 
     val articles = Articles()
     val sentencesNLP = DBNLPSentences()
@@ -146,9 +160,9 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             term: String?,
             partOfSpeech: String?,
             transcription: String?,
-            definitions: String?,
-            synonyms: String?,
-            examples: String?,
+            definitions: List<String>?,
+            synonyms: List<String>?,
+            examples: List<String>?,
             progressLevel: Int?,
             progressLastMistakeCount: Int?,
             progressLastLessonDate: Long?
@@ -158,11 +172,15 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     id!!,
                     date!!,
                     term!!,
-                    definitions?.split(CARD_SEPARATOR).orEmpty().toMutableList(),
-                    if (partOfSpeech != null) WordTeacherWord.PartOfSpeech.valueOf(partOfSpeech) else WordTeacherWord.PartOfSpeech.Undefined,
+                    definitions.orEmpty(),
+                    if (partOfSpeech != null) {
+                        WordTeacherWord.PartOfSpeech.valueOf(partOfSpeech)
+                    } else {
+                        WordTeacherWord.PartOfSpeech.Undefined
+                    },
                     transcription,
-                    synonyms?.split(CARD_SEPARATOR).orEmpty().toMutableList(),
-                    examples?.split(CARD_SEPARATOR).orEmpty().toMutableList(),
+                    synonyms.orEmpty(),
+                    examples.orEmpty(),
                     progress = ImmutableCardProgress(
                         progressLevel ?: 0,
                         progressLastMistakeCount ?: 0,
@@ -230,9 +248,9 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     term,
                     partOfSpeech.toString(),
                     transcription,
-                    definitions.joinToString(CARD_SEPARATOR),
-                    synonyms.joinToString(CARD_SEPARATOR),
-                    examples.joinToString(CARD_SEPARATOR),
+                    definitions,
+                    synonyms,
+                    examples,
                     progress.currentLevel,
                     progress.lastMistakeCount,
                     progress.lastLessonDate
@@ -278,9 +296,9 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             term,
             partOfSpeech.toString(),
             transcription,
-            definitions.joinToString(CARD_SEPARATOR),
-            synonyms.joinToString(CARD_SEPARATOR),
-            examples.joinToString(CARD_SEPARATOR),
+            definitions,
+            synonyms,
+            examples,
             progressLevel,
             progressLastMistakeCount,
             progressLastLessonDate,
@@ -305,20 +323,9 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         fun removeAll() = db.dBNoteQueries.removeAll()
         fun updateNote(id: Long, text: String) = db.dBNoteQueries.update(text, id)
     }
-
-//    companion object {
-//        // TODO: replace with SQLDelight adapters: https://cashapp.github.io/sqldelight/android_sqlite/types/
-//        const val NLP_SEPARATOR = "&&"
-//        const val CARD_SEPARATOR = "$$"
-//    }
 }
 
 fun DBNLPSentence.toNLPSentence(): NLPSentence {
-    val tokens = tokens.split(AppDatabase.NLP_SEPARATOR)
-    val tags = tags.split(AppDatabase.NLP_SEPARATOR)
-    val lemmas = lemmas.split(AppDatabase.NLP_SEPARATOR)
-    val chunks = chunks.split(AppDatabase.NLP_SEPARATOR)
-
     return NLPSentence(
         articleId,
         orderId,
@@ -357,6 +364,7 @@ private fun tokensToTokenSpans(text: String, tokenStrings: List<String>): List<T
     return resultTokens
 }
 
+// TODO: write tests
 private class StringListAdapter: ColumnAdapter<List<String>, String> {
 
     override fun decode(databaseValue: String): List<String> {
