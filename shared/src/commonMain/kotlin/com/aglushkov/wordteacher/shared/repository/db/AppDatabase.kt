@@ -372,13 +372,13 @@ private class StringListAdapter: ColumnAdapter<List<String>, String> {
 
         var charIndex = 0
         val len = databaseValue.length
-        var value = StringBuilder()
+        val value = StringBuilder()
 
         while (charIndex < len) {
             var ch = databaseValue[charIndex]
             if (ch == LIST_DIVIDER) {
                 resultList.add(value.toString())
-                value = StringBuilder()
+                value.clear()
 
                 ++charIndex
                 continue
@@ -398,6 +398,10 @@ private class StringListAdapter: ColumnAdapter<List<String>, String> {
 
             value.append(ch)
             ++charIndex
+        }
+
+        if (databaseValue.isNotEmpty()) {
+            resultList.add(value.toString())
         }
 
         return resultList

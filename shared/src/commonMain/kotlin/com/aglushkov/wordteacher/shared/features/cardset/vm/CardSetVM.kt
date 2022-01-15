@@ -8,8 +8,8 @@ import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.aglushkov.wordteacher.shared.model.ImmutableCardSet
 import com.aglushkov.wordteacher.shared.model.MutableCard
-import com.aglushkov.wordteacher.shared.model.MutableCardSet
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.UPDATE_DELAY
@@ -56,18 +56,26 @@ open class CardSetVMImpl(
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator
 ): ViewModel(), CardSetVM {
-    final override val cardSet: StateFlow<Resource<out CardSet>> = repository.cardSet.map { cardSet ->
-        mutableCardSet?.let { aMutableCardSet ->
-            when(cardSet) {
-                is Resource.Loaded -> cardSet.copyWith(mergeCardSets(cardSet.data, aMutableCardSet))
-                else -> cardSet
-            }
-        } ?: run {
-            cardSet
-        }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    private var mutableCardSet: MutableCardSet? = null
+    private var inMemoryCardSet = MutableStateFlow<CardSet?>(null)
+    final override val cardSet: StateFlow<Resource<out CardSet>> = combine(
+        repository.cardSet, inMemoryCardSet,
+        transform = { cardSet, inMemoryCardSet ->
+            if (inMemoryCardSet == null) {
+                cardSet
+            } else {
+                when (cardSet) {
+                    is Resource.Loaded -> cardSet.copyWith(
+                        mergeCardSets(
+                            cardSet.data,
+                            inMemoryCardSet
+                        )
+                    )
+                    else -> cardSet
+                }
+            }
+    }).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
 
@@ -105,9 +113,6 @@ open class CardSetVMImpl(
         }
     }
 
-    // TODO: consider storing only CardViewItem and separate UI parts in UI layer to leverage
-    // all the Android Compose profit of diffing UI changes instead of what's going on in generateIds
-    // (kinda hacky diffing with manual id management)
     private fun makeViewItems(loadedCardSet: CardSet): List<BaseViewItem<*>>  {
         val result = mutableListOf<BaseViewItem<*>>()
 
@@ -225,24 +230,24 @@ open class CardSetVMImpl(
         }
     }
 
-    private fun obtainMutableCardSet(cardSet: CardSet) =
-        mutableCardSet ?: cardSet.toMutableCardSet().apply {
-                cards = emptyList()
-                mutableCardSet = this
-            }
+//    private fun obtainMutableCardSet(cardSet: CardSet) =
+//        inMemoryCardSet.value ?: cardSet.toMutableCardSet().apply {
+//                cards = emptyList()
+//                inMemoryCardSet.value = this
+//            }
 
-    private fun withMutableCard(cardId: Long, block: (card: MutableCard) -> Unit) {
-        val cardSet = cardSet.value.data() ?: return
-        val card = findCard(cardId) ?: return
-        block(obtainMutableCard(card, cardSet))
-    }
+//    private fun withMutableCard(cardId: Long, block: (card: MutableCard) -> Unit) {
+//        val cardSet = cardSet.value.data() ?: return
+//        val card = findCard(cardId) ?: return
+//        block(obtainMutableCard(card, cardSet))
+//    }
 
-    private fun obtainMutableCard(card: Card, cardSet: CardSet): MutableCard {
-        val mutableCardSet = obtainMutableCardSet(cardSet)
-        return mutableCardSet.findCard(card.id) ?: card.toMutableCard().apply {
-            mutableCardSet.addCard(this)
-        }
-    }
+//    private fun obtainMutableCard(card: Card, cardSet: CardSet): MutableCard {
+//        val mutableCardSet = obtainMutableCardSet(cardSet)
+//        return mutableCardSet.findCard(card.id) ?: card.toMutableCard().apply {
+//            mutableCardSet.addCard(this)
+//        }
+//    }
 
     override fun onAddDefinitionPressed(cardId: Long) =
         withMutableCard(cardId) {
@@ -269,11 +274,21 @@ open class CardSetVMImpl(
         }
     }
 
-    override fun onAddSynonymPressed(cardId: Long) =
-        withMutableCard(cardId) {
-            it.synonyms += ""
-            updateCard(it, delay = 0)
+    override fun onAddSynonymPressed(cardId: Long) {
+        if (findCard(cardId)?.synonyms?.lastOrNull() == "") {
+            return
         }
+
+        inMemoryCardSet.update {
+            val resultCardset = inMemoryCardSet.value ?: cardSet.value.data()
+            resultCardset?.cop
+        }
+
+//        withMutableCard(cardId) {
+//            it.synonyms += ""
+//            //updateCard(it, delay = 0)
+//        }
+    }
 
     override fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long) =
         withMutableCard(cardId) {
@@ -299,7 +314,8 @@ open class CardSetVMImpl(
         viewModelScope.launch {
             try {
                 repository.updateCard(card, delay)
-                mutableCardSet?.removeCard(card)
+                inMemoryCardSet.value?.removeCard(card)
+                inMemoryCardSet.update {  }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
