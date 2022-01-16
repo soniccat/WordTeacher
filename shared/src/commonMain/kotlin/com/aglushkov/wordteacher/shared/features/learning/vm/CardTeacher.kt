@@ -4,9 +4,7 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.takeWhileNonNull
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Card
-import com.aglushkov.wordteacher.shared.model.MutableCard
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import com.arkivanov.essenty.parcelable.Parcelable
@@ -25,7 +23,7 @@ class CardTeacher(
 ) {
     private var sessions = mutableListOf<LearningSession>()
     private var currentSession: LearningSession? = null
-    private var currentCardStateFlow = MutableStateFlow<MutableCard?>(null)
+    private var currentCardStateFlow = MutableStateFlow<Card?>(null)
 
     val currentCard: Card?
         get() = currentCardStateFlow.value
@@ -58,7 +56,7 @@ class CardTeacher(
         if (sessionCards.isEmpty()) {
             currentSession = null
         } else {
-            val session = LearningSession(sessionCards.map { it.toMutableCard() })
+            val session = LearningSession(sessionCards)
             currentSession = session
 
             scope.launch {
@@ -101,53 +99,50 @@ class CardTeacher(
     }
 
     private suspend fun countWrongAnswer() {
-        val localCurrentCard = currentCard
-        val currentCardSnapshot = localCurrentCard?.toImmutableCard()
-        val mutableCard = localCurrentCard?.toMutableCard()
+        if (isWrongAnswerCounted) return
+        val currentCardSnapshot = currentCard!!
 
-        if (currentCardSnapshot != null && mutableCard != null && !isWrongAnswerCounted) {
-            databaseWorker.run {
+        val updatedCard = databaseWorker.runCancellable(
+            currentCardSnapshot.id.toString(),
+            runnable = {
                 try {
-                    mutableCard.progress.applyRightAnswer(timeSource)
-                    database.cards.updateCard(mutableCard)
+                    database.cards.updateCard(
+                        currentCardSnapshot.withWrongAnswer(timeSource)
+                    )
                 } catch (e: Throwable) {
                     // TODO: handle error
                     Logger.e("CardTeacher.countWrongAnswer", e.toString())
+                    throw e
                 }
-            }
+            },
+            delay = 0
+        )
 
-            val safeSession = currentSession
-            if (safeSession != null && currentCardSnapshot == currentCard?.toImmutableCard()) {
-                safeSession.updateProgress(mutableCard, false)
-                isWrongAnswerCounted = true
-            }
-        }
+        currentSession!!.updateProgress(updatedCard, false)
+        isWrongAnswerCounted = true
     }
 
     private suspend fun countRightAnswer() {
-        val localCurrentCard = currentCard
-        val currentCardSnapshot = localCurrentCard?.toImmutableCard()
-        val mutableCard = localCurrentCard?.toMutableCard()
+        val currentCardSnapshot = currentCard!!
 
-        if (currentCardSnapshot != null && mutableCard != null) {
-            if (!isWrongAnswerCounted) {
-                databaseWorker.run {
+        if (!isWrongAnswerCounted) {
+            val updatedCard = databaseWorker.runCancellable(
+                currentCardSnapshot.id.toString(),
+                runnable = {
                     try {
-                        mutableCard.progress.applyRightAnswer(timeSource)
-                        database.cards.updateCard(mutableCard)
+                        database.cards.updateCard(
+                            currentCardSnapshot.withRightAnswer(timeSource)
+                        )
                     } catch (e: Throwable) {
                         // TODO: handle error
                         Logger.e("CardTeacher.countRightAnswer", e.toString())
+                        throw e
                     }
-                }
+                },
+                delay = 0
+            )
 
-                val safeSession = currentSession
-                if (safeSession != null && currentCardSnapshot == currentCard?.toImmutableCard()) {
-                    //currentCardStateFlow.value?.set(mutableCard)
-                    safeSession.updateProgress(mutableCard, true)
-                }
-            }
-
+            currentSession!!.updateProgress(updatedCard, true)
             switchToNextCard()
         }
     }
@@ -184,7 +179,7 @@ class CardTeacher(
     private fun createLearningSession(sessionState: LearningSession.State) =
         LearningSession(
             cards = sessionState.cardIds.mapNotNull { cardId ->
-                cards.firstOrNull { it.id == cardId }?.toMutableCard()
+                cards.firstOrNull { it.id == cardId }
             }
         ).also {
             it.restore(sessionState)

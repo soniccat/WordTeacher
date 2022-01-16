@@ -7,12 +7,9 @@ import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
-import com.aglushkov.wordteacher.shared.model.ImmutableCard
-import com.aglushkov.wordteacher.shared.model.ImmutableCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
-import com.aglushkov.wordteacher.shared.repository.db.UPDATE_DELAY
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -22,9 +19,9 @@ class CardSetRepository(
     private val timeSource: TimeSource
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val stateFlow = MutableStateFlow<Resource<ImmutableCardSet>>(Resource.Uninitialized())
+    private val stateFlow = MutableStateFlow<Resource<CardSet>>(Resource.Uninitialized())
 
-    val cardSet: StateFlow<Resource<ImmutableCardSet>> = stateFlow
+    val cardSet: StateFlow<Resource<CardSet>> = stateFlow
     private var loadJob: Job? = null
 
     suspend fun loadCardSet(id: Long) {
@@ -59,8 +56,8 @@ class CardSetRepository(
         transcription: String = "",
         synonyms: MutableList<String> = mutableListOf(),
         examples: MutableList<String> = mutableListOf()
-    ): ImmutableCard? {
-        val loadedCardSet = cardSet.value.data() ?: return null
+    ): Card {
+        val loadedCardSet = cardSet.value.data()!!
         return databaseWorker.run {
             database.cards.insertCard(
                 setId = loadedCardSet.id,

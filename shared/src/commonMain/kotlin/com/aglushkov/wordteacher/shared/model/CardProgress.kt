@@ -2,13 +2,14 @@ package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
 
-interface CardProgress {
-    val currentLevel: Int
-    val lastMistakeCount: Int
-    val lastLessonDate: Long
+data class CardProgress(
+    val currentLevel: Int = 0,
+    val lastMistakeCount: Int = 0,
+    val lastLessonDate: Long = 0
+) {
 
     companion object {
-        val EMPTY = ImmutableCardProgress()
+        val EMPTY = CardProgress()
     }
 
     fun progress(): Float {
@@ -49,67 +50,41 @@ interface CardProgress {
     fun isCompleted(): Boolean =
         currentLevel >= CardProgressTable.lastLevel
 
-    fun toMutableCardProgress(): MutableCardProgress =
-        MutableCardProgress(
-            currentLevel = currentLevel,
-            lastMistakeCount = lastMistakeCount,
-            lastLessonDate = lastLessonDate
+    fun withRightAnswer(timeSource: TimeSource) =
+        copy(
+            currentLevel = currentLevel + 1,
+            lastMistakeCount = 0,
+            lastLessonDate = getNewLastLessonDate(timeSource)
         )
 
-    fun toImmutableCardProgress(): ImmutableCardProgress =
-        if (this is ImmutableCardProgress) {
-            this
-        } else {
-            ImmutableCardProgress(
-                currentLevel = currentLevel,
-                lastMistakeCount = lastMistakeCount,
-                lastLessonDate = lastLessonDate
-            )
-        }
-}
-
-data class ImmutableCardProgress (
-    override val currentLevel: Int = 0,
-    override val lastMistakeCount: Int = 0,
-    override val lastLessonDate: Long = 0
-) : CardProgress
-
-data class MutableCardProgress(
-    override var currentLevel: Int = 0,
-    override var lastMistakeCount: Int = 0,
-    override var lastLessonDate: Long = 0
-) : CardProgress {
-
-    fun applyRightAnswer(timeSource: TimeSource) {
-        ++currentLevel
-        lastMistakeCount = 0
-
-        updateLastLessonDate(timeSource)
+    fun withWrongAnswer(timeSource: TimeSource): CardProgress {
+        val tooManyMistakes = lastMistakeCount + 1 >= 2
+        return copy(
+            currentLevel = if (tooManyMistakes && currentLevel > 0) {
+                currentLevel - 1
+            } else {
+                currentLevel
+            },
+            lastMistakeCount = if (tooManyMistakes) {
+                0
+            } else {
+                lastMistakeCount + 1
+            },
+            lastLessonDate = getNewLastLessonDate(timeSource)
+        )
     }
 
-    fun applyWrongAnswer(timeSource: TimeSource) {
-        ++lastMistakeCount
+//    private fun updateLastLessonDate(timeSource: TimeSource) {
+//        lastLessonDate = timeSource.getTimeInMilliseconds()
+//    }
 
-        if (lastMistakeCount >= 2) {
-            lastMistakeCount = 0
+    fun getNewLastLessonDate(timeSource: TimeSource) = timeSource.getTimeInMilliseconds()
 
-            if (currentLevel > 0) {
-                currentLevel--
-            }
-        }
-
-        updateLastLessonDate(timeSource)
-    }
-
-    private fun updateLastLessonDate(timeSource: TimeSource) {
-        lastLessonDate = timeSource.getTimeInMilliseconds()
-    }
-
-    fun set(progress: CardProgress) {
-        currentLevel = progress.currentLevel
-        lastMistakeCount = progress.lastMistakeCount
-        lastLessonDate = progress.lastLessonDate
-    }
+//    fun set(progress: CardProgress) {
+//        currentLevel = progress.currentLevel
+//        lastMistakeCount = progress.lastMistakeCount
+//        lastLessonDate = progress.lastLessonDate
+//    }
 }
 
 private object CardProgressTable {

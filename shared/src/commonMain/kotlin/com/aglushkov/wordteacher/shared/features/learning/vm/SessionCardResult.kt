@@ -7,6 +7,6 @@ import com.arkivanov.essenty.parcelable.Parcelize
 data class SessionCardResult(
     val cardId: Long,
     val oldProgress: Float,
-    var newProgress: Float = 0f,
-    var isRight: Boolean = false,
+    val newProgress: Float = 0f,
+    val isRight: Boolean = false,
 ) : Parcelable

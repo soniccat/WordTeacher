@@ -8,8 +8,6 @@ import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
-import com.aglushkov.wordteacher.shared.model.ImmutableCardSet
-import com.aglushkov.wordteacher.shared.model.MutableCard
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.UPDATE_DELAY
@@ -57,8 +55,9 @@ open class CardSetVMImpl(
     private val idGenerator: IdGenerator
 ): ViewModel(), CardSetVM {
 
+    // Contains cards being edited and haven't been synched with DB
     private var inMemoryCardSet = MutableStateFlow<CardSet?>(null)
-    final override val cardSet: StateFlow<Resource<out CardSet>> = combine(
+    final override val cardSet: StateFlow<Resource<CardSet>> = combine(
         repository.cardSet, inMemoryCardSet,
         transform = { cardSet, inMemoryCardSet ->
             if (inMemoryCardSet == null) {
@@ -104,21 +103,17 @@ open class CardSetVMImpl(
     private fun mergeCardSets(dbCardSet: CardSet, inMemoryCardSet: CardSet): CardSet {
         // replace db cards with in-memory cards
         Logger.v("merge cardSet $dbCardSet\n with $inMemoryCardSet")
-        return dbCardSet.toImmutableCardSet().let { cardSet ->
-            cardSet.copy(
-                cards = cardSet.cards.map {
-                    inMemoryCardSet.findCard(it.id) ?: it
-                }
-            )
-        }
+        return dbCardSet.copy(
+            cards = dbCardSet.cards.map {
+                inMemoryCardSet.findCard(it.id) ?: it
+            }
+        )
     }
 
     private fun makeViewItems(loadedCardSet: CardSet): List<BaseViewItem<*>>  {
         val result = mutableListOf<BaseViewItem<*>>()
 
         loadedCardSet.cards.onEach { card ->
-            val mutableCard = card.toMutableCard()
-
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
             cardViewItems += WordTitleViewItem(card.term, providers = emptyList())
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty())
@@ -150,7 +145,7 @@ open class CardSetVMImpl(
             }
 
             result += CardViewItem(
-                card = mutableCard,
+                cardId = card.id,
                 innerViewItems = cardViewItems
             )
 
@@ -188,112 +183,155 @@ open class CardSetVMImpl(
     }
 
     override fun onItemTextChanged(text: String, item: BaseViewItem<*>, cardId: Long) {
-        val cardSet = cardSet.value.data() ?: return
-        val card = findCard(cardId) ?: return
-        val mutableCard = obtainMutableCard(card, cardSet)
-
-        withMutableCard(cardId) {
-            var wasChanged = false
-
-            when (item) {
-                is WordTitleViewItem -> if (card.term != text) {
-                    mutableCard.term = text
-                    wasChanged = true
-                }
-                is WordTranscriptionViewItem -> if (card.transcription != text) {
-                    mutableCard.transcription = text
-                    wasChanged = true
-                }
-                is WordDefinitionViewItem -> card.definitions.getOrNull(item.index)?.let {
-                    if (it != text) {
-                        mutableCard.definitions[item.index] = text
-                        wasChanged = true
-                    }
-                }
-                is WordExampleViewItem -> card.examples.getOrNull(item.index)?.let {
-                    if (it != text) {
-                        mutableCard.examples[item.index] = text
-                        wasChanged = true
-                    }
-                }
-                is WordSynonymViewItem -> card.synonyms.getOrNull(item.index)?.let {
-                    if (it != text) {
-                        mutableCard.synonyms[item.index] = text
-                        wasChanged = true
-                    }
-                }
+        editCard(cardId) { card ->
+            val newCard = when (item) {
+                is WordTitleViewItem ->
+                    card.copy(
+                        term = if (card.term != text) {
+                            text
+                        } else {
+                            card.term
+                        }
+                    )
+                is WordTranscriptionViewItem ->
+                    card.copy(
+                        term = if (card.transcription != text) {
+                            text
+                        } else {
+                            card.transcription
+                        }
+                    )
+                is WordDefinitionViewItem ->
+                    card.copy(
+                        definitions = card.definitions.mapIndexed { index, s ->
+                            if (item.index == index) {
+                                text
+                            } else {
+                                s
+                            }
+                        }
+                    )
+                is WordExampleViewItem ->
+                    card.copy(
+                        examples = card.examples.mapIndexed { index, s ->
+                            if (item.index == index) {
+                                text
+                            } else {
+                                s
+                            }
+                        }
+                    )
+                is WordSynonymViewItem ->
+                    card.copy(
+                        synonyms = card.synonyms.mapIndexed { index, s ->
+                            if (item.index == index) {
+                                text
+                            } else {
+                                s
+                            }
+                        }
+                    )
+                else -> card
             }
 
-            if (wasChanged) {
-                updateCard(mutableCard)
+            if (newCard != card) {
+                updateCard(newCard)
             }
+            newCard
         }
     }
 
-//    private fun obtainMutableCardSet(cardSet: CardSet) =
-//        inMemoryCardSet.value ?: cardSet.toMutableCardSet().apply {
-//                cards = emptyList()
-//                inMemoryCardSet.value = this
-//            }
+    private fun editCard(cardId: Long, transform: (card: Card) -> Card) {
+        val cardSet = obtainInMemoryCardSet(cardId) ?: return
+        val newCardSet = cardSet.copy(
+            cards = cardSet.cards.map {
+                if (it.id == cardId) {
+                    transform(it)
+                } else {
+                    it
+                }
+            }
+        )
 
-//    private fun withMutableCard(cardId: Long, block: (card: MutableCard) -> Unit) {
-//        val cardSet = cardSet.value.data() ?: return
-//        val card = findCard(cardId) ?: return
-//        block(obtainMutableCard(card, cardSet))
-//    }
+        inMemoryCardSet.update {
+            newCardSet
+        }
+    }
 
-//    private fun obtainMutableCard(card: Card, cardSet: CardSet): MutableCard {
-//        val mutableCardSet = obtainMutableCardSet(cardSet)
-//        return mutableCardSet.findCard(card.id) ?: card.toMutableCard().apply {
-//            mutableCardSet.addCard(this)
-//        }
-//    }
+    private fun obtainInMemoryCardSet(cardId: Long): CardSet? {
+        val resultSet = inMemoryCardSet.value ?: cardSet.value.data()?.copy(cards = emptyList()) ?: return null
+        val inMemoryCard = inMemoryCardSet.value?.findCard(cardId)
+        val modifiedSet = if (inMemoryCard != null) {
+            resultSet
+        } else {
+            val cardSetCard = cardSet.value.data()?.findCard(cardId) ?: return null
+            resultSet.copy(
+                cards = resultSet.cards + cardSetCard
+            )
+        }
+
+        inMemoryCardSet.update { modifiedSet }
+        return modifiedSet
+    }
 
     override fun onAddDefinitionPressed(cardId: Long) =
-        withMutableCard(cardId) {
-            it.definitions += ""
-            updateCard(it, delay = 0)
+        editCard(cardId) {
+            it.copy(
+                definitions = if (it.definitions.lastOrNull() != "") {
+                    it.definitions + ""
+                } else {
+                    it.definitions
+                }
+            )
         }
 
     override fun onDefinitionRemoved(item: WordDefinitionViewItem, cardId: Long) =
-        withMutableCard(cardId) {
-            it.definitions.removeAt(item.index)
-            updateCard(it, delay = 0)
+        editCard(cardId) {
+            it.copy(
+                definitions = it.definitions.filterIndexed { i, _ -> i != item.index }
+            ).apply {
+                updateCard(this, delay = 0)
+            }
         }
 
     override fun onAddExamplePressed(cardId: Long) =
-        withMutableCard(cardId) {
-            it.examples += ""
-            updateCard(it, delay = 0)
+        editCard(cardId) {
+            it.copy(
+                examples = if (it.examples.lastOrNull() != "") {
+                    it.examples + ""
+                } else {
+                    it.examples
+                }
+            )
         }
 
-    override fun onExampleRemoved(item: WordExampleViewItem, cardId: Long) {
-        withMutableCard(cardId) {
-            it.examples.removeAt(item.index)
-            updateCard(it, delay = 0)
-        }
-    }
-
-    override fun onAddSynonymPressed(cardId: Long) {
-        if (findCard(cardId)?.synonyms?.lastOrNull() == "") {
-            return
+    override fun onExampleRemoved(item: WordExampleViewItem, cardId: Long) =
+        editCard(cardId) {
+            it.copy(
+                examples = it.examples.filterIndexed { i, _ -> i != item.index }
+            ).apply {
+                updateCard(this, delay = 0)
+            }
         }
 
-        inMemoryCardSet.update {
-            val resultCardset = inMemoryCardSet.value ?: cardSet.value.data()
-            resultCardset?.cop
+    override fun onAddSynonymPressed(cardId: Long) =
+        editCard(cardId) {
+            it.copy(
+                synonyms = if (it.synonyms.lastOrNull() != "") {
+                    it.synonyms + ""
+                } else {
+                    it.synonyms
+                }
+            )
         }
-
-//        withMutableCard(cardId) {
-//            it.synonyms += ""
-//            //updateCard(it, delay = 0)
-//        }
-    }
 
     override fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long) =
-        withMutableCard(cardId) {
-            it.synonyms.removeAt(item.index)
-            updateCard(it, delay = 0)
+        editCard(cardId) {
+            it.copy(
+                synonyms = it.synonyms.filterIndexed { i, _ -> i != item.index }
+            ).apply {
+                updateCard(this, delay = 0)
+            }
         }
 
     override fun onCardCreatePressed() {
@@ -314,8 +352,12 @@ open class CardSetVMImpl(
         viewModelScope.launch {
             try {
                 repository.updateCard(card, delay)
-                inMemoryCardSet.value?.removeCard(card)
-                inMemoryCardSet.update {  }
+//                inMemoryCardSet.value?.removeCard(card)
+                inMemoryCardSet.update {
+                    it?.copy(
+                        cards = it.cards.filter { c -> c.id != card.id }
+                    )
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
@@ -341,5 +383,5 @@ open class CardSetVMImpl(
     }
 
     private fun findCard(id: Long): Card? =
-        cardSet.value.data()?.findCard(id)
+        inMemoryCardSet.value?.findCard(id) ?: cardSet.value.data()?.findCard(id)
 }

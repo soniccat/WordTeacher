@@ -1,8 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardset.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.model.Card
-import com.aglushkov.wordteacher.shared.model.MutableCard
 
 class CreateCardViewItem(
 ): BaseViewItem<Unit>(Unit, Type, -1) {
@@ -12,9 +10,9 @@ class CreateCardViewItem(
 }
 
 class CardViewItem(
-    val card: MutableCard,
+    val cardId: Long,
     val innerViewItems: List<BaseViewItem<*>>
-): BaseViewItem<Card>(card, Type, card.id) {
+): BaseViewItem<Long>(cardId, Type, cardId) {
     companion object {
         const val Type = 701
     }

@@ -2,14 +2,13 @@ package com.aglushkov.wordteacher.shared.features.learning.vm
 
 import com.aglushkov.wordteacher.shared.general.extensions.takeWhileNonNull
 import com.aglushkov.wordteacher.shared.model.Card
-import com.aglushkov.wordteacher.shared.model.MutableCard
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class LearningSession(
-    private val cards: List<MutableCard>
+    private var cards: List<Card>
 ) {
     var results: List<SessionCardResult> = cards.map { card ->
         SessionCardResult(card.id, card.progress.progress())
@@ -18,10 +17,10 @@ class LearningSession(
 
     private var currentIndex = 0
 
-    private val currentCardStateFlow = MutableStateFlow<MutableCard?>(null)
-    val currentCard: MutableCard?
+    private val currentCardStateFlow = MutableStateFlow<Card?>(null)
+    val currentCard: Card?
         get() = currentCardStateFlow.value
-    val currentCardFlow: Flow<MutableCard>
+    val currentCardFlow: Flow<Card>
         get() = currentCardStateFlow.takeWhileNonNull()
 
     val size: Int
@@ -32,13 +31,15 @@ class LearningSession(
     }
 
     fun updateProgress(card: Card, isRight: Boolean) =
-        getCardResult(card.id)?.let { result ->
-            result.newProgress = card.progress.progress()
-            result.isRight = isRight
+        updateCardResult(card) { result ->
+            result.copy(
+                newProgress = card.progress.progress(),
+                isRight = isRight
+            )
         }
 
     fun switchToNextCard(): Card? {
-        var result: MutableCard? = null
+        var result: Card? = null
         ++currentIndex
 
         if (currentIndex < cards.size) {
@@ -49,8 +50,16 @@ class LearningSession(
         return result
     }
 
-    private fun getCardResult(cardId: Long) =
-        results.firstOrNull { it.cardId == cardId }
+    private fun updateCardResult(card: Card, transform: (SessionCardResult) -> SessionCardResult) {
+        cards = cards.map { if (it.id == card.id) card else it }
+        results = results.map { sessionCardResult ->
+            if (sessionCardResult.cardId == card.id) {
+                transform(sessionCardResult)
+            } else {
+                sessionCardResult
+            }
+        }
+    }
 
     fun rightAnsweredCards() =
         cards.filterIndexed { index, card ->

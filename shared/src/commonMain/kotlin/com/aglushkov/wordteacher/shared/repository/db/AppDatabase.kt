@@ -5,7 +5,6 @@ import com.aglushkov.wordteacher.cache.DBCard
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
 import com.aglushkov.wordteacher.shared.model.CardProgress
-import com.aglushkov.wordteacher.shared.model.ImmutableCardProgress
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.*
@@ -131,7 +130,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
         fun selectAll() = db.dBCardSetQueries.selectAll(mapper = ::ShortCardSet)
-        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id, mapper = ::ImmutableCardSet)
+        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id, mapper = ::CardSet)
         fun removeCardSet(cardSetId: Long) {
             db.transaction {
                 db.dBCardQueries.removeCardsBySetId(cardSetId)
@@ -166,9 +165,9 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             progressLevel: Int?,
             progressLastMistakeCount: Int?,
             progressLastLessonDate: Long?
-        ) -> ImmutableCard =
+        ) -> Card =
             { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
-                ImmutableCard(
+                Card(
                     id!!,
                     date!!,
                     term!!,
@@ -181,7 +180,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     transcription,
                     synonyms.orEmpty(),
                     examples.orEmpty(),
-                    progress = ImmutableCardProgress(
+                    progress = CardProgress(
                         progressLevel ?: 0,
                         progressLastMistakeCount ?: 0,
                         progressLastLessonDate ?: 0L
@@ -199,8 +198,8 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             synonyms: List<String> = mutableListOf(),
             examples: List<String> = mutableListOf(),
             progress: CardProgress = CardProgress.EMPTY
-        ): ImmutableCard {
-            var newCard = ImmutableCard(
+        ): Card {
+            var newCard = Card(
                 id = -1,
                 date = date,
                 term = term,
@@ -209,7 +208,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 transcription = transcription,
                 synonyms = synonyms,
                 examples = examples,
-                progress = progress.toImmutableCardProgress()
+                progress = progress
             )
 
             cards.insertCardInternal(setId, newCard)
@@ -217,7 +216,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             return newCard
         }
 
-        private fun insertCardInternal(setId: Long, newCard: ImmutableCard) {
+        private fun insertCardInternal(setId: Long, newCard: Card) {
             cards.insertCardInternal(
                 setId = setId,
                 date = newCard.date,
@@ -263,7 +262,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
 
         fun updateCard(
             card: Card
-        ) {
+        ): Card {
             updateCard(
                 cardId = card.id,
                 date = card.date,
@@ -277,6 +276,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 progressLastMistakeCount = card.progress.lastMistakeCount,
                 progressLastLessonDate = card.progress.lastLessonDate,
             )
+            return card
         }
 
         fun updateCard(
