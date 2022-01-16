@@ -417,10 +417,15 @@ fun WordDefinitionView(
 @Composable
 fun WordSubHeaderView(
     viewItem: WordSubHeaderViewItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
+        Text(
+            text = text,
+            style = ts
+        )
+    }
 ) {
-    Text(
-        text = viewItem.firstItem().resolveString(),
+    Row(
         modifier = Modifier
             .then(modifier)
             .padding(
@@ -428,8 +433,9 @@ fun WordSubHeaderView(
                 end = dimensionResource(id = R.dimen.word_horizontalPadding),
                 top = dimensionResource(id = R.dimen.word_subHeader_topMargin)
             ),
-        style = AppTypography.wordDefinitionSubHeader
-    )
+    ) {
+        textContent(viewItem.firstItem().resolveString(), AppTypography.wordDefinitionSubHeader)
+    }
 }
 
 @Composable

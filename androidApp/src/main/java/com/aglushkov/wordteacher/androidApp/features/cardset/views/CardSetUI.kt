@@ -3,7 +3,6 @@ package com.aglushkov.wordteacher.androidApp.features.cardset.views
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -26,7 +24,6 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardViewItem
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.model.Card
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -165,7 +162,24 @@ private fun CardView(
                                 }
                             )
                         }
-                    is WordSubHeaderViewItem -> WordSubHeaderView(item)
+                    is WordSubHeaderViewItem -> WordSubHeaderView(
+                        item,
+                        textContent = { text, ts ->
+                            Text(
+                                text = text,
+                                style = ts,
+                                modifier = Modifier.weight(1.0f),
+                            )
+                            if (item.isOnlyHeader) {
+                                AddIcon {
+                                    when (item.contentType) {
+                                        WordSubHeaderViewItem.ContentType.SYNONYMS -> vm.onAddSynonymPressed(cardId)
+                                        WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(cardId)
+                                    }
+                                }
+                            }
+                        }
+                    )
                     is WordSynonymViewItem -> DeletableCell(
                         stateKey = item.id,
                         onClick = { /*TODO*/ },

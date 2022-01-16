@@ -51,6 +51,8 @@ class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE, val
     }
 }
 
+// TODO: consider to merge WordExampleViewItem and WordSynonymViewItem into sth more general like WordSubHeaderViewItem
+// for example WordListValue
 class WordSynonymViewItem(synonym: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false): BaseViewItem<String>(synonym, Type) {
     companion object {
         const val Type = 106
@@ -63,9 +65,20 @@ class WordHeaderViewItem(name: StringDesc): BaseViewItem<StringDesc>(name, Type)
     }
 }
 
-class WordSubHeaderViewItem(name: StringDesc, val indent: Indent = Indent.NONE): BaseViewItem<StringDesc>(name, Type) {
+class WordSubHeaderViewItem(
+    name: StringDesc,
+    val indent: Indent = Indent.NONE,
+    val isOnlyHeader: Boolean = false,
+    val contentType: ContentType = ContentType.UNKNOWN
+): BaseViewItem<StringDesc>(name, Type) {
     companion object {
         const val Type = 108
+    }
+
+    enum class ContentType {
+        UNKNOWN,
+        SYNONYMS,
+        EXAMPLES
     }
 }
 

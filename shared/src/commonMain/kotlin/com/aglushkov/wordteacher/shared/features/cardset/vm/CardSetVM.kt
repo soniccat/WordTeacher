@@ -126,7 +126,9 @@ open class CardSetVMImpl(
             // Examples
             cardViewItems += WordSubHeaderViewItem(
                 StringDesc.Resource(MR.strings.word_section_examples),
-                Indent.SMALL
+                Indent.SMALL,
+                isOnlyHeader = card.examples.isEmpty(),
+                contentType = WordSubHeaderViewItem.ContentType.EXAMPLES
             )
 
             card.examples.onEachIndexed { index, example ->
@@ -136,7 +138,9 @@ open class CardSetVMImpl(
             // Synonyms
             cardViewItems += WordSubHeaderViewItem(
                 StringDesc.Resource(MR.strings.word_section_synonyms),
-                Indent.SMALL
+                Indent.SMALL,
+                isOnlyHeader = card.synonyms.isEmpty(),
+                contentType = WordSubHeaderViewItem.ContentType.SYNONYMS
             )
 
             card.synonyms.onEachIndexed { index, synonym ->
