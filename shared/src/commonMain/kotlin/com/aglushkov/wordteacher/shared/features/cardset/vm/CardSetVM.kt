@@ -69,7 +69,9 @@ open class CardSetVMImpl(
                             cardSet.data,
                             inMemoryCardSet
                         )
-                    )
+                    ).also {
+                        pruneInMemoryCardSet(cardSet.data)
+                    }
                     else -> cardSet
                 }
             }
@@ -103,11 +105,23 @@ open class CardSetVMImpl(
     private fun mergeCardSets(dbCardSet: CardSet, inMemoryCardSet: CardSet): CardSet {
         // replace db cards with in-memory cards
         Logger.v("merge cardSet $dbCardSet\n with $inMemoryCardSet")
+
         return dbCardSet.copy(
             cards = dbCardSet.cards.map {
                 inMemoryCardSet.findCard(it.id) ?: it
             }
         )
+    }
+
+    private fun pruneInMemoryCardSet(dbCardSet: CardSet) {
+        // remove equal sets from inMemoryCardSet
+        inMemoryCardSet.update {
+            it?.copy(
+                cards = it.cards.filter { inMemoryCard ->
+                    dbCardSet.findCard(inMemoryCard.id) != inMemoryCard
+                }
+            )
+        }
     }
 
     private fun makeViewItems(loadedCardSet: CardSet): List<BaseViewItem<*>>  {
@@ -119,8 +133,12 @@ open class CardSetVMImpl(
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty())
             cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc())
 
-            card.definitions.onEachIndexed { index, def ->
-                cardViewItems += WordDefinitionViewItem(def, index = index, isLast = index == card.definitions.size - 1)
+            if (card.definitions.isEmpty()) {
+                cardViewItems += WordDefinitionViewItem("", index = 0, isLast = true)
+            } else {
+                card.definitions.onEachIndexed { index, def ->
+                    cardViewItems += WordDefinitionViewItem(def, index = index, isLast = index == card.definitions.size - 1)
+                }
             }
 
             // Examples
@@ -205,16 +223,21 @@ open class CardSetVMImpl(
                             card.transcription
                         }
                     )
-                is WordDefinitionViewItem ->
+                is WordDefinitionViewItem -> {
                     card.copy(
-                        definitions = card.definitions.mapIndexed { index, s ->
-                            if (item.index == index) {
-                                text
-                            } else {
-                                s
+                        definitions = if (card.definitions.isEmpty()) {
+                            listOf(text)
+                        } else {
+                            card.definitions.mapIndexed { index, s ->
+                                if (item.index == index) {
+                                    text
+                                } else {
+                                    s
+                                }
                             }
                         }
                     )
+                }
                 is WordExampleViewItem ->
                     card.copy(
                         examples = card.examples.mapIndexed { index, s ->
@@ -247,18 +270,16 @@ open class CardSetVMImpl(
 
     private fun editCard(cardId: Long, transform: (card: Card) -> Card) {
         val cardSet = obtainInMemoryCardSet(cardId) ?: return
-        val newCardSet = cardSet.copy(
-            cards = cardSet.cards.map {
-                if (it.id == cardId) {
-                    transform(it)
-                } else {
-                    it
-                }
-            }
-        )
-
         inMemoryCardSet.update {
-            newCardSet
+            cardSet.copy(
+                cards = cardSet.cards.map {
+                    if (it.id == cardId) {
+                        transform(it)
+                    } else {
+                        it
+                    }
+                }
+            )
         }
     }
 
@@ -292,7 +313,11 @@ open class CardSetVMImpl(
     override fun onDefinitionRemoved(item: WordDefinitionViewItem, cardId: Long) =
         editCard(cardId) {
             it.copy(
-                definitions = it.definitions.filterIndexed { i, _ -> i != item.index }
+                definitions = if (it.definitions.size <= 1) {
+                    listOf("")
+                } else {
+                    it.definitions.filterIndexed { i, _ -> i != item.index }
+                }
             ).apply {
                 updateCard(this, delay = 0)
             }
@@ -356,12 +381,6 @@ open class CardSetVMImpl(
         viewModelScope.launch {
             try {
                 repository.updateCard(card, delay)
-//                inMemoryCardSet.value?.removeCard(card)
-                inMemoryCardSet.update {
-                    it?.copy(
-                        cards = it.cards.filter { c -> c.id != card.id }
-                    )
-                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {

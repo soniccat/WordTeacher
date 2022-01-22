@@ -137,31 +137,17 @@ private fun CardView(
                         )
                     }
                     is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item)
-                    is WordDefinitionViewItem -> DeletableCell(
+                    is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
+                        CardSetDefinitionView(item, cardId, vm)
+                    } else {
+                        DeletableCell(
                             stateKey = item.id,
                             onClick = { /*TODO*/ },
                             onDeleted = { vm.onDefinitionRemoved(item, cardId) }
                         ) {
-                            WordDefinitionView(
-                                item,
-                                textContent = { text, textStyle ->
-                                    CardTextField(
-                                        modifier = Modifier.weight(1.0f),
-                                        text,
-                                        textStyle,
-                                        item,
-                                        cardId,
-                                        vm
-                                    )
-
-                                    if (item.isLast) {
-                                        AddIcon {
-                                            vm.onAddDefinitionPressed(cardId)
-                                        }
-                                    }
-                                }
-                            )
+                            CardSetDefinitionView(item, cardId, vm)
                         }
+                    }
                     is WordSubHeaderViewItem -> WordSubHeaderView(
                         item,
                         textContent = { text, ts ->
@@ -234,6 +220,33 @@ private fun CardView(
             }
         }
     }
+}
+
+@Composable
+private fun CardSetDefinitionView(
+    item: WordDefinitionViewItem,
+    cardId: Long,
+    vm: CardSetVM
+) {
+    WordDefinitionView(
+        item,
+        textContent = { text, textStyle ->
+            CardTextField(
+                modifier = Modifier.weight(1.0f),
+                text,
+                textStyle,
+                item,
+                cardId,
+                vm
+            )
+
+            if (item.isLast) {
+                AddIcon {
+                    vm.onAddDefinitionPressed(cardId)
+                }
+            }
+        }
+    )
 }
 
 @Composable
