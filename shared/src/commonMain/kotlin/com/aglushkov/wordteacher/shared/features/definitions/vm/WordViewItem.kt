@@ -28,7 +28,10 @@ class WordTranscriptionViewItem(transcription: String): BaseViewItem<String>(tra
     }
 }
 
-class WordPartOfSpeechViewItem(partOfSpeech: StringDesc): BaseViewItem<StringDesc>(partOfSpeech, Type) {
+class WordPartOfSpeechViewItem(
+    partOfSpeechString: StringDesc,
+    val partOfSpeech: WordTeacherWord.PartOfSpeech
+): BaseViewItem<StringDesc>(partOfSpeechString, Type) {
     companion object {
         const val Type = 103
     }

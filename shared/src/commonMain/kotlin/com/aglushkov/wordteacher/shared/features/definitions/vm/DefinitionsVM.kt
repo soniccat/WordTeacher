@@ -286,7 +286,7 @@ open class DefinitionsVMImpl(
         for (partOfSpeech in word.definitions.keys.filter {
             partsOfSpeechFilter.isEmpty() || partsOfSpeechFilter.contains(it)
         }) {
-            items.add(WordPartOfSpeechViewItem(partOfSpeech.toStringDesc()))
+            items.add(WordPartOfSpeechViewItem(partOfSpeech.toStringDesc(), partOfSpeech))
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
                 for (d in def.definitions) {

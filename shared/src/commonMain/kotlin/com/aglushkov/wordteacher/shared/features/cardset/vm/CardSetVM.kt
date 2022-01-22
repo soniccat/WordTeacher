@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.UPDATE_DELAY
@@ -29,6 +30,7 @@ interface CardSetVM {
 
     fun onCardCreatePressed()
     fun onCardDeleted(cardId: Long)
+    fun onPartOfSpeechChanged(newPartOfSpeech: WordTeacherWord.PartOfSpeech, cardId: Long)
     fun onItemTextChanged(text: String, item: BaseViewItem<*>, cardId: Long)
     fun onAddDefinitionPressed(cardId: Long)
     fun onDefinitionRemoved(item: WordDefinitionViewItem, cardId: Long)
@@ -131,7 +133,7 @@ open class CardSetVMImpl(
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
             cardViewItems += WordTitleViewItem(card.term, providers = emptyList())
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty())
-            cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc())
+            cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech)
 
             if (card.definitions.isEmpty()) {
                 cardViewItems += WordDefinitionViewItem("", index = 0, isLast = true)
@@ -376,6 +378,15 @@ open class CardSetVMImpl(
             }
         }
     }
+
+    override fun onPartOfSpeechChanged(newPartOfSpeech: WordTeacherWord.PartOfSpeech, cardId: Long) =
+        editCard(cardId) {
+            it.copy(
+                partOfSpeech = newPartOfSpeech
+            ).apply {
+                updateCard(this)
+            }
+        }
 
     private fun updateCard(card: Card, delay: Long = UPDATE_DELAY) {
         viewModelScope.launch {

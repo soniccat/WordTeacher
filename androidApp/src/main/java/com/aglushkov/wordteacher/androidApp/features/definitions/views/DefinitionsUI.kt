@@ -514,7 +514,7 @@ private fun DefinitionsUIPreviewWithResponse() {
                             providers = listOf(Config.Type.Yandex, Config.Type.Google, Config.Type.OwlBot)
                         ),
                         WordTranscriptionViewItem("[omg]"),
-                        WordPartOfSpeechViewItem(StringDesc.Raw("Noun")),
+                        WordPartOfSpeechViewItem(StringDesc.Raw("Noun"), WordTeacherWord.PartOfSpeech.Noun),
                         WordDefinitionViewItem("* definition 1"),
                         WordDefinitionViewItem("* definition 2"),
                         WordSynonymViewItem("synonym 1", Indent.NONE),

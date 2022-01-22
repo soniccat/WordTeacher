@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.androidApp.features.cardset.views
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,8 +23,12 @@ import com.aglushkov.wordteacher.androidApp.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardViewItem
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.model.toStringDesc
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -136,7 +141,16 @@ private fun CardView(
                             }
                         )
                     }
-                    is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item)
+                    is WordPartOfSpeechViewItem -> PartOfSpeechSelectPopup(
+                        vm,
+                        item,
+                        cardId
+                    ) { onClicked ->
+                        WordPartOfSpeechView(
+                            item,
+                            modifier = Modifier.clickable(onClick = onClicked)
+                        )
+                    }
                     is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
                         CardSetDefinitionView(item, cardId, vm)
                     } else {
@@ -289,6 +303,36 @@ private fun CreateCardView(
                 contentDescription = null,
                 tint = MaterialTheme.colors.secondary
             )
+        }
+    }
+}
+
+@Composable
+private fun PartOfSpeechSelectPopup(
+    vm: CardSetVM,
+    item: WordPartOfSpeechViewItem,
+    cardId: Long,
+    content: @Composable (onClicked: () -> Unit) -> Unit
+) {
+    Box {
+        var expanded by remember { mutableStateOf(false) }
+        content { expanded = true }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            WordTeacherWord.PartOfSpeech.values()
+                .filter { it != item.partOfSpeech }
+                .onEach {
+                    DropdownMenuItem(
+                        onClick = {
+                            expanded = false
+                            vm.onPartOfSpeechChanged(it, cardId)
+                        }
+                    ) {
+                        Text(it.toStringDesc().resolveString())
+                    }
+                }
         }
     }
 }

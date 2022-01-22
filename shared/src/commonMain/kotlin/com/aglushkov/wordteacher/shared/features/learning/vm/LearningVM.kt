@@ -143,7 +143,7 @@ open class LearningVMImpl(
 
     private fun buildCardItem(card: Card): List<BaseViewItem<*>> {
         val viewItems = mutableListOf(
-            WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc()),
+            WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech),
             *card.definitions.map { def ->
                 WordDefinitionViewItem(definition = def.replace(card.term, TERM_REPLACEMENT))
             }.toTypedArray(),
