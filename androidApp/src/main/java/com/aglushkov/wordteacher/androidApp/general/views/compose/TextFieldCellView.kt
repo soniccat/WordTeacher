@@ -111,6 +111,8 @@ fun InlineTextField(
     value: TextFieldValue,
     placeholder: String,
     textStyle: TextStyle,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     onValueChange: (TextFieldValue) -> Unit,
 ) {
     BasicTextField(
@@ -118,6 +120,8 @@ fun InlineTextField(
         onValueChange = onValueChange,
         modifier = modifier,
         textStyle = textStyle,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         decorationBox = @Composable { coreTextField ->
             Box(
                 contentAlignment = Alignment.CenterStart

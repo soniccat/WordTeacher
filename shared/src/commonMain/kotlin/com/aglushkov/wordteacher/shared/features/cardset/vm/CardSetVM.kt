@@ -219,7 +219,7 @@ open class CardSetVMImpl(
                     )
                 is WordTranscriptionViewItem ->
                     card.copy(
-                        term = if (card.transcription != text) {
+                        transcription = if (card.transcription != text) {
                             text
                         } else {
                             card.transcription

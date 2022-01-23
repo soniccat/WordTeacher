@@ -4,16 +4,26 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
@@ -23,12 +33,13 @@ import com.aglushkov.wordteacher.androidApp.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardViewItem
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
-import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -68,7 +79,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 )
             ) {
                 items(data, key = { it.id }) { item ->
-                    CardSetViewItems(Modifier.animateItemPlacement(), item, vm)
+                    CardSetViewItems(Modifier.animateItemPlacement(), item, vm, coroutineScope)
                 }
             }
         } else {
@@ -88,9 +99,10 @@ fun CardSetViewItems(
     modifier: Modifier,
     itemView: BaseViewItem<*>,
     vm: CardSetVM,
+    coroutineScope: CoroutineScope
 ) {
     when(val item = itemView) {
-        is CardViewItem -> CardView(item, vm)
+        is CardViewItem -> CardView(item, vm, coroutineScope)
         is CreateCardViewItem -> CreateCardView(
             item,
             modifier,
@@ -112,8 +124,10 @@ fun CardSetViewItems(
 @Composable
 private fun CardView(
     cardItem: CardViewItem,
-    vm: CardSetVM
+    vm: CardSetVM,
+    coroutineScope: CoroutineScope
 ) {
+    val focusManager = LocalFocusManager.current
     val cardId = cardItem.cardId
     DeletableCell(
         stateKey = cardItem.id,
@@ -129,7 +143,14 @@ private fun CardView(
                         WordTitleView(
                             viewItem = item,
                             textContent = { text, textStyle ->
-                                CardTextField(Modifier, text, textStyle, item, cardId, vm)
+                                CardTextField(
+                                    Modifier,
+                                    text,
+                                    textStyle,
+                                    item,
+                                    cardId,
+                                    vm,
+                                )
                             }
                         )
                     }
@@ -137,7 +158,14 @@ private fun CardView(
                         WordTranscriptionView(
                             item,
                             textContent = { text, textStyle ->
-                                CardTextField(Modifier, text, textStyle, item, cardId, vm)
+                                CardTextField(
+                                    Modifier,
+                                    text,
+                                    textStyle,
+                                    item,
+                                    cardId,
+                                    vm,
+                                )
                             }
                         )
                     }
@@ -148,18 +176,20 @@ private fun CardView(
                     ) { onClicked ->
                         WordPartOfSpeechView(
                             item,
-                            modifier = Modifier.clickable(onClick = onClicked)
+                            modifier = Modifier
+                                .clickable(onClick = onClicked)
+                                .focusable(false)
                         )
                     }
                     is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
-                        CardSetDefinitionView(item, cardId, vm)
+                        CardSetDefinitionView(item, cardId, vm, coroutineScope)
                     } else {
                         DeletableCell(
                             stateKey = item.id,
                             onClick = { /*TODO*/ },
                             onDeleted = { vm.onDefinitionRemoved(item, cardId) }
                         ) {
-                            CardSetDefinitionView(item, cardId, vm)
+                            CardSetDefinitionView(item, cardId, vm, coroutineScope)
                         }
                     }
                     is WordSubHeaderViewItem -> WordSubHeaderView(
@@ -176,6 +206,8 @@ private fun CardView(
                                         WordSubHeaderViewItem.ContentType.SYNONYMS -> vm.onAddSynonymPressed(cardId)
                                         WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(cardId)
                                     }
+
+                                    moveFocusDownAfterRecompose(coroutineScope, focusManager)
                                 }
                             }
                         }
@@ -200,6 +232,7 @@ private fun CardView(
                                 if (item.isLast) {
                                     AddIcon {
                                         vm.onAddSynonymPressed(cardId)
+                                        moveFocusDownAfterRecompose(coroutineScope, focusManager)
                                     }
                                 }
                             }
@@ -225,6 +258,7 @@ private fun CardView(
                                 if (item.isLast) {
                                     AddIcon {
                                         vm.onAddExamplePressed(cardId)
+                                        moveFocusDownAfterRecompose(coroutineScope, focusManager)
                                     }
                                 }
                             }
@@ -240,8 +274,10 @@ private fun CardView(
 private fun CardSetDefinitionView(
     item: WordDefinitionViewItem,
     cardId: Long,
-    vm: CardSetVM
+    vm: CardSetVM,
+    coroutineScope: CoroutineScope
 ) {
+    val focusManager = LocalFocusManager.current
     WordDefinitionView(
         item,
         textContent = { text, textStyle ->
@@ -251,16 +287,27 @@ private fun CardSetDefinitionView(
                 textStyle,
                 item,
                 cardId,
-                vm
+                vm,
             )
 
             if (item.isLast) {
                 AddIcon {
                     vm.onAddDefinitionPressed(cardId)
+                    moveFocusDownAfterRecompose(coroutineScope, focusManager)
                 }
             }
         }
     )
+}
+
+private fun moveFocusDownAfterRecompose(
+    scope: CoroutineScope,
+    focusManager: FocusManager
+) {
+    scope.launch {
+        delay(100) // TODO: hack to wait until a new cell is rendered
+        focusManager.moveFocus(FocusDirection.Down)
+    }
 }
 
 @Composable
@@ -272,12 +319,19 @@ private fun CardTextField(
     cardId: Long,
     vm: CardSetVM
 ) {
+    val focusManager = LocalFocusManager.current
     var textState by remember { mutableStateOf(TextFieldValue(text)) }
     InlineTextField(
         modifier = modifier,
         value = textState,
         placeholder = vm.getPlaceholder(item)?.toString(LocalContext.current).orEmpty(),
         textStyle = textStyle,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(
+            onNext = {
+                focusManager.moveFocus(FocusDirection.Down)
+            }
+        ),
         onValueChange = {
             textState = it
             vm.onItemTextChanged(it.text, item, cardId)
