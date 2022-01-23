@@ -16,7 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalContext
@@ -192,36 +194,46 @@ private fun CardView(
                             CardSetDefinitionView(item, cardId, vm, coroutineScope)
                         }
                     }
-                    is WordSubHeaderViewItem -> WordSubHeaderView(
-                        item,
-                        textContent = { text, ts ->
-                            Text(
-                                text = text,
-                                style = ts,
-                                modifier = Modifier.weight(1.0f),
-                            )
-                            if (item.isOnlyHeader) {
-                                AddIcon {
-                                    when (item.contentType) {
-                                        WordSubHeaderViewItem.ContentType.SYNONYMS -> vm.onAddSynonymPressed(cardId)
-                                        WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(cardId)
-                                    }
+                    is WordSubHeaderViewItem -> {
+                        val focusRequester = remember { FocusRequester() }
+                        WordSubHeaderView(
+                            item,
+                            modifier = Modifier.focusRequester(focusRequester),
+                            textContent = { text, ts ->
+                                Text(
+                                    text = text,
+                                    style = ts,
+                                    modifier = Modifier.weight(1.0f),
+                                )
+                                if (item.isOnlyHeader) {
+                                    AddIcon {
+                                        when (item.contentType) {
+                                            WordSubHeaderViewItem.ContentType.SYNONYMS -> vm.onAddSynonymPressed(
+                                                cardId
+                                            )
+                                            WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(
+                                                cardId
+                                            )
+                                        }
 
-                                    moveFocusDownAfterRecompose(coroutineScope, focusManager)
+                                        moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                     is WordSynonymViewItem -> DeletableCell(
                         stateKey = item.id,
                         onClick = { /*TODO*/ },
                         onDeleted = { vm.onSynonymRemoved(item, cardId) }
                     ) {
+                        val focusRequester = remember { FocusRequester() }
                         WordSynonymView(
                             item,
                             textContent = { text, textStyle ->
                                 CardTextField(
-                                    modifier = Modifier.weight(1.0f),
+                                    modifier = Modifier.weight(1.0f)
+                                        .focusRequester(focusRequester),
                                     text,
                                     textStyle,
                                     item,
@@ -232,7 +244,7 @@ private fun CardView(
                                 if (item.isLast) {
                                     AddIcon {
                                         vm.onAddSynonymPressed(cardId)
-                                        moveFocusDownAfterRecompose(coroutineScope, focusManager)
+                                        moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
                                     }
                                 }
                             }
@@ -243,11 +255,13 @@ private fun CardView(
                         onClick = { /*TODO*/ },
                         onDeleted = { vm.onExampleRemoved(item, cardId) }
                     ) {
+                        val focusRequester = remember { FocusRequester() }
                         WordExampleView(
                             item,
                             textContent = { text, textStyle ->
                                 CardTextField(
-                                    modifier = Modifier.weight(1.0f),
+                                    modifier = Modifier.weight(1.0f)
+                                        .focusRequester(focusRequester),
                                     text,
                                     textStyle,
                                     item,
@@ -258,7 +272,7 @@ private fun CardView(
                                 if (item.isLast) {
                                     AddIcon {
                                         vm.onAddExamplePressed(cardId)
-                                        moveFocusDownAfterRecompose(coroutineScope, focusManager)
+                                        moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
                                     }
                                 }
                             }
@@ -277,12 +291,14 @@ private fun CardSetDefinitionView(
     vm: CardSetVM,
     coroutineScope: CoroutineScope
 ) {
+    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     WordDefinitionView(
         item,
         textContent = { text, textStyle ->
             CardTextField(
-                modifier = Modifier.weight(1.0f),
+                modifier = Modifier.weight(1.0f)
+                    .focusRequester(focusRequester),
                 text,
                 textStyle,
                 item,
@@ -293,7 +309,7 @@ private fun CardSetDefinitionView(
             if (item.isLast) {
                 AddIcon {
                     vm.onAddDefinitionPressed(cardId)
-                    moveFocusDownAfterRecompose(coroutineScope, focusManager)
+                    moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
                 }
             }
         }
@@ -302,8 +318,10 @@ private fun CardSetDefinitionView(
 
 private fun moveFocusDownAfterRecompose(
     scope: CoroutineScope,
+    focusRequester: FocusRequester,
     focusManager: FocusManager
 ) {
+    focusRequester.requestFocus()
     scope.launch {
         delay(100) // TODO: hack to wait until a new cell is rendered
         focusManager.moveFocus(FocusDirection.Down)
