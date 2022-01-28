@@ -23,6 +23,7 @@ import opennlp.tools.sentdetect.SentenceModel
 import opennlp.tools.tokenize.TokenizerME
 import opennlp.tools.tokenize.TokenizerModel
 import opennlp.tools.util.Span
+import opennlp.tools.util.normalizer.EmojiCharSequenceNormalizer
 
 actual class NLPCore(
     private val resources: Resources,
@@ -58,7 +59,9 @@ actual class NLPCore(
     actual fun sentenceSpans(text: String): List<SentenceSpan> = sentenceDetector?.sentPosDetect(text).orEmpty().map {
         SentenceSpan(it.start, it. end)
     }
-    actual fun tokenSpans(sentence: String) = tokenizer?.tokenizePos(sentence).orEmpty().asList().map {
+    actual fun tokenSpans(sentence: String) = tokenizer?.tokenizePos(
+        EmojiCharSequenceNormalizer.getInstance().normalize(sentence).toString()
+    ).orEmpty().asList().map {
         createTokenSpan(it)
     }
     actual fun tag(tokens: List<String>) = tagger?.tag(tokens.toTypedArray()).orEmpty().asList()

@@ -58,6 +58,7 @@ fun ArticleUI(
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val article by vm.article.collectAsState()
     val paragraphs by vm.paragraphs.collectAsState()
     val data = paragraphs.data()
 
@@ -73,7 +74,7 @@ fun ArticleUI(
         ) {
             TopAppBar(
                 title = {
-                    Text(stringResource(id = R.string.add_article_title))
+                    Text(article.data()?.name ?: "")
                 },
                 navigationIcon = {
                     IconButton(
