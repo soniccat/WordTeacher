@@ -153,7 +153,11 @@ open class ArticleVMImpl(
                 ParagraphViewItem(
                     idGenerator.nextId(),
                     sentences = article.data.sentences.split(paragraph),
-                    annotations = annotations.split(paragraph)
+                    annotations = if (annotations.isNotEmpty()) {
+                        annotations.split(paragraph)
+                    } else {
+                        emptyList()
+                    }
                 )
             )
         }

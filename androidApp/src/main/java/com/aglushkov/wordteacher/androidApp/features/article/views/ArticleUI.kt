@@ -158,7 +158,14 @@ private fun ArticleParagraphView(
             paragraphViewItem.items.forEachIndexed { index, sentence ->
                 val annotationStartIndex = this.length
                 append(sentence.text)
-                addAnnotations(annotationStartIndex, paragraphViewItem.annotations[index])
+                addAnnotations(
+                    annotationStartIndex,
+                    if (paragraphViewItem.annotations.isNotEmpty()) {
+                        paragraphViewItem.annotations[index]
+                    } else {
+                        emptyList()
+                    }
+                )
 
                 append(SENTENCE_CONNECTOR)
             }
