@@ -2,14 +2,12 @@ package com.aglushkov.wordteacher.androidApp.features.article.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -19,22 +17,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.unit.*
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
-import com.aglushkov.wordteacher.androidApp.compose.shapes
 import com.aglushkov.wordteacher.androidApp.features.article.blueprints.*
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.BottomSheet
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.BottomSheetStates
@@ -42,10 +32,11 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.views.Definitio
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.HandleUI
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import kotlinx.coroutines.launch
 
@@ -164,10 +155,10 @@ private fun ArticleParagraphView(
         withStyle(
             style = ParagraphStyle()
         ) {
-            paragraphViewItem.items.forEach { sentence ->
+            paragraphViewItem.items.forEachIndexed { index, sentence ->
                 val annotationStartIndex = this.length
                 append(sentence.text)
-                addAnnotations(annotationStartIndex, sentence)
+                addAnnotations(annotationStartIndex, paragraphViewItem.annotations[index])
 
                 append(SENTENCE_CONNECTOR)
             }
@@ -262,33 +253,61 @@ private fun findSentence(viewItem: ParagraphViewItem, index: Int): Pair<NLPSente
     }
 }
 
-@Composable
 private fun AnnotatedString.Builder.addAnnotations(
-    annotationStartIndex: Int,
-    sentence: NLPSentence
+    annotationSentenceStartIndex: Int,
+    annotations: List<ArticleAnnotation>
 ) {
-    val tagEnums = sentence.tagEnums()
-    val tokenSpans = sentence.tokenSpans
-    tokenSpans.forEachIndexed { index, tokenSpan ->
-        val tag = tagEnums[index]
-        when {
-//            tag.isAdj() ->
-//                addStringAnnotation(
-//                    ROUNDED_ANNOTATION_KEY,
-//                    ROUNDED_ANNOTATION_VALUE_ADJECTIVE,
-//                    annotationStartIndex + tokenSpan.start,
-//                    annotationStartIndex + tokenSpan.end
-//                )
-            tag.isAdverb() ->
+    annotations.onEach { annotation ->
+        when (annotation) {
+            is ArticleAnnotation.LearnProgress -> {
                 addStringAnnotation(
                     ROUNDED_ANNOTATION_KEY,
-                    ROUNDED_ANNOTATION_VALUE_ADVERB,
-                    annotationStartIndex + tokenSpan.start,
-                    annotationStartIndex + tokenSpan.end
+                    ROUNDED_ANNOTATION_PROGRESS_VALUE_PREFIX + annotation.learnLevel,
+                    annotationSentenceStartIndex + annotation.start,
+                    annotationSentenceStartIndex + annotation.end
                 )
+            }
+            is ArticleAnnotation.PartOfSpeech -> {
+                if (annotation.partOfSpeech == WordTeacherWord.PartOfSpeech.Adverb) {
+                    addStringAnnotation(
+                        ROUNDED_ANNOTATION_KEY,
+                        ROUNDED_ANNOTATION_VALUE_ADVERB,
+                        annotationSentenceStartIndex + annotation.start,
+                        annotationSentenceStartIndex + annotation.end
+                    )
+                }
+            }
         }
     }
 }
+
+//@Composable
+//private fun AnnotatedString.Builder.addAnnotations(
+//    annotationStartIndex: Int,
+//    sentence: NLPSentence
+//) {
+//    val tagEnums = sentence.tagEnums()
+//    val tokenSpans = sentence.tokenSpans
+//    tokenSpans.forEachIndexed { index, tokenSpan ->
+//        val tag = tagEnums[index]
+//        when {
+////            tag.isAdj() ->
+////                addStringAnnotation(
+////                    ROUNDED_ANNOTATION_KEY,
+////                    ROUNDED_ANNOTATION_VALUE_ADJECTIVE,
+////                    annotationStartIndex + tokenSpan.start,
+////                    annotationStartIndex + tokenSpan.end
+////                )
+//            tag.isAdverb() ->
+//                addStringAnnotation(
+//                    ROUNDED_ANNOTATION_KEY,
+//                    ROUNDED_ANNOTATION_VALUE_ADVERB,
+//                    annotationStartIndex + tokenSpan.start,
+//                    annotationStartIndex + tokenSpan.end
+//                )
+//        }
+//    }
+//}
 
 //@Composable
 private fun DrawScope.drawAnnotation(

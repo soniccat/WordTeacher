@@ -29,10 +29,10 @@ class CardSetRepository(
         loadJob = scope.launch(Dispatchers.Default) {
             combine(
                 flow = database.cardSets.selectCardSet(id).asFlow().map {
-                    tryInResource { it.executeAsOne() }
+                    tryInResource(canTryAgain = true) { it.executeAsOne() }
                 },
                 flow2 = database.cards.selectCards(id).asFlow().map {
-                    tryInResource { it.executeAsList() }
+                    tryInResource(canTryAgain = true) { it.executeAsList() }
                 },
                 transform = { cardSetRes, cardsRes ->
                     cardSetRes.merge(cardsRes) { cardSet, cards ->

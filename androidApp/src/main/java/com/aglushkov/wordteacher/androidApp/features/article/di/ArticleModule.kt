@@ -22,6 +22,7 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -46,12 +47,14 @@ class ArticleModule {
         definitionsVM: DefinitionsAndroidVM,
         routerResolver: RouterResolver,
         articlesRepository: ArticleRepository,
+        cardsRepository: CardsRepository,
         state: ArticleVM.State,
         idGenerator: IdGenerator
     ): ArticleVM {
         return ArticleVMImpl(
             definitionsVM.vm,
             articlesRepository,
+            cardsRepository,
             state,
             object : ArticleRouter {
                 override fun closeArticle() {
@@ -67,6 +70,12 @@ class ArticleModule {
     fun articleRepository(
         database: AppDatabase
     ) = ArticleRepository(database)
+
+    @FragmentComp
+    @Provides
+    fun cardsRepository(
+        database: AppDatabase
+    ) = CardsRepository(database)
 
     @FragmentComp
     @Provides

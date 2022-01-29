@@ -11,9 +11,13 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
+import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.split
+import com.aglushkov.wordteacher.shared.model.nlp.toPartOfSpeech
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -22,7 +26,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlin.math.min
+import kotlinx.coroutines.Dispatchers
 
 interface ArticleVM {
     val state: State
@@ -46,10 +50,10 @@ interface ArticleVM {
     ) : Parcelable
 }
 
-
 open class ArticleVMImpl(
     override val definitionsVM: DefinitionsVM,
     private val articleRepository: ArticleRepository,
+    private val cardsRepository: CardsRepository,
     override var state: ArticleVM.State,
     private val router: ArticleRouter,
     private val idGenerator: IdGenerator,
@@ -58,16 +62,64 @@ open class ArticleVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
     override val article: StateFlow<Resource<Article>> = articleRepository.article
-    override val paragraphs = article.map {
-        Logger.v("build view items")
-        it.copyWith(buildViewItems(it))
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-//    init {
-//        viewModelScope.launch {
-//            articleRepository.loadArticle(state.id)
-//        }
-//    }
+    private val cardProgress = MutableStateFlow<Resource<Map<Pair<String, WordTeacherWord.PartOfSpeech>, Card>>>(
+        Resource.Uninitialized())
+    private val annotations = MutableStateFlow<List<List<ArticleAnnotation>>>(emptyList())
+
+    override val paragraphs = combine(article, annotations) { a, b -> a to b}
+        .map { (article, annotations) ->
+            Logger.v("build view items")
+            article.copyWith(buildViewItems(article, annotations))
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+
+    init {
+        viewModelScope.launch(Dispatchers.Default) {
+            cardsRepository.cardSets.map { res ->
+                res.copyWith(
+                    res.data()?.associateBy { it.term to it.partOfSpeech }
+                )
+            }.collect(cardProgress)
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            combine(article, cardProgress) { a, b -> a to b }
+                .map { (article, cards) ->
+                    if (article is Resource.Loaded && cards is Resource.Loaded) {
+                        article.data.sentences.map {
+                            resolveAnnotations(it, cards)
+                        }
+                    } else {
+                        emptyList()
+                    }
+                }.collect(annotations)
+        }
+    }
+
+    private fun resolveAnnotations(
+        sentence: NLPSentence,
+        cards: Resource.Loaded<Map<Pair<String, WordTeacherWord.PartOfSpeech>, Card>>
+    ) = sentence.tokenSpans.indices.mapNotNull { i ->
+        val span = sentence.tokenSpans[i]
+        val term = sentence.lemmaOrToken(i)
+        val partOfSpeech = sentence.tagEnum(i).toPartOfSpeech()
+
+        val progressAnnotation = cards.data[term to partOfSpeech]?.let { card ->
+            ArticleAnnotation.LearnProgress(
+                start = span.start,
+                end = span.end,
+                learnLevel = card.progress.currentLevel
+            )
+        }
+
+        val partOfSpeechAnnotation = ArticleAnnotation.PartOfSpeech(
+            start = span.start,
+            end = span.end,
+            partOfSpeech = partOfSpeech
+        )
+
+        listOfNotNull(progressAnnotation, partOfSpeechAnnotation)
+    }.flatten()
 
     fun restore(newState: ArticleVM.State) {
         state = newState
@@ -78,23 +130,30 @@ open class ArticleVMImpl(
         }
     }
 
-    private fun buildViewItems(article: Resource<Article>): List<BaseViewItem<*>> {
+    private fun buildViewItems(
+        article: Resource<Article>,
+        annotations: List<List<ArticleAnnotation>>
+    ): List<BaseViewItem<*>> {
         return when (article) {
             is Resource.Loaded -> {
-                makeParagraphs(article)
+                makeParagraphs(article, annotations)
             }
             else -> emptyList()
         }
     }
 
-    private fun makeParagraphs(article: Resource.Loaded<Article>): MutableList<BaseViewItem<*>> {
+    private fun makeParagraphs(
+        article: Resource.Loaded<Article>,
+        annotations: List<List<ArticleAnnotation>>
+    ): MutableList<BaseViewItem<*>> {
         val paragraphList = mutableListOf<BaseViewItem<*>>()
 
         article.data.style.paragraphs.onEach { paragraph ->
             paragraphList.add(
                 ParagraphViewItem(
                     idGenerator.nextId(),
-                    article.data.sentences.split(paragraph)
+                    sentences = article.data.sentences.split(paragraph),
+                    annotations = annotations.split(paragraph)
                 )
             )
         }
@@ -141,4 +200,18 @@ open class ArticleVMImpl(
         super.onCleared()
         eventChannel.cancel()
     }
+}
+
+sealed class ArticleAnnotation(
+    val type: ArticleAnnotationType,
+    val start: Int,
+    val end: Int
+) {
+    class LearnProgress(start: Int, end: Int, val learnLevel: Int): ArticleAnnotation(ArticleAnnotationType.LEARN_PROGRESS, start, end)
+    class PartOfSpeech(start: Int, end: Int, val partOfSpeech: WordTeacherWord.PartOfSpeech): ArticleAnnotation(ArticleAnnotationType.PART_OF_SPEECH, start, end)
+}
+
+enum class ArticleAnnotationType {
+    LEARN_PROGRESS,
+    PART_OF_SPEECH
 }

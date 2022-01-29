@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
@@ -27,6 +28,11 @@ class ArticleComposeModule {
     fun articleRepository(
         database: AppDatabase
     ) = ArticleRepository(database)
+
+    @Provides
+    fun cardsRepository(
+        database: AppDatabase
+    ) = CardsRepository(database)
 
     @Provides
     fun definitionsVM(
@@ -49,6 +55,7 @@ class ArticleComposeModule {
         configuration: MainDecomposeComponent.ChildConfiguration.ArticleConfiguration,
         definitionsVM: DefinitionsVM,
         articleRepository: ArticleRepository,
+        cardsRepository: CardsRepository,
         idGenerator: IdGenerator,
         router: RouterResolver
     ) = ArticleDecomposeComponent(
@@ -56,6 +63,7 @@ class ArticleComposeModule {
         configuration.id,
         definitionsVM,
         articleRepository,
+        cardsRepository,
         idGenerator,
         router.router!!.get()!!
     )

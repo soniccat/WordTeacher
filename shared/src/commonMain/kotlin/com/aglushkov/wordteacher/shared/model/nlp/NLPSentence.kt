@@ -47,6 +47,8 @@ data class NLPSentence(
         tagEnum(it)
     }
 
+    fun tagEnum(i: Int) = tagEnum(tags[i])
+
     fun lemmaOrToken(i: Int) = if (lemmas[i] != NLPConstants.UNKNOWN_LEMMA) {
         lemmas[i]
     } else {
@@ -77,7 +79,7 @@ private fun tagEnum(it: String) = try {
     Tag.UNKNOWN
 }
 
-private fun Tag.toPartOfSpeech() = when {
+fun Tag.toPartOfSpeech() = when {
     isNoun() -> WordTeacherWord.PartOfSpeech.Noun
     isAdj() -> WordTeacherWord.PartOfSpeech.Adjective
     isAdverb() -> WordTeacherWord.PartOfSpeech.Adverb

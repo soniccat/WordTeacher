@@ -149,6 +149,8 @@ const val ROUNDED_ANNOTATION_VALUE_NOUN = "noun"
 const val ROUNDED_ANNOTATION_VALUE_ADJECTIVE = "adjective"
 const val ROUNDED_ANNOTATION_VALUE_ADVERB = "adverb"
 const val ROUNDED_ANNOTATION_VALUE_PHRASE = "phrase"
+
+const val ROUNDED_ANNOTATION_PROGRESS_VALUE_PREFIX = "progress_value_"
 private const val SENTENCE_CONNECTOR = " "
 
 operator fun IntRange.plus(value: Int) = IntRange(start + value, endInclusive + value)

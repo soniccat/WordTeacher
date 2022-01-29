@@ -142,6 +142,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
 
     inner class Cards {
         fun selectAllCardIds() = db.dBCardQueries.selectAllCardIds()
+        fun selectAllCards() = db.dBCardQueries.selectAllCards(mapper = cardMapper())
 
         fun selectCards(ids: List<Long>) = db.dBCardQueries.selectCards(
             ids,

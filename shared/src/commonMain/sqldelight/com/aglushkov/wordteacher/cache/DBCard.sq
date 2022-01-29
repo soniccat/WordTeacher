@@ -19,6 +19,10 @@ selectAllCardIds:
 SELECT id
 FROM DBCard;
 
+selectAllCards:
+SELECT *
+FROM DBCard;
+
 selectCards:
 SELECT *
 FROM DBCard

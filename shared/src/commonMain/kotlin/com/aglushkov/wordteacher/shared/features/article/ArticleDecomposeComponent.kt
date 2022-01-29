@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVMImpl
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
@@ -16,11 +17,13 @@ class ArticleDecomposeComponent(
     id: Long,
     definitionsVM: DefinitionsVM,
     articleRepository: ArticleRepository,
+    cardsRepository: CardsRepository,
     idGenerator: IdGenerator,
     router: ArticleRouter,
 ) : ArticleVMImpl (
     definitionsVM,
     articleRepository,
+    cardsRepository,
     ArticleVM.State(id = id, DefinitionsVM.State()), // TODO: it seems we can remove it
     router,
     idGenerator

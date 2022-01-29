@@ -62,7 +62,6 @@ interface DefinitionsVM {
     val eventFlow: Flow<Event>
 
     // Card Sets
-
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
 
     fun onOpenCardSets(item: OpenCardSetViewItem)

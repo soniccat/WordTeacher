@@ -5,7 +5,8 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 
 class ParagraphViewItem(
     paragraphId: Long,
-    sentences: List<NLPSentence>
+    sentences: List<NLPSentence>,
+    val annotations: List<List<ArticleAnnotation>>
 ): BaseViewItem<NLPSentence>(sentences, Type, paragraphId) {
     companion object {
         const val Type = 201
