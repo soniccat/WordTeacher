@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
@@ -32,6 +33,9 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.views.Definitio
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.HandleUI
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.LoadingStatusView
+import com.aglushkov.wordteacher.androidApp.general.views.compose.ModalSideSheet
+import com.aglushkov.wordteacher.androidApp.general.views.compose.SideSheetValue
+import com.aglushkov.wordteacher.androidApp.general.views.compose.rememberSideSheetState
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
@@ -53,80 +57,108 @@ fun ArticleUI(
     val paragraphs by vm.paragraphs.collectAsState()
     val data = paragraphs.data()
 
+    val sideSheetState = rememberSideSheetState(SideSheetValue.Closed)
+
     BoxWithConstraints {
         val swipeableState = rememberSwipeableState(BottomSheetStates.Collapsed)
         val screenHeight = constraints.maxHeight
         val halfHeight = screenHeight/2.0f
 
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colors.background),
+        ModalSideSheet(
+            sideSheetContent = {
+                Text("abc")
+            },
+            sideSheetState = sideSheetState
         ) {
-            TopAppBar(
-                title = {
-                    Text(article.data()?.name ?: "")
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { vm.onBackPressed() }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_back_24),
-                            contentDescription = null,
-                            tint = LocalContentColor.current
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(color = MaterialTheme.colors.background),
+            ) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = article.data()?.name ?: "",
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
-                    }
-                }
-            )
-
-            if (data != null) {
-                LazyColumn(
-                    contentPadding = PaddingValues(
-                        bottom = dimensionResource(id = R.dimen.article_horizontalPadding) + this@BoxWithConstraints.maxHeight/2
-                    )
-                ) {
-                    items(data) { item ->
-                        ParagraphViewItem(item) { sentence, offset ->
-                            val isHandled = vm.onTextClicked(sentence, offset)
-                            if (isHandled) {
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { vm.onBackPressed() }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_arrow_back_24),
+                                contentDescription = null,
+                                tint = LocalContentColor.current
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
                                 coroutineScope.launch {
-                                    swipeableState.animateTo(BottomSheetStates.Expanded)
+                                    sideSheetState.open()
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_article_filter_24),
+                                contentDescription = null,
+                                tint = LocalContentColor.current
+                            )
+                        }
+                    }
+                )
+
+                if (data != null) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(
+                            bottom = dimensionResource(id = R.dimen.article_horizontalPadding) + this@BoxWithConstraints.maxHeight / 2
+                        )
+                    ) {
+                        items(data) { item ->
+                            ParagraphViewItem(item) { sentence, offset ->
+                                val isHandled = vm.onTextClicked(sentence, offset)
+                                if (isHandled) {
+                                    coroutineScope.launch {
+                                        swipeableState.animateTo(BottomSheetStates.Expanded)
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            } else {
-                LoadingStatusView(
-                    resource = paragraphs,
-                    loadingText = null,
-                    errorText = vm.getErrorText(paragraphs)?.resolveString(),
-                    emptyText = LocalContext.current.getString(R.string.article_empty)
-                ) {
-                    vm.onTryAgainClicked()
-                }
-            }
-        }
-
-        BottomSheet(
-            swipeableState = swipeableState,
-            anchors = mapOf(
-                halfHeight to BottomSheetStates.Expanded,
-                0f to BottomSheetStates.Full,
-                screenHeight.toFloat() to BottomSheetStates.Collapsed
-            ),
-            sheetContent = {
-                DefinitionsUI(
-                    vm = vm.definitionsVM,
-                    modalModifier = Modifier.fillMaxHeight(),
-                    withSearchBar = false,
-                    contentHeader = {
-                        HandleUI()
+                } else {
+                    LoadingStatusView(
+                        resource = paragraphs,
+                        loadingText = null,
+                        errorText = vm.getErrorText(paragraphs)?.resolveString(),
+                        emptyText = LocalContext.current.getString(R.string.article_empty)
+                    ) {
+                        vm.onTryAgainClicked()
                     }
-                )
+                }
             }
-        )
+
+            BottomSheet(
+                swipeableState = swipeableState,
+                anchors = mapOf(
+                    halfHeight to BottomSheetStates.Expanded,
+                    0f to BottomSheetStates.Full,
+                    screenHeight.toFloat() to BottomSheetStates.Collapsed
+                ),
+                sheetContent = {
+                    DefinitionsUI(
+                        vm = vm.definitionsVM,
+                        modalModifier = Modifier.fillMaxHeight(),
+                        withSearchBar = false,
+                        contentHeader = {
+                            HandleUI()
+                        }
+                    )
+                }
+            )
+        }
     }
 }
 
