@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.notes.vm
 
+import com.aglushkov.wordteacher.shared.general.Clearable
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.Logger
@@ -19,7 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-interface NotesVM {
+interface NotesVM: Clearable {
     val notes: StateFlow<Resource<List<BaseViewItem<*>>>>
     val stateFlow: StateFlow<State>
     val editingStateFlow: StateFlow<EditingState>

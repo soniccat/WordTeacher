@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity(), Router {
             ) {
                 when (val instance = it.instance) {
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
-                        vm = instance.inner.apply {
+                        vm = instance.vm.apply {
                             router = object : DefinitionsRouter {
                                 override fun openCardSets() {
                                     mainDecomposeComponent.openCardSets()
@@ -198,15 +198,15 @@ class MainActivity : AppCompatActivity(), Router {
                         modalModifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.CardSets -> CardSetsUI(
-                        vm = instance.inner,
+                        vm = instance.vm,
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Articles -> ArticlesUI(
-                        vm = instance.inner,
+                        vm = instance.vm,
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Notes -> NotesUI(
-                        vm = instance.inner,
+                        vm = instance.vm,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

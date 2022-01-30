@@ -81,4 +81,7 @@ open class DefinitionsVMPreview(
         cardSetViewItem: CardSetViewItem
     ) {
     }
+
+    override fun onCleared() {
+    }
 }

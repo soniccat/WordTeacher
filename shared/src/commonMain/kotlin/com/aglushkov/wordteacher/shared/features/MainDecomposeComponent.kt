@@ -12,8 +12,12 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.LearningSessionResultDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
+import com.aglushkov.wordteacher.shared.general.Clearable
+import com.aglushkov.wordteacher.shared.general.RouterStateChangeHandler
+import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
+import com.aglushkov.wordteacher.shared.general.toClearables
 import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
@@ -21,6 +25,7 @@ import com.arkivanov.decompose.router.Router
 import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.router.router
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.destroy
 import com.arkivanov.essenty.lifecycle.resume
@@ -45,8 +50,8 @@ interface MainDecomposeComponent {
     fun back()
 
     sealed class Child(
-        val inner: Any?
-    ) {
+        val inner: Clearable?
+    ): Clearable {
         data class Article(val vm: ArticleVM): Child(vm)
         data class CardSet(val vm: CardSetVM): Child(vm)
         data class CardSets(val vm: CardSetsVM): Child(vm)
@@ -56,6 +61,10 @@ interface MainDecomposeComponent {
 
         data class AddArticle(val vm: AddArticleDecomposeComponent): Child(vm)
         object EmptyDialog: Child(null)
+
+        override fun onCleared() {
+            inner?.onCleared()
+        }
     }
 
     sealed class ChildConfiguration: Parcelable {
@@ -84,9 +93,16 @@ class MainDecomposeComponentImpl(
             childFactory = ::resolveChild
         )
 
-    override val routerState: Value<RouterState<*, MainDecomposeComponent.Child>> = router.state
+    private val routerStateChangeHandler = RouterStateChangeHandler()
+    override val routerState: Value<RouterState<*, MainDecomposeComponent.Child>> = router.state.map {
+        routerStateChangeHandler.onClearableChanged(it.toClearables())
+        it
+    }
+
+    private val dialogStateChangeHandler = RouterStateChangeHandler()
     override val dialogsStateFlow = MutableStateFlow<List<Child.Created<*, MainDecomposeComponent.Child>>>(emptyList())
     private var dialogHolders: List<DialogHolder> by Delegates.observable(emptyList()) { _, _, newValue ->
+        dialogStateChangeHandler.onClearableChanged(newValue.map { it.child.instance })
         dialogsStateFlow.value = newValue.map { it.child }
     }
 

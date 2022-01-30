@@ -4,6 +4,7 @@ import com.aglushkov.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.tryInResource
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
@@ -15,8 +16,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
@@ -25,20 +30,10 @@ class CardSetsRepository(
     private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource
 ) {
-    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val stateFlow = MutableStateFlow<Resource<List<ShortCardSet>>>(Resource.Loading())
-
-    val cardSets: StateFlow<Resource<List<ShortCardSet>>> = stateFlow
-
-    init {
-        scope.launch(Dispatchers.Default) {
-            database.cardSets.selectAll().asFlow().collect {
-                val result = it.executeAsList()
-                Logger.v("CardSetsRepository loaded ${result.size} card sets")
-                stateFlow.value = Resource.Loaded(result)
-            }
-        }
-    }
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    val cardSets = database.cardSets.selectAll().asFlow().map {
+        tryInResource(canTryAgain = true) { it.executeAsList() }
+    }.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     suspend fun createCardSet(name: String, date: Long) = supervisorScope {
         // Async in the scope to avoid retaining the parent coroutine and to cancel immediately

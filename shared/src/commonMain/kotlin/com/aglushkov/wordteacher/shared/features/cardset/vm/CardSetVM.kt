@@ -22,7 +22,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-interface CardSetVM {
+interface CardSetVM: Clearable {
     val state: State
     val cardSet: StateFlow<Resource<out CardSet>>
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>

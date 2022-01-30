@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewI
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
+import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
@@ -32,7 +33,7 @@ import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-interface LearningVM {
+interface LearningVM: Clearable {
     var router: LearningRouter?
 
     val termState: StateFlow<TermState>

@@ -5,10 +5,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 
-open class ViewModel {
+interface Clearable {
+    fun onCleared()
+}
+
+open class ViewModel: Clearable {
     val viewModelScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    open fun onCleared() {
+    override fun onCleared() {
         viewModelScope.cancel()
     }
 }

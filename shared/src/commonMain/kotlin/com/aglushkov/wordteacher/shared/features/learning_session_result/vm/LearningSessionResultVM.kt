@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.learning_session_result.vm
 
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
+import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-interface LearningSessionResultVM {
+interface LearningSessionResultVM: Clearable {
     var router: LearningSessionResultRouter?
 
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>

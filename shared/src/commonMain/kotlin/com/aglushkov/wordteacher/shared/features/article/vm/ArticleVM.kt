@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsContext
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsWordContext
+import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -28,7 +29,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 
-interface ArticleVM {
+interface ArticleVM: Clearable {
     val state: State
     val article: StateFlow<Resource<Article>>
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
@@ -75,7 +76,7 @@ open class ArticleVMImpl(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            cardsRepository.cardSets.map { res ->
+            cardsRepository.cards.map { res ->
                 res.copyWith(
                     res.data()?.associateBy { it.term to it.partOfSpeech }
                 )
@@ -202,6 +203,8 @@ open class ArticleVMImpl(
 
     override fun onCleared() {
         super.onCleared()
+        articleRepository.cancel()
+        cardsRepository.cancel()
         eventChannel.cancel()
     }
 }

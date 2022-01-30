@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-interface DefinitionsVM {
+interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
 
     fun restore(newState: State)

@@ -119,7 +119,7 @@ class TextActionActivity: AppCompatActivity() {
                 ) {
                     when (val instance = it.instance) {
                         is TextActionDecomposeComponent.Child.Definitions -> DefinitionsUI(
-                            vm = instance.inner.apply {
+                            vm = instance.vm.apply {
                                 router = object : DefinitionsRouter {
                                     override fun openCardSets() {
                                         textActionDecomposeComponent.openCardSets()
@@ -131,7 +131,7 @@ class TextActionActivity: AppCompatActivity() {
                         is TextActionDecomposeComponent.Child.AddArticle -> {
                             val articleCreatedString = stringResource(id = R.string.articles_action_article_created)
                             AddArticleUI(
-                                vm = instance.inner,
+                                vm = instance.vm,
                                 modifier = Modifier.padding(innerPadding),
                                 onArticleCreated = {
                                     coroutineScope.launch {
@@ -141,7 +141,7 @@ class TextActionActivity: AppCompatActivity() {
                             )
                         }
                         is TextActionDecomposeComponent.Child.AddNote -> NotesUI(
-                            vm = instance.inner,
+                            vm = instance.vm,
                             modifier = Modifier.padding(innerPadding)
                         )
                     }

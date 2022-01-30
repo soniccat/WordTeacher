@@ -4,9 +4,12 @@ import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeCompo
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
+import com.aglushkov.wordteacher.shared.general.Clearable
+import com.aglushkov.wordteacher.shared.general.RouterStateChangeHandler
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.popToRoot
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationOrPopIfExists
+import com.aglushkov.wordteacher.shared.general.toClearables
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.Router
 import com.arkivanov.decompose.router.RouterState
@@ -14,8 +17,9 @@ import com.arkivanov.decompose.router.router
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.operator.map
 
-interface TabDecomposeComponent {
+interface TabDecomposeComponent: Clearable {
     val routerState: Value<RouterState<*, Child>>
 
     fun openDefinitions()
@@ -24,11 +28,17 @@ interface TabDecomposeComponent {
     fun openNotes()
     fun back()
 
-    sealed class Child {
-        data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
-        data class CardSets(val inner: CardSetsDecomposeComponent): Child()
-        data class Articles(val inner: ArticlesDecomposeComponent): Child()
-        data class Notes(val inner: NotesDecomposeComponent): Child()
+    sealed class Child(
+        val inner: Clearable
+    ): Clearable {
+        data class Definitions(val vm: DefinitionsDecomposeComponent): Child(vm)
+        data class CardSets(val vm: CardSetsDecomposeComponent): Child(vm)
+        data class Articles(val vm: ArticlesDecomposeComponent): Child(vm)
+        data class Notes(val vm: NotesDecomposeComponent): Child(vm)
+
+        override fun onCleared() {
+            inner.onCleared()
+        }
     }
 
     sealed class ChildConfiguration: Parcelable {
@@ -52,7 +62,11 @@ class TabDecomposeComponentImpl(
             childFactory = ::resolveChild
         )
 
-    override val routerState: Value<RouterState<*, TabDecomposeComponent.Child>> = router.state
+    private val routerStateChangeHandler = RouterStateChangeHandler()
+    override val routerState: Value<RouterState<*, TabDecomposeComponent.Child>> = router.state.map {
+        routerStateChangeHandler.onClearableChanged(it.toClearables())
+        it
+    }
 
     private fun resolveChild(
         configuration: TabDecomposeComponent.ChildConfiguration,
@@ -60,16 +74,16 @@ class TabDecomposeComponentImpl(
     ): TabDecomposeComponent.Child = when (configuration) {
         // TODO: refactor
         is TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> TabDecomposeComponent.Child.Definitions(
-            inner = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
+            vm = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
         )
         is TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration -> TabDecomposeComponent.Child.CardSets(
-            inner = childComponentFactory(componentContext, configuration) as CardSetsDecomposeComponent
+            vm = childComponentFactory(componentContext, configuration) as CardSetsDecomposeComponent
         )
         is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> TabDecomposeComponent.Child.Articles(
-            inner = childComponentFactory(componentContext, configuration) as ArticlesDecomposeComponent
+            vm = childComponentFactory(componentContext, configuration) as ArticlesDecomposeComponent
         )
         is TabDecomposeComponent.ChildConfiguration.NotesConfiguration -> TabDecomposeComponent.Child.Notes(
-            inner = childComponentFactory(componentContext, configuration) as NotesDecomposeComponent
+            vm = childComponentFactory(componentContext, configuration) as NotesDecomposeComponent
         )
     }
 
@@ -87,4 +101,7 @@ class TabDecomposeComponentImpl(
 
     override fun back() = router.popIfNotEmpty()
 
+    override fun onCleared() {
+        router.navigate { emptyList() }
+    }
 }

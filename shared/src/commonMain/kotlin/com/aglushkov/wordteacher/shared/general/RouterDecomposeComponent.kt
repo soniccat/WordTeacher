@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.general
 
+import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.router.Router
 import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.router.pop
@@ -52,3 +53,35 @@ fun <T: Any> Router<T, *>.popToRoot() {
         listOf(it.first())
     }
 }
+
+class RouterStateChangeHandler {
+    private var prevClearables: List<Clearable>? = null
+
+    fun onClearableChanged(newClearables: List<Clearable>) {
+        prevClearables?.let { prev ->
+            handleDiff(prev, newClearables)
+        }
+        prevClearables = newClearables
+    }
+
+    private fun handleDiff(prevClearables: List<Clearable>, newClearables: List<Clearable>) {
+        val popedClearables = prevClearables.filter {
+            !newClearables.contains(it)
+        }
+        popedClearables.onEach {
+            it.onCleared()
+        }
+    }
+}
+
+fun RouterState<*, Clearable>.toClearables(): List<Clearable> =
+    listOfNotNull(
+        *backStack.mapNotNull {
+            if (it is Child.Created<*, Clearable>) {
+                it.instance
+            } else {
+                null
+            }
+        }.toTypedArray(),
+        activeChild.instance,
+    )

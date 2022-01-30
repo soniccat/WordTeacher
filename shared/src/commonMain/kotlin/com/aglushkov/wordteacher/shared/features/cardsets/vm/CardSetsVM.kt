@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -19,7 +20,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-interface CardSetsVM {
+interface CardSetsVM: Clearable {
     val stateFlow: StateFlow<State>
     val eventFlow: Flow<Event>
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>

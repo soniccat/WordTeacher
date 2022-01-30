@@ -2,15 +2,24 @@ package com.aglushkov.wordteacher.shared.features.textaction
 
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
+import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.RouterDecomposeComponent
+import com.aglushkov.wordteacher.shared.general.RouterStateChangeHandler
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.popToRoot
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
+import com.aglushkov.wordteacher.shared.general.toClearables
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.Router
+import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.router.router
+import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import io.ktor.http.Url
@@ -28,10 +37,16 @@ interface TextActionDecomposeComponent
 
     fun openCardSets()
 
-    sealed class Child {
-        data class Definitions(val inner: DefinitionsDecomposeComponent): Child()
-        data class AddArticle(val inner: AddArticleDecomposeComponent): Child()
-        data class AddNote(val inner: NotesDecomposeComponent): Child()
+    sealed class Child(
+        val inner: Clearable
+    ): Clearable {
+        data class Definitions(val vm: DefinitionsVM): Child(vm)
+        data class AddArticle(val vm: AddArticleVM): Child(vm)
+        data class AddNote(val vm: NotesVM): Child(vm)
+
+        override fun onCleared() {
+            inner.onCleared()
+        }
     }
 
     sealed class ChildConfiguration: Parcelable {
@@ -55,18 +70,25 @@ class TextActionDecomposeComponentImpl(
             childFactory = ::resolveChild
         )
 
+    private val routerStateChangeHandler = RouterStateChangeHandler()
+    override val routerState: Value<RouterState<*, TextActionDecomposeComponent.Child>>
+        get() = super.routerState.map {
+            routerStateChangeHandler.onClearableChanged(it.toClearables())
+            it
+        }
+
     private fun resolveChild(
         configuration: TextActionDecomposeComponent.ChildConfiguration,
         componentContext: ComponentContext
     ): TextActionDecomposeComponent.Child = when (configuration) {
         is TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> TextActionDecomposeComponent.Child.Definitions(
-            inner = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
+            vm = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
         )
         is TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> TextActionDecomposeComponent.Child.AddArticle(
-            inner = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
+            vm = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
         )
         is TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration -> TextActionDecomposeComponent.Child.AddNote(
-            inner = childComponentFactory(componentContext, configuration) as NotesDecomposeComponent
+            vm = childComponentFactory(componentContext, configuration) as NotesDecomposeComponent
         )
     }
 
