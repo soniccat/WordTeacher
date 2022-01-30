@@ -8,6 +8,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.androidApp.R
 
@@ -38,7 +39,7 @@ class AppTypography {
                     color = color
                 )}
             }
-        val wordDefinition = typography.body2
+        val wordDefinition = typography.body1
         val wordSynonym = typography.body2
         val wordExample = typography.body2
         val wordDefinitionSubHeader: TextStyle

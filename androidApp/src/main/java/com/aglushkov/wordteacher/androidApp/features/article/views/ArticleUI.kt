@@ -173,7 +173,7 @@ private fun ArticleParagraphView(
     }
 
     var textLayoutResult by remember {
-        mutableStateOf<TextLayoutResultOrNothing>(TextLayoutResultOrNothing.NothingOption)
+        mutableStateOf<TextLayoutResult?>(null)
     }
 
     Box(
@@ -185,6 +185,7 @@ private fun ArticleParagraphView(
                 end = dimensionResource(id = R.dimen.article_horizontalPadding)
             )
     ) {
+        val colors = MaterialTheme.colors
         Text(
             text = text,
             modifier = Modifier
@@ -192,9 +193,9 @@ private fun ArticleParagraphView(
                 .pointerInput(onSentenceClick) {
                     detectTapGestures { pos ->
                         val v = textLayoutResult
-                        if (v is TextLayoutResultOrNothing.TextLayoutResultOption) {
+                        if (v is TextLayoutResult) {
                             textLayoutResult.let { layoutResult ->
-                                val offset = v.data.getOffsetForPosition(pos)
+                                val offset = v.getOffsetForPosition(pos)
                                 findSentence(paragraphViewItem, offset)?.let { (sentence, offset) ->
                                     onSentenceClick(sentence, offset)
                                 }
@@ -204,15 +205,14 @@ private fun ArticleParagraphView(
                 }
                 .drawBehind {
                     val v = textLayoutResult
-                    if (v is TextLayoutResultOrNothing.TextLayoutResultOption) {
-                        val layoutResult = v.data
+                    if (v is TextLayoutResult) {
                         text
                             .getStringAnnotations(0, text.length)
                             .filter {
                                 it.end < text.length
                             }
                             .onEach {
-                                drawAnnotation(it, layoutResult)
+                                drawAnnotation(it, v, colors)
                             }
 
 //                    data.getLineForOffset()
@@ -231,7 +231,7 @@ private fun ArticleParagraphView(
             fontSize = TextUnit(16f, TextUnitType.Sp),
             style = AppTypography.wordDefinition,
             onTextLayout = {
-                textLayoutResult = TextLayoutResultOrNothing.TextLayoutResultOption(it)
+                textLayoutResult = it
             }
         )
     }
@@ -275,52 +275,23 @@ private fun AnnotatedString.Builder.addAnnotations(
                 )
             }
             is ArticleAnnotation.PartOfSpeech -> {
-                if (annotation.partOfSpeech == WordTeacherWord.PartOfSpeech.Adverb) {
-                    addStringAnnotation(
-                        ROUNDED_ANNOTATION_KEY,
-                        ROUNDED_ANNOTATION_VALUE_ADVERB,
-                        annotationSentenceStartIndex + annotation.start,
-                        annotationSentenceStartIndex + annotation.end
-                    )
-                }
+                addStringAnnotation(
+                    ROUNDED_ANNOTATION_KEY,
+                    ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE_PREFIX + annotation.partOfSpeech.name,
+                    annotationSentenceStartIndex + annotation.start,
+                    annotationSentenceStartIndex + annotation.end
+                )
             }
         }
     }
 }
 
-//@Composable
-//private fun AnnotatedString.Builder.addAnnotations(
-//    annotationStartIndex: Int,
-//    sentence: NLPSentence
-//) {
-//    val tagEnums = sentence.tagEnums()
-//    val tokenSpans = sentence.tokenSpans
-//    tokenSpans.forEachIndexed { index, tokenSpan ->
-//        val tag = tagEnums[index]
-//        when {
-////            tag.isAdj() ->
-////                addStringAnnotation(
-////                    ROUNDED_ANNOTATION_KEY,
-////                    ROUNDED_ANNOTATION_VALUE_ADJECTIVE,
-////                    annotationStartIndex + tokenSpan.start,
-////                    annotationStartIndex + tokenSpan.end
-////                )
-//            tag.isAdverb() ->
-//                addStringAnnotation(
-//                    ROUNDED_ANNOTATION_KEY,
-//                    ROUNDED_ANNOTATION_VALUE_ADVERB,
-//                    annotationStartIndex + tokenSpan.start,
-//                    annotationStartIndex + tokenSpan.end
-//                )
-//        }
-//    }
-//}
-
-//@Composable
 private fun DrawScope.drawAnnotation(
     it: AnnotatedString.Range<String>,
-    layoutResult: TextLayoutResult
+    layoutResult: TextLayoutResult,
+    colors: Colors
 ) {
+    val annotationColors = it.resolveColor(colors)
     val lineStart = layoutResult.getLineForOffset(it.start)
     val lineEnd = layoutResult.getLineForOffset(it.end)
 
@@ -334,31 +305,62 @@ private fun DrawScope.drawAnnotation(
         val bgOffset = 2.dp.toPx()
         val cornerRadius = 4.dp.toPx()
 
-        drawRoundRect(
-            color = Color.Yellow,
-            topLeft = Offset(ll, lt).minus(Offset(bgOffset, bgOffset)),
-            size = Size(lr - ll + 2 * bgOffset, lb - lt + 2 * bgOffset),
-            cornerRadius = CornerRadius(cornerRadius, cornerRadius),
-            style = Fill,
-            alpha = 0.2f
-        )
+        annotationColors.bgColor?.let {
+            drawRoundRect(
+                color = it,
+                topLeft = Offset(ll, lt).minus(Offset(bgOffset, bgOffset)),
+                size = Size(lr - ll + 2 * bgOffset, lb - lt + 2 * bgOffset),
+                cornerRadius = CornerRadius(cornerRadius, cornerRadius),
+                style = Fill,
+                alpha = 0.2f
+            )
+        }
 
-        drawRoundRect(
-            color = Color.Red,
-            topLeft = Offset(ll, lt).minus(Offset(bgOffset, bgOffset)),
-            size = Size(lr - ll + 2 * bgOffset, lb - lt + 2 * bgOffset),
-            cornerRadius = CornerRadius(cornerRadius, cornerRadius),
-            style = Stroke(
-                width = 1.dp.toPx()
-            ),
-            alpha = 1.0f
-        )
+        annotationColors.strokeColor?.let {
+            drawRoundRect(
+                color = it,
+                topLeft = Offset(ll, lt).minus(Offset(bgOffset, bgOffset)),
+                size = Size(lr - ll + 2 * bgOffset, lb - lt + 2 * bgOffset),
+                cornerRadius = CornerRadius(cornerRadius, cornerRadius),
+                style = Stroke(
+                    width = 1.dp.toPx()
+                ),
+                alpha = 1.0f
+            )
+        }
     }
 }
 
-sealed class TextLayoutResultOrNothing {
-    class TextLayoutResultOption(val data: TextLayoutResult): TextLayoutResultOrNothing()
-    object NothingOption: TextLayoutResultOrNothing()
+private fun AnnotatedString.Range<String>.resolveColor(
+    colors: Colors
+): AnnotationColors {
+    return when {
+        this.item.startsWith(ROUNDED_ANNOTATION_PROGRESS_VALUE_PREFIX) -> {
+            val progressLevel = this.item.replace(ROUNDED_ANNOTATION_PROGRESS_VALUE_PREFIX, "").toIntOrNull() ?: 0
+            val newAlpha = (0.1f + progressLevel * 0.1f).coerceAtMost(8.0f)
+            AnnotationColors(
+                bgColor = colors.secondary.copy(newAlpha),
+                strokeColor = colors.secondary
+            )
+        }
+        this.item.startsWith(ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE_PREFIX) -> {
+            val partOfSpeechName = this.item.replace(ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE_PREFIX, "")
+            val partOfSpeech = WordTeacherWord.PartOfSpeech.valueOf(partOfSpeechName)
+            when (partOfSpeech) {
+                WordTeacherWord.PartOfSpeech.Adverb -> AnnotationColors(
+                    Color.Yellow,
+                    Color.Red
+                )
+                else -> AnnotationColors(null, null)
+            }
+        }
+        else -> AnnotationColors(null, null)
+    }
 }
+
+private data class AnnotationColors(
+    val bgColor: Color?,
+    val strokeColor: Color?
+)
 
 private const val SENTENCE_CONNECTOR = " "
