@@ -66,7 +66,7 @@ open class ArticleVMImpl(
     override val definitionsVM: DefinitionsVM,
     private val articleRepository: ArticleRepository,
     private val cardsRepository: CardsRepository,
-    private var initialState: ArticleVM.State,
+    initialState: ArticleVM.State,
     private val router: ArticleRouter,
     private val idGenerator: IdGenerator,
 ): ViewModel(), ArticleVM {
@@ -80,10 +80,10 @@ open class ArticleVMImpl(
         Resource.Uninitialized())
     private val annotations = MutableStateFlow<List<List<ArticleAnnotation>>>(emptyList())
 
-    override val paragraphs = combine(article, annotations) { a, b -> a to b}
-        .map { (article, annotations) ->
+    override val paragraphs = combine(article, annotations, state) { a, b, c -> Triple(a,b,c.selectionState)}
+        .map { (article, annotations, selectionState) ->
             Logger.v("build view items")
-            article.copyWith(buildViewItems(article, annotations))
+            article.copyWith(buildViewItems(article, filterAnnotations(annotations, selectionState)))
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     init {
@@ -152,6 +152,18 @@ open class ArticleVMImpl(
                 makeParagraphs(article, annotations)
             }
             else -> emptyList()
+        }
+    }
+
+    private fun filterAnnotations(
+        annotations: List<List<ArticleAnnotation>>,
+        selectionState: ArticleVM.SelectionState
+    ) = annotations.map {
+        it.filter { annotation ->
+            when (annotation) {
+                is ArticleAnnotation.LearnProgress -> selectionState.cardSetWords
+                is ArticleAnnotation.PartOfSpeech -> selectionState.partsOfSpeech.contains(annotation.partOfSpeech)
+            }
         }
     }
 

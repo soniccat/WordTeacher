@@ -62,7 +62,7 @@
     <string name="article_error">@string/error_default</string>
     <string name="article_empty">There\'s an empty article</string>
     <string name="article_side_sheet_selection_phrasal_verbs">Phrasal verbs</string>
-    <string name="article_side_sheet_selection_cardset_words">Your words</string>
+    <string name="article_side_sheet_selection_cardset_words">Learning progress</string>
     <string name="article_side_sheet_part_of_speech_title">Parts of speech</string>
 
     <string name="notes_error">@string/error_default</string>

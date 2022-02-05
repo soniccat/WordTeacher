@@ -69,29 +69,7 @@ fun ArticleUI(
 
         ModalSideSheet(
             sideSheetContent = {
-                CheckableListItem(
-                    isChecked = state.selectionState.cardSetWords,
-                    textRes = R.string.article_side_sheet_selection_cardset_words,
-                    onClicked = { vm.onCardSetWordSelectionChanged() }
-                )
-                CheckableListItem(
-                    isChecked = state.selectionState.phrasalVerbs,
-                    textRes = R.string.article_side_sheet_selection_phrasal_verbs,
-                    onClicked = { vm.onPhrasalVerbSelectionChanged() }
-                )
-
-                Text(
-                    modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
-                    text = stringResource(id = R.string.article_side_sheet_part_of_speech_title),
-                    style = AppTypography.articleSideSheetSection
-                )
-                WordTeacherWord.PartOfSpeech.values().onEach { partOfSpeech ->
-                    CheckableListItem(
-                        isChecked = state.selectionState.partsOfSpeech.contains(partOfSpeech),
-                        text = partOfSpeech.toStringDesc().resolveString(),
-                        onClicked = { vm.onPartOfSpeechSelectionChanged(partOfSpeech) }
-                    )
-                }
+                ArticleSideSheetContent(vm, state)
             },
             sideSheetState = sideSheetState
         ) {
@@ -141,6 +119,36 @@ fun ArticleUI(
 
             ArticleDefinitionBottomSheet(vm, swipeableState, screenHeight)
         }
+    }
+}
+
+@Composable
+private fun ArticleSideSheetContent(
+    vm: ArticleVM,
+    state: ArticleVM.State
+) {
+    CheckableListItem(
+        isChecked = state.selectionState.cardSetWords,
+        textRes = R.string.article_side_sheet_selection_cardset_words,
+        onClicked = { vm.onCardSetWordSelectionChanged() }
+    )
+    CheckableListItem(
+        isChecked = state.selectionState.phrasalVerbs,
+        textRes = R.string.article_side_sheet_selection_phrasal_verbs,
+        onClicked = { vm.onPhrasalVerbSelectionChanged() }
+    )
+
+    Text(
+        modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
+        text = stringResource(id = R.string.article_side_sheet_part_of_speech_title),
+        style = AppTypography.articleSideSheetSection
+    )
+    WordTeacherWord.PartOfSpeech.values().onEach { partOfSpeech ->
+        CheckableListItem(
+            isChecked = state.selectionState.partsOfSpeech.contains(partOfSpeech),
+            text = partOfSpeech.toStringDesc().resolveString(),
+            onClicked = { vm.onPartOfSpeechSelectionChanged(partOfSpeech) }
+        )
     }
 }
 
@@ -347,16 +355,16 @@ private fun AnnotatedString.Builder.addAnnotations(
         when (annotation) {
             is ArticleAnnotation.LearnProgress -> {
                 addStringAnnotation(
-                    ROUNDED_ANNOTATION_KEY,
-                    ROUNDED_ANNOTATION_PROGRESS_VALUE_PREFIX + annotation.learnLevel,
+                    ROUNDED_ANNOTATION_PROGRESS_VALUE,
+                    annotation.learnLevel.toString(),
                     annotationSentenceStartIndex + annotation.start,
                     annotationSentenceStartIndex + annotation.end
                 )
             }
             is ArticleAnnotation.PartOfSpeech -> {
                 addStringAnnotation(
-                    ROUNDED_ANNOTATION_KEY,
-                    ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE_PREFIX + annotation.partOfSpeech.name,
+                    ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE,
+                    annotation.partOfSpeech.name,
                     annotationSentenceStartIndex + annotation.start,
                     annotationSentenceStartIndex + annotation.end
                 )
@@ -391,7 +399,7 @@ private fun DrawScope.drawAnnotation(
                 size = Size(lr - ll + 2 * bgOffset, lb - lt + 2 * bgOffset),
                 cornerRadius = CornerRadius(cornerRadius, cornerRadius),
                 style = Fill,
-                alpha = 0.2f
+                //alpha = 0.2f
             )
         }
 
@@ -404,7 +412,7 @@ private fun DrawScope.drawAnnotation(
                 style = Stroke(
                     width = 1.dp.toPx()
                 ),
-                alpha = 1.0f
+                //alpha = 1.0f
             )
         }
     }
@@ -413,29 +421,31 @@ private fun DrawScope.drawAnnotation(
 private fun AnnotatedString.Range<String>.resolveColor(
     colors: Colors
 ): AnnotationColors {
-    return when {
-        this.item.startsWith(ROUNDED_ANNOTATION_PROGRESS_VALUE_PREFIX) -> {
-            val progressLevel = this.item.replace(ROUNDED_ANNOTATION_PROGRESS_VALUE_PREFIX, "").toIntOrNull() ?: 0
+    return when(tag) {
+        ROUNDED_ANNOTATION_PROGRESS_VALUE -> {
+            val progressLevel = item.toIntOrNull() ?: 0
             val newAlpha = (0.1f + progressLevel * 0.1f).coerceAtMost(8.0f)
-            AnnotationColors(
-                bgColor = colors.secondary.copy(newAlpha),
-                strokeColor = colors.secondary
-            )
+            AnnotationColors(colors.secondary, newAlpha)
         }
-        this.item.startsWith(ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE_PREFIX) -> {
-            val partOfSpeechName = this.item.replace(ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE_PREFIX, "")
-            val partOfSpeech = WordTeacherWord.PartOfSpeech.valueOf(partOfSpeechName)
-            when (partOfSpeech) {
-                WordTeacherWord.PartOfSpeech.Adverb -> AnnotationColors(
-                    Color.Yellow,
-                    Color.Red
-                )
-                else -> AnnotationColors(null, null)
-            }
-        }
-        else -> AnnotationColors(null, null)
+        ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE ->
+            PartOfSpeechToColorMap[WordTeacherWord.PartOfSpeech.valueOf(item)] ?: AnnotationColors(null)
+        else -> AnnotationColors(null)
     }
 }
+
+private val PartOfSpeechToColorMap = mapOf(
+    WordTeacherWord.PartOfSpeech.Noun to AnnotationColors(Color(0xFFCE00F1)),
+    WordTeacherWord.PartOfSpeech.Verb to AnnotationColors(Color(0xFFD8302B)),
+    WordTeacherWord.PartOfSpeech.Adjective to AnnotationColors(Color(0xFF584383)),
+    WordTeacherWord.PartOfSpeech.Adverb to AnnotationColors(Color(0xFFE06F1F)),
+    WordTeacherWord.PartOfSpeech.Pronoun to AnnotationColors(Color(0xFFDF3E6D)),
+    WordTeacherWord.PartOfSpeech.Preposition to AnnotationColors(Color(0xFFEDD32F)),
+    WordTeacherWord.PartOfSpeech.Conjunction to AnnotationColors(Color(0xFF309449)),
+    WordTeacherWord.PartOfSpeech.Interjection to AnnotationColors(Color(0xFF98F0AE)),
+    WordTeacherWord.PartOfSpeech.Abbreviation to AnnotationColors(Color(0xFFBEAE13)),
+    WordTeacherWord.PartOfSpeech.Exclamation to AnnotationColors(Color(0xFFE40202)),
+    WordTeacherWord.PartOfSpeech.Determiner to AnnotationColors(Color(0xFF14E2B9)),
+)
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -466,9 +476,12 @@ fun CheckableListItem(
     text = { Text(text) },
 )
 
-private data class AnnotationColors(
-    val bgColor: Color?,
-    val strokeColor: Color?
-)
+private class AnnotationColors(
+    inputColor: Color?,
+    alpha: Float = 0.2f
+) {
+    val bgColor: Color? = inputColor?.copy(alpha = alpha)
+    val strokeColor: Color? = inputColor
+}
 
 private const val SENTENCE_CONNECTOR = " "
