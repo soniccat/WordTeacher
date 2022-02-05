@@ -29,7 +29,6 @@ import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUIDialog
-import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesUI
@@ -379,7 +378,6 @@ class MainActivity : AppCompatActivity(), Router {
     private fun screenNameByClass(cl: KClass<*>): String = when(cl) {
         DefinitionsFragment::class -> "definitions"
         ArticlesFragment::class -> "articles"
-        ArticleFragment::class -> "article"
         CardSetsFragment::class -> "cardsets"
         else -> throw IllegalArgumentException("Wrong screen class $cl")
     }
@@ -398,12 +396,10 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun openAddArticle() {
         mainDecomposeComponent.openAddArticleDialog()
-//        openDialogFragment(AddArticleFragment::class)
     }
 
     override fun openArticle(id: Long) {
         mainDecomposeComponent.openArticle(id)
-//        openFragment(ArticleFragment::class, ArticleFragment.createArguments(id), true)
     }
 
     override fun closeArticle() {

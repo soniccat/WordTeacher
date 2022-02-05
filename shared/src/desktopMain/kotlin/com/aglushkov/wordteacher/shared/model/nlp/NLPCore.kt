@@ -11,8 +11,6 @@ actual class NLPCore {
     actual fun lemmatize(tokens: List<String>, tags: List<String>) = emptyList<String>()
     actual fun chunk(tokens: List<String>, tags: List<String>) = emptyList<String>()
 
-    actual fun phrases(sentence: NLPSentence): List<PhraseSpan> = emptyList()
-
     // to be able to work with NLPCore in a separate thread
     actual fun clone(): NLPCore {
         TODO("isn't implemented")

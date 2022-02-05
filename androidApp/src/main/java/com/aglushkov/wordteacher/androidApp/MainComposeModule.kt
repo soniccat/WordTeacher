@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.androidApp
 
 import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArticleComposeComponent
-import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComponent
 import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.cardset.di.DaggerCardSetComponent

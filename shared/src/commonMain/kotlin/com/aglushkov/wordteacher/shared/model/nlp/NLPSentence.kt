@@ -57,6 +57,9 @@ data class NLPSentence(
         }
     }
 
+    fun phrases(): List<PhraseSpan> =
+        phrasesAsSpanList(tokenStrings(), tags, chunks)
+
     override fun toString(): String {
         return tokenSpans.joinToString(separator = " ")
     }

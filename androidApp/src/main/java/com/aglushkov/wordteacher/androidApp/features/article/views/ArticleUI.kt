@@ -28,7 +28,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
-import com.aglushkov.wordteacher.androidApp.features.article.blueprints.*
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.BottomSheet
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.BottomSheetStates
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
@@ -485,3 +484,6 @@ private class AnnotationColors(
 }
 
 private const val SENTENCE_CONNECTOR = " "
+private const val ROUNDED_ANNOTATION_PROGRESS_VALUE = "progress_value"
+private const val ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE = "part_of_speech_value"
+private const val ROUNDED_ANNOTATION_PHRASE_VALUE = "phrase_value"

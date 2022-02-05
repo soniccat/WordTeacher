@@ -24,10 +24,6 @@ actual class NLPCore {
         TODO("not implemented")
     }
 
-    actual fun phrases(sentence: NLPSentence): List<PhraseSpan> {
-        TODO("not implemented")
-    }
-
     actual suspend fun waitUntilInitialized(): Resource<NLPCore> {
         TODO("not implemented")
     }
@@ -35,4 +31,10 @@ actual class NLPCore {
     actual fun clone(): NLPCore {
         TODO("not implemented")
     }
+}
+
+actual fun phrasesAsSpanList(
+    tokenStrings: List<String>, tags: List<String>, chunks: List<String>
+): List<PhraseSpan> {
+    TODO("not implemented")
 }

@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.split
 import com.aglushkov.wordteacher.shared.model.nlp.toPartOfSpeech
@@ -57,6 +58,7 @@ interface ArticleVM: Clearable {
     @Parcelize
     data class SelectionState(
         var partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
+        var phrases: Set<ChunkType> = emptySet(),
         var cardSetWords: Boolean = true,
         var phrasalVerbs: Boolean = true
     ) : Parcelable
@@ -112,27 +114,41 @@ open class ArticleVMImpl(
     private fun resolveAnnotations(
         sentence: NLPSentence,
         cards: Resource.Loaded<Map<Pair<String, WordTeacherWord.PartOfSpeech>, Card>>
-    ) = sentence.tokenSpans.indices.mapNotNull { i ->
-        val span = sentence.tokenSpans[i]
-        val term = sentence.lemmaOrToken(i)
-        val partOfSpeech = sentence.tagEnum(i).toPartOfSpeech()
+    ): List<ArticleAnnotation> {
+        val progressAndPartOfSpeechAnnotations = sentence.tokenSpans.indices.mapNotNull { i ->
+            val span = sentence.tokenSpans[i]
+            val term = sentence.lemmaOrToken(i)
+            val partOfSpeech = sentence.tagEnum(i).toPartOfSpeech()
 
-        val progressAnnotation = cards.data[term to partOfSpeech]?.let { card ->
-            ArticleAnnotation.LearnProgress(
+            // TODO: that won't work with phrases
+            val progressAnnotation = cards.data[term to partOfSpeech]?.let { card ->
+                ArticleAnnotation.LearnProgress(
+                    start = span.start,
+                    end = span.end,
+                    learnLevel = card.progress.currentLevel
+                )
+            }
+
+            val partOfSpeechAnnotation = ArticleAnnotation.PartOfSpeech(
                 start = span.start,
                 end = span.end,
-                learnLevel = card.progress.currentLevel
+                partOfSpeech = partOfSpeech
+            )
+
+            listOfNotNull(progressAnnotation, partOfSpeechAnnotation)
+        }.flatten()
+
+        val phrases = sentence.phrases()
+        val phraseAnnotations = phrases.map { phrase ->
+            ArticleAnnotation.Phrase(
+                start = phrase.start,
+                end = phrase.end,
+                phrase = phrase.type
             )
         }
 
-        val partOfSpeechAnnotation = ArticleAnnotation.PartOfSpeech(
-            start = span.start,
-            end = span.end,
-            partOfSpeech = partOfSpeech
-        )
-
-        listOfNotNull(progressAnnotation, partOfSpeechAnnotation)
-    }.flatten()
+        return progressAndPartOfSpeechAnnotations + phraseAnnotations
+    }
 
     fun restore(newState: ArticleVM.State) {
         state.value = newState
@@ -163,6 +179,7 @@ open class ArticleVMImpl(
             when (annotation) {
                 is ArticleAnnotation.LearnProgress -> selectionState.cardSetWords
                 is ArticleAnnotation.PartOfSpeech -> selectionState.partsOfSpeech.contains(annotation.partOfSpeech)
+                is ArticleAnnotation.Phrase -> selectionState.phrases.contains(annotation.phrase)
             }
         }
     }
@@ -274,9 +291,11 @@ sealed class ArticleAnnotation(
 ) {
     class LearnProgress(start: Int, end: Int, val learnLevel: Int): ArticleAnnotation(ArticleAnnotationType.LEARN_PROGRESS, start, end)
     class PartOfSpeech(start: Int, end: Int, val partOfSpeech: WordTeacherWord.PartOfSpeech): ArticleAnnotation(ArticleAnnotationType.PART_OF_SPEECH, start, end)
+    class Phrase(start: Int, end: Int, val phrase: ChunkType): ArticleAnnotation(ArticleAnnotationType.PHRASE, start, end)
 }
 
 enum class ArticleAnnotationType {
     LEARN_PROGRESS,
-    PART_OF_SPEECH
+    PART_OF_SPEECH,
+    PHRASE
 }

@@ -69,14 +69,14 @@ actual class NLPCore(
     actual fun chunk(tokens: List<String>, tags: List<String>) = chunker?.chunk(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
 
     // TODO: move to NLPSentence
-    actual fun phrases(sentence: NLPSentence): List<PhraseSpan> =
-        ChunkSample.phrasesAsSpanList(
-            sentence.tokenStrings().toTypedArray(),
-            sentence.tags.toTypedArray(),
-            sentence.chunks.toTypedArray()
-        ).map {
-            createPhraseSpan(it)
-        }
+//    actual fun phrases(sentence: NLPSentence): List<PhraseSpan> =
+//        ChunkSample.phrasesAsSpanList(
+//            sentence.tokenStrings().toTypedArray(),
+//            sentence.tags.toTypedArray(),
+//            sentence.chunks.toTypedArray()
+//        ).map {
+//            createPhraseSpan(it)
+//        }
     // TODO: get rid of all these toTypedArray above...
 
     fun load() {
@@ -155,11 +155,21 @@ actual class NLPCore(
         }
     }
 
-    fun createPhraseSpan(span: opennlp.tools.util.Span): PhraseSpan {
-        return PhraseSpan(span.start, span.end, ChunkType.parse(span.type))
-    }
-
     fun createTokenSpan(span: Span): TokenSpan {
         return TokenSpan(span.start, span.end)
     }
+}
+
+actual fun phrasesAsSpanList(
+    tokenStrings: List<String>, tags: List<String>, chunks: List<String>
+): List<PhraseSpan> = ChunkSample.phrasesAsSpanList(
+    tokenStrings.toTypedArray(),
+    tags.toTypedArray(),
+    chunks.toTypedArray()
+).map {
+    createPhraseSpan(it)
+}
+
+private fun createPhraseSpan(span: Span): PhraseSpan {
+    return PhraseSpan(span.start, span.end, ChunkType.parse(span.type))
 }

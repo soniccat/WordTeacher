@@ -2,8 +2,6 @@ package com.aglushkov.wordteacher.androidApp.features.article.di
 
 import android.content.Context
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
-import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleFragment
-import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleAndroidVM
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeModule
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
@@ -46,4 +44,9 @@ interface ArticleComposeComponent {
         fun setDefinitionsDeps(deps: DefinitionsDependencies): Builder
         fun build(): ArticleComposeComponent
     }
+}
+
+interface ArticleDependencies {
+    fun database(): AppDatabase
+    fun nlpCore(): NLPCore
 }
