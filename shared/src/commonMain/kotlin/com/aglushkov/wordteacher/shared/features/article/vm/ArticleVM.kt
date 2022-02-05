@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 
 interface ArticleVM: Clearable {
-    val state: State
+    val state: StateFlow<State>
     val article: StateFlow<Resource<Article>>
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
     val eventFlow: Flow<Event>
@@ -41,13 +41,24 @@ interface ArticleVM: Clearable {
     fun onBackPressed()
     fun onTextClicked(sentence: NLPSentence, offset: Int): Boolean
     fun onTryAgainClicked()
+    fun onPhrasalVerbSelectionChanged()
+    fun onCardSetWordSelectionChanged()
+    fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
     @Parcelize
     data class State(
         var id: Long,
-        var definitionsState: DefinitionsVM.State
+        var definitionsState: DefinitionsVM.State,
+        var selectionState: SelectionState = SelectionState()
+    ) : Parcelable
+
+    @Parcelize
+    data class SelectionState(
+        var partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
+        var cardSetWords: Boolean = true,
+        var phrasalVerbs: Boolean = true
     ) : Parcelable
 }
 
@@ -55,7 +66,7 @@ open class ArticleVMImpl(
     override val definitionsVM: DefinitionsVM,
     private val articleRepository: ArticleRepository,
     private val cardsRepository: CardsRepository,
-    override var state: ArticleVM.State,
+    private var initialState: ArticleVM.State,
     private val router: ArticleRouter,
     private val idGenerator: IdGenerator,
 ): ViewModel(), ArticleVM {
@@ -63,6 +74,7 @@ open class ArticleVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
     override val article: StateFlow<Resource<Article>> = articleRepository.article
+    override val state = MutableStateFlow(initialState)
 
     private val cardProgress = MutableStateFlow<Resource<Map<Pair<String, WordTeacherWord.PartOfSpeech>, Card>>>(
         Resource.Uninitialized())
@@ -123,11 +135,11 @@ open class ArticleVMImpl(
     }.flatten()
 
     fun restore(newState: ArticleVM.State) {
-        state = newState
-        definitionsVM.restore(state.definitionsState)
+        state.value = newState
+        definitionsVM.restore(newState.definitionsState)
 
         viewModelScope.launch {
-            articleRepository.loadArticle(state.id)
+            articleRepository.loadArticle(newState.id)
         }
     }
 
@@ -183,6 +195,40 @@ open class ArticleVMImpl(
         }
 
         return slice != null
+    }
+
+    override fun onPhrasalVerbSelectionChanged() =
+        state.update {
+            it.copy(
+                selectionState = it.selectionState.copy(
+                    phrasalVerbs = !it.selectionState.phrasalVerbs
+                )
+            )
+        }
+
+    override fun onCardSetWordSelectionChanged() =
+        state.update {
+            it.copy(
+                selectionState = it.selectionState.copy(
+                    cardSetWords = !it.selectionState.cardSetWords
+                )
+            )
+        }
+
+    override fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech) {
+        state.update {
+            val partsOfSpeech = it.selectionState.partsOfSpeech
+            val needRemove = partsOfSpeech.contains(partOfSpeech)
+            it.copy(
+                selectionState = it.selectionState.copy(
+                    partsOfSpeech = if (needRemove) {
+                        partsOfSpeech.minus(partOfSpeech)
+                    } else {
+                        partsOfSpeech.plus(partOfSpeech)
+                    }
+                )
+            )
+        }
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {

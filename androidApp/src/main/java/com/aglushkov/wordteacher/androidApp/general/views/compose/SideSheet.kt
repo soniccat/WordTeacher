@@ -12,6 +12,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -252,6 +255,7 @@ fun ModalSideSheet(
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
     BoxWithConstraints(modifier.fillMaxSize()) {
         val modalSideSheetConstraints = constraints
         // TODO : think about Infinite max bounds case
@@ -322,7 +326,12 @@ fun ModalSideSheet(
                 contentColor = sideSheetContentColor,
                 elevation = sideSheetElevation
             ) {
-                Column(Modifier.fillMaxSize(), content = sideSheetContent)
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState),
+                    content = sideSheetContent
+                )
             }
         }
     }

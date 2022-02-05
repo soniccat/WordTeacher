@@ -59,6 +59,8 @@ class AppTypography {
             @Composable get() {
                 return typography.body1
             }
+        val articleSideSheetSection = typography.h5
+        val articleSideSheetItem = typography.body1
 
         val noteDate: TextStyle
             @Composable get() {

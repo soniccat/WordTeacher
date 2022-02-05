@@ -35,7 +35,7 @@ class ArticleDecomposeComponent(
 
     init {
         stateKeeper.register(KEY_STATE) {
-            state
+            state.value
         }
 
         restore(instanceState.state)

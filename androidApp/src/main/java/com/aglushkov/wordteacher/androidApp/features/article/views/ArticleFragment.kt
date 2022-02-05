@@ -116,7 +116,7 @@ class ArticleFragment: DialogFragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(VM_STATE, articleVM.state)
+        outState.putParcelable(VM_STATE, articleVM.state.value)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {

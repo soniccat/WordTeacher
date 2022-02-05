@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.androidApp.features.article.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
@@ -42,6 +44,7 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
+import com.aglushkov.wordteacher.shared.model.toStringDesc
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -53,6 +56,7 @@ fun ArticleUI(
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val state by vm.state.collectAsState()
     val article by vm.article.collectAsState()
     val paragraphs by vm.paragraphs.collectAsState()
     val data = paragraphs.data()
@@ -62,11 +66,32 @@ fun ArticleUI(
     BoxWithConstraints {
         val swipeableState = rememberSwipeableState(BottomSheetStates.Collapsed)
         val screenHeight = constraints.maxHeight
-        val halfHeight = screenHeight/2.0f
 
         ModalSideSheet(
             sideSheetContent = {
-                Text("abc")
+                CheckableListItem(
+                    isChecked = state.selectionState.cardSetWords,
+                    textRes = R.string.article_side_sheet_selection_cardset_words,
+                    onClicked = { vm.onCardSetWordSelectionChanged() }
+                )
+                CheckableListItem(
+                    isChecked = state.selectionState.phrasalVerbs,
+                    textRes = R.string.article_side_sheet_selection_phrasal_verbs,
+                    onClicked = { vm.onPhrasalVerbSelectionChanged() }
+                )
+
+                Text(
+                    modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
+                    text = stringResource(id = R.string.article_side_sheet_part_of_speech_title),
+                    style = AppTypography.articleSideSheetSection
+                )
+                WordTeacherWord.PartOfSpeech.values().onEach { partOfSpeech ->
+                    CheckableListItem(
+                        isChecked = state.selectionState.partsOfSpeech.contains(partOfSpeech),
+                        text = partOfSpeech.toStringDesc().resolveString(),
+                        onClicked = { vm.onPartOfSpeechSelectionChanged(partOfSpeech) }
+                    )
+                }
             },
             sideSheetState = sideSheetState
         ) {
@@ -75,38 +100,12 @@ fun ArticleUI(
                     .fillMaxSize()
                     .background(color = MaterialTheme.colors.background),
             ) {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = article.data()?.name ?: "",
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = { vm.onBackPressed() }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_arrow_back_24),
-                                contentDescription = null,
-                                tint = LocalContentColor.current
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    sideSheetState.open()
-                                }
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_article_filter_24),
-                                contentDescription = null,
-                                tint = LocalContentColor.current
-                            )
+                ArticleTopBar(
+                    title = article.data()?.name ?: "",
+                    onBackPressed = { vm.onBackPressed() },
+                    onSideSheetPressed = {
+                        coroutineScope.launch {
+                            sideSheetState.open()
                         }
                     }
                 )
@@ -140,26 +139,75 @@ fun ArticleUI(
                 }
             }
 
-            BottomSheet(
-                swipeableState = swipeableState,
-                anchors = mapOf(
-                    halfHeight to BottomSheetStates.Expanded,
-                    0f to BottomSheetStates.Full,
-                    screenHeight.toFloat() to BottomSheetStates.Collapsed
-                ),
-                sheetContent = {
-                    DefinitionsUI(
-                        vm = vm.definitionsVM,
-                        modalModifier = Modifier.fillMaxHeight(),
-                        withSearchBar = false,
-                        contentHeader = {
-                            HandleUI()
-                        }
-                    )
+            ArticleDefinitionBottomSheet(vm, swipeableState, screenHeight)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@Composable
+private fun ArticleDefinitionBottomSheet(
+    vm: ArticleVM,
+    swipeableState: SwipeableState<BottomSheetStates>,
+    screenHeight: Int
+) {
+    BottomSheet(
+        swipeableState = swipeableState,
+        anchors = mapOf(
+            screenHeight / 2.0f to BottomSheetStates.Expanded,
+            0f to BottomSheetStates.Full,
+            screenHeight.toFloat() to BottomSheetStates.Collapsed
+        ),
+        sheetContent = {
+            DefinitionsUI(
+                vm = vm.definitionsVM,
+                modalModifier = Modifier.fillMaxHeight(),
+                withSearchBar = false,
+                contentHeader = {
+                    HandleUI()
                 }
             )
         }
-    }
+    )
+}
+
+@Composable
+private fun ArticleTopBar(
+    title: String,
+    onBackPressed: () -> Unit,
+    onSideSheetPressed: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = title,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        navigationIcon = {
+            IconButton(
+                onClick = onBackPressed
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_back_24),
+                    contentDescription = null,
+                    tint = LocalContentColor.current
+                )
+            }
+        },
+        actions = {
+            IconButton(
+                onClick = onSideSheetPressed
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_article_filter_24),
+                    contentDescription = null,
+                    tint = LocalContentColor.current
+                )
+            }
+        }
+    )
 }
 
 @ExperimentalUnitApi
@@ -175,7 +223,6 @@ fun ParagraphViewItem(
         )
     }
 }
-
 
 @ExperimentalUnitApi
 @Composable
@@ -389,6 +436,35 @@ private fun AnnotatedString.Range<String>.resolveColor(
         else -> AnnotationColors(null, null)
     }
 }
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun CheckableListItem(
+    isChecked: Boolean,
+    textRes: Int,
+    onClicked: () -> Unit,
+) = CheckableListItem(
+    isChecked,
+    stringResource(id = textRes),
+    onClicked
+)
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun CheckableListItem(
+    isChecked: Boolean,
+    text: String,
+    onClicked: () -> Unit
+) = ListItem(
+    modifier = Modifier.clickable(onClick = onClicked),
+    trailing = {
+        Checkbox(
+            checked = isChecked,
+            onCheckedChange = null
+        )
+    },
+    text = { Text(text) },
+)
 
 private data class AnnotationColors(
     val bgColor: Color?,
