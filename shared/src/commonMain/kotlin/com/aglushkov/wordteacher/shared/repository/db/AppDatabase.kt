@@ -173,11 +173,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                     date!!,
                     term!!,
                     definitions.orEmpty(),
-                    if (partOfSpeech != null) {
-                        WordTeacherWord.PartOfSpeech.valueOf(partOfSpeech)
-                    } else {
-                        WordTeacherWord.PartOfSpeech.Undefined
-                    },
+                    partOfSpeechEnum(partOfSpeech),
                     transcription,
                     synonyms.orEmpty(),
                     examples.orEmpty(),

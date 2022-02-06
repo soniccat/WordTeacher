@@ -25,6 +25,13 @@
     <string name="word_partofspeech_determiner">Determiner</string>
     <string name="word_partofspeech_unknown">Other</string>
 
+    <string name="word_phrase_noun">Noun phrase</string>
+    <string name="word_phrase_verb">Verb phrase</string>
+    <string name="word_phrase_preposition">Prepositional phrase</string>
+    <string name="word_phrase_adjective">Adjective phrase</string>
+    <string name="word_phrase_adverb">Adverb phrase</string>
+    <string name="word_phrase_unknown">Other</string>
+
     <string name="word_providedBy_template">by %1$s</string>
     <string name="word_section_definition">Definition</string>
     <string name="word_section_examples">Examples</string>
@@ -61,6 +68,7 @@
     <string name="articles_error">@string/error_default</string>
     <string name="article_error">@string/error_default</string>
     <string name="article_empty">There\'s an empty article</string>
+    <string name="article_side_sheet_selection_phrases">Phrases</string>
     <string name="article_side_sheet_selection_phrasal_verbs">Phrasal verbs</string>
     <string name="article_side_sheet_selection_cardset_words">Learning progress</string>
     <string name="article_side_sheet_part_of_speech_title">Parts of speech</string>

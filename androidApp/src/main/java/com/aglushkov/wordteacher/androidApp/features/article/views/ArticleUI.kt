@@ -42,7 +42,11 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
+import com.aglushkov.wordteacher.shared.model.nlp.chunkEnum
+import com.aglushkov.wordteacher.shared.model.nlp.toStringDesc
+import com.aglushkov.wordteacher.shared.model.partOfSpeechEnum
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import kotlinx.coroutines.launch
 
@@ -136,6 +140,19 @@ private fun ArticleSideSheetContent(
         textRes = R.string.article_side_sheet_selection_phrasal_verbs,
         onClicked = { vm.onPhrasalVerbSelectionChanged() }
     )
+
+    Text(
+        modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
+        text = stringResource(id = R.string.article_side_sheet_selection_phrases),
+        style = AppTypography.articleSideSheetSection
+    )
+    ChunkType.values().onEach { chunkType ->
+        CheckableListItem(
+            isChecked = state.selectionState.phrases.contains(chunkType),
+            text = chunkType.toStringDesc().resolveString(),
+            onClicked = { vm.onPhraseSelectionChanged(chunkType) }
+        )
+    }
 
     Text(
         modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
@@ -368,6 +385,14 @@ private fun AnnotatedString.Builder.addAnnotations(
                     annotationSentenceStartIndex + annotation.end
                 )
             }
+            is ArticleAnnotation.Phrase -> {
+                addStringAnnotation(
+                    ROUNDED_ANNOTATION_PHRASE_VALUE,
+                    annotation.phrase.name,
+                    annotationSentenceStartIndex + annotation.start,
+                    annotationSentenceStartIndex + annotation.end
+                )
+            }
         }
     }
 }
@@ -427,7 +452,9 @@ private fun AnnotatedString.Range<String>.resolveColor(
             AnnotationColors(colors.secondary, newAlpha)
         }
         ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE ->
-            PartOfSpeechToColorMap[WordTeacherWord.PartOfSpeech.valueOf(item)] ?: AnnotationColors(null)
+            PartOfSpeechToColorMap[partOfSpeechEnum(item)] ?: AnnotationColors(null)
+        ROUNDED_ANNOTATION_PHRASE_VALUE ->
+            PhraseTypeToColorMap[chunkEnum(item)] ?: AnnotationColors(null)
         else -> AnnotationColors(null)
     }
 }
@@ -444,6 +471,16 @@ private val PartOfSpeechToColorMap = mapOf(
     WordTeacherWord.PartOfSpeech.Abbreviation to AnnotationColors(Color(0xFFBEAE13)),
     WordTeacherWord.PartOfSpeech.Exclamation to AnnotationColors(Color(0xFFE40202)),
     WordTeacherWord.PartOfSpeech.Determiner to AnnotationColors(Color(0xFF14E2B9)),
+    WordTeacherWord.PartOfSpeech.Undefined to AnnotationColors(Color(0xFF5F5D5D)),
+)
+
+private val PhraseTypeToColorMap = mapOf(
+    ChunkType.NP to AnnotationColors(Color(0xFFE0B6E7)),
+    ChunkType.VP to AnnotationColors(Color(0xFF5D70E2)),
+    ChunkType.PP to AnnotationColors(Color(0xFF81CE80)),
+    ChunkType.ADJP to AnnotationColors(Color(0xFFECC13D)),
+    ChunkType.ADVP to AnnotationColors(Color(0xFFF33119)),
+    ChunkType.X to AnnotationColors(Color(0xFF5E0A0A)),
 )
 
 @OptIn(ExperimentalMaterialApi::class)

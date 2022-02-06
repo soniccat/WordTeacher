@@ -171,5 +171,5 @@ actual fun phrasesAsSpanList(
 }
 
 private fun createPhraseSpan(span: Span): PhraseSpan {
-    return PhraseSpan(span.start, span.end, ChunkType.parse(span.type))
+    return PhraseSpan(span.start, span.end, chunkEnum(span.type))
 }

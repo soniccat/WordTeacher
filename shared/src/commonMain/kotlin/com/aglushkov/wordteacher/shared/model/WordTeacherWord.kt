@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.model
 
+import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
@@ -33,6 +34,16 @@ data class WordTeacherWord(
     }
 
     companion object
+}
+
+fun partOfSpeechEnum(it: String?) = if (it == null) {
+    WordTeacherWord.PartOfSpeech.Undefined
+} else {
+    try {
+        WordTeacherWord.PartOfSpeech.valueOf(it)
+    } catch (e: Exception) {
+        WordTeacherWord.PartOfSpeech.Undefined
+    }
 }
 
 fun WordTeacherWord.PartOfSpeech.Companion.fromString(string: String?): WordTeacherWord.PartOfSpeech {

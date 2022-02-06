@@ -45,6 +45,7 @@ interface ArticleVM: Clearable {
     fun onPhrasalVerbSelectionChanged()
     fun onCardSetWordSelectionChanged()
     fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech)
+    fun onPhraseSelectionChanged(phraseType: ChunkType)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
@@ -141,8 +142,8 @@ open class ArticleVMImpl(
         val phrases = sentence.phrases()
         val phraseAnnotations = phrases.map { phrase ->
             ArticleAnnotation.Phrase(
-                start = phrase.start,
-                end = phrase.end,
+                start = sentence.tokenSpans[phrase.start].start,
+                end = sentence.tokenSpans[phrase.end-1].end,
                 phrase = phrase.type
             )
         }
@@ -254,6 +255,22 @@ open class ArticleVMImpl(
                         partsOfSpeech.minus(partOfSpeech)
                     } else {
                         partsOfSpeech.plus(partOfSpeech)
+                    }
+                )
+            )
+        }
+    }
+
+    override fun onPhraseSelectionChanged(phraseType: ChunkType) {
+        state.update {
+            val phrases = it.selectionState.phrases
+            val needRemove = phrases.contains(phraseType)
+            it.copy(
+                selectionState = it.selectionState.copy(
+                    phrases = if (needRemove) {
+                        phrases.minus(phraseType)
+                    } else {
+                        phrases.plus(phraseType)
                     }
                 )
             )
