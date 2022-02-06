@@ -19,7 +19,8 @@ data class Config(
         @SerialName("google") Google,
         @SerialName("owlbot") OwlBot,
         @SerialName("wordnik") Wordnik,
-        @SerialName("yandex") Yandex
+        @SerialName("yandex") Yandex,
+        @SerialName("local") Local
     }
 }
 

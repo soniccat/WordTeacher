@@ -48,14 +48,10 @@ fun GoogleService.Companion.createWordTeacherWordService(
 ): WordTeacherWordService {
     return object : WordTeacherWordService {
         override var type: Config.Type = Config.Type.Google
-        override var key = ""
-        override var baseUrl = aBaseUrl
-        override var methodParams = params
-
         private val service = GoogleService(aBaseUrl)
 
         override suspend fun define(word: String): List<WordTeacherWord> {
-            val lang: String = methodParams.value[Entries]?.get(EntriesLang) ?: "en"
+            val lang: String = params.value[Entries]?.get(EntriesLang) ?: "en"
             return service.loadDefinitions(word, lang).mapNotNull { it.asWordTeacherWord() }
         }
     }

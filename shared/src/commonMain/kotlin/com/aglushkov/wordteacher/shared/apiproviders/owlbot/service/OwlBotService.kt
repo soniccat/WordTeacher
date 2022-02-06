@@ -56,10 +56,6 @@ fun OwlBotService.Companion.createWordTeacherWordService(
 ): WordTeacherWordService {
     return object : WordTeacherWordService {
         override var type: Config.Type = Config.Type.OwlBot
-        override var key = aKey
-        override var baseUrl = aBaseUrl
-        override var methodParams = ServiceMethodParams(emptyMap())
-
         private val service = OwlBotService(aBaseUrl, aKey)
 
         override suspend fun define(word: String): List<WordTeacherWord> {

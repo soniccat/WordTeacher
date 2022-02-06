@@ -60,7 +60,4 @@ class ServiceRepository(
         val connectParams = it.connectParams.first()
         return serviceFactory.createService(it.type, connectParams, ServiceMethodParams(it.methods))
     }
-
-    init {
-    }
 }

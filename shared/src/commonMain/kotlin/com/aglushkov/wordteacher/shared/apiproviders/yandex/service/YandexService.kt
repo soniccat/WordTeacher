@@ -70,14 +70,10 @@ fun YandexService.Companion.createWordTeacherWordService(
 ): WordTeacherWordService {
     return object : WordTeacherWordService {
         override var type: Config.Type = Config.Type.Yandex
-        override var key = aKey
-        override var baseUrl = aBaseUrl
-        override var methodParams = params
-
         private val service = YandexService(aBaseUrl, aKey)
 
         override suspend fun define(word: String): List<WordTeacherWord> {
-            val lookup = methodParams.value[Lookup]
+            val lookup = params.value[Lookup]
             val lang = lookup?.get(LookupLang) ?: "en-en"
             val ui = lookup?.get(LookupUi) ?: "en"
             val flags = lookup?.get(LookupFlags)?.toIntOrNull() ?: 4

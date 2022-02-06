@@ -119,14 +119,10 @@ fun WordnikService.Companion.createWordTeacherWordService(
 ): WordTeacherWordService {
     return object : WordTeacherWordService {
         override var type: Config.Type = Config.Type.Wordnik
-        override var key = aKey
-        override var baseUrl = aBaseUrl
-        override var methodParams = params
-
-        private val service = WordnikService(aBaseUrl, key)
+        private val service = WordnikService(aBaseUrl, aKey)
 
         override suspend fun define(word: String): List<WordTeacherWord> {
-            val definitions = methodParams.value[Definitions]
+            val definitions = params.value[Definitions]
             val dictionaries = definitions?.get(DefinitionsSourceDictionaries) ?: WordnikService.Dictionary.Wiktionary.value
             val limit = definitions?.get(DefinitionsLimit)?.toIntOrNull() ?: 20
             val partOfSpeech = definitions?.get(DefinitionsPartOfSpeech)
