@@ -54,15 +54,20 @@ class StringReader(
         }
     }
 
-    fun readUntil(stopChar: Char): Int {
-        while (!isEnd() && string[pos] != stopChar) {
+    fun readUntil(stopChar: Char, needSkip: Boolean = false): Int {
+        while (!isEnd() && char != stopChar) {
             readChar()
         }
+
+        if (!isEnd() && needSkip) {
+            skip()
+        }
+
         return pos
     }
 
     fun readUntil(stopChar: Set<Char>): Int {
-        while (!isEnd() && !stopChar.contains(string[pos])) {
+        while (!isEnd() && !stopChar.contains(char)) {
             readChar()
         }
         return pos

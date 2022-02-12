@@ -34,17 +34,19 @@ class DslDict(
         fileSystem.read(path) {
             var pos = 0L
             var line = readUtf8Line()
-            while (line != null && line.isNotEmpty()) {
-                val firstChar = line.first()
-                when (firstChar) {
-                    '#' -> readHeader(line)
-                    '-', '\n', '\t' -> {}
-                    else -> {
-                        index.add(line, pos)
+            while (line != null) {
+                if (line.isNotEmpty()) {
+                    val firstChar = line.first()
+                    when (firstChar) {
+                        '#' -> readHeader(line)
+                        '-', '\n', '\t' -> {}
+                        else -> {
+                            index.add(line, pos)
+                        }
                     }
                 }
 
-                pos += line.length
+                pos += line.length + 1
                 line = readUtf8Line()
             }
         }
@@ -56,7 +58,7 @@ class DslDict(
         val pos = dslIndex.get(term) ?: return null
 
         fileSystem.read(path) {
-            skip(pos + term.length)
+            skip(pos + term.length + 1)
             var line = readUtf8Line()
             while (line != null && line.isNotEmpty() && line.first() == '\t') {
                 readWordLine(line, wordTeacherWordBuilder)
@@ -92,7 +94,9 @@ class DslDict(
                     }
                 } else {
                     val ch = readChar()
-                    value.append(ch)
+                    if (isDef || isExample) {
+                        value.append(ch)
+                    }
                 }
             }
         }
@@ -107,10 +111,14 @@ class DslDict(
     }
 
     private fun StringReader.readTag(isClose: Boolean): String? {
-        val startTagPos = readUntil('[')
+        val startTagPos = readUntil('[', needSkip = true)
         val endTagPos = readUntil(']')
 
-        val tag = string.substring(startTagPos, endTagPos)
+        val tag = string.substring(startTagPos + if (isClose) 1 else 0, endTagPos)
+        if (!isEnd()) {
+            skip()
+        }
+
         return if (tag.isNotEmpty()) {
             tag
         } else {

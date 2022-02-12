@@ -42,6 +42,8 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinTest)
                 implementation(libs.kotlinTestAnnotations)
+                implementation(libs.okioFakeFileSystem)
+                implementation(libs.coroutinesCommonTest)
             }
         }
         val androidMain by getting {
