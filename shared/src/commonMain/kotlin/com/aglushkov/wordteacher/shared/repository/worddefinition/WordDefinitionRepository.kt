@@ -38,16 +38,13 @@ import kotlinx.coroutines.supervisorScope
 class WordDefinitionRepository(
     private val serviceRepository: ServiceRepository,
 ) {
-
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlows: MutableMap<String, MutableStateFlow<Resource<List<WordTeacherWord>>>> = hashMapOf()
     private val jobs: MutableMap<String, Job> = hashMapOf()
 
-    val servicesFlow = serviceRepository.flow
-
     init {
         scope.launch {
-            serviceRepository.flow.collect {
+            serviceRepository.services.collect {
                 if (it.isLoaded()) {
                     defineUninitializedFlows()
                     // TODO: consider to handle adding new services
@@ -79,7 +76,7 @@ class WordDefinitionRepository(
         reload: Boolean = false
     ): Flow<Resource<List<WordTeacherWord>>> {
         val tag = "WordDefinitionRepository.define"
-        val services = serviceRepository.services.data().orEmpty()
+        val services = serviceRepository.services.value.data().orEmpty()
 
         // Decide if we need to load or reuse what we've already loaded or what we're loading now
         val stateFlow = obtainMutableStateFlow(word)

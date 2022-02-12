@@ -20,7 +20,7 @@ decomposeVersion = "0.4.0"
 essenty = "0.2.2"
 coroutines = "1.6.0-native-mt"
 ktor = "1.5.4"
-okio = "2.9.0"
+okio = "3.0.0"
 napier = "1.4.1"
 uuid = "0.3.0"
 junit = "4.13"
@@ -74,7 +74,7 @@ ktorAndroidClient = { module = "io.ktor:ktor-client-android", version.ref = "kto
 ktoriOSClient = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
 ktorDesktop = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
-okio = { module = "com.squareup.okio:okio-multiplatform", version.ref = "okio" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 logger = { module = "com.github.aakira:napier", version.ref = "napier" }
 junit = { module = "junit:junit", version.ref = "junit" }
 

@@ -25,18 +25,10 @@ class WordTeacherWordServiceFactory {
         val key = connectParams.key
 
         return when (type) {
-            Config.Type.OwlBot -> {
-                OwlBotService.createWordTeacherWordService(baseUrl, key)
-            }
-            Config.Type.Yandex -> {
-                YandexService.createWordTeacherWordService(baseUrl, key, methodParams)
-            }
-            Config.Type.Wordnik -> {
-                WordnikService.createWordTeacherWordService(baseUrl, key, methodParams)
-            }
-            Config.Type.Google -> {
-                GoogleService.createWordTeacherWordService(baseUrl, methodParams)
-            }
+            Config.Type.OwlBot -> OwlBotService.createWordTeacherWordService(baseUrl, key)
+            Config.Type.Yandex -> YandexService.createWordTeacherWordService(baseUrl, key, methodParams)
+            Config.Type.Wordnik -> WordnikService.createWordTeacherWordService(baseUrl, key, methodParams)
+            Config.Type.Google -> GoogleService.createWordTeacherWordService(baseUrl, methodParams)
             else -> null
         }
     }

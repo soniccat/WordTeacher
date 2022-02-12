@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.shared.model
 
-import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
@@ -34,6 +33,111 @@ data class WordTeacherWord(
     }
 
     companion object
+}
+
+class WordTeacherWordBuilder {
+    private var word: String = ""
+    private var transcription: String? = null
+    private var wordDefinitions = mutableMapOf<WordTeacherWord.PartOfSpeech, MutableList<WordTeacherDefinition>>()
+    private var types = mutableListOf<Config.Type>()
+
+    // current def
+    private var partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined
+    private var definitions = mutableListOf<String>()
+    private var examples = mutableListOf<String>()
+    private var synonyms = mutableListOf<String>()
+    private var imageUrl: String? = null
+
+    fun setWord(v: String): WordTeacherWordBuilder {
+        word = v
+        return this
+    }
+
+    fun setTranscription(v: String): WordTeacherWordBuilder {
+        transcription = v
+        return this
+    }
+
+    fun addType(type: Config.Type) {
+        types.add(type)
+    }
+
+    fun startPartOfSpeech(partOfSpeech: WordTeacherWord.PartOfSpeech) {
+        if (hasWordDefinition()) {
+            addWordDefinition()
+        }
+
+        this.partOfSpeech = partOfSpeech
+    }
+
+    fun addDefinition(def: String): WordTeacherWordBuilder {
+        definitions.add(def)
+        return this
+    }
+
+    fun addExample(example: String): WordTeacherWordBuilder {
+        examples.add(example)
+        return this
+    }
+
+    fun addSynonym(syn: String): WordTeacherWordBuilder {
+        synonyms.add(syn)
+        return this
+    }
+
+    private fun hasWordDefinition() =
+        partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined ||
+            definitions.isNotEmpty() ||
+            examples.isNotEmpty() ||
+            synonyms.isNotEmpty() ||
+            imageUrl != null
+
+    private fun addWordDefinition() {
+        val list = wordDefinitions.getOrPut(partOfSpeech) { mutableListOf() }
+        list.add(
+            WordTeacherDefinition(
+                definitions.toList(),
+                examples.toList(),
+                synonyms.toList(),
+                imageUrl
+            )
+        )
+
+        clearCurrentPartOfSpeech()
+    }
+
+    private fun clearCurrentPartOfSpeech() {
+        partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined
+        definitions.clear()
+        examples.clear()
+        synonyms.clear()
+        imageUrl = null
+    }
+
+    fun clear() {
+        word = ""
+        transcription = null
+        wordDefinitions.clear()
+        types.clear()
+        clearCurrentPartOfSpeech()
+    }
+
+    fun build(): WordTeacherWord? {
+        if (hasWordDefinition()) {
+            addWordDefinition()
+        }
+
+        return if (wordDefinitions.isNotEmpty()) {
+            WordTeacherWord(
+                word,
+                transcription,
+                wordDefinitions.toMap(),
+                types.toList()
+            )
+        } else {
+            null
+        }
+    }
 }
 
 fun partOfSpeechEnum(it: String?) = if (it == null) {
