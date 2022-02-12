@@ -17,6 +17,8 @@ class StringReader(
                 ch
             }
         }
+    val isCharEscaped: Boolean
+        get() = string[pos] == escapeCharacter
     val nextChar: Char?
         get() {
             val ch = string.getOrNull(pos + 1)

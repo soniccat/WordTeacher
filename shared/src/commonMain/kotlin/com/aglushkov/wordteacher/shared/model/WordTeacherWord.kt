@@ -71,6 +71,10 @@ class WordTeacherWordBuilder {
     }
 
     fun addDefinition(def: String): WordTeacherWordBuilder {
+        if (definitions.isNotEmpty() && (examples.isNotEmpty() || synonyms.isNotEmpty())) {
+            addWordDefinition()
+        }
+
         definitions.add(def)
         return this
     }

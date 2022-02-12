@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWordBuilder
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
+import okio.utf8Size
 
 class DslDict(
     override val path: Path,
@@ -46,7 +47,7 @@ class DslDict(
                     }
                 }
 
-                pos += line.length + 1
+                pos += line.utf8Size() + 1
                 line = readUtf8Line()
             }
         }
@@ -72,29 +73,31 @@ class DslDict(
     private fun readWordLine(line: String, builder: WordTeacherWordBuilder) {
         var isDef = false
         var isExample = false
+        var isTranscription = false
         val value = StringBuilder()
 
         stringReader.read(line) {
             skip()
             var tag: String? = null
             while (!isEnd()) {
-                if (char == '[') {
+                if (char == '[' && !isCharEscaped) {
                     val isCloseTag = nextChar == '/'
                     tag = readTag(isCloseTag)
 
                     if (isCloseTag) {
-                        if (tag == "trn" || tag == "ex") {
+                        if (tag == "trn" || tag == "ex" || tag == "t") {
                             break;
                         }
                     } else {
                         when (tag) {
                             "trn" -> isDef = true
                             "ex" -> isExample = true
+                            "t" -> isTranscription = true
                         }
                     }
                 } else {
                     val ch = readChar()
-                    if (isDef || isExample) {
+                    if (isDef || isExample || isTranscription) {
                         value.append(ch)
                     }
                 }
@@ -102,7 +105,9 @@ class DslDict(
         }
 
         if (value.isNotEmpty()) {
-            if (isDef) {
+            if (isTranscription) {
+                builder.setTranscription(value.toString())
+            } else if (isDef) {
                 builder.addDefinition(value.toString())
             } else if(isExample) {
                 builder.addExample(value.toString())
