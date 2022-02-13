@@ -1,16 +1,16 @@
 package com.aglushkov.wordteacher.shared.dicts
 
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import okio.Path
 
-interface Dict {
+interface Dict: WordTeacherWordService {
     val path: Path
     val name: String
     val fromLang: Language
     val toLang: Language
 
     suspend fun load()
-    suspend fun define(term: String): WordTeacherWord?
 }
 
 enum class Language {

@@ -34,6 +34,8 @@ kotlin {
                 implementation(libs.essentryInstanceKeeper)
                 implementation(libs.essentryStateKeeper)
                 implementation(libs.decompose)
+                implementation(libs.statelyCommon)
+                implementation(libs.statelyConcurrency)
 
                 api(libs.mokoResourcesLib)
             }

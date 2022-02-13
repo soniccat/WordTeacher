@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoadin
 import com.aglushkov.wordteacher.shared.general.resource.isUninitialized
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -37,6 +38,7 @@ import kotlinx.coroutines.supervisorScope
 
 class WordDefinitionRepository(
     private val serviceRepository: ServiceRepository,
+    private val dictRepository: DictRepository
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlows: MutableMap<String, MutableStateFlow<Resource<List<WordTeacherWord>>>> = hashMapOf()
@@ -76,7 +78,8 @@ class WordDefinitionRepository(
         reload: Boolean = false
     ): Flow<Resource<List<WordTeacherWord>>> {
         val tag = "WordDefinitionRepository.define"
-        val services = serviceRepository.services.value.data().orEmpty()
+        val services = serviceRepository.services.value.data().orEmpty() +
+                dictRepository.dicts.value.data().orEmpty()
 
         // Decide if we need to load or reuse what we've already loaded or what we're loading now
         val stateFlow = obtainMutableStateFlow(word)

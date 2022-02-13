@@ -18,12 +18,18 @@ import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
+import com.aglushkov.wordteacher.shared.repository.dict.DictFactory
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.service.ConfigService
+import okio.FileSystem
+import okio.Path
 import dagger.Module
 import dagger.Provides
+import kotlin.io.path.div
+import okio.Path.Companion.toPath
 
 @Module
 class AppModule {
@@ -58,8 +64,37 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun wordRepository(serviceRepository: ServiceRepository): WordDefinitionRepository {
-        return WordDefinitionRepository(serviceRepository)
+    fun fileSystem(): FileSystem {
+        return FileSystem.SYSTEM
+    }
+
+    @AppComp
+    @Provides
+    fun dictFactory(
+        fileSystem: FileSystem
+    ): DictFactory {
+        return DictFactory(fileSystem)
+    }
+
+    @AppComp
+    @Provides
+    fun dictRepository(
+        context: Context,
+        dictFactory: DictFactory,
+        fileSystem: FileSystem
+    ): DictRepository {
+        val docPath = context.filesDir.absolutePath.toPath()
+        fileSystem.createDirectory(docPath.div("dicts"))
+        return DictRepository(docPath, dictFactory, fileSystem)
+    }
+
+    @AppComp
+    @Provides
+    fun wordRepository(
+        serviceRepository: ServiceRepository,
+        dictRepository: DictRepository
+    ): WordDefinitionRepository {
+        return WordDefinitionRepository(serviceRepository, dictRepository)
     }
 
     @AppComp

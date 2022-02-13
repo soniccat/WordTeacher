@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.dicts.Language
 import com.aglushkov.wordteacher.shared.general.StringReader
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.WordTeacherWordBuilder
+import com.aglushkov.wordteacher.shared.repository.config.Config
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -14,6 +15,7 @@ class DslDict(
     override val path: Path,
     private val fileSystem: FileSystem
 ): Dict {
+    override var type = Config.Type.Local
     override var name = ""
     override var fromLang = Language.EN
     override var toLang = Language.EN
@@ -33,7 +35,7 @@ class DslDict(
 
     private fun fillIndex(index: DslIndex) {
         fileSystem.read(path) {
-            var pos = 0L
+            var offset = 0L
             var line = readUtf8Line()
             while (line != null) {
                 if (line.isNotEmpty()) {
@@ -42,21 +44,21 @@ class DslDict(
                         '#' -> readHeader(line)
                         '-', '\n', '\t' -> {}
                         else -> {
-                            index.add(line, pos)
+                            index.add(line, offset)
                         }
                     }
                 }
 
-                pos += line.utf8Size() + 1
+                offset += line.utf8Size() + 1
                 line = readUtf8Line()
             }
         }
     }
 
-    override suspend fun define(term: String): WordTeacherWord? {
+    override suspend fun define(term: String): List<WordTeacherWord> {
         wordTeacherWordBuilder.clear()
         wordTeacherWordBuilder.setWord(term)
-        val pos = dslIndex.get(term) ?: return null
+        val pos = dslIndex.get(term) ?: return emptyList()
 
         fileSystem.read(path) {
             skip(pos + term.length + 1)
@@ -67,7 +69,12 @@ class DslDict(
             }
         }
 
-        return wordTeacherWordBuilder.build()
+        val word = wordTeacherWordBuilder.build()
+        return if (word != null) {
+            listOf(word)
+        } else {
+            emptyList()
+        }
     }
 
     private fun readWordLine(line: String, builder: WordTeacherWordBuilder) {

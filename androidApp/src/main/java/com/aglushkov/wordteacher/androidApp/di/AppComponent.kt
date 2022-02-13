@@ -25,6 +25,7 @@ import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsSt
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
@@ -49,6 +50,7 @@ public interface AppComponent:
     fun configRepository(): ConfigRepository
     fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository
     fun serviceRepository(): ServiceRepository
+    fun dictRepository(): DictRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
     override fun database(): AppDatabase
     override fun databaseWorker(): DatabaseWorker

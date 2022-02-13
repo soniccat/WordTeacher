@@ -86,6 +86,8 @@ dependencies {
     implementation(libs.coroutinesAndroid)
     implementation(libs.ktorAndroidClient)
 
+    implementation(libs.okio)
+
     implementation("com.google.dagger:dagger:2.40.5")
     kapt("com.google.dagger:dagger-compiler:2.40.5")
 }
