@@ -83,9 +83,9 @@ class AppModule {
         dictFactory: DictFactory,
         fileSystem: FileSystem
     ): DictRepository {
-        val docPath = context.filesDir.absolutePath.toPath()
-        fileSystem.createDirectory(docPath.div("dicts"))
-        return DictRepository(docPath, dictFactory, fileSystem)
+        val dictsPath = context.filesDir.absolutePath.toPath().div("dicts")
+        fileSystem.createDirectory(dictsPath)
+        return DictRepository(dictsPath, dictFactory, fileSystem)
     }
 
     @AppComp
