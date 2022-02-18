@@ -22,15 +22,16 @@ class DslDict(
 
     private val stringReader = StringReader()
     private val wordTeacherWordBuilder = WordTeacherWordBuilder()
-    private var dslIndex = DslIndex("".toPath(), fileSystem)
+    private lateinit var dslIndex: DslIndex
 
     override suspend fun load() {
-        val dslIndex = DslIndex((path.name + DSL_INDEX_SUFFIX).toPath(), fileSystem)
+        val dslIndex = DslIndex((path.toString() + DSL_INDEX_SUFFIX).toPath(), fileSystem)
         if (dslIndex.isEmpty()) {
             fillIndex(dslIndex)
             dslIndex.save()
-            this.dslIndex = dslIndex
         }
+
+        this.dslIndex = dslIndex
     }
 
     private fun fillIndex(index: DslIndex) {

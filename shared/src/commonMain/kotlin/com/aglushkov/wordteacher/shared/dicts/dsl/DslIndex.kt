@@ -10,15 +10,39 @@ class DslIndex(
     private val index = hashMapOf<String, Long>() //TODO: use trie
 
     init {
-        // TODO: load index
+        if (fileSystem.exists(path)) {
+            loadIndex()
+        }
+    }
+
+    private fun loadIndex() {
+        fileSystem.read(path) {
+            while (!this.exhausted()) {
+                val key = readUtf8Line()
+                val value = readUtf8Line()
+
+                if (key != null && value != null) {
+                    value.toLongOrNull()?.let { offset ->
+                        index[key] = offset
+                    }
+                }
+            }
+        }
     }
 
     fun add(term: String, offset: Long) {
-        index.put(term, offset)
+        index[term] = offset
     }
 
     fun save() {
-        // TODO: save index
+        fileSystem.write(path) {
+            index.onEach {
+                writeUtf8(it.key)
+                writeUtf8("\n")
+                writeUtf8(it.value.toString())
+                writeUtf8("\n")
+            }
+        }
     }
 
     fun get(term: String): Long? = index[term]

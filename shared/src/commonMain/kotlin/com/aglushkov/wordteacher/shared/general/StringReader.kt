@@ -76,6 +76,11 @@ class StringReader(
     }
 
     fun readWord() = readUntil(SPACE_CHAR_SET)
+    fun readWordString(): String {
+        val p = pos
+        val endPos = readWord()
+        return string.substring(p, endPos)
+    }
 }
 
-private val SPACE_CHAR_SET = setOf(' ', '\t')
+private val SPACE_CHAR_SET = setOf(' ', '\t', '\n', '\r')
