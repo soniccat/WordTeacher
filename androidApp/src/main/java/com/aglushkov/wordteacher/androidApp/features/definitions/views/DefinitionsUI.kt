@@ -1,7 +1,9 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
@@ -37,11 +41,9 @@ import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.Chooser
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import kotlinx.coroutines.launch
@@ -109,7 +111,16 @@ private fun DefinitionsWordUI(
 ) {
     val defs = vm.definitions.collectAsState()
     var searchText by remember { mutableStateOf(vm.state.word.orEmpty()) }
-    var suggests = vm.suggests.collectAsState()
+    var needShowSuggests by remember { mutableStateOf(false) }
+    val suggests = vm.suggests.collectAsState()
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+
+    if (withSearchBar) {
+        BackHandler(enabled = needShowSuggests) {
+            focusManager.clearFocus()
+        }
+    }
 
     Column(
         modifier = modifier,
@@ -118,9 +129,18 @@ private fun DefinitionsWordUI(
             CustomTopAppBar {
                 SearchView(
                     searchText,
+                    focusRequester = focusRequester,
                     onTextChanged = {
                         searchText = it
-                        vm.requestSuggests(it)
+
+                        if (it.isEmpty()) {
+                            vm.clearSuggests()
+                        } else {
+                            vm.requestSuggests(it)
+                        }
+                    },
+                    onFocusChanged = {
+                        needShowSuggests = it.isFocused
                     }
                 ) {
                     vm.onWordSubmitted(searchText)
@@ -130,32 +150,89 @@ private fun DefinitionsWordUI(
 
         contentHeader()
 
-        val res = defs.value
-        val data = res.data()
+        if (needShowSuggests) {
+            val res = suggests.value
+            val data = res.data()
 
-        if (data?.isNotEmpty() == true) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(data, key = { it.id }) { item ->
-                    showViewItem(
-                        Modifier.animateItemPlacement(),
-                        item,
-                        vm,
-                        onPartOfSpeechFilterClicked
-                    )
+            if (data?.isNotEmpty() == true) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(data, key = { it.id }) { item ->
+                        showSuggestItem(
+                            Modifier.animateItemPlacement(),
+                            item,
+                            vm,
+                            onClicked = {
+                                vm.onWordSubmitted(it.firstItem())
+                                focusManager.clearFocus()
+                            }
+                        )
+                    }
+                }
+            } else {
+                LoadingStatusView(
+                    resource = res,
+                    loadingText = null,
+                    errorText = vm.getErrorText(res)?.resolveString(),
+                    emptyText = LocalContext.current.getString(R.string.error_no_definitions)
+                ) {
+                    vm.onTryAgainClicked()
                 }
             }
+
         } else {
-            LoadingStatusView(
-                resource = res,
-                loadingText = null,
-                errorText = vm.getErrorText(res)?.resolveString(),
-                emptyText = LocalContext.current.getString(R.string.error_no_definitions)
-            ) {
-                vm.onTryAgainClicked()
+            val res = defs.value
+            val data = res.data()
+
+            if (data?.isNotEmpty() == true) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(data, key = { it.id }) { item ->
+                        showViewItem(
+                            Modifier.animateItemPlacement(),
+                            item,
+                            vm,
+                            onPartOfSpeechFilterClicked
+                        )
+                    }
+                }
+            } else {
+                LoadingStatusView(
+                    resource = res,
+                    loadingText = null,
+                    errorText = vm.getErrorText(res)?.resolveString(),
+                    emptyText = LocalContext.current.getString(R.string.error_no_definitions)
+                ) {
+                    vm.onTryAgainClicked()
+                }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun showSuggestItem(
+    modifier: Modifier,
+    item: BaseViewItem<*>,
+    vm: DefinitionsVM,
+    onClicked: (item: WordSuggestViewItem) -> Unit
+) = when (item) {
+    is WordSuggestViewItem -> {
+        ListItem (
+            modifier = modifier
+                .clickable { onClicked.invoke(item) },
+            secondaryText = { Text(item.source) },
+            text = { Text(item.firstItem()) }
+        )
+    }
+    else -> {
+        Text(
+            text = "unknown item $item",
+            modifier = modifier
+        )
     }
 }
 

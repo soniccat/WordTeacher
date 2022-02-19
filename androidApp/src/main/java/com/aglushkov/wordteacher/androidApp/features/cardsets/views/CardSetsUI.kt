@@ -44,7 +44,7 @@ fun CardSetsUI(
     ) {
         Column{
             CustomTopAppBar {
-                SearchView(searchText, { searchText = it }) {
+                SearchView(searchText, onTextChanged = { searchText = it }) {
                     //vm.onWordSubmitted(searchText)
                 }
             }

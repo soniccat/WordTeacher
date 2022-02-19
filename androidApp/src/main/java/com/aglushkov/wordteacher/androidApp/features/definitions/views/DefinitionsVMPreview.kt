@@ -85,12 +85,12 @@ open class DefinitionsVMPreview(
 
     // Suggests
 
-    override val suggests: StateFlow<Resource<List<Dict.Index.Entry>>>
+    override val suggests: StateFlow<Resource<List<BaseViewItem<*>>>>
         get() = MutableStateFlow(Resource.Uninitialized())
 
-    override fun requestSuggests(word: String) {
-    }
+    override fun clearSuggests() {}
 
-    override fun onCleared() {
-    }
+    override fun requestSuggests(word: String) {}
+
+    override fun onCleared() {}
 }

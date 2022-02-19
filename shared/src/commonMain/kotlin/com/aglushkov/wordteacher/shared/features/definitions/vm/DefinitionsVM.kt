@@ -70,8 +70,9 @@ interface DefinitionsVM: Clearable {
     fun onAddDefinitionInSet(wordDefinitionViewItem: WordDefinitionViewItem, cardSetViewItem: CardSetViewItem)
 
     // Suggests
-    val suggests: StateFlow<Resource<List<Dict.Index.Entry>>>
+    val suggests: StateFlow<Resource<List<BaseViewItem<*>>>>
 
+    fun clearSuggests()
     fun requestSuggests(word: String)
 
     @Parcelize
@@ -456,10 +457,23 @@ open class DefinitionsVMImpl(
     }
 
     // suggests
-    override val suggests = MutableStateFlow<Resource<List<Dict.Index.Entry>>>(Resource.Uninitialized())
+    override val suggests = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+
+    override fun clearSuggests() {
+        suggests.value = Resource.Uninitialized()
+    }
 
     override fun requestSuggests(word: String) {
-        val entries = dictRepository.wordsStartWith(word, 20)
+        var i = 0L
+        val entries = dictRepository.wordsStartWith(word, 20).map {
+            WordSuggestViewItem(
+                word = it.word,
+                definition = "", // TODO: support first definition
+                source = it.dict.name
+            ).apply {
+                id = i++
+            }
+        }
         suggests.value = Resource.Loaded(entries)
     }
 }

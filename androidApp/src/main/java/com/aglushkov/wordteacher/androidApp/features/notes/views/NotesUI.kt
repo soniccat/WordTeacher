@@ -52,7 +52,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     ) {
         Column{
             CustomTopAppBar {
-                SearchView(searchText, { searchText = it }) {
+                SearchView(searchText, onTextChanged = { searchText = it }) {
                     //vm.onWordSubmitted(searchText)
                 }
             }

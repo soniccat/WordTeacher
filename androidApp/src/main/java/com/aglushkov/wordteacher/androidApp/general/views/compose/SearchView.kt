@@ -14,10 +14,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -28,11 +32,11 @@ import com.aglushkov.wordteacher.androidApp.R
 @Composable
 fun SearchView(
     text: String,
+    focusRequester: FocusRequester = remember { FocusRequester() },
     onTextChanged: (String) -> Unit,
-    onImeAction: () -> Unit
+    onFocusChanged: (FocusState) -> Unit = {},
+    onImeAction: () -> Unit,
 ) {
-    val focusRequester = remember { FocusRequester() }
-
     TextField(
         value = text,
         onValueChange = onTextChanged,
@@ -43,7 +47,8 @@ fun SearchView(
                 color = MaterialTheme.colors.surface,
                 shape = RoundedCornerShape(2.dp)
             )
-            .focusRequester(focusRequester),
+            .focusRequester(focusRequester)
+            .onFocusChanged(onFocusChanged),
         textStyle = LocalTextStyle.current.copy(
             color = MaterialTheme.colors.onSurface
         ),
@@ -78,6 +83,6 @@ fun SearchView(
             backgroundColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
-        )
+        ),
     )
 }
