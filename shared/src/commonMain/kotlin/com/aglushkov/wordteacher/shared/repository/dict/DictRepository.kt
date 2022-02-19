@@ -32,6 +32,7 @@ class DictRepository(
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     val dicts = MutableStateFlow<Resource<List<Dict>>>(Resource.Uninitialized())
+    private var trie = DictTrie()
 
     var isImporting = AtomicBoolean(false)
     var needReimport = AtomicBoolean(false)
@@ -65,6 +66,10 @@ class DictRepository(
                 if (!isDictLoaded) {
                     dictFactory.createDict(filePath)?.let { dict ->
                         dict.load()
+                        for (e in dict.index.allEntries()) {
+                            trie.putWord(e.word, e)
+                        }
+
                         dicts.update {
                             Resource.Loaded( (it.data() ?: emptyList()) + listOf(dict))
                         }
@@ -79,6 +84,10 @@ class DictRepository(
         } else {
             needReimport.value = true
         }
+    }
+
+    fun wordsStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {
+        return trie.wordsStartWith(prefix, limit)
     }
 
     suspend fun define(word: String): Flow<Resource<List<WordTeacherWord>>> {

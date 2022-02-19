@@ -37,9 +37,11 @@ import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.Chooser
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import kotlinx.coroutines.launch
@@ -107,13 +109,20 @@ private fun DefinitionsWordUI(
 ) {
     val defs = vm.definitions.collectAsState()
     var searchText by remember { mutableStateOf(vm.state.word.orEmpty()) }
+    var suggests = vm.suggests.collectAsState()
 
     Column(
         modifier = modifier,
     ) {
         if (withSearchBar) {
             CustomTopAppBar {
-                SearchView(searchText, { searchText = it }) {
+                SearchView(
+                    searchText,
+                    onTextChanged = {
+                        searchText = it
+                        vm.requestSuggests(it)
+                    }
+                ) {
                     vm.onWordSubmitted(searchText)
                 }
             }

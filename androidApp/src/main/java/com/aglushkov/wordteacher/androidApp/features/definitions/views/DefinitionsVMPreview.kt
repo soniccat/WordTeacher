@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
+import com.aglushkov.wordteacher.shared.dicts.Dict
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
@@ -80,6 +81,14 @@ open class DefinitionsVMPreview(
         wordDefinitionViewItem: WordDefinitionViewItem,
         cardSetViewItem: CardSetViewItem
     ) {
+    }
+
+    // Suggests
+
+    override val suggests: StateFlow<Resource<List<Dict.Index.Entry>>>
+        get() = MutableStateFlow(Resource.Uninitialized())
+
+    override fun requestSuggests(word: String) {
     }
 
     override fun onCleared() {

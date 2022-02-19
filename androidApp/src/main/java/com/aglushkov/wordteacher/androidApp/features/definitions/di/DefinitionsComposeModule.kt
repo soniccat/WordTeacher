@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -20,6 +21,7 @@ class DefinitionsComposeModule {
         configuration: DefinitionsComposeComponent.DefinitionConfiguration,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
+        dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
     ) = DefinitionsDecomposeComponent(
@@ -27,6 +29,7 @@ class DefinitionsComposeModule {
         configuration.word,
         connectivityManager,
         wordDefinitionRepository,
+        dictRepository,
         cardSetsRepository,
         idGenerator
     )

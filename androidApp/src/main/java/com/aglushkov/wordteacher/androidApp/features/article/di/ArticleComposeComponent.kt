@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecompos
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component

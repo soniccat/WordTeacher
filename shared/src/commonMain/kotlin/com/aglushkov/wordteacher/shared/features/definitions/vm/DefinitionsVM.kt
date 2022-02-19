@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
+import com.aglushkov.wordteacher.shared.dicts.Dict
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
@@ -20,6 +21,7 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
@@ -67,6 +69,11 @@ interface DefinitionsVM: Clearable {
     fun onOpenCardSets(item: OpenCardSetViewItem)
     fun onAddDefinitionInSet(wordDefinitionViewItem: WordDefinitionViewItem, cardSetViewItem: CardSetViewItem)
 
+    // Suggests
+    val suggests: StateFlow<Resource<List<Dict.Index.Entry>>>
+
+    fun requestSuggests(word: String)
+
     @Parcelize
     class State(
         var word: String? = null
@@ -77,6 +84,7 @@ open class DefinitionsVMImpl(
     override var state: DefinitionsVM.State,
     private val connectivityManager: ConnectivityManager,
     private val wordDefinitionRepository: WordDefinitionRepository,
+    private val dictRepository: DictRepository,
     private val cardSetsRepository: CardSetsRepository,
     private val idGenerator: IdGenerator
 ): ViewModel(), DefinitionsVM {
@@ -110,6 +118,7 @@ open class DefinitionsVMImpl(
 
     private val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     private var loadJob: Job? = null
+    private var observeJob: Job? = null
     private var definitionsContext: DefinitionsContext? = null
 
     private var word: String?
@@ -200,15 +209,24 @@ open class DefinitionsVMImpl(
 
     private fun load(word: String) {
         val tag = "DefinitionsVM.load"
-
         Logger.v("Start Loading $word", tag)
 
+        observeJob?.cancel()
         loadJob?.cancel()
+
         loadJob = viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             Logger.e("Load Word exception for $word ${e.message}", tag)
         }) {
             wordDefinitionRepository.define(word, false).forward(definitionWords)
             Logger.v("Finish Loading $word", tag)
+        }
+
+        observeJob = viewModelScope.launch {
+            wordDefinitionRepository.obtainStateFlow(word).collect {
+                if (it.isUninitialized()) {
+                    load(word) // reload when cache is unloaded
+                }
+            }
         }
     }
 
@@ -435,6 +453,14 @@ open class DefinitionsVMImpl(
                 examples = viewData.def.examples + contextExamples
             )
         }
+    }
+
+    // suggests
+    override val suggests = MutableStateFlow<Resource<List<Dict.Index.Entry>>>(Resource.Uninitialized())
+
+    override fun requestSuggests(word: String) {
+        val entries = dictRepository.wordsStartWith(word, 20)
+        suggests.value = Resource.Loaded(entries)
     }
 }
 

@@ -9,8 +9,17 @@ interface Dict: WordTeacherWordService {
     val name: String
     val fromLang: Language
     val toLang: Language
+    val index: Index
 
     suspend fun load()
+    suspend fun define(word: String, indexEntry: Index.Entry): List<WordTeacherWord>
+
+    interface Index {
+        fun allEntries(): Sequence<Entry>
+        fun indexEntry(word: String): Entry?
+
+        data class Entry(val word: String, val indexValue: Any?, val dict: Dict)
+    }
 }
 
 enum class Language {

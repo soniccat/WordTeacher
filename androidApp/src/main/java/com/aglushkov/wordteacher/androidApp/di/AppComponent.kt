@@ -50,7 +50,7 @@ public interface AppComponent:
     fun configRepository(): ConfigRepository
     fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository
     fun serviceRepository(): ServiceRepository
-    fun dictRepository(): DictRepository
+    override fun dictRepository(): DictRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
     override fun database(): AppDatabase
     override fun databaseWorker(): DatabaseWorker

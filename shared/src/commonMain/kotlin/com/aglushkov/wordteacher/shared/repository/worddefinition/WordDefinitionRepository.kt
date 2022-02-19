@@ -48,6 +48,11 @@ class WordDefinitionRepository(
         scope.launch {
             serviceRepository.services.collect {
                 if (it.isLoaded()) {
+                    stateFlows.onEach {
+                        it.value.value = Resource.Uninitialized() // mark as uninitialized to notify
+                    }
+                    stateFlows.clear() // invalidate cache() // TODO: just load definition for new services
+
                     defineUninitializedFlows()
                     // TODO: consider to handle adding new services
                 } else if (it is Resource.Error) {

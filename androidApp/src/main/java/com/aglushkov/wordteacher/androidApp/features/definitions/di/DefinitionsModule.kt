@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
@@ -58,6 +59,7 @@ class DefinitionsModule {
         state: DefinitionsVM.State,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
+        dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
     ): DefinitionsVM {
@@ -65,6 +67,7 @@ class DefinitionsModule {
             state,
             connectivityManager,
             wordDefinitionRepository,
+            dictRepository,
             cardSetsRepository,
             idGenerator,
         )

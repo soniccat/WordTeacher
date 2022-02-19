@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import dagger.BindsInstance
 import dagger.Component
 
@@ -34,4 +35,5 @@ interface DefinitionsDependencies {
     fun connectivityManager(): ConnectivityManager
     fun idGenerator(): IdGenerator
     fun cardSetsRepository(): CardSetsRepository
+    fun dictRepository(): DictRepository
 }

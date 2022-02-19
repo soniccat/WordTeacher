@@ -1,17 +1,29 @@
 package com.aglushkov.wordteacher.shared.dicts.dsl
 
+import com.aglushkov.wordteacher.shared.dicts.Dict
 import okio.FileSystem
 import okio.Path
 
 class DslIndex(
+    private val dict: Dict,
     private val path: Path,
-    private val fileSystem: FileSystem
-) {
+    private val fileSystem: FileSystem,
+) : Dict.Index {
     private val index = hashMapOf<String, Long>() //TODO: use trie
 
     init {
         if (fileSystem.exists(path)) {
             loadIndex()
+        }
+    }
+
+    override fun allEntries(): Sequence<Dict.Index.Entry> {
+        return index.asSequence().map { Dict.Index.Entry(it.key, it.value, dict) }
+    }
+
+    override fun indexEntry(word: String): Dict.Index.Entry? {
+        return index[word]?.let { offset ->
+            Dict.Index.Entry(word, offset, dict)
         }
     }
 

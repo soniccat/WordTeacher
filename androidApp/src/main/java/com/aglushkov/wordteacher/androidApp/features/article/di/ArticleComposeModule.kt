@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
@@ -39,12 +40,14 @@ class ArticleComposeModule {
         configuration: MainDecomposeComponent.ChildConfiguration.ArticleConfiguration,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
+        dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
     ): DefinitionsVM = DefinitionsVMImpl(
         DefinitionsVM.State(),
         connectivityManager,
         wordDefinitionRepository,
+        dictRepository,
         cardSetsRepository,
         idGenerator
     )

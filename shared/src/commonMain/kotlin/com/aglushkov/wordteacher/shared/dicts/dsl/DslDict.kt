@@ -24,8 +24,11 @@ class DslDict(
     private val wordTeacherWordBuilder = WordTeacherWordBuilder()
     private lateinit var dslIndex: DslIndex
 
+    override val index: Dict.Index
+        get() = dslIndex
+
     override suspend fun load() {
-        val dslIndex = DslIndex((path.toString() + DSL_INDEX_SUFFIX).toPath(), fileSystem)
+        val dslIndex = DslIndex(this, (path.toString() + DSL_INDEX_SUFFIX).toPath(), fileSystem)
         if (dslIndex.isEmpty()) {
             fillIndex(dslIndex)
             dslIndex.save()
@@ -56,13 +59,19 @@ class DslDict(
         }
     }
 
-    override suspend fun define(term: String): List<WordTeacherWord> {
-        wordTeacherWordBuilder.clear()
-        wordTeacherWordBuilder.setWord(term)
-        val pos = dslIndex.get(term) ?: return emptyList()
+    override suspend fun define(word: String): List<WordTeacherWord> {
+        return dslIndex.indexEntry(word)?.let { indexEntry ->
+            define(word, indexEntry)
+        } ?: emptyList()
+    }
 
+    override suspend fun define(word: String, indexEntry: Dict.Index.Entry): List<WordTeacherWord> {
+        wordTeacherWordBuilder.clear()
+        wordTeacherWordBuilder.setWord(word)
+
+        val pos = indexEntry.indexValue as Long
         fileSystem.read(path) {
-            skip(pos + term.length + 1)
+            skip(pos + word.length + 1)
             var line = readUtf8Line()
             while (line != null && line.isNotEmpty() && line.first() == '\t') {
                 readWordLine(line, wordTeacherWordBuilder)
@@ -70,9 +79,9 @@ class DslDict(
             }
         }
 
-        val word = wordTeacherWordBuilder.build()
-        return if (word != null) {
-            listOf(word)
+        val wordTeacherWord = wordTeacherWordBuilder.build()
+        return if (wordTeacherWord != null) {
+            listOf(wordTeacherWord)
         } else {
             emptyList()
         }
