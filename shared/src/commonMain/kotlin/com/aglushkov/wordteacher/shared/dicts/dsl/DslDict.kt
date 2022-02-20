@@ -32,9 +32,26 @@ class DslDict(
         if (dslIndex.isEmpty()) {
             fillIndex(dslIndex)
             dslIndex.save()
+        } else {
+            readHeader()
         }
 
         this.dslIndex = dslIndex
+    }
+
+    private fun readHeader() {
+        var headerLineCount = 10
+        fileSystem.read(path) {
+            while (!exhausted() && headerLineCount > 0) {
+                readUtf8Line()?.let { line ->
+                    if (line.isNotEmpty() && line.first() == '#') {
+                        readHeader(line)
+                    }
+                } ?: break
+
+                --headerLineCount
+            }
+        }
     }
 
     private fun fillIndex(index: DslIndex) {

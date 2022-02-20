@@ -144,50 +144,44 @@ private fun DefinitionsWordUI(
                     }
                 ) {
                     vm.onWordSubmitted(searchText)
+                    focusManager.clearFocus()
                 }
             }
         }
 
         contentHeader()
 
-        if (needShowSuggests) {
-            val res = suggests.value
-            val data = res.data()
-
-            if (data?.isNotEmpty() == true) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(data, key = { it.id }) { item ->
-                        showSuggestItem(
-                            Modifier.animateItemPlacement(),
-                            item,
-                            vm,
-                            onClicked = {
-                                vm.onWordSubmitted(it.firstItem())
-                                focusManager.clearFocus()
-                            }
-                        )
-                    }
-                }
-            } else {
-                LoadingStatusView(
-                    resource = res,
-                    loadingText = null,
-                    errorText = vm.getErrorText(res)?.resolveString(),
-                    emptyText = LocalContext.current.getString(R.string.error_no_definitions)
-                ) {
-                    vm.onTryAgainClicked()
+        val suggestsRes = suggests.value
+        val suggestsData = suggestsRes.data()
+        if (needShowSuggests && suggestsData?.isNotEmpty() == true) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(
+                    bottom = 300.dp
+                )
+            ) {
+                items(suggestsData, key = { it.id }) { item ->
+                    showSuggestItem(
+                        Modifier.animateItemPlacement(),
+                        item,
+                        vm,
+                        onClicked = {
+                            vm.onWordSubmitted(it.firstItem())
+                            focusManager.clearFocus()
+                        }
+                    )
                 }
             }
-
         } else {
             val res = defs.value
             val data = res.data()
 
             if (data?.isNotEmpty() == true) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(
+                        bottom = 300.dp
+                    )
                 ) {
                     items(data, key = { it.id }) { item ->
                         showViewItem(

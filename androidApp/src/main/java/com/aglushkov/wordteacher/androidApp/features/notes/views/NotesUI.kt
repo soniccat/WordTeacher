@@ -168,6 +168,9 @@ private fun NoteView(
 ) {
     if (isEditing) {
         EditableCell(
+            modifier = Modifier.padding(
+                bottom = dimensionResource(id = R.dimen.note_verticalPadding)
+            ),
             textFieldValue = rememberTextFieldValue,
             onTextChanged = onTextChanged,
             onDonePressed = onDoneEditing,
@@ -190,6 +193,8 @@ private fun NoteView(
                     }
                     .fillMaxWidth()
                     .padding(
+                        top = dimensionResource(id = R.dimen.note_verticalPadding),
+                        bottom = dimensionResource(id = R.dimen.note_verticalPadding),
                         start = dimensionResource(id = R.dimen.note_horizontalPadding),
                         end = dimensionResource(id = R.dimen.note_horizontalPadding)
                     )

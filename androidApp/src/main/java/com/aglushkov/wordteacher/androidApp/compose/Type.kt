@@ -42,13 +42,13 @@ class AppTypography {
         val wordDefinition = typography.body1
         val wordSynonym = typography.body2
         val wordExample = typography.body2
-        val wordDefinitionSubHeader: TextStyle
+        val wordDefinitionSubHeader = typography.subtitle2/*: TextStyle
             @Composable get() {
                 val color = colorResource(id = R.color.word_subheader)
                 return remember(color) { typography.subtitle2.copy(
                     color = color
                 )}
-            }
+            }*/
 
         val articleTitle = wordDefinitionTitle
         val articleDate: TextStyle

@@ -14,6 +14,7 @@
     <dimen name="article_divider_topMargin">@dimen/content_padding</dimen>
 
     <dimen name="note_horizontalPadding">@dimen/definitions_search_horizontal_margin</dimen>
+    <dimen name="note_verticalPadding">@dimen/definitions_search_horizontal_margin</dimen>
     <dimen name="note_divider_topMargin">@dimen/content_padding</dimen>
 
     <dimen name="learning_horizontalPadding">@dimen/content_padding</dimen>

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 
 @Composable
 fun EditableCell(
+    modifier: Modifier = Modifier,
     textFieldValue: TextFieldValue,
     onTextChanged: (text: TextFieldValue) -> Unit,
     onDonePressed: (text: String) -> Unit,
@@ -32,7 +33,7 @@ fun EditableCell(
     TextField(
         value = textFieldValue,
         onValueChange = onTextChanged,
-        modifier = Modifier
+        modifier = modifier
             //.apply { aFocusRequester?.let { focusRequester(it) } }
             .focusRequester(aFocusRequester)
             .fillMaxWidth()

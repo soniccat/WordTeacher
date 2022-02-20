@@ -39,7 +39,8 @@ fun CardSetsUI(
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { newCardSetTextState.value.newCardSetText }) }
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .background(color = MaterialTheme.colors.background),
     ) {
         Column{
@@ -134,22 +135,10 @@ private fun CardSetTitleView(
         onClick,
         onDeleted
     ) {
-        Row(
-            modifier = Modifier.padding(
-                start = dimensionResource(id = R.dimen.article_horizontalPadding),
-                end = dimensionResource(id = R.dimen.article_horizontalPadding)
-            )
-        ) {
-            Text(
-                text = cardSetViewItem.name,
-                modifier = Modifier.weight(1.0f, true),
-                style = AppTypography.articleTitle
-            )
-            Text(
-                text = cardSetViewItem.date,
-                style = AppTypography.articleDate
-            )
-        }
+        ListItem(
+            text = { Text(cardSetViewItem.name) },
+            secondaryText = { Text(cardSetViewItem.date) }
+        )
     }
 }
 
