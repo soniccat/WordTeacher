@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.dicts.dsl
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.repository.dict.DictTrie
 import okio.FileSystem
 import okio.Path
 
@@ -9,7 +10,7 @@ class DslIndex(
     private val path: Path,
     private val fileSystem: FileSystem,
 ) : Dict.Index {
-    private val index = hashMapOf<String, Long>() //TODO: use trie
+    private val index = DictTrie()
 
     init {
         if (fileSystem.exists(path)) {
@@ -18,13 +19,11 @@ class DslIndex(
     }
 
     override fun allEntries(): Sequence<Dict.Index.Entry> {
-        return index.asSequence().map { Dict.Index.Entry(it.key, it.value, dict) }
+        return index.asSequence()
     }
 
     override fun indexEntry(word: String): Dict.Index.Entry? {
-        return index[word]?.let { offset ->
-            Dict.Index.Entry(word, offset, dict)
-        }
+        return index.word(word).firstOrNull()
     }
 
     private fun loadIndex() {
@@ -35,7 +34,7 @@ class DslIndex(
 
                 if (key != null && value != null) {
                     value.toLongOrNull()?.let { offset ->
-                        index[key] = offset
+                        add(key, offset)
                     }
                 }
             }
@@ -43,21 +42,21 @@ class DslIndex(
     }
 
     fun add(term: String, offset: Long) {
-        index[term] = offset
+        index.putWord(term, Dict.Index.Entry(term, offset, dict))
     }
 
     fun save() {
         fileSystem.write(path) {
             index.onEach {
-                writeUtf8(it.key)
+                writeUtf8(it.word)
                 writeUtf8("\n")
-                writeUtf8(it.value.toString())
+                writeUtf8((it.indexValue as Long).toString())
                 writeUtf8("\n")
             }
         }
     }
 
-    fun get(term: String): Long? = index[term]
+    fun get(term: String): Long? = index.word(term).firstOrNull()?.indexValue as? Long
 
     fun isEmpty() = index.isEmpty()
 }

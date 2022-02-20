@@ -65,7 +65,7 @@ class DslDictTests {
         val dslDict = DslDict(dictPath, fakeFileSystem)
         dslDict.load()
 
-        val word = dslDict.define("term1")
+        val word = dslDict.define("term1").firstOrNull()
         assertNotNull(word)
         assertEquals(
             WordTeacherWord(
@@ -114,7 +114,7 @@ class DslDictTests {
         val dslDict = DslDict(dictPath, fakeFileSystem)
         dslDict.load()
 
-        val word = dslDict.define("another term")
+        val word = dslDict.define("another term").firstOrNull()
         assertNotNull(word)
         assertEquals(
             WordTeacherWord(
@@ -173,8 +173,8 @@ class DslDictTests {
         val dslDict = DslDict(dictPath, fakeFileSystem)
         dslDict.load()
 
-        val word1 = dslDict.define("term1")
-        val word2 = dslDict.define("term2")
+        val word1 = dslDict.define("term1").firstOrNull()
+        val word2 = dslDict.define("term2").firstOrNull()
         assertNotNull(word1)
         assertNotNull(word2)
         assertEquals(
