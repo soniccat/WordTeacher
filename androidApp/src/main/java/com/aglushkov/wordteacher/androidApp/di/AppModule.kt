@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.dict.DictFactory
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepositoryImpl
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
@@ -85,7 +86,7 @@ class AppModule {
     ): DictRepository {
         val dictsPath = context.filesDir.absolutePath.toPath().div("dicts")
         fileSystem.createDirectory(dictsPath)
-        return DictRepository(dictsPath, dictFactory, fileSystem)
+        return DictRepositoryImpl(dictsPath, dictFactory, fileSystem)
     }
 
     @AppComp

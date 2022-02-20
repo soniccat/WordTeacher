@@ -41,6 +41,8 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
@@ -125,11 +127,14 @@ fun ArticleUI(
     }
 }
 
+// TODO: consider passing prepared view items from vm instead of resolving them here
 @Composable
 private fun ArticleSideSheetContent(
     vm: ArticleVM,
     state: ArticleVM.State
 ) {
+    val dictPaths by vm.dictPaths.collectAsState()
+
     CheckableListItem(
         isChecked = state.selectionState.cardSetWords,
         textRes = R.string.article_side_sheet_selection_cardset_words,
@@ -140,6 +145,23 @@ private fun ArticleSideSheetContent(
         textRes = R.string.article_side_sheet_selection_phrasal_verbs,
         onClicked = { vm.onPhrasalVerbSelectionChanged() }
     )
+
+    Text(
+        modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
+        text = stringResource(id = R.string.article_side_sheet_selection_dicts),
+        style = AppTypography.articleSideSheetSection
+    )
+    if (dictPaths.isLoaded()) {
+        dictPaths.data()?.onEach {
+            CheckableListItem(
+                isChecked = state.selectionState.dicts.contains(it),
+                text = it,
+                onClicked = { vm.onDictSelectionChanged(it) }
+            )
+        }
+    } else {
+        // TODO: handle other states
+    }
 
     Text(
         modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),

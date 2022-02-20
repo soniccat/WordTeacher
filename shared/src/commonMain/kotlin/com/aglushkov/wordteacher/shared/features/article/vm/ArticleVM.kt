@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.article.vm
 
+import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsContext
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
@@ -7,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsWordC
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.Quadruple
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -20,6 +22,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.split
 import com.aglushkov.wordteacher.shared.model.nlp.toPartOfSpeech
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -35,6 +38,7 @@ interface ArticleVM: Clearable {
     val article: StateFlow<Resource<Article>>
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
     val eventFlow: Flow<Event>
+    val dictPaths: StateFlow<Resource<List<String>>>
 
     val definitionsVM: DefinitionsVM
 
@@ -46,6 +50,7 @@ interface ArticleVM: Clearable {
     fun onCardSetWordSelectionChanged()
     fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech)
     fun onPhraseSelectionChanged(phraseType: ChunkType)
+    fun onDictSelectionChanged(dictPath: String)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
@@ -61,7 +66,8 @@ interface ArticleVM: Clearable {
         var partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
         var phrases: Set<ChunkType> = emptySet(),
         var cardSetWords: Boolean = true,
-        var phrasalVerbs: Boolean = true
+        var phrasalVerbs: Boolean = true,
+        var dicts: List<String> = emptyList()
     ) : Parcelable
 }
 
@@ -69,6 +75,7 @@ open class ArticleVMImpl(
     override val definitionsVM: DefinitionsVM,
     private val articleRepository: ArticleRepository,
     private val cardsRepository: CardsRepository,
+    private val dictRepository: DictRepository,
     initialState: ArticleVM.State,
     private val router: ArticleRouter,
     private val idGenerator: IdGenerator,
@@ -83,10 +90,17 @@ open class ArticleVMImpl(
         Resource.Uninitialized())
     private val annotations = MutableStateFlow<List<List<ArticleAnnotation>>>(emptyList())
 
-    override val paragraphs = combine(article, annotations, state) { a, b, c -> Triple(a,b,c.selectionState)}
-        .map { (article, annotations, selectionState) ->
+    override val paragraphs = combine(article, annotations) { a, b -> a to b }
+        .map { (article, annotations) ->
             Logger.v("build view items")
-            article.copyWith(buildViewItems(article, filterAnnotations(annotations, selectionState)))
+            article.copyWith(buildViewItems(article, annotations))
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+
+    private val dicts: StateFlow<Resource<List<Dict>>>
+        get() = dictRepository.dicts
+    override val dictPaths: StateFlow<Resource<List<String>>>
+        get() = dicts.map {
+            it.copyWith(it.data()?.map { dict -> dict.path.toString() })
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     init {
@@ -99,11 +113,11 @@ open class ArticleVMImpl(
         }
 
         viewModelScope.launch(Dispatchers.Default) {
-            combine(article, cardProgress) { a, b -> a to b }
-                .map { (article, cards) ->
+            combine(article, cardProgress, dicts, state) { a, b, c, d -> Quadruple(a, b, c, d) }
+                .map { (article, cards, dicts, state) ->
                     if (article is Resource.Loaded && cards is Resource.Loaded) {
                         article.data.sentences.map {
-                            resolveAnnotations(it, cards)
+                            resolveAnnotations(it, cards, dicts.data().orEmpty(), state.selectionState)
                         }
                     } else {
                         emptyList()
@@ -114,7 +128,9 @@ open class ArticleVMImpl(
 
     private fun resolveAnnotations(
         sentence: NLPSentence,
-        cards: Resource.Loaded<Map<Pair<String, WordTeacherWord.PartOfSpeech>, Card>>
+        cards: Resource.Loaded<Map<Pair<String, WordTeacherWord.PartOfSpeech>, Card>>,
+        dicts: List<Dict>,
+        selectionState: ArticleVM.SelectionState
     ): List<ArticleAnnotation> {
         val progressAndPartOfSpeechAnnotations = sentence.tokenSpans.indices.mapNotNull { i ->
             val span = sentence.tokenSpans[i]
@@ -122,31 +138,46 @@ open class ArticleVMImpl(
             val partOfSpeech = sentence.tagEnum(i).toPartOfSpeech()
 
             // TODO: that won't work with phrases
-            val progressAnnotation = cards.data[term to partOfSpeech]?.let { card ->
-                ArticleAnnotation.LearnProgress(
-                    start = span.start,
-                    end = span.end,
-                    learnLevel = card.progress.currentLevel
-                )
+            val progressAnnotation = if (selectionState.cardSetWords) {
+                cards.data[term to partOfSpeech]?.let { card ->
+                    ArticleAnnotation.LearnProgress(
+                        start = span.start,
+                        end = span.end,
+                        learnLevel = card.progress.currentLevel
+                    )
+                }
+            } else {
+                null
             }
 
-            val partOfSpeechAnnotation = ArticleAnnotation.PartOfSpeech(
-                start = span.start,
-                end = span.end,
-                partOfSpeech = partOfSpeech
-            )
+            val partOfSpeechAnnotation = if (selectionState.partsOfSpeech.contains(partOfSpeech)) {
+                ArticleAnnotation.PartOfSpeech(
+                    start = span.start,
+                    end = span.end,
+                    partOfSpeech = partOfSpeech
+                )
+            } else {
+                null
+            }
 
             listOfNotNull(progressAnnotation, partOfSpeechAnnotation)
         }.flatten()
 
         val phrases = sentence.phrases()
-        val phraseAnnotations = phrases.map { phrase ->
-            ArticleAnnotation.Phrase(
-                start = sentence.tokenSpans[phrase.start].start,
-                end = sentence.tokenSpans[phrase.end-1].end,
-                phrase = phrase.type
-            )
+        val phraseAnnotations = phrases.mapNotNull { phrase ->
+            if (selectionState.phrases.contains(phrase.type)) {
+                ArticleAnnotation.Phrase(
+                    start = sentence.tokenSpans[phrase.start].start,
+                    end = sentence.tokenSpans[phrase.end - 1].end,
+                    phrase = phrase.type
+                )
+            } else {
+                null
+            }
         }
+
+        val actualDicts = selectionState.dicts.mapIndexed { index, s -> dicts[index] }
+        
 
         return progressAndPartOfSpeechAnnotations + phraseAnnotations
     }
@@ -172,18 +203,18 @@ open class ArticleVMImpl(
         }
     }
 
-    private fun filterAnnotations(
-        annotations: List<List<ArticleAnnotation>>,
-        selectionState: ArticleVM.SelectionState
-    ) = annotations.map {
-        it.filter { annotation ->
-            when (annotation) {
-                is ArticleAnnotation.LearnProgress -> selectionState.cardSetWords
-                is ArticleAnnotation.PartOfSpeech -> selectionState.partsOfSpeech.contains(annotation.partOfSpeech)
-                is ArticleAnnotation.Phrase -> selectionState.phrases.contains(annotation.phrase)
-            }
-        }
-    }
+//    private fun filterAnnotations(
+//        annotations: List<List<ArticleAnnotation>>,
+//        selectionState: ArticleVM.SelectionState
+//    ) = annotations.map {
+//        it.filter { annotation ->
+//            when (annotation) {
+//                is ArticleAnnotation.LearnProgress -> selectionState.cardSetWords
+//                is ArticleAnnotation.PartOfSpeech -> selectionState.partsOfSpeech.contains(annotation.partOfSpeech)
+//                is ArticleAnnotation.Phrase -> selectionState.phrases.contains(annotation.phrase)
+//            }
+//        }
+//    }
 
     private fun makeParagraphs(
         article: Resource.Loaded<Article>,
@@ -271,6 +302,22 @@ open class ArticleVMImpl(
                         phrases.minus(phraseType)
                     } else {
                         phrases.plus(phraseType)
+                    }
+                )
+            )
+        }
+    }
+
+    override fun onDictSelectionChanged(dictPath: String) {
+        state.update {
+            val dicts = it.selectionState.dicts
+            val needRemove = dicts.contains(dictPath)
+            it.copy(
+                selectionState = it.selectionState.copy(
+                    dicts = if (needRemove) {
+                        dicts.minus(dictPath)
+                    } else {
+                        dicts.plus(dictPath)
                     }
                 )
             )

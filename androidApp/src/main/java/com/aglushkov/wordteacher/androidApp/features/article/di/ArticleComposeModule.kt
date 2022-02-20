@@ -59,6 +59,7 @@ class ArticleComposeModule {
         definitionsVM: DefinitionsVM,
         articleRepository: ArticleRepository,
         cardsRepository: CardsRepository,
+        dictRepository: DictRepository,
         idGenerator: IdGenerator,
         router: RouterResolver
     ) = ArticleDecomposeComponent(
@@ -67,6 +68,7 @@ class ArticleComposeModule {
         definitionsVM,
         articleRepository,
         cardsRepository,
+        dictRepository,
         idGenerator,
         router.router!!.get()!!
     )

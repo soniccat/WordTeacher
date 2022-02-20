@@ -5,18 +5,16 @@ import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.isUninitialized
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
@@ -25,13 +23,21 @@ import kotlinx.coroutines.supervisorScope
 import okio.FileSystem
 import okio.Path
 
-class DictRepository(
+interface DictRepository {
+    val dicts: StateFlow<Resource<List<Dict>>>
+
+    fun importDicts()
+    fun wordsStartWith(prefix: String, limit: Int): List<Dict.Index.Entry>
+    suspend fun define(word: String): Flow<Resource<List<WordTeacherWord>>>
+}
+
+class DictRepositoryImpl(
     private val path: Path,
     private val dictFactory: DictFactory,
     private val fileSystem: FileSystem
-) {
+) : DictRepository {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    val dicts = MutableStateFlow<Resource<List<Dict>>>(Resource.Uninitialized())
+    override val dicts = MutableStateFlow<Resource<List<Dict>>>(Resource.Uninitialized())
     private var trie = DictTrie()
 
     var isImporting = AtomicBoolean(false)
@@ -40,13 +46,13 @@ class DictRepository(
     var word: String? = null
         private set
     private var wordJob: Job? = null
-    val wordStateFlow = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
+    private val wordStateFlow = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
 
     init {
         importDicts()
     }
 
-    fun importDicts() {
+    override fun importDicts() {
         scope.launch {
             importDictsInternal()
         }
@@ -86,11 +92,11 @@ class DictRepository(
         }
     }
 
-    fun wordsStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {
+    override fun wordsStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {
         return trie.wordsStartWith(prefix, limit)
     }
 
-    suspend fun define(word: String): Flow<Resource<List<WordTeacherWord>>> {
+    override suspend fun define(word: String): Flow<Resource<List<WordTeacherWord>>> {
         if (this.word == word) {
             return wordStateFlow
         }
