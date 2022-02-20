@@ -18,6 +18,7 @@ interface Dict: WordTeacherWordService {
         fun allEntries(): Sequence<Entry>
         fun indexEntry(word: String): Entry?
 
+        // TODO: consider removing "word" property and build it from a trie
         data class Entry(val word: String, val indexValue: Any?, val dict: Dict)
     }
 }

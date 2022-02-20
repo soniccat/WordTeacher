@@ -415,6 +415,14 @@ private fun AnnotatedString.Builder.addAnnotations(
                     annotationSentenceStartIndex + annotation.end
                 )
             }
+            is ArticleAnnotation.DictWord -> {
+                addStringAnnotation(
+                    ROUNDED_ANNOTATION_DICT_VALUE,
+                    annotation.dict.path.toString(),
+                    annotationSentenceStartIndex + annotation.start,
+                    annotationSentenceStartIndex + annotation.end
+                )
+            }
         }
     }
 }
@@ -477,6 +485,8 @@ private fun AnnotatedString.Range<String>.resolveColor(
             PartOfSpeechToColorMap[partOfSpeechEnum(item)] ?: AnnotationColors(null)
         ROUNDED_ANNOTATION_PHRASE_VALUE ->
             PhraseTypeToColorMap[chunkEnum(item)] ?: AnnotationColors(null)
+        ROUNDED_ANNOTATION_DICT_VALUE ->
+            AnnotationColors(Color(0xB44C0A57))
         else -> AnnotationColors(null)
     }
 }
@@ -546,3 +556,4 @@ private const val SENTENCE_CONNECTOR = " "
 private const val ROUNDED_ANNOTATION_PROGRESS_VALUE = "progress_value"
 private const val ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE = "part_of_speech_value"
 private const val ROUNDED_ANNOTATION_PHRASE_VALUE = "phrase_value"
+private const val ROUNDED_ANNOTATION_DICT_VALUE = "dict_value"

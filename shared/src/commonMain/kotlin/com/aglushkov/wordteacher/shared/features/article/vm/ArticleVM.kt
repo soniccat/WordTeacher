@@ -177,7 +177,13 @@ open class ArticleVMImpl(
         }
 
         val actualDicts = selectionState.dicts.mapIndexed { index, s -> dicts[index] }
-        
+        val dictAnnotations = actualDicts.map {
+            for (i in 0 until sentence.lemmas.size) {
+                val word = sentence.lemmaOrToken(i)
+
+            }
+
+        }
 
         return progressAndPartOfSpeechAnnotations + phraseAnnotations
     }
@@ -356,10 +362,12 @@ sealed class ArticleAnnotation(
     class LearnProgress(start: Int, end: Int, val learnLevel: Int): ArticleAnnotation(ArticleAnnotationType.LEARN_PROGRESS, start, end)
     class PartOfSpeech(start: Int, end: Int, val partOfSpeech: WordTeacherWord.PartOfSpeech): ArticleAnnotation(ArticleAnnotationType.PART_OF_SPEECH, start, end)
     class Phrase(start: Int, end: Int, val phrase: ChunkType): ArticleAnnotation(ArticleAnnotationType.PHRASE, start, end)
+    class DictWord(start: Int, end: Int, val dict: Dict): ArticleAnnotation(ArticleAnnotationType.DICT, start, end)
 }
 
 enum class ArticleAnnotationType {
     LEARN_PROGRESS,
     PART_OF_SPEECH,
-    PHRASE
+    PHRASE,
+    DICT
 }
