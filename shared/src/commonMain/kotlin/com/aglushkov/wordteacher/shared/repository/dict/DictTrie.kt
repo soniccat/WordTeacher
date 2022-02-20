@@ -119,9 +119,8 @@ class DictTrie: Iterable<Dict.Index.Entry> {
             val entry = nodeStack.last()
             if (entry.entryIterator.hasNext()) {
                 result = entry.entryIterator.next()
-            }
 
-            if (entry.childIterator.hasNext()) {
+            } else if (entry.childIterator.hasNext()) {
                 val nextLastNode = walkDownUntilEntries(entry.childIterator.next().value)
                 result = nextLastNode.entryIterator.next()
             }
