@@ -25,6 +25,7 @@ napier = "1.4.1"
 uuid = "0.3.0"
 junit = "4.13"
 stately = "1.2.0"
+mockitoKotlin = "4.0.0"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
@@ -78,6 +79,8 @@ ktorDesktop = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 statelyCommon = { module = "co.touchlab:stately-common", version.ref = "stately" }
 statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
+
+mockitoKotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okioFakeFileSystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }

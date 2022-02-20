@@ -50,7 +50,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
         }
     }
 
-    fun isEmpty() = root.children.isNotEmpty() || root.dictIndexEntries.isNotEmpty()
+    fun isEmpty() = root.children.isEmpty() && root.dictIndexEntries.isEmpty()
 
     private fun runVisitor(
         node: DictTrieNode,
@@ -77,7 +77,9 @@ class DictTrie: Iterable<Dict.Index.Entry> {
         private var nodeStack = ArrayDeque<TrieIteratorNode>()
 
         init {
-            walkDownUntilEntries(rootNode)
+            if (rootNode.children.isNotEmpty() || rootNode.dictIndexEntries.isNotEmpty()) {
+                walkDownUntilEntries(rootNode)
+            }
         }
 
         private fun walkDownUntilEntries(aNode: DictTrieNode): TrieIteratorNode {

@@ -66,6 +66,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinTestJUnit)
                 implementation(libs.junit)
+                implementation(libs.mockitoKotlin)
             }
         }
         val iosMain by getting {

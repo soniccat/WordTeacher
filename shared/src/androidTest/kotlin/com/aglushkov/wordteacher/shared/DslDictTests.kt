@@ -1,3 +1,5 @@
+package com.aglushkov.wordteacher.shared
+
 import com.aglushkov.wordteacher.shared.dicts.Language
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
