@@ -17,6 +17,7 @@ interface Dict: WordTeacherWordService {
     interface Index {
         fun allEntries(): Sequence<Entry>
         fun indexEntry(word: String): Entry?
+        fun entry(word: String, nextWord: (needAnotherOne: Boolean) -> String?): Dict.Index.Entry?
 
         // TODO: consider removing "word" property and build it from a trie
         data class Entry(val word: String, val indexValue: Any?, val dict: Dict)

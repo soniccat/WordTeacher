@@ -26,6 +26,10 @@ class DslIndex(
         return index.word(word).firstOrNull()
     }
 
+    override fun entry(word: String, nextWord: (needAnotherOne: Boolean) -> String?): Dict.Index.Entry? {
+        return index.entry(word, nextWord).firstOrNull()
+    }
+
     private fun loadIndex() {
         fileSystem.read(path) {
             while (!this.exhausted()) {

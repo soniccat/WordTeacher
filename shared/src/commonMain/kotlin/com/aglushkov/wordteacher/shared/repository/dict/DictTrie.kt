@@ -67,6 +67,55 @@ class DictTrie: Iterable<Dict.Index.Entry> {
         return true
     }
 
+    fun entry(word: String, nextWord: (needAnotherOne: Boolean) -> String?): List<Dict.Index.Entry> {
+        var node: DictTrieNode? = root
+        word.onEach { ch ->
+            node = node?.children?.get(ch)
+            if (node == null) return emptyList()
+        }
+
+        val spaceNode = node?.children?.get(' ')
+        if (spaceNode != null) {
+            node = spaceNode
+        } else {
+            return node?.dictIndexEntries.orEmpty()
+        }
+
+        var needAnotherOne = false
+        var nw = nextWord(needAnotherOne)
+        while (nw != null) {
+            val nextNode = wordNode(nw, node)
+            if (nextNode == null) {
+                needAnotherOne = true
+            } else {
+                needAnotherOne = false
+                node = nextNode
+
+                val spaceNode2 = node?.children?.get(' ')
+                if (spaceNode2 != null) {
+                    node = spaceNode2
+                } else {
+                    return node?.dictIndexEntries.orEmpty()
+                }
+            }
+
+            nw = nextWord(needAnotherOne)
+        }
+
+        return node?.dictIndexEntries.orEmpty()
+    }
+
+    private fun wordNode(word: String, startNode: DictTrieNode?): DictTrieNode? {
+        var node: DictTrieNode? = startNode
+        word.onEach { ch ->
+            node = node?.children?.get(ch)
+
+            if (node == null) return null
+        }
+
+        return node
+    }
+
     override fun iterator(): Iterator<Dict.Index.Entry> {
         return TrieIterator(root)
     }
@@ -83,9 +132,6 @@ class DictTrie: Iterable<Dict.Index.Entry> {
         }
 
         private fun walkDownUntilEntries(aNode: DictTrieNode): TrieIteratorNode {
-            //nodeStack.addLast(anIteratorNode)
-            //if (anIteratorNode.entryIterator.hasNext()) return anIteratorNode.node
-
             var node = aNode
             do {
                 val iteratorNode = TrieIteratorNode(node)
@@ -99,14 +145,6 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                     break
                 }
             } while (true)
-//            {
-//                nodeIterator = TrieIteratorNode(nodeIterator.childIterator.next().value)
-//                nodeStack.addLast(nodeIterator)
-//
-//                if (nodeIterator.entryIterator.hasNext()) {
-//                    return nodeIterator.node
-//                }
-//            }
 
             throw RuntimeException("TrieIterator.walkDownUntilEntries returns null")
         }

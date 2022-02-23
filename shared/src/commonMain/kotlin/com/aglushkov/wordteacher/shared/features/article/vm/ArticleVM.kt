@@ -177,15 +177,51 @@ open class ArticleVMImpl(
         }
 
         val actualDicts = selectionState.dicts.mapIndexed { index, s -> dicts[index] }
-        val dictAnnotations = actualDicts.map {
-            for (i in 0 until sentence.lemmas.size) {
-                val word = sentence.lemmaOrToken(i)
+        val dictAnnotations = actualDicts.map { dict ->
+            val annotations = mutableListOf<ArticleAnnotation.DictWord>()
 
+            var i = 0
+            while (i < sentence.lemmas.size) {
+                val firstWord = sentence.lemmaOrToken(i).toString()
+                val isVerb = sentence.tagEnum(i).isVerb()
+
+                if (isVerb) {
+                    var ci = i
+                    val entry = dict.index.entry(firstWord) { needAnotherOne ->
+                        if (needAnotherOne) {
+                            if (sentence.tagEnum(ci).isPronoun()) {
+                                ++ci
+                                sentence.lemmaOrToken(ci).toString()
+                            } else {
+                                null
+                            }
+                        } else {
+                            ++ci
+                            if (ci < sentence.lemmas.size) {
+                                sentence.lemmaOrToken(ci).toString()
+                            } else {
+                                null
+                            }
+                        }
+                    }
+
+                    if (entry != null) {
+                        annotations.add(ArticleAnnotation.DictWord(
+                            start = sentence.tokenSpans[i].start,
+                            end = sentence.tokenSpans[ci].end,
+                            dict = dict
+                        ))
+                        i = ci
+                    }
+                }
+
+                ++i
             }
 
-        }
+            annotations
+        }.flatten()
 
-        return progressAndPartOfSpeechAnnotations + phraseAnnotations
+        return progressAndPartOfSpeechAnnotations + phraseAnnotations + dictAnnotations
     }
 
     fun restore(newState: ArticleVM.State) {
