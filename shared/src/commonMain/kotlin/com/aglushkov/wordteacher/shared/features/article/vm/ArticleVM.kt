@@ -18,6 +18,8 @@ import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
+import com.aglushkov.wordteacher.shared.model.nlp.spanIndexWithIndex
+import com.aglushkov.wordteacher.shared.model.nlp.spanWithIndex
 import com.aglushkov.wordteacher.shared.model.nlp.split
 import com.aglushkov.wordteacher.shared.model.nlp.toPartOfSpeech
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
@@ -187,15 +189,27 @@ open class ArticleVMImpl(
                     var ci = i
                     val entry = dict.index.entry(firstWord) { needAnotherOne ->
                         if (needAnotherOne) {
-                            if (sentence.isAdverbNotPart(ci) || sentence.tagEnum(ci).isPronoun()) {
-                                ++ci
-                                sentence.lemmaOrToken(ci).toString()
+                            val phrase = phrases.spanWithIndex(ci)
+                            if (phrase?.type?.isNounPhrase() == true) {
+                                if (ci + phrase.length < sentence.lemmas.size) {
+                                    ci += phrase.length
+                                    sentence.lemmaOrToken(ci).toString()
+                                } else {
+                                    null
+                                }
+                            } else if (sentence.isAdverbNotPart(ci) || sentence.tagEnum(ci).isPronoun() || sentence.tagEnum(ci).isNoun()) {
+                                if (ci + 1 < sentence.lemmas.size) {
+                                    ++ci
+                                    sentence.lemmaOrToken(ci).toString()
+                                } else {
+                                    null
+                                }
                             } else {
                                 null
                             }
                         } else {
-                            ++ci
-                            if (ci < sentence.lemmas.size) {
+                            if (ci + 1 < sentence.lemmas.size) {
+                                ++ci
                                 sentence.lemmaOrToken(ci).toString()
                             } else {
                                 null

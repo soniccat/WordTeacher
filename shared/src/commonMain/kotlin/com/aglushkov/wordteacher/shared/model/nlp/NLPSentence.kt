@@ -12,13 +12,7 @@ data class NLPSentence(
     var chunks: List<String> = emptyList()
 ) {
     fun textIndexToNlpIndex(textIndex: Int): Int {
-        return tokenSpans.binarySearch {
-            when {
-                it.end <= textIndex -> -1
-                it.start > textIndex -> 1
-                else -> 0
-            }
-        }
+        return tokenSpans.spanIndexWithIndex(textIndex)
     }
 
     fun sliceFromTextIndex(textIndex: Int): NLPSentenceSlice? {
