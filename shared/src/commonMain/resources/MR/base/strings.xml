@@ -23,6 +23,7 @@
     <string name="word_partofspeech_abbreviation">Abbreviation</string>
     <string name="word_partofspeech_exclamation">Exclamation</string>
     <string name="word_partofspeech_determiner">Determiner</string>
+    <string name="word_partofspeech_phrasalVerb">Phrasal Verb</string>
     <string name="word_partofspeech_unknown">Other</string>
 
     <string name="word_phrase_noun">Noun phrase</string>

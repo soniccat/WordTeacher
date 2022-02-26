@@ -20,7 +20,7 @@ interface Dict: WordTeacherWordService {
         fun entry(word: String, nextWord: (needAnotherOne: Boolean) -> String?): Dict.Index.Entry?
 
         // TODO: consider removing "word" property and build it from a trie
-        data class Entry(val word: String, val indexValue: Any?, val dict: Dict)
+        data class Entry(val word: String, val partOfSpeech: WordTeacherWord.PartOfSpeech, val indexValue: Any?, val dict: Dict)
     }
 }
 

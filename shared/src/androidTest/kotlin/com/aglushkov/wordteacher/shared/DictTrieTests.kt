@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.dict.DictTrie
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,7 +16,7 @@ class DictTrieTests {
     fun testPut() {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        val entry = Dict.Index.Entry("abc", 100, dict)
+        val entry = Dict.Index.Entry("abc", WordTeacherWord.PartOfSpeech.Noun, 100, dict)
         trie.putWord("abc", entry)
 
         val foundEntry = trie.word("abc").firstOrNull()
@@ -28,8 +29,8 @@ class DictTrieTests {
     fun testPut2() {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        val entry1 = Dict.Index.Entry("abc", 100, dict)
-        val entry2 = Dict.Index.Entry("abcd", 100, dict)
+        val entry1 = Dict.Index.Entry("abc", WordTeacherWord.PartOfSpeech.Noun, 100, dict)
+        val entry2 = Dict.Index.Entry("abcd", WordTeacherWord.PartOfSpeech.Noun, 100, dict)
         trie.putWord("abc", entry1)
         trie.putWord("abcd", entry2)
 
@@ -46,8 +47,8 @@ class DictTrieTests {
     fun testAsSequence() {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        val entry1 = Dict.Index.Entry("abc", 100, dict)
-        val entry2 = Dict.Index.Entry("abcd", 100, dict)
+        val entry1 = Dict.Index.Entry("abc", WordTeacherWord.PartOfSpeech.Noun,100, dict)
+        val entry2 = Dict.Index.Entry("abcd", WordTeacherWord.PartOfSpeech.Noun, 100, dict)
         trie.putWord("abc", entry1)
         trie.putWord("abcd", entry2)
 

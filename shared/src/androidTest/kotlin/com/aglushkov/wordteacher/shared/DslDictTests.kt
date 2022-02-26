@@ -1,7 +1,9 @@
 package com.aglushkov.wordteacher.shared
 
+import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.Language
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
+import com.aglushkov.wordteacher.shared.dicts.dsl.DslIndex
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import kotlin.test.Test
@@ -11,6 +13,7 @@ import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
+import org.mockito.kotlin.any
 
 
 class DslDictTests {
@@ -162,7 +165,7 @@ class DslDictTests {
                 	[p]phrasal verb[/p]
                 	[m1]1) [trn]def1[/trn][/m]
                 	[m2][*][ex][lang id=1033]ex1[/lang] — ex1_1[/ex][/*][/m]
-
+                
                 term2
                 	\[[t]transcription2[/t]\]
                 	[p]phrasal verb2[/p]
@@ -214,6 +217,73 @@ class DslDictTests {
                 types = emptyList()
             ),
             word2
+        )
+    }
+
+    // TODO: handle
+    // [m1][p][trn]фраз. гл.[/p] def1 def2 def3 [i][com](comment)[/com][/trn][/i][/m]
+    @Test
+    fun testPhrasalVerbParsing() = runTest {
+        val fakeFileSystem = FakeFileSystem()
+        val dirPath = "/test".toPath()
+        val dictPath = dirPath.div("dict.dsl")
+        fakeFileSystem.createDirectories(dirPath)
+        fakeFileSystem.write(dictPath, true) {
+            writeUtf8(
+                """
+                #NAME	"testname"
+                #INDEX_LANGUAGE	"English"
+                #CONTENTS_LANGUAGE	"Russian"
+
+                term1
+                	[p]фраз. гл.[/p]
+                	[m1]1) [trn]def1[/trn][/m]
+                	[m1][ex]ex1[/ex][/m]
+                	[m1]2) [trn]def2[/trn][/m]
+                """.trimIndent()
+            )
+        }
+
+        val dslDict = DslDict(dictPath, fakeFileSystem)
+        dslDict.load()
+
+        assertEquals(1, dslDict.index.allEntries().toList().size)
+        assertEquals(
+            Dict.Index.Entry(
+                "term1",
+                WordTeacherWord.PartOfSpeech.PhrasalVerb,
+                73L,
+                dslDict
+            ),
+            dslDict.index.allEntries().first()
+        )
+
+        val word = dslDict.define("term1").firstOrNull()
+        assertNotNull(word)
+        assertEquals(1, word.definitions.keys.size)
+        assertEquals(
+            WordTeacherWord(
+                word = "term1",
+                transcription = null,
+                definitions = mapOf(
+                    WordTeacherWord.PartOfSpeech.PhrasalVerb to listOf(
+                        WordTeacherDefinition(
+                            definitions = listOf("def1"),
+                            examples = listOf("ex1"),
+                            synonyms = listOf(),
+                            imageUrl = null
+                        ),
+                        WordTeacherDefinition(
+                            definitions = listOf("def2"),
+                            examples = listOf(),
+                            synonyms = listOf(),
+                            imageUrl = null
+                        )
+                    )
+                ),
+                types = emptyList()
+            ),
+            word
         )
     }
 }

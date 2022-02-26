@@ -49,12 +49,20 @@ data class NLPSentence(
 
     fun tagEnum(i: Int) = tagEnum(tags[i])
 
+    fun isAdverbNotPart(i: Int) =
+        tagEnum(i).isAdverb() && when (token(i)) {
+            "n't", "not" -> true
+            else -> false
+        }
+
     fun lemmaOrToken(i: Int) = if (lemmas[i] != NLPConstants.UNKNOWN_LEMMA) {
         lemmas[i]
     } else {
-        tokenSpans[i].let {
-            text.subSequence(it.start, it.end)
-        }
+        token(i)
+    }
+
+    fun token(i: Int) = tokenSpans[i].let {
+        text.subSequence(it.start, it.end)
     }
 
     fun phrases(): List<PhraseSpan> =

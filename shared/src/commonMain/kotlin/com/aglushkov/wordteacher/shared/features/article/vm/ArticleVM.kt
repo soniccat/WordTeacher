@@ -179,17 +179,17 @@ open class ArticleVMImpl(
         val actualDicts = selectionState.dicts.mapIndexed { index, s -> dicts[index] }
         val dictAnnotations = actualDicts.map { dict ->
             val annotations = mutableListOf<ArticleAnnotation.DictWord>()
-
             var i = 0
+
             while (i < sentence.lemmas.size) {
                 val firstWord = sentence.lemmaOrToken(i).toString()
                 val isVerb = sentence.tagEnum(i).isVerb()
 
-                if (isVerb) {
+                if (isVerb) { // try to find a phrasal verb
                     var ci = i
                     val entry = dict.index.entry(firstWord) { needAnotherOne ->
                         if (needAnotherOne) {
-                            if (sentence.tagEnum(ci).isPronoun()) {
+                            if (sentence.isAdverbNotPart(ci) || sentence.tagEnum(ci).isPronoun()) {
                                 ++ci
                                 sentence.lemmaOrToken(ci).toString()
                             } else {
@@ -209,6 +209,7 @@ open class ArticleVMImpl(
                         annotations.add(ArticleAnnotation.DictWord(
                             start = sentence.tokenSpans[i].start,
                             end = sentence.tokenSpans[ci].end,
+                            entry = entry,
                             dict = dict
                         ))
                         i = ci
@@ -245,19 +246,6 @@ open class ArticleVMImpl(
         }
     }
 
-//    private fun filterAnnotations(
-//        annotations: List<List<ArticleAnnotation>>,
-//        selectionState: ArticleVM.SelectionState
-//    ) = annotations.map {
-//        it.filter { annotation ->
-//            when (annotation) {
-//                is ArticleAnnotation.LearnProgress -> selectionState.cardSetWords
-//                is ArticleAnnotation.PartOfSpeech -> selectionState.partsOfSpeech.contains(annotation.partOfSpeech)
-//                is ArticleAnnotation.Phrase -> selectionState.phrases.contains(annotation.phrase)
-//            }
-//        }
-//    }
-
     private fun makeParagraphs(
         article: Resource.Loaded<Article>,
         annotations: List<List<ArticleAnnotation>>
@@ -284,12 +272,26 @@ open class ArticleVMImpl(
     override fun onTextClicked(sentence: NLPSentence, offset: Int): Boolean {
         val slice = sentence.sliceFromTextIndex(offset)
         if (slice != null) {
+            val sentenceIndex = article.value.data()?.sentences?.indexOf(sentence) ?: return false
+            val sentenceAnnotations = annotations.value[sentenceIndex].filterIsInstance<ArticleAnnotation.DictWord>()
+            val annotations = sentenceAnnotations.filter {
+                slice.tokenSpan.start >= it.start && slice.tokenSpan.end <= it.end
+            }
+            val firstAnnotation = annotations.firstOrNull()
+            val resultWord = firstAnnotation?.entry?.word ?: slice.tokenString
+            val resultPartOfSpeech = firstAnnotation?.entry?.partOfSpeech ?: slice.partOfSpeech()
+            val resultPartOfSpeechList = if (resultPartOfSpeech == WordTeacherWord.PartOfSpeech.PhrasalVerb) {
+                listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.Verb)
+            } else {
+                listOf(resultPartOfSpeech)
+            }
+
             definitionsVM.onWordSubmitted(
-                slice.tokenString,
-                listOf(slice.partOfSpeech()),
+                resultWord,
+                resultPartOfSpeechList,
                 DefinitionsContext(
                     wordContexts = mapOf(
-                        slice.partOfSpeech() to DefinitionsWordContext(
+                        resultPartOfSpeech to DefinitionsWordContext(
                             examples = listOf(sentence.text)
                         )
                     )
@@ -398,7 +400,7 @@ sealed class ArticleAnnotation(
     class LearnProgress(start: Int, end: Int, val learnLevel: Int): ArticleAnnotation(ArticleAnnotationType.LEARN_PROGRESS, start, end)
     class PartOfSpeech(start: Int, end: Int, val partOfSpeech: WordTeacherWord.PartOfSpeech): ArticleAnnotation(ArticleAnnotationType.PART_OF_SPEECH, start, end)
     class Phrase(start: Int, end: Int, val phrase: ChunkType): ArticleAnnotation(ArticleAnnotationType.PHRASE, start, end)
-    class DictWord(start: Int, end: Int, val dict: Dict): ArticleAnnotation(ArticleAnnotationType.DICT, start, end)
+    class DictWord(start: Int, end: Int, val entry: Dict.Index.Entry, val dict: Dict): ArticleAnnotation(ArticleAnnotationType.DICT, start, end)
 }
 
 enum class ArticleAnnotationType {

@@ -3,8 +3,10 @@ package com.aglushkov.wordteacher.shared.dicts.dsl
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.Language
 import com.aglushkov.wordteacher.shared.general.StringReader
+import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.WordTeacherWordBuilder
+import com.aglushkov.wordteacher.shared.model.fromString
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import okio.FileSystem
 import okio.Path
@@ -65,7 +67,27 @@ class DslDict(
                         '#' -> readHeader(line)
                         '-', '\n', '\t' -> {}
                         else -> {
-                            index.add(line, offset)
+                            val nextLine = readUtf8Line()
+                            val partOfSpeech = nextLine?.let { firstLine ->
+                                val stringBuilder = StringBuilder()
+                                stringReader.read(firstLine) {
+                                    skip()
+                                    while (!isEnd()) {
+                                        if (char == '[' && !isCharEscaped) {
+                                            val isCloseTag = nextChar == '/'
+                                            readTag(isCloseTag)
+                                        } else {
+                                            stringBuilder.append(readChar())
+                                        }
+                                    }
+                                }
+                                WordTeacherWord.PartOfSpeech.fromString(stringBuilder.toString().trimNonLetterNonDigit())
+                            }
+
+                            index.add(line, partOfSpeech, offset)
+                            if (nextLine != null) {
+                                offset += nextLine.utf8Size() + 1
+                            }
                         }
                     }
                 }
@@ -90,9 +112,11 @@ class DslDict(
         fileSystem.read(path) {
             skip(pos + word.length + 1)
             var line = readUtf8Line()
+            var isFirstLine = true
             while (line != null && line.isNotEmpty() && line.first() == '\t') {
-                readWordLine(line, wordTeacherWordBuilder)
+                readWordLine(line, isFirstLine, wordTeacherWordBuilder)
                 line = readUtf8Line()
+                isFirstLine = false
             }
         }
 
@@ -104,11 +128,12 @@ class DslDict(
         }
     }
 
-    private fun readWordLine(line: String, builder: WordTeacherWordBuilder) {
+    private fun readWordLine(line: String, isFirstLine: Boolean, builder: WordTeacherWordBuilder) {
         var isDef = false
         var isExample = false
         var isTranscription = false
         val value = StringBuilder()
+        var firstLineValue: StringBuilder? = null
 
         stringReader.read(line) {
             skip()
@@ -120,7 +145,7 @@ class DslDict(
 
                     if (isCloseTag) {
                         if (tag == "trn" || tag == "ex" || tag == "t") {
-                            break;
+                            break
                         }
                     } else {
                         when (tag) {
@@ -133,18 +158,26 @@ class DslDict(
                     val ch = readChar()
                     if (isDef || isExample || isTranscription) {
                         value.append(ch)
+                    } else if (isFirstLine) {
+                        if (firstLineValue == null) {
+                            firstLineValue = StringBuilder()
+                        }
+                        firstLineValue?.append(ch)
                     }
                 }
             }
         }
 
-        if (value.isNotEmpty()) {
+        if (value.isNotEmpty() || firstLineValue?.isNotEmpty() == true) {
             if (isTranscription) {
                 builder.setTranscription(value.toString())
             } else if (isDef) {
                 builder.addDefinition(value.toString())
             } else if(isExample) {
                 builder.addExample(value.toString())
+            } else if (isFirstLine) {
+                val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(firstLineValue.toString().trimNonLetterNonDigit())
+                wordTeacherWordBuilder.startPartOfSpeech(partOfSpeech)
             }
         }
     }

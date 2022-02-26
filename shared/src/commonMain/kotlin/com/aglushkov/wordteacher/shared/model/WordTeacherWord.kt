@@ -16,6 +16,7 @@ data class WordTeacherWord(
 ) : Parcelable {
 
     enum class PartOfSpeech {
+        Undefined,
         Noun,
         Verb,
         Adjective,
@@ -27,7 +28,7 @@ data class WordTeacherWord(
         Abbreviation,
         Exclamation,
         Determiner,
-        Undefined;
+        PhrasalVerb;
 
         companion object
     }
@@ -111,7 +112,7 @@ class WordTeacherWordBuilder {
     }
 
     private fun clearCurrentPartOfSpeech() {
-        partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined
+        //partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined
         definitions.clear()
         examples.clear()
         synonyms.clear()
@@ -168,6 +169,7 @@ fun WordTeacherWord.PartOfSpeech.Companion.fromString(string: String?): WordTeac
         resultString == "abbreviation" -> WordTeacherWord.PartOfSpeech.Abbreviation
         resultString == "determiner" -> WordTeacherWord.PartOfSpeech.Determiner
         resultString == "exclamation" -> WordTeacherWord.PartOfSpeech.Exclamation
+        resultString == "фраз. гл" -> WordTeacherWord.PartOfSpeech.PhrasalVerb
         else -> {
             if (string != null) {
                 //Log.d("WordTeacherWord", "New Part of Speech has found: $string")
@@ -190,6 +192,7 @@ fun WordTeacherWord.PartOfSpeech.toStringDesc(): StringDesc {
         WordTeacherWord.PartOfSpeech.Abbreviation -> MR.strings.word_partofspeech_abbreviation
         WordTeacherWord.PartOfSpeech.Exclamation -> MR.strings.word_partofspeech_exclamation
         WordTeacherWord.PartOfSpeech.Determiner -> MR.strings.word_partofspeech_determiner
+        WordTeacherWord.PartOfSpeech.PhrasalVerb -> MR.strings.word_partofspeech_phrasalVerb
         else -> MR.strings.word_partofspeech_unknown
     }
     return StringDesc.Resource(res)
