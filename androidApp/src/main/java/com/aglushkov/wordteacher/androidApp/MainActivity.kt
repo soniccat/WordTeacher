@@ -95,18 +95,6 @@ class MainActivity : AppCompatActivity(), Router {
         }
 
         setupComposeLayout()
-
-        lifecycleScope.launch {
-            val buffer = 100 * 1024
-            val text = resources.openRawResource(R.raw.sample).buffered(buffer).use { stream ->
-                stream.bufferedReader().readText()
-            }
-
-            val parser = ArticleParser()
-            val article = parser.parse(text)
-            Logger.v(article.title.orEmpty())
-            Logger.v(article.text.orEmpty())
-        }
     }
 
     private fun setupComposeLayout() {

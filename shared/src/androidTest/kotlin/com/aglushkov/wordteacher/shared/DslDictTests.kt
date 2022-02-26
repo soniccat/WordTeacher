@@ -220,6 +220,7 @@ class DslDictTests {
         )
     }
 
+    // TODO: split this test
     // TODO: handle
     // [m1][p][trn]фраз. гл.[/p] def1 def2 def3 [i][com](comment)[/com][/trn][/i][/m]
     @Test

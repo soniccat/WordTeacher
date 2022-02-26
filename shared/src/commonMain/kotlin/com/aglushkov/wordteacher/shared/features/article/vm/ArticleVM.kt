@@ -96,10 +96,8 @@ open class ArticleVMImpl(
             article.copyWith(buildViewItems(article, annotations))
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    private val dicts: StateFlow<Resource<List<Dict>>>
-        get() = dictRepository.dicts
-    override val dictPaths: StateFlow<Resource<List<String>>>
-        get() = dicts.map {
+    private val dicts: StateFlow<Resource<List<Dict>>> = dictRepository.dicts
+    override val dictPaths: StateFlow<Resource<List<String>>> = dicts.map {
             it.copyWith(it.data()?.map { dict -> dict.path.toString() })
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
