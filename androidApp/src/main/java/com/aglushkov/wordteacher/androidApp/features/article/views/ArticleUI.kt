@@ -13,8 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -41,7 +43,6 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
@@ -436,15 +437,29 @@ private fun DrawScope.drawAnnotation(
     val lineStart = layoutResult.getLineForOffset(it.start)
     val lineEnd = layoutResult.getLineForOffset(it.end)
 
+    val lt = layoutResult.getLineTop(lineStart)
+    val lb = layoutResult.getLineBottom(lineStart)
+    val bgOffset = 2.dp.toPx()
+    val cornerRadius = 4.dp.toPx()
+
     if (lineStart != lineEnd) {
-        // TODO
+        // left part
+        val leftPartLl = layoutResult.getHorizontalPosition(it.start, true)
+        val leftPartLr = layoutResult.getLineRight(lineStart)
+        val leftRect = Rect(leftPartLl - bgOffset, lt - bgOffset, leftPartLr + bgOffset, lb + bgOffset)
+        drawAnnotationPart(leftRect, cornerRadius, isLeftPart = true, annotationColors)
+
+        // right part
+        val rightPartLt = layoutResult.getLineTop(lineEnd)
+        val rightPartLb = layoutResult.getLineBottom(lineEnd)
+        val rightPartLl = layoutResult.getLineLeft(lineEnd)
+        val rightPartLr = layoutResult.getHorizontalPosition(it.end, true)
+        val rightRect = Rect(rightPartLl - bgOffset, rightPartLt - bgOffset, rightPartLr + bgOffset, rightPartLb + bgOffset)
+        drawAnnotationPart(rightRect, cornerRadius, isLeftPart = false, annotationColors)
+
     } else {
-        val lt = layoutResult.getLineTop(lineStart)
-        val lb = layoutResult.getLineBottom(lineStart)
         val ll = layoutResult.getHorizontalPosition(it.start, true)
         val lr = layoutResult.getHorizontalPosition(it.end, true)
-        val bgOffset = 2.dp.toPx()
-        val cornerRadius = 4.dp.toPx()
 
         annotationColors.bgColor?.let {
             drawRoundRect(
@@ -452,8 +467,7 @@ private fun DrawScope.drawAnnotation(
                 topLeft = Offset(ll, lt).minus(Offset(bgOffset, bgOffset)),
                 size = Size(lr - ll + 2 * bgOffset, lb - lt + 2 * bgOffset),
                 cornerRadius = CornerRadius(cornerRadius, cornerRadius),
-                style = Fill,
-                //alpha = 0.2f
+                style = Fill
             )
         }
 
@@ -465,11 +479,63 @@ private fun DrawScope.drawAnnotation(
                 cornerRadius = CornerRadius(cornerRadius, cornerRadius),
                 style = Stroke(
                     width = 1.dp.toPx()
-                ),
-                //alpha = 1.0f
+                )
             )
         }
     }
+}
+
+private fun DrawScope.drawAnnotationPart(
+    rect: Rect,
+    cornerRadius: Float,
+    isLeftPart: Boolean,
+    annotationColors: AnnotationColors
+) {
+    val path = buildRoundRectPath(
+        rect,
+        topLeftRadius = if (isLeftPart) cornerRadius else 0f,
+        bottomLeftRadius = if (isLeftPart) cornerRadius else 0f,
+        topRightRadius = if (!isLeftPart) cornerRadius else 0f,
+        bottomRightRadius = if (!isLeftPart) cornerRadius else 0f
+    )
+    annotationColors.bgColor?.let {
+        drawPath(
+            path = path,
+            color = it,
+            style = Fill
+        )
+    }
+    annotationColors.strokeColor?.let {
+        drawPath(
+            path = path,
+            color = it,
+            style = Stroke(
+                width = 1.dp.toPx()
+            )
+        )
+    }
+}
+
+private fun buildRoundRectPath(
+    rect: Rect,
+    topLeftRadius: Float = 0.0f,
+    topRightRadius: Float = 0.0f,
+    bottomLeftRadius: Float = 0.0f,
+    bottomRightRadius: Float = 0.0f
+): Path {
+    val path = Path()
+    path.moveTo(rect.left + topLeftRadius ,rect.top);
+    path.lineTo(rect.right - topRightRadius,rect.top);
+    path.quadraticBezierTo(rect.right, rect.top, rect.right, rect.top + topRightRadius);
+    path.lineTo(rect.right, rect.bottom - bottomRightRadius)
+    path.quadraticBezierTo(rect.right, rect.bottom, rect.right - bottomRightRadius, rect.bottom)
+    path.lineTo(rect.left + bottomLeftRadius, rect.bottom)
+    path.quadraticBezierTo(rect.left, rect.bottom, rect.left, rect.bottom - bottomLeftRadius)
+    path.lineTo(rect.left, rect.top + topLeftRadius)
+    path.quadraticBezierTo(rect.left, rect.top, rect.left + topLeftRadius, rect.top)
+    path.close()
+
+    return path
 }
 
 private fun AnnotatedString.Range<String>.resolveColor(
