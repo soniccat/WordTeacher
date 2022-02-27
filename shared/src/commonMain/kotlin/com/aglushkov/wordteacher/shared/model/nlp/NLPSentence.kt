@@ -55,6 +55,15 @@ data class NLPSentence(
         token(i)
     }
 
+    fun lemma(i: Int): String? {
+        val lemma = lemmas[i]
+        return if (lemma == NLPConstants.UNKNOWN_LEMMA) {
+            null
+        } else {
+            lemma
+        }
+    }
+
     fun token(i: Int) = tokenSpans[i].let {
         text.subSequence(it.start, it.end)
     }

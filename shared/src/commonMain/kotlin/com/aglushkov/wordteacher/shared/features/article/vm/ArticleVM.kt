@@ -185,22 +185,40 @@ open class ArticleVMImpl(
                 val firstWord = sentence.lemmaOrToken(i).toString()
                 val isVerb = sentence.tagEnum(i).isVerb()
 
-                if (isVerb) { // try to find a phrasal verb
+                //if (isVerb) { // try to find a phrasal verb
                     var ci = i
+                    var takeLemma = true
+                    var tokenLemmaGetter: (Int) -> String? = { index ->
+                        var r: CharSequence? = if (takeLemma) {
+                            sentence.lemma(index)
+                        } else {
+                            null
+                        }
+
+                        if (r == null) {
+                            takeLemma = false
+                            r = sentence.token(index)
+                        }
+                        r.toString()
+                    }
+
                     val entry = dict.index.entry(firstWord) { needAnotherOne ->
                         if (needAnotherOne) {
                             val phrase = phrases.spanWithIndex(ci)
-                            if (phrase?.type?.isNounPhrase() == true) {
+                            if (takeLemma) {
+                                takeLemma = false
+                                tokenLemmaGetter.invoke(ci)
+                            } else if (phrase?.type?.isNounPhrase() == true) {
                                 if (ci + phrase.length < sentence.lemmas.size) {
                                     ci += phrase.length
-                                    sentence.lemmaOrToken(ci).toString()
+                                    tokenLemmaGetter.invoke(ci)
                                 } else {
                                     null
                                 }
                             } else if (sentence.isAdverbNotPart(ci) || sentence.tagEnum(ci).isPronoun() || sentence.tagEnum(ci).isNoun()) {
                                 if (ci + 1 < sentence.lemmas.size) {
                                     ++ci
-                                    sentence.lemmaOrToken(ci).toString()
+                                    tokenLemmaGetter.invoke(ci)
                                 } else {
                                     null
                                 }
@@ -208,9 +226,10 @@ open class ArticleVMImpl(
                                 null
                             }
                         } else {
+                            takeLemma = true
                             if (ci + 1 < sentence.lemmas.size) {
                                 ++ci
-                                sentence.lemmaOrToken(ci).toString()
+                                tokenLemmaGetter.invoke(ci)
                             } else {
                                 null
                             }
@@ -226,7 +245,7 @@ open class ArticleVMImpl(
                         ))
                         i = ci
                     }
-                }
+                //}
 
                 ++i
             }

@@ -84,18 +84,21 @@ class DictTrie: Iterable<Dict.Index.Entry> {
         var needAnotherOne = false
         var nw = nextWord(needAnotherOne)
         while (nw != null) {
+            //val backupNode = node
             val nextNode = wordNode(nw, node)
             if (nextNode == null) {
                 needAnotherOne = true
             } else {
                 needAnotherOne = false
-                node = nextNode
+                //node = nextNode
 
-                val spaceNode2 = node?.children?.get(' ')
+                val spaceNode2 = nextNode.children.get(' ')
                 if (spaceNode2 != null) {
                     node = spaceNode2
+                } else if (nextNode.dictIndexEntries.isEmpty()) {
+                    needAnotherOne = true
                 } else {
-                    return node?.dictIndexEntries.orEmpty()
+                    return nextNode.dictIndexEntries
                 }
             }
 
