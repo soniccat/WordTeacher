@@ -2,12 +2,16 @@ package com.aglushkov.wordteacher.shared.dicts.dsl
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.Language
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.StringReader
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
+import com.aglushkov.wordteacher.shared.general.okio.newLineSize
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.WordTeacherWordBuilder
 import com.aglushkov.wordteacher.shared.model.fromString
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import okio.BufferedSource
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -59,41 +63,77 @@ class DslDict(
     private fun fillIndex(index: DslIndex) {
         fileSystem.read(path) {
             var offset = 0L
+            var nextLine: String? = null
             var line = readUtf8Line()
             while (line != null) {
+
                 if (line.isNotEmpty()) {
                     val firstChar = line.first()
                     when (firstChar) {
                         '#' -> readHeader(line)
                         '-', '\n', '\t' -> {}
                         else -> {
-                            val nextLine = readUtf8Line()
-                            val partOfSpeech = nextLine?.let { firstLine ->
-                                val stringBuilder = StringBuilder()
-                                stringReader.read(firstLine) {
-                                    skip()
-                                    while (!isEnd()) {
-                                        if (char == '[' && !isCharEscaped) {
-                                            val isCloseTag = nextChar == '/'
-                                            readTag(isCloseTag)
-                                        } else {
-                                            stringBuilder.append(readChar())
-                                        }
-                                    }
+                            wordTeacherWordBuilder.clear()
+                            wordTeacherWordBuilder.setWord(line)
+                            val (readBytes, nl) = readWord(wordTeacherWordBuilder)
+                            val word = wordTeacherWordBuilder.build()
+                            if (word?.definitions?.isNotEmpty() == true) {
+                                val partOfSpeeches = word.definitions.keys
+                                if (partOfSpeeches.size > 1) {
+                                    Logger.e("DslDict fillIndex found several partOfSpeeches for $word")
+                                } else if (partOfSpeeches.size == 1) {
+                                    val partOfSpeech = partOfSpeeches.first()
+                                    index.add(word.word, partOfSpeech, offset)
+//                                if (nextLine != null) {
+//                                    offset += nextLine.utf8Size() + 1
+//                                }
                                 }
-                                WordTeacherWord.PartOfSpeech.fromString(stringBuilder.toString().trimNonLetterNonDigit())
                             }
 
-                            index.add(line, partOfSpeech, offset)
-                            if (nextLine != null) {
-                                offset += nextLine.utf8Size() + 1
-                            }
+                            nextLine = nl
+                            offset += readBytes
+
+//                            val nextLine = readUtf8Line()
+//                            val partOfSpeech = nextLine?.let { firstLine ->
+//                                val stringBuilder = StringBuilder()
+//                                stringReader.read(firstLine) {
+//                                    skip()
+//                                    while (!isEnd()) {
+//                                        if (char == '[' && !isCharEscaped) {
+//                                            val isCloseTag = nextChar == '/'
+//                                            readTag(isCloseTag)
+//                                        } else {
+//                                            stringBuilder.append(readChar())
+//                                        }
+//                                    }
+//                                }
+//                                WordTeacherWord.PartOfSpeech.fromString(stringBuilder.toString().trimNonLetterNonDigit())
+//                            }
+//
+//                            index.add(line, partOfSpeech, offset)
+//                            if (nextLine != null) {
+//                                offset += nextLine.utf8Size() + 1
+//                            }
                         }
                     }
                 }
 
-                offset += line.utf8Size() + 1
-                line = readUtf8Line()
+                if (nextLine != null) {
+//                    offset += line.utf8Size() + newLineSize
+                    if (nextLine.isEmpty()) {
+                        line = readUtf8Line()
+                        if (line != null) {
+                            offset += line.utf8Size() + newLineSize
+                        }
+                    } else {
+                        line = nextLine
+                    }
+                    nextLine = null
+                } else {
+                    offset += line.utf8Size() + newLineSize
+                    line = readUtf8Line()
+                }
+                //line = readUtf8Line() это похоже надо убрать т/к/ мы читаем слово в readWord
             }
         }
     }
@@ -110,14 +150,8 @@ class DslDict(
 
         val pos = indexEntry.indexValue as Long
         fileSystem.read(path) {
-            skip(pos + word.length + 1)
-            var line = readUtf8Line()
-            var isFirstLine = true
-            while (line != null && line.isNotEmpty() && line.first() == '\t') {
-                readWordLine(line, isFirstLine, wordTeacherWordBuilder)
-                line = readUtf8Line()
-                isFirstLine = false
-            }
+            skip(pos + word.length + newLineSize)
+            readWord(wordTeacherWordBuilder)
         }
 
         val wordTeacherWord = wordTeacherWordBuilder.build()
@@ -126,6 +160,24 @@ class DslDict(
         } else {
             emptyList()
         }
+    }
+
+    private fun BufferedSource.readWord(wordTeacherWordBuilder: WordTeacherWordBuilder): Pair<Long, String?> {
+        var readBytes = 0L
+        var line = readUtf8Line()
+        var isFirstLine = true
+        while (line != null && line.isNotEmpty() && line.first() == '\t') {
+            readWordLine(line, isFirstLine, wordTeacherWordBuilder)
+
+            readBytes += line.utf8Size() + newLineSize
+            line = readUtf8Line()
+            isFirstLine = false
+        }
+
+        if (line != null) {
+            readBytes += line.utf8Size() + newLineSize
+        }
+        return Pair(readBytes, line)
     }
 
     private fun readWordLine(line: String, isFirstLine: Boolean, builder: WordTeacherWordBuilder) {

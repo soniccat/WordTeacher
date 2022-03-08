@@ -6,5 +6,5 @@ import okio.utf8Size
 fun BufferedSource.skipSpace() = skip(spaceSize)
 fun BufferedSource.skipNewLine() = skip(newLineSize)
 
-private val spaceSize = " ".utf8Size()
-private val newLineSize = "\n".utf8Size()
+val spaceSize = " ".utf8Size()
+val newLineSize = "\n".utf8Size()
