@@ -100,7 +100,7 @@ open class ArticleVMImpl(
 
     private val dicts: StateFlow<Resource<List<Dict>>> = dictRepository.dicts
     override val dictPaths: StateFlow<Resource<List<String>>> = dicts.map {
-            it.copyWith(it.data()?.map { dict -> dict.path.toString() })
+            it.copyWith(it.data()?.map { dict -> dict.path.name })
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     init {

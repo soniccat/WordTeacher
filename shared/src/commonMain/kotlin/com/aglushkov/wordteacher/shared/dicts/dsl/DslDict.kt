@@ -63,18 +63,24 @@ class DslDict(
     private fun fillIndex(index: DslIndex) {
         fileSystem.read(path) {
             var offset = 0L
-            var nextLine: String? = null
             var line = readUtf8Line()
-            while (line != null) {
+            var readLine: String? = null
 
-                if (line.isNotEmpty()) {
-                    val firstChar = line.first()
+            while (line != null || readLine != null) {
+                val resultLine: String = readLine ?: (line ?: "")
+                if (readLine != null) {
+                    readLine = null
+                }
+
+                if (resultLine.isNotEmpty()) {
+                    val firstChar = resultLine.first()
                     when (firstChar) {
-                        '#' -> readHeader(line)
+                        '#' -> readHeader(resultLine)
                         '-', '\n', '\t' -> {}
                         else -> {
                             wordTeacherWordBuilder.clear()
-                            wordTeacherWordBuilder.setWord(line)
+                            wordTeacherWordBuilder.setWord(resultLine)
+
                             val (readBytes, nl) = readWord(wordTeacherWordBuilder)
                             val word = wordTeacherWordBuilder.build()
                             if (word?.definitions?.isNotEmpty() == true) {
@@ -84,56 +90,19 @@ class DslDict(
                                 } else if (partOfSpeeches.size == 1) {
                                     val partOfSpeech = partOfSpeeches.first()
                                     index.add(word.word, partOfSpeech, offset)
-//                                if (nextLine != null) {
-//                                    offset += nextLine.utf8Size() + 1
-//                                }
                                 }
                             }
 
-                            nextLine = nl
-                            offset += readBytes
-
-//                            val nextLine = readUtf8Line()
-//                            val partOfSpeech = nextLine?.let { firstLine ->
-//                                val stringBuilder = StringBuilder()
-//                                stringReader.read(firstLine) {
-//                                    skip()
-//                                    while (!isEnd()) {
-//                                        if (char == '[' && !isCharEscaped) {
-//                                            val isCloseTag = nextChar == '/'
-//                                            readTag(isCloseTag)
-//                                        } else {
-//                                            stringBuilder.append(readChar())
-//                                        }
-//                                    }
-//                                }
-//                                WordTeacherWord.PartOfSpeech.fromString(stringBuilder.toString().trimNonLetterNonDigit())
-//                            }
-//
-//                            index.add(line, partOfSpeech, offset)
-//                            if (nextLine != null) {
-//                                offset += nextLine.utf8Size() + 1
-//                            }
+                            readLine = nl
+                            offset += readBytes + resultLine.utf8Size() + newLineSize
                         }
                     }
                 }
 
-                if (nextLine != null) {
-//                    offset += line.utf8Size() + newLineSize
-                    if (nextLine.isEmpty()) {
-                        line = readUtf8Line()
-                        if (line != null) {
-                            offset += line.utf8Size() + newLineSize
-                        }
-                    } else {
-                        line = nextLine
-                    }
-                    nextLine = null
-                } else {
-                    offset += line.utf8Size() + newLineSize
+                if (readLine == null) {
+                    offset += resultLine.utf8Size() + newLineSize
                     line = readUtf8Line()
                 }
-                //line = readUtf8Line() это похоже надо убрать т/к/ мы читаем слово в readWord
             }
         }
     }
@@ -174,9 +143,8 @@ class DslDict(
             isFirstLine = false
         }
 
-        if (line != null) {
-            readBytes += line.utf8Size() + newLineSize
-        }
+        // don't add size of the last read line to readBytes on purpose
+        // that should do a caller if it's required
         return Pair(readBytes, line)
     }
 

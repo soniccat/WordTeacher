@@ -91,8 +91,7 @@ class WordTeacherWordBuilder {
     }
 
     private fun hasWordDefinition() =
-        partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined ||
-            definitions.isNotEmpty() ||
+        definitions.isNotEmpty() ||
             examples.isNotEmpty() ||
             synonyms.isNotEmpty() ||
             imageUrl != null
@@ -108,11 +107,11 @@ class WordTeacherWordBuilder {
             )
         )
 
-        clearCurrentPartOfSpeech()
+        // assume that the current part of speech is valid for the next definition
+        clearWordDefinition()
     }
 
-    private fun clearCurrentPartOfSpeech() {
-        //partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined
+    private fun clearWordDefinition() {
         definitions.clear()
         examples.clear()
         synonyms.clear()
@@ -124,7 +123,8 @@ class WordTeacherWordBuilder {
         transcription = null
         wordDefinitions.clear()
         types.clear()
-        clearCurrentPartOfSpeech()
+        partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined
+        clearWordDefinition()
     }
 
     fun build(): WordTeacherWord? {
