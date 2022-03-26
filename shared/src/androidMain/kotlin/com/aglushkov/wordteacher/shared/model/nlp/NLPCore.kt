@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.measure
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -31,9 +32,10 @@ actual class NLPCore(
     private val tokenRes: Int,
     private val posModelRes: Int,
     private val lemmatizerRes: Int,
-    private val chunkerRes: Int
+    private val chunkerRes: Int,
+    dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) {
-    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val mainScope = CoroutineScope(dispatcher + SupervisorJob())
 
     val state = MutableStateFlow<Resource<NLPCore>>(Resource.Uninitialized())
 
@@ -68,22 +70,11 @@ actual class NLPCore(
     actual fun lemmatize(tokens: List<String>, tags: List<String>) = lemmatizer?.lemmatize(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
     actual fun chunk(tokens: List<String>, tags: List<String>) = chunker?.chunk(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
 
-    // TODO: move to NLPSentence
-//    actual fun phrases(sentence: NLPSentence): List<PhraseSpan> =
-//        ChunkSample.phrasesAsSpanList(
-//            sentence.tokenStrings().toTypedArray(),
-//            sentence.tags.toTypedArray(),
-//            sentence.chunks.toTypedArray()
-//        ).map {
-//            createPhraseSpan(it)
-//        }
-    // TODO: get rid of all these toTypedArray above...
-
-    fun load() {
+    fun load(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
         state.value = Resource.Loading(this@NLPCore)
         mainScope.launch {
             try {
-                withContext(Dispatchers.Default) {
+                withContext(dispatcher) {
                     loadModels()
                     createMEObjects()
                 }
