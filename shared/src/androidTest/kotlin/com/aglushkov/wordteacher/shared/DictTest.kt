@@ -16,3 +16,25 @@ fun createFakeDict(content: String): DslDict {
     val dict = DslDict(dictPath, fakeFileSystem)
     return dict
 }
+
+fun buildDslDictContent(actionsCallback: DslDictActions.() -> Unit): String {
+    val actions = DslDictActions()
+    actionsCallback.invoke(actions)
+    return actions.build()
+}
+
+class DslDictActions {
+    var sb = StringBuilder()
+
+    fun addTerm(term: String, defs: List<String>) {
+        sb.append(term + '\n')
+
+        defs.onEach(::addDef)
+    }
+
+    fun addDef(def: String) {
+        sb.append("\t[m1]1) [trn]$def[/trn][/m]\\n")
+    }
+
+    fun build() = sb.toString()
+}

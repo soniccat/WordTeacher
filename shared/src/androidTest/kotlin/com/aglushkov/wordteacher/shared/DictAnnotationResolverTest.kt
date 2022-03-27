@@ -41,10 +41,9 @@ class DictAnnotationResolverTest {
     @Test
     fun testPhrasalVerb() {
         val dict = createFakeDict(
-            """
-            make up
-            	[m1]1) [trn]def1[/trn][/m]
-            """.trimIndent()
+            buildDslDictContent {
+                addTerm("make up", listOf("def1"))
+            }
         )
         runBlocking {
             dict.load()
