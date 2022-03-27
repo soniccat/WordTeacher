@@ -63,6 +63,8 @@ kotlin {
             }
         }
         val androidTest by getting {
+            kotlin.srcDirs.add(File("src/androidTestShared/kotlin"))
+//            kotlin.include("")
             dependencies {
                 implementation(libs.kotlinTestJUnit)
                 implementation(libs.junit)

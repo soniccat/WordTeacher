@@ -1,4 +1,5 @@
 import com.aglushkov.wordteacher.androidApp.R
+import com.aglushkov.wordteacher.shared.createFakeDict
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
 import com.aglushkov.wordteacher.shared.features.article.vm.DictAnnotationResolver
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -15,44 +16,38 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 class DictAnnotationResolverTest {
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun testPhrasalVerb() {
-        val testDispatcher = StandardTestDispatcher()
 
-        val res = RuntimeEnvironment.getApplication().resources
-        val nlpCore = NLPCore(
-            res,
-            R.raw.en_sent,
-            R.raw.en_token,
-            R.raw.en_pos_maxent,
-            R.raw.en_lemmatizer_dict,
-            R.raw.en_chunker,
-            testDispatcher
-        )
+    val testDispatcher = StandardTestDispatcher()
+    val res = RuntimeEnvironment.getApplication().resources
+    val nlpCore = NLPCore(
+        res,
+        R.raw.en_sent,
+        R.raw.en_token,
+        R.raw.en_pos_maxent,
+        R.raw.en_lemmatizer_dict,
+        R.raw.en_chunker,
+        testDispatcher
+    )
+    val nlpSentenceProcessor = NLPSentenceProcessor(
+        nlpCore
+    )
+
+    init {
         nlpCore.load(testDispatcher)
         testDispatcher.scheduler.runCurrent()
+    }
 
-        val nlpSentenceProcessor = NLPSentenceProcessor(
-            nlpCore
+    @Test
+    fun testPhrasalVerb() {
+        val dict = createFakeDict(
+            """
+            make up
+            	[m1]1) [trn]def1[/trn][/m]
+            """.trimIndent()
         )
-
-        val fakeFileSystem = FakeFileSystem()
-        val dirPath = "/test".toPath()
-        val dictPath = dirPath.div("dict.dsl")
-        fakeFileSystem.createDirectories(dirPath)
-        fakeFileSystem.write(dictPath, true) {
-            writeUtf8(
-                """
-                make up
-                	[m1]1) [trn]def1[/trn][/m]
-                """.trimIndent()
-            )
-        }
-
-        val dict = DslDict(dictPath, fakeFileSystem)
         runBlocking {
             dict.load()
         }
@@ -73,3 +68,4 @@ class DictAnnotationResolverTest {
         assertEquals("make up", annotations.first().entry.word)
     }
 }
+
