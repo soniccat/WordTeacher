@@ -3,11 +3,9 @@ package com.aglushkov.wordteacher.shared
 import com.aglushkov.wordteacher.android.R
 import com.aglushkov.wordteacher.shared.features.article.vm.DictAnnotationResolver
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
-import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import kotlin.test.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,6 +30,7 @@ class DictAnnotationResolverTest {
     val nlpSentenceProcessor = NLPSentenceProcessor(
         nlpCore
     )
+    val dictAnnotationResolver = DictAnnotationResolver()
 
     init {
         nlpCore.load(testDispatcher)
@@ -45,16 +44,8 @@ class DictAnnotationResolverTest {
                 addTerm("make up", listOf("def1"))
             }
         )
-        runBlocking {
-            dict.load()
-        }
 
-        val nlpSentence = NLPSentence(
-            text = "I've made up this idea"
-        )
-        nlpSentenceProcessor.process(nlpSentence)
-
-        val dictAnnotationResolver = DictAnnotationResolver()
+        val nlpSentence = nlpSentenceProcessor.processString("I've made up this idea")
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,
@@ -65,4 +56,3 @@ class DictAnnotationResolverTest {
         assertEquals("make up", annotations.first().entry.word)
     }
 }
-

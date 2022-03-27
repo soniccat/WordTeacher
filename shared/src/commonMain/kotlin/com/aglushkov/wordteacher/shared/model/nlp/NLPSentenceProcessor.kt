@@ -9,4 +9,8 @@ class NLPSentenceProcessor(
         sentence.lemmas = nlpCore.lemmatize(sentence.tokenStrings(), sentence.tags)
         sentence.chunks = nlpCore.chunk(sentence.tokenStrings(), sentence.tags)
     }
+
+    fun processString(sentence: String): NLPSentence {
+        return NLPSentence(text = sentence).apply { process(this) }
+    }
 }

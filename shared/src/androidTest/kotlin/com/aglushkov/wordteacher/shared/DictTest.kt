@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared
 
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
+import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
 
@@ -14,6 +15,11 @@ fun createFakeDict(content: String): DslDict {
     }
 
     val dict = DslDict(dictPath, fakeFileSystem)
+
+    runBlocking {
+        dict.load()
+    }
+
     return dict
 }
 
