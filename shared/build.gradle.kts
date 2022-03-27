@@ -63,12 +63,13 @@ kotlin {
             }
         }
         val androidTest by getting {
-            kotlin.srcDirs.add(File("src/androidTestShared/kotlin"))
-//            kotlin.include("")
             dependencies {
                 implementation(libs.kotlinTestJUnit)
                 implementation(libs.junit)
                 implementation(libs.mockitoKotlin)
+                implementation("org.robolectric:robolectric:4.7.3")
+                implementation(libs.coroutinesCommonTest)
+                implementation(libs.okioFakeFileSystem)
             }
         }
         val iosMain by getting {

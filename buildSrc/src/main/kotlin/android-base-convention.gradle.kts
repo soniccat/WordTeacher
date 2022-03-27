@@ -8,4 +8,10 @@ configure<BaseExtension> {
         minSdkVersion(21)
         targetSdkVersion(31)
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }

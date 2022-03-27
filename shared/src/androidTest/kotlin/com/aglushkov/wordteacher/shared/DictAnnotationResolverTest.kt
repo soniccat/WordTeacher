@@ -1,6 +1,6 @@
-import com.aglushkov.wordteacher.androidApp.R
-import com.aglushkov.wordteacher.shared.createFakeDict
-import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
+package com.aglushkov.wordteacher.shared
+
+import com.aglushkov.wordteacher.android.R
 import com.aglushkov.wordteacher.shared.features.article.vm.DictAnnotationResolver
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
@@ -9,8 +9,6 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
-import okio.Path.Companion.toPath
-import okio.fakefilesystem.FakeFileSystem
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner

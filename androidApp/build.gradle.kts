@@ -96,11 +96,4 @@ dependencies {
 
     implementation("com.google.dagger:dagger:2.40.5")
     kapt("com.google.dagger:dagger-compiler:2.40.5")
-
-    testImplementation(libs.kotlinTestJUnit)
-    testImplementation(libs.junit)
-    testImplementation(libs.mockitoKotlin)
-    testImplementation("org.robolectric:robolectric:4.7.3")
-    testImplementation(libs.coroutinesCommonTest)
-    testImplementation(libs.okioFakeFileSystem)
 }
