@@ -67,23 +67,26 @@ class DictTrie: Iterable<Dict.Index.Entry> {
         return true
     }
 
-    fun entry(word: String, nextWord: (needAnotherOne: Boolean) -> String?): List<Dict.Index.Entry> {
+    fun entry(
+        word: String,
+        nextWord: (needAnotherOne: Boolean) -> String?,
+        onFound: (node: MutableList<Dict.Index.Entry>) -> Unit
+    ) {
         var node: DictTrieNode? = root
         word.onEach { ch ->
             node = node?.children?.get(ch)
-            if (node == null) return emptyList()
+            if (node == null) return
         }
 
         val spaceNode = node?.children?.get(' ')
         if (spaceNode != null) {
             node = spaceNode
         } else {
-            return node?.dictIndexEntries.orEmpty()
+            return
         }
 
         var needAnotherOne = false
         var nw = nextWord(needAnotherOne)
-        var lastEndNode: DictTrieNode? = null
         while (nw != null) {
             val nextNode = wordNode(nw, node)
             if (nextNode == null) {
@@ -92,7 +95,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 needAnotherOne = false
 
                 if (nextNode.isEnd) {
-                    lastEndNode = nextNode
+                    onFound(nextNode.dictIndexEntries)
                 }
 
                 val spaceNode2 = nextNode.children.get(' ')
@@ -101,21 +104,19 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 } else if (nextNode.dictIndexEntries.isEmpty()) {
                     needAnotherOne = true
                 } else {
-                    return nextNode.dictIndexEntries
+                    //return nextNode.dictIndexEntries
+                    node = nextNode
+                    break
                 }
             }
 
             nw = nextWord(needAnotherOne)
         }
 
-        val resultEndNode = if (node?.isEnd == true) {
-            node
-        } else if (lastEndNode?.isEnd == true) {
-            lastEndNode
-        } else {
-            null
+        val safeNode = node
+        if (safeNode != null && safeNode.isEnd) {
+            onFound(safeNode.dictIndexEntries)
         }
-        return resultEndNode?.dictIndexEntries.orEmpty()
     }
 
     private fun wordNode(word: String, startNode: DictTrieNode?): DictTrieNode? {

@@ -35,8 +35,12 @@ class DslIndex(
         return index.word(word).firstOrNull()
     }
 
-    override fun entry(word: String, nextWord: (needAnotherOne: Boolean) -> String?): Dict.Index.Entry? {
-        return index.entry(word, nextWord).firstOrNull()
+    override fun entry(
+        word: String,
+        nextWord: (needAnotherOne: Boolean) -> String?,
+        onFound: (node: MutableList<Dict.Index.Entry>) -> Unit
+    ) {
+        return index.entry(word, nextWord, onFound)
     }
 
     private fun loadIndex() {

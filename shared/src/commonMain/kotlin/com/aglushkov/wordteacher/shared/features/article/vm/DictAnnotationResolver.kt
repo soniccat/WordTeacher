@@ -24,7 +24,7 @@ class DictAnnotationResolver {
                 //if (isVerb) { // try to find a phrasal verb
                 var ci = i
                 var takeLemma = true
-                var tokenLemmaGetter: (Int) -> String? = { index ->
+                val tokenLemmaGetter: (Int) -> String? = { index ->
                     var r: CharSequence? = if (takeLemma) {
                         sentence.lemma(index)
                     } else {
@@ -38,53 +38,60 @@ class DictAnnotationResolver {
                     r.toString()
                 }
 
-                val entry = dict.index.entry(firstWord) { needAnotherOne ->
-                    if (needAnotherOne) {
-                        val phrase = phrases.spanWithIndex(ci)
-                        if (takeLemma) {
-                            takeLemma = false
-                            tokenLemmaGetter.invoke(ci)
-                        } else if (phrase?.type?.isNounPhrase() == true && isVerb && firstWord != "be" && !skippedNounPhrase) {
-                            if (ci + phrase.length < sentence.lemmas.size) {
-                                skippedNounPhrase = true
-                                ci += phrase.length
+                val foundList = mutableListOf<Pair<Int, List<Dict.Index.Entry>>>()
+                dict.index.entry(
+                    firstWord,
+                    nextWord = { needAnotherOne ->
+                        if (needAnotherOne) {
+                            val phrase = phrases.spanWithIndex(ci)
+                            if (takeLemma) {
+                                takeLemma = false
                                 tokenLemmaGetter.invoke(ci)
+                            } else if (phrase?.type?.isNounPhrase() == true && isVerb && firstWord != "be" && !skippedNounPhrase) {
+                                if (ci + phrase.length < sentence.lemmas.size) {
+                                    skippedNounPhrase = true
+                                    ci += phrase.length
+                                    tokenLemmaGetter.invoke(ci)
+                                } else {
+                                    null
+                                }
+                            } else if (sentence.isAdverbNotPart(ci) || sentence.tagEnum(ci)
+                                    .isPronoun() || sentence.tagEnum(ci).isNoun()
+                            ) {
+                                if (ci + 1 < sentence.lemmas.size) {
+                                    ++ci
+                                    tokenLemmaGetter.invoke(ci)
+                                } else {
+                                    null
+                                }
                             } else {
                                 null
                             }
-                        } else if (sentence.isAdverbNotPart(ci) || sentence.tagEnum(ci)
-                                .isPronoun() || sentence.tagEnum(ci).isNoun()
-                        ) {
+                        } else {
+                            takeLemma = true
                             if (ci + 1 < sentence.lemmas.size) {
                                 ++ci
                                 tokenLemmaGetter.invoke(ci)
                             } else {
                                 null
                             }
-                        } else {
-                            null
                         }
-                    } else {
-                        takeLemma = true
-                        if (ci + 1 < sentence.lemmas.size) {
-                            ++ci
-                            tokenLemmaGetter.invoke(ci)
-                        } else {
-                            null
-                        }
+                    },
+                    onFound = {
+                        foundList.add(ci to it)
                     }
-                }
+                )
 
-                if (entry != null) {
+                foundList.lastOrNull().takeIf { it?.second?.isNotEmpty() == true }?.let {
                     annotations.add(
                         ArticleAnnotation.DictWord(
                             start = sentence.tokenSpans[i].start,
-                            end = sentence.tokenSpans[ci].end,
-                            entry = entry,
+                            end = sentence.tokenSpans[it.first].end,
+                            entry = it.second.last(),
                             dict = dict
                         )
                     )
-                    i = ci
+                    i = it.first
                 }
                 //}
 
