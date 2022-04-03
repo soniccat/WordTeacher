@@ -23,7 +23,7 @@ fun createFakeDict(content: String): DslDict {
     return dict
 }
 
-fun buildDslDictContent(actionsCallback: DslDictActions.() -> Unit): String {
+fun buildDictContent(actionsCallback: DslDictActions.() -> Unit): String {
     val actions = DslDictActions()
     actionsCallback.invoke(actions)
     return actions.build()
@@ -39,7 +39,7 @@ class DslDictActions {
     }
 
     fun addDef(def: String) {
-        sb.append("\t[m1]1) [trn]$def[/trn][/m]\\n")
+        sb.append("\t[m1]1) [trn]$def[/trn][/m]\n")
     }
 
     fun build() = sb.toString()

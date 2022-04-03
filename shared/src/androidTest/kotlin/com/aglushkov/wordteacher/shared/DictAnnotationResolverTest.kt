@@ -40,7 +40,7 @@ class DictAnnotationResolverTest {
     @Test
     fun testPhrasalVerb() {
         val dict = createFakeDict(
-            buildDslDictContent {
+            buildDictContent {
                 addTerm("make up", listOf("def1"))
             }
         )
@@ -54,5 +54,80 @@ class DictAnnotationResolverTest {
 
         assertEquals(1, annotations.size)
         assertEquals("make up", annotations.first().entry.word)
+    }
+
+    @Test
+    fun testPhrasalVerbWithNounPhrase() {
+        val dict = createFakeDict(
+            buildDictContent {
+                addTerm("talk into", listOf("def1"))
+            }
+        )
+
+        val nlpSentence = nlpSentenceProcessor.processString("He have talked my best friend into it")
+        val annotations = dictAnnotationResolver.resolve(
+            listOf(dict),
+            nlpSentence,
+            nlpSentence.phrases()
+        )
+
+        assertEquals(1, annotations.size)
+        assertEquals("talk into", annotations.first().entry.word)
+    }
+
+    @Test
+    fun testPhrasalVerbBeOn() {
+        val dict = createFakeDict(
+            buildDictContent {
+                addTerm("be on", listOf("def1"))
+            }
+        )
+
+        val nlpSentence = nlpSentenceProcessor.processString("In fact, many phrasal verbs are distinct variations on the same base verb, which can add to the confusion")
+        val annotations = dictAnnotationResolver.resolve(
+            listOf(dict),
+            nlpSentence,
+            nlpSentence.phrases()
+        )
+
+        assertEquals(0, annotations.size)
+    }
+
+    @Test
+    fun testTwoPhrasalVerbsGetOver() {
+        val dict = createFakeDict(
+            buildDictContent {
+                addTerm("get over", listOf("def1"))
+                addTerm("get over with", listOf("def1"))
+            }
+        )
+
+        val nlpSentence = nlpSentenceProcessor.processString("Let’s look at the phrasal verb get over as an example")
+        val annotations = dictAnnotationResolver.resolve(
+            listOf(dict),
+            nlpSentence,
+            nlpSentence.phrases()
+        )
+
+        assertEquals(1, annotations.size)
+        assertEquals("get over", annotations.first().entry.word)
+    }
+
+    @Test
+    fun testPhraseHighlight() {
+        val dict = createFakeDict(
+            buildDictContent {
+                addTerm("much as", listOf("def1"))
+            }
+        )
+
+        val nlpSentence = nlpSentenceProcessor.processString("Phrasal verbs are two or more words that together act as a completely new word, with a meaning separate from the original words")
+        val annotations = dictAnnotationResolver.resolve(
+            listOf(dict),
+            nlpSentence,
+            nlpSentence.phrases()
+        )
+
+        assertEquals(0, annotations.size)
     }
 }

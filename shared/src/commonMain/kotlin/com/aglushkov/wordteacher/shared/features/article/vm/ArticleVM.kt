@@ -174,14 +174,12 @@ open class ArticleVMImpl(
             }
         }
 
-        val actualDicts = selectionState.dicts.mapIndexed { index, s -> dicts[index] }
+        val actualDicts = selectionState.dicts.mapNotNull { s -> dicts.firstOrNull { it.path.name == s } }
         val dictAnnotationResolver = DictAnnotationResolver()
         val dictAnnotations = dictAnnotationResolver.resolve(actualDicts, sentence, phrases)
 
         return progressAndPartOfSpeechAnnotations + phraseAnnotations + dictAnnotations
     }
-
-
 
     fun restore(newState: ArticleVM.State) {
         state.value = newState

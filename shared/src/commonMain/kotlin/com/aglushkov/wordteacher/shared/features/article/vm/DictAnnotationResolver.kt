@@ -19,6 +19,7 @@ class DictAnnotationResolver {
             while (i < sentence.lemmas.size) {
                 val firstWord = sentence.lemmaOrToken(i).toString()
                 val isVerb = sentence.tagEnum(i).isVerb()
+                var skippedNounPhrase = false
 
                 //if (isVerb) { // try to find a phrasal verb
                 var ci = i
@@ -43,8 +44,9 @@ class DictAnnotationResolver {
                         if (takeLemma) {
                             takeLemma = false
                             tokenLemmaGetter.invoke(ci)
-                        } else if (phrase?.type?.isNounPhrase() == true) { // TODO: check if the previous word was a verb
+                        } else if (phrase?.type?.isNounPhrase() == true && isVerb && firstWord != "be" && !skippedNounPhrase) {
                             if (ci + phrase.length < sentence.lemmas.size) {
+                                skippedNounPhrase = true
                                 ci += phrase.length
                                 tokenLemmaGetter.invoke(ci)
                             } else {
