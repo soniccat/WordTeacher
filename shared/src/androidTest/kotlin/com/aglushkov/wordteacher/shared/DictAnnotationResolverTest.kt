@@ -114,6 +114,25 @@ class DictAnnotationResolverTest {
     }
 
     @Test
+    fun testPhrasalVerbPickUpAtTheBeginning() {
+        val dict = createFakeDict(
+            buildDictContent {
+                addTerm("pick up", listOf("def1"))
+            }
+        )
+
+        val nlpSentence = nlpSentenceProcessor.processString("Pick it up and carry it to the kitchen.")
+        val annotations = dictAnnotationResolver.resolve(
+            listOf(dict),
+            nlpSentence,
+            nlpSentence.phrases()
+        )
+
+        assertEquals(1, annotations.size)
+        assertEquals("pick up", annotations.first().entry.word)
+    }
+
+    @Test
     fun testPhraseHighlight() {
         val dict = createFakeDict(
             buildDictContent {

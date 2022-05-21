@@ -169,8 +169,8 @@ class SideSheetState(
      * Finally, if no swipe or animation is in progress, this is the same as the [currentValue].
      */
     @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @ExperimentalMaterialApi
-    @get:ExperimentalMaterialApi
+//    @ExperimentalMaterialApi
+//    @get:ExperimentalMaterialApi
     val targetValue: SideSheetValue
         get() = swipeableState.targetValue
 
@@ -178,8 +178,8 @@ class SideSheetState(
      * The current position (in pixels) of the drawer sheet.
      */
     @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @ExperimentalMaterialApi
-    @get:ExperimentalMaterialApi
+//    @ExperimentalMaterialApi
+//    @get:ExperimentalMaterialApi
     val offset: State<Float>
         get() = swipeableState.offset
 

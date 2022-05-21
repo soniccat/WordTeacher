@@ -1,7 +1,7 @@
 PODS:
   - Cleanse (4.2.6)
   - Reachability (3.2)
-  - shared (1.0-SNAPSHOT):
+  - shared (0.0.1):
     - Reachability (= 3.2)
 
 DEPENDENCIES:
@@ -20,7 +20,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Cleanse: 6bfc62033dcc0e5ba7992f410a5352ddd1283551
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
-  shared: 8ed31c5b5150a31805bdca88ffc85af43db64488
+  shared: 44e7bfb3d02d7cd10c98b7fd7d76a6a22b0acfd7
 
 PODFILE CHECKSUM: 7bc57aeecf55687500a98cf55f96bf2ffdeb26bf
 

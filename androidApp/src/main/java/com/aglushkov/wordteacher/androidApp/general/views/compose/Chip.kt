@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 
+// TODO: replace with material one
 @Composable
 fun Chip(
     modifier: Modifier = Modifier,
