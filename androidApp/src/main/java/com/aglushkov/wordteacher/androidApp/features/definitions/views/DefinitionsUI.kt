@@ -70,36 +70,36 @@ fun DefinitionsUI(
     val focusManager = LocalFocusManager.current
 
     // TODO: consider moving chooser outside...
-    ChooserUI(
-        state = partOfSpeechFilterBottomSheetState,
-        items = partsOfSpeech.map { partOfSpeech ->
-            val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
-            ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
-        },
-        modifier = modalModifier,
-        onSelected = { items ->
-            vm.onPartOfSpeechFilterUpdated(
-                items.filter { option ->
-                    option.isSelected
-                }.map { option ->
-                    option.obj as WordTeacherWord.PartOfSpeech
-                }
-            )
-        }
-    ) {
+//    ChooserUI(
+//        state = partOfSpeechFilterBottomSheetState,
+//        items = partsOfSpeech.map { partOfSpeech ->
+//            val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
+//            ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
+//        },
+//        modifier = modalModifier,
+//        onSelected = { items ->
+//            vm.onPartOfSpeechFilterUpdated(
+//                items.filter { option ->
+//                    option.isSelected
+//                }.map { option ->
+//                    option.obj as WordTeacherWord.PartOfSpeech
+//                }
+//            )
+//        }
+//    ) {
         DefinitionsWordUI(
             vm,
             contentModifier,
             withSearchBar,
             contentHeader,
-            onPartOfSpeechFilterClicked = { items ->
-                focusManager.clearFocus() // consider showing choose in a window popup
-                scope.launch {
-                    partOfSpeechFilterBottomSheetState.show()
-                }
-            }
+//            onPartOfSpeechFilterClicked = { items ->
+//                focusManager.clearFocus() // consider showing choose in a window popup
+//                scope.launch {
+//                    partOfSpeechFilterBottomSheetState.show()
+//                }
+//            }
         )
-    }
+    //}
 }
 
 @ExperimentalFoundationApi
@@ -109,7 +109,7 @@ private fun DefinitionsWordUI(
     modifier: Modifier = Modifier,
     withSearchBar: Boolean,
     contentHeader: @Composable () -> Unit,
-    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
+//    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
     var searchText by remember { mutableStateOf(vm.state.word.orEmpty()) }
@@ -124,15 +124,20 @@ private fun DefinitionsWordUI(
         }
     }
 
-    val res = defs.value
-    val isNotEmpty by remember(res) {
+    val isNotEmpty by remember(defs) {
         derivedStateOf {
-            res.data()?.isNotEmpty() == true
+            defs.value.data()?.isNotEmpty() == true
         }
     }
-    val derivedDefs by remember(res) {
+    val derivedDefs by remember(defs) {
         derivedStateOf {
-            res.data() ?: emptyList()
+            val data = defs.value.data() ?: emptyList()
+            data
+        }
+    }
+    val defsValue by remember(defs) {
+        derivedStateOf {
+            defs.value
         }
     }
 
@@ -195,23 +200,22 @@ private fun DefinitionsWordUI(
                     )
                 ) {
                     items(derivedDefs, key = { it.id }, contentType = { it.type }) { item ->
-//                        showViewItem(
-//                            Modifier,//.animateItemPlacement(),
-//                            item,
-////                            onPartOfSpeechFilterClicked
-//                        )
-
-                        showViewItemTest(
-                            Modifier,
-                            item
+                        showViewItem(
+                            Modifier,//.animateItemPlacement(),
+                            item,
+//                            onPartOfSpeechFilterClicked
                         )
+//                        showViewItemTest(
+//                            Modifier,
+//                            item
+//                        )
                     }
                 }
             } else {
                 LoadingStatusView(
-                    resource = res,
+                    resource = defsValue,
                     loadingText = null,
-                    errorText = vm.getErrorText(res)?.resolveString(),
+                    errorText = vm.getErrorText(defsValue)?.resolveString(),
                     emptyText = LocalContext.current.getString(R.string.error_no_definitions)
                 ) {
                     vm.onTryAgainClicked()
