@@ -1,8 +1,11 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import android.annotation.SuppressLint
+import android.os.Looper
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -11,7 +14,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
@@ -62,6 +68,10 @@ fun DefinitionsUI(
     withSearchBar: Boolean = true,
     contentHeader: @Composable () -> Unit = {}
 ) {
+    LaunchedEffect(key1 = "DefinitionsUI") {
+        Log.v("ComposeDebug", "DefinitionsUI - LaunchedEffect")
+    }
+    
     val scope = rememberCoroutineScope()
     val partsOfSpeech by vm.partsOfSpeechFilterStateFlow.collectAsState()
     val selectedPartsOfSpeeches by vm.selectedPartsOfSpeechStateFlow.collectAsState()
@@ -110,6 +120,10 @@ private fun DefinitionsWordUI(
     contentHeader: @Composable () -> Unit,
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
+    LaunchedEffect(key1 = "DefinitionsWordUI") {
+        Log.v("ComposeDebug", "DefinitionsWordUI - LaunchedEffect")
+    }
+
     val defs = vm.definitions.collectAsState()
     var searchText by remember { mutableStateOf(vm.state.word.orEmpty()) }
     var needShowSuggests by remember { mutableStateOf(false) }
@@ -120,6 +134,29 @@ private fun DefinitionsWordUI(
     if (withSearchBar) {
         BackHandler(enabled = needShowSuggests) {
             focusManager.clearFocus()
+        }
+    }
+
+    //var testData by remember { mutableStateOf(listOf(0)) }
+//    val testData by remember(defs) {
+//        derivedStateOf {
+//            val data = defs.value.data() ?: emptyList()
+//            data.mapIndexed { index, baseViewItem -> index }
+//        }
+//    }
+
+//    val res = defs.value
+//    val data = res.data()
+
+    val isNotEmpty by remember(defs) {
+        derivedStateOf {
+            defs.value.data()?.isNotEmpty() == true
+        }
+    }
+    val derivedDefs by remember(defs) {
+        derivedStateOf {
+            val data = defs.value.data() ?: emptyList()
+            data
         }
     }
 
@@ -139,6 +176,9 @@ private fun DefinitionsWordUI(
                         } else {
                             vm.requestSuggests(it)
                         }
+
+
+                        //testData = (0..(it.length+1)*2).toList()
                     },
                     onFocusChanged = {
                         needShowSuggests = it.isFocused
@@ -149,6 +189,37 @@ private fun DefinitionsWordUI(
                 }
             }
         }
+//
+//        Text(
+//            text = "TEST TEXT",
+//            style = AppTypography.wordDefinitionTitle
+//        )
+//
+//        val suggestsRes = suggests.value
+//        val suggestsData = suggestsRes.data()
+//        val res = defs.value
+//        val data = res.data()
+//
+//        //if (data?.isNotEmpty() == true) {
+//            LazyColumn(
+//                modifier = Modifier.fillMaxWidth(),
+//                contentPadding = PaddingValues(
+//                    bottom = 300.dp
+//                )
+//            ) {
+//                items(
+//                    items = testData,
+//                    key = { it }
+//                ) {
+//                    Text(
+//                        text = "TEST TEXT In Item",
+//                        modifier = Modifier
+//                            .animateItemPlacement()
+//                            .weight(1.0f, true)
+//                    )
+//                }
+//            }
+//        //}
 
         contentHeader()
 
@@ -174,34 +245,36 @@ private fun DefinitionsWordUI(
                 }
             }
         } else {
-            val res = defs.value
-            val data = res.data()
-
-            if (data?.isNotEmpty() == true) {
+            if (isNotEmpty) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().background(Color.Yellow),
                     contentPadding = PaddingValues(
                         bottom = 300.dp
                     )
                 ) {
-                    items(data, key = { it.id }) { item ->
-                        showViewItem(
+                    items(derivedDefs, key = { it.id }) { item ->
+//                        showViewItem(
+//                            Modifier.animateItemPlacement(),
+//                            item,
+//                            vm,
+//                            onPartOfSpeechFilterClicked
+//                        )
+                        showViewItemTest(
                             Modifier.animateItemPlacement(),
                             item,
-                            vm,
-                            onPartOfSpeechFilterClicked
+                            vm
                         )
                     }
                 }
             } else {
-                LoadingStatusView(
-                    resource = res,
-                    loadingText = null,
-                    errorText = vm.getErrorText(res)?.resolveString(),
-                    emptyText = LocalContext.current.getString(R.string.error_no_definitions)
-                ) {
-                    vm.onTryAgainClicked()
-                }
+//                LoadingStatusView(
+//                    resource = res,
+//                    loadingText = null,
+//                    errorText = vm.getErrorText(res)?.resolveString(),
+//                    emptyText = LocalContext.current.getString(R.string.error_no_definitions)
+//                ) {
+//                    vm.onTryAgainClicked()
+//                }
             }
         }
     }
@@ -228,6 +301,25 @@ private fun showSuggestItem(
             text = "unknown item $item",
             modifier = modifier
         )
+    }
+}
+
+@Composable
+private fun showViewItemTest(
+    modifier: Modifier,
+    item: BaseViewItem<*>,
+// Comment this argument to fix the bug
+    vm: DefinitionsVM
+) {
+    return when (item) {
+        is WordTitleViewItem -> WordTitleView(item, modifier)
+        else -> {
+            Text(
+                text = "TEST TEXT In Item",
+                modifier = modifier,
+                //style = AppTypography.wordDefinitionTitle,
+            )
+        }
     }
 }
 
@@ -402,6 +494,10 @@ fun WordTitleView(
         )
     }
 ) {
+    LaunchedEffect(key1 = "WordTitleView") {
+        Log.v("ComposeDebug", "WordTitleView (${viewItem.firstItem()}) - LaunchedEffect")
+    }
+
     Row(
         modifier = Modifier
             .then(modifier)
