@@ -181,7 +181,7 @@ private fun DefinitionsWordUI(
             ) {
                 items(suggestsData, key = { it.id }) { item ->
                     showSuggestItem(
-                        Modifier,//.animateItemPlacement(),
+                        Modifier.animateItemPlacement(),
                         item,
                         vm,
                         onClicked = {
@@ -201,14 +201,12 @@ private fun DefinitionsWordUI(
                 ) {
                     items(derivedDefs, key = { it.id }, contentType = { it.type }) { item ->
                         showViewItem(
-                            Modifier,//.animateItemPlacement(),
+                            Modifier.animateItemPlacement(),
                             item,
-                            onPartOfSpeechFilterClicked
+                            onPartOfSpeechFilterClicked,
+                            { vm.onPartOfSpeechFilterCloseClicked(it) },
+                            { vm.onDisplayModeChanged(it) }
                         )
-//                        showViewItemTest(
-//                            Modifier,
-//                            item
-//                        )
                     }
                 }
             } else {
@@ -221,23 +219,6 @@ private fun DefinitionsWordUI(
                     vm.onTryAgainClicked()
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun showViewItemTest(
-    modifier: Modifier,
-    item: BaseViewItem<*>
-) {
-    return when (item) {
-        is WordTitleViewItem -> WordTitleView(item, modifier)
-        else -> {
-            Text(
-                text = "TEST TEXT In Item",
-                modifier = modifier,
-                //style = AppTypography.wordDefinitionTitle,
-            )
         }
     }
 }
@@ -270,14 +251,17 @@ private fun showSuggestItem(
 private fun showViewItem(
     modifier: Modifier,
     item: BaseViewItem<*>,
-    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
+    onPartOfSpeechFilterClicked: (DefinitionsDisplayModeViewItem) -> Unit,
+    onPartOfSpeechFilterCloseClicked: (DefinitionsDisplayModeViewItem) -> Unit,
+    onDisplayModeChanged: (DefinitionsDisplayMode) -> Unit,
+//    onAddToSetClicked: (WordDefinitionViewItem) -> Unit
 ) = when (item) {
     is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
         item,
         modifier,
         { onPartOfSpeechFilterClicked(item) },
-        { /*vm.onPartOfSpeechFilterCloseClicked(item)*/ },
-        { /*mode -> vm.onDisplayModeChanged(mode)*/ }
+        { onPartOfSpeechFilterCloseClicked(item) },
+        onDisplayModeChanged
     )
     is WordDividerViewItem -> WordDividerView(modifier)
     is WordTitleViewItem -> WordTitleView(item, modifier)
@@ -292,7 +276,7 @@ private fun showViewItem(
                 text = text,
                 style = ts
             )
-            //AddToSet(vm, item)
+//            AddToSet(vm, item)
         }
     )
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
