@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.Dp
 fun CustomTopAppBar(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
-//    contentColor: Color = contentColorFor(backgroundColor),
     elevation: Dp = AppBarDefaults.TopAppBarElevation,
     contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
     shape: Shape = RectangleShape,
@@ -43,7 +42,7 @@ fun CustomTopAppBar(
     // for now there is my simple surface
     Box(
         modifier = modifier
-            .mysurface(
+            .mySurface(
                 shape = shape,
                 backgroundColor = backgroundColor,
                 border = null,
@@ -64,7 +63,7 @@ fun CustomTopAppBar(
     }
 }
 
-fun Modifier.mysurface(
+fun Modifier.mySurface(
     shape: Shape,
     backgroundColor: Color,
     border: BorderStroke?,
