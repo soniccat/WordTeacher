@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.Dp
 fun CustomTopAppBar(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.primarySurface,
-    contentColor: Color = contentColorFor(backgroundColor),
+//    contentColor: Color = contentColorFor(backgroundColor),
     elevation: Dp = AppBarDefaults.TopAppBarElevation,
     contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
     shape: Shape = RectangleShape,
@@ -41,11 +41,17 @@ fun CustomTopAppBar(
     // TODO: after switchig to 1.2.0-beta02 compose using Surface with primarySurface color
     // changes it globally and breaks colors of other compositions... need to check in the next version
     // for now there is my simple surface
-    Surface(
-        color = backgroundColor,
-        contentColor = contentColor,
-        elevation = elevation,
-        shape = shape
+    Box(
+        modifier = modifier
+            .mysurface(
+                shape = shape,
+                backgroundColor = backgroundColor,
+                border = null,
+                elevation = elevation
+            )
+            .semantics(mergeDescendants = false) {}
+            .pointerInput(Unit) {},
+        propagateMinConstraints = true
     ) {
         Row(
             Modifier

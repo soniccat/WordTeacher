@@ -70,36 +70,36 @@ fun DefinitionsUI(
     val focusManager = LocalFocusManager.current
 
     // TODO: consider moving chooser outside...
-//    ChooserUI(
-//        state = partOfSpeechFilterBottomSheetState,
-//        items = partsOfSpeech.map { partOfSpeech ->
-//            val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
-//            ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
-//        },
-//        modifier = modalModifier,
-//        onSelected = { items ->
-//            vm.onPartOfSpeechFilterUpdated(
-//                items.filter { option ->
-//                    option.isSelected
-//                }.map { option ->
-//                    option.obj as WordTeacherWord.PartOfSpeech
-//                }
-//            )
-//        }
-//    ) {
+    ChooserUI(
+        state = partOfSpeechFilterBottomSheetState,
+        items = partsOfSpeech.map { partOfSpeech ->
+            val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
+            ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
+        },
+        modifier = modalModifier,
+        onSelected = { items ->
+            vm.onPartOfSpeechFilterUpdated(
+                items.filter { option ->
+                    option.isSelected
+                }.map { option ->
+                    option.obj as WordTeacherWord.PartOfSpeech
+                }
+            )
+        }
+    ) {
         DefinitionsWordUI(
             vm,
             contentModifier,
             withSearchBar,
             contentHeader,
-//            onPartOfSpeechFilterClicked = { items ->
-//                focusManager.clearFocus() // consider showing choose in a window popup
-//                scope.launch {
-//                    partOfSpeechFilterBottomSheetState.show()
-//                }
-//            }
+            onPartOfSpeechFilterClicked = { items ->
+                focusManager.clearFocus() // consider showing choose in a window popup
+                scope.launch {
+                    partOfSpeechFilterBottomSheetState.show()
+                }
+            }
         )
-    //}
+    }
 }
 
 @ExperimentalFoundationApi
@@ -109,7 +109,7 @@ private fun DefinitionsWordUI(
     modifier: Modifier = Modifier,
     withSearchBar: Boolean,
     contentHeader: @Composable () -> Unit,
-//    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
+    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
     var searchText by remember { mutableStateOf(vm.state.word.orEmpty()) }
@@ -203,7 +203,7 @@ private fun DefinitionsWordUI(
                         showViewItem(
                             Modifier,//.animateItemPlacement(),
                             item,
-//                            onPartOfSpeechFilterClicked
+                            onPartOfSpeechFilterClicked
                         )
 //                        showViewItemTest(
 //                            Modifier,
@@ -270,12 +270,12 @@ private fun showSuggestItem(
 private fun showViewItem(
     modifier: Modifier,
     item: BaseViewItem<*>,
-//    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
+    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) = when (item) {
     is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
         item,
         modifier,
-        { /*onPartOfSpeechFilterClicked(item)*/ },
+        { onPartOfSpeechFilterClicked(item) },
         { /*vm.onPartOfSpeechFilterCloseClicked(item)*/ },
         { /*mode -> vm.onDisplayModeChanged(mode)*/ }
     )
