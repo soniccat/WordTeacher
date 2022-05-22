@@ -176,7 +176,7 @@ private fun DefinitionsWordUI(
             ) {
                 items(suggestsData, key = { it.id }) { item ->
                     showSuggestItem(
-                        Modifier.animateItemPlacement(),
+                        Modifier,//.animateItemPlacement(),
                         item,
                         vm,
                         onClicked = {
@@ -194,11 +194,16 @@ private fun DefinitionsWordUI(
                         bottom = 300.dp
                     )
                 ) {
-                    items(derivedDefs, key = { it.id }) { item ->
-                        showViewItem(
-                            Modifier.animateItemPlacement(),
-                            item,
-//                            onPartOfSpeechFilterClicked
+                    items(derivedDefs, key = { it.id }, contentType = { it.type }) { item ->
+//                        showViewItem(
+//                            Modifier,//.animateItemPlacement(),
+//                            item,
+////                            onPartOfSpeechFilterClicked
+//                        )
+
+                        showViewItemTest(
+                            Modifier,
+                            item
                         )
                     }
                 }
@@ -263,32 +268,32 @@ private fun showViewItem(
     item: BaseViewItem<*>,
 //    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) = when (item) {
-//    is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
-//        item,
-//        modifier,
-//        { /*onPartOfSpeechFilterClicked(item)*/ },
-//        { /*vm.onPartOfSpeechFilterCloseClicked(item)*/ },
-//        { /*mode -> vm.onDisplayModeChanged(mode)*/ }
-//    )
-//    is WordDividerViewItem -> WordDividerView(modifier)
+    is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
+        item,
+        modifier,
+        { /*onPartOfSpeechFilterClicked(item)*/ },
+        { /*vm.onPartOfSpeechFilterCloseClicked(item)*/ },
+        { /*mode -> vm.onDisplayModeChanged(mode)*/ }
+    )
+    is WordDividerViewItem -> WordDividerView(modifier)
     is WordTitleViewItem -> WordTitleView(item, modifier)
-//    is WordTranscriptionViewItem -> WordTranscriptionView(item, modifier)
-//    is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier)
-//    is WordDefinitionViewItem -> WordDefinitionView(
-//        item,
-//        modifier,
-//        textContent = { text, ts ->
-//            Text(
-//                modifier = Modifier.weight(1.0f),
-//                text = text,
-//                style = ts
-//            )
-//            //AddToSet(vm, item)
-//        }
-//    )
-//    is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
-//    is WordSynonymViewItem -> WordSynonymView(item, modifier)
-//    is WordExampleViewItem -> WordExampleView(item, modifier)
+    is WordTranscriptionViewItem -> WordTranscriptionView(item, modifier)
+    is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier)
+    is WordDefinitionViewItem -> WordDefinitionView(
+        item,
+        modifier,
+        textContent = { text, ts ->
+            Text(
+                modifier = Modifier.weight(1.0f),
+                text = text,
+                style = ts
+            )
+            //AddToSet(vm, item)
+        }
+    )
+    is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
+    is WordSynonymViewItem -> WordSynonymView(item, modifier)
+    is WordExampleViewItem -> WordExampleView(item, modifier)
     else -> {
         Text(
             text = "unknown item $item",
