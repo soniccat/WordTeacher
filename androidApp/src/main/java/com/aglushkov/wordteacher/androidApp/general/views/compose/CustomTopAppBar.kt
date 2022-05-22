@@ -35,7 +35,7 @@ fun CustomTopAppBar(
     shape: Shape = RectangleShape,
     content: @Composable RowScope.() -> Unit
 ) {
-    // TODO: after switchig to 1.2.0-beta02 compose using Surface with primarySurface color
+    // HACK: after switchig to 1.2.0-beta02 compose using Surface with primarySurface color
     // changes it globally and breaks colors of other compositions... need to check in the next version
     // for now there is my simple surface
     Box(
