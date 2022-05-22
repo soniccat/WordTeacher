@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -123,6 +124,18 @@ private fun DefinitionsWordUI(
         }
     }
 
+    val res = defs.value
+    val isNotEmpty by remember(res) {
+        derivedStateOf {
+            res.data()?.isNotEmpty() == true
+        }
+    }
+    val derivedDefs by remember(res) {
+        derivedStateOf {
+            res.data() ?: emptyList()
+        }
+    }
+
     Column(
         modifier = modifier,
     ) {
@@ -174,22 +187,18 @@ private fun DefinitionsWordUI(
                 }
             }
         } else {
-            val res = defs.value
-            val data = res.data()
-
-            if (data?.isNotEmpty() == true) {
+            if (isNotEmpty) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(
                         bottom = 300.dp
                     )
                 ) {
-                    items(data, key = { it.id }) { item ->
+                    items(derivedDefs, key = { it.id }) { item ->
                         showViewItem(
                             Modifier.animateItemPlacement(),
                             item,
-                            vm,
-                            onPartOfSpeechFilterClicked
+//                            onPartOfSpeechFilterClicked
                         )
                     }
                 }
@@ -203,6 +212,23 @@ private fun DefinitionsWordUI(
                     vm.onTryAgainClicked()
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun showViewItemTest(
+    modifier: Modifier,
+    item: BaseViewItem<*>
+) {
+    return when (item) {
+        is WordTitleViewItem -> WordTitleView(item, modifier)
+        else -> {
+            Text(
+                text = "TEST TEXT In Item",
+                modifier = modifier,
+                //style = AppTypography.wordDefinitionTitle,
+            )
         }
     }
 }
@@ -235,35 +261,34 @@ private fun showSuggestItem(
 private fun showViewItem(
     modifier: Modifier,
     item: BaseViewItem<*>,
-    vm: DefinitionsVM,
-    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
+//    onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) = when (item) {
-    is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
-        item,
-        modifier,
-        { onPartOfSpeechFilterClicked(item) },
-        { vm.onPartOfSpeechFilterCloseClicked(item) },
-        { mode -> vm.onDisplayModeChanged(mode) }
-    )
-    is WordDividerViewItem -> WordDividerView(modifier)
+//    is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
+//        item,
+//        modifier,
+//        { /*onPartOfSpeechFilterClicked(item)*/ },
+//        { /*vm.onPartOfSpeechFilterCloseClicked(item)*/ },
+//        { /*mode -> vm.onDisplayModeChanged(mode)*/ }
+//    )
+//    is WordDividerViewItem -> WordDividerView(modifier)
     is WordTitleViewItem -> WordTitleView(item, modifier)
-    is WordTranscriptionViewItem -> WordTranscriptionView(item, modifier)
-    is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier)
-    is WordDefinitionViewItem -> WordDefinitionView(
-        item,
-        modifier,
-        textContent = { text, ts ->
-            Text(
-                modifier = Modifier.weight(1.0f),
-                text = text,
-                style = ts
-            )
-            AddToSet(vm, item)
-        }
-    )
-    is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
-    is WordSynonymViewItem -> WordSynonymView(item, modifier)
-    is WordExampleViewItem -> WordExampleView(item, modifier)
+//    is WordTranscriptionViewItem -> WordTranscriptionView(item, modifier)
+//    is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier)
+//    is WordDefinitionViewItem -> WordDefinitionView(
+//        item,
+//        modifier,
+//        textContent = { text, ts ->
+//            Text(
+//                modifier = Modifier.weight(1.0f),
+//                text = text,
+//                style = ts
+//            )
+//            //AddToSet(vm, item)
+//        }
+//    )
+//    is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
+//    is WordSynonymViewItem -> WordSynonymView(item, modifier)
+//    is WordExampleViewItem -> WordExampleView(item, modifier)
     else -> {
         Text(
             text = "unknown item $item",
