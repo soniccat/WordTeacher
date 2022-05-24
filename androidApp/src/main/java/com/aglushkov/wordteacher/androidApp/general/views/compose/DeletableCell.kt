@@ -8,6 +8,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -20,8 +21,9 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.*
-import com.aglushkov.wordteacher.androidApp.features.articles.views.roundToMax
+import kotlin.math.roundToInt
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -30,19 +32,11 @@ fun DeletableCell(
     stateKey: Any,
     onClick: () -> Unit,
     onDeleted: () -> Unit,
-    threshold: Float = 0.3f,
     content: @Composable RowScope.() -> Unit
 ) {
     key(stateKey) {
         var isSwipedAway by remember { mutableStateOf(false) }
-        val dismissState = rememberDismissState(
-            confirmStateChange = {
-                if (it == DismissValue.DismissedToStart) {
-                    isSwipedAway = true
-                }
-                true
-            }
-        )
+        val dismissState = rememberDismissState()
 
         AnimatedVisibility(
             visible = !isSwipedAway,
@@ -62,18 +56,15 @@ fun DeletableCell(
             }
 
             val deleteButtonWidth = (DeleteButtonWidth.value * LocalDensity.current.density).toInt()
-            val dismissThreshold: (DismissDirection) -> ThresholdConfig =
-                { FractionalThreshold(threshold) }
-            SwipeToDismiss(
+            DeleteSwipeable(
                 state = dismissState,
-                modifier = Modifier.clickable { onClick() },
-                directions = setOf(DismissDirection.EndToStart),
-                dismissThresholds = dismissThreshold,
+                contentModifier = Modifier.clickable { onClick() },
+                deleteButtonWidth = deleteButtonWidth,
                 background = {
                     Box(
-                        Modifier.fillMaxSize()
+                        Modifier
+                            .fillMaxSize()
                     ) {
-                        val density = LocalDensity.current
                         // To support icon sliding from the right edge
                         Layout(
                             content = {
@@ -82,18 +73,16 @@ fun DeletableCell(
                                     contentDescription = null,
                                     modifier = Modifier
                                         .background(Color.Red.copy(alpha = 0.8f))
-                                        .fillMaxSize(),
+                                        .fillMaxSize()
+                                        .clickable {
+                                            isSwipedAway = true
+                                        },
                                     alignment = DeleteIconAlignment(deleteButtonWidth),
                                     contentScale = ContentScale.None
                                 )
                             }
                         ) { measurables, constraints ->
-                            val resultFraction = when (dismissState.progress.to) {
-                                DismissValue.DismissedToStart -> dismissState.progress.fraction * (1.0f / threshold)
-                                else -> 0f
-                            }.roundToMax(1.0f)
-
-                            val iconWidth = (deleteButtonWidth * resultFraction).toInt()
+                            val iconWidth = (-dismissState.offset.value.toInt()).coerceAtLeast(0)
                             val icon = measurables[0].measure(
                                 constraints.constrain(
                                     Constraints(
@@ -116,6 +105,49 @@ fun DeletableCell(
                 content()
             }
         }
+    }
+}
+
+@Composable
+@ExperimentalMaterialApi
+fun DeleteSwipeable(
+    state: DismissState,
+    contentModifier: Modifier,
+    deleteButtonWidth: Int,
+    background: @Composable RowScope.() -> Unit,
+    dismissContent: @Composable RowScope.() -> Unit
+) {
+    val deleteButtonWidthFloat = deleteButtonWidth.toFloat()
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
+    val anchors = mutableMapOf(0f to DismissValue.Default)
+    anchors += -deleteButtonWidthFloat to DismissValue.DismissedToStart
+
+    val minFactor = SwipeableDefaults.StandardResistanceFactor
+    val maxFactor = SwipeableDefaults.StiffResistanceFactor
+    Box(
+        Modifier.swipeable(
+            state = state,
+            anchors = anchors,
+            orientation = Orientation.Horizontal,
+            reverseDirection = isRtl,
+            resistance = ResistanceConfig(
+                basis = deleteButtonWidthFloat,
+                factorAtMin = minFactor,
+                factorAtMax = maxFactor
+            )
+        )
+    ) {
+        Row(
+            content = background,
+            modifier = Modifier.matchParentSize()
+        )
+        Row(
+            content = dismissContent,
+            modifier = Modifier
+                .offset { IntOffset(kotlin.math.min(deleteButtonWidth, state.offset.value.roundToInt()), 0) }
+                .then(contentModifier)
+        )
     }
 }
 

@@ -203,6 +203,7 @@ private fun DefinitionsWordUI(
                         showViewItem(
                             Modifier.animateItemPlacement(),
                             item,
+                            vm,
                             onPartOfSpeechFilterClicked,
                             { vm.onPartOfSpeechFilterCloseClicked(it) },
                             { vm.onDisplayModeChanged(it) }
@@ -251,10 +252,10 @@ private fun showSuggestItem(
 private fun showViewItem(
     modifier: Modifier,
     item: BaseViewItem<*>,
+    vm: DefinitionsVM,
     onPartOfSpeechFilterClicked: (DefinitionsDisplayModeViewItem) -> Unit,
     onPartOfSpeechFilterCloseClicked: (DefinitionsDisplayModeViewItem) -> Unit,
     onDisplayModeChanged: (DefinitionsDisplayMode) -> Unit,
-//    onAddToSetClicked: (WordDefinitionViewItem) -> Unit
 ) = when (item) {
     is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
         item,
@@ -276,7 +277,7 @@ private fun showViewItem(
                 text = text,
                 style = ts
             )
-//            AddToSet(vm, item)
+            AddToSet(vm, item)
         }
     )
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
