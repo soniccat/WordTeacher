@@ -46,6 +46,9 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                     node.dictIndexEntries.toMutableList(),
                     node.children.toMutableList()
                 )
+                node.dictIndexEntries.map {
+                    (it as DictEntry).node = newNode1
+                }
 
                 val newNode2 = DictTrieNode(
                     ch.toString(),
@@ -287,7 +290,7 @@ data class DictWordData(
 )
 
 private class DictEntry(
-    private val node: DictTrieNode,
+    var node: DictTrieNode,
     partOfSpeech: WordTeacherWord.PartOfSpeech,
     indexValue: Any?,
     dict: Dict
