@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.dicts
 
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.repository.dict.DictWordData
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import okio.Path
 
@@ -20,13 +21,22 @@ interface Dict: WordTeacherWordService {
         fun entry(
             word: String,
             nextWord: (needAnotherOne: Boolean) -> String?,
-            onFound: (node: MutableList<Dict.Index.Entry>) -> Unit
+            onFound: (node: MutableList<Entry>) -> Unit
         )
 
         // TODO: consider removing "word" property and build it from a trie
-        data class Entry(val word: String, val partOfSpeech: WordTeacherWord.PartOfSpeech, val indexValue: Any?, val dict: Dict)
+        abstract class Entry(
+            val partOfSpeech: WordTeacherWord.PartOfSpeech,
+            val indexValue: Any?,
+            val dict: Dict
+        ) {
+            abstract val word: String
+        }
     }
 }
+
+fun Dict.Index.Entry.toWordData(): DictWordData =
+    DictWordData(word, partOfSpeech, indexValue, dict)
 
 enum class Language {
     RU,

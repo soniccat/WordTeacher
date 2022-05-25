@@ -73,7 +73,7 @@ class DictRepositoryImpl(
                     dictFactory.createDict(filePath)?.let { dict ->
                         dict.load()
                         for (e in dict.index.allEntries()) {
-                            trie.putWord(e.word, e)
+                            trie.putWord(DictWordData(e.word, e.partOfSpeech, e.indexValue, e.dict))
                         }
 
                         dicts.update {

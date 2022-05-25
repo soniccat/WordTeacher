@@ -4,8 +4,10 @@ import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.Language
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslIndex
+import com.aglushkov.wordteacher.shared.dicts.toWordData
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.repository.dict.DictWordData
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -250,13 +252,13 @@ class DslDictTests {
 
         assertEquals(1, dslDict.index.allEntries().toList().size)
         assertEquals(
-            Dict.Index.Entry(
+            DictWordData(
                 "term1",
                 WordTeacherWord.PartOfSpeech.PhrasalVerb,
                 73L,
                 dslDict
             ),
-            dslDict.index.allEntries().first()
+            dslDict.index.allEntries().first().toWordData()
         )
 
         val word = dslDict.define("term1").firstOrNull()

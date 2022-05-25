@@ -1,17 +1,25 @@
 package com.aglushkov.wordteacher.shared.repository.dict
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 
 class DictTrie: Iterable<Dict.Index.Entry> {
-    private val root = DictTrieNode()
+    private val root = DictTrieNode(' ', null)
 
-    fun putWord(word: String, dicIndexEntry: Dict.Index.Entry) {
+    fun putWord(data: DictWordData) {
         var node = root
-        word.onEach { ch ->
+        data.word.onEach { ch ->
             node = node.obtainNode(ch)
         }
 
-        node.dictIndexEntries.add(dicIndexEntry)
+        node.dictIndexEntries.add(
+            DictEntry(
+                node,
+                data.partOfSpeech,
+                data.indexValue,
+                data.dict
+            )
+        )
     }
 
     fun wordsStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {
@@ -60,8 +68,8 @@ class DictTrie: Iterable<Dict.Index.Entry> {
             if (!visitor.invoke(it)) return false
         }
 
-        node.onEachChild { _, n ->
-            if (!runVisitor(n, visitor)) return false
+        node.children.onEach {
+            if (!runVisitor(it, visitor)) return false
         }
 
         return true
@@ -154,7 +162,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 if (iteratorNode.entryIterator.hasNext()) {
                     return iteratorNode
                 } else if (iteratorNode.childIterator.hasNext()) {
-                    node = iteratorNode.childIterator.next().second
+                    node = iteratorNode.childIterator.next()
                 } else {
                     break
                 }
@@ -173,7 +181,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 result = entry.entryIterator.next()
 
             } else if (entry.childIterator.hasNext()) {
-                val nextLastNode = walkDownUntilEntries(entry.childIterator.next().second)
+                val nextLastNode = walkDownUntilEntries(entry.childIterator.next())
                 result = nextLastNode.entryIterator.next()
             }
 
@@ -193,7 +201,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
         private data class TrieIteratorNode(
             val node: DictTrieNode,
             var entryIterator: Iterator<Dict.Index.Entry> = node.dictIndexEntries.iterator(),
-            var childIterator: Iterator<Pair<Char, DictTrieNode>> = node.childrenIterator()
+            var childIterator: Iterator<DictTrieNode> = node.children.iterator()
         )
     }
 
@@ -210,18 +218,38 @@ class DictTrie: Iterable<Dict.Index.Entry> {
             c = 1
         }
 
-        node.onEachChild { _, node ->
-            c += singleNodeCount(node)
+        node.children.onEach {
+            c += singleNodeCount(it)
         }
 
         return c
     }
 }
 
+data class DictWordData(
+    val word: String,
+    val partOfSpeech: WordTeacherWord.PartOfSpeech,
+    val indexValue: Any?,
+    val dict: Dict
+)
+
+private class DictEntry(
+    private val node: DictTrieNode,
+    partOfSpeech: WordTeacherWord.PartOfSpeech,
+    indexValue: Any?,
+    dict: Dict
+) : Dict.Index.Entry(partOfSpeech, indexValue, dict) {
+    override val word: String
+        get() {
+            return node.calcWord()
+        }
+}
+
 private class DictTrieNode(
-    var dictIndexEntries: MutableList<Dict.Index.Entry> = mutableListOf(),
-    // list of pairs Char + DictTrieNode, to avoid creating an extra object
-    val children: MutableList<Any> = mutableListOf() // TODO: add alphabetical sorting
+    val ch: Char,
+    val parent: DictTrieNode?,
+    val dictIndexEntries: MutableList<Dict.Index.Entry> = mutableListOf(),
+    val children: MutableList<DictTrieNode> = mutableListOf() // TODO: add alphabetical sorting
 ) {
     val isEnd: Boolean
         get() {
@@ -233,45 +261,29 @@ private class DictTrieNode(
         return if (node != null) {
             node
         } else {
-            val newNode = DictTrieNode()
-            children.add(ch)
+            val newNode = DictTrieNode(ch, this)
             children.add(newNode)
             newNode
         }
     }
 
-    inline fun onEachChild(callback: (Char, DictTrieNode) -> Unit) {
-        for (i in children.indices step 2) {
-            callback(children[i] as Char, children[i+1] as DictTrieNode)
-        }
-    }
-
     fun findChild(ch: Char): DictTrieNode? {
-        for (i in children.indices step 2) {
-            if (children[i] == ch) {
-                return children[i+1] as DictTrieNode
-            }
-        }
-
-        return null
+        return children.firstOrNull { it.ch == ch }
     }
 
-    fun childrenIterator(): Iterator<Pair<Char,DictTrieNode>> =
-        ChildrenIterator(children)
+    fun calcWord(): String {
+        return buildString {
+            var node: DictTrieNode = this@DictTrieNode
+            do {
+                insert(0, node.ch)
 
-    private class ChildrenIterator(
-        private val children: List<Any>
-    ): Iterator<Pair<Char,DictTrieNode>> {
-        private var i = 0
-
-        override fun hasNext(): Boolean {
-            return i < children.size
-        }
-
-        override fun next(): Pair<Char, DictTrieNode> {
-            val p = Pair(children[i] as Char, children[i+1] as DictTrieNode)
-            i += 2
-            return p
+                val p = node.parent
+                if (p != null) {
+                    node = p
+                } else {
+                    break;
+                }
+            } while (node.parent != null)
         }
     }
 }
