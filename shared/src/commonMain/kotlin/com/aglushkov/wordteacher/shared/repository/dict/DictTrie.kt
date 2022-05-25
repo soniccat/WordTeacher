@@ -3,7 +3,7 @@ package com.aglushkov.wordteacher.shared.repository.dict
 import com.aglushkov.wordteacher.shared.dicts.Dict
 
 class DictTrie: Iterable<Dict.Index.Entry> {
-    private val root = DictTrieNode(' ')
+    private val root = DictTrieNode()
 
     fun putWord(word: String, dicIndexEntry: Dict.Index.Entry) {
         var node = root
@@ -17,7 +17,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
     fun wordsStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {
         var node: DictTrieNode? = root
         prefix.onEach { ch ->
-            node = node?.children?.get(ch)
+            node = node?.findChild(ch)
         }
 
         return node?.let {
@@ -38,7 +38,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
     fun word(word: String): List<Dict.Index.Entry> {
         var node: DictTrieNode? = root
         word.onEach { ch ->
-            node = node?.children?.get(ch)
+            node = node?.findChild(ch)
         }
 
         return node?.dictIndexEntries.orEmpty()
@@ -60,8 +60,8 @@ class DictTrie: Iterable<Dict.Index.Entry> {
             if (!visitor.invoke(it)) return false
         }
 
-        node.children.onEach {
-            if (!runVisitor(it.value, visitor)) return false
+        node.onEachChild { _, n ->
+            if (!runVisitor(n, visitor)) return false
         }
 
         return true
@@ -74,11 +74,11 @@ class DictTrie: Iterable<Dict.Index.Entry> {
     ) {
         var node: DictTrieNode? = root
         word.onEach { ch ->
-            node = node?.children?.get(ch)
+            node = node?.findChild(ch)
             if (node == null) return
         }
 
-        val spaceNode = node?.children?.get(' ')
+        val spaceNode = node?.findChild(' ')
         if (spaceNode != null) {
             node = spaceNode
         } else {
@@ -98,7 +98,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                     onFound(nextNode.dictIndexEntries)
                 }
 
-                val spaceNode2 = nextNode.children.get(' ')
+                val spaceNode2 = nextNode.findChild(' ')
                 if (spaceNode2 != null) {
                     node = spaceNode2
                 } else if (nextNode.dictIndexEntries.isEmpty()) {
@@ -122,7 +122,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
     private fun wordNode(word: String, startNode: DictTrieNode?): DictTrieNode? {
         var node: DictTrieNode? = startNode
         word.onEach { ch ->
-            node = node?.children?.get(ch)
+            node = node?.findChild(ch)
 
             if (node == null) return null
         }
@@ -154,7 +154,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 if (iteratorNode.entryIterator.hasNext()) {
                     return iteratorNode
                 } else if (iteratorNode.childIterator.hasNext()) {
-                    node = iteratorNode.childIterator.next().value
+                    node = iteratorNode.childIterator.next().second
                 } else {
                     break
                 }
@@ -173,7 +173,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 result = entry.entryIterator.next()
 
             } else if (entry.childIterator.hasNext()) {
-                val nextLastNode = walkDownUntilEntries(entry.childIterator.next().value)
+                val nextLastNode = walkDownUntilEntries(entry.childIterator.next().second)
                 result = nextLastNode.entryIterator.next()
             }
 
@@ -193,15 +193,35 @@ class DictTrie: Iterable<Dict.Index.Entry> {
         private data class TrieIteratorNode(
             val node: DictTrieNode,
             var entryIterator: Iterator<Dict.Index.Entry> = node.dictIndexEntries.iterator(),
-            var childIterator: Iterator<Map.Entry<Char, DictTrieNode>> = node.children.iterator()
+            var childIterator: Iterator<Pair<Char, DictTrieNode>> = node.childrenIterator()
         )
+    }
+
+    // For debugging
+
+    fun singleNodeCount(): Int {
+        return singleNodeCount(root)
+    }
+
+    private fun singleNodeCount(node: DictTrieNode): Int {
+        var c = 0;
+
+        if (node.children.size == 1 && node.dictIndexEntries.size == 0) {
+            c = 1
+        }
+
+        node.onEachChild { _, node ->
+            c += singleNodeCount(node)
+        }
+
+        return c
     }
 }
 
 private class DictTrieNode(
-    val char: Char,
     var dictIndexEntries: MutableList<Dict.Index.Entry> = mutableListOf(),
-    val children: HashMap<Char, DictTrieNode> = HashMap() // TODO: add alphabetical sorting
+    // list of pairs Char + DictTrieNode, to avoid creating an extra object
+    val children: MutableList<Any> = mutableListOf() // TODO: add alphabetical sorting
 ) {
     val isEnd: Boolean
         get() {
@@ -209,13 +229,49 @@ private class DictTrieNode(
         }
 
     fun obtainNode(ch: Char): DictTrieNode {
-        val node = children[ch]
+        val node = findChild(ch)
         return if (node != null) {
             node
         } else {
-            val newNode = DictTrieNode(ch)
-            children[ch] = newNode
+            val newNode = DictTrieNode()
+            children.add(ch)
+            children.add(newNode)
             newNode
+        }
+    }
+
+    inline fun onEachChild(callback: (Char, DictTrieNode) -> Unit) {
+        for (i in children.indices step 2) {
+            callback(children[i] as Char, children[i+1] as DictTrieNode)
+        }
+    }
+
+    fun findChild(ch: Char): DictTrieNode? {
+        for (i in children.indices step 2) {
+            if (children[i] == ch) {
+                return children[i+1] as DictTrieNode
+            }
+        }
+
+        return null
+    }
+
+    fun childrenIterator(): Iterator<Pair<Char,DictTrieNode>> =
+        ChildrenIterator(children)
+
+    private class ChildrenIterator(
+        private val children: List<Any>
+    ): Iterator<Pair<Char,DictTrieNode>> {
+        private var i = 0
+
+        override fun hasNext(): Boolean {
+            return i < children.size
+        }
+
+        override fun next(): Pair<Char, DictTrieNode> {
+            val p = Pair(children[i] as Char, children[i+1] as DictTrieNode)
+            i += 2
+            return p
         }
     }
 }
