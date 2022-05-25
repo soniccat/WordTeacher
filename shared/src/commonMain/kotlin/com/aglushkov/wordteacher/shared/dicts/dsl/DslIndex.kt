@@ -163,6 +163,8 @@ class DslIndex(
 
     fun isEmpty() = index.isEmpty()
 
+    fun singleNodeCount() = index.singleNodeCount()
+
     private data class ReadEntry(
         val word: String,
         val partOfSpeech: WordTeacherWord.PartOfSpeech,

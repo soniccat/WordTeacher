@@ -42,6 +42,8 @@ class DslDict(
             readHeader()
         }
 
+        var c = dslIndex.singleNodeCount()
+
         this.dslIndex = dslIndex
     }
 
@@ -66,6 +68,7 @@ class DslDict(
             var line = readUtf8Line()
             var readLine: String? = null
 
+//            var c = 0;
             while (line != null || readLine != null) {
                 val resultLine: String = readLine ?: (line ?: "")
                 if (readLine != null) {
@@ -103,6 +106,11 @@ class DslDict(
                     offset += resultLine.utf8Size() + newLineSize
                     line = readUtf8Line()
                 }
+
+//                ++c
+//                if (c > 1000) {
+//                    break;
+//                }
             }
         }
     }

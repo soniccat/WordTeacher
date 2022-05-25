@@ -1,15 +1,68 @@
 package com.aglushkov.wordteacher.shared.repository.dict
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.extensions.addElements
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 
 class DictTrie: Iterable<Dict.Index.Entry> {
-    private val root = DictTrieNode(' ', null)
+    private val root = DictTrieNode("", null)
 
     fun putWord(data: DictWordData) {
         var node = root
+        var innerNodeIndex = 0
         data.word.onEach { ch ->
-            node = node.obtainNode(ch)
+            // match with prefix -> go along the prefix
+            if (innerNodeIndex < node.prefix.length && node.prefix[innerNodeIndex] == ch) {
+                innerNodeIndex += 1
+
+            // reached the end of prefix and there aren't any children aren't any entries -> extend prefix
+            } else if (node.prefix.length == innerNodeIndex && node.children.isEmpty() && node.dictIndexEntries.isEmpty()) {
+                node.prefix = node.prefix + ch
+                innerNodeIndex += 1
+
+            // reached the end of prefix and there children or entries -> try to find a child with the same prefix or add a new child
+            } else if (node.prefix.length == innerNodeIndex && (node.children.isNotEmpty() || node.dictIndexEntries.isNotEmpty())) {
+                val childNode = node.children.firstOrNull {
+                    it.prefix.first() == ch
+                }
+
+                if (childNode != null) {
+                    node = childNode
+                } else {
+                    val newNode = DictTrieNode(ch.toString(), node)
+                    node.children.add(newNode)
+                    node = newNode
+                }
+
+                innerNodeIndex = 1
+
+            // in the middle of prefix got that the next character is different -> split the node
+            } else if (innerNodeIndex < node.prefix.length && node.prefix[innerNodeIndex] != ch) {
+                val newNode1 = DictTrieNode(
+                    node.prefix.substring(innerNodeIndex, node.prefix.length),
+                    node,
+                    node.dictIndexEntries.toMutableList(),
+                    node.children.toMutableList()
+                )
+
+                val newNode2 = DictTrieNode(
+                    ch.toString(),
+                    node
+                )
+
+                node.prefix = node.prefix.substring(0, innerNodeIndex)
+                node.dictIndexEntries.clear()
+                node.children.clear()
+                node.children.addElements(newNode1, newNode2)
+
+                node = newNode2
+                innerNodeIndex = 1
+            } else {
+                Logger.v("hmm")
+            }
+            //node = node.obtainNode(ch)
         }
 
         node.dictIndexEntries.add(
@@ -245,8 +298,8 @@ private class DictEntry(
         }
 }
 
-private class DictTrieNode(
-    val ch: Char,
+private open class DictTrieNode(
+    var prefix: String,
     val parent: DictTrieNode?,
     val dictIndexEntries: MutableList<Dict.Index.Entry> = mutableListOf(),
     val children: MutableList<DictTrieNode> = mutableListOf() // TODO: add alphabetical sorting
@@ -256,26 +309,32 @@ private class DictTrieNode(
             return dictIndexEntries.isNotEmpty()
         }
 
-    fun obtainNode(ch: Char): DictTrieNode {
-        val node = findChild(ch)
-        return if (node != null) {
-            node
-        } else {
-            val newNode = DictTrieNode(ch, this)
-            children.add(newNode)
-            newNode
-        }
-    }
+//    fun obtainNode(ch: Char): DictTrieNode {
+//        val node = findChild(ch)
+//        return if (node != null) {
+//            node
+//        } else if (dictIndexEntries.isEmpty()) {
+//
+//        } else {
+//            val newNode = DictTrieNode(ch, this)
+//            children.add(newNode)
+//            newNode
+//        }
+//    }
 
-    fun findChild(ch: Char): DictTrieNode? {
-        return children.firstOrNull { it.ch == ch }
+    open fun findChild(ch: Char): DictTrieNode? {
+        if (prefix.isNotEmpty() && prefix.first() == ch) {
+            return MetaDictTrieNode(this, 1)
+        }
+
+        return children.firstOrNull { it.prefix.first() == ch }
     }
 
     fun calcWord(): String {
         return buildString {
             var node: DictTrieNode = this@DictTrieNode
-            do {
-                insert(0, node.ch)
+            while (true) {
+                insert(0, node.prefix)
 
                 val p = node.parent
                 if (p != null) {
@@ -283,7 +342,21 @@ private class DictTrieNode(
                 } else {
                     break;
                 }
-            } while (node.parent != null)
+            }
         }
+    }
+}
+
+private data class MetaDictTrieNode(
+    val ref: DictTrieNode,
+    val offset: Int
+): DictTrieNode(ref.prefix, ref, ref.dictIndexEntries, ref.children) {
+
+    override fun findChild(ch: Char): DictTrieNode? {
+        if (offset < prefix.length && prefix[offset] == ch) {
+            return MetaDictTrieNode(this, offset + 1)
+        }
+
+        return children.firstOrNull { it.prefix.first() == ch }
     }
 }
