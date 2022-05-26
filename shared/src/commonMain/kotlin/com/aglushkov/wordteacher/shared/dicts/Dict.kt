@@ -25,7 +25,6 @@ interface Dict: WordTeacherWordService {
             onFound: (node: MutableList<Entry>) -> Unit
         )
 
-        // TODO: consider removing "word" property and build it from a trie
         abstract class Entry(
             val partOfSpeech: WordTeacherWord.PartOfSpeech,
             val indexValue: Any?,

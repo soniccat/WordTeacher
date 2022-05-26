@@ -30,13 +30,13 @@ class DictTrie: Iterable<Dict.Index.Entry> {
             if (innerNodeIndex < node.prefix.length && node.prefix[innerNodeIndex] == ch) {
                 innerNodeIndex += 1
 
-                // reached the end of prefix and there aren't any children aren't any entries -> extend prefix
-                // skip if node is root
+            // reached the end of prefix and there aren't any children aren't any entries -> extend prefix
+            // skip if node is root
             } else if (node != root && node.prefix.length == innerNodeIndex && node.children.isEmpty() && node.dictIndexEntries.isEmpty()) {
                 node.prefix = node.prefix + ch
                 innerNodeIndex += 1
 
-                // reached the end of prefix and there children or entries -> try to find a child with the same prefix or add a new child
+            // reached the end of prefix and there children or entries -> try to find a child with the same prefix or add a new child
             } else if (node.prefix.length == innerNodeIndex && (node.children.isNotEmpty() || node.dictIndexEntries.isNotEmpty() || node == root)) {
                 val childNode = node.children.firstOrNull {
                     it.prefix.first() == ch
@@ -52,7 +52,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
 
                 innerNodeIndex = 1
 
-                // in the middle of prefix got that the next character is different -> split the node
+            // in the middle of prefix got that the next character is different -> split the node
             } else if (innerNodeIndex < node.prefix.length && node.prefix[innerNodeIndex] != ch) {
                 val newNode1 = DictTrieNode(
                     node.prefix.substring(innerNodeIndex, node.prefix.length),
@@ -80,7 +80,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 node = newNode2
                 innerNodeIndex = 1
             } else {
-                Logger.v("hmm")
+                throw RuntimeException("DictTrie.putWordInternal: impossible condition")
             }
         }
 
@@ -177,7 +177,6 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 } else if (nextNode.isEnd && nextNode.dictIndexEntries.isEmpty()) {
                     needAnotherOne = true
                 } else {
-                    //return nextNode.dictIndexEntries
                     node = nextNode
                     break
                 }
@@ -269,26 +268,6 @@ class DictTrie: Iterable<Dict.Index.Entry> {
             var childIterator: Iterator<DictTrieNode> = node.children.iterator()
         )
     }
-
-    // For debugging
-
-    fun singleNodeCount(): Int {
-        return singleNodeCount(root)
-    }
-
-    private fun singleNodeCount(node: DictTrieNode): Int {
-        var c = 0;
-
-        if (node.children.size == 1 && node.dictIndexEntries.size == 0) {
-            c = 1
-        }
-
-        node.children.onEach {
-            c += singleNodeCount(it)
-        }
-
-        return c
-    }
 }
 
 data class DictWordData(
@@ -321,6 +300,13 @@ private open class DictTrieNode(
             return prefix.length == 1 && dictIndexEntries.isNotEmpty()
         }
 
+    // To be able to work with nodes in this way:
+    //
+    //    var node: DictTrieNode? = n
+    //    prefix.onEach { ch ->
+    //        node = node?.findChild(ch)
+    //    }
+    //
     open fun findChild(ch: Char): DictTrieNode? {
         if (prefix.length > 1 && prefix[1] == ch) {
             return MetaDictTrieNode(this, 1)
