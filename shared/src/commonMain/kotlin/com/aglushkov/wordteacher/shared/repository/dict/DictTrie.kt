@@ -1,9 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.dict
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.extensions.addElements
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 
 class DictTrie: Iterable<Dict.Index.Entry> {
