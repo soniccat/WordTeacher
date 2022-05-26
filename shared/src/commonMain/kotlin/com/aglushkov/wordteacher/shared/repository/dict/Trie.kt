@@ -9,11 +9,13 @@ abstract class Trie<T, D>: Iterable<T> {
 
     abstract fun setNodeForEntry(entry: T, node: TrieNode<T>)
 
-    fun put(word: String, data: D) {
+    fun put(word: String, data: D): T {
         val node = putWord(word)
+        val entry = createEntry(node, data)
         node.dictIndexEntries.add(
-            createEntry(node, data)
+            entry
         )
+        return entry
     }
 
     private fun putWord(word: String): TrieNode<T> {

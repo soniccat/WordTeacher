@@ -23,7 +23,8 @@ class MyLemmatizer : Lemmatizer {
             LemmatizerEntry(
                 node,
                 data.postag,
-                data.lemmas
+                data.lemma,
+                data.isLemma
             )
 
         override fun setNodeForEntry(entry: LemmatizerEntry, node: TrieNode<LemmatizerEntry>) {
@@ -33,14 +34,16 @@ class MyLemmatizer : Lemmatizer {
 
     private data class LemmatizerData(
         val word: String,
-        val postag: String,
-        val lemmas: List<String>
+        val postag: String?,
+        val lemma: LemmatizerEntry?,
+        val isLemma: Boolean
     )
 
     private class LemmatizerEntry(
         var node: TrieNode<LemmatizerEntry>,
-        val postag: String,
-        val lemmas: List<String>
+        val postag: String?,
+        val lemma: LemmatizerEntry?,
+        val isLemma: Boolean
     )
 
     /**
@@ -76,7 +79,19 @@ class MyLemmatizer : Lemmatizer {
                 val elems = line.split(elemRegexp).toTypedArray()
                 val lemmas = elems[2].split(lemmasRegexp).toTypedArray()
                 //dictMap[Arrays.asList(elems[0], elems[1])] = Arrays.asList(*lemmas)
-                trie.put(elems[0], LemmatizerData(elems[0], elems[1], listOf(*lemmas)))
+
+                //put lemmas
+                val lemmaEntry = lemmas.firstOrNull()?.let {
+                    val existingLemmas = trie.word(it).filter { it.isLemma }
+                    if (existingLemmas.isEmpty()) {
+                        trie.put(it, LemmatizerData(it, null, null, true))
+                    } else {
+                        existingLemmas.first()
+                    }
+                }
+
+                //put word
+                trie.put(elems[0], LemmatizerData(elems[0], elems[1], lemmaEntry, false))
             }
         } catch (t: Throwable) {
             Logger.e(t.message.orEmpty())
@@ -136,11 +151,11 @@ class MyLemmatizer : Lemmatizer {
         // val keys = getDictKeys(word, postag)
         // lookup lemma as value of the map
 
-        val entries = trie.word(word.lowercase()).filter { it.postag == postag }
-        val keyValues = entries.map { it.lemmas }.flatten()
+        val entries = trie.word(word.lowercase()).filter { it.postag == postag && !it.isLemma }
+        val lemmas = entries.mapNotNull { it.lemma }
 
-        lemma = if (keyValues.isNotEmpty()) {
-            keyValues[0]
+        lemma = if (lemmas.isNotEmpty()) {
+            lemmas[0].node.calcWord()
         } else {
             "O"
         }
