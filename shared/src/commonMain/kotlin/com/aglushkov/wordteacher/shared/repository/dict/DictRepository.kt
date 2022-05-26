@@ -38,7 +38,7 @@ class DictRepositoryImpl(
 ) : DictRepository {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     override val dicts = MutableStateFlow<Resource<List<Dict>>>(Resource.Uninitialized())
-    private var trie = DictTrie()
+    private var trie = DictTrie() // TODO: that takes much memory, just keep a list of dicts
 
     var isImporting = AtomicBoolean(false)
     var needReimport = AtomicBoolean(false)

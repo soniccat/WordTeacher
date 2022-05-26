@@ -18,12 +18,13 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 innerNodeIndex += 1
 
             // reached the end of prefix and there aren't any children aren't any entries -> extend prefix
-            } else if (node.prefix.length == innerNodeIndex && node.children.isEmpty() && node.dictIndexEntries.isEmpty()) {
+            // skip if node is root
+            } else if (node != root && node.prefix.length == innerNodeIndex && node.children.isEmpty() && node.dictIndexEntries.isEmpty()) {
                 node.prefix = node.prefix + ch
                 innerNodeIndex += 1
 
             // reached the end of prefix and there children or entries -> try to find a child with the same prefix or add a new child
-            } else if (node.prefix.length == innerNodeIndex && (node.children.isNotEmpty() || node.dictIndexEntries.isNotEmpty())) {
+            } else if (node.prefix.length == innerNodeIndex && (node.children.isNotEmpty() || node.dictIndexEntries.isNotEmpty() || node == root)) {
                 val childNode = node.children.firstOrNull {
                     it.prefix.first() == ch
                 }
@@ -46,8 +47,11 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                     node.dictIndexEntries.toMutableList(),
                     node.children.toMutableList()
                 )
-                node.dictIndexEntries.map {
+                newNode1.dictIndexEntries.map {
                     (it as DictEntry).node = newNode1
+                }
+                newNode1.children.onEach {
+                    it.parent = newNode1
                 }
 
                 val newNode2 = DictTrieNode(
@@ -165,7 +169,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
                 val spaceNode2 = nextNode.findChild(' ')
                 if (spaceNode2 != null) {
                     node = spaceNode2
-                } else if (nextNode.dictIndexEntries.isEmpty()) {
+                } else if (nextNode.isEnd && nextNode.dictIndexEntries.isEmpty()) {
                     needAnotherOne = true
                 } else {
                     //return nextNode.dictIndexEntries
@@ -303,30 +307,17 @@ private class DictEntry(
 
 private open class DictTrieNode(
     var prefix: String,
-    val parent: DictTrieNode?,
+    var parent: DictTrieNode?,
     val dictIndexEntries: MutableList<Dict.Index.Entry> = mutableListOf(),
     val children: MutableList<DictTrieNode> = mutableListOf() // TODO: add alphabetical sorting
 ) {
-    val isEnd: Boolean
+    open val isEnd: Boolean
         get() {
-            return dictIndexEntries.isNotEmpty()
+            return prefix.length == 1 && dictIndexEntries.isNotEmpty()
         }
 
-//    fun obtainNode(ch: Char): DictTrieNode {
-//        val node = findChild(ch)
-//        return if (node != null) {
-//            node
-//        } else if (dictIndexEntries.isEmpty()) {
-//
-//        } else {
-//            val newNode = DictTrieNode(ch, this)
-//            children.add(newNode)
-//            newNode
-//        }
-//    }
-
     open fun findChild(ch: Char): DictTrieNode? {
-        if (prefix.isNotEmpty() && prefix.first() == ch) {
+        if (prefix.length > 1 && prefix[1] == ch) {
             return MetaDictTrieNode(this, 1)
         }
 
@@ -354,9 +345,11 @@ private data class MetaDictTrieNode(
     val ref: DictTrieNode,
     val offset: Int
 ): DictTrieNode(ref.prefix, ref, ref.dictIndexEntries, ref.children) {
+    override val isEnd: Boolean
+        get() = offset + 1 == ref.prefix.length && ref.dictIndexEntries.isNotEmpty()
 
     override fun findChild(ch: Char): DictTrieNode? {
-        if (offset < prefix.length && prefix[offset] == ch) {
+        if (offset + 1 < prefix.length && prefix[offset + 1] == ch) {
             return MetaDictTrieNode(this, offset + 1)
         }
 

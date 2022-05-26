@@ -13,7 +13,7 @@ import org.mockito.kotlin.mock
 
 class DslIndexTests {
     @Test
-    fun testHeaderParsing() = runTest {
+    fun testSaveAndLoadThreeTerms() = runTest {
         val fakeFileSystem = FakeFileSystem()
         val dirPath = "/test".toPath()
         val dictPath = dirPath.div("dict.dsl")
