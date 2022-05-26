@@ -2,10 +2,6 @@ package com.aglushkov.wordteacher.shared.repository.dict
 
 import com.aglushkov.wordteacher.shared.general.extensions.addElements
 
-//interface TrieEntry<T> {
-//    //var node: TrieNode<T>
-//}
-
 abstract class Trie<T, D>: Iterable<T> {
     private val root = TrieNode<T>("", null)
 

@@ -1,5 +1,9 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.repository.dict.Trie
+import com.aglushkov.wordteacher.shared.repository.dict.TrieNode
 import opennlp.tools.lemmatizer.Lemmatizer
 import java.io.*
 import java.util.*
@@ -8,7 +12,36 @@ class MyLemmatizer : Lemmatizer {
     /**
      * The hashmap containing the dictionary.
      */
-    private val dictMap: MutableMap<List<String>, List<String>> = HashMap()
+    //private val dictMap: MutableMap<List<String>, List<String>> = HashMap()
+    private val trie = LemmatizerTrie()
+
+    private class LemmatizerTrie: Trie<LemmatizerEntry, LemmatizerData>(){
+        override fun createEntry(
+            node: TrieNode<LemmatizerEntry>,
+            data: LemmatizerData
+        ) =
+            LemmatizerEntry(
+                node,
+                data.postag,
+                data.lemmas
+            )
+
+        override fun setNodeForEntry(entry: LemmatizerEntry, node: TrieNode<LemmatizerEntry>) {
+            entry.node = node
+        }
+    }
+
+    private data class LemmatizerData(
+        val word: String,
+        val postag: String,
+        val lemmas: List<String>
+    )
+
+    private class LemmatizerEntry(
+        var node: TrieNode<LemmatizerEntry>,
+        val postag: String,
+        val lemmas: List<String>
+    )
 
     /**
      * Construct a hashmap from the input tab separated dictionary.
@@ -34,10 +67,19 @@ class MyLemmatizer : Lemmatizer {
             InputStreamReader(dictionary)
         )
         var line: String
-        while (breader.readLine().also { line = it } != null) {
-            val elems = line.split("\t".toRegex()).toTypedArray()
-            val lemmas = elems[2].split("#".toRegex()).toTypedArray()
-            dictMap[Arrays.asList(elems[0], elems[1])] = Arrays.asList(*lemmas)
+
+        val elemRegexp = "\t".toRegex()
+        val lemmasRegexp = "#".toRegex()
+
+        try {
+            while (breader.readLine().also { line = it } != null) {
+                val elems = line.split(elemRegexp).toTypedArray()
+                val lemmas = elems[2].split(lemmasRegexp).toTypedArray()
+                //dictMap[Arrays.asList(elems[0], elems[1])] = Arrays.asList(*lemmas)
+                trie.put(elems[0], LemmatizerData(elems[0], elems[1], listOf(*lemmas)))
+            }
+        } catch (t: Throwable) {
+            Logger.e(t.message.orEmpty())
         }
     }
 
@@ -46,9 +88,9 @@ class MyLemmatizer : Lemmatizer {
      *
      * @return dictMap the Map
      */
-    fun getDictMap(): Map<List<String>, List<String>> {
-        return dictMap
-    }
+//    fun getDictMap(): Map<List<String>, List<String>> {
+//        return dictMap
+//    }
 
     /**
      * Get the dictionary keys (word and postag).
@@ -59,9 +101,9 @@ class MyLemmatizer : Lemmatizer {
      * the assigned postag
      * @return returns the dictionary keys
      */
-    private fun getDictKeys(word: String, postag: String): List<String> {
-        return ArrayList(Arrays.asList(word.lowercase(Locale.getDefault()), postag))
-    }
+//    private fun getDictKeys(word: String, postag: String): List<String> {
+//        return ArrayList(Arrays.asList(word.lowercase(Locale.getDefault()), postag))
+//    }
 
     override fun lemmatize(tokens: Array<String>, postags: Array<String>): Array<String> {
         val lemmas: MutableList<String> = ArrayList()
@@ -72,11 +114,12 @@ class MyLemmatizer : Lemmatizer {
     }
 
     override fun lemmatize(tokens: List<String>, posTags: List<String>): List<List<String>> {
-        val allLemmas: MutableList<List<String>> = ArrayList()
-        for (i in tokens.indices) {
-            allLemmas.add(getAllLemmas(tokens[i], posTags[i]))
-        }
-        return allLemmas
+//        val allLemmas: MutableList<List<String>> = ArrayList()
+//        for (i in tokens.indices) {
+//            allLemmas.add(getAllLemmas(tokens[i], posTags[i]))
+//        }
+//        return allLemmas
+        throw RuntimeException("Not implemented")
     }
 
     /**
@@ -90,10 +133,13 @@ class MyLemmatizer : Lemmatizer {
      */
     private fun lemmatize(word: String, postag: String): String {
         val lemma: String
-        val keys = getDictKeys(word, postag)
+        // val keys = getDictKeys(word, postag)
         // lookup lemma as value of the map
-        val keyValues = dictMap[keys]
-        lemma = if (keyValues != null && !keyValues.isEmpty()) {
+
+        val entries = trie.word(word.lowercase()).filter { it.postag == postag }
+        val keyValues = entries.map { it.lemmas }.flatten()
+
+        lemma = if (keyValues.isNotEmpty()) {
             keyValues[0]
         } else {
             "O"
@@ -111,16 +157,16 @@ class MyLemmatizer : Lemmatizer {
      * the postag
      * @return every lemma
      */
-    private fun getAllLemmas(word: String, postag: String): List<String> {
-        val lemmasList: MutableList<String> = ArrayList()
-        val keys = getDictKeys(word, postag)
-        // lookup lemma as value of the map
-        val keyValues = dictMap[keys]
-        if (keyValues != null && !keyValues.isEmpty()) {
-            lemmasList.addAll(keyValues)
-        } else {
-            lemmasList.add("O")
-        }
-        return lemmasList
-    }
+//    private fun getAllLemmas(word: String, postag: String): List<String> {
+//        val lemmasList: MutableList<String> = ArrayList()
+//        val keys = getDictKeys(word, postag)
+//        // lookup lemma as value of the map
+//        val keyValues = dictMap[keys]
+//        if (keyValues != null && !keyValues.isEmpty()) {
+//            lemmasList.addAll(keyValues)
+//        } else {
+//            lemmasList.add("O")
+//        }
+//        return lemmasList
+//    }
 }

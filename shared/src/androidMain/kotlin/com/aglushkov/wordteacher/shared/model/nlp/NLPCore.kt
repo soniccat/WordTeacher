@@ -17,6 +17,7 @@ import opennlp.tools.chunker.ChunkSample
 import opennlp.tools.chunker.ChunkerME
 import opennlp.tools.chunker.ChunkerModel
 import opennlp.tools.lemmatizer.DictionaryLemmatizer
+import opennlp.tools.lemmatizer.Lemmatizer
 import opennlp.tools.postag.POSModel
 import opennlp.tools.postag.POSTaggerME
 import opennlp.tools.sentdetect.SentenceDetectorME
@@ -47,7 +48,7 @@ actual class NLPCore(
     private var sentenceDetector: SentenceDetectorME? = null
     private var tokenizer: TokenizerME? = null
     private var tagger: POSTaggerME? = null
-    private var lemmatizer: DictionaryLemmatizer? = null
+    private var lemmatizer: Lemmatizer? = null
     private var chunker: ChunkerME? = null
 
     init {
@@ -107,7 +108,7 @@ actual class NLPCore(
 
         Logger.measure("DictionaryLemmatizer loaded: ") {
             resources.openRawResource(lemmatizerRes).buffered(buffer).use { stream ->
-                lemmatizer = DictionaryLemmatizer(stream)
+                lemmatizer = MyLemmatizer(stream)
             }
         }
 
