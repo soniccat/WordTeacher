@@ -18,6 +18,7 @@ interface Dict: WordTeacherWordService {
     interface Index {
         fun allEntries(): Sequence<Entry>
         fun indexEntry(word: String): Entry?
+        fun entriesStartWith(prefix: String, limit: Int): List<Entry>
         fun entry(
             word: String,
             nextWord: (needAnotherOne: Boolean) -> String?,

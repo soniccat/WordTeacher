@@ -12,11 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -38,7 +34,6 @@ class DictRepositoryImpl(
 ) : DictRepository {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     override val dicts = MutableStateFlow<Resource<List<Dict>>>(Resource.Uninitialized())
-    private var trie = DictTrie() // TODO: that takes much memory, just keep a list of dicts
 
     var isImporting = AtomicBoolean(false)
     var needReimport = AtomicBoolean(false)
@@ -72,10 +67,6 @@ class DictRepositoryImpl(
                 if (!isDictLoaded) {
                     dictFactory.createDict(filePath)?.let { dict ->
                         dict.load()
-                        for (e in dict.index.allEntries()) {
-                            trie.putWord(DictWordData(e.word, e.partOfSpeech, e.indexValue, e.dict))
-                        }
-
                         dicts.update {
                             Resource.Loaded( (it.data() ?: emptyList()) + listOf(dict))
                         }
@@ -93,7 +84,11 @@ class DictRepositoryImpl(
     }
 
     override fun wordsStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {
-        return trie.wordsStartWith(prefix, limit)
+        return dicts.value.data().orEmpty()
+            .map { it.index.entriesStartWith(prefix, limit) }
+            .flatten()
+            .sortedBy { it.word }
+            .take(limit)
     }
 
     override suspend fun define(word: String): Flow<Resource<List<WordTeacherWord>>> {

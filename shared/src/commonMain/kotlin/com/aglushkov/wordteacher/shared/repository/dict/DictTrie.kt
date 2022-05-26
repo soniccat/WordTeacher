@@ -10,20 +10,33 @@ class DictTrie: Iterable<Dict.Index.Entry> {
     private val root = DictTrieNode("", null)
 
     fun putWord(data: DictWordData) {
+        val node = putWordInternal(data)
+        node.dictIndexEntries.add(
+            DictEntry(
+                node,
+                data.partOfSpeech,
+                data.indexValue,
+                data.dict
+            )
+        )
+    }
+
+    private fun putWordInternal(data: DictWordData): DictTrieNode {
         var node = root
         var innerNodeIndex = 0
+
         data.word.onEach { ch ->
             // match with prefix -> go along the prefix
             if (innerNodeIndex < node.prefix.length && node.prefix[innerNodeIndex] == ch) {
                 innerNodeIndex += 1
 
-            // reached the end of prefix and there aren't any children aren't any entries -> extend prefix
-            // skip if node is root
+                // reached the end of prefix and there aren't any children aren't any entries -> extend prefix
+                // skip if node is root
             } else if (node != root && node.prefix.length == innerNodeIndex && node.children.isEmpty() && node.dictIndexEntries.isEmpty()) {
                 node.prefix = node.prefix + ch
                 innerNodeIndex += 1
 
-            // reached the end of prefix and there children or entries -> try to find a child with the same prefix or add a new child
+                // reached the end of prefix and there children or entries -> try to find a child with the same prefix or add a new child
             } else if (node.prefix.length == innerNodeIndex && (node.children.isNotEmpty() || node.dictIndexEntries.isNotEmpty() || node == root)) {
                 val childNode = node.children.firstOrNull {
                     it.prefix.first() == ch
@@ -39,7 +52,7 @@ class DictTrie: Iterable<Dict.Index.Entry> {
 
                 innerNodeIndex = 1
 
-            // in the middle of prefix got that the next character is different -> split the node
+                // in the middle of prefix got that the next character is different -> split the node
             } else if (innerNodeIndex < node.prefix.length && node.prefix[innerNodeIndex] != ch) {
                 val newNode1 = DictTrieNode(
                     node.prefix.substring(innerNodeIndex, node.prefix.length),
@@ -69,17 +82,9 @@ class DictTrie: Iterable<Dict.Index.Entry> {
             } else {
                 Logger.v("hmm")
             }
-            //node = node.obtainNode(ch)
         }
 
-        node.dictIndexEntries.add(
-            DictEntry(
-                node,
-                data.partOfSpeech,
-                data.indexValue,
-                data.dict
-            )
-        )
+        return node
     }
 
     fun wordsStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {

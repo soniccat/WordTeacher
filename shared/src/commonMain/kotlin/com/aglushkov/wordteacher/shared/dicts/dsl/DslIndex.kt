@@ -36,6 +36,9 @@ class DslIndex(
         return index.word(word).firstOrNull()
     }
 
+    override fun entriesStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> =
+        index.wordsStartWith(prefix, limit)
+
     override fun entry(
         word: String,
         nextWord: (needAnotherOne: Boolean) -> String?,
