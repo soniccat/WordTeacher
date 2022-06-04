@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
 import opennlp.tools.chunker.ChunkSample
 import opennlp.tools.chunker.ChunkerME
 import opennlp.tools.chunker.ChunkerModel
@@ -34,6 +37,8 @@ actual class NLPCore(
     private val posModelRes: Int,
     private val lemmatizerRes: Int,
     private val chunkerRes: Int,
+    private val indexPath: Path,
+    private val fileSystem: FileSystem,
     dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) {
     private val mainScope = CoroutineScope(dispatcher + SupervisorJob())
@@ -108,7 +113,9 @@ actual class NLPCore(
 
         Logger.measure("DictionaryLemmatizer loaded: ") {
             resources.openRawResource(lemmatizerRes).buffered(buffer).use { stream ->
-                lemmatizer = MyLemmatizer(stream)
+                lemmatizer = MyLemmatizer(stream, indexPath, fileSystem).apply {
+                    load()
+                }
             }
         }
 
@@ -136,7 +143,9 @@ actual class NLPCore(
             tokenRes,
             posModelRes,
             lemmatizerRes,
-            chunkerRes
+            chunkerRes,
+            indexPath,
+            fileSystem
         ).apply {
             sentenceDetector = SentenceDetectorME(this@NLPCore.sentenceModel)
             tokenizer = TokenizerME(this@NLPCore.tokenModel)

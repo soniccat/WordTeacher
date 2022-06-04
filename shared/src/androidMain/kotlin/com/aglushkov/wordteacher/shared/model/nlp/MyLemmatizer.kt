@@ -2,72 +2,41 @@ package com.aglushkov.wordteacher.shared.model.nlp
 
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.okio.newLineSize
 import com.aglushkov.wordteacher.shared.repository.dict.Trie
 import com.aglushkov.wordteacher.shared.repository.dict.TrieNode
+import okio.FileSystem
+import okio.Path
+import okio.utf8Size
 import opennlp.tools.lemmatizer.Lemmatizer
 import java.io.*
 import java.util.*
 
-class MyLemmatizer : Lemmatizer {
-    /**
-     * The hashmap containing the dictionary.
-     */
-    //private val dictMap: MutableMap<List<String>, List<String>> = HashMap()
-    private val trie = LemmatizerTrie()
+class MyLemmatizer(
+    private val stream: InputStream,
+    private val indexPath: Path,
+    private val fileSystem: FileSystem
+) : Lemmatizer {
+    private lateinit var index: MyLemmatizerIndex
 
-    private class LemmatizerTrie: Trie<LemmatizerEntry, LemmatizerData>(){
-        override fun createEntry(
-            node: TrieNode<LemmatizerEntry>,
-            data: LemmatizerData
-        ) =
-            LemmatizerEntry(
-                node,
-                data.postag,
-                data.lemma,
-                data.isLemma
-            )
+    fun load() {
+        val anIndex = MyLemmatizerIndex(
+            stream,
+            indexPath,
+            fileSystem
+        )
 
-        override fun setNodeForEntry(entry: LemmatizerEntry, node: TrieNode<LemmatizerEntry>) {
-            entry.node = node
+        if (anIndex.isEmpty()) {
+            fillIndex(anIndex)
+            anIndex.save()
         }
+
+        index = anIndex
     }
 
-    private data class LemmatizerData(
-        val word: String,
-        val postag: String?,
-        val lemma: LemmatizerEntry?,
-        val isLemma: Boolean
-    )
-
-    private class LemmatizerEntry(
-        var node: TrieNode<LemmatizerEntry>,
-        val postag: String?,
-        val lemma: LemmatizerEntry?,
-        val isLemma: Boolean
-    )
-
-    /**
-     * Construct a hashmap from the input tab separated dictionary.
-     *
-     * The input file should have, for each line, word\tabpostag\tablemma.
-     * Alternatively, if multiple lemmas are possible for each word,postag pair,
-     * then the format should be word\tab\postag\tablemma01#lemma02#lemma03
-     *
-     * @param dictionary
-     * the input dictionary via inputstream
-     */
-    constructor(dictionary: InputStream) {
-        init(dictionary)
-    }
-
-    constructor(dictionaryFile: File?) {
-        FileInputStream(dictionaryFile).use { `in` -> init(`in`) }
-    }
-
-    @Throws(IOException::class)
-    private fun init(dictionary: InputStream) {
+    fun fillIndex(anIndex: MyLemmatizerIndex) {
         val breader = BufferedReader(
-            InputStreamReader(dictionary)
+            InputStreamReader(stream)
         )
         var line: String
 
@@ -75,23 +44,16 @@ class MyLemmatizer : Lemmatizer {
         val lemmasRegexp = "#".toRegex()
 
         try {
+            var lastWord = ""
+            var offset = 0L
             while (breader.readLine().also { line = it } != null) {
                 val elems = line.split(elemRegexp).toTypedArray()
-                val lemmas = elems[2].split(lemmasRegexp).toTypedArray()
-                //dictMap[Arrays.asList(elems[0], elems[1])] = Arrays.asList(*lemmas)
-
-                //put lemmas
-                val lemmaEntry = lemmas.firstOrNull()?.let {
-                    val existingLemmas = trie.word(it).filter { it.isLemma }
-                    if (existingLemmas.isEmpty()) {
-                        trie.put(it, LemmatizerData(it, null, null, true))
-                    } else {
-                        existingLemmas.first()
-                    }
+                if (lastWord != elems[0]) {
+                    lastWord = elems[0]
+                    anIndex.add(elems[0], offset)
                 }
 
-                //put word
-                trie.put(elems[0], LemmatizerData(elems[0], elems[1], lemmaEntry, false))
+                offset += line.utf8Size() + newLineSize
             }
         } catch (t: Throwable) {
             Logger.e(t.message.orEmpty())
@@ -147,18 +109,16 @@ class MyLemmatizer : Lemmatizer {
      * @return the lemma
      */
     private fun lemmatize(word: String, postag: String): String {
-        val lemma: String
-        // val keys = getDictKeys(word, postag)
-        // lookup lemma as value of the map
+        val lemma: String = ""
 
-        val entries = trie.word(word.lowercase()).filter { it.postag == postag && !it.isLemma }
-        val lemmas = entries.mapNotNull { it.lemma }
-
-        lemma = if (lemmas.isNotEmpty()) {
-            lemmas[0].node.calcWord()
-        } else {
-            "O"
-        }
+//        val entries = trie.word(word.lowercase()).filter { it.postags.contains(postag) && !it.isLemma }
+//        val lemmas = entries.mapNotNull { it.lemma }
+//
+//        lemma = if (lemmas.isNotEmpty()) {
+//            lemmas[0].node.calcWord()
+//        } else {
+//            "O"
+//        }
         return lemma
     }
 

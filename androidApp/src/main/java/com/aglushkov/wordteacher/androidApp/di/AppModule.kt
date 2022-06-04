@@ -168,14 +168,20 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun nlpCore(context: Context): NLPCore {
+    fun nlpCore(context: Context, fileSystem: FileSystem): NLPCore {
+        val nlpIndexPath = context.filesDir.absolutePath.toPath().div("nlp")
+        if (!fileSystem.exists(nlpIndexPath)) {
+            fileSystem.createDirectory(nlpIndexPath)
+        }
         return NLPCore(
             context.resources,
             R.raw.en_sent,
             R.raw.en_token,
             R.raw.en_pos_maxent,
             R.raw.en_lemmatizer_dict,
-            R.raw.en_chunker
+            R.raw.en_chunker,
+            nlpIndexPath.div("lemmatizer_index"),
+            fileSystem
         )
     }
 }

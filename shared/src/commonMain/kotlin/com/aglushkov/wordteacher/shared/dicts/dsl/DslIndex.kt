@@ -1,6 +1,9 @@
 package com.aglushkov.wordteacher.shared.dicts.dsl
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.general.extensions.writeIntValue
+import com.aglushkov.wordteacher.shared.general.extensions.writeLongValue
+import com.aglushkov.wordteacher.shared.general.extensions.writeStringValue
 import com.aglushkov.wordteacher.shared.general.okio.skipNewLine
 import com.aglushkov.wordteacher.shared.general.okio.skipSpace
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -136,27 +139,6 @@ class DslIndex(
         writeLongValue(INDEX_OFFSET, it.indexValue as Long)
 
         writeInt(INDEX_WORD_END)
-        writeUtf8("\n")
-    }
-
-    private fun BufferedSink.writeIntValue(key: Int, value: Int) {
-        writeInt(key)
-        writeUtf8(" ")
-        writeInt(value)
-        writeUtf8("\n")
-    }
-
-    private fun BufferedSink.writeLongValue(key: Int, value: Long) {
-        writeInt(key)
-        writeUtf8(" ")
-        writeLong(value)
-        writeUtf8("\n")
-    }
-
-    private fun BufferedSink.writeStringValue(key: Int, value: String) {
-        writeInt(key)
-        writeUtf8(" ")
-        writeUtf8(value)
         writeUtf8("\n")
     }
 
