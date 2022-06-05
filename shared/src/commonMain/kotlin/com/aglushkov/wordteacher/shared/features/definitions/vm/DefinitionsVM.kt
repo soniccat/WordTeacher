@@ -441,7 +441,8 @@ open class DefinitionsVMImpl(
         cardSetViewItem: CardSetViewItem
     ) {
         val viewData = wordDefinitionViewItem.data as WordDefinitionViewData
-        val contextExamples = definitionsContext?.wordContexts?.get(viewData.partOfSpeech)?.examples.orEmpty()
+        val contextExamples = definitionsContext?.wordContexts?.get(viewData.partOfSpeech)?.examples ?:
+        definitionsContext?.wordContexts?.values?.map { it.examples }?.flatten() ?: emptyList()
 
         viewModelScope.launch {
             cardSetsRepository.addCard(

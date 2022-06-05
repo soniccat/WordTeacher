@@ -137,11 +137,12 @@ open class ArticleVMImpl(
 
             // TODO: that won't work with phrases
             val progressAnnotation = if (selectionState.cardSetWords) {
-                cards.data[term to partOfSpeech]?.let { card ->
+                val card = cards.data[term to partOfSpeech] ?: cards.data[term to WordTeacherWord.PartOfSpeech.Undefined]
+                card?.let { safeCard ->
                     ArticleAnnotation.LearnProgress(
                         start = span.start,
                         end = span.end,
-                        learnLevel = card.progress.currentLevel
+                        learnLevel = safeCard.progress.currentLevel
                     )
                 }
             } else {
