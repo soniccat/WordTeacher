@@ -7,6 +7,9 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import kotlin.test.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import okio.Path
+import okio.Path.Companion.toPath
+import okio.fakefilesystem.FakeFileSystem
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -25,6 +28,8 @@ class DictAnnotationResolverTest {
         R.raw.en_pos_maxent,
         R.raw.en_lemmatizer_dict,
         R.raw.en_chunker,
+        "lemmatizer_test".toPath(),
+        FakeFileSystem(),
         testDispatcher
     )
     val nlpSentenceProcessor = NLPSentenceProcessor(

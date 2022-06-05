@@ -9,29 +9,25 @@ import okio.BufferedSink
 import okio.BufferedSource
 import okio.FileSystem
 import okio.Path
-import java.io.InputStream
-
-//typealias LemmatizerIndexEntry = Map.Entry<String, Int>
 
 class MyLemmatizerIndex(
-    private val stream: InputStream,
-    private val path: Path,
+    private val indexPath: Path,
     private val fileSystem: FileSystem,
 ) {
     private val index = HashMap<String, Long>()
 
     init {
-        if (fileSystem.exists(path)) {
+        if (fileSystem.exists(indexPath)) {
             try {
                 loadIndex()
             } catch (e: Throwable) {
-                fileSystem.delete(path)
+                fileSystem.delete(indexPath)
             }
         }
     }
 
     private fun loadIndex() {
-        fileSystem.read(path) {
+        fileSystem.read(indexPath) {
             val v = readInt()
             if (v == INDEX_VERSION) {
                 skipSpace()
@@ -55,7 +51,7 @@ class MyLemmatizerIndex(
     }
 
     fun save() {
-        fileSystem.write(path) {
+        fileSystem.write(indexPath) {
             writeIntValue(INDEX_VERSION, CURRENT_VERSION)
 
             index.onEach {

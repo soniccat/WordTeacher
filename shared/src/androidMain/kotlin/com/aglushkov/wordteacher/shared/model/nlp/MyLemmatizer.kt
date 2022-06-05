@@ -13,15 +13,15 @@ import java.io.*
 import java.util.*
 
 class MyLemmatizer(
-    private val stream: InputStream,
+    private val lemmatizerUseBlock: ( (InputStream) -> Unit ) -> Unit,
     private val indexPath: Path,
     private val fileSystem: FileSystem
 ) : Lemmatizer {
+    private val elemRegexp = "\t".toRegex()
     private lateinit var index: MyLemmatizerIndex
 
     fun load() {
         val anIndex = MyLemmatizerIndex(
-            stream,
             indexPath,
             fileSystem
         )
@@ -34,14 +34,11 @@ class MyLemmatizer(
         index = anIndex
     }
 
-    fun fillIndex(anIndex: MyLemmatizerIndex) {
+    fun fillIndex(anIndex: MyLemmatizerIndex) = lemmatizerUseBlock { stream ->
         val breader = BufferedReader(
             InputStreamReader(stream)
         )
         var line: String
-
-        val elemRegexp = "\t".toRegex()
-        val lemmasRegexp = "#".toRegex()
 
         try {
             var lastWord = ""
@@ -60,28 +57,6 @@ class MyLemmatizer(
         }
     }
 
-    /**
-     * Get the Map containing the dictionary.
-     *
-     * @return dictMap the Map
-     */
-//    fun getDictMap(): Map<List<String>, List<String>> {
-//        return dictMap
-//    }
-
-    /**
-     * Get the dictionary keys (word and postag).
-     *
-     * @param word
-     * the surface form word
-     * @param postag
-     * the assigned postag
-     * @return returns the dictionary keys
-     */
-//    private fun getDictKeys(word: String, postag: String): List<String> {
-//        return ArrayList(Arrays.asList(word.lowercase(Locale.getDefault()), postag))
-//    }
-
     override fun lemmatize(tokens: Array<String>, postags: Array<String>): Array<String> {
         val lemmas: MutableList<String> = ArrayList()
         for (i in tokens.indices) {
@@ -91,11 +66,6 @@ class MyLemmatizer(
     }
 
     override fun lemmatize(tokens: List<String>, posTags: List<String>): List<List<String>> {
-//        val allLemmas: MutableList<List<String>> = ArrayList()
-//        for (i in tokens.indices) {
-//            allLemmas.add(getAllLemmas(tokens[i], posTags[i]))
-//        }
-//        return allLemmas
         throw RuntimeException("Not implemented")
     }
 
@@ -109,39 +79,26 @@ class MyLemmatizer(
      * @return the lemma
      */
     private fun lemmatize(word: String, postag: String): String {
-        val lemma: String = ""
+        var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
 
-//        val entries = trie.word(word.lowercase()).filter { it.postags.contains(postag) && !it.isLemma }
-//        val lemmas = entries.mapNotNull { it.lemma }
-//
-//        lemma = if (lemmas.isNotEmpty()) {
-//            lemmas[0].node.calcWord()
-//        } else {
-//            "O"
-//        }
-        return lemma
+        lemmatizerUseBlock { stream ->
+            val breader = BufferedReader(
+                InputStreamReader(stream)
+            )
+
+            index.offset(word)?.let { offset ->
+                breader.skip(offset)
+                while (true) {
+                    val line = breader.readLine() ?: break
+                    val elems = line.split(elemRegexp).toTypedArray()
+                    if (elems[1] == postag) {
+                        resultLemma = elems[2]
+                        break
+                    }
+                }
+            }
+        }
+
+        return resultLemma
     }
-
-    /**
-     * Lookup every lemma for a word,pos tag in a dictionary. Outputs "O" if not
-     * found.
-     *
-     * @param word
-     * the token
-     * @param postag
-     * the postag
-     * @return every lemma
-     */
-//    private fun getAllLemmas(word: String, postag: String): List<String> {
-//        val lemmasList: MutableList<String> = ArrayList()
-//        val keys = getDictKeys(word, postag)
-//        // lookup lemma as value of the map
-//        val keyValues = dictMap[keys]
-//        if (keyValues != null && !keyValues.isEmpty()) {
-//            lemmasList.addAll(keyValues)
-//        } else {
-//            lemmasList.add("O")
-//        }
-//        return lemmasList
-//    }
 }

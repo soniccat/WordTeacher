@@ -112,10 +112,16 @@ actual class NLPCore(
         }
 
         Logger.measure("DictionaryLemmatizer loaded: ") {
-            resources.openRawResource(lemmatizerRes).buffered(buffer).use { stream ->
-                lemmatizer = MyLemmatizer(stream, indexPath, fileSystem).apply {
-                    load()
-                }
+            lemmatizer = MyLemmatizer(
+                { block ->
+                    resources.openRawResource(lemmatizerRes).buffered(buffer).use { stream ->
+                        block(stream)
+                    }
+                },
+                indexPath,
+                fileSystem
+            ).apply {
+                load()
             }
         }
 
