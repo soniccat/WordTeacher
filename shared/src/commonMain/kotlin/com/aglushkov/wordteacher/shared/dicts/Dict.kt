@@ -36,7 +36,7 @@ interface Dict: WordTeacherWordService {
 }
 
 fun Dict.Index.Entry.toWordData(): DictWordData =
-    DictWordData(word, partOfSpeech, indexValue, dict)
+    DictWordData(partOfSpeech, indexValue, dict)
 
 enum class Language {
     RU,

@@ -85,7 +85,7 @@ class DslIndex(
         indexValue: Any?,
         dict: Dict
     ) =
-        index.put(term, DictWordData(term, partOfSpeech, indexValue, dict))
+        index.put(term, DictWordData(partOfSpeech, indexValue, dict))
 
     fun save() {
         fileSystem.write(path) {

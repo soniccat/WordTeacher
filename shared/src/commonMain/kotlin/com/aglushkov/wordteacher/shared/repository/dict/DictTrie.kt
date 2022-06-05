@@ -19,7 +19,6 @@ class DictTrie: Trie<Dict.Index.Entry, DictWordData>(), Iterable<Dict.Index.Entr
 }
 
 data class DictWordData(
-    val word: String,
     val partOfSpeech: WordTeacherWord.PartOfSpeech,
     val indexValue: Any?,
     val dict: Dict

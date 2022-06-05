@@ -253,7 +253,6 @@ class DslDictTests {
         assertEquals(1, dslDict.index.allEntries().toList().size)
         assertEquals(
             DictWordData(
-                "term1",
                 WordTeacherWord.PartOfSpeech.PhrasalVerb,
                 73L,
                 dslDict

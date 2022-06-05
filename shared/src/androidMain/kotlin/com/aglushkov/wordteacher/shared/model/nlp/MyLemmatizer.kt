@@ -3,8 +3,6 @@ package com.aglushkov.wordteacher.shared.model.nlp
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.okio.newLineSize
-import com.aglushkov.wordteacher.shared.repository.dict.Trie
-import com.aglushkov.wordteacher.shared.repository.dict.TrieNode
 import okio.FileSystem
 import okio.Path
 import okio.utf8Size
@@ -49,7 +47,6 @@ class MyLemmatizer(
                     lastWord = elems[0]
                     anIndex.add(elems[0], offset)
                 }
-
                 offset += line.utf8Size() + newLineSize
             }
         } catch (t: Throwable) {
@@ -82,12 +79,12 @@ class MyLemmatizer(
         var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
 
         lemmatizerUseBlock { stream ->
-            val breader = BufferedReader(
-                InputStreamReader(stream)
-            )
-
             index.offset(word)?.let { offset ->
-                breader.skip(offset)
+                stream.skip(offset)
+                val breader = BufferedReader(
+                    InputStreamReader(stream)
+                )
+
                 while (true) {
                     val line = breader.readLine() ?: break
                     val elems = line.split(elemRegexp).toTypedArray()
