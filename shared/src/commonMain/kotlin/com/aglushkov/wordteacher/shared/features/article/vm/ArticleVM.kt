@@ -244,7 +244,7 @@ open class ArticleVMImpl(
 
             definitionsVM.onWordSubmitted(
                 resultWord,
-                resultPartOfSpeechList,
+                resultPartOfSpeechList + WordTeacherWord.PartOfSpeech.Undefined, // undefined to show dict result,
                 DefinitionsContext(
                     wordContexts = mapOf(
                         resultPartOfSpeech to DefinitionsWordContext(

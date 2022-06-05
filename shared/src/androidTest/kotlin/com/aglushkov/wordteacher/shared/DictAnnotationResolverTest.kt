@@ -154,4 +154,22 @@ class DictAnnotationResolverTest {
 
         assertEquals(0, annotations.size)
     }
+
+    @Test
+    fun testNountHighlight() {
+        val dict = createFakeDict(
+            buildDictContent {
+                addTerm("verb", listOf("def1"))
+            }
+        )
+
+        val nlpSentence = nlpSentenceProcessor.processString("Phrasal verbs are two or more words")
+        val annotations = dictAnnotationResolver.resolve(
+            listOf(dict),
+            nlpSentence,
+            nlpSentence.phrases()
+        )
+
+        assertEquals(1, annotations.size)
+    }
 }

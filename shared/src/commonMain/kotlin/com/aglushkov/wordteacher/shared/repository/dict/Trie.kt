@@ -152,6 +152,10 @@ abstract class Trie<T, D>: Iterable<T> {
         val spaceNode = node?.findChild(' ')
         if (spaceNode != null) {
             node = spaceNode
+        } else if (node?.isEnd == true) {
+            node?.let { safeNode ->
+                onFound(safeNode.dictIndexEntries)
+            }
         } else {
             return
         }
@@ -183,9 +187,10 @@ abstract class Trie<T, D>: Iterable<T> {
             nw = nextWord(needAnotherOne)
         }
 
-        val safeNode = node
-        if (safeNode != null && safeNode.isEnd) {
-            onFound(safeNode.dictIndexEntries)
+        node?.let { safeNode ->
+            if (safeNode.isEnd) {
+                onFound(safeNode.dictIndexEntries)
+            }
         }
     }
 

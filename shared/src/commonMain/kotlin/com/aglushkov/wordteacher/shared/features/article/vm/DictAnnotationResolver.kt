@@ -21,7 +21,6 @@ class DictAnnotationResolver {
                 val isVerb = sentence.tagEnum(i).isVerb()
                 var skippedNounPhrase = false
 
-                //if (isVerb) { // try to find a phrasal verb
                 var ci = i
                 var takeLemma = true
                 val tokenLemmaGetter: (Int) -> String? = { index ->
@@ -93,7 +92,6 @@ class DictAnnotationResolver {
                     )
                     i = it.first
                 }
-                //}
 
                 ++i
             }
