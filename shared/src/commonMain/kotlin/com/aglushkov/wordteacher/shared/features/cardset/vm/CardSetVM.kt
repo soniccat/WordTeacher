@@ -43,6 +43,8 @@ interface CardSetVM: Clearable {
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun getPlaceholder(viewItem: BaseViewItem<*>): StringDesc?
 
+    fun onStartLearningClicked()
+
     @Parcelize
     data class State (
         val cardSetId: Long
@@ -418,4 +420,17 @@ open class CardSetVMImpl(
 
     private fun findCard(id: Long): Card? =
         inMemoryCardSet.value?.findCard(id) ?: cardSet.value.data()?.findCard(id)
+
+    override fun onStartLearningClicked() {
+        viewModelScope.launch {
+            try {
+                cardSet.value.data()?.let { set ->
+                    val allCardIds = set.cards.map { it.id }
+                    router.openLearning(allCardIds)
+                }
+            } catch (e: Throwable) {
+                // TODO: handle error
+            }
+        }
+    }
 }

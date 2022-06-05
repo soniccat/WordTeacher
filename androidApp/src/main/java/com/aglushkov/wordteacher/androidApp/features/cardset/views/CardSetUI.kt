@@ -37,6 +37,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardViewItem
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import kotlinx.coroutines.CoroutineScope
@@ -73,24 +74,45 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
             }
         )
 
-        if (data != null) {
-            LazyColumn(
-                contentPadding = PaddingValues(
-                    top = dimensionResource(id = R.dimen.word_horizontalPadding),
-                    bottom = 300.dp
-                )
-            ) {
-                items(data, key = { it.id }) { item ->
-                    CardSetViewItems(Modifier.animateItemPlacement(), item, vm, coroutineScope)
+        Box(
+            modifier = modifier.fillMaxSize()
+        ) {
+            if (data != null) {
+                LazyColumn(
+                    contentPadding = PaddingValues(
+                        top = dimensionResource(id = R.dimen.word_horizontalPadding),
+                        bottom = 300.dp
+                    )
+                ) {
+                    items(data, key = { it.id }) { item ->
+                        CardSetViewItems(Modifier.animateItemPlacement(), item, vm, coroutineScope)
+                    }
+                }
+            } else {
+                LoadingStatusView(
+                    resource = viewItemsRes,
+                    loadingText = null,
+                    errorText = vm.getErrorText(viewItemsRes)?.resolveString()
+                ) {
+                    vm.onTryAgainClicked()
                 }
             }
-        } else {
-            LoadingStatusView(
-                resource = viewItemsRes,
-                loadingText = null,
-                errorText = vm.getErrorText(viewItemsRes)?.resolveString()
+
+            Box(
+                modifier = Modifier.matchParentSize(),
+                contentAlignment = Alignment.BottomEnd
             ) {
-                vm.onTryAgainClicked()
+                FloatingActionButton(
+                    onClick = { vm.onStartLearningClicked() },
+                    modifier = Modifier.padding(
+                        dimensionResource(id = R.dimen.article_horizontalPadding)
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_start_learning_24),
+                        contentDescription = null
+                    )
+                }
             }
         }
     }
@@ -232,7 +254,8 @@ private fun CardView(
                             item,
                             textContent = { text, textStyle ->
                                 CardTextField(
-                                    modifier = Modifier.weight(1.0f)
+                                    modifier = Modifier
+                                        .weight(1.0f)
                                         .focusRequester(focusRequester),
                                     text,
                                     textStyle,
@@ -260,7 +283,8 @@ private fun CardView(
                             item,
                             textContent = { text, textStyle ->
                                 CardTextField(
-                                    modifier = Modifier.weight(1.0f)
+                                    modifier = Modifier
+                                        .weight(1.0f)
                                         .focusRequester(focusRequester),
                                     text,
                                     textStyle,
@@ -297,7 +321,8 @@ private fun CardSetDefinitionView(
         item,
         textContent = { text, textStyle ->
             CardTextField(
-                modifier = Modifier.weight(1.0f)
+                modifier = Modifier
+                    .weight(1.0f)
                     .focusRequester(focusRequester),
                 text,
                 textStyle,

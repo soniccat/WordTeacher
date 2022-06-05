@@ -195,4 +195,4 @@ class CardTeacher(
     ) : Parcelable
 }
 
-private const val CARD_PER_SESSION = 2
+private const val CARD_PER_SESSION = 7
