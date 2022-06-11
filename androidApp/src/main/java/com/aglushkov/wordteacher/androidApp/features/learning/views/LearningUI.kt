@@ -1,5 +1,10 @@
 package com.aglushkov.wordteacher.androidApp.features.learning.views
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,14 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -87,7 +86,7 @@ fun LearningUIDialog(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun LearningUI(
     vm: LearningVM,
@@ -99,55 +98,112 @@ fun LearningUI(
     val errorString by vm.titleErrorFlow.collectAsState()
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
+    val canShowHint by vm.canShowHint.collectAsState()
+    val hintString by vm.hintString.collectAsState()
     val focusRequester = remember { FocusRequester() }
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(
-        modifier = modifier
+    Box(
+        modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colors.background),
+            .then(modifier)
     ) {
-        TopAppBar(
-            title = {
-                if (termState.term.isNotEmpty()) {
-                    Text(
-                        text = stringResource(id = R.string.learning_title)
-                            .format(termState.index + 1, termState.count)
-                    )
-                }
-            },
-            actions = actions
-        )
-
-        if (data != null) {
-            TermInput(
-                term = termState.term,
-                errorString = errorString?.resolveString(),
-                focusRequester = focusRequester,
-                onDone = { value ->
-                    vm.onCheckPressed(value)
-                }
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colors.background),
+        ) {
+            TopAppBar(
+                title = {
+                    if (termState.term.isNotEmpty()) {
+                        Text(
+                            text = stringResource(id = R.string.learning_title)
+                                .format(termState.index + 1, termState.count)
+                        )
+                    }
+                },
+                actions = actions
             )
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(
-                    bottom = 300.dp
+
+            if (data != null) {
+                TermInput(
+                    term = termState.term,
+                    errorString = errorString?.resolveString(),
+                    focusRequester = focusRequester,
+                    onDone = { value ->
+                        vm.onCheckPressed(value)
+                    }
                 )
-            ) {
-                items(data, key = { it.id }) { item ->
-                    LearningViewItems(Modifier.animateItemPlacement(), item, vm)
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(
+                        bottom = 300.dp
+                    )
+                ) {
+                    items(data, key = { it.id }) { item ->
+                        LearningViewItems(Modifier.animateItemPlacement(), item, vm)
+                    }
+                }
+
+                LaunchedEffect(key1 = "editing") {
+                    focusRequester.requestFocus()
+                }
+            } else {
+                LoadingStatusView(
+                    resource = viewItemsRes,
+                    loadingText = null,
+                    errorText = vm.getErrorText(viewItemsRes)?.resolveString()
+                ) {
+                    vm.onTryAgainClicked()
                 }
             }
+        }
 
-            LaunchedEffect(key1 = "editing") {
-                focusRequester.requestFocus()
-            }
-        } else {
-            LoadingStatusView(
-                resource = viewItemsRes,
-                loadingText = null,
-                errorText = vm.getErrorText(viewItemsRes)?.resolveString()
+//        val transition = updateTransition(hintString)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+        ) {
+            ExtendedFloatingActionButton(
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = if (canShowHint) {
+                                R.string.learning_show_hint
+                            } else {
+                                R.string.learning_give_up
+                            }
+                        ),
+                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
+                    )
+                },
+                onClick = {
+                    if (canShowHint) {
+                        vm.onHintAskedPressed()
+                    } else {
+                        vm.onGiveUpPressed()
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(dimensionResource(id = R.dimen.content_padding))
+            )
+
+            SnackbarHost(
+                modifier = Modifier.animateContentSize(),
+                hostState = snackbarHostState
             ) {
-                vm.onTryAgainClicked()
+                Snackbar(snackbarData = it)
+            }
+        }
+
+        LaunchedEffect(key1 = hintString) {
+            if (hintString.isNotEmpty()) {
+                val resultString = hintString.fold("") { str, char ->
+                    "$str $char"
+                }
+                snackbarHostState.showSnackbar(resultString)
             }
         }
     }

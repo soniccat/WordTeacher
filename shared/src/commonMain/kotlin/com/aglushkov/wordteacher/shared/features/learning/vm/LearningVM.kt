@@ -8,7 +8,6 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderVie
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -16,7 +15,6 @@ import com.aglushkov.wordteacher.shared.general.extensions.addElements
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
@@ -27,10 +25,7 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectIndexed
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 interface LearningVM: Clearable {
@@ -39,13 +34,16 @@ interface LearningVM: Clearable {
     val termState: StateFlow<TermState>
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val titleErrorFlow: StateFlow<StringDesc?>
+    val canShowHint: StateFlow<Boolean>
+    val hintString: StateFlow<List<Char>>
 
     fun onCheckPressed(answer: String)
     fun onTextChanged()
     fun onShowNextLetterPressed()
     fun onShowRandomLetterPressed()
     fun onTryAgainClicked()
-    suspend fun onGiveUpPressed()
+    fun onHintAskedPressed()
+    fun onGiveUpPressed()
     fun onClosePressed()
 
     fun save(): State
@@ -77,6 +75,8 @@ open class LearningVMImpl(
     override val termState = MutableStateFlow(LearningVM.TermState())
     override val viewItems = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
     override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
+    override val canShowHint = MutableStateFlow(true)
+    override val hintString = MutableStateFlow(listOf<Char>())
 
     private var teacher: CardTeacher? = null
 
@@ -89,6 +89,7 @@ open class LearningVMImpl(
     // Screen state flow
     private fun startLearning(cardIds: List<Long>, teacherState: CardTeacher.State?) {
         viewModelScope.launch {
+            // Need to load cards first
             val cards = cardLoader.loadCardsUntilLoaded(
                 cardIds = cardIds,
                 onLoading = {
@@ -100,6 +101,13 @@ open class LearningVMImpl(
             )
 
             val teacher = createTeacher(cards, teacherState)
+            launch { // start observing hint string
+                teacher.hintString.collect(hintString)
+            }
+            launch { // bind canShowHint
+                teacher.hintShowCount.map { it < 2 }.collect(canShowHint)
+            }
+
             var sessionResults: List<SessionCardResult>? = null
             do {
                 sessionResults = teacher.runSession { cardCount, sessionCards ->
@@ -211,8 +219,16 @@ open class LearningVMImpl(
         TODO("Not yet implemented")
     }
 
-    override suspend fun onGiveUpPressed() {
-        teacher?.onGiveUp()
+    override fun onHintAskedPressed() {
+        viewModelScope.launch {
+            teacher?.onHintAsked()
+        }
+    }
+
+    override fun onGiveUpPressed() {
+        viewModelScope.launch {
+            teacher?.onGiveUp()
+        }
     }
 
     override fun onTryAgainClicked() {

@@ -55,6 +55,8 @@
     <string name="learning_error">@string/error_default</string>
     <string name="learning_wrong_input">Something is wrong</string>
     <string name="learning_term_title_hint">Term</string>
+    <string name="learning_show_hint">Give me a clue</string>
+    <string name="learning_give_up">Give up</string>
 
     <string name="learning_session_result_title">Learning</string>
     <string name="learning_session_result_error">@string/error_default</string>

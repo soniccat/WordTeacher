@@ -24,14 +24,19 @@ class CardTeacher(
     private var sessions = mutableListOf<LearningSession>()
     private var currentSession: LearningSession? = null
     private var currentCardStateFlow = MutableStateFlow<Card?>(null)
+    private var hintStringStateFlow = MutableStateFlow<List<Char>>(emptyList())
+    private var hintShowCountStateFlow = MutableStateFlow(0)
 
     val currentCard: Card?
         get() = currentCardStateFlow.value
     val currentCardFlow: Flow<Card>
         get() = currentCardStateFlow.takeWhileNonNull()
+    val hintString: Flow<List<Char>>
+        get() = hintStringStateFlow
+    val hintShowCount: Flow<Int>
+        get() = hintShowCountStateFlow
 
     private var checkCount = 0
-    private var hintShowCount = 0
     var isWrongAnswerCounted = false
         private set
 
@@ -69,9 +74,10 @@ class CardTeacher(
     }
 
     private fun prepareToNewCard() {
+        hintStringStateFlow.value = emptyList()
         isWrongAnswerCounted = false
         checkCount = 0
-        hintShowCount = 0
+        hintShowCountStateFlow.value = 0
     }
 
     suspend fun onCheckInput(answer: String): Boolean {
@@ -88,13 +94,37 @@ class CardTeacher(
         return isRight
     }
 
-    suspend fun onGiveUp() = countWrongAnswer()
+    suspend fun onGiveUp() {
+        countWrongAnswer()
+        switchToNextCard()
+    }
 
-    suspend fun onHintShown() {
-        hintShowCount++
-
-        if (hintShowCount > 1) {
+    suspend fun onHintAsked() {
+        if (hintShowCountStateFlow.value > 1) {
             countWrongAnswer()
+        } else {
+            updateHintString()
+            hintShowCountStateFlow.value++
+        }
+    }
+
+    private fun updateHintString() {
+        val term = currentCard!!.term
+        val currentHint = if (hintStringStateFlow.value.isEmpty()) {
+            term.map { HINT_HIDDEN_CHAR }
+        } else {
+            hintStringStateFlow.value
+        }
+        val indexToOpen = currentHint.indices.filter {
+            currentHint[it] == HINT_HIDDEN_CHAR
+        }.randomOrNull() ?: return
+
+        hintStringStateFlow.value = currentHint.mapIndexed { index, c ->
+            if (index == indexToOpen) {
+                term[index]
+            } else {
+                c
+            }
         }
     }
 
@@ -164,7 +194,7 @@ class CardTeacher(
         sessionStates = sessions.map { it.save() },
         currentSessionState = currentSession?.save(),
         checkCount = checkCount,
-        hintShowCount = hintShowCount,
+        hintShowCount = hintShowCountStateFlow.value,
         isWrongAnswerCounted = isWrongAnswerCounted
     )
 
@@ -172,7 +202,7 @@ class CardTeacher(
         sessions = state.sessionStates.map(::createLearningSession).toMutableList()
         currentSession = state.currentSessionState?.let(::createLearningSession)
         checkCount = state.checkCount
-        hintShowCount = state.hintShowCount
+        hintShowCountStateFlow.value = state.hintShowCount
         isWrongAnswerCounted = state.isWrongAnswerCounted
     }
 
@@ -196,3 +226,4 @@ class CardTeacher(
 }
 
 private const val CARD_PER_SESSION = 7
+private const val HINT_HIDDEN_CHAR = '_'
