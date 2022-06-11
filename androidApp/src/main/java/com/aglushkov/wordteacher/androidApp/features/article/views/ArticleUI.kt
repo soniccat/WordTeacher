@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.features.article.views
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -72,6 +73,17 @@ fun ArticleUI(
     BoxWithConstraints {
         val swipeableState = rememberSwipeableState(BottomSheetStates.Collapsed)
         val screenHeight = constraints.maxHeight
+
+        BackHandler(enabled = swipeableState.currentValue != BottomSheetStates.Collapsed) {
+            coroutineScope.launch {
+                swipeableState.animateTo(BottomSheetStates.Collapsed)
+            }
+        }
+        BackHandler(enabled = sideSheetState.currentValue != SideSheetValue.Closed) {
+            coroutineScope.launch {
+                sideSheetState.close()
+            }
+        }
 
         ModalSideSheet(
             sideSheetContent = {

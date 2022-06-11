@@ -11,6 +11,8 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.WordTeacherWordBuilder
 import com.aglushkov.wordteacher.shared.model.fromString
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okio.BufferedSource
 import okio.FileSystem
 import okio.Path
@@ -114,20 +116,22 @@ class DslDict(
     }
 
     override suspend fun define(word: String, indexEntry: Dict.Index.Entry): List<WordTeacherWord> {
-        wordTeacherWordBuilder.clear()
-        wordTeacherWordBuilder.setWord(word)
+        return withContext(Dispatchers.Default) {
+            val builder = WordTeacherWordBuilder()
+            builder.setWord(word)
 
-        val pos = indexEntry.indexValue as Long
-        fileSystem.read(path) {
-            skip(pos + word.length + newLineSize)
-            readWord(wordTeacherWordBuilder)
-        }
+            val pos = indexEntry.indexValue as Long
+            fileSystem.read(path) {
+                skip(pos + word.length + newLineSize)
+                readWord(builder)
+            }
 
-        val wordTeacherWord = wordTeacherWordBuilder.build()
-        return if (wordTeacherWord != null) {
-            listOf(wordTeacherWord)
-        } else {
-            emptyList()
+            val wordTeacherWord = builder.build()
+            if (wordTeacherWord != null) {
+                listOf(wordTeacherWord)
+            } else {
+                emptyList()
+            }
         }
     }
 

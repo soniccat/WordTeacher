@@ -93,9 +93,10 @@ class AppModule {
     @Provides
     fun wordRepository(
         serviceRepository: ServiceRepository,
-        dictRepository: DictRepository
+        dictRepository: DictRepository,
+        nlpCore: NLPCore
     ): WordDefinitionRepository {
-        return WordDefinitionRepository(serviceRepository, dictRepository)
+        return WordDefinitionRepository(serviceRepository, dictRepository, nlpCore)
     }
 
     @AppComp

@@ -88,6 +88,9 @@ class MyLemmatizer(
                 while (true) {
                     val line = breader.readLine() ?: break
                     val elems = line.split(elemRegexp).toTypedArray()
+                    if (elems[0] != word) {
+                        break
+                    }
                     if (elems[1] == postag) {
                         resultLemma = elems[2]
                         break

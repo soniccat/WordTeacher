@@ -10,15 +10,14 @@ import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoadin
 import com.aglushkov.wordteacher.shared.general.resource.isUninitialized
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.model.nlp.NLPConstants.UNKNOWN_LEMMA
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.model.nlp.Tag
+import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,14 +30,12 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 
 
 class WordDefinitionRepository(
     private val serviceRepository: ServiceRepository,
-    private val dictRepository: DictRepository
+    private val dictRepository: DictRepository,
+    private val nlpCore: NLPCore
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlows: MutableMap<String, MutableStateFlow<Resource<List<WordTeacherWord>>>> = hashMapOf()
@@ -156,11 +153,33 @@ class WordDefinitionRepository(
             Logger.v("send Loading", tag)
 
             for (service in services) {
+                val dictNlpCore = if (service.type == Config.Type.Local) {
+                    nlpCore.waitUntilInitialized()
+                    nlpCore.clone()
+                } else {
+                    null
+                }
+
                 // launch instead of async/await to get results as soon as possible in a completion order
                 val job = launch(CoroutineExceptionHandler { _, throwable ->
                     Logger.e("loadDefinitionsFlow Exception: " + throwable.message, service.type.toString())
                 }) {
                     words.addAll(service.define(word))
+
+                    if (dictNlpCore != null) {
+                        val lemmas = withContext(Dispatchers.Default) {
+                            val tags = Tag.values()
+                            dictNlpCore.lemmatize(
+                                tags.map { word },
+                                tags.map { it.value }
+                            ).distinct().filter { it != word && it != UNKNOWN_LEMMA }
+                        }
+
+                        lemmas.onEach { lemma ->
+                            words.addAll(service.define(lemma))
+                        }
+                    }
+
                     send(Resource.Loading(words.toList(), version = version))
                 }
 
