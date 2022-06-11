@@ -95,8 +95,13 @@ class CardTeacher(
     }
 
     suspend fun onGiveUp() {
-        countWrongAnswer()
-        switchToNextCard()
+        val termChars = currentCard!!.term.map { it }
+        if (hintStringStateFlow.value != termChars) {
+            hintStringStateFlow.value = termChars
+            countWrongAnswer()
+        } else {
+            switchToNextCard()
+        }
     }
 
     suspend fun onHintAsked() {
@@ -115,9 +120,9 @@ class CardTeacher(
         } else {
             hintStringStateFlow.value
         }
-        val indexToOpen = currentHint.indices.filter {
+        val indexToOpen = currentHint.indices.firstOrNull {
             currentHint[it] == HINT_HIDDEN_CHAR
-        }.randomOrNull() ?: return
+        } ?: return
 
         hintStringStateFlow.value = currentHint.mapIndexed { index, c ->
             if (index == indexToOpen) {

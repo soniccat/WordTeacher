@@ -159,11 +159,10 @@ fun LearningUI(
             }
         }
 
-//        val transition = updateTransition(hintString)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter)
+                .align(Alignment.BottomEnd)
         ) {
             ExtendedFloatingActionButton(
                 text = {
