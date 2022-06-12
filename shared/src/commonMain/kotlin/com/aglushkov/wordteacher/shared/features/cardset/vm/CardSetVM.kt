@@ -425,7 +425,9 @@ open class CardSetVMImpl(
         viewModelScope.launch {
             try {
                 cardSet.value.data()?.let { set ->
-                    val allCardIds = set.cards.map { it.id }
+                    val allCardIds = set.cards.filter {
+                        it.progress.isReadyToLearn(timeSource)
+                    }.map { it.id }
                     router.openLearning(allCardIds)
                 }
             } catch (e: Throwable) {

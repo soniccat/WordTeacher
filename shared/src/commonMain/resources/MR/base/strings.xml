@@ -11,6 +11,7 @@
     <string name="tab_notes">Notes</string>
     <string name="search">Search</string>
     <string name="close">Close</string>
+    <string name="done">Done</string>
 
     <string name="word_partofspeech_noun">Noun</string>
     <string name="word_partofspeech_verb">Verb</string>

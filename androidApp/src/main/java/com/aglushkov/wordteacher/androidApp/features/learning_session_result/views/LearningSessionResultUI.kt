@@ -2,30 +2,21 @@ package com.aglushkov.wordteacher.androidApp.features.learning_session_result.vi
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
@@ -54,6 +45,7 @@ fun LearningSessionResultUIDialog(
         LearningSessionResultUI(
             vm = vm,
             modifier = modifier,
+            onClose = { vm.onCloseClicked() },
             actions = {
                 IconButton(
                     onClick = { vm.onCloseClicked() }
@@ -74,43 +66,59 @@ fun LearningSessionResultUIDialog(
 fun LearningSessionResultUI(
     vm: LearningSessionResultVM,
     modifier: Modifier = Modifier,
+    onClose: () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colors.background),
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        TopAppBar(
-            title = {
-                Text(text = stringResource(id = R.string.learning_session_result_title))
-            },
-            actions = actions
-        )
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colors.background),
+        ) {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(id = R.string.learning_session_result_title))
+                },
+                actions = actions
+            )
 
-        if (data != null) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(
-                    bottom = 300.dp
-                )
-            ) {
-                items(data, key = { it.id }) { item ->
-                    LearningSessionResultViewItems(Modifier.animateItemPlacement(), item, vm)
+            if (data != null) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(
+                        bottom = 300.dp
+                    )
+                ) {
+                    items(data, key = { it.id }) { item ->
+                        LearningSessionResultViewItems(Modifier.animateItemPlacement(), item, vm)
+                    }
+                }
+            } else {
+                LoadingStatusView(
+                    resource = viewItemsRes,
+                    loadingText = null,
+                    errorText = vm.getErrorText(viewItemsRes)?.resolveString()
+                ) {
+                    vm.onTryAgainClicked()
                 }
             }
-        } else {
-            LoadingStatusView(
-                resource = viewItemsRes,
-                loadingText = null,
-                errorText = vm.getErrorText(viewItemsRes)?.resolveString()
-            ) {
-                vm.onTryAgainClicked()
-            }
         }
+
+        ExtendedFloatingActionButton(
+            text = {
+                Text(stringResource(id = R.string.done))
+            },
+            onClick = { onClose() },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(dimensionResource(id = R.dimen.content_padding)
+            )
+        )
     }
 }
 
@@ -164,4 +172,12 @@ fun LearningSessionCardResultView(
             style = AppTypography.learningSessionProgress
         )
     }
+}
+
+@Preview
+@Composable
+fun TestPreview() {
+    LearningSessionResultUI(
+        LearningSessionResultVMPreview()
+    )
 }

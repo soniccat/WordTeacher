@@ -86,6 +86,7 @@ class CardTeacher(
         val isRight = currentCard!!.term == answer
         if (isRight) {
             countRightAnswer()
+            switchToNextCard()
 
         } else if (checkCount > 1) {
             countWrongAnswer()
@@ -178,7 +179,6 @@ class CardTeacher(
             )
 
             currentSession!!.updateProgress(updatedCard, true)
-            switchToNextCard()
         }
     }
 

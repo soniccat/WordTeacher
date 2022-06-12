@@ -22,19 +22,17 @@ data class CardProgress(
         return result / 100.0f
     }
 
-    fun isReadyForLearning(timeSource: TimeSource): Boolean {
-        var result = true
-
-        if (isCompleted()) {
-            result = false
+    fun isReadyToLearn(timeSource: TimeSource): Boolean {
+        return if (isCompleted()) {
+            false
         } else {
             val newLessonDate: Long = nextLessonDate()
             if (newLessonDate != 0L) {
-                result = timeSource.getTimeInMilliseconds() >= newLessonDate
+                timeSource.getTimeInMilliseconds() >= newLessonDate
+            } else {
+                true
             }
         }
-
-        return result
     }
 
     fun nextLessonDate(): Long {

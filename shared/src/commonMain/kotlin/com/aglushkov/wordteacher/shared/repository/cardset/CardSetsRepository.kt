@@ -83,4 +83,12 @@ class CardSetsRepository(
             database.cards.selectAllCardIds().executeAsList()
         }
     }
+
+    suspend fun allReadyToLearnCardIds(): List<Long> {
+        return databaseWorker.run {
+            database.cards.selectAllCards().executeAsList().filter {
+                it.progress.isReadyToLearn(timeSource)
+            }.map { it.id }
+        }
+    }
 }

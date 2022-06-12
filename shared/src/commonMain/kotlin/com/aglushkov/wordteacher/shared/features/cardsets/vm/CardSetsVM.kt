@@ -108,7 +108,7 @@ open class CardSetsVMImpl(
     override fun onStartLearningClicked() {
         viewModelScope.launch {
             try {
-                val allCardIds = cardSetsRepository.allCardIds()
+                val allCardIds = cardSetsRepository.allReadyToLearnCardIds()
                 router.openLearning(allCardIds)
             } catch (e: Throwable) {
                 // TODO: handle error
