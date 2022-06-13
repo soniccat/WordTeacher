@@ -7,4 +7,6 @@
     <dimen name="definitions_search_vertical_margin">8dp</dimen>
     <dimen name="definitions_displayMode_horizontal_padding">@dimen/definitions_search_horizontal_margin</dimen>
     <dimen name="definitions_displayMode_vertical_padding">@dimen/definitions_search_vertical_margin</dimen>
+
+    <dimen name="learning_testOption_margin">8dp</dimen>
 </resources>

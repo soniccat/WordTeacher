@@ -21,16 +21,21 @@ class CardTeacher(
     private val timeSource: TimeSource,
     private val scope: CoroutineScope
 ) {
+    private var testSessions = mutableListOf<TestSession>()
+    private var currentTestSession: TestSession? = null
+    private var currentTestCardStateFlow = MutableStateFlow<TestSession.TestCard?>(null)
+    private val currentTestCard: TestSession.TestCard?
+        get() = currentTestCardStateFlow.value
+
     private var sessions = mutableListOf<LearningSession>()
     private var currentSession: LearningSession? = null
     private var currentCardStateFlow = MutableStateFlow<Card?>(null)
+    private val currentCard: Card?
+        get() = currentCardStateFlow.value
+
     private var hintStringStateFlow = MutableStateFlow<List<Char>>(emptyList())
     private var hintShowCountStateFlow = MutableStateFlow(0)
 
-    val currentCard: Card?
-        get() = currentCardStateFlow.value
-    val currentCardFlow: Flow<Card>
-        get() = currentCardStateFlow.takeWhileNonNull()
     val hintString: Flow<List<Char>>
         get() = hintStringStateFlow
     val hintShowCount: Flow<Int>
@@ -40,13 +45,31 @@ class CardTeacher(
     var isWrongAnswerCounted = false
         private set
 
-    suspend fun runSession(block: suspend (count:Int, cards: Flow<Card>) -> Unit): List<SessionCardResult>? {
-        val session = buildLearnSession()
-        if (session != null) {
-            block(session.size, currentCardFlow)
+    suspend fun runSession(
+        block: suspend (count:Int, testCards: Flow<TestSession.TestCard>?, cards: Flow<Card>) -> Unit
+    ): List<SessionCardResult>? {
+        val session = buildLearnSession() ?: return null
+
+        if (session.cards.size >= TEST_SESSION_OPTION_COUNT) {
+            val testSession = TestSession(session.cards, cards.map { it.term })
+            currentTestSession = testSession
+            scope.launch {
+                testSession.currentTestCardFlow.collect(currentTestCardStateFlow) // TODO: simplify this, try to use only testSession.currentTestCardFlow
+                currentTestCardStateFlow.value = null // to propagate cancellation
+            }
         }
 
-        return session?.results
+        block(
+            session.size,
+            if (currentTestSession != null) {
+                currentTestCardStateFlow.takeWhileNonNull()
+            } else {
+                null
+            },
+            currentCardStateFlow.takeWhileNonNull()
+        )
+
+        return session.results
     }
 
     private fun buildLearnSession(): LearningSession? {
@@ -195,7 +218,29 @@ class CardTeacher(
         return nextCard
     }
 
+    fun onTestOptionSelected(option: String): Boolean {
+        return if (currentTestCard?.card?.term == option) {
+            switchToNextTestCard()
+            true
+        } else {
+            false
+        }
+    }
+
+    private fun switchToNextTestCard(): TestSession.TestCard? {
+        val nextTestCard = currentTestSession?.switchToNextCard()
+        val safeTestSession = currentTestSession
+
+        if (safeTestSession != null && nextTestCard == null) {
+            testSessions.add(safeTestSession)
+            currentTestSession = null
+        }
+
+        return nextTestCard
+    }
+
     fun save() = State(
+        currentTestSessionState = currentTestSession?.save(),
         sessionStates = sessions.map { it.save() },
         currentSessionState = currentSession?.save(),
         checkCount = checkCount,
@@ -204,6 +249,7 @@ class CardTeacher(
     )
 
     fun restore(state: State) {
+        currentTestSession = state.currentTestSessionState?.let(::createTestSession)
         sessions = state.sessionStates.map(::createLearningSession).toMutableList()
         currentSession = state.currentSessionState?.let(::createLearningSession)
         checkCount = state.checkCount
@@ -220,8 +266,19 @@ class CardTeacher(
             it.restore(sessionState)
         }
 
+    private fun createTestSession(sessionState: TestSession.State) =
+        TestSession(
+            cards = sessionState.cardIds.mapNotNull { cardId ->
+                cards.firstOrNull { it.id == cardId }
+            },
+            options = cards.map { it.term }
+        ).also {
+            it.restore(sessionState)
+        }
+
     @Parcelize
     data class State(
+        val currentTestSessionState: TestSession.State?,
         val sessionStates: List<LearningSession.State>,
         val currentSessionState: LearningSession.State?,
         val checkCount: Int,

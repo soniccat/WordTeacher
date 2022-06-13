@@ -37,6 +37,7 @@ interface LearningVM: Clearable {
     val canShowHint: StateFlow<Boolean>
     val hintString: StateFlow<List<Char>>
 
+    fun onTestOptionPressed(answer: String)
     fun onCheckPressed(answer: String)
     fun onTextChanged()
     fun onShowNextLetterPressed()
@@ -52,7 +53,8 @@ interface LearningVM: Clearable {
     data class TermState(
         val term: String = "",
         val index: Int = 0,
-        val count: Int = 0
+        val count: Int = 0,
+        val testOptions: List<String> = emptyList() // for testSession
     )
 
     @Parcelize
@@ -110,12 +112,25 @@ open class LearningVMImpl(
 
             var sessionResults: List<SessionCardResult>? = null
             do {
-                sessionResults = teacher.runSession { cardCount, sessionCards ->
+                sessionResults = teacher.runSession { cardCount, testCards, sessionCards ->
+                    // test session
+                    testCards?.collectIndexed { index, testCard ->
+                        termState.update { it.copy(
+                            term = testCard.card.term,
+                            index = index,
+                            count = cardCount,
+                            testOptions = testCard.options
+                        ) }
+                        viewItems.value = Resource.Loaded(buildCardItem(testCard.card))
+                    }
+
+                    // type session
                     sessionCards.collectIndexed { index, card ->
                         termState.update { it.copy(
                             term = card.term,
                             index = index,
-                            count = cardCount
+                            count = cardCount,
+                            testOptions = emptyList()
                         ) }
                         viewItems.value = Resource.Loaded(buildCardItem(card))
                     }
@@ -154,7 +169,7 @@ open class LearningVMImpl(
         val viewItems = mutableListOf(
             WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech),
             *card.definitions.map { def ->
-                WordDefinitionViewItem(definition = def.replace(card.term, TERM_REPLACEMENT))
+                WordDefinitionViewItem(definition = def.replace(card.term, TERM_REPLACEMENT, ignoreCase = true))
             }.toTypedArray(),
         )
 
@@ -165,7 +180,7 @@ open class LearningVMImpl(
                     Indent.SMALL
                 ),
                 *card.examples.map { ex ->
-                    WordExampleViewItem(ex.replace(card.term, TERM_REPLACEMENT), Indent.SMALL)
+                    WordExampleViewItem(ex.replace(card.term, TERM_REPLACEMENT, ignoreCase = true), Indent.SMALL)
                 }.toTypedArray(),
             )
         }
@@ -177,7 +192,7 @@ open class LearningVMImpl(
                     Indent.SMALL
                 ),
                 *card.synonyms.map { synonym ->
-                    WordSynonymViewItem(synonym.replace(card.term, TERM_REPLACEMENT), Indent.SMALL)
+                    WordSynonymViewItem(synonym.replace(card.term, TERM_REPLACEMENT, ignoreCase = true), Indent.SMALL)
                 }.toTypedArray()
             )
         }
@@ -188,6 +203,10 @@ open class LearningVMImpl(
 
     private fun generateIds(items: List<BaseViewItem<*>>) {
         generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator)
+    }
+
+    override fun onTestOptionPressed(answer: String) {
+        teacher?.onTestOptionSelected(answer)
     }
 
     override fun onCheckPressed(answer: String) {
@@ -248,4 +267,4 @@ open class LearningVMImpl(
     }
 }
 
-private const val TERM_REPLACEMENT = "__"
+private const val TERM_REPLACEMENT = "___"

@@ -7,14 +7,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -36,7 +29,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
@@ -57,6 +52,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderVie
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import java.util.*
 
 @ExperimentalUnitApi
 @ExperimentalComposeUiApi
@@ -98,6 +94,7 @@ fun LearningUI(
     val errorString by vm.titleErrorFlow.collectAsState()
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
+    val isTestSession = termState.testOptions.isNotEmpty()
     val canShowHint by vm.canShowHint.collectAsState()
     val hintString by vm.hintString.collectAsState()
     val focusRequester = remember { FocusRequester() }
@@ -126,14 +123,40 @@ fun LearningUI(
             )
 
             if (data != null) {
-                TermInput(
-                    term = termState.term,
-                    errorString = errorString?.resolveString(),
-                    focusRequester = focusRequester,
-                    onDone = { value ->
-                        vm.onCheckPressed(value)
+                if (isTestSession) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(dimensionResource(id = R.dimen.learning_testOption_margin))
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                OptionButton(vm, termState.testOptions[0])
+                                OptionButton(vm, termState.testOptions[1])
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                OptionButton(vm, termState.testOptions[2])
+                                OptionButton(vm, termState.testOptions[3])
+                            }
+                        }
                     }
-                )
+                } else {
+                    TermInput(
+                        term = termState.term,
+                        errorString = errorString?.resolveString(),
+                        focusRequester = focusRequester,
+                        onDone = { value ->
+                            vm.onCheckPressed(value)
+                        }
+                    )
+                    LaunchedEffect(key1 = "editing") {
+                        focusRequester.requestFocus()
+                    }
+                }
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(
@@ -143,10 +166,6 @@ fun LearningUI(
                     items(data, key = { it.id }) { item ->
                         LearningViewItems(Modifier.animateItemPlacement(), item, vm)
                     }
-                }
-
-                LaunchedEffect(key1 = "editing") {
-                    focusRequester.requestFocus()
                 }
             } else {
                 LoadingStatusView(
@@ -159,52 +178,74 @@ fun LearningUI(
             }
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomEnd)
-        ) {
-            ExtendedFloatingActionButton(
-                text = {
-                    Text(
-                        text = stringResource(
-                            id = if (canShowHint) {
-                                R.string.learning_show_hint
-                            } else {
-                                R.string.learning_give_up
-                            }
-                        ),
-                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
-                    )
-                },
-                onClick = {
-                    if (canShowHint) {
-                        vm.onHintAskedPressed()
-                    } else {
-                        vm.onGiveUpPressed()
-                    }
-                },
+        if (!isTestSession) {
+            Column(
                 modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(dimensionResource(id = R.dimen.content_padding))
-            )
-
-            SnackbarHost(
-                modifier = Modifier.animateContentSize(),
-                hostState = snackbarHostState
+                    .fillMaxWidth()
+                    .align(Alignment.BottomEnd)
             ) {
-                Snackbar(snackbarData = it)
-            }
-        }
+                ExtendedFloatingActionButton(
+                    text = {
+                        Text(
+                            text = stringResource(
+                                id = if (canShowHint) {
+                                    R.string.learning_show_hint
+                                } else {
+                                    R.string.learning_give_up
+                                }
+                            ).uppercase(Locale.getDefault()),
+                            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
+                        )
+                    },
+                    onClick = {
+                        if (canShowHint) {
+                            vm.onHintAskedPressed()
+                        } else {
+                            vm.onGiveUpPressed()
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(dimensionResource(id = R.dimen.content_padding))
+                )
 
-        LaunchedEffect(key1 = hintString) {
-            if (hintString.isNotEmpty()) {
-                val resultString = hintString.fold("") { str, char ->
-                    "$str $char"
+                SnackbarHost(
+                    modifier = Modifier.animateContentSize(),
+                    hostState = snackbarHostState
+                ) {
+                    Snackbar(snackbarData = it)
                 }
-                snackbarHostState.showSnackbar(resultString)
+            }
+
+            LaunchedEffect(key1 = hintString) {
+                if (hintString.isNotEmpty()) {
+                    val resultString = hintString.fold("") { str, char ->
+                        "$str $char"
+                    }
+                    snackbarHostState.showSnackbar(resultString)
+                }
             }
         }
+    }
+}
+
+@Composable
+fun RowScope.OptionButton(
+    vm: LearningVM,
+    option: String
+) {
+    OutlinedButton(
+        modifier = Modifier
+            .weight(1.0f)
+            .padding(dimensionResource(id = R.dimen.learning_testOption_margin)),
+        onClick = {
+            vm.onTestOptionPressed(option)
+        }
+    ) {
+        Text(
+            text = option,
+            color = MaterialTheme.colors.secondary
+        )
     }
 }
 

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class LearningSession(
-    private var cards: List<Card>
+    var cards: List<Card>
 ) {
     var results: List<SessionCardResult> = cards.map { card ->
         SessionCardResult(card.id, card.progress.progress())

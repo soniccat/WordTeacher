@@ -111,7 +111,7 @@ fun LearningSessionResultUI(
 
         ExtendedFloatingActionButton(
             text = {
-                Text(stringResource(id = R.string.done))
+                Text(stringResource(id = R.string.done).uppercase(Locale.getDefault()))
             },
             onClick = { onClose() },
             modifier = Modifier
