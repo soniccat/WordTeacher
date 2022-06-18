@@ -1,12 +1,12 @@
 import com.android.build.gradle.BaseExtension
 
 configure<BaseExtension> {
-    compileSdkVersion(31)
-    buildToolsVersion = "31.0.0"
+    compileSdkVersion(32)
+    buildToolsVersion = "32.0.0"
 
     defaultConfig {
         minSdkVersion(21)
-        targetSdkVersion(31)
+        targetSdkVersion(32)
     }
 
     testOptions {
