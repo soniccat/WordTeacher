@@ -138,40 +138,34 @@ class AppDatabase(
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
 
-        fun selectAll(): Flow<Resource<List<ShortCardSet>>> = flow {
+        fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
+            // TODO: reorganize db to pull progress from it instead of loading all the cards
+            val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date ->
+                ShortCardSet(id, name, date, 0f, 0f)
+            }).asFlow()
+            val setsWithCardsFlow = selectSetIdsWithCards().asFlow()
 
-            try {
-                // TODO: reorganize db to pull progress from it instead of loading all the cards
-                val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date ->
-                    ShortCardSet(id, name, date, 0f, 0f)
-                }).asFlow()
-                val setsWithCardsFlow = selectSetIdsWithCards().asFlow()
-
-                combine(
-                    flow = shortCardSetsFlow.map {
-                        tryInResource(canTryAgain = true) { it.executeAsList() }
-                    },
-                    flow2 = setsWithCardsFlow.map { query ->
-                        tryInResource(canTryAgain = true) {
-                            query.executeAsList().groupBy({ it.first }, { it.second })
-                        }
-                    },
-                    transform = { shortCardSetsRes, setsWithCardsRes ->
-                        shortCardSetsRes.merge(setsWithCardsRes) { shortSets, setsWithCards ->
-                            shortSets.orEmpty().map { set ->
-                                val cards = setsWithCards?.get(set.id)
-                                set.copy(
-                                    readyToLearnProgress = cards?.readyToLearnProgress(timeSource)
-                                        ?: 0f,
-                                    totalProgress = cards?.totalProgress() ?: 0f
-                                )
-                            }
+            return combine(
+                flow = shortCardSetsFlow.map {
+                    tryInResource(canTryAgain = true) { it.executeAsList() }
+                },
+                flow2 = setsWithCardsFlow.map { query ->
+                    tryInResource(canTryAgain = true) {
+                        query.executeAsList().groupBy({ it.first }, { it.second })
+                    }
+                },
+                transform = { shortCardSetsRes, setsWithCardsRes ->
+                    shortCardSetsRes.merge(setsWithCardsRes) { shortSets, setsWithCards ->
+                        shortSets.orEmpty().map { set ->
+                            val cards = setsWithCards?.get(set.id)
+                            set.copy(
+                                readyToLearnProgress = cards?.readyToLearnProgress(timeSource) ?: 0f,
+                                totalProgress = cards?.totalProgress() ?: 0f
+                            )
                         }
                     }
-                )
-            } catch (ex: Throwable) {
-                Logger.e("omg " + ex.message)
-            }
+                }
+            )
         }
         fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id, mapper = ::CardSet)
         fun removeCardSet(cardSetId: Long) {

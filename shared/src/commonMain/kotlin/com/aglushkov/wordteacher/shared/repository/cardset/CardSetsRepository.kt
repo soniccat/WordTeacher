@@ -31,17 +31,7 @@ class CardSetsRepository(
     private val timeSource: TimeSource
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    val cardSets = MutableStateFlow<Resource<List<ShortCardSet>>>(Resource.Uninitialized())
-    //val test =
-        //.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
-
-    init {
-        scope.launch {
-            database.cardSets.selectAll().collect {
-                cardSets.value = it
-            }
-        }
-    }
+    val cardSets = database.cardSets.selectAll().stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     suspend fun createCardSet(name: String, date: Long) = supervisorScope {
         // Async in the scope to avoid retaining the parent coroutine and to cancel immediately
