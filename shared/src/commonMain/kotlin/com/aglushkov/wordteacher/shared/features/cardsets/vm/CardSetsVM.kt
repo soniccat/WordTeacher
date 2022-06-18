@@ -120,7 +120,15 @@ open class CardSetsVMImpl(
         val items = mutableListOf<BaseViewItem<*>>()
 
         cardSets.forEach {
-            items.add(CardSetViewItem(it.id, it.name, timeSource.stringDate(it.date)))
+            items.add(
+                CardSetViewItem(
+                    it.id,
+                    it.name,
+                    timeSource.stringDate(it.date),
+                    it.readyToLearnProgress,
+                    it.totalProgress
+                )
+            )
         }
 
         return listOf(

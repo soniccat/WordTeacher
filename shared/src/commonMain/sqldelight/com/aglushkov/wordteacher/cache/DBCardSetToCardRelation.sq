@@ -4,10 +4,19 @@ CREATE TABLE IF NOT EXISTS DBCardSetToCardRelation (
   cardId INTEGER NOT NULL
 );
 
+selectAll:
+SELECT *
+FROM DBCardSetToCardRelation;
+
 selectCardCount:
 SELECT COUNT(id)
 FROM DBCardSetToCardRelation
 WHERE setId = ?;
+
+selectSetIdsWithCards:
+SELECT setId, DBCard.*
+FROM DBCardSetToCardRelation
+    LEFT JOIN DBCard ON DBCardSetToCardRelation.cardId = DBCard.id;
 
 selectCards:
 SELECT DBCard.*

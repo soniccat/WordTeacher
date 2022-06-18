@@ -30,7 +30,7 @@ class TestSession(
                 (
                     options.filter {
                         it != card.term
-                    }.take(TEST_SESSION_OPTION_COUNT - 1) + card.term
+                    }.shuffled().take(TEST_SESSION_OPTION_COUNT - 1) + card.term
                 ).shuffled()
             )
         }

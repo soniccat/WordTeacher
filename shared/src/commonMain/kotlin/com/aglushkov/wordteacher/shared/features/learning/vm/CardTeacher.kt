@@ -111,7 +111,7 @@ class CardTeacher(
             countRightAnswer()
             switchToNextCard()
 
-        } else if (checkCount > 1) {
+        } else if (checkCount > 1) { // TODO: move to settings
             countWrongAnswer()
         }
 
@@ -129,7 +129,7 @@ class CardTeacher(
     }
 
     suspend fun onHintAsked() {
-        if (hintShowCountStateFlow.value > 1) {
+        if (hintShowCountStateFlow.value > 1) { // TODO: move to settings
             countWrongAnswer()
         } else {
             updateHintString()

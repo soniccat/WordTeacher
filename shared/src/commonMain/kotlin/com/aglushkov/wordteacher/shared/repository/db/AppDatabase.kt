@@ -1,12 +1,18 @@
 package com.aglushkov.wordteacher.shared.repository.db
 
+import com.aglushkov.extensions.asFlow
 import com.aglushkov.extensions.firstLong
 import com.aglushkov.wordteacher.cache.DBCard
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.model.CardProgress
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.merge
+import com.aglushkov.wordteacher.shared.general.resource.tryInResource
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
@@ -15,15 +21,17 @@ import com.squareup.sqldelight.TransactionWithoutReturn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNull.content
 
-class AppDatabase(driverFactory: DatabaseDriverFactory) {
+class AppDatabase(
+    driverFactory: DatabaseDriverFactory,
+    private val timeSource: TimeSource
+) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private val driver = driverFactory.createDriver()
@@ -49,6 +57,10 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
     val notes = Notes()
 
     val state = MutableStateFlow<Resource<AppDatabase>>(Resource.Uninitialized())
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
 
     init {
         create()
@@ -117,19 +129,50 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
         fun removeAll() = db.dBArticleQueries.removeAll()
 
         private fun decodeStyle(style: String): ArticleStyle =
-            Json {
-                ignoreUnknownKeys = true
-            }.decodeFromString<ArticleStyle>(style)
+            json.decodeFromString<ArticleStyle>(style)
 
         private fun encodeStyle(style: ArticleStyle): String =
-            Json {
-                ignoreUnknownKeys = true
-            }.encodeToString(style)
+            json.encodeToString(style)
     }
 
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
-        fun selectAll() = db.dBCardSetQueries.selectAll(mapper = ::ShortCardSet)
+
+        fun selectAll(): Flow<Resource<List<ShortCardSet>>> = flow {
+
+            try {
+                // TODO: reorganize db to pull progress from it instead of loading all the cards
+                val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date ->
+                    ShortCardSet(id, name, date, 0f, 0f)
+                }).asFlow()
+                val setsWithCardsFlow = selectSetIdsWithCards().asFlow()
+
+                combine(
+                    flow = shortCardSetsFlow.map {
+                        tryInResource(canTryAgain = true) { it.executeAsList() }
+                    },
+                    flow2 = setsWithCardsFlow.map { query ->
+                        tryInResource(canTryAgain = true) {
+                            query.executeAsList().groupBy({ it.first }, { it.second })
+                        }
+                    },
+                    transform = { shortCardSetsRes, setsWithCardsRes ->
+                        shortCardSetsRes.merge(setsWithCardsRes) { shortSets, setsWithCards ->
+                            shortSets.orEmpty().map { set ->
+                                val cards = setsWithCards?.get(set.id)
+                                set.copy(
+                                    readyToLearnProgress = cards?.readyToLearnProgress(timeSource)
+                                        ?: 0f,
+                                    totalProgress = cards?.totalProgress() ?: 0f
+                                )
+                            }
+                        }
+                    }
+                )
+            } catch (ex: Throwable) {
+                Logger.e("omg " + ex.message)
+            }
+        }
         fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id, mapper = ::CardSet)
         fun removeCardSet(cardSetId: Long) {
             db.transaction {
@@ -137,6 +180,10 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
                 db.dBCardSetToCardRelationQueries.removeCardSet(cardSetId)
                 db.dBCardSetQueries.removeCardSet(cardSetId)
             }
+        }
+
+        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
+            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
         }
     }
 
@@ -154,7 +201,7 @@ class AppDatabase(driverFactory: DatabaseDriverFactory) {
             mapper = cardMapper()
         )
 
-        private fun cardMapper() : (
+        fun cardMapper() : (
             id: Long?,
             date: Long?,
             term: String?,

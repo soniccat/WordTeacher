@@ -141,8 +141,8 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun database(driver: DatabaseDriverFactory): AppDatabase {
-        return AppDatabase(driver)
+    fun database(driver: DatabaseDriverFactory, timeSource: TimeSource,): AppDatabase {
+        return AppDatabase(driver, timeSource)
     }
 
     @AppComp

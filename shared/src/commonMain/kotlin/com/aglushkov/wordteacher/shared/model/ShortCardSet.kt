@@ -1,9 +1,11 @@
 package com.aglushkov.wordteacher.shared.model
 
-class ShortCardSet (
+data class ShortCardSet (
     val id: Long,
     val name: String,
-    val date: Long
+    val date: Long,
+    val readyToLearnProgress: Float,
+    val totalProgress: Float
 ) {
 
 }
