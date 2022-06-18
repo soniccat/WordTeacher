@@ -16,9 +16,7 @@ data class CardSet (
 fun List<Card>.totalProgress(): Float = calcProgress(this)
 
 fun List<Card>.readyToLearnProgress(timeSource: TimeSource) =
-    calcProgress(
-        filter { it.progress.isReadyToLearn(timeSource) }
-    )
+    count { !it.progress.isReadyToLearn(timeSource) } / size.toFloat()
 
 private fun calcProgress(aListOfCards: List<Card>): Float =
     aListOfCards.sumOf { it.progress.progress() } / aListOfCards.size.toFloat()

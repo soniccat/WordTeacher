@@ -10,11 +10,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.androidApp.R
-import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
@@ -126,20 +128,58 @@ private fun CardSetsViewItem(
 @ExperimentalMaterialApi
 @Composable
 private fun CardSetTitleView(
-    cardSetViewItem: CardSetViewItem,
-    onClick: () -> Unit,
-    onDeleted: () -> Unit
+    item: CardSetViewItem,
+    onClick: () -> Unit = {},
+    onDeleted: () -> Unit = {}
 ) {
     DeletableCell(
-        stateKey = cardSetViewItem.id,
+        stateKey = item.id,
         onClick,
         onDeleted
     ) {
-        ListItem(
-            text = { Text(cardSetViewItem.name) },
-            secondaryText = { Text(cardSetViewItem.date) }
-        )
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ListItem(
+                text = { Text(item.name) },
+                secondaryText = { Text(item.date) },
+                trailing = {
+                    val side = 30.dp
+                    Box(
+                        modifier = Modifier.size(side, side)
+                    ) {
+                        CircularProgressIndicator(
+                            progress = 1.0f,
+                            color = Color.LightGray.copy(alpha = 0.2f)
+                        )
+                        CircularProgressIndicator(progress = item.totalProgress)
+                    }
+                }
+            )
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart),
+                progress = item.readyToLearnProgress,
+                color = MaterialTheme.colors.secondary
+            )
+        }
     }
+}
+
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+@Preview
+@Composable
+fun CardSetTitleViewPreviews() {
+    CardSetTitleView(
+        CardSetViewItem(
+            setId = 0L,
+            name = "My card set",
+            date = "Today",
+            readyToLearnProgress = 0.3f,
+            totalProgress = 0.1f,
+        )
+    )
 }
 
 //@ExperimentalAnimationApi

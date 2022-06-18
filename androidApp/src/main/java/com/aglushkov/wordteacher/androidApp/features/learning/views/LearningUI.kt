@@ -178,7 +178,7 @@ fun LearningUI(
             }
         }
 
-        if (!isTestSession) {
+        if (data != null && !isTestSession) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
