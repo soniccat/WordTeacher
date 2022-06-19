@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPConstants.UNKNOWN_LEMMA
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.Tag
+import com.aglushkov.wordteacher.shared.model.nlp.allLemmas
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
@@ -168,11 +169,7 @@ class WordDefinitionRepository(
 
                     if (dictNlpCore != null) {
                         val lemmas = withContext(Dispatchers.Default) {
-                            val tags = Tag.values()
-                            dictNlpCore.lemmatize(
-                                tags.map { word },
-                                tags.map { it.value }
-                            ).distinct().filter { it != word && it != UNKNOWN_LEMMA }
+                            dictNlpCore.allLemmas(word)
                         }
 
                         lemmas.onEach { lemma ->

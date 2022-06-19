@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
@@ -44,4 +45,5 @@ interface LearningDependencies {
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
     fun routerResolver(): RouterResolver
+    fun nlpCore(): NLPCore
 }

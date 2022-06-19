@@ -16,6 +16,8 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.model.nlp.allLemmas
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -25,8 +27,10 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 interface LearningVM: Clearable {
     var router: LearningRouter?
@@ -70,8 +74,10 @@ open class LearningVMImpl(
     private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource,
-    private val idGenerator: IdGenerator
+    private val idGenerator: IdGenerator,
+    private val nlpCore: NLPCore
 ) : ViewModel(), LearningVM {
+
     override var router: LearningRouter? = null
 
     override val termState = MutableStateFlow(LearningVM.TermState())
@@ -113,26 +119,33 @@ open class LearningVMImpl(
             var sessionResults: List<SessionCardResult>? = null
             do {
                 sessionResults = teacher.runSession { cardCount, testCards, sessionCards ->
+                    // type session
+                    nlpCore.waitUntilInitialized()
+                    val nlpCopy = nlpCore.clone()
+
                     // test session
-                    testCards?.collectIndexed { index, testCard ->
+                    testCards?.map { testCard ->
+                        testCard to extractLemmas(testCard.card.term, nlpCopy)
+                    }?.collectIndexed { index, (testCard, lemmas) ->
                         termState.update { it.copy(
                             term = testCard.card.term,
                             index = index,
                             count = cardCount,
                             testOptions = testCard.options
                         ) }
-                        viewItems.value = Resource.Loaded(buildCardItem(testCard.card))
+                        viewItems.value = Resource.Loaded(buildCardItem(testCard.card, lemmas))
                     }
 
-                    // type session
-                    sessionCards.collectIndexed { index, card ->
+                    sessionCards.map { card ->
+                        card to extractLemmas(card.term, nlpCopy)
+                    }.collectIndexed { index, (card, lemmas) ->
                         termState.update { it.copy(
                             term = card.term,
                             index = index,
                             count = cardCount,
                             testOptions = emptyList()
                         ) }
-                        viewItems.value = Resource.Loaded(buildCardItem(card))
+                        viewItems.value = Resource.Loaded(buildCardItem(card, lemmas))
                     }
                 }
 
@@ -142,6 +155,14 @@ open class LearningVMImpl(
             } while (sessionResults != null)
 
             onLearningCompleted()
+        }
+    }
+
+    private suspend fun extractLemmas(term: String, nlpCore: NLPCore): List<List<String>> {
+        return withContext(Dispatchers.Default) {
+            term.split(' ').map { word ->
+                nlpCore.allLemmas(word)
+            }
         }
     }
 
@@ -165,11 +186,11 @@ open class LearningVMImpl(
         }
     }
 
-    private fun buildCardItem(card: Card): List<BaseViewItem<*>> {
+    private fun buildCardItem(card: Card, lemmas: List<List<String>>): List<BaseViewItem<*>> {
         val viewItems = mutableListOf(
             WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech),
             *card.definitions.map { def ->
-                WordDefinitionViewItem(definition = def.replace(card.term, TERM_REPLACEMENT, ignoreCase = true))
+                WordDefinitionViewItem(definition = replaceTerm(def, card.term, lemmas))
             }.toTypedArray(),
         )
 
@@ -180,7 +201,7 @@ open class LearningVMImpl(
                     Indent.SMALL
                 ),
                 *card.examples.map { ex ->
-                    WordExampleViewItem(ex.replace(card.term, TERM_REPLACEMENT, ignoreCase = true), Indent.SMALL)
+                    WordExampleViewItem(replaceTerm(ex, card.term, lemmas), Indent.SMALL)
                 }.toTypedArray(),
             )
         }
@@ -192,13 +213,48 @@ open class LearningVMImpl(
                     Indent.SMALL
                 ),
                 *card.synonyms.map { synonym ->
-                    WordSynonymViewItem(synonym.replace(card.term, TERM_REPLACEMENT, ignoreCase = true), Indent.SMALL)
+                    WordSynonymViewItem(replaceTerm(synonym, card.term, lemmas), Indent.SMALL)
                 }.toTypedArray()
             )
         }
 
         generateIds(viewItems)
         return viewItems
+    }
+
+    private fun replaceTerm(src: String, term: String, lemmas: List<List<String>>): String {
+        var modifiedSrc: CharSequence = src
+        val words = term.split(' ')
+        var chI = 0
+        var wordI = 0
+
+        while (wordI < words.size && chI < src.length) {
+            var foundChI = modifiedSrc.indexOf(words[wordI], chI, ignoreCase = true)
+            var foundWord = words[wordI]
+
+            if (foundChI == -1) {
+                lemmas[wordI].forEach { lemma ->
+                    foundChI = modifiedSrc.indexOf(lemma, chI, ignoreCase = true)
+                    foundWord = lemma
+                    if (foundChI != -1) {
+                        return@forEach
+                    }
+                }
+            }
+
+            if (foundChI != -1) {
+                modifiedSrc = modifiedSrc.replaceRange(
+                    foundChI,
+                    foundChI + foundWord.length,
+                    TERM_REPLACEMENT
+                )
+                chI = foundChI + TERM_REPLACEMENT.length//foundWord.length
+            }
+
+            ++wordI
+        }
+
+        return modifiedSrc.toString()
     }
 
     private fun generateIds(items: List<BaseViewItem<*>>) {

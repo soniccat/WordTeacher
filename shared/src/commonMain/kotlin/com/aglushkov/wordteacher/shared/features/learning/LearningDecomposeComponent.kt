@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
@@ -20,14 +21,16 @@ class LearningDecomposeComponent (
     database: AppDatabase,
     databaseWorker: DatabaseWorker,
     timeSource: TimeSource,
-    idGenerator: IdGenerator
+    idGenerator: IdGenerator,
+    nlpCore: NLPCore
 ) : LearningVMImpl(
     state,
     cardLoader,
     database,
     databaseWorker,
     timeSource,
-    idGenerator
+    idGenerator,
+    nlpCore
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {

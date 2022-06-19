@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.compose
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -67,9 +68,12 @@ class AppTypography {
                 return wordDefinitionProvidedBy
             }
         val noteText: TextStyle = typography.body1
-        val notePlaceholder = noteText.copy(
-            color = noteText.color.copy(alpha = 0.5f)
-        )
+        val notePlaceholder: TextStyle
+            @Composable get() {
+                return noteText.copy(
+                    color = MaterialTheme.colors.secondary
+                )
+            }
 
         val learningSessionTerm = wordDefinitionTitle
         val learningSessionProgress = wordDefinitionTitle
