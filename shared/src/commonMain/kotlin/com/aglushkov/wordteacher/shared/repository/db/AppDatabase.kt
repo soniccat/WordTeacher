@@ -5,6 +5,7 @@ import com.aglushkov.extensions.firstLong
 import com.aglushkov.wordteacher.cache.DBCard
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
+import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase.Companion.Schema
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.e
@@ -13,11 +14,14 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.TransactionWithoutReturn
+import com.squareup.sqldelight.db.AfterVersionWithDriver
+import com.squareup.sqldelight.db.migrateWithCallbacks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -39,9 +43,9 @@ class AppDatabase(
         driver,
         DBCardAdapter = DBCard.Adapter(
             StringListAdapter(),
+            StringListAdapter(),
+            StringListAdapter(),
             SpanListAdapter(),
-            StringListAdapter(),
-            StringListAdapter(),
         ),
         DBNLPSentenceAdapter = DBNLPSentence.Adapter(
             StringListAdapter(),
@@ -82,6 +86,14 @@ class AppDatabase(
     }
 
     private fun createDb() {
+        Schema.migrateWithCallbacks(
+            driver = driver,
+            oldVersion = 0,
+            newVersion = Schema.version,
+            AfterVersionWithDriver(1) {
+                Logger.v("migrated to 2")
+            },
+        )
         SQLDelightDatabase.Schema.create(driver)
     }
 
@@ -139,7 +151,9 @@ class AppDatabase(
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
 
-        fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
+        suspend fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
+            waitUntilInitialized()
+
             // TODO: reorganize db to pull progress from it instead of loading all the cards
             val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date ->
                 ShortCardSet(id, name, date, 0f, 0f)
@@ -177,8 +191,8 @@ class AppDatabase(
             }
         }
 
-        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, definitionTermSpans, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
-            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, definitionTermSpans, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
+        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans ->
+            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans)
         }
     }
 
@@ -203,14 +217,14 @@ class AppDatabase(
             partOfSpeech: String?,
             transcription: String?,
             definitions: List<String>?,
-            definitionTermSpans: List<List<Pair<Int, Int>>>?,
             synonyms: List<String>?,
             examples: List<String>?,
             progressLevel: Int?,
             progressLastMistakeCount: Int?,
-            progressLastLessonDate: Long?
+            progressLastLessonDate: Long?,
+            definitionTermSpans: List<List<Pair<Int, Int>>>?,
         ) -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, definitionTermSpans, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
+            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans ->
                 Card(
                     id!!,
                     date!!,
@@ -292,12 +306,12 @@ class AppDatabase(
                     partOfSpeech.toString(),
                     transcription,
                     definitions,
-                    definitionTermSpans,
                     synonyms,
                     examples,
                     progress.currentLevel,
                     progress.lastMistakeCount,
-                    progress.lastLessonDate
+                    progress.lastLessonDate,
+                    definitionTermSpans,
                 )
 
                 val cardId = db.dBCardQueries.lastInsertedRowId().firstLong()!!
@@ -344,12 +358,12 @@ class AppDatabase(
             partOfSpeech.toString(),
             transcription,
             definitions,
-            definitionTermSpans,
             synonyms,
             examples,
             progressLevel,
             progressLastMistakeCount,
             progressLastLessonDate,
+            definitionTermSpans,
             cardId
         )
 

@@ -1,0 +1,5 @@
+import kotlin.collections.List;
+import kotlin.Pair;
+import kotlin.Int;
+
+ALTER TABLE DBCard ADD COLUMN definitionTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT "";

@@ -20,8 +20,12 @@ class CardSetsRepository(
     private val nlpCore: NLPCore,
     private val nlpSentenceProcessor: NLPSentenceProcessor
 ) {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     val cardSets = database.cardSets.selectAll().stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
+
+    init {
+
+    }
 
     suspend fun createCardSet(name: String, date: Long) = supervisorScope {
         // Async in the scope to avoid retaining the parent coroutine and to cancel immediately

@@ -5,6 +5,6 @@ plugins {
 sqldelight {
     database("SQLDelightDatabase") {
         packageName = "com.aglushkov.wordteacher.shared.cache"
-//        schemaOutputDirectory = File("/shared/src/commonMain/kotlin/com/aglushkov/wordteacher/db")
+        schemaOutputDirectory = File("./src/commonMain/sqldelight/com/aglushkov/wordteacher/schemes")
     }
 }
