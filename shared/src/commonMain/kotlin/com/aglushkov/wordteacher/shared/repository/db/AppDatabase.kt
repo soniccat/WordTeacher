@@ -5,27 +5,20 @@ import com.aglushkov.extensions.firstLong
 import com.aglushkov.wordteacher.cache.DBCard
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
-import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase.Companion.Schema
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
-import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.model.CardProgress
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.TransactionWithoutReturn
-import com.squareup.sqldelight.db.AfterVersionWithDriver
-import com.squareup.sqldelight.db.migrateWithCallbacks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
@@ -86,14 +79,6 @@ class AppDatabase(
     }
 
     private fun createDb() {
-        Schema.migrateWithCallbacks(
-            driver = driver,
-            oldVersion = 0,
-            newVersion = Schema.version,
-            AfterVersionWithDriver(1) {
-                Logger.v("migrated to 2")
-            },
-        )
         SQLDelightDatabase.Schema.create(driver)
     }
 
@@ -151,9 +136,7 @@ class AppDatabase(
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
 
-        suspend fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
-            waitUntilInitialized()
-
+        fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
             // TODO: reorganize db to pull progress from it instead of loading all the cards
             val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date ->
                 ShortCardSet(id, name, date, 0f, 0f)
@@ -279,6 +262,7 @@ class AppDatabase(
                 date = newCard.date,
                 term = newCard.term,
                 definitions = newCard.definitions,
+                definitionTermSpans = newCard.definitionTermSpans,
                 partOfSpeech = newCard.partOfSpeech,
                 transcription = newCard.transcription,
                 synonyms = newCard.synonyms,

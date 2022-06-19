@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.repository.cardset
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
@@ -10,6 +11,8 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSpan
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
@@ -22,10 +25,6 @@ class CardSetsRepository(
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     val cardSets = database.cardSets.selectAll().stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
-
-    init {
-
-    }
 
     suspend fun createCardSet(name: String, date: Long) = supervisorScope {
         // Async in the scope to avoid retaining the parent coroutine and to cancel immediately

@@ -74,8 +74,7 @@ open class LearningVMImpl(
     private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource,
-    private val idGenerator: IdGenerator,
-    private val nlpCore: NLPCore
+    private val idGenerator: IdGenerator
 ) : ViewModel(), LearningVM {
 
     override var router: LearningRouter? = null
@@ -119,33 +118,26 @@ open class LearningVMImpl(
             var sessionResults: List<SessionCardResult>? = null
             do {
                 sessionResults = teacher.runSession { cardCount, testCards, sessionCards ->
-                    // type session
-                    nlpCore.waitUntilInitialized()
-                    val nlpCopy = nlpCore.clone()
-
                     // test session
-                    testCards?.map { testCard ->
-                        testCard to extractLemmas(testCard.card.term, nlpCopy)
-                    }?.collectIndexed { index, (testCard, lemmas) ->
+                    testCards?.collectIndexed { index, testCard ->
                         termState.update { it.copy(
                             term = testCard.card.term,
                             index = index,
                             count = cardCount,
                             testOptions = testCard.options
                         ) }
-                        viewItems.value = Resource.Loaded(buildCardItem(testCard.card, lemmas))
+                        viewItems.value = Resource.Loaded(buildCardItem(testCard.card))
                     }
 
-                    sessionCards.map { card ->
-                        card to extractLemmas(card.term, nlpCopy)
-                    }.collectIndexed { index, (card, lemmas) ->
+                    // type session
+                    sessionCards.collectIndexed { index, card ->
                         termState.update { it.copy(
                             term = card.term,
                             index = index,
                             count = cardCount,
                             testOptions = emptyList()
                         ) }
-                        viewItems.value = Resource.Loaded(buildCardItem(card, lemmas))
+                        viewItems.value = Resource.Loaded(buildCardItem(card))
                     }
                 }
 
@@ -155,14 +147,6 @@ open class LearningVMImpl(
             } while (sessionResults != null)
 
             onLearningCompleted()
-        }
-    }
-
-    private suspend fun extractLemmas(term: String, nlpCore: NLPCore): List<List<String>> {
-        return withContext(Dispatchers.Default) {
-            term.split(' ').map { word ->
-                nlpCore.allLemmas(word)
-            }
         }
     }
 
@@ -186,11 +170,11 @@ open class LearningVMImpl(
         }
     }
 
-    private fun buildCardItem(card: Card, lemmas: List<List<String>>): List<BaseViewItem<*>> {
+    private fun buildCardItem(card: Card): List<BaseViewItem<*>> {
         val viewItems = mutableListOf(
             WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech),
-            *card.definitions.map { def ->
-                WordDefinitionViewItem(definition = replaceTerm(def, card.term, lemmas))
+            *card.resolveDefinitionsWithHiddenTerm().map { def ->
+                WordDefinitionViewItem(definition = def)
             }.toTypedArray(),
         )
 
@@ -201,7 +185,7 @@ open class LearningVMImpl(
                     Indent.SMALL
                 ),
                 *card.examples.map { ex ->
-                    WordExampleViewItem(replaceTerm(ex, card.term, lemmas), Indent.SMALL)
+                    WordExampleViewItem(ex, Indent.SMALL)
                 }.toTypedArray(),
             )
         }
@@ -213,48 +197,13 @@ open class LearningVMImpl(
                     Indent.SMALL
                 ),
                 *card.synonyms.map { synonym ->
-                    WordSynonymViewItem(replaceTerm(synonym, card.term, lemmas), Indent.SMALL)
+                    WordSynonymViewItem(synonym, Indent.SMALL)
                 }.toTypedArray()
             )
         }
 
         generateIds(viewItems)
         return viewItems
-    }
-
-    private fun replaceTerm(src: String, term: String, lemmas: List<List<String>>): String {
-        var modifiedSrc: CharSequence = src
-        val words = term.split(' ')
-        var chI = 0
-        var wordI = 0
-
-        while (wordI < words.size && chI < src.length) {
-            var foundChI = modifiedSrc.indexOf(words[wordI], chI, ignoreCase = true)
-            var foundWord = words[wordI]
-
-            if (foundChI == -1) {
-                lemmas[wordI].forEach { lemma ->
-                    foundChI = modifiedSrc.indexOf(lemma, chI, ignoreCase = true)
-                    foundWord = lemma
-                    if (foundChI != -1) {
-                        return@forEach
-                    }
-                }
-            }
-
-            if (foundChI != -1) {
-                modifiedSrc = modifiedSrc.replaceRange(
-                    foundChI,
-                    foundChI + foundWord.length,
-                    TERM_REPLACEMENT
-                )
-                chI = foundChI + TERM_REPLACEMENT.length//foundWord.length
-            }
-
-            ++wordI
-        }
-
-        return modifiedSrc.toString()
     }
 
     private fun generateIds(items: List<BaseViewItem<*>>) {
@@ -323,4 +272,3 @@ open class LearningVMImpl(
     }
 }
 
-private const val TERM_REPLACEMENT = "___"

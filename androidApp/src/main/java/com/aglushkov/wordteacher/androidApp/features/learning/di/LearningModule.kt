@@ -23,8 +23,7 @@ class LearningModule {
         database: AppDatabase,
         databaseWorker: DatabaseWorker,
         timeSource: TimeSource,
-        idGenerator: IdGenerator,
-        nlpCore: NLPCore
+        idGenerator: IdGenerator
     ) = LearningDecomposeComponent(
         state,
         componentContext,
@@ -32,7 +31,6 @@ class LearningModule {
         database,
         databaseWorker,
         timeSource,
-        idGenerator,
-        nlpCore
+        idGenerator
     )
 }

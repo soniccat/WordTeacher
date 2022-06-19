@@ -23,4 +23,17 @@ data class Card (
         copy(
             progress = progress.withWrongAnswer(timeSource)
         )
+
+    fun resolveDefinitionsWithHiddenTerm(): List<String> =
+        definitions.mapIndexed { i, def ->
+            definitionTermSpans.getOrNull(i)?.let { spans ->
+                var resString: CharSequence = def
+                spans.asReversed().forEach {
+                    resString = resString.replaceRange(it.first, it.second, TERM_REPLACEMENT)
+                }
+                resString.toString()
+            } ?: def
+        }
 }
+
+private const val TERM_REPLACEMENT = "___"
