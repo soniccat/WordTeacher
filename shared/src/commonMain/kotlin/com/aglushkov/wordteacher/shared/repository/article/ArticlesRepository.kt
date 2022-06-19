@@ -99,7 +99,7 @@ class ArticlesRepository(
             val sentences = mutableListOf<NLPSentence>()
             resultText.split(sentenceSpans).forEachIndexed { index, s ->
                 val nlpSentence = NLPSentence(articleId, index.toLong(), s.toString())
-                nlpSentenceProcessor.process(nlpSentence)
+                nlpSentenceProcessor.process(nlpSentence, nlpCoreCopy)
                 database.sentencesNLP.insert(nlpSentence)
                 sentences += nlpSentence
             }

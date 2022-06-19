@@ -122,8 +122,10 @@ class AppModule {
         database: AppDatabase,
         databaseWorker: DatabaseWorker,
         timeSource: TimeSource,
+        nlpCore: NLPCore,
+        nlpSentenceProcessor: NLPSentenceProcessor,
     ): CardSetsRepository {
-        return CardSetsRepository(database, databaseWorker, timeSource)
+        return CardSetsRepository(database, databaseWorker, timeSource, nlpCore, nlpSentenceProcessor)
     }
 
     @AppComp
@@ -137,7 +139,7 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun nlpSentenceProcessor(nlpCore: NLPCore) = NLPSentenceProcessor(nlpCore)
+    fun nlpSentenceProcessor(nlpCore: NLPCore) = NLPSentenceProcessor()
 
     @AppComp
     @Provides

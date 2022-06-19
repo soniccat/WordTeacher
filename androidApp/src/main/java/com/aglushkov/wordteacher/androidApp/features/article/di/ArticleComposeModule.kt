@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
@@ -43,6 +44,7 @@ class ArticleComposeModule {
         dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
+        nlpCore: NLPCore
     ): DefinitionsVM = DefinitionsVMImpl(
         DefinitionsVM.State(),
         connectivityManager,

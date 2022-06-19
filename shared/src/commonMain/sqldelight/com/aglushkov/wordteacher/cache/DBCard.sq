@@ -1,4 +1,6 @@
 import kotlin.collections.List;
+import kotlin.Pair;
+import kotlin.Int;
 
 CREATE TABLE IF NOT EXISTS DBCard (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -7,6 +9,7 @@ CREATE TABLE IF NOT EXISTS DBCard (
   partOfSpeech TEXT NOT NULL,
   transcription TEXT,
   definitions TEXT AS List<String> NOT NULL,
+  definitionTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL,
   synonyms TEXT AS List<String> NOT NULL,
   examples TEXT AS List<String> NOT NULL,
 -- Progress
@@ -29,16 +32,16 @@ FROM DBCard
 WHERE DBCard.id IN ?;
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, definitionTermSpans, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, definitionTermSpans, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
 VALUES ?;
 
 updateCard:
 UPDATE DBCard
-SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, definitionTermSpans = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?
 WHERE id = ?;
 
 lastInsertedRowId:

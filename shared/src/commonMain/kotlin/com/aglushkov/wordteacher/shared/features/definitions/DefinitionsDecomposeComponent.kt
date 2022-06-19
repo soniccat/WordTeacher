@@ -5,6 +5,8 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
@@ -21,14 +23,14 @@ class DefinitionsDecomposeComponent (
     wordDefinitionRepository: WordDefinitionRepository,
     dictRepository: DictRepository,
     cardSetsRepository: CardSetsRepository,
-    idGenerator: IdGenerator
+    idGenerator: IdGenerator,
 ) : DefinitionsVMImpl(
     DefinitionsVM.State(word = word),
     connectivityManager,
     wordDefinitionRepository,
     dictRepository,
     cardSetsRepository,
-    idGenerator
+    idGenerator,
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {

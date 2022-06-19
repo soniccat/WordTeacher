@@ -7,6 +7,7 @@ data class Card (
     val date: Long,
     val term: String,
     val definitions: List<String>,
+    val definitionTermSpans: List<List<Pair<Int, Int>>>,
     val partOfSpeech: WordTeacherWord.PartOfSpeech,
     val transcription: String?,
     val synonyms: List<String>,

@@ -39,6 +39,7 @@ class AppDatabase(
         driver,
         DBCardAdapter = DBCard.Adapter(
             StringListAdapter(),
+            SpanListAdapter(),
             StringListAdapter(),
             StringListAdapter(),
         ),
@@ -176,8 +177,8 @@ class AppDatabase(
             }
         }
 
-        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
-            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
+        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, definitionTermSpans, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
+            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, definitionTermSpans, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate)
         }
     }
 
@@ -202,18 +203,20 @@ class AppDatabase(
             partOfSpeech: String?,
             transcription: String?,
             definitions: List<String>?,
+            definitionTermSpans: List<List<Pair<Int, Int>>>?,
             synonyms: List<String>?,
             examples: List<String>?,
             progressLevel: Int?,
             progressLastMistakeCount: Int?,
             progressLastLessonDate: Long?
         ) -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
+            { id, date, term, partOfSpeech, transcription, definitions, definitionTermSpans, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate ->
                 Card(
                     id!!,
                     date!!,
                     term!!,
                     definitions.orEmpty(),
+                    definitionTermSpans.orEmpty(),
                     partOfSpeechEnum(partOfSpeech),
                     transcription,
                     synonyms.orEmpty(),
@@ -231,6 +234,7 @@ class AppDatabase(
             term: String = "",
             date: Long = 0,
             definitions: List<String> = listOf(),
+            definitionTermSpans: List<List<Pair<Int, Int>>> = listOf(),
             partOfSpeech: WordTeacherWord.PartOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
             transcription: String? = "",
             synonyms: List<String> = mutableListOf(),
@@ -242,6 +246,7 @@ class AppDatabase(
                 date = date,
                 term = term,
                 definitions = definitions,
+                definitionTermSpans = definitionTermSpans,
                 partOfSpeech = partOfSpeech,
                 transcription = transcription,
                 synonyms = synonyms,
@@ -273,6 +278,7 @@ class AppDatabase(
             date: Long,
             term: String,
             definitions: List<String>,
+            definitionTermSpans: List<List<Pair<Int, Int>>> = listOf(),
             partOfSpeech: WordTeacherWord.PartOfSpeech,
             transcription: String?,
             synonyms: List<String>,
@@ -286,6 +292,7 @@ class AppDatabase(
                     partOfSpeech.toString(),
                     transcription,
                     definitions,
+                    definitionTermSpans,
                     synonyms,
                     examples,
                     progress.currentLevel,
@@ -306,6 +313,7 @@ class AppDatabase(
                 date = card.date,
                 term = card.term,
                 definitions = card.definitions,
+                definitionTermSpans = card.definitionTermSpans,
                 partOfSpeech = card.partOfSpeech,
                 transcription = card.transcription,
                 synonyms = card.synonyms,
@@ -322,6 +330,7 @@ class AppDatabase(
             date: Long,
             term: String,
             definitions: List<String>,
+            definitionTermSpans: List<List<Pair<Int, Int>>>,
             partOfSpeech: WordTeacherWord.PartOfSpeech,
             transcription: String?,
             synonyms: List<String>,
@@ -335,6 +344,7 @@ class AppDatabase(
             partOfSpeech.toString(),
             transcription,
             definitions,
+            definitionTermSpans,
             synonyms,
             examples,
             progressLevel,
@@ -470,5 +480,37 @@ private class StringListAdapter: ColumnAdapter<List<String>, String> {
     }
 }
 
+private class SpanListAdapter: ColumnAdapter<List<List<Pair<Int, Int>>>, String> {
+    private val innerAdapter = StringListAdapter()
+
+    override fun decode(databaseValue: String): List<List<Pair<Int, Int>>> =
+        innerAdapter.decode(databaseValue).map { sentence ->
+            innerAdapter.decode(sentence).map { stringSpan ->
+                stringSpan.decodePair()
+            }
+        }
+
+    override fun encode(value: List<List<Pair<Int, Int>>>): String =
+        innerAdapter.encode(
+            value.map { listOfSpans ->
+                innerAdapter.encode(
+                    listOfSpans.map { it.encode() }
+                )
+            }
+        )
+}
+
+private fun Pair<Int,Int>.encode(): String =
+    "$first$PAIR_DIVIDER$second"
+
+private fun String.decodePair(): Pair<Int, Int> {
+    val numbers = split(PAIR_DIVIDER)
+    return Pair(
+        first = numbers[0].toInt(),
+        second = numbers[1].toInt()
+    )
+}
+
 private const val LIST_DIVIDER = '|'
 private const val LIST_ESCAPE = '\\'
+private const val PAIR_DIVIDER = '*'

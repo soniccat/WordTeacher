@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.general.resource
 
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import kotlinx.coroutines.CancellationException
 import kotlin.js.JsName
 
@@ -144,6 +146,7 @@ fun <T> tryInResource(canTryAgain: Boolean = false, code: () -> T): Resource<T> 
     } catch (e: CancellationException) {
         throw e
     } catch (e: Throwable) {
+        Logger.e(e.message.toString(), "tryInResource")
         return Resource.Error(throwable = e, canTryAgain)
     }
 }
