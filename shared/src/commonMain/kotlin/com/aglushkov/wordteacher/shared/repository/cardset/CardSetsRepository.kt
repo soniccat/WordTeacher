@@ -60,6 +60,9 @@ class CardSetsRepository(
             val definitionSpans = definitions.map { sentence ->
                 findTermSpans(sentence, term, nlpCoreCopy)
             }
+            val exampleSpans = examples.map { sentence ->
+                findTermSpans(sentence, term, nlpCoreCopy)
+            }
 
             database.cards.insertCard(
                 setId = setId,
@@ -70,7 +73,8 @@ class CardSetsRepository(
                 partOfSpeech = partOfSpeech,
                 transcription = transcription,
                 synonyms = synonyms,
-                examples = examples
+                examples = examples,
+                exampleTermSpans = exampleSpans
             )
         }.await()
     }

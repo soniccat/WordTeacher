@@ -12,6 +12,7 @@ data class Card (
     val transcription: String?,
     val synonyms: List<String>,
     val examples: List<String>,
+    val exampleTermSpans: List<List<Pair<Int, Int>>>,
     val progress: CardProgress,
 ) {
     fun withRightAnswer(timeSource: TimeSource) =
@@ -25,14 +26,20 @@ data class Card (
         )
 
     fun resolveDefinitionsWithHiddenTerm(): List<String> =
-        definitions.mapIndexed { i, def ->
-            definitionTermSpans.getOrNull(i)?.let { spans ->
-                var resString: CharSequence = def
-                spans.asReversed().forEach {
-                    resString = resString.replaceRange(it.first, it.second, TERM_REPLACEMENT)
+        resolveWithHiddenTerm(definitions, definitionTermSpans)
+
+    fun resolveExamplesWithHiddenTerm(): List<String> =
+        resolveWithHiddenTerm(examples, exampleTermSpans)
+
+    fun resolveWithHiddenTerm(strings: List<String>, spans: List<List<Pair<Int, Int>>>): List<String> =
+        strings.mapIndexed { i, str ->
+            spans.getOrNull(i)?.let { spans ->
+                var resString: CharSequence = str
+                spans.asReversed().forEach { span ->
+                    resString = resString.replaceRange(span.first, span.second, TERM_REPLACEMENT)
                 }
                 resString.toString()
-            } ?: def
+            } ?: str
         }
 }
 

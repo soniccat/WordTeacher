@@ -39,6 +39,7 @@ class AppDatabase(
             StringListAdapter(),
             StringListAdapter(),
             SpanListAdapter(),
+            SpanListAdapter(),
         ),
         DBNLPSentenceAdapter = DBNLPSentence.Adapter(
             StringListAdapter(),
@@ -174,8 +175,8 @@ class AppDatabase(
             }
         }
 
-        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans ->
-            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans)
+        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans ->
+            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans)
         }
     }
 
@@ -206,8 +207,9 @@ class AppDatabase(
             progressLastMistakeCount: Int?,
             progressLastLessonDate: Long?,
             definitionTermSpans: List<List<Pair<Int, Int>>>?,
+            exampleTermSpans: List<List<Pair<Int, Int>>>?,
         ) -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans ->
+            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans ->
                 Card(
                     id!!,
                     date!!,
@@ -218,6 +220,7 @@ class AppDatabase(
                     transcription,
                     synonyms.orEmpty(),
                     examples.orEmpty(),
+                    exampleTermSpans.orEmpty(),
                     progress = CardProgress(
                         progressLevel ?: 0,
                         progressLastMistakeCount ?: 0,
@@ -236,6 +239,7 @@ class AppDatabase(
             transcription: String? = "",
             synonyms: List<String> = mutableListOf(),
             examples: List<String> = mutableListOf(),
+            exampleTermSpans: List<List<Pair<Int, Int>>> = listOf(),
             progress: CardProgress = CardProgress.EMPTY
         ): Card {
             var newCard = Card(
@@ -248,6 +252,7 @@ class AppDatabase(
                 transcription = transcription,
                 synonyms = synonyms,
                 examples = examples,
+                exampleTermSpans = exampleTermSpans,
                 progress = progress
             )
 
@@ -267,6 +272,7 @@ class AppDatabase(
                 transcription = newCard.transcription,
                 synonyms = newCard.synonyms,
                 examples = newCard.examples,
+                exampleTermSpans = newCard.exampleTermSpans,
                 progress = newCard.progress
             )
         }
@@ -281,6 +287,7 @@ class AppDatabase(
             transcription: String?,
             synonyms: List<String>,
             examples: List<String>,
+            exampleTermSpans: List<List<Pair<Int, Int>>> = listOf(),
             progress: CardProgress
         ) {
             db.transaction {
@@ -296,6 +303,7 @@ class AppDatabase(
                     progress.lastMistakeCount,
                     progress.lastLessonDate,
                     definitionTermSpans,
+                    exampleTermSpans
                 )
 
                 val cardId = db.dBCardQueries.lastInsertedRowId().firstLong()!!
@@ -316,6 +324,7 @@ class AppDatabase(
                 transcription = card.transcription,
                 synonyms = card.synonyms,
                 examples = card.examples,
+                exampleTermSpans = card.exampleTermSpans,
                 progressLevel = card.progress.currentLevel,
                 progressLastMistakeCount = card.progress.lastMistakeCount,
                 progressLastLessonDate = card.progress.lastLessonDate,
@@ -333,6 +342,7 @@ class AppDatabase(
             transcription: String?,
             synonyms: List<String>,
             examples: List<String>,
+            exampleTermSpans: List<List<Pair<Int, Int>>>,
             progressLevel: Int,
             progressLastMistakeCount: Int,
             progressLastLessonDate: Long
@@ -348,6 +358,7 @@ class AppDatabase(
             progressLastMistakeCount,
             progressLastLessonDate,
             definitionTermSpans,
+            exampleTermSpans,
             cardId
         )
 
@@ -411,7 +422,10 @@ private fun tokensToTokenSpans(text: String, tokenStrings: List<String>): List<T
 }
 
 // TODO: write tests
-private class StringListAdapter: ColumnAdapter<List<String>, String> {
+private class StringListAdapter(
+    private val divider: Char = LIST_DIVIDER,
+    private val escape: Char = LIST_ESCAPE
+): ColumnAdapter<List<String>, String> {
 
     override fun decode(databaseValue: String): List<String> {
         val resultList = mutableListOf<String>()
@@ -422,20 +436,20 @@ private class StringListAdapter: ColumnAdapter<List<String>, String> {
 
         while (charIndex < len) {
             var ch = databaseValue[charIndex]
-            if (ch == LIST_DIVIDER) {
+            if (ch == divider) {
                 resultList.add(value.toString())
                 value.clear()
 
                 ++charIndex
                 continue
 
-            } else if (ch == LIST_ESCAPE) {
+            } else if (ch == escape) {
                 if (charIndex + 1 < len) {
                     val nextCh = databaseValue[charIndex + 1]
-                    if (nextCh == LIST_ESCAPE) {
+                    if (nextCh == escape) {
                         ch = nextCh
                         ++charIndex
-                    } else if (nextCh == LIST_DIVIDER) {
+                    } else if (nextCh == divider) {
                         ch = nextCh
                         ++charIndex
                     }
@@ -454,19 +468,19 @@ private class StringListAdapter: ColumnAdapter<List<String>, String> {
     }
 
     override fun encode(value: List<String>): String {
-        return value.joinToString(LIST_DIVIDER.toString()) { str ->
+        return value.joinToString(divider.toString()) { str ->
             val sb = StringBuilder(str)
             var charIndex = 0
             var len = sb.length
 
             while (charIndex < len) {
                 val ch = sb[charIndex]
-                if (ch == LIST_DIVIDER) {
-                    sb.insert(charIndex, LIST_ESCAPE)
+                if (ch == divider) {
+                    sb.insert(charIndex, escape)
                     ++charIndex
                     ++len
-                } else if (ch == LIST_ESCAPE) {
-                    sb.insert(charIndex, LIST_ESCAPE)
+                } else if (ch == escape) {
+                    sb.insert(charIndex, escape)
                     ++charIndex
                     ++len
                 }
@@ -479,17 +493,21 @@ private class StringListAdapter: ColumnAdapter<List<String>, String> {
 }
 
 private class SpanListAdapter: ColumnAdapter<List<List<Pair<Int, Int>>>, String> {
-    private val innerAdapter = StringListAdapter()
+    private val outerAdapter = StringListAdapter()
+    private val innerAdapter = StringListAdapter(
+        divider = '#',
+        escape = '$'
+    )
 
     override fun decode(databaseValue: String): List<List<Pair<Int, Int>>> =
-        innerAdapter.decode(databaseValue).map { sentence ->
+        outerAdapter.decode(databaseValue).map { sentence ->
             innerAdapter.decode(sentence).map { stringSpan ->
                 stringSpan.decodePair()
             }
         }
 
     override fun encode(value: List<List<Pair<Int, Int>>>): String =
-        innerAdapter.encode(
+        outerAdapter.encode(
             value.map { listOfSpans ->
                 innerAdapter.encode(
                     listOfSpans.map { it.encode() }

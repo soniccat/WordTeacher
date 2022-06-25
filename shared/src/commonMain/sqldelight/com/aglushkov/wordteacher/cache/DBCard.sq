@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS DBCard (
   progressLastMistakeCount INTEGER AS Int DEFAULT 0,
   progressLastLessonDate INTEGER DEFAULT 0,
 -- Spans
-  definitionTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT ""
+  definitionTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT "",
+  exampleTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT ""
 );
 
 selectAllCardIds:
@@ -33,16 +34,16 @@ FROM DBCard
 WHERE DBCard.id IN ?;
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans)
 VALUES ?;
 
 updateCard:
 UPDATE DBCard
-SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?
 WHERE id = ?;
 
 lastInsertedRowId:

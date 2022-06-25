@@ -184,7 +184,7 @@ open class LearningVMImpl(
                     StringDesc.Resource(MR.strings.word_section_examples),
                     Indent.SMALL
                 ),
-                *card.examples.map { ex ->
+                *card.resolveExamplesWithHiddenTerm().map { ex ->
                     WordExampleViewItem(ex, Indent.SMALL)
                 }.toTypedArray(),
             )
