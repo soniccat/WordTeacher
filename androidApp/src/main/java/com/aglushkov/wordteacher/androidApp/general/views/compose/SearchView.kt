@@ -38,74 +38,52 @@ fun SearchView(
     onFocusChanged: (FocusState) -> Unit = {},
     onImeAction: () -> Unit,
 ) {
-    Box {
-        TextField(
-            value = text,
-            onValueChange = onTextChanged,
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-                .background(
-                    color = MaterialTheme.colors.surface,
-                    shape = RoundedCornerShape(2.dp)
-                )
-                .focusRequester(focusRequester)
-                .onFocusChanged(onFocusChanged),
-            textStyle = LocalTextStyle.current.copy(
-                color = MaterialTheme.colors.onSurface
-            ),
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_field_search_24),
-                    contentDescription = null,
-                    tint = LocalContentColor.current
-                )
-            },
-// HACK: return it back, now it break cell text color after typing 3 or more characters
-//        trailingIcon = {
-//            if (text.isNotEmpty()) {
-//            Icon(
-//                painter = painterResource(R.drawable.ic_field_close_24),
-//                contentDescription = null,
-//                modifier = Modifier.clickable {
-//                    onTextChanged("")
-//                    focusRequester.requestFocus()
-//                },
-//                tint = LocalContentColor.current
-//            )
-//            }
-//        },
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(
-                onSearch = {
-                    onImeAction()
-                }
-            ),
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-        )
-
-        // HACK: read above
-        if (text.isNotEmpty()) {
+    TextField(
+        value = text,
+        onValueChange = onTextChanged,
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colors.surface,
+                shape = RoundedCornerShape(2.dp)
+            )
+            .focusRequester(focusRequester)
+            .onFocusChanged(onFocusChanged),
+        textStyle = LocalTextStyle.current.copy(
+            color = MaterialTheme.colors.onSurface
+        ),
+        leadingIcon = {
             Icon(
-                painter = painterResource(R.drawable.ic_field_close_24),
+                painter = painterResource(R.drawable.ic_field_search_24),
                 contentDescription = null,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .align(Alignment.CenterEnd)
-                    .background(color = Color.Transparent, shape = CircleShape)
-                    .clip(CircleShape)
-                    .clickable {
-                        onTextChanged("")
-                        focusRequester.requestFocus()
-                    }
-                    .padding(8.dp),
                 tint = LocalContentColor.current
             )
+        },
+    trailingIcon = {
+        if (text.isNotEmpty()) {
+        Icon(
+            painter = painterResource(R.drawable.ic_field_close_24),
+            contentDescription = null,
+            modifier = Modifier.clickable {
+                onTextChanged("")
+                focusRequester.requestFocus()
+            },
+            tint = LocalContentColor.current
+        )
         }
-    }
+    },
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                onImeAction()
+            }
+        ),
+        singleLine = true,
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+    )
 }
