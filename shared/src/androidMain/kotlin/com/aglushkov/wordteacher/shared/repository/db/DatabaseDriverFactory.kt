@@ -4,6 +4,7 @@ import android.content.Context
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase.Companion.Schema
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.v
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.db.AfterVersionWithDriver
 import com.squareup.sqldelight.db.SqlDriver
@@ -17,6 +18,7 @@ actual class DatabaseDriverFactory(private val context: Context) {
             callback = AndroidSqliteDriver.Callback(
                 schema = Schema,
                 AfterVersionWithDriver(1) {
+
                     Logger.v("migrated to 2")
                 }
             )

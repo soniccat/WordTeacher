@@ -143,7 +143,7 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun database(driver: DatabaseDriverFactory, timeSource: TimeSource,): AppDatabase {
+    fun database(driver: DatabaseDriverFactory, timeSource: TimeSource): AppDatabase {
         return AppDatabase(driver, timeSource)
     }
 

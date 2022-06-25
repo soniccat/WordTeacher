@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSpan
+import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
 import kotlinx.coroutines.*
@@ -92,10 +93,17 @@ class CardSetsRepository(
             val word = words[wordI]
             val token = nlpSentence.token(tokenI)
             val lemma = nlpSentence.lemma(tokenI)
+            var foundSpan: NLPSpan? = null
 
             if (token == word || lemma == word) {
-                termTokenSpans.add(nlpSentence.tokenSpans[tokenI])
+                foundSpan = nlpSentence.tokenSpans[tokenI]
+            } else if (token.startsWith(word)) {
+                val start = nlpSentence.tokenSpans[tokenI].start
+                foundSpan = TokenSpan(start, start + word.length)
+            }
 
+            if (foundSpan != null) {
+                termTokenSpans.add(foundSpan)
                 if (wordI == words.size - 1) {
                     foundTokenSpans.addAll(termTokenSpans)
                     termTokenSpans.clear()
