@@ -12,7 +12,7 @@ class WordViewItem(word: WordTeacherWord): BaseViewItem<WordTeacherWord>(word, T
     }
 }
 
-class WordTitleViewItem(title: String, val providers: List<Config.Type>): BaseViewItem<String>(title, Type) {
+class WordTitleViewItem(title: String, val providers: List<Config.Type>, val cardId: Long = -1): BaseViewItem<String>(title, Type) {
     companion object {
         const val Type = 101
     }
@@ -22,7 +22,7 @@ class WordTitleViewItem(title: String, val providers: List<Config.Type>): BaseVi
     }
 }
 
-class WordTranscriptionViewItem(transcription: String): BaseViewItem<String>(transcription, Type) {
+class WordTranscriptionViewItem(transcription: String, val cardId: Long = -1): BaseViewItem<String>(transcription, Type) {
     companion object {
         const val Type = 102
     }
@@ -30,7 +30,8 @@ class WordTranscriptionViewItem(transcription: String): BaseViewItem<String>(tra
 
 class WordPartOfSpeechViewItem(
     partOfSpeechString: StringDesc,
-    val partOfSpeech: WordTeacherWord.PartOfSpeech
+    val partOfSpeech: WordTeacherWord.PartOfSpeech,
+    val cardId: Long = -1
 ): BaseViewItem<StringDesc>(partOfSpeechString, Type) {
     companion object {
         const val Type = 103
@@ -41,14 +42,15 @@ class WordDefinitionViewItem(
     definition: String,
     val data: Any? = null,
     val index: Int = -1,
-    val isLast: Boolean = false
+    val isLast: Boolean = false,
+    val cardId: Long = -1
 ): BaseViewItem<String>(definition, Type) {
     companion object {
         const val Type = 104
     }
 }
 
-class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false): BaseViewItem<String>(example, Type) {
+class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false, val cardId: Long = -1): BaseViewItem<String>(example, Type) {
     companion object {
         const val Type = 105
     }
@@ -56,7 +58,7 @@ class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE, val
 
 // TODO: consider to merge WordExampleViewItem and WordSynonymViewItem into sth more general like WordSubHeaderViewItem
 // for example WordListValue
-class WordSynonymViewItem(synonym: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false): BaseViewItem<String>(synonym, Type) {
+class WordSynonymViewItem(synonym: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false, val cardId: Long = -1): BaseViewItem<String>(synonym, Type) {
     companion object {
         const val Type = 106
     }
@@ -72,7 +74,8 @@ class WordSubHeaderViewItem(
     name: StringDesc,
     val indent: Indent = Indent.NONE,
     val isOnlyHeader: Boolean = false,
-    val contentType: ContentType = ContentType.UNKNOWN
+    val contentType: ContentType = ContentType.UNKNOWN,
+    val cardId: Long = -1
 ): BaseViewItem<StringDesc>(name, Type) {
     companion object {
         const val Type = 108

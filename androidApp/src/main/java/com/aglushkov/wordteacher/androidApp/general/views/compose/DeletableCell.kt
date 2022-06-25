@@ -58,7 +58,7 @@ fun DeletableCell(
             val deleteButtonWidth = (DeleteButtonWidth.value * LocalDensity.current.density).toInt()
             DeleteSwipeable(
                 state = dismissState,
-                contentModifier = Modifier.clickable { onClick() },
+                contentModifier = Modifier.fillMaxWidth().clickable { onClick() },
                 deleteButtonWidth = deleteButtonWidth,
                 background = {
                     Box(

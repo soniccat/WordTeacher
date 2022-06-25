@@ -9,11 +9,11 @@ class CreateCardViewItem(
     }
 }
 
-class CardViewItem(
-    val cardId: Long,
-    val innerViewItems: List<BaseViewItem<*>>
-): BaseViewItem<Long>(cardId, Type, cardId) {
-    companion object {
-        const val Type = 701
-    }
-}
+//class CardViewItem(
+//    val cardId: Long,
+//    val innerViewItems: List<BaseViewItem<*>>
+//): BaseViewItem<Long>(cardId, Type, cardId) {
+//    companion object {
+//        const val Type = 701
+//    }
+//}

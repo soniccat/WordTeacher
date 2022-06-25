@@ -133,15 +133,15 @@ open class CardSetVMImpl(
 
         loadedCardSet.cards.onEach { card ->
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
-            cardViewItems += WordTitleViewItem(card.term, providers = emptyList())
-            cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty())
-            cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech)
+            cardViewItems += WordTitleViewItem(card.term, providers = emptyList(), cardId = card.id)
+            cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty(), cardId = card.id)
+            cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech, cardId = card.id)
 
             if (card.definitions.isEmpty()) {
-                cardViewItems += WordDefinitionViewItem("", index = 0, isLast = true)
+                cardViewItems += WordDefinitionViewItem("", index = 0, isLast = true, cardId = card.id)
             } else {
                 card.definitions.onEachIndexed { index, def ->
-                    cardViewItems += WordDefinitionViewItem(def, index = index, isLast = index == card.definitions.size - 1)
+                    cardViewItems += WordDefinitionViewItem(def, index = index, isLast = index == card.definitions.size - 1, cardId = card.id)
                 }
             }
 
@@ -150,11 +150,12 @@ open class CardSetVMImpl(
                 StringDesc.Resource(MR.strings.word_section_examples),
                 Indent.SMALL,
                 isOnlyHeader = card.examples.isEmpty(),
-                contentType = WordSubHeaderViewItem.ContentType.EXAMPLES
+                contentType = WordSubHeaderViewItem.ContentType.EXAMPLES,
+                cardId = card.id
             )
 
             card.examples.onEachIndexed { index, example ->
-                cardViewItems += WordExampleViewItem(example, Indent.SMALL, index, isLast = index == card.examples.size - 1)
+                cardViewItems += WordExampleViewItem(example, Indent.SMALL, index, isLast = index == card.examples.size - 1, cardId = card.id)
             }
 
             // Synonyms
@@ -162,18 +163,20 @@ open class CardSetVMImpl(
                 StringDesc.Resource(MR.strings.word_section_synonyms),
                 Indent.SMALL,
                 isOnlyHeader = card.synonyms.isEmpty(),
-                contentType = WordSubHeaderViewItem.ContentType.SYNONYMS
+                contentType = WordSubHeaderViewItem.ContentType.SYNONYMS,
+                cardId = card.id
             )
 
             card.synonyms.onEachIndexed { index, synonym ->
                 Logger.v("Card synonym $index ($synonym)")
-                cardViewItems += WordSynonymViewItem(synonym, Indent.SMALL, index, isLast = index == card.synonyms.size - 1)
+                cardViewItems += WordSynonymViewItem(synonym, Indent.SMALL, index, isLast = index == card.synonyms.size - 1, cardId = card.id)
             }
 
-            result += CardViewItem(
+            result += cardViewItems
+            /*CardViewItem(
                 cardId = card.id,
                 innerViewItems = cardViewItems
-            )
+            )*/
 
             result += WordDividerViewItem()
         }
@@ -185,23 +188,24 @@ open class CardSetVMImpl(
     }
 
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
-        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator) { newItem, oldItem ->
-            if (newItem is CardViewItem && (oldItem is CardViewItem?)) {
-                if (newItem.innerViewItems.size != oldItem?.innerViewItems?.size) {
-                    // set ids depending on the item content to handle adding/deleting right
-                    generateViewItemIds(
-                        newItem.innerViewItems,
-                        oldItem?.innerViewItems.orEmpty(),
-                        idGenerator
-                    )
-                } else {
-                    // keep ids not to alter them after content changing
-                    newItem.innerViewItems.onEachIndexed { index, baseViewItem ->
-                        baseViewItem.id = oldItem.innerViewItems[index].id
-                    }
-                }
-            }
-        }
+        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator)
+//        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator) { newItem, oldItem ->
+//            if (newItem is CardViewItem && (oldItem is CardViewItem?)) {
+//                if (newItem.innerViewItems.size != oldItem?.innerViewItems?.size) {
+//                    // set ids depending on the item content to handle adding/deleting right
+//                    generateViewItemIds(
+//                        newItem.innerViewItems,
+//                        oldItem?.innerViewItems.orEmpty(),
+//                        idGenerator
+//                    )
+//                } else {
+//                    // keep ids not to alter them after content changing
+//                    newItem.innerViewItems.onEachIndexed { index, baseViewItem ->
+//                        baseViewItem.id = oldItem.innerViewItems[index].id
+//                    }
+//                }
+//            }
+//        }
     }
 
     override fun onTryAgainClicked() {

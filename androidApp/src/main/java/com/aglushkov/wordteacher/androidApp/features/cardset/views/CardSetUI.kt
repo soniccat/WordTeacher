@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+
 package com.aglushkov.wordteacher.androidApp.features.cardset.views
 
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -17,10 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
@@ -33,11 +32,9 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.views.*
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
-import com.aglushkov.wordteacher.shared.features.cardset.vm.CardViewItem
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import kotlinx.coroutines.CoroutineScope
@@ -51,6 +48,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
     val cardSet by vm.cardSet.collectAsState()
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = modifier
@@ -85,7 +83,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                     )
                 ) {
                     items(data, key = { it.id }) { item ->
-                        CardSetViewItems(Modifier.animateItemPlacement(), item, vm, coroutineScope)
+                        CardSetViewItems(Modifier.animateItemPlacement(), item, vm, coroutineScope, focusManager)
                     }
                 }
             } else {
@@ -118,15 +116,161 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun CardSetViewItems(
     modifier: Modifier,
     itemView: BaseViewItem<*>,
     vm: CardSetVM,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    focusManager: FocusManager
 ) {
     when(val item = itemView) {
-        is CardViewItem -> CardView(item, vm, coroutineScope)
+        is WordTitleViewItem -> {
+            DeletableCell(
+                stateKey = item.id,
+                onClick = { /*TODO*/ },
+                onDeleted = { vm.onCardDeleted(item.cardId) }
+            ) {
+                WordTitleView(
+                    viewItem = item,
+                    textContent = { text, textStyle ->
+                        CardTextField(
+                            Modifier,
+                            text,
+                            textStyle,
+                            item,
+                            item.cardId,
+                            vm,
+                        )
+                    }
+                )
+            }
+        }
+        is WordTranscriptionViewItem -> {
+            WordTranscriptionView(
+                item,
+                textContent = { text, textStyle ->
+                    CardTextField(
+                        Modifier,
+                        text,
+                        textStyle,
+                        item,
+                        item.cardId,
+                        vm,
+                    )
+                }
+            )
+        }
+        is WordPartOfSpeechViewItem -> PartOfSpeechSelectPopup(
+            vm,
+            item,
+            item.cardId
+        ) { onClicked ->
+            WordPartOfSpeechView(
+                item,
+                modifier = Modifier
+                    .clickable(onClick = onClicked)
+                    .focusable(false)
+            )
+        }
+        is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
+            CardSetDefinitionView(item, item.cardId, vm, coroutineScope)
+        } else {
+            DeletableCell(
+                stateKey = item.id,
+                onClick = { /*TODO*/ },
+                onDeleted = { vm.onDefinitionRemoved(item, item.cardId) }
+            ) {
+                CardSetDefinitionView(item, item.cardId, vm, coroutineScope)
+            }
+        }
+        is WordSubHeaderViewItem -> {
+            val focusRequester = remember { FocusRequester() }
+            WordSubHeaderView(
+                item,
+                modifier = Modifier.focusRequester(focusRequester),
+                textContent = { text, ts ->
+                    Text(
+                        text = text,
+                        style = ts,
+                        modifier = Modifier.weight(1.0f),
+                    )
+                    if (item.isOnlyHeader) {
+                        AddIcon {
+                            when (item.contentType) {
+                                WordSubHeaderViewItem.ContentType.SYNONYMS -> vm.onAddSynonymPressed(
+                                    item.cardId
+                                )
+                                WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(
+                                    item.cardId
+                                )
+                            }
+
+                            moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
+                        }
+                    }
+                }
+            )
+        }
+        is WordSynonymViewItem -> DeletableCell(
+            stateKey = item.id,
+            onClick = { /*TODO*/ },
+            onDeleted = { vm.onSynonymRemoved(item, item.cardId) }
+        ) {
+            val focusRequester = remember { FocusRequester() }
+            WordSynonymView(
+                item,
+                textContent = { text, textStyle ->
+                    CardTextField(
+                        modifier = Modifier
+                            .weight(1.0f)
+                            .focusRequester(focusRequester),
+                        text,
+                        textStyle,
+                        item,
+                        item.cardId,
+                        vm
+                    )
+
+                    if (item.isLast) {
+                        AddIcon {
+                            vm.onAddSynonymPressed(item.cardId)
+                            moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
+                        }
+                    }
+                }
+            )
+        }
+        is WordExampleViewItem -> DeletableCell(
+            stateKey = item.id,
+            onClick = { /*TODO*/ },
+            onDeleted = { vm.onExampleRemoved(item, item.cardId) }
+        ) {
+            val focusRequester = remember { FocusRequester() }
+            WordExampleView(
+                item,
+                textContent = { text, textStyle ->
+                    CardTextField(
+                        modifier = Modifier
+                            .weight(1.0f)
+                            .focusRequester(focusRequester),
+                        text,
+                        textStyle,
+                        item,
+                        item.cardId,
+                        vm
+                    )
+
+                    if (item.isLast) {
+                        AddIcon {
+                            vm.onAddExamplePressed(item.cardId)
+                            moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
+                        }
+                    }
+                }
+            )
+        }
         is CreateCardViewItem -> CreateCardView(
             item,
             modifier,
@@ -144,169 +288,21 @@ fun CardSetViewItems(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
-@Composable
-private fun CardView(
-    cardItem: CardViewItem,
-    vm: CardSetVM,
-    coroutineScope: CoroutineScope
-) {
-    val focusManager = LocalFocusManager.current
-    val cardId = cardItem.cardId
-    DeletableCell(
-        stateKey = cardItem.id,
-        onClick = { /*TODO*/ },
-        onDeleted = { vm.onCardDeleted(cardId) }
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            cardItem.innerViewItems.onEach {
-                when (val item = it) {
-                    is WordTitleViewItem -> {
-                        WordTitleView(
-                            viewItem = item,
-                            textContent = { text, textStyle ->
-                                CardTextField(
-                                    Modifier,
-                                    text,
-                                    textStyle,
-                                    item,
-                                    cardId,
-                                    vm,
-                                )
-                            }
-                        )
-                    }
-                    is WordTranscriptionViewItem -> {
-                        WordTranscriptionView(
-                            item,
-                            textContent = { text, textStyle ->
-                                CardTextField(
-                                    Modifier,
-                                    text,
-                                    textStyle,
-                                    item,
-                                    cardId,
-                                    vm,
-                                )
-                            }
-                        )
-                    }
-                    is WordPartOfSpeechViewItem -> PartOfSpeechSelectPopup(
-                        vm,
-                        item,
-                        cardId
-                    ) { onClicked ->
-                        WordPartOfSpeechView(
-                            item,
-                            modifier = Modifier
-                                .clickable(onClick = onClicked)
-                                .focusable(false)
-                        )
-                    }
-                    is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
-                        CardSetDefinitionView(item, cardId, vm, coroutineScope)
-                    } else {
-                        DeletableCell(
-                            stateKey = item.id,
-                            onClick = { /*TODO*/ },
-                            onDeleted = { vm.onDefinitionRemoved(item, cardId) }
-                        ) {
-                            CardSetDefinitionView(item, cardId, vm, coroutineScope)
-                        }
-                    }
-                    is WordSubHeaderViewItem -> {
-                        val focusRequester = remember { FocusRequester() }
-                        WordSubHeaderView(
-                            item,
-                            modifier = Modifier.focusRequester(focusRequester),
-                            textContent = { text, ts ->
-                                Text(
-                                    text = text,
-                                    style = ts,
-                                    modifier = Modifier.weight(1.0f),
-                                )
-                                if (item.isOnlyHeader) {
-                                    AddIcon {
-                                        when (item.contentType) {
-                                            WordSubHeaderViewItem.ContentType.SYNONYMS -> vm.onAddSynonymPressed(
-                                                cardId
-                                            )
-                                            WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(
-                                                cardId
-                                            )
-                                        }
-
-                                        moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
-                                    }
-                                }
-                            }
-                        )
-                    }
-                    is WordSynonymViewItem -> DeletableCell(
-                        stateKey = item.id,
-                        onClick = { /*TODO*/ },
-                        onDeleted = { vm.onSynonymRemoved(item, cardId) }
-                    ) {
-                        val focusRequester = remember { FocusRequester() }
-                        WordSynonymView(
-                            item,
-                            textContent = { text, textStyle ->
-                                CardTextField(
-                                    modifier = Modifier
-                                        .weight(1.0f)
-                                        .focusRequester(focusRequester),
-                                    text,
-                                    textStyle,
-                                    item,
-                                    cardId,
-                                    vm
-                                )
-
-                                if (item.isLast) {
-                                    AddIcon {
-                                        vm.onAddSynonymPressed(cardId)
-                                        moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
-                                    }
-                                }
-                            }
-                        )
-                    }
-                    is WordExampleViewItem -> DeletableCell(
-                        stateKey = item.id,
-                        onClick = { /*TODO*/ },
-                        onDeleted = { vm.onExampleRemoved(item, cardId) }
-                    ) {
-                        val focusRequester = remember { FocusRequester() }
-                        WordExampleView(
-                            item,
-                            textContent = { text, textStyle ->
-                                CardTextField(
-                                    modifier = Modifier
-                                        .weight(1.0f)
-                                        .focusRequester(focusRequester),
-                                    text,
-                                    textStyle,
-                                    item,
-                                    cardId,
-                                    vm
-                                )
-
-                                if (item.isLast) {
-                                    AddIcon {
-                                        vm.onAddExamplePressed(cardId)
-                                        moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
-                                    }
-                                }
-                            }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
+//@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+//@Composable
+//private fun CardView(
+//    cardItem: CardViewItem,
+//    vm: CardSetVM,
+//    coroutineScope: CoroutineScope
+//) {
+//    val focusManager = LocalFocusManager.current
+//    val cardId = cardItem.cardId
+//    cardItem.innerViewItems.onEach {
+//        when (val item = it) {
+//
+//        }
+//    }
+//}
 
 @Composable
 private fun CardSetDefinitionView(
