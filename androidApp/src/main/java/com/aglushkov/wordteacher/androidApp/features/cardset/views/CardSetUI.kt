@@ -197,18 +197,17 @@ fun CardSetViewItems(
             )
         }
         is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
-            CardSetDefinitionView(item, item.cardId, vm, coroutineScope)
+            CardSetDefinitionView(item, item.cardId, vm, coroutineScope, focusRequester)
         } else {
             DeletableCell(
                 stateKey = item.id,
                 onClick = { /*TODO*/ },
                 onDeleted = { vm.onDefinitionRemoved(item, item.cardId) }
             ) {
-                CardSetDefinitionView(item, item.cardId, vm, coroutineScope)
+                CardSetDefinitionView(item, item.cardId, vm, coroutineScope, focusRequester)
             }
         }
         is WordSubHeaderViewItem -> {
-            val focusRequester = remember { FocusRequester() }
             WordSubHeaderView(
                 item,
                 modifier = Modifier.focusRequester(focusRequester),
@@ -228,8 +227,6 @@ fun CardSetViewItems(
                                     item.cardId
                                 )
                             }
-
-                            moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
                         }
                     }
                 }
@@ -240,7 +237,6 @@ fun CardSetViewItems(
             onClick = { /*TODO*/ },
             onDeleted = { vm.onSynonymRemoved(item, item.cardId) }
         ) {
-            val focusRequester = remember { FocusRequester() }
             WordSynonymView(
                 item,
                 textContent = { text, textStyle ->
@@ -258,7 +254,6 @@ fun CardSetViewItems(
                     if (item.isLast) {
                         AddIcon {
                             vm.onAddSynonymPressed(item.cardId)
-                            moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
                         }
                     }
                 }
@@ -335,9 +330,9 @@ private fun CardSetDefinitionView(
     item: WordDefinitionViewItem,
     cardId: Long,
     vm: CardSetVM,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    focusRequester: FocusRequester
 ) {
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     WordDefinitionView(
         item,
@@ -356,23 +351,10 @@ private fun CardSetDefinitionView(
             if (item.isLast) {
                 AddIcon {
                     vm.onAddDefinitionPressed(cardId)
-                    moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
                 }
             }
         }
     )
-}
-
-private fun moveFocusDownAfterRecompose(
-    scope: CoroutineScope,
-    focusRequester: FocusRequester,
-    focusManager: FocusManager
-) {
-//    focusRequester.requestFocus()
-//    scope.launch {
-//        //delay(3000) // TODO: hack to wait until a new cell is rendered
-//        //focusManager.moveFocus(FocusDirection.Up)
-//    }
 }
 
 @Composable

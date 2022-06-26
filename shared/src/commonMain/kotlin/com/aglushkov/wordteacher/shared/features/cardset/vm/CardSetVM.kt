@@ -139,10 +139,12 @@ open class CardSetVMImpl(
 
     private fun makeViewItems(loadedCardSet: CardSet): List<BaseViewItem<*>>  {
         val result = mutableListOf<BaseViewItem<*>>()
-        val notHandledPendingEvents = this.notHandledPendingEvents
-        val filteredEvents = this.events.value.filter { it !is FocusViewItemEvent }
 
         loadedCardSet.cards.onEach { card ->
+            var lastDefViewItem: BaseViewItem<*>? = null
+            var lastExViewItem: BaseViewItem<*>? = null
+            var lastSynViewItem: BaseViewItem<*>? = null
+
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
             cardViewItems += WordTitleViewItem(card.term, providers = emptyList(), cardId = card.id)
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty(), cardId = card.id)
@@ -152,7 +154,9 @@ open class CardSetVMImpl(
                 cardViewItems += WordDefinitionViewItem("", index = 0, isLast = true, cardId = card.id)
             } else {
                 card.definitions.onEachIndexed { index, def ->
-                    cardViewItems += WordDefinitionViewItem(def, index = index, isLast = index == card.definitions.size - 1, cardId = card.id)
+                    cardViewItems += WordDefinitionViewItem(def, index = index, isLast = index == card.definitions.size - 1, cardId = card.id).also {
+                        lastDefViewItem = it
+                    }
                 }
             }
 
@@ -166,16 +170,8 @@ open class CardSetVMImpl(
             )
 
             card.examples.onEachIndexed { index, example ->
-                cardViewItems += WordExampleViewItem(example, Indent.SMALL, index, isLast = index == card.examples.size - 1, cardId = card.id)
-            }
-
-            notHandledPendingEvents.onEach {
-                when (val e = it) {
-                    is PendingEvent.FocusLastExample -> {
-                        if (e.cardId == card.id) {
-                            events.value = filteredEvents + e.makeEvent(cardViewItems.last())
-                        }
-                    }
+                cardViewItems += WordExampleViewItem(example, Indent.SMALL, index, isLast = index == card.examples.size - 1, cardId = card.id).also {
+                    lastExViewItem = it
                 }
             }
 
@@ -190,31 +186,55 @@ open class CardSetVMImpl(
 
             card.synonyms.onEachIndexed { index, synonym ->
                 Logger.v("Card synonym $index ($synonym)")
-                cardViewItems += WordSynonymViewItem(synonym, Indent.SMALL, index, isLast = index == card.synonyms.size - 1, cardId = card.id)
+                cardViewItems += WordSynonymViewItem(synonym, Indent.SMALL, index, isLast = index == card.synonyms.size - 1, cardId = card.id).also {
+                    lastSynViewItem = it
+                }
             }
 
             result += cardViewItems
-            /*CardViewItem(
-                cardId = card.id,
-                innerViewItems = cardViewItems
-            )*/
-
             result += WordDividerViewItem()
+
+            makeFocusEvents(card.id, lastDefViewItem, lastExViewItem, lastSynViewItem)
         }
 
         result += CreateCardViewItem()
-
         generateIds(result)
+
         return result
+    }
+
+    private fun makeFocusEvents(cardId: Long, lastDefViewItem: BaseViewItem<*>?, lastExViewItem: BaseViewItem<*>?, lastSynViewItem: BaseViewItem<*>?) {
+        val filteredEvents = this.events.value.filter { it !is FocusViewItemEvent }
+        this.notHandledPendingEvents.onEach {
+            when (val e = it) {
+                is PendingEvent.FocusLast -> {
+                    lastDefViewItem?.let { safeItem ->
+                        if (e.type == FocusLastType.Definition && e.cardId == cardId) {
+                            events.value = filteredEvents + e.makeEvent(safeItem)
+                        }
+                    }
+                    lastExViewItem?.let { safeItem ->
+                        if (e.type == FocusLastType.Example && e.cardId == cardId) {
+                            events.value = filteredEvents + e.makeEvent(safeItem)
+                        }
+                    }
+                    lastSynViewItem?.let { safeItem ->
+                        if (e.type == FocusLastType.Synonym && e.cardId == cardId) {
+                            events.value = filteredEvents + e.makeEvent(safeItem)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
         val prevItems = viewItems.value.data().orEmpty()
-        if (items.size == prevItems.size) {
+        if (items.size == prevItems.size) { // keep ids not to recompose text fields being edited
             prevItems.onEachIndexed { index, baseViewItem ->
                 items[index].id = baseViewItem.id
             }
-        } else {
+        } else { // regenerate not to mix up with current ids where swipeable cells are in hidden state
             items.onEach {
                 it.id = idGenerator.nextId()
             }
@@ -320,8 +340,9 @@ open class CardSetVMImpl(
         return modifiedSet
     }
 
-    override fun onAddDefinitionPressed(cardId: Long) =
-        editCard(cardId) {
+    override fun onAddDefinitionPressed(cardId: Long) {
+        pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Definition, cardId))
+        return editCard(cardId) {
             it.copy(
                 definitions = if (it.definitions.lastOrNull() != "") {
                     it.definitions + ""
@@ -330,6 +351,7 @@ open class CardSetVMImpl(
                 }
             )
         }
+    }
 
     override fun onDefinitionRemoved(item: WordDefinitionViewItem, cardId: Long) =
         editCard(cardId) {
@@ -345,7 +367,7 @@ open class CardSetVMImpl(
         }
 
     override fun onAddExamplePressed(cardId: Long) {
-        pendingEvents.add(PendingEvent.FocusLastExample(cardId))
+        pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Example, cardId))
         return editCard(cardId) {
             it.copy(
                 examples = if (it.examples.lastOrNull() != "") {
@@ -366,7 +388,8 @@ open class CardSetVMImpl(
             }
         }
 
-    override fun onAddSynonymPressed(cardId: Long) =
+    override fun onAddSynonymPressed(cardId: Long) {
+        pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Synonym, cardId))
         editCard(cardId) {
             it.copy(
                 synonyms = if (it.synonyms.lastOrNull() != "") {
@@ -376,6 +399,7 @@ open class CardSetVMImpl(
                 }
             )
         }
+    }
 
     override fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long) =
         editCard(cardId) {
@@ -455,8 +479,14 @@ open class CardSetVMImpl(
         }
     }
 
+    enum class FocusLastType {
+        Definition,
+        Example,
+        Synonym
+    }
+
     sealed class PendingEvent(var isHandled: Boolean = false) {
-        data class FocusLastExample(val cardId: Long): PendingEvent() {
+        data class FocusLast(val type: FocusLastType, val cardId: Long): PendingEvent() {
             var prevEvent: FocusViewItemEvent? = null
 
             fun makeEvent(viewItem: BaseViewItem<*>): FocusViewItemEvent {
@@ -464,7 +494,7 @@ open class CardSetVMImpl(
                 val newEvent = object : FocusViewItemEvent(viewItem) {
                     override fun markAsHandled() {
                         super.markAsHandled()
-                        this@FocusLastExample.isHandled = true
+                        this@FocusLast.isHandled = true
                     }
                 }
                 prevEvent = newEvent
