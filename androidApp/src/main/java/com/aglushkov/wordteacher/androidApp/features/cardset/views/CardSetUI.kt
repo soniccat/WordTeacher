@@ -371,7 +371,7 @@ private fun CardTextField(
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(
             onNext = {
-                focusManager.moveFocus(FocusDirection.Next)
+                focusManager.moveFocus(FocusDirection.Down)
             }
         ),
         onValueChange = {
