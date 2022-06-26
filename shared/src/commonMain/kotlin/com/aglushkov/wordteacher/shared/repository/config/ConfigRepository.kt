@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.repository.config
 
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
@@ -61,8 +63,11 @@ class ConfigRepository(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            Logger.e(e.message.orEmpty(), TAG)
             e.printStackTrace()
             emit(stateFlow.value.toError(e, true))
         }
     }
 }
+
+private const val TAG = "ConfigRepository"

@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.service
 
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
@@ -61,6 +63,7 @@ class ConfigConnectParamsStatRepository(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            Logger.e(e.message.orEmpty(), TAG)
             e.printStackTrace()
             emit(Resource.Loaded<List<ConfigConnectParamsStat>>(emptyList()))
         }
@@ -81,3 +84,5 @@ class ConfigConnectParamsStatRepository(
         }
     }
 }
+
+private const val TAG = "ConfigConnectParamsStatRepository"
