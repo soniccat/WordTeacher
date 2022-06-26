@@ -34,38 +34,42 @@ fun DeletableCell(
     onDeleted: () -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
-    key(stateKey) {
-        var isSwipedAway by remember { mutableStateOf(false) }
-        val dismissState = rememberDismissState()
+    var isSwipedAway by remember { mutableStateOf(false) }
+    val dismissState = rememberDismissState()
+    val needShowIcon by remember {
+        derivedStateOf {
+            (-dismissState.offset.value.toInt()).coerceAtLeast(0) != 0
+        }
+    }
 
-        AnimatedVisibility(
-            visible = !isSwipedAway,
-            enter = expandVertically(),
-            exit = shrinkVertically(
-                animationSpec = tween(
-                    durationMillis = 300,
-                )
+    AnimatedVisibility(
+        visible = !isSwipedAway,
+        enter = expandVertically(),
+        exit = shrinkVertically(
+            animationSpec = tween(
+                durationMillis = 300,
             )
-        ) {
-            DisposableEffect("Wait until a disappear animation completes") {
-                onDispose {
-                    if (isSwipedAway) {
-                        onDeleted()
-                    }
+        )
+    ) {
+        DisposableEffect("Wait until a disappear animation completes") {
+            onDispose {
+                if (isSwipedAway) {
+                    onDeleted()
                 }
             }
+        }
 
-            val deleteButtonWidth = (DeleteButtonWidth.value * LocalDensity.current.density).toInt()
-            DeleteSwipeable(
-                state = dismissState,
-                contentModifier = Modifier.fillMaxWidth().clickable { onClick() },
-                deleteButtonWidth = deleteButtonWidth,
-                background = {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                    ) {
-                        // To support icon sliding from the right edge
+        val deleteButtonWidth = (DeleteButtonWidth.value * LocalDensity.current.density).toInt()
+        DeleteSwipeable(
+            state = dismissState,
+            contentModifier = Modifier.fillMaxWidth().clickable { onClick() },
+            deleteButtonWidth = deleteButtonWidth,
+            background = {
+                Box(
+                    Modifier.fillMaxSize()
+                ) {
+                    // To support icon sliding from the right edge
+                    if (needShowIcon) {
                         Layout(
                             content = {
                                 Image(
@@ -82,7 +86,8 @@ fun DeletableCell(
                                 )
                             }
                         ) { measurables, constraints ->
-                            val iconWidth = (-dismissState.offset.value.toInt()).coerceAtLeast(0)
+                            val iconWidth =
+                                (-dismissState.offset.value.toInt()).coerceAtLeast(0)
                             val icon = measurables[0].measure(
                                 constraints.constrain(
                                     Constraints(
@@ -101,9 +106,9 @@ fun DeletableCell(
                         }
                     }
                 }
-            ) {
-                content()
             }
+        ) {
+            content()
         }
     }
 }
