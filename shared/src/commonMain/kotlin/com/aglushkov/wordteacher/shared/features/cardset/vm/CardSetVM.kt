@@ -188,24 +188,16 @@ open class CardSetVMImpl(
     }
 
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
-        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator)
-//        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator) { newItem, oldItem ->
-//            if (newItem is CardViewItem && (oldItem is CardViewItem?)) {
-//                if (newItem.innerViewItems.size != oldItem?.innerViewItems?.size) {
-//                    // set ids depending on the item content to handle adding/deleting right
-//                    generateViewItemIds(
-//                        newItem.innerViewItems,
-//                        oldItem?.innerViewItems.orEmpty(),
-//                        idGenerator
-//                    )
-//                } else {
-//                    // keep ids not to alter them after content changing
-//                    newItem.innerViewItems.onEachIndexed { index, baseViewItem ->
-//                        baseViewItem.id = oldItem.innerViewItems[index].id
-//                    }
-//                }
-//            }
-//        }
+        val prevItems = viewItems.value.data().orEmpty()
+        if (items.size == prevItems.size) {
+            prevItems.onEachIndexed { index, baseViewItem ->
+                items[index].id = baseViewItem.id
+            }
+        } else {
+            items.onEach {
+                it.id = idGenerator.nextId()
+            }
+        }
     }
 
     override fun onTryAgainClicked() {

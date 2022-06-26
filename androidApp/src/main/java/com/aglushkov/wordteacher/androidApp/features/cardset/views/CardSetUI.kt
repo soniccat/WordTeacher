@@ -342,11 +342,11 @@ private fun moveFocusDownAfterRecompose(
     focusRequester: FocusRequester,
     focusManager: FocusManager
 ) {
-    focusRequester.requestFocus()
-    scope.launch {
-        delay(100) // TODO: hack to wait until a new cell is rendered
-        focusManager.moveFocus(FocusDirection.Down)
-    }
+//    focusRequester.requestFocus()
+//    scope.launch {
+//        //delay(3000) // TODO: hack to wait until a new cell is rendered
+//        //focusManager.moveFocus(FocusDirection.Up)
+//    }
 }
 
 @Composable
