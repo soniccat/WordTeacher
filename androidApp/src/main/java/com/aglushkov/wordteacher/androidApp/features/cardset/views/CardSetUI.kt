@@ -17,13 +17,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -94,8 +94,6 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                             Modifier.animateItemPlacement(),
                             item,
                             vm,
-                            coroutineScope,
-                            focusManager,
                             if (item == focusEvent?.viewItem) {
                                 focusEvent?.markAsHandled()
                                 true
@@ -141,8 +139,6 @@ fun CardSetViewItems(
     modifier: Modifier,
     itemView: BaseViewItem<*>,
     vm: CardSetVM,
-    coroutineScope: CoroutineScope,
-    focusManager: FocusManager,
     needFocus: Boolean
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -172,6 +168,7 @@ fun CardSetViewItems(
         is WordTranscriptionViewItem -> {
             WordTranscriptionView(
                 item,
+                modifier = Modifier.focusRequester(focusRequester),
                 textContent = { text, textStyle ->
                     CardTextField(
                         Modifier,
@@ -197,14 +194,14 @@ fun CardSetViewItems(
             )
         }
         is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
-            CardSetDefinitionView(item, item.cardId, vm, coroutineScope, focusRequester)
+            CardSetDefinitionView(item, item.cardId, vm, focusRequester)
         } else {
             DeletableCell(
                 stateKey = item.id,
                 onClick = { /*TODO*/ },
                 onDeleted = { vm.onDefinitionRemoved(item, item.cardId) }
             ) {
-                CardSetDefinitionView(item, item.cardId, vm, coroutineScope, focusRequester)
+                CardSetDefinitionView(item, item.cardId, vm, focusRequester)
             }
         }
         is WordSubHeaderViewItem -> {
@@ -330,10 +327,8 @@ private fun CardSetDefinitionView(
     item: WordDefinitionViewItem,
     cardId: Long,
     vm: CardSetVM,
-    coroutineScope: CoroutineScope,
     focusRequester: FocusRequester
 ) {
-    val focusManager = LocalFocusManager.current
     WordDefinitionView(
         item,
         textContent = { text, textStyle ->
@@ -367,7 +362,7 @@ private fun CardTextField(
     vm: CardSetVM
 ) {
     val focusManager = LocalFocusManager.current
-    var textState by remember { mutableStateOf(TextFieldValue(text)) }
+    var textState by remember { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
     InlineTextField(
         modifier = modifier,
         value = textState,
@@ -376,7 +371,7 @@ private fun CardTextField(
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(
             onNext = {
-                focusManager.moveFocus(FocusDirection.Down)
+                focusManager.moveFocus(FocusDirection.Next)
             }
         ),
         onValueChange = {
