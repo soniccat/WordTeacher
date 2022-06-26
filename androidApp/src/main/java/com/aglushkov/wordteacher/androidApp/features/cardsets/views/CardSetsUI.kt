@@ -1,5 +1,8 @@
 package com.aglushkov.wordteacher.androidApp.features.cardsets.views
 
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,6 +19,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.androidApp.BuildConfig
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
@@ -24,6 +28,10 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import io.ktor.utils.io.streams.*
+import okio.FileSystem
+import okio.FileSystem.Companion.SYSTEM
+import okio.Path.Companion.toPath
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -53,6 +61,10 @@ fun CardSetsUI(
             }
 
             if (cardSets.isLoaded() && data != null) {
+                if (data.size == 1) {
+                    importDBButton()
+                }
+
                 LazyColumn {
                     items(
                         data,
@@ -201,3 +213,32 @@ fun CardSetTitleViewPreviews() {
 //    }
 //}
 
+@Composable
+fun importDBButton() {
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { result ->
+        result?.let {
+            val byteArray = ByteArray(10 * 1024)
+            val importPath = context.getDatabasePath("test2").absolutePath.toPath()
+            context.contentResolver.openInputStream(result)?.buffered()?.use { stream ->
+                FileSystem.SYSTEM.write(importPath, true) {
+                    while (stream.read(byteArray) != -1) {
+                        write(byteArray)
+                    }
+                }
+            }
+
+            val dbPath = context.getDatabasePath("test.db").absolutePath.toPath()
+            FileSystem.SYSTEM.delete(dbPath)
+            FileSystem.SYSTEM.atomicMove(importPath, dbPath)
+        }
+    }
+
+    return Column {
+        Button(onClick = {
+            launcher.launch("*/*")
+        }) {
+            Text("Import db file")
+        }
+    }
+}
