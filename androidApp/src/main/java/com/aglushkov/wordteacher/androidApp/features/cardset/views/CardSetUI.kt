@@ -31,6 +31,7 @@ import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.*
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.compose.*
+import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
@@ -49,6 +50,12 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
     val focusManager = LocalFocusManager.current
+    val events by vm.eventFlow.collectAsState(initial = emptyList())
+    val focusEvent by remember {
+        derivedStateOf {
+            events.firstOrNull { it is FocusViewItemEvent } as? FocusViewItemEvent
+        }
+    }
 
     Column(
         modifier = modifier
@@ -83,7 +90,19 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                     )
                 ) {
                     items(data, key = { it.id }) { item ->
-                        CardSetViewItems(Modifier.animateItemPlacement(), item, vm, coroutineScope, focusManager)
+                        CardSetViewItems(
+                            Modifier.animateItemPlacement(),
+                            item,
+                            vm,
+                            coroutineScope,
+                            focusManager,
+                            if (item == focusEvent?.viewItem) {
+                                focusEvent?.markAsHandled()
+                                true
+                            } else {
+                                false
+                            }
+                        )
                     }
                 }
             } else {
@@ -123,8 +142,11 @@ fun CardSetViewItems(
     itemView: BaseViewItem<*>,
     vm: CardSetVM,
     coroutineScope: CoroutineScope,
-    focusManager: FocusManager
+    focusManager: FocusManager,
+    needFocus: Boolean
 ) {
+    val focusRequester = remember { FocusRequester() }
+
     when(val item = itemView) {
         is WordTitleViewItem -> {
             DeletableCell(
@@ -247,7 +269,6 @@ fun CardSetViewItems(
             onClick = { /*TODO*/ },
             onDeleted = { vm.onExampleRemoved(item, item.cardId) }
         ) {
-            val focusRequester = remember { FocusRequester() }
             WordExampleView(
                 item,
                 textContent = { text, textStyle ->
@@ -265,7 +286,6 @@ fun CardSetViewItems(
                     if (item.isLast) {
                         AddIcon {
                             vm.onAddExamplePressed(item.cardId)
-                            moveFocusDownAfterRecompose(coroutineScope, focusRequester, focusManager)
                         }
                     }
                 }
@@ -284,6 +304,12 @@ fun CardSetViewItems(
                 text = "unknown item $item",
                 modifier = modifier
             )
+        }
+    }
+
+    if (needFocus) {
+        LaunchedEffect(key1 = "focus") {
+            focusRequester.requestFocus()
         }
     }
 }

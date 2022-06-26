@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.cardset.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -26,7 +27,7 @@ interface CardSetVM: Clearable {
     val state: State
     val cardSet: StateFlow<Resource<out CardSet>>
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
-    val eventFlow: Flow<Event>
+    val eventFlow: Flow<List<Event>>
 
     fun onCardCreatePressed()
     fun onCardDeleted(cardId: Long)
@@ -59,6 +60,13 @@ open class CardSetVMImpl(
     private val idGenerator: IdGenerator
 ): ViewModel(), CardSetVM {
 
+    private var pendingEvents = mutableListOf<PendingEvent>()
+    private val notHandledPendingEvents: List<PendingEvent>
+        get() {
+            pendingEvents.removeAll { it.isHandled }
+            return pendingEvents
+        }
+
     // Contains cards being edited and haven't been synched with DB
     private var inMemoryCardSet = MutableStateFlow<CardSet?>(null)
     final override val cardSet: StateFlow<Resource<CardSet>> = combine(
@@ -81,8 +89,9 @@ open class CardSetVMImpl(
             }
     }).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    private val eventChannel = Channel<Event>(Channel.BUFFERED)
-    override val eventFlow = eventChannel.receiveAsFlow()
+    //private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    private val events = MutableStateFlow<List<Event>>(emptyList())
+    override val eventFlow = events.map { eventList -> eventList.filter { !it.isHandled } }
 
     override val viewItems = cardSet.map {
         Logger.v("build view items")
@@ -130,6 +139,8 @@ open class CardSetVMImpl(
 
     private fun makeViewItems(loadedCardSet: CardSet): List<BaseViewItem<*>>  {
         val result = mutableListOf<BaseViewItem<*>>()
+        val notHandledPendingEvents = this.notHandledPendingEvents
+        val filteredEvents = this.events.value.filter { it !is FocusViewItemEvent }
 
         loadedCardSet.cards.onEach { card ->
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
@@ -156,6 +167,16 @@ open class CardSetVMImpl(
 
             card.examples.onEachIndexed { index, example ->
                 cardViewItems += WordExampleViewItem(example, Indent.SMALL, index, isLast = index == card.examples.size - 1, cardId = card.id)
+            }
+
+            notHandledPendingEvents.onEach {
+                when (val e = it) {
+                    is PendingEvent.FocusLastExample -> {
+                        if (e.cardId == card.id) {
+                            events.value = filteredEvents + e.makeEvent(cardViewItems.last())
+                        }
+                    }
+                }
             }
 
             // Synonyms
@@ -323,8 +344,9 @@ open class CardSetVMImpl(
             }
         }
 
-    override fun onAddExamplePressed(cardId: Long) =
-        editCard(cardId) {
+    override fun onAddExamplePressed(cardId: Long) {
+        pendingEvents.add(PendingEvent.FocusLastExample(cardId))
+        return editCard(cardId) {
             it.copy(
                 examples = if (it.examples.lastOrNull() != "") {
                     it.examples + ""
@@ -333,6 +355,7 @@ open class CardSetVMImpl(
                 }
             )
         }
+    }
 
     override fun onExampleRemoved(item: WordExampleViewItem, cardId: Long) =
         editCard(cardId) {
@@ -428,6 +451,24 @@ open class CardSetVMImpl(
                 }
             } catch (e: Throwable) {
                 // TODO: handle error
+            }
+        }
+    }
+
+    sealed class PendingEvent(var isHandled: Boolean = false) {
+        data class FocusLastExample(val cardId: Long): PendingEvent() {
+            var prevEvent: FocusViewItemEvent? = null
+
+            fun makeEvent(viewItem: BaseViewItem<*>): FocusViewItemEvent {
+                prevEvent?.markAsHandled()
+                val newEvent = object : FocusViewItemEvent(viewItem) {
+                    override fun markAsHandled() {
+                        super.markAsHandled()
+                        this@FocusLastExample.isHandled = true
+                    }
+                }
+                prevEvent = newEvent
+                return newEvent
             }
         }
     }
