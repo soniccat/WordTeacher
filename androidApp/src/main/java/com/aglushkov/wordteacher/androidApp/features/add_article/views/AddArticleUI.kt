@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.features.add_article.views
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -26,7 +27,6 @@ import com.aglushkov.wordteacher.androidApp.general.views.compose.CustomDialogUI
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @ExperimentalUnitApi
@@ -71,7 +71,9 @@ fun AddArticleUI(
     val focusRequester = remember { FocusRequester() }
 
     Box(
-        modifier = Modifier.fillMaxSize().then(modifier)
+        modifier = Modifier
+            .fillMaxSize()
+            .then(modifier)
     ) {
         Column {
             TopAppBar(
@@ -135,6 +137,7 @@ private fun AddArticlesFieldsUI(
     val title by vm.title.collectAsState()
     val titleError by vm.titleErrorFlow.collectAsState(initial = null)
     val text by vm.text.collectAsState()
+    val needToCreateSet by vm.needToCreateSet.collectAsState()
 
     val hasTitleError = remember(titleError) { titleError != null }
     val scrollableState = rememberScrollState()
@@ -188,7 +191,7 @@ private fun AddArticlesFieldsUI(
 
         Box(
             modifier = Modifier
-                .height(15.dp)
+                .defaultMinSize(minHeight = 16.dp)
                 .padding(horizontal = 16.dp)
         ) {
             val titleErrorDesc = titleError
@@ -211,5 +214,23 @@ private fun AddArticlesFieldsUI(
                 }),
             label = { Text(stringResource(id = R.string.add_article_field_text_hint)) }
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = { vm.onNeedToCreateSetPressed() })
+                .padding(top = 16.dp, bottom = 16.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.add_article_create_set_option),
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .weight(1.0f)
+            )
+            Checkbox(
+                checked = needToCreateSet,
+                onCheckedChange = null
+            )
+        }
     }
 }

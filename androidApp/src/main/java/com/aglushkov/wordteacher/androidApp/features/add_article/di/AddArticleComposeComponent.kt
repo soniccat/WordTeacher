@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecompose
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -27,5 +28,6 @@ interface AddArticleComposeComponent {
 
 interface AddArticleDependencies {
     fun articlesRepository(): ArticlesRepository
+    fun cardSetsRepository(): CardSetsRepository
     fun timeSource(): TimeSource
 }

@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -23,12 +24,14 @@ class AddArticleComposeModule {
         state: AddArticleVM.State,
         articlesRepository: ArticlesRepository,
         articleParserRepository: ArticleParserRepository,
+        cardSetsRepository: CardSetsRepository,
         timeSource: TimeSource
     ): AddArticleDecomposeComponent {
         return AddArticleDecomposeComponent(
             componentContext,
             articlesRepository,
             articleParserRepository,
+            cardSetsRepository,
             timeSource,
             state
         )

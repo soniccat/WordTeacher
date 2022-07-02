@@ -297,7 +297,7 @@ fun TermInput(
 
         Box(
             modifier = Modifier
-                .height(15.dp)
+                .defaultMinSize(minHeight = 16.dp)
                 .padding(horizontal = dimensionResource(id = R.dimen.learning_horizontalPadding))
         ) {
             if (errorString != null) {

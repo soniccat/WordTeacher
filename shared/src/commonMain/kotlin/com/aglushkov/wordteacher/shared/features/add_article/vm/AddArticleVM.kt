@@ -8,9 +8,9 @@ import com.aglushkov.wordteacher.shared.events.CompletionResult
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.*
-import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -25,9 +25,11 @@ import kotlinx.coroutines.launch
 
 interface AddArticleVM: Clearable {
     val eventFlow: Flow<Event>
+    // TODO: consider to move it into one StateFlow<State>
     val title: StateFlow<String>
     val titleErrorFlow: Flow<StringDesc?>
     val text: StateFlow<String>
+    val needToCreateSet: StateFlow<Boolean>
     var state: State
 
     fun onTitleChanged(title: String)
@@ -35,23 +37,26 @@ interface AddArticleVM: Clearable {
     fun onCancelPressed(): Job
     fun onTitleFocusChanged(hasFocus: Boolean)
     fun onCompletePressed()
+    fun onNeedToCreateSetPressed()
 
     @Parcelize
     class State(
         var title: String? = null,
         var text: String? = null,
-        var url: String? = null
+        var url: String? = null,
+        var needToCreateSet: Boolean = false
     ): Parcelable
 }
 
 open class AddArticleVMImpl(
     private val articlesRepository: ArticlesRepository,
     private val articleParseRepository: ArticleParserRepository,
+    private val cardSetsRepository: CardSetsRepository,
     private val timeSource: TimeSource,
     override var state: AddArticleVM.State
 ): ViewModel(), AddArticleVM {
 
-    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    private val eventChannel = Channel<Event>(Channel.BUFFERED) // TODO: replace with a list of strings
     override val eventFlow = eventChannel.receiveAsFlow()
 
     // TODO: consider creating a dingle UIState object
@@ -59,6 +64,7 @@ open class AddArticleVMImpl(
     override val title: StateFlow<String> = mutableTitle
     private val mutableTitleErrorFlow = MutableStateFlow<StringDesc?>(null)
     override val titleErrorFlow: Flow<StringDesc?> = mutableTitleErrorFlow
+    override val needToCreateSet = MutableStateFlow<Boolean>(false)
 
     private val mutableText = MutableStateFlow("")
     override val text: StateFlow<String> = mutableText
@@ -66,6 +72,7 @@ open class AddArticleVMImpl(
     fun restore(state: AddArticleVM.State) {
         mutableTitle.value = state.title.orEmpty()
         mutableText.value = state.text.orEmpty()
+        needToCreateSet.value = state.needToCreateSet
 
         state.url?.let {
             viewModelScope.launch {
@@ -107,19 +114,43 @@ open class AddArticleVMImpl(
     override fun onCompletePressed() {
         updateTitleErrorFlow()
         if (mutableTitleErrorFlow.value == null) {
+            if (needToCreateSet.value) {
+                createCardSet()
+            }
+
             createArticle()
         }
     }
 
+    override fun onNeedToCreateSetPressed() {
+        needToCreateSet.value = !needToCreateSet.value
+        state.needToCreateSet = needToCreateSet.value
+    }
+
+    private fun createCardSet() = viewModelScope.launch {
+        runSafely {
+            cardSetsRepository.createCardSet(
+                title.value,
+                timeSource.getTimeInMilliseconds()
+            )
+        }
+    }
+
     private fun createArticle() = viewModelScope.launch {
-        try {
+        runSafely {
             // TODO: show loading, adding might take for a while
             articlesRepository.createArticle(title.value, text.value)
             eventChannel.trySend(CompletionEvent(CompletionResult.COMPLETED))
+        }
+    }
+
+    private suspend fun runSafely(block: suspend () -> Unit) {
+        try {
+            block()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Logger.e("${e.toString()}: ${e.message.orEmpty()}: ${e.stackTraceToString()}", TAG)
+            Logger.exception(e, TAG)
             val errorText = e.message?.let {
                 StringDesc.Raw(it)
             } ?: StringDesc.Resource(MR.strings.error_default)

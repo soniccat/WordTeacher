@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVMImpl
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
@@ -14,11 +15,13 @@ class AddArticleDecomposeComponent(
     componentContext: ComponentContext,
     articlesRepository: ArticlesRepository,
     articleParserRepository: ArticleParserRepository,
+    cardSetsRepository: CardSetsRepository,
     timeSource: TimeSource,
     val initialState: AddArticleVM.State = AddArticleVM.State()
 ): AddArticleVMImpl(
     articlesRepository,
     articleParserRepository,
+    cardSetsRepository,
     timeSource,
     initialState
 ), ComponentContext by componentContext {
