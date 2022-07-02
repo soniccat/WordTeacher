@@ -19,6 +19,7 @@ class MyLemmatizer(
     // and its skip operation is very expensive
     private val unzippedLemmatizerPath = nlpPath.div("unzipped_lemmatizer")
     private val indexPath = nlpPath.div("unizppedlemmatizer_index")
+    private var randomAccessFile: RandomAccessFile? = null
 
     private val elemRegexp = "\t".toRegex()
     private lateinit var index: MyLemmatizerIndex
@@ -37,6 +38,7 @@ class MyLemmatizer(
         }
 
         index = anIndex
+        randomAccessFile = RandomAccessFile(unzippedLemmatizerPath.toFile(), "r")
     }
 
     private fun createUnzippedLemmatizerIfNeeded() {
@@ -103,24 +105,22 @@ class MyLemmatizer(
      */
     private fun lemmatize(word: String, postag: String): String {
         var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
+        val safeRandomAccessFile = randomAccessFile ?: return resultLemma
 
-        fileSystem.read(unzippedLemmatizerPath) {
-            index.offset(word)?.let { offset ->
-                skip(offset)
+        index.offset(word)?.let { offset ->
+            safeRandomAccessFile.channel.position(offset)
 
-                while (true) {
-                    val line = readUtf8Line() ?: break
-                    val elems = line.split(elemRegexp).toTypedArray()
-                    if (elems[0] != word) {
-                        break
-                    }
-                    if (elems[1] == postag) {
-                        resultLemma = elems[2]
-                        break
-                    }
+            while (true) {
+                val line = safeRandomAccessFile.readLine() ?: break
+                val elems = line.split(elemRegexp).toTypedArray()
+                if (elems[0] != word) {
+                    break
+                }
+                if (elems[1] == postag) {
+                    resultLemma = elems[2]
+                    break
                 }
             }
-            Unit
         }
 
         return resultLemma
