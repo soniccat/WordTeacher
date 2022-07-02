@@ -37,3 +37,8 @@ SELECT last_insert_rowid();
 removeAll:
 DELETE
 FROM DBNLPSentence;
+
+removeWithArticleId:
+DELETE
+FROM DBNLPSentence
+WHERE articleId = ?;

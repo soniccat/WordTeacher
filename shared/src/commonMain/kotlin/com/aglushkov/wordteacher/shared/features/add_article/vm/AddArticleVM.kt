@@ -7,9 +7,7 @@ import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.CompletionResult
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.general.Clearable
-import com.aglushkov.wordteacher.shared.general.TimeSource
-import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
@@ -121,6 +119,7 @@ open class AddArticleVMImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            Logger.e("${e.toString()}: ${e.message.orEmpty()}: ${e.stackTraceToString()}", TAG)
             val errorText = e.message?.let {
                 StringDesc.Raw(it)
             } ?: StringDesc.Resource(MR.strings.error_default)
@@ -142,3 +141,5 @@ open class AddArticleVMImpl(
         eventChannel.cancel()
     }
 }
+
+private const val TAG = "AddArticleVM"

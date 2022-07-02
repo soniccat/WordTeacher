@@ -183,7 +183,7 @@ class AppModule {
             R.raw.en_pos_maxent,
             R.raw.en_lemmatizer_dict,
             R.raw.en_chunker,
-            nlpIndexPath.div("lemmatizer_index"),
+            nlpIndexPath,
             fileSystem
         )
     }

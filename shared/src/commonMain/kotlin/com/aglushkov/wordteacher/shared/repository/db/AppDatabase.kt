@@ -125,7 +125,12 @@ class AppDatabase(
             val sentences = sentencesNLP.selectForArticle(anId)
             Article(id, name, date, sentences, decodeStyle(style))
         }
-        fun removeArticle(anId: Long) = db.dBArticleQueries.removeArticle(anId)
+        fun removeArticle(anId: Long) {
+            db.transaction {
+                db.dBNLPSentenceQueries.removeWithArticleId(anId)
+                db.dBArticleQueries.removeArticle(anId)
+            }
+        }
         fun removeAll() = db.dBArticleQueries.removeAll()
 
         private fun decodeStyle(style: String): ArticleStyle =

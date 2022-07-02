@@ -11,14 +11,21 @@ import java.io.*
 import java.util.*
 
 class MyLemmatizer(
-    private val lemmatizerUseBlock: ( (InputStream) -> Unit ) -> Unit,
-    private val indexPath: Path,
+    private val lemmatizerResourceReader: ( (InputStream) -> Unit ) -> Unit,
+    private val nlpPath: Path,
     private val fileSystem: FileSystem
 ) : Lemmatizer {
+    // first we need to decompress bundled raw lemmatizer as a raw resource requires StreamingZipInflater
+    // and its skip operation is very expensive
+    private val unzippedLemmatizerPath = nlpPath.div("unzipped_lemmatizer")
+    private val indexPath = nlpPath.div("unizppedlemmatizer_index")
+
     private val elemRegexp = "\t".toRegex()
     private lateinit var index: MyLemmatizerIndex
 
     fun load() {
+        createUnzippedLemmatizerIfNeeded()
+
         val anIndex = MyLemmatizerIndex(
             indexPath,
             fileSystem
@@ -32,16 +39,35 @@ class MyLemmatizer(
         index = anIndex
     }
 
-    fun fillIndex(anIndex: MyLemmatizerIndex) = lemmatizerUseBlock { stream ->
-        val breader = BufferedReader(
-            InputStreamReader(stream)
-        )
-        var line: String
+    private fun createUnzippedLemmatizerIfNeeded() {
+        if (fileSystem.exists(unzippedLemmatizerPath)) {
+            return
+        }
+
+        val inProgressPath = nlpPath.div("unzipped_lemmatizer_in_progress")
+        if (fileSystem.exists(inProgressPath)) {
+            fileSystem.delete(inProgressPath)
+        }
+
+        lemmatizerResourceReader { stream ->
+            val byteArray = ByteArray(DEFAULT_BUFFER_SIZE)
+            fileSystem.write(inProgressPath) {
+                while (stream.read(byteArray) != -1) {
+                    write(byteArray)
+                }
+            }
+        }
+
+        fileSystem.atomicMove(inProgressPath, unzippedLemmatizerPath)
+    }
+
+    private fun fillIndex(anIndex: MyLemmatizerIndex) = fileSystem.read(unzippedLemmatizerPath) {
+        var line = ""
 
         try {
             var lastWord = ""
             var offset = 0L
-            while (breader.readLine().also { line = it } != null) {
+            while (readUtf8Line()?.also { line = it } != null) {
                 val elems = line.split(elemRegexp).toTypedArray()
                 if (lastWord != elems[0]) {
                     lastWord = elems[0]
@@ -78,15 +104,12 @@ class MyLemmatizer(
     private fun lemmatize(word: String, postag: String): String {
         var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
 
-        lemmatizerUseBlock { stream ->
+        fileSystem.read(unzippedLemmatizerPath) {
             index.offset(word)?.let { offset ->
-                stream.skip(offset)
-                val breader = BufferedReader(
-                    InputStreamReader(stream)
-                )
+                skip(offset)
 
                 while (true) {
-                    val line = breader.readLine() ?: break
+                    val line = readUtf8Line() ?: break
                     val elems = line.split(elemRegexp).toTypedArray()
                     if (elems[0] != word) {
                         break
@@ -97,6 +120,7 @@ class MyLemmatizer(
                     }
                 }
             }
+            Unit
         }
 
         return resultLemma

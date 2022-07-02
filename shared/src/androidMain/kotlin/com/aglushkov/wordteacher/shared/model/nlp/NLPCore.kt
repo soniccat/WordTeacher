@@ -15,11 +15,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
-import okio.Path.Companion.toPath
 import opennlp.tools.chunker.ChunkSample
 import opennlp.tools.chunker.ChunkerME
 import opennlp.tools.chunker.ChunkerModel
-import opennlp.tools.lemmatizer.DictionaryLemmatizer
 import opennlp.tools.lemmatizer.Lemmatizer
 import opennlp.tools.postag.POSModel
 import opennlp.tools.postag.POSTaggerME
@@ -37,7 +35,7 @@ actual class NLPCore(
     private val posModelRes: Int,
     private val lemmatizerRes: Int,
     private val chunkerRes: Int,
-    private val indexPath: Path,
+    private val nlpPath: Path,
     private val fileSystem: FileSystem,
     dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) {
@@ -118,7 +116,7 @@ actual class NLPCore(
                         block(stream)
                     }
                 },
-                indexPath,
+                nlpPath,
                 fileSystem
             ).apply {
                 load()
@@ -150,7 +148,7 @@ actual class NLPCore(
             posModelRes,
             lemmatizerRes,
             chunkerRes,
-            indexPath,
+            nlpPath,
             fileSystem
         ).apply {
             sentenceDetector = SentenceDetectorME(this@NLPCore.sentenceModel)

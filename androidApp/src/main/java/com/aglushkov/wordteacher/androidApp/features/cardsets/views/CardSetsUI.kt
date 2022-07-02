@@ -218,7 +218,7 @@ fun importDBButton() {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { result ->
         result?.let {
-            val byteArray = ByteArray(10 * 1024)
+            val byteArray = ByteArray(DEFAULT_BUFFER_SIZE)
             val importPath = context.getDatabasePath("test2").absolutePath.toPath()
             context.contentResolver.openInputStream(result)?.buffered()?.use { stream ->
                 FileSystem.SYSTEM.write(importPath, true) {
