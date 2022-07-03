@@ -62,15 +62,17 @@ fun SearchView(
         },
     trailingIcon = {
         if (text.isNotEmpty()) {
-        Icon(
-            painter = painterResource(R.drawable.ic_field_close_24),
-            contentDescription = null,
-            modifier = Modifier.clickable {
-                onTextChanged("")
-                focusRequester.requestFocus()
-            },
-            tint = LocalContentColor.current
-        )
+            Icon(
+                painter = painterResource(R.drawable.ic_field_close_24),
+                contentDescription = null,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                        onTextChanged("")
+                        focusRequester.requestFocus()
+                    },
+                tint = LocalContentColor.current
+            )
         }
     },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),

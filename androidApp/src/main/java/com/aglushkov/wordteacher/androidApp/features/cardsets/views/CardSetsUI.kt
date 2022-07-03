@@ -65,7 +65,9 @@ fun CardSetsUI(
                     importDBButton()
                 }
 
-                LazyColumn {
+                LazyColumn(
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
                     items(
                         data,
                         key = { it.id }
