@@ -16,7 +16,7 @@ androidCoreKts = "1.8.0"
 androidLifecycle = "2.4.1"
 
 mokoResources = "0.17.2"
-decomposeVersion = "0.4.0"
+decomposeVersion = "0.7.0"
 essenty = "0.2.2"
 coroutines = "1.6.0-native-mt"
 ktor = "1.5.4"

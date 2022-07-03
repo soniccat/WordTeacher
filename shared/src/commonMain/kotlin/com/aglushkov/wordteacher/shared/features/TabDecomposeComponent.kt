@@ -102,6 +102,6 @@ class TabDecomposeComponentImpl(
     override fun back() = router.popIfNotEmpty()
 
     override fun onCleared() {
-        router.navigate { emptyList() }
+        router.navigate({ emptyList() }, { _, _ -> })
     }
 }

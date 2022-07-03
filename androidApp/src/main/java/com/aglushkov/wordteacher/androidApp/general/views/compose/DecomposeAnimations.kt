@@ -2,42 +2,48 @@ package com.aglushkov.wordteacher.androidApp.general.views.compose
 
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.layout
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.jetpack.ChildAnimation
-import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.childAnimation
-import com.arkivanov.decompose.extensions.compose.jetpack.animation.page.PageArrangement
+import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.ChildAnimator
+import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.childAnimator
 
 internal val defaultChildAnimationSpec: FiniteAnimationSpec<Float> = tween()
 
 @ExperimentalDecomposeApi
-fun <C : Any, T : Any> slideFromBottom(
+fun slideFromBottom(
     animationSpec: FiniteAnimationSpec<Float> = defaultChildAnimationSpec,
-): ChildAnimation<C, T> =
-    childAnimation(animationSpec = animationSpec) { _, factor, arrangement, _, content ->
+): ChildAnimator =
+    childAnimator(animationSpec = animationSpec) { factor, direction, content ->
         content(
-            Modifier.offset(
-                y = when (arrangement) {
-                    PageArrangement.PREVIOUS -> 0.dp
-                    PageArrangement.FOLLOWING -> maxHeight * (1F - factor)
-                }
-            )
+            Modifier.offsetYFactor(factor = factor)
         )
     }
 
 @ExperimentalDecomposeApi
-fun <C : Any, T : Any> slideFromRight(
+fun slideFromRight(
     animationSpec: FiniteAnimationSpec<Float> = defaultChildAnimationSpec,
-): ChildAnimation<C, T> =
-    childAnimation(animationSpec = animationSpec) { _, factor, arrangement, _, content ->
+): ChildAnimator =
+    childAnimator(animationSpec = animationSpec) { factor, direction, content ->
         content(
-            Modifier.offset(
-                x = when (arrangement) {
-                    PageArrangement.PREVIOUS -> 0.dp
-                    PageArrangement.FOLLOWING -> maxWidth * (1F - factor)
-                }
-            )
+            Modifier.offsetYFactor(factor = factor)
         )
+    }
+
+private fun Modifier.offsetYFactor(factor: Float): Modifier =
+    layout { measurable, constraints ->
+        val placeable = measurable.measure(constraints)
+
+        layout(placeable.width, placeable.height) {
+            placeable.placeRelative(x = 0, y = (placeable.height.toFloat() * factor).toInt())
+        }
+    }
+
+private fun Modifier.offsetXFactor(factor: Float): Modifier =
+    layout { measurable, constraints ->
+        val placeable = measurable.measure(constraints)
+
+        layout(placeable.width, placeable.height) {
+            placeable.placeRelative(x = (placeable.width.toFloat() * factor).toInt(), y = 0)
+        }
     }

@@ -37,6 +37,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRoute
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponent
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
+import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.childAnimation
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
 import java.net.URL
 import kotlinx.coroutines.coroutineScope
@@ -115,7 +116,7 @@ class TextActionActivity: AppCompatActivity() {
             ) { innerPadding ->
                 Children(
                     routerState = textActionDecomposeComponent.routerState,
-                    animation = slide()
+                    animation = childAnimation(slide())
                 ) {
                     when (val instance = it.instance) {
                         is TextActionDecomposeComponent.Child.Definitions -> DefinitionsUI(

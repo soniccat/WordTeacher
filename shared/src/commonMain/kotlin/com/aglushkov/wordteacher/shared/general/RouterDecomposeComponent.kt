@@ -19,9 +19,10 @@ inline fun <reified C: Any, reified C2: C>
         return
     }
 
-    navigate {
-        it + listOf(configuration)
-    }
+    navigate(
+        { it + listOf(configuration) },
+        {_, _ -> }
+    )
 }
 
 inline fun <reified C: Any, reified C2: C>
@@ -32,13 +33,15 @@ inline fun <reified C: Any, reified C2: C>
 
     val i = state.value.backStack.indexOfFirst { it.configuration is C2 }
     if (i >= 0) {
-        navigate {
-            it.take(i + 1)
-        }
+        navigate(
+            { it.take(i + 1) },
+            { _,_ -> }
+        )
     } else {
-        navigate {
-            it + listOf(configuration)
-        }
+        navigate(
+            { it + listOf(configuration) },
+            { _, _ -> }
+        )
     }
 }
 
@@ -49,9 +52,10 @@ fun Router<*, *>.popIfNotEmpty() {
 }
 
 fun <T: Any> Router<T, *>.popToRoot() {
-    navigate {
-        listOf(it.first())
-    }
+    navigate(
+        { listOf(it.first()) },
+        { _, _ -> }
+    )
 }
 
 class RouterStateChangeHandler {

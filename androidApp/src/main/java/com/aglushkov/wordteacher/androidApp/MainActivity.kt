@@ -58,6 +58,7 @@ import com.aglushkov.wordteacher.shared.general.article_parser.ArticleParser
 import com.aglushkov.wordteacher.shared.general.v
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
+import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.childAnimation
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
 import kotlin.reflect.KClass
 import kotlinx.coroutines.launch
@@ -138,7 +139,7 @@ class MainActivity : AppCompatActivity(), Router {
         ) {
             Children(
                 routerState = mainDecomposeComponent.routerState,
-                animation = slideFromRight()
+                animation = childAnimation(slideFromRight())
             ) {
                 when (val instance = it.instance) {
                     is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)
@@ -171,7 +172,7 @@ class MainActivity : AppCompatActivity(), Router {
         ) { innerPadding ->
             Children(
                 routerState = component.routerState,
-                animation = slide()
+                animation = childAnimation(slide())
             ) {
                 when (val instance = it.instance) {
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
