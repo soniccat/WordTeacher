@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.model
 
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.e
 
 data class Card (
     val id: Long,
@@ -36,7 +38,11 @@ data class Card (
             spans.getOrNull(i)?.let { spans ->
                 var resString: CharSequence = str
                 spans.asReversed().forEach { span ->
-                    resString = resString.replaceRange(span.first, span.second, TERM_REPLACEMENT)
+                    if (span.second < resString.length) {
+                        resString = resString.replaceRange(span.first, span.second, TERM_REPLACEMENT)
+                    } else {
+                        Logger.e("$resString is shorter than expected span ${span.first}:${span.second}")
+                    }
                 }
                 resString.toString()
             } ?: str

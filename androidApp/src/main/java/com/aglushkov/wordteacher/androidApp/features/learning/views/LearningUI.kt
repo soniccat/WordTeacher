@@ -164,7 +164,7 @@ fun LearningUI(
                     )
                 ) {
                     items(data, key = { it.id }) { item ->
-                        LearningViewItems(Modifier.animateItemPlacement(), item, vm)
+                        LearningViewItems(itemView = item, vm = vm)
                     }
                 }
             } else {
@@ -313,7 +313,7 @@ fun TermInput(
 
 @Composable
 fun LearningViewItems(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     itemView: BaseViewItem<*>,
     vm: LearningVM,
 ) {
