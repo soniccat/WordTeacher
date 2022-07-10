@@ -6,7 +6,7 @@ import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.takeWhileNonNull
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
-import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
+import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.CoroutineScope

@@ -4,10 +4,9 @@ import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeCompo
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
-import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
-import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
+import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides

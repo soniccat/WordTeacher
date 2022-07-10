@@ -5,21 +5,19 @@ import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
-import com.aglushkov.wordteacher.shared.repository.db.UPDATE_DELAY
+import com.aglushkov.wordteacher.shared.workers.UPDATE_DELAY
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -276,7 +274,8 @@ open class CardSetVMImpl(
                                     s
                                 }
                             }
-                        }
+                        },
+                        needToUpdateDefinitionSpans = true
                     )
                 }
                 is WordExampleViewItem ->
@@ -287,7 +286,8 @@ open class CardSetVMImpl(
                             } else {
                                 s
                             }
-                        }
+                        },
+                        needToUpdateExampleSpans = true
                     )
                 is WordSynonymViewItem ->
                     card.copy(
@@ -360,7 +360,8 @@ open class CardSetVMImpl(
                     listOf("")
                 } else {
                     it.definitions.filterIndexed { i, _ -> i != item.index }
-                }
+                },
+                needToUpdateDefinitionSpans = true
             ).apply {
                 updateCard(this, delay = 0)
             }
@@ -382,7 +383,8 @@ open class CardSetVMImpl(
     override fun onExampleRemoved(item: WordExampleViewItem, cardId: Long) =
         editCard(cardId) {
             it.copy(
-                examples = it.examples.filterIndexed { i, _ -> i != item.index }
+                examples = it.examples.filterIndexed { i, _ -> i != item.index },
+                needToUpdateExampleSpans = true
             ).apply {
                 updateCard(this, delay = 0)
             }

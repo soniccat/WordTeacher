@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
+import com.aglushkov.wordteacher.shared.general.toLong
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
@@ -181,14 +182,15 @@ class AppDatabase(
             }
         }
 
-        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans ->
-            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans)
+        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate ->
+            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate)
         }
     }
 
     inner class Cards {
         fun selectAllCardIds() = db.dBCardQueries.selectAllCardIds()
         fun selectAllCards() = db.dBCardQueries.selectAllCards(mapper = cardMapper())
+        fun selectCardsWithOutdatedSpans() = db.dBCardQueries.selectCardsWithOutdatedSpans(mapper = cardMapper())
 
         fun selectCards(ids: List<Long>) = db.dBCardQueries.selectCards(
             ids,
@@ -214,8 +216,10 @@ class AppDatabase(
             progressLastLessonDate: Long?,
             definitionTermSpans: List<List<Pair<Int, Int>>>?,
             exampleTermSpans: List<List<Pair<Int, Int>>>?,
+            needToUpdateDefinitionSpans: Long?,
+            needToUpdateExampleSpans: Long?
         ) -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans ->
+            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans ->
                 Card(
                     id!!,
                     date!!,
@@ -231,7 +235,9 @@ class AppDatabase(
                         progressLevel ?: 0,
                         progressLastMistakeCount ?: 0,
                         progressLastLessonDate ?: 0L
-                    )
+                    ),
+                    needToUpdateDefinitionSpans = needToUpdateDefinitionSpans!! != 0L,
+                    needToUpdateExampleSpans = needToUpdateExampleSpans!! != 0L
                 )
             }
 
@@ -246,7 +252,9 @@ class AppDatabase(
             synonyms: List<String> = mutableListOf(),
             examples: List<String> = mutableListOf(),
             exampleTermSpans: List<List<Pair<Int, Int>>> = listOf(),
-            progress: CardProgress = CardProgress.EMPTY
+            progress: CardProgress = CardProgress.EMPTY,
+            needToUpdateDefinitionSpans: Boolean = false,
+            needToUpdateExampleSpans: Boolean = false
         ): Card {
             var newCard = Card(
                 id = -1,
@@ -259,7 +267,9 @@ class AppDatabase(
                 synonyms = synonyms,
                 examples = examples,
                 exampleTermSpans = exampleTermSpans,
-                progress = progress
+                progress = progress,
+                needToUpdateDefinitionSpans = needToUpdateDefinitionSpans,
+                needToUpdateExampleSpans = needToUpdateExampleSpans
             )
 
             cards.insertCardInternal(setId, newCard)
@@ -279,7 +289,9 @@ class AppDatabase(
                 synonyms = newCard.synonyms,
                 examples = newCard.examples,
                 exampleTermSpans = newCard.exampleTermSpans,
-                progress = newCard.progress
+                progress = newCard.progress,
+                needToUpdateDefinitionSpans = newCard.needToUpdateDefinitionSpans,
+                needToUpdateExampleSpans = newCard.needToUpdateExampleSpans
             )
         }
 
@@ -294,7 +306,9 @@ class AppDatabase(
             synonyms: List<String>,
             examples: List<String>,
             exampleTermSpans: List<List<Pair<Int, Int>>> = listOf(),
-            progress: CardProgress
+            progress: CardProgress,
+            needToUpdateDefinitionSpans: Boolean,
+            needToUpdateExampleSpans: Boolean
         ) {
             db.transaction {
                 db.dBCardQueries.insert(
@@ -309,7 +323,9 @@ class AppDatabase(
                     progress.lastMistakeCount,
                     progress.lastLessonDate,
                     definitionTermSpans,
-                    exampleTermSpans
+                    exampleTermSpans,
+                    needToUpdateDefinitionSpans.toLong(),
+                    needToUpdateExampleSpans.toLong()
                 )
 
                 val cardId = db.dBCardQueries.lastInsertedRowId().firstLong()!!
@@ -334,11 +350,13 @@ class AppDatabase(
                 progressLevel = card.progress.currentLevel,
                 progressLastMistakeCount = card.progress.lastMistakeCount,
                 progressLastLessonDate = card.progress.lastLessonDate,
+                needToUpdateDefinitionSpans = card.needToUpdateDefinitionSpans.toLong(),
+                needToUpdateExampleSpans = card.needToUpdateExampleSpans.toLong()
             )
             return card
         }
 
-        fun updateCard(
+        private fun updateCard(
             cardId: Long,
             date: Long,
             term: String,
@@ -351,7 +369,9 @@ class AppDatabase(
             exampleTermSpans: List<List<Pair<Int, Int>>>,
             progressLevel: Int,
             progressLastMistakeCount: Int,
-            progressLastLessonDate: Long
+            progressLastLessonDate: Long,
+            needToUpdateDefinitionSpans: Long,
+            needToUpdateExampleSpans: Long
         ) = db.dBCardQueries.updateCard(
             date,
             term,
@@ -365,10 +385,12 @@ class AppDatabase(
             progressLastLessonDate,
             definitionTermSpans,
             exampleTermSpans,
+            needToUpdateDefinitionSpans,
+            needToUpdateExampleSpans,
             cardId
         )
 
-        fun insertedCardId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
+        private fun insertedCardId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
 
         fun removeCard(cardId: Long) {
             db.transaction {

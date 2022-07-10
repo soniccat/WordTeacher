@@ -1,23 +1,15 @@
 package com.aglushkov.wordteacher.androidApp.features.learning.di
 
-import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.CardLoaderModule
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
-import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
-import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
-import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
-import com.aglushkov.wordteacher.shared.repository.db.DatabaseWorker
-import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
+import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
-import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
 

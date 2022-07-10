@@ -17,7 +17,9 @@ CREATE TABLE IF NOT EXISTS DBCard (
   progressLastLessonDate INTEGER DEFAULT 0,
 -- Spans
   definitionTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT "",
-  exampleTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT ""
+  exampleTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT "",
+  needToUpdateDefinitionSpans INTEGER NOT NULL DEFAULT 0,
+  needToUpdateExampleDefinitionSpans INTEGER NOT NULL DEFAULT 0
 );
 
 selectAllCardIds:
@@ -33,17 +35,22 @@ SELECT *
 FROM DBCard
 WHERE DBCard.id IN ?;
 
+selectCardsWithOutdatedSpans:
+SELECT *
+FROM DBCard
+WHERE DBCard.needToUpdateDefinitionSpans OR DBCard.needToUpdateExampleDefinitionSpans;
+
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans)
 VALUES ?;
 
 updateCard:
 UPDATE DBCard
-SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?, needToUpdateDefinitionSpans = ?, needToUpdateExampleDefinitionSpans = ?
 WHERE id = ?;
 
 lastInsertedRowId:

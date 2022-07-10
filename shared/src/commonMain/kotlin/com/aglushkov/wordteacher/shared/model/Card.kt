@@ -16,6 +16,8 @@ data class Card (
     val examples: List<String>,
     val exampleTermSpans: List<List<Pair<Int, Int>>>,
     val progress: CardProgress,
+    val needToUpdateDefinitionSpans: Boolean,
+    val needToUpdateExampleSpans: Boolean,
 ) {
     fun withRightAnswer(timeSource: TimeSource) =
         copy(

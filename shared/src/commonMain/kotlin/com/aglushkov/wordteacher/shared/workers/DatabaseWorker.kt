@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.repository.db
+package com.aglushkov.wordteacher.shared.workers
 
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
@@ -78,7 +78,7 @@ class DatabaseWorker {
 
             if (shouldRunNext) {
                 scope.launch {
-                    launchPendingIfNeeded()
+                    launchPendingIfNeeded() // TODO: it seems here we need to proceed with cancellable pending first
                 }
             }
         }
@@ -124,7 +124,7 @@ class DatabaseWorker {
 
             if (shouldRunNext) {
                 scope.launch {
-                    launchPendingIfNeeded()
+                    launchPendingIfNeeded() // TODO: it seems here we need to proceed with non-cancellable pending first
                 }
             }
         }

@@ -1,0 +1,6 @@
+import kotlin.collections.List;
+import kotlin.Pair;
+import kotlin.Int;
+
+ALTER TABLE DBCard ADD COLUMN needToUpdateDefinitionSpans INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE DBCard ADD COLUMN needToUpdateExampleDefinitionSpans INTEGER NOT NULL DEFAULT 0;
