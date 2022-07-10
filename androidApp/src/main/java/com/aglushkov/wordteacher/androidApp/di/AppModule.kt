@@ -25,6 +25,8 @@ import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.service.ConfigService
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
 import okio.FileSystem
 import dagger.Module
 import dagger.Provides
@@ -143,6 +145,27 @@ class AppModule {
     @Provides
     fun database(driver: DatabaseDriverFactory, timeSource: TimeSource): AppDatabase {
         return AppDatabase(driver, timeSource)
+    }
+
+    @AppComp
+    @Provides
+    fun databaseCardWorker(
+        database: AppDatabase,
+        databaseWorker: DatabaseWorker,
+        spanUpdateWorker: SpanUpdateWorker
+    ): DatabaseCardWorker {
+        return DatabaseCardWorker(database, databaseWorker, spanUpdateWorker)
+    }
+
+    @AppComp
+    @Provides
+    fun spanUpdateWorker(
+        database: AppDatabase,
+        databaseWorker: DatabaseWorker,
+        nlpCore: NLPCore,
+        nlpSentenceProcessor: NLPSentenceProcessor
+    ): SpanUpdateWorker {
+        return SpanUpdateWorker(database, databaseWorker, nlpCore, nlpSentenceProcessor)
     }
 
     @AppComp

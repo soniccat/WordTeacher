@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
@@ -15,6 +16,7 @@ class CardSetDecomposeComponent (
     initialState: CardSetVM.State,
     router: CardSetRouter,
     cardSetsRepository: CardSetRepository,
+    databaseCardWorker: DatabaseCardWorker,
     componentContext: ComponentContext,
     timeSource: TimeSource,
     idGenerator: IdGenerator
@@ -22,6 +24,7 @@ class CardSetDecomposeComponent (
     initialState,
     router,
     cardSetsRepository,
+    databaseCardWorker,
     timeSource,
     idGenerator
 ), ComponentContext by componentContext {

@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.workers
 
 import com.aglushkov.extensions.asFlow
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilFalse
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.cardset.findTermSpans
@@ -25,7 +26,7 @@ class SpanUpdateWorker (
                 var wasPaused = false
                 do {
                     wasPaused = false
-                    pauseState.takeWhile { it }.collect() // wait while we're on pause
+                    pauseState.waitUntilFalse() // wait while we're on pause
 
                     val cards = query.executeAsList() // execute or re-execute the query
                     inProgressState.value = true
@@ -78,7 +79,7 @@ class SpanUpdateWorker (
     }
 
     suspend fun waitUntilDone() {
-        inProgressState.takeWhile { it }.collect()
+        inProgressState.waitUntilFalse()
     }
 
     suspend fun pauseAndWaitUntilDone() {

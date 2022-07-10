@@ -18,9 +18,8 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
-import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
-import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Resource
@@ -67,8 +66,7 @@ interface LearningVM: Clearable {
 open class LearningVMImpl(
     private var state: LearningVM.State,
     private val cardLoader: CardLoader,
-    private val database: AppDatabase,
-    private val databaseWorker: DatabaseWorker,
+    private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator
 ) : ViewModel(), LearningVM {
@@ -89,9 +87,22 @@ open class LearningVMImpl(
         startLearning(state.cardIds, state.teacherState)
     }
 
+    override fun save(): LearningVM.State {
+        state = state.copy(teacherState = teacher?.save())
+        return state
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopLearning()
+    }
+
     // Screen state flow
     private fun startLearning(cardIds: List<Long>, teacherState: CardTeacher.State?) {
         viewModelScope.launch {
+            // TODO: show loading
+            databaseCardWorker.pushState(DatabaseCardWorker.State.EDITING)
+
             // Need to load cards first
             val cards = cardLoader.loadCardsUntilLoaded(
                 cardIds = cardIds,
@@ -146,16 +157,14 @@ open class LearningVMImpl(
         }
     }
 
-    override fun save(): LearningVM.State {
-        state = state.copy(teacherState = teacher?.save())
-        return state
+    private fun stopLearning() {
+        databaseCardWorker.popState(DatabaseCardWorker.State.EDITING)
     }
 
     private fun createTeacher(cards: List<Card>, teacherState: CardTeacher.State?): CardTeacher {
         return CardTeacher(
             cards.shuffled(),
-            database,
-            databaseWorker,
+            databaseCardWorker,
             timeSource,
             viewModelScope
         ).also { aTeacher ->

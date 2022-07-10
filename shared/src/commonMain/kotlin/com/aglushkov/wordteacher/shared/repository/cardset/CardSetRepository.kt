@@ -71,23 +71,4 @@ class CardSetRepository(
             )
         }
     }
-
-    suspend fun deleteCard(card: Card) {
-        databaseWorker.run {
-            database.cards.removeCard(card.id)
-        }
-    }
-
-    suspend fun updateCard(card: Card, delay: Long) {
-        databaseWorker.runCancellable(
-            id = "updateCard_" + card.id.toString(),
-            runnable = {
-                database.cards.updateCard(card)
-            },
-            delay
-        )
-//        databaseWorker.run {
-//            database.cards.updateCard(card)
-//        }
-    }
 }

@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
@@ -20,7 +21,7 @@ class LearningModule {
         componentContext: ComponentContext,
         cardLoader: CardLoader,
         database: AppDatabase,
-        databaseWorker: DatabaseWorker,
+        databaseCardWorker: DatabaseCardWorker,
         timeSource: TimeSource,
         idGenerator: IdGenerator
     ) = LearningDecomposeComponent(
@@ -28,7 +29,7 @@ class LearningModule {
         componentContext,
         cardLoader,
         database,
-        databaseWorker,
+        databaseCardWorker,
         timeSource,
         idGenerator
     )

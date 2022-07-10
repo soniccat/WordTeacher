@@ -6,13 +6,11 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.model.Card
-import com.aglushkov.wordteacher.shared.model.CardSet
-import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.model.toStringDesc
+import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.workers.UPDATE_DELAY
 import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Resource
@@ -54,6 +52,7 @@ open class CardSetVMImpl(
     override var state: CardSetVM.State,
     private val router: CardSetRouter,
     private val repository: CardSetRepository,
+    private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator
 ): ViewModel(), CardSetVM {
@@ -68,26 +67,29 @@ open class CardSetVMImpl(
     // Contains cards being edited and haven't been synched with DB
     private var inMemoryCardSet = MutableStateFlow<CardSet?>(null)
     final override val cardSet: StateFlow<Resource<CardSet>> = combine(
-        repository.cardSet, inMemoryCardSet,
-        transform = { cardSet, inMemoryCardSet ->
-            if (inMemoryCardSet == null) {
-                cardSet
-            } else {
-                when (cardSet) {
-                    is Resource.Loaded -> cardSet.copyWith(
-                        mergeCardSets(
-                            cardSet.data,
-                            inMemoryCardSet
-                        )
-                    ).also {
-                        pruneInMemoryCardSet(cardSet.data)
+        repository.cardSet, inMemoryCardSet, databaseCardWorker.untilFirstEditingFlow(),
+        transform = { cardSet, inMemoryCardSet, state ->
+            if (state == DatabaseCardWorker.State.EDITING) {
+                if (inMemoryCardSet == null) {
+                    cardSet
+                } else {
+                    when (cardSet) {
+                        is Resource.Loaded -> cardSet.copyWith(
+                            mergeCardSets(
+                                cardSet.data,
+                                inMemoryCardSet
+                            )
+                        ).also {
+                            pruneInMemoryCardSet(cardSet.data)
+                        }
+                        else -> cardSet
                     }
-                    else -> cardSet
                 }
+            } else {
+                Resource.Loading()
             }
     }).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    //private val eventChannel = Channel<Event>(Channel.BUFFERED)
     private val events = MutableStateFlow<List<Event>>(emptyList())
     override val eventFlow = events.map { eventList -> eventList.filter { !it.isHandled } }
 
@@ -95,6 +97,21 @@ open class CardSetVMImpl(
         Logger.v("build view items")
         it.copyWith(buildViewItems(it))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+
+    init {
+        viewModelScope.launch {
+            databaseCardWorker.pushState(DatabaseCardWorker.State.EDITING)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        onEndEditing()
+    }
+
+    fun onEndEditing() {
+        databaseCardWorker.popState(DatabaseCardWorker.State.EDITING)
+    }
 
     fun restore(newState: CardSetVM.State) {
         state = newState
@@ -421,7 +438,7 @@ open class CardSetVMImpl(
     override fun onCardDeleted(cardId: Long) {
         findCard(cardId)?.let { card ->
             viewModelScope.launch {
-                repository.deleteCard(card)
+                databaseCardWorker.deleteCard(card)
             }
         }
     }
@@ -437,13 +454,7 @@ open class CardSetVMImpl(
 
     private fun updateCard(card: Card, delay: Long = UPDATE_DELAY) {
         viewModelScope.launch {
-            try {
-                repository.updateCard(card, delay)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Throwable) {
-                // TODO: handle
-            }
+            databaseCardWorker.updateCardCancellableSafely(card, delay)
         }
     }
 

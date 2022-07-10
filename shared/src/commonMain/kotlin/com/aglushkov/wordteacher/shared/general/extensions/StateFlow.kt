@@ -6,13 +6,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.v
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.*
 
 // TODO: replace with simple .collect(stateFlow)
 suspend fun <T> Flow<T>.forward(stateFlow: MutableStateFlow<T>) {
@@ -108,6 +102,14 @@ fun <T> StateFlow<T?>.takeWhileNonNull(
 
         takeWhile { it != null }.collect(this as FlowCollector<T?>)
     }
+
+suspend fun StateFlow<Boolean>.waitUntilFalse() {
+    takeWhile { it }.collect()
+}
+
+suspend fun StateFlow<Boolean>.waitUntilTrue() {
+    takeWhile { !it }.collect()
+}
 
 class AbortFlowException constructor(
     val owner: FlowCollector<*>

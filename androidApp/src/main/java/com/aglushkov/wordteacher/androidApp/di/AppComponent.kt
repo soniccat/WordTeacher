@@ -28,6 +28,7 @@ import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.service.ConfigService
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import dagger.Component
 
 
@@ -52,6 +53,7 @@ public interface AppComponent:
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
     override fun database(): AppDatabase
     override fun databaseWorker(): DatabaseWorker
+    override fun databaseCardSetWorker(): DatabaseCardWorker
 
     override fun nlpCore(): NLPCore
 

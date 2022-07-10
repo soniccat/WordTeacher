@@ -6,9 +6,11 @@ import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.takeWhileNonNull
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +18,7 @@ import kotlinx.coroutines.launch
 
 class CardTeacher(
     private val cards: List<Card>,
-    private val database: AppDatabase,
-    private val databaseWorker: DatabaseWorker,
+    private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
     private val scope: CoroutineScope
 ) {
@@ -159,50 +160,15 @@ class CardTeacher(
 
     private suspend fun countWrongAnswer() {
         if (isWrongAnswerCounted) return
-        val currentCardSnapshot = currentCard!!
 
-        val updatedCard = databaseWorker.runCancellable(
-            currentCardSnapshot.id.toString(),
-            runnable = {
-                try {
-                    database.cards.updateCard(
-                        currentCardSnapshot.withWrongAnswer(timeSource)
-                    )
-                } catch (e: Throwable) {
-                    // TODO: handle error
-                    Logger.e("CardTeacher.countWrongAnswer", e.toString())
-                    throw e
-                }
-            },
-            delay = 0
-        )
-
+        val updatedCard = databaseCardWorker.updateCardSafely(currentCard!!.withWrongAnswer(timeSource))
         currentSession!!.updateProgress(updatedCard, false)
         isWrongAnswerCounted = true
     }
 
     private suspend fun countRightAnswer() {
-        val currentCardSnapshot = currentCard!!
-
-        if (!isWrongAnswerCounted) {
-            val updatedCard = databaseWorker.runCancellable(
-                currentCardSnapshot.id.toString(),
-                runnable = {
-                    try {
-                        database.cards.updateCard(
-                            currentCardSnapshot.withRightAnswer(timeSource)
-                        )
-                    } catch (e: Throwable) {
-                        // TODO: handle error
-                        Logger.e("CardTeacher.countRightAnswer", e.toString())
-                        throw e
-                    }
-                },
-                delay = 0
-            )
-
-            currentSession!!.updateProgress(updatedCard, true)
-        }
+        val updatedCard = databaseCardWorker.updateCardSafely(currentCard!!.withRightAnswer(timeSource))
+        currentSession!!.updateProgress(updatedCard, true)
     }
 
     private fun switchToNextCard(): Card? {
