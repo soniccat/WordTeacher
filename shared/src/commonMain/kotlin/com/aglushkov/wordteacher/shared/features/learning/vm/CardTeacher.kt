@@ -161,13 +161,13 @@ class CardTeacher(
     private suspend fun countWrongAnswer() {
         if (isWrongAnswerCounted) return
 
-        val updatedCard = databaseCardWorker.updateCardSafely(currentCard!!.withWrongAnswer(timeSource))
+        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.withWrongAnswer(timeSource))
         currentSession!!.updateProgress(updatedCard, false)
         isWrongAnswerCounted = true
     }
 
     private suspend fun countRightAnswer() {
-        val updatedCard = databaseCardWorker.updateCardSafely(currentCard!!.withRightAnswer(timeSource))
+        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.withRightAnswer(timeSource))
         currentSession!!.updateProgress(updatedCard, true)
     }
 

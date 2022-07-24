@@ -2,9 +2,9 @@ package com.aglushkov.wordteacher.shared.workers
 
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlin.properties.Delegates
 
@@ -18,14 +18,22 @@ class DatabaseCardWorker(
     private val databaseWorker: DatabaseWorker,
     private val spanUpdateWorker: SpanUpdateWorker
 ) {
+    //private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val serialQueue = SerialQueue()
     private val editOperationCount = MutableStateFlow(0)
-    private var stateStack by Delegates.observable(listOf(State.UPDATING_SPANS)) { _, _, new ->
+    private var stateStack by Delegates.observable(listOf(DEFAULT_STATE)) { _, _, new ->
         currentStateFlow.value = currentState
+        Logger.v("state: ${new}", "DatabaseCardWorker")
     }
 
-    val currentStateFlow = MutableStateFlow(State.UPDATING_SPANS)
+    val currentStateFlow = MutableStateFlow(DEFAULT_STATE)
     val currentState: State
-        get() = stateStack.lastOrNull() ?: State.UPDATING_SPANS
+        get() = stateStack.lastOrNull() ?: DEFAULT_STATE
+    val previousState: State
+        get() {
+            if (stateStack.size <= 1) return DEFAULT_STATE
+            return stateStack[stateStack.size - 2]
+        }
 
     fun untilFirstEditingFlow() = flow {
         currentStateFlow.takeWhile { it != State.EDITING }.collect {
@@ -34,11 +42,39 @@ class DatabaseCardWorker(
         emit(State.EDITING)
     }
 
-    suspend fun pushState(newState: State) {
+    fun pushState(newState: State) = serialQueue.send {
+        pushStateInternal(newState)
+    }
+
+    suspend fun pushStateAndWait(newState: State) = serialQueue.sendAndWait {
+        pushStateInternal(newState)
+    }
+
+    private suspend fun pushStateInternal(newState: State) {
         if (currentState == newState) {
             return
         }
 
+        prepareToNewState(newState)
+        stateStack = stateStack + newState
+    }
+
+    fun popState(state: State) = serialQueue.send {
+        popStateInternal(state)
+    }
+
+    suspend fun popStateAndWait(state: State) = serialQueue.sendAndWait {
+        popStateInternal(state)
+    }
+
+    private suspend fun popStateInternal(state: State) {
+        if (currentState == state && stateStack.isNotEmpty()) {
+            prepareToNewState(previousState)
+            stateStack = stateStack.take(stateStack.size - 1)
+        }
+    }
+
+    private suspend fun prepareToNewState(newState: State) {
         when (newState) {
             State.EDITING -> {
                 spanUpdateWorker.pauseAndWaitUntilDone()
@@ -48,47 +84,84 @@ class DatabaseCardWorker(
                 spanUpdateWorker.resume()
             }
         }
-
-        stateStack = stateStack + newState
-    }
-
-    fun popState(state: State) {
-        if (currentState == state && stateStack.isNotEmpty()) {
-            stateStack = stateStack.takeLast(1)
-        }
     }
 
     suspend fun waitUntilEditingIsDone() {
-        editOperationCount.takeWhile { it >= 0 }.collect()
+        editOperationCount.takeWhile { it > 0 }.collect()
     }
 
     // Editing State Operation
 
-    suspend fun deleteCard(card: Card) = performEditOperation {
+    fun deleteCard(card: Card) = serialQueue.send {
+        deleteCardInternal(card)
+    }
+
+    suspend fun deleteCardAndWait(card: Card) = serialQueue.sendAndWait {
+        deleteCardInternal(card)
+    }
+
+    private suspend fun deleteCardInternal(card: Card) = performEditOperation {
         databaseWorker.run {
             database.cards.removeCard(card.id)
         }
     }
 
-    suspend fun updateCard(card: Card) = performEditOperation {
+    suspend fun updateCard(card: Card) = serialQueue.send {
+        updateCardInternal(card)
+    }
+
+    suspend fun updateCardAndWait(card: Card) = serialQueue.sendAndWait {
+        performEditOperation {
+            databaseWorker.run {
+                database.cards.updateCard(card)
+            }
+        }
+    }
+
+    private suspend fun updateCardInternal(card: Card) = performEditOperation {
         databaseWorker.run {
             database.cards.updateCard(card)
         }
     }
 
-    suspend fun updateCardSafely(card: Card) = performEditOperation {
-        try {
-            updateCard(card)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Throwable) {
-            // TODO: handle error
-            Logger.e("DatabaseCardWorker.updateCardSafely", e.toString())
-            throw e
-        }
+//    suspend fun updateCardSafely(card: Card) = sequentialWorker.sendAndWait {
+//        performEditOperation {
+//            try {
+//                updateCard(card)
+//            } catch (e: CancellationException) {
+//                throw e
+//            } catch (e: Throwable) {
+//                // TODO: handle error
+//                Logger.e("DatabaseCardWorker.updateCardSafely", e.toString())
+//                throw e
+//            }
+//        }
+//    }
+
+    fun updateCardCancellable(card: Card, delay: Long) = serialQueue.send {
+        updateCardCancellableInternal(card, delay)
     }
 
-    suspend fun updateCardCancellable(card: Card, delay: Long) = performEditOperation {
+    suspend fun updateCardCancellableAndWait(card: Card, delay: Long) = serialQueue.sendAndWait {
+        updateCardCancellableInternal(card, delay)
+    }
+
+//    suspend fun updateCardCancellableSafely(card: Card, delay: Long): Card {
+//        return try {
+//            updateCardCancellable(card, delay)
+//        } catch (e: CancellationException) {
+//            throw e
+//        } catch (e: Throwable) {
+//            // TODO: handle error
+//            Logger.e("DatabaseCardWorker.updateCardSafely", e.toString())
+//            throw e
+//        }
+//    }
+
+    private suspend fun updateCardCancellableInternal(
+        card: Card,
+        delay: Long
+    ) = performEditOperation {
         databaseWorker.runCancellable(
             id = "updateCard_" + card.id.toString(),
             runnable = {
@@ -96,24 +169,12 @@ class DatabaseCardWorker(
             },
             delay
         )
-//        databaseWorker.run {
-//            database.cards.updateCard(card)
-//        }
+        //        databaseWorker.run {
+        //            database.cards.updateCard(card)
+        //        }
     }
 
-    suspend fun updateCardCancellableSafely(card: Card, delay: Long): Card {
-        return try {
-            updateCardCancellable(card, delay)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Throwable) {
-            // TODO: handle error
-            Logger.e("DatabaseCardWorker.updateCardSafely", e.toString())
-            throw e
-        }
-    }
-
-    suspend fun <T> performEditOperation(block: suspend () -> T): T {
+    private suspend fun <T> performEditOperation(block: suspend () -> T): T {
         return try {
             validateEditingState()
             editOperationCount.update { it + 1 }
@@ -123,7 +184,7 @@ class DatabaseCardWorker(
         }
     }
 
-    private suspend fun validateEditingState() {
+    private fun validateEditingState() {
         if (currentState != State.EDITING) {
             Logger.e("Editing operation was called when state is ${currentState.name}")
         }
@@ -135,3 +196,5 @@ class DatabaseCardWorker(
         UPDATING_SPANS
     }
 }
+
+private val DEFAULT_STATE = DatabaseCardWorker.State.UPDATING_SPANS

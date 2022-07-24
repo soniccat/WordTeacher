@@ -20,8 +20,9 @@ class SpanUpdateWorker (
     private val inProgressState = MutableStateFlow(false)
 
     init {
-        val nlpCoreCopy = nlpCore.clone()
         scope.launch {
+            nlpCore.waitUntilInitialized()
+            val nlpCoreCopy = nlpCore.clone()
             database.cards.selectCardsWithOutdatedSpans().asFlow().collect { query ->
                 var wasPaused = false
                 do {

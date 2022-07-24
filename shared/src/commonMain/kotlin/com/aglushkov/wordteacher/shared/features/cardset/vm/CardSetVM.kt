@@ -453,9 +453,7 @@ open class CardSetVMImpl(
         }
 
     private fun updateCard(card: Card, delay: Long = UPDATE_DELAY) {
-        viewModelScope.launch {
-            databaseCardWorker.updateCardCancellableSafely(card, delay)
-        }
+        databaseCardWorker.updateCardCancellable(card, delay)
     }
 
     override fun onBackPressed() {
