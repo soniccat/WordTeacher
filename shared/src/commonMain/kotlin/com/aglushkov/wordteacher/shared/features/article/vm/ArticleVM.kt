@@ -92,7 +92,7 @@ open class ArticleVMImpl(
 
     override val paragraphs = combine(article, annotations) { a, b -> a to b }
         .map { (article, annotations) ->
-            Logger.v("build view items")
+            //Logger.v("build view items")
             article.copyWith(buildViewItems(article, annotations))
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 

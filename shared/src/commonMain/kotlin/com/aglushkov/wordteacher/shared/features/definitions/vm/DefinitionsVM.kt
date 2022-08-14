@@ -103,7 +103,7 @@ open class DefinitionsVMImpl(
         selectedPartsOfSpeechStateFlow
     ) { a, b, c -> Triple(a, b, c) }
     .map { (wordDefinitions, displayMode, partOfSpeechFilter) ->
-        Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
+        //Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
         wordDefinitions.copyWith(
             buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter)
         )
@@ -411,7 +411,7 @@ open class DefinitionsVMImpl(
     // card sets
 
     override val cardSets = cardSetsRepository.cardSets.map {
-        Logger.v("build view items")
+        //Logger.v("build view items")
         it.copyWith(buildCardSetViewItems(it.data() ?: emptyList()))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 

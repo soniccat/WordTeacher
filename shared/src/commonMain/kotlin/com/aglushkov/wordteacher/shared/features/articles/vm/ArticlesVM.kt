@@ -45,7 +45,7 @@ open class ArticlesVMImpl(
 ): ViewModel(), ArticlesVM {
 
     override val articles = articlesRepository.shortArticles.map {
-        Logger.v("build view items")
+        //Logger.v("build view items")
         it.copyWith(buildViewItems(it.data() ?: emptyList()))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 

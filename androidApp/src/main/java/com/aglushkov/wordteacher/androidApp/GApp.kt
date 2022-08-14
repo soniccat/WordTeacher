@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.di.DaggerAppComponent
 import com.aglushkov.wordteacher.di.GeneralModule
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,6 +24,7 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var nlpCore: NLPCore
     @Inject lateinit var routerResolver: RouterResolver
     @Inject lateinit var activityVisibilityResolver: ActivityVisibilityResolver
+    @Inject lateinit var databaseCardWorker: DatabaseCardWorker
 
     override fun onCreate() {
         super.onCreate()

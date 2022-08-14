@@ -94,7 +94,7 @@ open class CardSetVMImpl(
     override val eventFlow = events.map { eventList -> eventList.filter { !it.isHandled } }
 
     override val viewItems = cardSet.map {
-        Logger.v("build view items")
+        //Logger.v("build view items")
         it.copyWith(buildViewItems(it))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
@@ -132,7 +132,7 @@ open class CardSetVMImpl(
 
     private fun mergeCardSets(dbCardSet: CardSet, inMemoryCardSet: CardSet): CardSet {
         // replace db cards with in-memory cards
-        Logger.v("merge cardSet $dbCardSet\n with $inMemoryCardSet")
+        //Logger.v("merge cardSet $dbCardSet\n with $inMemoryCardSet")
 
         return dbCardSet.copy(
             cards = dbCardSet.cards.map {

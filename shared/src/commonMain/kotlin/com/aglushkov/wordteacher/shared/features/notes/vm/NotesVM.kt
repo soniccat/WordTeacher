@@ -58,7 +58,7 @@ open class NotesVMImpl(
 
     override val notes = combine(notesRepository.notes, stateFlow) { a, b -> a to b }
     .map { (notes, state) ->
-        Logger.v("build view items")
+        //Logger.v("build view items")
         notes.copyWith(buildViewItems(notes.data() ?: emptyList(), state.newNoteText))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 

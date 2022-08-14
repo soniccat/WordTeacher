@@ -100,8 +100,14 @@ open class LearningVMImpl(
     // Screen state flow
     private fun startLearning(cardIds: List<Long>, teacherState: CardTeacher.State?) {
         viewModelScope.launch {
-            // TODO: show loading
-            databaseCardWorker.pushState(DatabaseCardWorker.State.EDITING)
+            viewItems.value = Resource.Loading()
+
+            // TODO: consider updating span priority to calculate required card spans first
+            // Update all spans before starting editing
+            databaseCardWorker.pushState(DatabaseCardWorker.State.UPDATING_SPANS)
+            databaseCardWorker.waitUntilUpdatingSpansIsDone()
+            databaseCardWorker.popState(DatabaseCardWorker.State.UPDATING_SPANS)
+            databaseCardWorker.pushStateAndWait(DatabaseCardWorker.State.EDITING)
 
             // Need to load cards first
             val cards = cardLoader.loadCardsUntilLoaded(

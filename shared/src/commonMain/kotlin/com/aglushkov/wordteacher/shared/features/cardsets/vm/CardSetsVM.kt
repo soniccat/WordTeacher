@@ -51,7 +51,7 @@ open class CardSetsVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
     override val cardSets = cardSetsRepository.cardSets.map {
-        Logger.v("build view items")
+        //Logger.v("build view items")
         it.copyWith(buildViewItems(it.data() ?: emptyList(), state.newCardSetText))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 

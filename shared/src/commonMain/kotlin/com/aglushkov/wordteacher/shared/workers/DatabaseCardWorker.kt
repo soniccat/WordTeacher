@@ -77,13 +77,24 @@ class DatabaseCardWorker(
     private suspend fun prepareToNewState(newState: State) {
         when (newState) {
             State.EDITING -> {
-                spanUpdateWorker.pauseAndWaitUntilDone()
+                Logger.v("pauseAndWaitUntilPausedOrDone", "DatabaseCardWorker")
+                spanUpdateWorker.pauseAndWaitUntilPausedOrDone()
             }
             State.UPDATING_SPANS -> {
+                Logger.v("waitUntilEditingIsDone", "DatabaseCardWorker")
                 waitUntilEditingIsDone()
+                Logger.v("spanUpdateWorker.resume()", "DatabaseCardWorker")
                 spanUpdateWorker.resume()
             }
         }
+    }
+
+//    suspend fun waitUntilUpdatingSpansIsStarted() {
+//        spanUpdateWorker.waitUntilStarted()
+//    }
+
+    suspend fun waitUntilUpdatingSpansIsDone() {
+        spanUpdateWorker.waitUntilDone()
     }
 
     suspend fun waitUntilEditingIsDone() {
@@ -177,10 +188,18 @@ class DatabaseCardWorker(
     private suspend fun <T> performEditOperation(block: suspend () -> T): T {
         return try {
             validateEditingState()
-            editOperationCount.update { it + 1 }
+            editOperationCount.update {
+                val v = it + 1
+                Logger.v("editOperationCount: $v", "DatabaseCardWorker")
+                v
+            }
             block()
         } finally {
-            editOperationCount.update { it - 1 }
+            editOperationCount.update {
+                val v = it - 1
+                Logger.v("editOperationCount: $v", "DatabaseCardWorker")
+                v
+            }
         }
     }
 

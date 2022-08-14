@@ -25,7 +25,7 @@ class SerialQueue { // like iOS serial queue
                     Logger.e(ex.message.orEmpty(), "SequentialWorker")
                 }
             }
-            Logger.e("omg rrrr")
+            Logger.e("omg SerialQueue has finished...")
         }
     }
 
