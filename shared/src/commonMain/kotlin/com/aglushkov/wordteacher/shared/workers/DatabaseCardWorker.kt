@@ -42,7 +42,18 @@ class DatabaseCardWorker(
         emit(State.EDITING)
     }
 
-    fun pushState(newState: State) = serialQueue.send {
+    fun startEditing() = pushState(State.EDITING)
+
+    fun endEditing() = popState(State.EDITING)
+
+    suspend fun updateSpansAndStartEditing() {
+        pushState(State.UPDATING_SPANS)
+        waitUntilUpdatingSpansIsDone()
+        popState(State.UPDATING_SPANS)
+        pushStateAndWait(State.EDITING)
+    }
+
+    private fun pushState(newState: State) = serialQueue.send {
         pushStateInternal(newState)
     }
 
@@ -59,7 +70,7 @@ class DatabaseCardWorker(
         stateStack = stateStack + newState
     }
 
-    fun popState(state: State) = serialQueue.send {
+    private fun popState(state: State) = serialQueue.send {
         popStateInternal(state)
     }
 

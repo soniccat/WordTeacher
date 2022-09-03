@@ -100,7 +100,7 @@ open class CardSetVMImpl(
 
     init {
         viewModelScope.launch {
-            databaseCardWorker.pushState(DatabaseCardWorker.State.EDITING)
+            databaseCardWorker.startEditing()
         }
     }
 
@@ -109,9 +109,8 @@ open class CardSetVMImpl(
         onEndEditing()
     }
 
-    fun onEndEditing() {
-        databaseCardWorker.popState(DatabaseCardWorker.State.EDITING)
-    }
+    private fun onEndEditing() =
+        databaseCardWorker.endEditing()
 
     fun restore(newState: CardSetVM.State) {
         state = newState

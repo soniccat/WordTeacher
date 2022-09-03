@@ -159,7 +159,7 @@ private sealed interface State {
     fun getPrevState(): State = when(this) {
         is PendingPause -> pendingPrevState
         is Paused -> pausedPrevState
-        else -> InProgress
+        else -> this
     }
 }
 
