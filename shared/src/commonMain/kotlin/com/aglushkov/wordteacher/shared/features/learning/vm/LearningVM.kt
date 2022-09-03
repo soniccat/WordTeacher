@@ -102,7 +102,7 @@ open class LearningVMImpl(
         viewModelScope.launch {
             viewItems.value = Resource.Loading()
 
-            // TODO: consider updating span priority to calculate required card spans first
+            // TODO: consider updating span priority to calculate required card spans first and skip not required for now
             // Update all spans before starting editing
             databaseCardWorker.pushState(DatabaseCardWorker.State.UPDATING_SPANS)
             databaseCardWorker.waitUntilUpdatingSpansIsDone()

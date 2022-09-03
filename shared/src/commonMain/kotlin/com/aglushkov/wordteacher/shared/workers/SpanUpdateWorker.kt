@@ -18,22 +18,15 @@ class SpanUpdateWorker (
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val state = MutableStateFlow<State>(State.Done)
-//    private val pendingState = MutableStateFlow(State.Idle)
 
     init {
         scope.launch {
             nlpCore.waitUntilInitialized()
             val nlpCoreCopy = nlpCore.clone()
             database.cards.selectCardsWithOutdatedSpans().asFlow().collect { query ->
-//                var wasPaused = false
                 do {
                     Logger.v("wait until not paused", "SpanUpdateWorker")
-//                    wasPaused = false
                     state.takeWhile { it.isPaused() }.collect()
-                    //pauseState.waitUntilFalse() // wait while we're on pause
-
-                    val cards = query.executeAsList() // execute or re-execute the query
-                    //inProgressState.value = true
                     state.update {
                         if (it.isPendingPause()) {
                             it
@@ -42,12 +35,11 @@ class SpanUpdateWorker (
                         }
                     }
 
+                    val cards = query.executeAsList() // execute or re-execute the query
                     Logger.v("is in progress or pending pause (${cards.size}, ${state.value})", "SpanUpdateWorker")
 
                     cards.forEach { card ->
-                        if (state.value.isPendingPause()) {
-//                            wasPaused = true;
-                            state.update { it.toPaused() }
+                        if (state.tryPauseIfPendingPause()) {
                             Logger.v("paused", "SpanUpdateWorker")
                             return@forEach
                         }
@@ -55,9 +47,7 @@ class SpanUpdateWorker (
                         var defSpans = emptyList<List<Pair<Int, Int>>>()
                         if (card.needToUpdateDefinitionSpans) {
                             defSpans = card.definitions.map {
-                                if (state.value.isPendingPause()) {
-//                                    wasPaused = true
-                                    state.update { it.toPaused() }
+                                if (state.tryPauseIfPendingPause()) {
                                     Logger.v("paused", "SpanUpdateWorker")
                                     return@forEach
                                 }
@@ -68,9 +58,7 @@ class SpanUpdateWorker (
                         var exampleSpans = emptyList<List<Pair<Int, Int>>>()
                         if (card.needToUpdateExampleSpans) {
                             exampleSpans = card.examples.map {
-                                if (state.value.isPendingPause()) {
-//                                    wasPaused = true
-                                    state.update { it.toPaused() }
+                                if (state.tryPauseIfPendingPause()) {
                                     Logger.v("paused", "SpanUpdateWorker")
                                     return@forEach
                                 }
@@ -78,9 +66,7 @@ class SpanUpdateWorker (
                             }
                         }
 
-                        if (state.value.isPendingPause()) {
-//                            wasPaused = true
-                            state.update { it.toPaused() }
+                        if (state.tryPauseIfPendingPause()) {
                             Logger.v("paused", "SpanUpdateWorker")
                             return@forEach
                         }
@@ -97,7 +83,6 @@ class SpanUpdateWorker (
                         }
                     }
 
-//                    inProgressState.value = false
                     Logger.v("completed, paused=${ state.value.isPaused() }", "SpanUpdateWorker")
                 } while (state.value.isPaused()) // we were interrupted, need to try again
 
@@ -114,7 +99,7 @@ class SpanUpdateWorker (
             } else if (it.isDone()) {
                 it.toPaused()
             } else {
-                State.PendingPause
+                State.PendingPause(it)
             }
         }
     }
@@ -140,16 +125,17 @@ class SpanUpdateWorker (
 private sealed interface State {
     object Done: State // no requests to execute
     object InProgress: State // working with cards right now
-    object PendingPause: State // pause request is in progress
-    data class Paused(val prevState: State): State // interrupted working with cards, will proceed after resuming
+    data class PendingPause(val pendingPrevState: State): State // pause request is in progress
+    data class Paused(val pausedPrevState: State): State // interrupted working with cards, will proceed after resuming
 
     fun toPaused() = when(this) {
         is Paused -> this
-        else -> Paused(this)
+        else -> Paused(this.getPrevState())
     }
 
     fun resume() = when(this) {
-        is Paused -> prevState
+        is Paused -> pausedPrevState
+        is PendingPause -> pendingPrevState
         else -> this
     }
 
@@ -169,4 +155,19 @@ private sealed interface State {
     }
 
     fun isPausedOrDone() = isPaused() || isDone()
+
+    fun getPrevState(): State = when(this) {
+        is PendingPause -> pendingPrevState
+        is Paused -> pausedPrevState
+        else -> InProgress
+    }
 }
+
+private fun MutableStateFlow<State>.tryPauseIfPendingPause(): Boolean =
+    updateAndGet {
+        if (it.isPendingPause()) {
+            it.toPaused()
+        } else {
+            it
+        }
+    } is State.Paused
