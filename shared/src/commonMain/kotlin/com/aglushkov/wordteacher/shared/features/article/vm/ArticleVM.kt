@@ -26,12 +26,19 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import com.russhwolf.settings.coroutines.FlowSettings
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import io.ktor.util.Identity.decode
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 
 interface ArticleVM: Clearable {
     val state: StateFlow<State>
@@ -62,6 +69,7 @@ interface ArticleVM: Clearable {
     ) : Parcelable
 
     @Parcelize
+    @Serializable
     data class SelectionState(
         var partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
         var phrases: Set<ChunkType> = emptySet(),
@@ -79,6 +87,7 @@ open class ArticleVMImpl(
     initialState: ArticleVM.State,
     private val router: ArticleRouter,
     private val idGenerator: IdGenerator,
+    private val settings: FlowSettings
 ): ViewModel(), ArticleVM {
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
@@ -121,6 +130,19 @@ open class ArticleVMImpl(
                         emptyList()
                     }
                 }.collect(annotations)
+        }
+
+        viewModelScope.launch {
+            state.collect {
+                val selectionStateString = withContext(Dispatchers.Default) {
+                    Json {
+                        ignoreUnknownKeys = true
+                    }.encodeToString(it.selectionState)
+
+                }
+
+                settings.putString("dicts", selectionStateString)
+            }
         }
     }
 

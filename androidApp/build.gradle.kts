@@ -91,8 +91,9 @@ dependencies {
     implementation(libs.coroutinesCommon)
     implementation(libs.coroutinesAndroid)
     implementation(libs.ktorAndroidClient)
-
     implementation(libs.okio)
+    //implementation(libs.settingsDataStore)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation("com.google.dagger:dagger:2.40.5")
     kapt("com.google.dagger:dagger-compiler:2.40.5")

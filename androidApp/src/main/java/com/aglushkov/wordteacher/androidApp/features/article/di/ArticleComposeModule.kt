@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
+import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Module
 import dagger.Provides
 
@@ -63,7 +64,8 @@ class ArticleComposeModule {
         cardsRepository: CardsRepository,
         dictRepository: DictRepository,
         idGenerator: IdGenerator,
-        router: RouterResolver
+        router: RouterResolver,
+        settings: FlowSettings
     ) = ArticleDecomposeComponent(
         componentContext,
         configuration.id,
@@ -72,6 +74,7 @@ class ArticleComposeModule {
         cardsRepository,
         dictRepository,
         idGenerator,
-        router.router!!.get()!!
+        router.router!!.get()!!,
+        settings
     )
 }

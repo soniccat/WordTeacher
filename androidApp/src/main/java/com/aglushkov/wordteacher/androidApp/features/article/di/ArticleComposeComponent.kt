@@ -18,6 +18,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
+import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Qualifier
@@ -50,4 +51,5 @@ interface ArticleComposeComponent {
 interface ArticleDependencies {
     fun database(): AppDatabase
     fun nlpCore(): NLPCore
+    fun settings(): FlowSettings
 }

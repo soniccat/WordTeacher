@@ -26,6 +26,7 @@ uuid = "0.3.0"
 junit = "4.13"
 stately = "1.2.0"
 mockitoKotlin = "4.0.0"
+settings = "0.9"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
@@ -79,6 +80,11 @@ ktorDesktop = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 statelyCommon = { module = "co.touchlab:stately-common", version.ref = "stately" }
 statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
+
+settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
+settingsCoroutinesMt = { module = "com.russhwolf:multiplatform-settings-coroutines-native-mt", version.ref = "settings" }
+settingsCoroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "settings" }
+settingsDataStore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "settings" }
 
 mockitoKotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 

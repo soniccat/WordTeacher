@@ -29,6 +29,7 @@ import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.service.ConfigService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Component
 
 
@@ -45,6 +46,7 @@ public interface AppComponent:
     LearningDependencies,
     LearningSessionResultDependencies {
 
+    override fun settings(): FlowSettings
     fun configService(): ConfigService
     fun configRepository(): ConfigRepository
     fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository

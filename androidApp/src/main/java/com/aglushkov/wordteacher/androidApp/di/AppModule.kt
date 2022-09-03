@@ -1,6 +1,9 @@
 package com.aglushkov.wordteacher.di
 
 import android.content.Context
+import androidx.datastore.dataStoreFile
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.preferencesDataStore
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.di.AppComp
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
@@ -27,6 +30,8 @@ import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServic
 import com.aglushkov.wordteacher.shared.service.ConfigService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
+import com.russhwolf.settings.coroutines.FlowSettings
+import com.russhwolf.settings.datastore.DataStoreSettings
 import okio.FileSystem
 import dagger.Module
 import dagger.Provides
@@ -75,6 +80,18 @@ class AppModule {
         fileSystem: FileSystem
     ): DictFactory {
         return DictFactory(fileSystem)
+    }
+
+    @AppComp
+    @Provides
+    fun settings(
+        context: Context
+    ): FlowSettings {
+        return DataStoreSettings(
+            PreferenceDataStoreFactory.create {
+                context.dataStoreFile("settings.preferences_pb")
+            }
+        )
     }
 
     @AppComp

@@ -12,6 +12,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.statekeeper.consume
+import com.russhwolf.settings.coroutines.FlowSettings
 
 class ArticleDecomposeComponent(
     componentContext: ComponentContext,
@@ -22,6 +23,7 @@ class ArticleDecomposeComponent(
     dictRepository: DictRepository,
     idGenerator: IdGenerator,
     router: ArticleRouter,
+    settings: FlowSettings
 ) : ArticleVMImpl (
     definitionsVM,
     articleRepository,
@@ -29,7 +31,8 @@ class ArticleDecomposeComponent(
     dictRepository,
     ArticleVM.State(id = id, DefinitionsVM.State()), // TODO: it seems we can remove it
     router,
-    idGenerator
+    idGenerator,
+    settings
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
