@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -52,6 +53,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.chunkEnum
 import com.aglushkov.wordteacher.shared.model.nlp.toStringDesc
 import com.aglushkov.wordteacher.shared.model.partOfSpeechEnum
 import com.aglushkov.wordteacher.shared.model.toStringDesc
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -69,6 +71,15 @@ fun ArticleUI(
     val data = paragraphs.data()
 
     val sideSheetState = rememberSideSheetState(SideSheetValue.Closed)
+    val lazyColumnState = rememberLazyListState(state.lastFirstVisibleItem)
+
+    LaunchedEffect(lazyColumnState) {
+        snapshotFlow { lazyColumnState.firstVisibleItemIndex }
+            .filter { it != state.lastFirstVisibleItem }
+            .collect {
+                vm.onFirstItemIndexChanged(it)
+            }
+    }
 
     BoxWithConstraints {
         val swipeableState = rememberSwipeableState(BottomSheetStates.Collapsed)
@@ -108,6 +119,7 @@ fun ArticleUI(
 
                 if (data != null) {
                     LazyColumn(
+                        state = lazyColumnState,
                         contentPadding = PaddingValues(
                             bottom = dimensionResource(id = R.dimen.article_horizontalPadding) + this@BoxWithConstraints.maxHeight / 2
                         )

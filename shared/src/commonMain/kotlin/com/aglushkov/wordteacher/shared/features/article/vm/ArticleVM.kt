@@ -52,6 +52,7 @@ interface ArticleVM: Clearable {
     fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech)
     fun onPhraseSelectionChanged(phraseType: ChunkType)
     fun onDictSelectionChanged(dictPath: String)
+    fun onFirstItemIndexChanged(index: Int)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
@@ -60,37 +61,63 @@ interface ArticleVM: Clearable {
         private val settings: FlowSettings,
     ) {
         private val SELECTION_STATE_KEY = "articleSelectionState"
-        private val DEFAULT_SELECTION_STATE = "{}"
+        private val FIRSTITEMINDEX_STATE_KEY = "articleFirstItemState"
         private val jsonCoder = Json {
             ignoreUnknownKeys = true
         }
+        private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
         private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-        private var inMemorySelectionState: SelectionState = runBlocking {
-            settings.getString(SELECTION_STATE_KEY, DEFAULT_SELECTION_STATE).let {
-                jsonCoder.decodeFromString(it)
-            }
+
+        private var inMemoryState = runBlocking {
+            InMemoryState(
+                id = id,
+                selectionState =
+                    settings.getString(SELECTION_STATE_KEY, "{}").let {
+                        try {
+                            jsonCoder.decodeFromString(it) as SelectionState
+                        } catch (e: Exception) {
+                            SelectionState()
+                        }
+                    }
+                ,
+                lastFirstVisibleItemMap = settings.getString(FIRSTITEMINDEX_STATE_KEY, "{}").let {
+                    try {
+                        (jsonCoder.decodeFromString(it) as Map<Long, Int>)
+                    } catch (e: Exception) {
+                        emptyMap()
+                    }
+                }
+            )
         }
 
-        private val mutableFlow = MutableStateFlow(
-            State(
-                id = id,
-                selectionState = inMemorySelectionState
-            )
-        )
-
-        val stateFlow: StateFlow<State> = mutableFlow
+        private val mutableFlow = MutableStateFlow(inMemoryState)
+        val stateFlow: StateFlow<State> = mutableFlow.map { it.toState() }
+            .stateIn(mainScope, SharingStarted.Eagerly, inMemoryState.toState())
 
         var selectionState: SelectionState
-            get() {
-                return inMemorySelectionState
-            }
+            get() = inMemoryState.selectionState
             set(value) {
+                inMemoryState = inMemoryState.copy(selectionState = value)
+                mutableFlow.update { inMemoryState }
                 scope.launch {
                     val stringValue = jsonCoder.encodeToString(value)
                     settings.putString(SELECTION_STATE_KEY, stringValue)
                 }
-                inMemorySelectionState = value
-                mutableFlow.update { it.copy(selectionState = value) }
+            }
+
+        var lastFirstVisibleItem: Int
+            get() = inMemoryState.lastFirstVisibleItem
+            set(value) {
+                if (value != inMemoryState.lastFirstVisibleItem) {
+                    inMemoryState = inMemoryState.updateWithLastFirstVisibleItem(value)
+                    mutableFlow.update { inMemoryState }
+
+                    val mapToStore = inMemoryState.lastFirstVisibleItemMap
+                    scope.launch {
+                        val stringValue = jsonCoder.encodeToString(mapToStore)
+                        settings.putString(FIRSTITEMINDEX_STATE_KEY, stringValue)
+                    }
+                }
             }
 
         fun updateSelectionState(block: (SelectionState) -> SelectionState) {
@@ -98,10 +125,26 @@ interface ArticleVM: Clearable {
         }
     }
 
+    private data class InMemoryState(
+        val id: Long,
+        val selectionState: SelectionState = SelectionState(),
+        val lastFirstVisibleItemMap: Map<Long, Int> = emptyMap() // keep the whole map not to reload it repeatedly
+    ) {
+        val lastFirstVisibleItem: Int
+            get() = lastFirstVisibleItemMap[id] ?: 0
+
+        fun toState() = State(id = id, selectionState = selectionState, lastFirstVisibleItem = lastFirstVisibleItem)
+        fun updateWithLastFirstVisibleItem(index: Int) =
+            copy(
+                lastFirstVisibleItemMap = lastFirstVisibleItemMap + (id to index)
+            )
+    }
+
     @Parcelize
     data class State(
         val id: Long,
-        val selectionState: SelectionState = SelectionState()
+        val selectionState: SelectionState = SelectionState(),
+        val lastFirstVisibleItem: Int = 0
     ) : Parcelable
 
     @Parcelize
@@ -347,6 +390,10 @@ open class ArticleVMImpl(
                 }
             )
         }
+    }
+
+    override fun onFirstItemIndexChanged(index: Int) {
+        stateController.lastFirstVisibleItem = index
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
