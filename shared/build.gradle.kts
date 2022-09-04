@@ -1,3 +1,5 @@
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
+
 plugins {
     id("kmmlib-convention")
     id("android-base-convention")
@@ -35,8 +37,7 @@ kotlin {
                 implementation(libs.decompose)
                 implementation(libs.statelyCommon)
                 implementation(libs.statelyConcurrency)
-
-                //api(libs.settings)
+                api(libs.settingsCoroutinesMt)
                 api(libs.mokoResourcesLib)
             }
         }
@@ -54,8 +55,6 @@ kotlin {
                 implementation(libs.sqlDelightAndroidDriver)
                 implementation("org.apache.opennlp:opennlp-tools:1.9.4")
                 implementation("org.jsoup:jsoup:1.14.3")
-                api(libs.settingsCoroutines) // can't put it in common as settingsDataStore isn't compatible with settingsCoroutinesMt (lots of duplication)
-                api(libs.settingsDataStore)
 
                 // for compose-jb - uncomment - start
 //                implementation(compose.runtime)
@@ -85,7 +84,6 @@ kotlin {
                     }
                 }*/
                 implementation(libs.sqlDelightiOSDriver)
-                api(libs.settingsCoroutinesMt)
             }
         }
         val iosTest by getting
@@ -101,7 +99,6 @@ kotlin {
 //                implementation(compose.uiTooling)
 //                implementation(compose.preview)
                 implementation(libs.sqlDelightJvmDriver)
-                api(libs.settingsCoroutinesMt)
             }
         }
     }

@@ -7,12 +7,10 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsWordContext
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.Quadruple
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -29,16 +27,13 @@ import com.arkivanov.essenty.parcelable.Parcelize
 import com.russhwolf.settings.coroutines.FlowSettings
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import io.ktor.util.Identity.decode
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
 
 interface ArticleVM: Clearable {
     val state: StateFlow<State>
@@ -53,7 +48,6 @@ interface ArticleVM: Clearable {
     fun onBackPressed()
     fun onTextClicked(sentence: NLPSentence, offset: Int): Boolean
     fun onTryAgainClicked()
-    fun onPhrasalVerbSelectionChanged()
     fun onCardSetWordSelectionChanged()
     fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech)
     fun onPhraseSelectionChanged(phraseType: ChunkType)
@@ -61,21 +55,62 @@ interface ArticleVM: Clearable {
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
+    class StateController(
+        id: Long,
+        private val settings: FlowSettings,
+    ) {
+        private val SELECTION_STATE_KEY = "articleSelectionState"
+        private val DEFAULT_SELECTION_STATE = "{}"
+        private val jsonCoder = Json {
+            ignoreUnknownKeys = true
+        }
+        private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+        private var inMemorySelectionState: SelectionState = runBlocking {
+            settings.getString(SELECTION_STATE_KEY, DEFAULT_SELECTION_STATE).let {
+                jsonCoder.decodeFromString(it)
+            }
+        }
+
+        private val mutableFlow = MutableStateFlow(
+            State(
+                id = id,
+                selectionState = inMemorySelectionState
+            )
+        )
+
+        val stateFlow: StateFlow<State> = mutableFlow
+
+        var selectionState: SelectionState
+            get() {
+                return inMemorySelectionState
+            }
+            set(value) {
+                scope.launch {
+                    val stringValue = jsonCoder.encodeToString(value)
+                    settings.putString(SELECTION_STATE_KEY, stringValue)
+                }
+                inMemorySelectionState = value
+                mutableFlow.update { it.copy(selectionState = value) }
+            }
+
+        fun updateSelectionState(block: (SelectionState) -> SelectionState) {
+            this.selectionState = block.invoke(this.selectionState)
+        }
+    }
+
     @Parcelize
     data class State(
-        var id: Long,
-        var definitionsState: DefinitionsVM.State,
-        var selectionState: SelectionState = SelectionState()
+        val id: Long,
+        val selectionState: SelectionState = SelectionState()
     ) : Parcelable
 
     @Parcelize
     @Serializable
     data class SelectionState(
-        var partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
-        var phrases: Set<ChunkType> = emptySet(),
-        var cardSetWords: Boolean = true,
-        var phrasalVerbs: Boolean = true,
-        var dicts: List<String> = emptyList()
+        val partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
+        val phrases: Set<ChunkType> = emptySet(),
+        val cardSetWords: Boolean = true,
+        val dicts: List<String> = emptyList()
     ) : Parcelable
 }
 
@@ -84,16 +119,21 @@ open class ArticleVMImpl(
     private val articleRepository: ArticleRepository,
     private val cardsRepository: CardsRepository,
     private val dictRepository: DictRepository,
-    initialState: ArticleVM.State,
+    articleId: Long,
     private val router: ArticleRouter,
     private val idGenerator: IdGenerator,
-    private val settings: FlowSettings
+    settings: FlowSettings
 ): ViewModel(), ArticleVM {
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
     override val article: StateFlow<Resource<Article>> = articleRepository.article
-    override val state = MutableStateFlow(initialState)
+
+    private val stateController = ArticleVM.StateController(
+        id = articleId,
+        settings = settings
+    )
+    override val state = stateController.stateFlow
 
     private val cardProgress = MutableStateFlow<Resource<Map<Pair<String, WordTeacherWord.PartOfSpeech>, Card>>>(
         Resource.Uninitialized())
@@ -130,19 +170,6 @@ open class ArticleVMImpl(
                         emptyList()
                     }
                 }.collect(annotations)
-        }
-
-        viewModelScope.launch {
-            state.collect {
-                val selectionStateString = withContext(Dispatchers.Default) {
-                    Json {
-                        ignoreUnknownKeys = true
-                    }.encodeToString(it.selectionState)
-
-                }
-
-                settings.putString("dicts", selectionStateString)
-            }
         }
     }
 
@@ -205,9 +232,6 @@ open class ArticleVMImpl(
     }
 
     fun restore(newState: ArticleVM.State) {
-        state.value = newState
-        definitionsVM.restore(newState.definitionsState)
-
         viewModelScope.launch {
             articleRepository.loadArticle(newState.id)
         }
@@ -281,68 +305,46 @@ open class ArticleVMImpl(
         return slice != null
     }
 
-    override fun onPhrasalVerbSelectionChanged() =
-        state.update {
-            it.copy(
-                selectionState = it.selectionState.copy(
-                    phrasalVerbs = !it.selectionState.phrasalVerbs
-                )
-            )
-        }
-
     override fun onCardSetWordSelectionChanged() =
-        state.update {
-            it.copy(
-                selectionState = it.selectionState.copy(
-                    cardSetWords = !it.selectionState.cardSetWords
-                )
-            )
+        stateController.updateSelectionState {
+            it.copy(cardSetWords = !it.cardSetWords)
         }
 
     override fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech) {
-        state.update {
-            val partsOfSpeech = it.selectionState.partsOfSpeech
-            val needRemove = partsOfSpeech.contains(partOfSpeech)
+        stateController.updateSelectionState {
+            val needRemove = it.partsOfSpeech.contains(partOfSpeech)
             it.copy(
-                selectionState = it.selectionState.copy(
-                    partsOfSpeech = if (needRemove) {
-                        partsOfSpeech.minus(partOfSpeech)
-                    } else {
-                        partsOfSpeech.plus(partOfSpeech)
-                    }
-                )
+                partsOfSpeech = if (needRemove) {
+                    it.partsOfSpeech.minus(partOfSpeech)
+                } else {
+                    it.partsOfSpeech.plus(partOfSpeech)
+                }
             )
         }
     }
 
     override fun onPhraseSelectionChanged(phraseType: ChunkType) {
-        state.update {
-            val phrases = it.selectionState.phrases
-            val needRemove = phrases.contains(phraseType)
+        stateController.updateSelectionState {
+            val needRemove = it.phrases.contains(phraseType)
             it.copy(
-                selectionState = it.selectionState.copy(
-                    phrases = if (needRemove) {
-                        phrases.minus(phraseType)
-                    } else {
-                        phrases.plus(phraseType)
-                    }
-                )
+                phrases = if (needRemove) {
+                    it.phrases.minus(phraseType)
+                } else {
+                    it.phrases.plus(phraseType)
+                }
             )
         }
     }
 
     override fun onDictSelectionChanged(dictPath: String) {
-        state.update {
-            val dicts = it.selectionState.dicts
-            val needRemove = dicts.contains(dictPath)
+        stateController.updateSelectionState {
+            val needRemove = it.dicts.contains(dictPath)
             it.copy(
-                selectionState = it.selectionState.copy(
-                    dicts = if (needRemove) {
-                        dicts.minus(dictPath)
-                    } else {
-                        dicts.plus(dictPath)
-                    }
-                )
+                dicts = if (needRemove) {
+                    it.dicts.minus(dictPath)
+                } else {
+                    it.dicts.plus(dictPath)
+                }
             )
         }
     }

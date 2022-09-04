@@ -153,11 +153,6 @@ private fun ArticleSideSheetContent(
         textRes = R.string.article_side_sheet_selection_cardset_words,
         onClicked = { vm.onCardSetWordSelectionChanged() }
     )
-    CheckableListItem(
-        isChecked = state.selectionState.phrasalVerbs,
-        textRes = R.string.article_side_sheet_selection_phrasal_verbs,
-        onClicked = { vm.onPhrasalVerbSelectionChanged() }
-    )
 
     Text(
         modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),

@@ -29,14 +29,14 @@ class ArticleDecomposeComponent(
     articleRepository,
     cardsRepository,
     dictRepository,
-    ArticleVM.State(id = id, DefinitionsVM.State()), // TODO: it seems we can remove it
+    id,
     router,
     idGenerator,
     settings
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
-        Handler(stateKeeper.consume(KEY_STATE) ?: ArticleVM.State(id = id, DefinitionsVM.State()))
+        Handler(stateKeeper.consume(KEY_STATE) ?: ArticleVM.State(id = id))
     }
 
     init {
