@@ -1,6 +1,8 @@
 package main
 
 import (
+	"auth/cmd/userauthtoken"
+	"auth/cmd/usernetwork"
 	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,6 +14,7 @@ import (
 const MongoUserCounter = "count"
 
 type UserModel struct {
+	logger            *logger
 	counterCollection *mongo.Collection
 	userCollection    *mongo.Collection
 	authTokens        *mongo.Collection
@@ -40,7 +43,7 @@ func (m *UserModel) FindGoogleUser(context context.Context, googleUserId *string
 		bson.M{
 			"networks": bson.M{
 				"$elemMatch": bson.M{
-					"type":          NetworkGoogle,
+					"type":          usernetwork.Google,
 					"networkUserId": *googleUserId,
 				},
 			},
@@ -67,7 +70,7 @@ func (m *UserModel) InsertUser(context context.Context, user *User) (*User, erro
 
 	objId, ok := res.InsertedID.(primitive.ObjectID)
 	if !ok {
-		return nil, errors.New("InsertedID cast")
+		return nil, errors.New("InsertUser, InsertedID cast")
 	}
 
 	var newUser = *user
@@ -89,4 +92,53 @@ func (m *UserModel) GetNewUserCounter(context context.Context) (uint64, error) {
 	}
 
 	return counter.Count, nil
+}
+
+func (m *UserModel) InsertUserAuthToken(
+	context context.Context,
+	userId *primitive.ObjectID,
+	userNetwork *usernetwork.UserNetwork,
+	deviceId *string,
+) (*userauthtoken.UserAuthToken, error) {
+	token, err := userauthtoken.New(userId, userNetwork, deviceId)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.insertUserAuthToken(context, token)
+}
+
+func (m *UserModel) insertUserAuthToken(
+	context context.Context,
+	token *userauthtoken.UserAuthToken,
+) (*userauthtoken.UserAuthToken, error) {
+	// Remove stale auth tokens
+	if token.NetworkType != nil && token.DeviceId != nil {
+		_, err := m.authTokens.DeleteMany(
+			context,
+			bson.M{
+				"networkType": *token.NetworkType,
+				"deviceId":    token.DeviceId,
+			},
+		)
+		if err != nil {
+			m.logger.error.Printf("InsertUserToken DeleteMany error %f", err.Error())
+		}
+	}
+
+	res, err := m.authTokens.InsertOne(
+		context,
+		token,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	objId, ok := res.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, errors.New("InsertUserAuthToken, InsertedID cast")
+	}
+
+	token.ID = &objId
+	return token, nil
 }

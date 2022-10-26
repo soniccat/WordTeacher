@@ -6,6 +6,7 @@ require (
 	github.com/alexedwards/scs/redisstore v0.0.0-20220528130143-d93ace5be94b
 	github.com/alexedwards/scs/v2 v2.5.0
 	github.com/gomodule/redigo v1.8.9
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/mmorejon/microservices-docker-go-mongodb/movies v0.0.0-20210814221753-d2cdd54df461
 	go.mongodb.org/mongo-driver v1.10.3
@@ -23,6 +24,7 @@ require (
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
+	github.com/xorcare/pointer v1.2.1 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect

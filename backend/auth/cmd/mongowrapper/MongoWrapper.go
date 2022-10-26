@@ -1,4 +1,4 @@
-package main
+package mongowrapper
 
 import (
 	"context"
@@ -14,12 +14,12 @@ const EnvMongoPassword = "MONGODB_PASSWORD"
 const MongoTimeout = 20 * time.Second
 
 type MongoWrapper struct {
-	client     *mongo.Client
-	context    *context.Context
+	Client     *mongo.Client
+	Context    *context.Context
 	cancelFunc *context.CancelFunc
 }
 
-func createMongoWrapper(mongoURI *string, enableCredentials *bool) (*MongoWrapper, error) {
+func New(mongoURI *string, enableCredentials *bool) (*MongoWrapper, error) {
 	co := options.Client().ApplyURI(*mongoURI)
 	if *enableCredentials {
 		co.Auth = &options.Credential{
@@ -36,19 +36,19 @@ func createMongoWrapper(mongoURI *string, enableCredentials *bool) (*MongoWrappe
 	ctx, cancel := context.WithTimeout(context.Background(), MongoTimeout)
 
 	return &MongoWrapper{
-		client:     client,
-		context:    &ctx,
+		Client:     client,
+		Context:    &ctx,
 		cancelFunc: &cancel,
 	}, nil
 }
 
-func (mw *MongoWrapper) connect() error {
-	return mw.client.Connect(*mw.context)
+func (mw *MongoWrapper) Connect() error {
+	return mw.Client.Connect(*mw.Context)
 }
 
-func (mw *MongoWrapper) stop() {
+func (mw *MongoWrapper) Stop() {
 	(*mw.cancelFunc)()
-	if err := mw.client.Disconnect(*mw.context); err != nil {
+	if err := mw.Client.Disconnect(*mw.Context); err != nil {
 		panic(err)
 	}
 }

@@ -60,7 +60,7 @@ func createApplication(
 	}
 	err := app.setupMongo(mongoURI, enableCredentials)
 	if err == nil {
-		err = app.userModel.prepare(*app.mongoWrapper.context)
+		err = app.userModel.prepare(*app.mongoWrapper.Context)
 	}
 
 	return app, err
