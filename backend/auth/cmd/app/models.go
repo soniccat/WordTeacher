@@ -16,12 +16,6 @@ const (
 	SessionUserIdKey                    = "userId"
 )
 
-// Networks
-
-type SocialCredentials struct {
-	Token string `json:"token,omitempty"`
-}
-
 // Database
 
 // collections

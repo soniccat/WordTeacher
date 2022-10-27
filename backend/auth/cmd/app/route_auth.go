@@ -14,6 +14,10 @@ import (
 
 const GoogleIdTokenAudience = "409354406675-eqcftgj7fi5m4ri5s78r33kguqj2mgo3.apps.googleusercontent.com"
 
+type AuthInput struct {
+	Token string `json:"token,omitempty"`
+}
+
 type AuthResponse struct {
 	Token AuthResponseToken `json:"token"`
 	User  AuthResponseUser  `json:"user"`
@@ -40,6 +44,15 @@ func NewAuthErrorInvalidToken(str string) *AuthErrorInvalidToken {
 
 func (e *AuthErrorInvalidToken) Error() string { return e.s }
 
+//	Purpose:
+//		Validate input credentials and if everything is fine, generate new access token and refresh token
+//	In:
+//		Path: 	networkType
+//		Header: deviceId
+//		Body: 	AuthInput
+//	Out:
+//		AuthResponse
+//
 func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	// Path params
 	params := mux.Vars(r)
@@ -52,7 +65,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Body params
-	var credentials SocialCredentials
+	var credentials AuthInput
 	err := json.NewDecoder(r.Body).Decode(&credentials)
 	if err != nil {
 		app.serverError(w, err)
@@ -139,7 +152,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) resolveGoogleUser(
 	context context.Context,
-	credentials *SocialCredentials,
+	credentials *AuthInput,
 ) (*User, *usernetwork.UserNetwork, error) {
 
 	validator, err := idtoken.NewValidator(context)
