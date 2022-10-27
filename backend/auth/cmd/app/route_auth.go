@@ -1,7 +1,6 @@
 package main
 
 import (
-	"auth/cmd/sessiondata"
 	"auth/cmd/usernetwork"
 	"context"
 	"encoding/json"
@@ -111,7 +110,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create new access token / refresh token pair
-	token, err := app.userModel.InsertUserAuthToken(
+	token, err := app.InsertUserAuthToken(
 		r.Context(),
 		&user.ID,
 		userNetwork.NetworkType,
@@ -121,15 +120,6 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-
-	// Fill session with data to access them easily
-	sessiondata.New(
-		&token.AccessToken,
-		&token.RefreshToken,
-		userNetwork.NetworkType,
-		&deviceId,
-		&user.ID,
-	).Save(r.Context(), app.sessionManager)
 
 	// Build response
 	response := AuthResponse{

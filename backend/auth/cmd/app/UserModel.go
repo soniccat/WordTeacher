@@ -100,7 +100,7 @@ func (m *UserModel) InsertUserAuthToken(
 	networkType usernetwork.UserNetworkType,
 	deviceId string,
 ) (*userauthtoken.UserAuthToken, error) {
-	token, err := userauthtoken.New(userId, networkType, deviceId)
+	token, err := userauthtoken.Generate(userId, networkType, deviceId)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (m *UserModel) insertUserAuthToken(
 	_, err := m.authTokens.DeleteMany(
 		context,
 		bson.M{
-			"deviceId": token.DeviceId,
+			"deviceId": token.UserDeviceId,
 		},
 	)
 	if err != nil {

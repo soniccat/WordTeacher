@@ -1,7 +1,7 @@
 package main
 
 import (
-	"auth/cmd/sessiondata"
+	"auth/cmd/userauthtoken"
 	"encoding/json"
 	"net/http"
 )
@@ -50,18 +50,18 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sessionData, err := sessiondata.Load(r.Context(), app.sessionManager)
+	userAuthToken, err := userauthtoken.Load(r.Context(), app.sessionManager)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	if !sessionData.IsValid() {
+	if !userAuthToken.IsValid() {
 		app.clientError(w, http.StatusUnauthorized)
 		return
 	}
 
-	if !sessionData.IsMatched(
+	if !userAuthToken.IsMatched(
 		input.AccessToken,
 		input.RefreshToken,
 		deviceId,
@@ -72,10 +72,10 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: consider changing current auth token token changing
 	// Create new access token / refresh token pair
-	token, err := app.userModel.InsertUserAuthToken(
+	token, err := app.InsertUserAuthToken(
 		r.Context(),
-		&sessionData.UserMongoId,
-		sessionData.NetworkType,
+		userAuthToken.UserMongoId,
+		userAuthToken.NetworkType,
 		deviceId,
 	)
 	if err != nil {
