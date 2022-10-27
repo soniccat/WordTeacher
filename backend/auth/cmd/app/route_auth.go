@@ -1,13 +1,13 @@
 package main
 
 import (
+	"auth/cmd/sessiondata"
 	"auth/cmd/usernetwork"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/xorcare/pointer"
 	"google.golang.org/api/idtoken"
 	"net/http"
 )
@@ -59,16 +59,17 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	networkType := params["networkType"]
 
 	// Header params
-	var deviceId = pointer.String(r.Header.Get(HeaderDeviceId))
-	if len(*deviceId) == 1 {
-		deviceId = nil
+	var deviceId = r.Header.Get(HeaderDeviceId)
+	if len(deviceId) == 0 {
+		app.clientError(w, http.StatusBadRequest)
+		return
 	}
 
 	// Body params
 	var credentials AuthInput
 	err := json.NewDecoder(r.Body).Decode(&credentials)
 	if err != nil {
-		app.serverError(w, err)
+		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
@@ -113,7 +114,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	token, err := app.userModel.InsertUserAuthToken(
 		r.Context(),
 		&user.ID,
-		userNetwork,
+		userNetwork.NetworkType,
 		deviceId,
 	)
 	if err != nil {
@@ -122,10 +123,13 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fill session with data to access them easily
-	app.sessionManager.Put(r.Context(), SessionAccessTokenKey, token.AccessToken.Value)
-	app.sessionManager.Put(r.Context(), SessionAccessTokenExpirationDateKey, int64(token.AccessToken.ExpirationDate))
-	app.sessionManager.Put(r.Context(), SessionRefreshTokenKey, token.RefreshToken)
-	app.sessionManager.Put(r.Context(), SessionUserIdKey, user.ID.Hex())
+	sessiondata.New(
+		&token.AccessToken,
+		&token.RefreshToken,
+		userNetwork.NetworkType,
+		&deviceId,
+		&user.ID,
+	).Save(r.Context(), app.sessionManager)
 
 	// Build response
 	response := AuthResponse{
@@ -176,6 +180,11 @@ func (app *application) resolveGoogleUser(
 		return nil, nil, NewAuthErrorInvalidToken("google Id Token doesn't have an email")
 	}
 
+	googleName, ok := payload.Claims["name"].(string)
+	if !ok {
+		return nil, nil, NewAuthErrorInvalidToken("google Id Token doesn't have a name")
+	}
+
 	googleUser, err := app.userModel.FindGoogleUser(context, &googleUserId)
 	if err != nil {
 		return nil, nil, err
@@ -186,6 +195,7 @@ func (app *application) resolveGoogleUser(
 		NetworkType:   usernetwork.Google,
 		NetworkUserId: googleUserId,
 		Email:         googleEmail,
+		Name:          googleName,
 	}
 
 	return googleUser, userNetwork, nil

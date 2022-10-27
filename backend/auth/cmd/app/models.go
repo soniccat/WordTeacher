@@ -9,13 +9,6 @@ const CookieSession = "session"
 
 const HeaderDeviceId = "deviceId"
 
-const (
-	SessionAccessTokenKey               = "accessToken"
-	SessionAccessTokenExpirationDateKey = "accessTokenExpirationDate"
-	SessionRefreshTokenKey              = "refreshToken"
-	SessionUserIdKey                    = "userId"
-)
-
 // Database
 
 // collections

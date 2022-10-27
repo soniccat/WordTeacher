@@ -14,5 +14,6 @@ func (app *application) serverError(w http.ResponseWriter, err error) {
 }
 
 func (app *application) clientError(w http.ResponseWriter, status int) {
+	app.logger.info.Printf("Client error: %s", debug.Stack())
 	http.Error(w, http.StatusText(status), status)
 }

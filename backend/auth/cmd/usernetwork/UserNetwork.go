@@ -1,7 +1,5 @@
 package usernetwork
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
-
 type UserNetworkType int32
 
 const (
@@ -9,8 +7,8 @@ const (
 )
 
 type UserNetwork struct {
-	ID            primitive.ObjectID `bson:"_id,omitempty"`
-	NetworkType   UserNetworkType    `bson:"type"`
-	NetworkUserId string             `bson:"networkUserId,omitempty"`
-	Email         string             `bson:"email,omitempty"`
+	NetworkType   UserNetworkType `bson:"type"`
+	NetworkUserId string          `bson:"networkUserId,omitempty"`
+	Email         string          `bson:"email,omitempty"`
+	Name          string          `bson:"name,omitempty"`
 }

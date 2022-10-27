@@ -97,10 +97,10 @@ func (m *UserModel) GetNewUserCounter(context context.Context) (uint64, error) {
 func (m *UserModel) InsertUserAuthToken(
 	context context.Context,
 	userId *primitive.ObjectID,
-	userNetwork *usernetwork.UserNetwork,
-	deviceId *string,
+	networkType usernetwork.UserNetworkType,
+	deviceId string,
 ) (*userauthtoken.UserAuthToken, error) {
-	token, err := userauthtoken.New(userId, userNetwork, deviceId)
+	token, err := userauthtoken.New(userId, networkType, deviceId)
 	if err != nil {
 		return nil, err
 	}
@@ -113,19 +113,17 @@ func (m *UserModel) insertUserAuthToken(
 	token *userauthtoken.UserAuthToken,
 ) (*userauthtoken.UserAuthToken, error) {
 	// Remove stale auth tokens
-	if token.NetworkType != nil && token.DeviceId != nil {
-		_, err := m.authTokens.DeleteMany(
-			context,
-			bson.M{
-				"networkType": *token.NetworkType,
-				"deviceId":    token.DeviceId,
-			},
-		)
-		if err != nil {
-			m.logger.error.Printf("InsertUserToken DeleteMany error %f", err.Error())
-		}
+	_, err := m.authTokens.DeleteMany(
+		context,
+		bson.M{
+			"deviceId": token.DeviceId,
+		},
+	)
+	if err != nil {
+		m.logger.error.Printf("InsertUserToken DeleteMany error %f", err.Error())
 	}
 
+	// Add the new one
 	res, err := m.authTokens.InsertOne(
 		context,
 		token,
