@@ -4,6 +4,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"models/logger"
 	"os"
 	"time"
 )
@@ -12,6 +13,14 @@ const EnvMongoUsername = "MONGODB_USERNAME"
 const EnvMongoPassword = "MONGODB_PASSWORD"
 
 const MongoTimeout = 20 * time.Second
+
+// collections
+const (
+	MongoDatabaseUsers         = "users"
+	MongoCollectionUsers       = "users"
+	MongoCollectionUserCounter = "counter"
+	MongoCollectionAuthTokens  = "authTokens"
+)
 
 type MongoWrapper struct {
 	Client     *mongo.Client
@@ -51,4 +60,25 @@ func (mw *MongoWrapper) Stop() {
 	if err := mw.Client.Disconnect(*mw.Context); err != nil {
 		panic(err)
 	}
+}
+
+type MongoApp interface {
+	GetLogger() *logger.Logger
+	SetMongoWrapper(*MongoWrapper)
+}
+
+func SetupMongo(app MongoApp, mongoURI *string, enableCredentials *bool) error {
+	mongoWrapper, err := New(mongoURI, enableCredentials)
+	if err != nil {
+		app.GetLogger().Error.Printf("createMongoWrapper failed: %s", err.Error())
+		return err
+	}
+
+	if err = mongoWrapper.Connect(); err != nil {
+		app.GetLogger().Error.Printf("mongoWrapper.connect() failed: %s", err.Error())
+		return err
+	}
+
+	app.SetMongoWrapper(mongoWrapper)
+	return nil
 }

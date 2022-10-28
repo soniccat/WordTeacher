@@ -6,14 +6,10 @@ import (
 	"net/http"
 )
 
-type RefreshInput struct {
-	AccessToken  string `json:"accessToken,omitempty"`
-	RefreshToken string `json:"refreshToken,omitempty"`
+type CardSetUploadInput struct {
 }
 
-type RefreshResponse struct {
-	AccessToken  string `json:"accessToken,omitempty"`
-	RefreshToken string `json:"refreshToken,omitempty"`
+type CardSetUploadResponse struct {
 }
 
 // Purpose:
@@ -26,7 +22,7 @@ type RefreshResponse struct {
 // Out:
 //
 //	RefreshResponse
-func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
+func (app *application) cardSetUpload(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie(CookieSession)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -69,36 +65,6 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		deviceId,
 	) {
 		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	// TODO: consider changing current auth token token changing
-	// Create new access token / refresh token pair
-	token, err := app.InsertUserAuthToken(
-		r.Context(),
-		userAuthToken.UserMongoId,
-		userAuthToken.NetworkType,
-		deviceId,
-	)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	// Build response
-	response := RefreshResponse{
-		AccessToken:  token.AccessToken.Value,
-		RefreshToken: token.RefreshToken,
-	}
-
-	marshaledResponse, err := json.Marshal(response)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	if _, err = w.Write(marshaledResponse); err != nil {
-		app.serverError(w, err)
 		return
 	}
 }

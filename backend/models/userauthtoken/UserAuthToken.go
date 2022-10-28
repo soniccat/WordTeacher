@@ -1,13 +1,13 @@
 package userauthtoken
 
 import (
-	"auth/cmd/accesstoken"
-	"auth/cmd/usernetwork"
 	"context"
 	"errors"
 	"github.com/alexedwards/scs/v2"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"models/accesstoken"
+	"models/usernetwork"
 	"time"
 )
 

@@ -3,12 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/alexedwards/scs/redisstore"
-	"github.com/alexedwards/scs/v2"
-	"github.com/gomodule/redigo/redis"
-	"log"
+	"models/apphelpers"
+	"models/logger"
+	"models/mongowrapper"
+	"models/user"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -37,16 +36,16 @@ func main() {
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)
 	srv := &http.Server{
 		Addr:         serverURI,
-		ErrorLog:     app.logger.error,
+		ErrorLog:     app.logger.Error,
 		Handler:      app.routes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 
-	app.logger.info.Printf("Starting server on %s", serverURI)
+	app.logger.Info.Printf("Starting server on %s", serverURI)
 	err = srv.ListenAndServe()
-	app.logger.error.Fatal(err)
+	app.logger.Error.Fatal(err)
 }
 
 func createApplication(
@@ -55,34 +54,20 @@ func createApplication(
 	enableCredentials *bool,
 ) (*application, error) {
 	app := &application{
-		logger:         createLogger(),
-		sessionManager: createSessionManager(redisAddress),
+		logger:         logger.New(),
+		sessionManager: apphelpers.CreateSessionManager(redisAddress),
 	}
-	err := app.setupMongo(mongoURI, enableCredentials)
-	if err == nil {
-		err = app.userModel.prepare(*app.mongoWrapper.Context)
-	}
-
-	return app, err
-}
-
-func createSessionManager(redisAddress *string) *scs.SessionManager {
-	pool := &redis.Pool{
-		MaxIdle: 10,
-		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", *redisAddress)
-		},
+	err := mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
+	if err != nil {
+		return nil, err
 	}
 
-	sessionManager := scs.New()
-	sessionManager.Store = redisstore.New(pool)
-	sessionManager.Lifetime = 24 * time.Hour
-	return sessionManager
-}
-
-func createLogger() *logger {
-	return &logger{
-		error: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-		info:  log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime),
+	usersDatabase := app.mongoWrapper.Client.Database(mongowrapper.MongoDatabaseUsers)
+	app.userModel, err = user.NewUserModel(*app.mongoWrapper.Context, app.logger, usersDatabase)
+	if err != nil {
+		app.stop()
+		return nil, err
 	}
+
+	return app, nil
 }

@@ -16,6 +16,10 @@ func (app *application) routes() *mux.Router {
 		"/api/auth/refresh",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(app.refresh)),
 	).Methods("POST")
+	//r.Handle(
+	//	"/api/cardsets/upload",
+	//	app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetUpload)),
+	//).Methods("POST")
 	//r.HandleFunc("/api/movies/{id}", app.findByID).Methods("GET")
 	//r.HandleFunc("/api/movies/", app.insert).Methods("POST")
 	//r.HandleFunc("/api/movies/{id}", app.delete).Methods("DELETE")

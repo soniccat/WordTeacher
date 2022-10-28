@@ -1,13 +1,14 @@
 package main
 
 import (
-	"auth/cmd/usernetwork"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"google.golang.org/api/idtoken"
+	"models/user"
+	"models/usernetwork"
 	"net/http"
 )
 
@@ -43,15 +44,19 @@ func NewAuthErrorInvalidToken(str string) *AuthErrorInvalidToken {
 
 func (e *AuthErrorInvalidToken) Error() string { return e.s }
 
-//	Purpose:
-//		Validate input credentials and if everything is fine, generate new access token and refresh token
-//	In:
-//		Path: 	networkType
-//		Header: deviceId
-//		Body: 	AuthInput
-//	Out:
-//		AuthResponse
+// Purpose:
 //
+//	Validate input credentials and if everything is fine, generate new access token and refresh token
+//
+// In:
+//
+//	Path: 	networkType
+//	Header: deviceId
+//	Body: 	AuthInput
+//
+// Out:
+//
+//	AuthResponse
 func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	// Path params
 	params := mux.Vars(r)
@@ -73,11 +78,11 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Resolve user and userNetwork
-	var user *User
+	var aUser *user.User
 	var userNetwork *usernetwork.UserNetwork
 
 	if networkType == "google" {
-		user, userNetwork, err = app.resolveGoogleUser(r.Context(), &credentials)
+		aUser, userNetwork, err = app.resolveGoogleUser(r.Context(), &credentials)
 
 		if err, ok := err.(*AuthErrorInvalidToken); ok {
 			app.clientError(w, http.StatusBadRequest)
@@ -94,17 +99,17 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create user if needed
-	if user == nil {
-		user = &User{
+	if aUser == nil {
+		aUser = &user.User{
 			Networks: []usernetwork.UserNetwork{*userNetwork},
 		}
-		newUser, err := app.userModel.InsertUser(r.Context(), user)
+		newUser, err := app.userModel.InsertUser(r.Context(), aUser)
 		if err != nil {
 			app.serverError(w, err)
 			return
 		}
 
-		user = newUser
+		aUser = newUser
 	} else {
 		// TODO: add new network if needed
 	}
@@ -112,7 +117,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	// Create new access token / refresh token pair
 	token, err := app.InsertUserAuthToken(
 		r.Context(),
-		&user.ID,
+		&aUser.ID,
 		userNetwork.NetworkType,
 		deviceId,
 	)
@@ -128,7 +133,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 			RefreshToken: token.RefreshToken,
 		},
 		User: AuthResponseUser{
-			Id: fmt.Sprint(user.Counter),
+			Id: fmt.Sprint(aUser.Counter),
 		},
 	}
 
@@ -147,7 +152,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 func (app *application) resolveGoogleUser(
 	context context.Context,
 	credentials *AuthInput,
-) (*User, *usernetwork.UserNetwork, error) {
+) (*user.User, *usernetwork.UserNetwork, error) {
 
 	validator, err := idtoken.NewValidator(context)
 	if err != nil {

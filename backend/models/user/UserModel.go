@@ -1,31 +1,56 @@
-package main
+package user
 
 import (
-	"auth/cmd/userauthtoken"
-	"auth/cmd/usernetwork"
 	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/writeconcern"
+	"models/logger"
+	"models/mongowrapper"
+	"models/userauthtoken"
+	"models/usernetwork"
 )
 
 const MongoUserCounter = "count"
 
+// TODO: move in auth module
 type UserModel struct {
-	logger            *logger
-	counterCollection *mongo.Collection
-	userCollection    *mongo.Collection
-	authTokens        *mongo.Collection
+	Logger            *logger.Logger
+	CounterCollection *mongo.Collection
+	UserCollection    *mongo.Collection
+	AuthTokens        *mongo.Collection
+}
+
+func NewUserModel(context context.Context, logger *logger.Logger, usersDatabase *mongo.Database) (*UserModel, error) {
+	model := &UserModel{
+		Logger: logger,
+		CounterCollection: usersDatabase.
+			Collection(
+				mongowrapper.MongoCollectionUserCounter,
+				&options.CollectionOptions{
+					WriteConcern: writeconcern.New(writeconcern.WMajority()),
+				},
+			),
+		UserCollection: usersDatabase.Collection(mongowrapper.MongoCollectionUsers),
+		AuthTokens:     usersDatabase.Collection(mongowrapper.MongoCollectionAuthTokens),
+	}
+	err := model.prepare(context)
+	if err != nil {
+		return nil, err
+	}
+
+	return model, nil
 }
 
 func (m *UserModel) prepare(context context.Context) error {
 	var counter = UserCounter{}
-	err := m.counterCollection.FindOne(context, bson.M{}).Decode(&counter)
+	err := m.CounterCollection.FindOne(context, bson.M{}).Decode(&counter)
 
 	if err == mongo.ErrNoDocuments {
-		if _, err = m.counterCollection.InsertOne(context, bson.M{MongoUserCounter: uint64(1)}); err != nil {
+		if _, err = m.CounterCollection.InsertOne(context, bson.M{MongoUserCounter: uint64(1)}); err != nil {
 			return err
 		}
 
@@ -38,7 +63,7 @@ func (m *UserModel) prepare(context context.Context) error {
 func (m *UserModel) FindGoogleUser(context context.Context, googleUserId *string) (*User, error) {
 	var user = User{}
 
-	err := m.userCollection.FindOne(
+	err := m.UserCollection.FindOne(
 		context,
 		bson.M{
 			"networks": bson.M{
@@ -63,7 +88,7 @@ func (m *UserModel) InsertUser(context context.Context, user *User) (*User, erro
 	}
 
 	user.Counter = userCounter
-	res, err := m.userCollection.InsertOne(context, user)
+	res, err := m.UserCollection.InsertOne(context, user)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +106,7 @@ func (m *UserModel) InsertUser(context context.Context, user *User) (*User, erro
 
 func (m *UserModel) GetNewUserCounter(context context.Context) (uint64, error) {
 	var counter = UserCounter{}
-	err := m.counterCollection.FindOneAndUpdate(
+	err := m.CounterCollection.FindOneAndUpdate(
 		context,
 		bson.M{},
 		bson.M{"$inc": bson.M{MongoUserCounter: 1}},
@@ -94,6 +119,7 @@ func (m *UserModel) GetNewUserCounter(context context.Context) (uint64, error) {
 	return counter.Count, nil
 }
 
+// TODO: move in auth module
 func (m *UserModel) InsertUserAuthToken(
 	context context.Context,
 	userId *primitive.ObjectID,
@@ -108,23 +134,24 @@ func (m *UserModel) InsertUserAuthToken(
 	return m.insertUserAuthToken(context, token)
 }
 
+// TODO: move in auth module
 func (m *UserModel) insertUserAuthToken(
 	context context.Context,
 	token *userauthtoken.UserAuthToken,
 ) (*userauthtoken.UserAuthToken, error) {
 	// Remove stale auth tokens
-	_, err := m.authTokens.DeleteMany(
+	_, err := m.AuthTokens.DeleteMany(
 		context,
 		bson.M{
 			"deviceId": token.UserDeviceId,
 		},
 	)
 	if err != nil {
-		m.logger.error.Printf("InsertUserToken DeleteMany error %f", err.Error())
+		m.Logger.Error.Printf("InsertUserToken DeleteMany error %f", err.Error())
 	}
 
 	// Add the new one
-	res, err := m.authTokens.InsertOne(
+	res, err := m.AuthTokens.InsertOne(
 		context,
 		token,
 	)
