@@ -66,10 +66,10 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 
 	if !userAuthToken.IsMatched(
 		input.AccessToken,
-		input.RefreshToken,
+		&input.RefreshToken,
 		deviceId,
 	) {
-		app.clientError(w, http.StatusBadRequest)
+		app.clientError(w, http.StatusUnauthorized)
 		return
 	}
 

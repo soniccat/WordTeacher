@@ -87,37 +87,37 @@ func (sd *UserAuthToken) SaveAsSession(context context.Context, manager *scs.Ses
 func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken, error) {
 	sessionAccessToken, ok := manager.Get(context, SessionAccessTokenKey).(string)
 	if !ok {
-		return nil, errors.New("access token is missing")
+		return nil, errors.New("session access token is missing")
 	}
 
 	sessionAccessTokenExpirationDate, ok := manager.Get(context, SessionAccessTokenExpirationDateKey).(int64)
 	if !ok {
-		return nil, errors.New("access token expiration date is missing")
+		return nil, errors.New("session access token expiration date is missing")
 	}
 
 	sessionRefreshToken, ok := manager.Get(context, SessionRefreshTokenKey).(string)
 	if !ok {
-		return nil, errors.New("refresh token is missing")
+		return nil, errors.New("session refresh token is missing")
 	}
 
 	networkType, ok := manager.Get(context, SessionNetworkTypeKey).(int8)
 	if !ok {
-		return nil, errors.New("networkType is missing")
+		return nil, errors.New("session networkType is missing")
 	}
 
 	sessionDeviceId, ok := manager.Get(context, SessionUserDeviceId).(string)
 	if !ok || len(sessionDeviceId) == 0 {
-		return nil, errors.New("device id is missing")
+		return nil, errors.New("session device id is missing")
 	}
 
 	sessionUserMongoIdHex, ok := manager.Get(context, SessionUserMongoIdKey).(string)
 	if !ok {
-		return nil, errors.New("user mongo id is missing")
+		return nil, errors.New("session user mongo id is missing")
 	}
 
 	sessionUserMongoId, err := primitive.ObjectIDFromHex(sessionUserMongoIdHex)
 	if err != nil {
-		return nil, errors.New("user mongo id is missing")
+		return nil, errors.New("session user mongo id is missing")
 	}
 
 	return &UserAuthToken{
@@ -138,10 +138,10 @@ func (sd *UserAuthToken) IsValid() bool {
 
 func (sd *UserAuthToken) IsMatched(
 	accessToken string,
-	refreshToken string,
+	refreshToken *string,
 	userDeviceId string,
 ) bool {
 	return sd.AccessToken.Value == accessToken &&
-		sd.RefreshToken == refreshToken &&
+		(refreshToken == nil || sd.RefreshToken == *refreshToken) &&
 		sd.UserDeviceId == userDeviceId
 }

@@ -1,15 +1,23 @@
 package main
 
 import (
-	"encoding/json"
 	"models/apphelpers"
 	"models/cardset"
-	"models/userauthtoken"
+	"models/user"
 	"net/http"
 )
 
 type CardSetUploadInput struct {
-	cardSets []cardset.CardSet `json:"cardSets"`
+	AccessToken string               `json:"accessToken,omitempty"`
+	CardSets    []cardset.CardSetApi `json:"cardSets"`
+}
+
+func (i CardSetUploadInput) GetAccessToken() string {
+	return i.AccessToken
+}
+
+func (i CardSetUploadInput) GetRefreshToken() *string {
+	return nil
 }
 
 type CardSetUploadResponse struct {
@@ -26,49 +34,11 @@ type CardSetUploadResponse struct {
 //
 //	RefreshResponse
 func (app *application) cardSetUpload(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie(apphelpers.CookieSession)
+
+	input, err := user.ValidateSession[CardSetUploadInput](r, app.sessionManager)
 	if err != nil {
-		apphelpers.SetError(w, err, app.logger)
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-	if len(session.Value) == 0 {
-		app.clientError(w, http.StatusBadRequest)
+		apphelpers.SetError(w, err.InnerError, err.StatusCode, app.logger)
 		return
 	}
 
-	// Header params
-	var deviceId = r.Header.Get(app.HeaderDeviceId)
-	if len(deviceId) == 0 {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	// Body params
-	var input app.RefreshInput
-	err = json.NewDecoder(r.Body).Decode(&input)
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	userAuthToken, err := userauthtoken.Load(r.Context(), app.sessionManager)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	if !userAuthToken.IsValid() {
-		app.clientError(w, http.StatusUnauthorized)
-		return
-	}
-
-	if !userAuthToken.IsMatched(
-		input.AccessToken,
-		input.RefreshToken,
-		deviceId,
-	) {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
 }

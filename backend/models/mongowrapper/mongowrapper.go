@@ -16,10 +16,9 @@ const MongoTimeout = 20 * time.Second
 
 // collections
 const (
-	MongoDatabaseUsers         = "users"
-	MongoCollectionUsers       = "users"
-	MongoCollectionUserCounter = "counter"
-	MongoCollectionAuthTokens  = "authTokens"
+	MongoDatabaseUsers        = "users"
+	MongoCollectionUsers      = "users"
+	MongoCollectionAuthTokens = "authTokens"
 )
 
 type MongoWrapper struct {

@@ -2,62 +2,35 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"github.com/alexedwards/scs/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/writeconcern"
+	"models/apphelpers"
 	"models/logger"
 	"models/mongowrapper"
 	"models/userauthtoken"
 	"models/usernetwork"
+	"net/http"
 )
-
-const MongoUserCounter = "count"
 
 // TODO: move in auth module
 type UserModel struct {
-	Logger            *logger.Logger
-	CounterCollection *mongo.Collection
-	UserCollection    *mongo.Collection
-	AuthTokens        *mongo.Collection
+	Logger         *logger.Logger
+	UserCollection *mongo.Collection
+	AuthTokens     *mongo.Collection
 }
 
-func NewUserModel(context context.Context, logger *logger.Logger, usersDatabase *mongo.Database) (*UserModel, error) {
+func NewUserModel(logger *logger.Logger, usersDatabase *mongo.Database) (*UserModel, error) {
 	model := &UserModel{
-		Logger: logger,
-		CounterCollection: usersDatabase.
-			Collection(
-				mongowrapper.MongoCollectionUserCounter,
-				&options.CollectionOptions{
-					WriteConcern: writeconcern.New(writeconcern.WMajority()),
-				},
-			),
+		Logger:         logger,
 		UserCollection: usersDatabase.Collection(mongowrapper.MongoCollectionUsers),
 		AuthTokens:     usersDatabase.Collection(mongowrapper.MongoCollectionAuthTokens),
 	}
-	err := model.prepare(context)
-	if err != nil {
-		return nil, err
-	}
 
 	return model, nil
-}
-
-func (m *UserModel) prepare(context context.Context) error {
-	var counter = UserCounter{}
-	err := m.CounterCollection.FindOne(context, bson.M{}).Decode(&counter)
-
-	if err == mongo.ErrNoDocuments {
-		if _, err = m.CounterCollection.InsertOne(context, bson.M{MongoUserCounter: uint64(1)}); err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	return err
 }
 
 func (m *UserModel) FindGoogleUser(context context.Context, googleUserId *string) (*User, error) {
@@ -82,41 +55,17 @@ func (m *UserModel) FindGoogleUser(context context.Context, googleUserId *string
 }
 
 func (m *UserModel) InsertUser(context context.Context, user *User) (*User, error) {
-	userCounter, err := m.GetNewUserCounter(context)
-	if err != nil {
-		return nil, err
-	}
-
-	user.Counter = userCounter
 	res, err := m.UserCollection.InsertOne(context, user)
 	if err != nil {
 		return nil, err
 	}
 
-	objId, ok := res.InsertedID.(primitive.ObjectID)
-	if !ok {
-		return nil, errors.New("InsertUser, InsertedID cast")
-	}
+	objId := res.InsertedID.(primitive.ObjectID)
 
 	var newUser = *user
 	newUser.ID = objId
 
 	return &newUser, nil
-}
-
-func (m *UserModel) GetNewUserCounter(context context.Context) (uint64, error) {
-	var counter = UserCounter{}
-	err := m.CounterCollection.FindOneAndUpdate(
-		context,
-		bson.M{},
-		bson.M{"$inc": bson.M{MongoUserCounter: 1}},
-		options.FindOneAndUpdate().SetReturnDocument(options.After),
-	).Decode(&counter)
-	if err != nil {
-		return 0, err
-	}
-
-	return counter.Count, nil
 }
 
 // TODO: move in auth module
@@ -159,11 +108,71 @@ func (m *UserModel) insertUserAuthToken(
 		return nil, err
 	}
 
-	objId, ok := res.InsertedID.(primitive.ObjectID)
-	if !ok {
-		return nil, errors.New("GenerateUserAuthToken, InsertedID cast")
-	}
+	objId := res.InsertedID.(primitive.ObjectID)
 
 	token.ID = &objId
 	return token, nil
+}
+
+type ValidateSessionError struct {
+	StatusCode int
+	InnerError error
+}
+
+type TokenHolder interface {
+	GetAccessToken() string
+	GetRefreshToken() *string
+}
+
+func NewValidateSessionError(code int, err error) *ValidateSessionError {
+	return &ValidateSessionError{
+		StatusCode: code,
+		InnerError: err,
+	}
+}
+
+func (v *ValidateSessionError) Error() string {
+	return v.InnerError.Error()
+}
+
+func ValidateSession[T TokenHolder](
+	r *http.Request,
+	sessionManager *scs.SessionManager,
+) (*T, *ValidateSessionError) {
+	_, err := r.Cookie(apphelpers.CookieSession)
+	if err != nil {
+		return nil, NewValidateSessionError(http.StatusBadRequest, err)
+	}
+
+	// Header params
+	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
+	if len(deviceId) == 0 {
+		return nil, NewValidateSessionError(http.StatusBadRequest, errors.New("invalid device id"))
+	}
+
+	// Body params
+	var input T
+	err = json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		return nil, NewValidateSessionError(http.StatusBadRequest, err)
+	}
+
+	userAuthToken, err := userauthtoken.Load(r.Context(), sessionManager)
+	if err != nil {
+		return nil, NewValidateSessionError(http.StatusServiceUnavailable, err)
+	}
+
+	if !userAuthToken.IsValid() {
+		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
+	}
+
+	if !userAuthToken.IsMatched(
+		input.GetAccessToken(),
+		input.GetRefreshToken(),
+		deviceId,
+	) {
+		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
+	}
+
+	return &input, nil
 }
