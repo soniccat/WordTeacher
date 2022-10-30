@@ -120,7 +120,7 @@ func (m *UserModel) GetNewUserCounter(context context.Context) (uint64, error) {
 }
 
 // TODO: move in auth module
-func (m *UserModel) InsertUserAuthToken(
+func (m *UserModel) GenerateUserAuthToken(
 	context context.Context,
 	userId *primitive.ObjectID,
 	networkType usernetwork.UserNetworkType,
@@ -161,7 +161,7 @@ func (m *UserModel) insertUserAuthToken(
 
 	objId, ok := res.InsertedID.(primitive.ObjectID)
 	if !ok {
-		return nil, errors.New("InsertUserAuthToken, InsertedID cast")
+		return nil, errors.New("GenerateUserAuthToken, InsertedID cast")
 	}
 
 	token.ID = &objId

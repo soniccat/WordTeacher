@@ -1,9 +1,9 @@
 package usernetwork
 
-type UserNetworkType int32
+type UserNetworkType int8
 
 const (
-	Google UserNetworkType = 1
+	Google UserNetworkType = iota
 )
 
 type UserNetwork struct {

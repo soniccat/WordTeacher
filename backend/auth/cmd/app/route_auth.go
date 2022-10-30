@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"google.golang.org/api/idtoken"
+	"models/apphelpers"
 	"models/user"
 	"models/usernetwork"
 	"net/http"
@@ -63,7 +64,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	networkType := params["networkType"]
 
 	// Header params
-	var deviceId = r.Header.Get(HeaderDeviceId)
+	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
 	if len(deviceId) == 0 {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -115,7 +116,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create new access token / refresh token pair
-	token, err := app.InsertUserAuthToken(
+	token, err := app.GenerateUserAuthToken(
 		r.Context(),
 		&aUser.ID,
 		userNetwork.NetworkType,

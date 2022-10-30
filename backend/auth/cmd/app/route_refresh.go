@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"models/apphelpers"
 	"models/userauthtoken"
 	"net/http"
 )
@@ -27,7 +28,7 @@ type RefreshResponse struct {
 //
 //	RefreshResponse
 func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie(CookieSession)
+	session, err := r.Cookie(apphelpers.CookieSession)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -38,7 +39,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Header params
-	var deviceId = r.Header.Get(HeaderDeviceId)
+	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
 	if len(deviceId) == 0 {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -72,9 +73,9 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: consider changing current auth token token changing
+	// TODO: consider changing current auth token and refresh token
 	// Create new access token / refresh token pair
-	token, err := app.InsertUserAuthToken(
+	token, err := app.GenerateUserAuthToken(
 		r.Context(),
 		userAuthToken.UserMongoId,
 		userAuthToken.NetworkType,

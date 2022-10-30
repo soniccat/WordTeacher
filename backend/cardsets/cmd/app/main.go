@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"models/apphelpers"
+	"models/cardset"
 	"models/logger"
 	"models/mongowrapper"
-	"models/user"
 	"net/http"
 	"time"
 )
@@ -64,7 +64,7 @@ func createApplication(
 	}
 
 	usersDatabase := app.mongoWrapper.Client.Database(mongowrapper.MongoDatabaseUsers)
-	app.userModel, err = user.NewUserModel(*app.mongoWrapper.Context, app.logger, usersDatabase)
+	app.cardSetModel, err = cardset.CardSetModel{}(*app.mongoWrapper.Context, app.logger, usersDatabase)
 	if err != nil {
 		app.stop()
 		return nil, err

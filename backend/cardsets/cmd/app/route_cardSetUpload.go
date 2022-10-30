@@ -2,11 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"models/apphelpers"
+	"models/cardset"
 	"models/userauthtoken"
 	"net/http"
 )
 
 type CardSetUploadInput struct {
+	cardSets []cardset.CardSet `json:"cardSets"`
 }
 
 type CardSetUploadResponse struct {
@@ -23,8 +26,9 @@ type CardSetUploadResponse struct {
 //
 //	RefreshResponse
 func (app *application) cardSetUpload(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie(CookieSession)
+	session, err := r.Cookie(apphelpers.CookieSession)
 	if err != nil {
+		apphelpers.SetError(w, err, app.logger)
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
@@ -34,14 +38,14 @@ func (app *application) cardSetUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Header params
-	var deviceId = r.Header.Get(HeaderDeviceId)
+	var deviceId = r.Header.Get(app.HeaderDeviceId)
 	if len(deviceId) == 0 {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
 	// Body params
-	var input RefreshInput
+	var input app.RefreshInput
 	err = json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)

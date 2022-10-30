@@ -36,13 +36,13 @@ func (app *application) stop() {
 	app.mongoWrapper.Stop()
 }
 
-func (app *application) InsertUserAuthToken(
+func (app *application) GenerateUserAuthToken(
 	context context.Context,
 	userMongoId *primitive.ObjectID,
 	networkType usernetwork.UserNetworkType,
 	deviceId string,
 ) (*userauthtoken.UserAuthToken, error) {
-	token, err := app.userModel.InsertUserAuthToken(
+	token, err := app.userModel.GenerateUserAuthToken(
 		context,
 		userMongoId,
 		networkType,

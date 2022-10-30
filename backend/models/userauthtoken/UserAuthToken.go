@@ -79,7 +79,7 @@ func (sd *UserAuthToken) SaveAsSession(context context.Context, manager *scs.Ses
 	manager.Put(context, SessionAccessTokenKey, sd.AccessToken.Value)
 	manager.Put(context, SessionAccessTokenExpirationDateKey, int64(sd.AccessToken.ExpirationDate))
 	manager.Put(context, SessionRefreshTokenKey, sd.RefreshToken)
-	manager.Put(context, SessionNetworkTypeKey, int32(sd.NetworkType))
+	manager.Put(context, SessionNetworkTypeKey, int8(sd.NetworkType))
 	manager.Put(context, SessionUserMongoIdKey, sd.UserMongoId.Hex())
 	manager.Put(context, SessionUserDeviceId, sd.UserDeviceId)
 }
@@ -100,7 +100,7 @@ func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken,
 		return nil, errors.New("refresh token is missing")
 	}
 
-	networkType, ok := manager.Get(context, SessionNetworkTypeKey).(int32)
+	networkType, ok := manager.Get(context, SessionNetworkTypeKey).(int8)
 	if !ok {
 		return nil, errors.New("networkType is missing")
 	}

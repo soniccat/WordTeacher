@@ -3,7 +3,7 @@ package partofspeech
 type PartOfSpeech = uint8
 
 const (
-	Undefined = PartOfSpeech(iota)
+	Undefined PartOfSpeech = iota
 	Noun
 	Verb
 	Adjective
