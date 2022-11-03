@@ -11,7 +11,7 @@ type CardSetApi struct {
 	Cards            []*card.CardApi `json:"cards"`
 	UserId           string          `json:"userId"`
 	CreationDate     string          `json:"creationDate"`
-	ModificationDate *string         `json:"modificationDate"`
+	ModificationDate *string         `json:"modificationDate,omitempty"`
 }
 
 type CardSetDb struct {

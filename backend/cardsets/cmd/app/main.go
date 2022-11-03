@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"models/apphelpers"
+	"models/card"
 	"models/cardset"
 	"models/logger"
 	"models/mongowrapper"
@@ -15,7 +16,7 @@ func main() {
 	// Define command-line flags
 	isDebug := flag.Bool("debugMode", false, "Shows stack traces in logs")
 	serverAddr := flag.String("serverAddr", "", "HTTP server network address")
-	serverPort := flag.Int("serverPort", 4000, "HTTP server network port")
+	serverPort := flag.Int("serverPort", 4001, "HTTP server network port")
 
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
@@ -63,12 +64,9 @@ func createApplication(
 		return nil, err
 	}
 
-	usersDatabase := app.mongoWrapper.Client.Database(mongowrapper.MongoDatabaseUsers)
-	app.cardSetModel, err = cardset.CardSetModel{}(*app.mongoWrapper.Context, app.logger, usersDatabase)
-	if err != nil {
-		app.stop()
-		return nil, err
-	}
+	cardSetDatabase := app.mongoWrapper.Client.Database(mongowrapper.MongoDatabaseCardSets)
+	cardModel := card.New(app.logger, cardSetDatabase)
+	app.cardSetModel = cardset.New(app.logger, app.mongoWrapper.Client, cardSetDatabase, cardModel)
 
 	return app, nil
 }

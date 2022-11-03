@@ -18,6 +18,9 @@ const MongoTimeout = 20 * time.Second
 const (
 	MongoDatabaseUsers        = "users"
 	MongoCollectionUsers      = "users"
+	MongoDatabaseCardSets     = "cardSets"
+	MongoCollectionCardSets   = "cardSets"
+	MongoCollectionCards      = "cards"
 	MongoCollectionAuthTokens = "authTokens"
 )
 

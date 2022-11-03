@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gorilla/mux"
 	"google.golang.org/api/idtoken"
 	"models/apphelpers"
@@ -134,7 +133,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 			RefreshToken: token.RefreshToken,
 		},
 		User: AuthResponseUser{
-			Id: fmt.Sprint(aUser.Counter),
+			Id: aUser.ID.Hex(),
 		},
 	}
 

@@ -23,14 +23,14 @@ type UserModel struct {
 	AuthTokens     *mongo.Collection
 }
 
-func NewUserModel(logger *logger.Logger, usersDatabase *mongo.Database) (*UserModel, error) {
+func New(logger *logger.Logger, usersDatabase *mongo.Database) *UserModel {
 	model := &UserModel{
 		Logger:         logger,
 		UserCollection: usersDatabase.Collection(mongowrapper.MongoCollectionUsers),
 		AuthTokens:     usersDatabase.Collection(mongowrapper.MongoCollectionAuthTokens),
 	}
 
-	return model, nil
+	return model
 }
 
 func (m *UserModel) FindGoogleUser(context context.Context, googleUserId *string) (*User, error) {

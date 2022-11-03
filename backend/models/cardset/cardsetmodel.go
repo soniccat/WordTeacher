@@ -6,15 +6,27 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"models/card"
 	"models/logger"
+	"models/mongowrapper"
 	"models/tools"
 	"time"
 )
 
 type CardSetModel struct {
-	logger            *logger.Logger
-	mongoClient       *mongo.Client
-	cardSetCollection *mongo.Collection
-	cardModel         *card.CardModel
+	Logger            *logger.Logger
+	MongoClient       *mongo.Client
+	CardSetCollection *mongo.Collection
+	CardModel         *card.CardModel
+}
+
+func New(logger *logger.Logger, mongoClient *mongo.Client, cardSetDatabase *mongo.Database, cardModel *card.CardModel) *CardSetModel {
+	model := &CardSetModel{
+		Logger:            logger,
+		MongoClient:       mongoClient,
+		CardSetCollection: cardSetDatabase.Collection(mongowrapper.MongoCollectionCardSets),
+		CardModel:         cardModel,
+	}
+
+	return model
 }
 
 func (m *CardSetModel) InsertCardSet(
@@ -35,7 +47,7 @@ func (m *CardSetModel) InsertCardSet(
 		}
 	}
 
-	session, err := m.mongoClient.StartSession()
+	session, err := m.MongoClient.StartSession()
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +69,7 @@ func (m *CardSetModel) InsertCardSet(
 
 			cardDbIds := make([]primitive.ObjectID, len(cardSet.Cards))
 			for _, crd := range cardSet.Cards {
-				cardDb, err := m.cardModel.Insert(sCtx, crd, userId)
+				cardDb, err := m.CardModel.Insert(sCtx, crd, userId)
 				if err != nil {
 					return nil, err
 				}
@@ -68,7 +80,7 @@ func (m *CardSetModel) InsertCardSet(
 
 			cardSetDb.Cards = cardDbIds
 
-			res, err := m.cardSetCollection.InsertOne(sCtx, cardSetDb)
+			res, err := m.CardSetCollection.InsertOne(sCtx, cardSetDb)
 			if err != nil {
 				return nil, err
 			}

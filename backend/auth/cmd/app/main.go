@@ -64,11 +64,7 @@ func createApplication(
 	}
 
 	usersDatabase := app.mongoWrapper.Client.Database(mongowrapper.MongoDatabaseUsers)
-	app.userModel, err = user.NewUserModel(*app.mongoWrapper.Context, app.logger, usersDatabase)
-	if err != nil {
-		app.stop()
-		return nil, err
-	}
+	app.userModel = user.New(app.logger, usersDatabase)
 
 	return app, nil
 }

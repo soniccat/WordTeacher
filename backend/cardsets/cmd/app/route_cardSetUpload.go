@@ -35,7 +35,7 @@ type CardSetUploadResponse struct {
 //	RefreshResponse
 func (app *application) cardSetUpload(w http.ResponseWriter, r *http.Request) {
 
-	input, err := user.ValidateSession[CardSetUploadInput](r, app.sessionManager)
+	_, err := user.ValidateSession[CardSetUploadInput](r, app.sessionManager)
 	if err != nil {
 		apphelpers.SetError(w, err.InnerError, err.StatusCode, app.logger)
 		return

@@ -5,13 +5,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"models/logger"
+	"models/mongowrapper"
 	"models/tools"
 	"time"
 )
 
 type CardModel struct {
-	logger         *logger.Logger
-	cardCollection *mongo.Collection
+	Logger         *logger.Logger
+	CardCollection *mongo.Collection
+}
+
+func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *CardModel {
+	model := &CardModel{
+		Logger:         logger,
+		CardCollection: cardSetDatabase.Collection(mongowrapper.MongoCollectionCards),
+	}
+
+	return model
 }
 
 func (cm *CardModel) Insert(
@@ -45,7 +55,7 @@ func (cm *CardModel) Insert(
 		ModificationDate:    modificationDateTime,
 	}
 
-	res, err := cm.cardCollection.InsertOne(context, cardDb)
+	res, err := cm.CardCollection.InsertOne(context, cardDb)
 	if err != nil {
 		return nil, err
 	}
