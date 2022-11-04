@@ -3,6 +3,8 @@ package card
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"models/partofspeech"
+	"models/tools"
+	"time"
 )
 
 type CardApi struct {
@@ -20,6 +22,47 @@ type CardApi struct {
 	ModificationDate    *string                   `json:"modificationDate,omitempty"`
 }
 
+func (cs *CardApi) IsEqual(a *CardApi) bool {
+	if cs.Id != a.Id {
+		return false
+	}
+	if cs.Term != a.Term {
+		return false
+	}
+	if cs.Transcription != a.Transcription {
+		return false
+	}
+	if cs.PartOfSpeech != a.PartOfSpeech {
+		return false
+	}
+	if !tools.SliceComparableEqual(&cs.Definitions, &a.Definitions) {
+		return false
+	}
+	if !tools.SliceComparableEqual(&cs.Synonyms, &a.Synonyms) {
+		return false
+	}
+	if !tools.SliceComparableEqual(&cs.Examples, &a.Examples) {
+		return false
+	}
+	if !tools.DoubleSliceComparableEqual(&cs.DefinitionTermSpans, &a.DefinitionTermSpans) {
+		return false
+	}
+	if !tools.DoubleSliceComparableEqual(&cs.ExampleTermSpans, &a.ExampleTermSpans) {
+		return false
+	}
+	if cs.UserId != a.UserId {
+		return false
+	}
+	if cs.CreationDate != a.CreationDate {
+		return false
+	}
+	if cs.ModificationDate != a.ModificationDate {
+		return false
+	}
+
+	return true
+}
+
 type CardDb struct {
 	ID                  primitive.ObjectID        `bson:"_id,omitempty"`
 	Term                string                    `bson:"term"`
@@ -30,7 +73,7 @@ type CardDb struct {
 	Examples            []string                  `bson:"examples"`
 	DefinitionTermSpans [][]Span                  `bson:"definitionTermSpans"`
 	ExampleTermSpans    [][]Span                  `bson:"exampleTermSpans"`
-	UserId              primitive.ObjectID        `bson:"userId"`
+	UserId              *primitive.ObjectID       `bson:"userId"`
 	CreationDate        primitive.DateTime        `bson:"creationDate"`
 	ModificationDate    *primitive.DateTime       `bson:"modificationDate"`
 }
@@ -38,4 +81,26 @@ type CardDb struct {
 type Span struct {
 	start int
 	end   int
+}
+
+func (c *CardDb) ToApi() *CardApi {
+	var md *string
+	if c.ModificationDate != nil {
+		md = tools.Ptr(c.ModificationDate.Time().Format(time.RFC3339))
+	}
+
+	return &CardApi{
+		Id:                  c.ID.Hex(),
+		Term:                c.Term,
+		Transcription:       c.Transcription,
+		PartOfSpeech:        c.PartOfSpeech,
+		Definitions:         c.Definitions,
+		Synonyms:            c.Synonyms,
+		Examples:            c.Examples,
+		DefinitionTermSpans: c.DefinitionTermSpans,
+		ExampleTermSpans:    c.ExampleTermSpans,
+		UserId:              c.UserId.Hex(),
+		CreationDate:        c.CreationDate.Time().Format(time.RFC3339),
+		ModificationDate:    md,
+	}
 }

@@ -2,6 +2,7 @@ package cardset
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"models/card"
@@ -29,10 +30,55 @@ func New(logger *logger.Logger, mongoClient *mongo.Client, cardSetDatabase *mong
 	return model
 }
 
+func (m *CardSetModel) FindCardSetByCreationId(
+	context context.Context,
+	creationId string,
+) (*CardSetDb, error) {
+	var result CardSetDb
+	err := m.CardSetCollection.FindOne(context, bson.M{"creationId": creationId}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func (m *CardSetModel) DeleteCardSetByCreationId(
+	context context.Context,
+	creationId string,
+) error {
+	_, err := m.CardSetCollection.DeleteMany(context, bson.M{"creationId": creationId})
+	return err
+}
+
+func (m *CardSetModel) LoadCardSetApiFromDb(
+	context context.Context,
+	cardSetDb *CardSetDb,
+) (*CardSetApi, error) {
+	var ids []primitive.ObjectID
+	for _, id := range cardSetDb.Cards {
+		ids = append(ids, id)
+	}
+
+	cardsDb, err := m.CardModel.LoadByIds(context, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var cardsApi []*card.CardApi
+	for _, cardDb := range *cardsDb {
+		cardsApi = append(cardsApi, cardDb.ToApi())
+	}
+
+	return cardSetDb.ToApi(cardsApi), nil
+}
+
 func (m *CardSetModel) InsertCardSet(
 	context context.Context,
 	cardSet *CardSetApi,
-	userId primitive.ObjectID,
+	userId *primitive.ObjectID,
 ) (*CardSetApi, error) {
 
 	creationDate, err := time.Parse(time.RFC3339, cardSet.CreationDate)
@@ -61,6 +107,7 @@ func (m *CardSetModel) InsertCardSet(
 		UserId:           userId,
 		CreationDate:     primitive.NewDateTimeFromTime(creationDate),
 		ModificationDate: modificationDateTime,
+		CreationId:       cardSet.CreationId,
 	}
 
 	_, err = session.WithTransaction(

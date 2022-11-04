@@ -8,9 +8,14 @@ import (
 func (app *application) routes() *mux.Router {
 	// Register handler functions.
 	r := mux.NewRouter()
+	// TODO: to get the current status of remote cardsets, should support ifModifiedSince
+	//r.Handle(
+	//	"/api/cardsets/status",
+	//	app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetSync)),
+	//).Methods("POST")
 	r.Handle(
-		"/api/cardsets/upload",
-		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetUpload)),
+		"/api/cardsets/sync",
+		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetSync)),
 	).Methods("POST")
 
 	return r

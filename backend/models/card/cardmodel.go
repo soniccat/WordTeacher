@@ -2,6 +2,7 @@ package card
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"models/logger"
@@ -24,10 +25,25 @@ func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *CardModel {
 	return model
 }
 
+func (cm *CardModel) LoadByIds(context context.Context, ids []primitive.ObjectID) (*[]*CardDb, error) {
+	var result []*CardDb
+	cursor, err := cm.CardCollection.Find(context, bson.M{"_id": bson.M{"$in": ids}})
+	if err != nil {
+		return nil, err
+	}
+
+	err = cursor.All(context, result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
 func (cm *CardModel) Insert(
 	context context.Context,
 	card *CardApi,
-	userId primitive.ObjectID,
+	userId *primitive.ObjectID,
 ) (*CardDb, error) {
 	creationDate, err := time.Parse(time.RFC3339, card.CreationDate)
 	if err != nil {

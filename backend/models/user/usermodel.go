@@ -138,32 +138,32 @@ func (v *ValidateSessionError) Error() string {
 func ValidateSession[T TokenHolder](
 	r *http.Request,
 	sessionManager *scs.SessionManager,
-) (*T, *ValidateSessionError) {
+) (*T, *userauthtoken.UserAuthToken, *ValidateSessionError) {
 	_, err := r.Cookie(apphelpers.CookieSession)
 	if err != nil {
-		return nil, NewValidateSessionError(http.StatusBadRequest, err)
+		return nil, nil, NewValidateSessionError(http.StatusBadRequest, err)
 	}
 
 	// Header params
 	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
 	if len(deviceId) == 0 {
-		return nil, NewValidateSessionError(http.StatusBadRequest, errors.New("invalid device id"))
+		return nil, nil, NewValidateSessionError(http.StatusBadRequest, errors.New("invalid device id"))
 	}
 
 	// Body params
 	var input T
 	err = json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		return nil, NewValidateSessionError(http.StatusBadRequest, err)
+		return nil, nil, NewValidateSessionError(http.StatusBadRequest, err)
 	}
 
 	userAuthToken, err := userauthtoken.Load(r.Context(), sessionManager)
 	if err != nil {
-		return nil, NewValidateSessionError(http.StatusServiceUnavailable, err)
+		return nil, nil, NewValidateSessionError(http.StatusServiceUnavailable, err)
 	}
 
 	if !userAuthToken.IsValid() {
-		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
+		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
 	}
 
 	if !userAuthToken.IsMatched(
@@ -171,8 +171,8 @@ func ValidateSession[T TokenHolder](
 		input.GetRefreshToken(),
 		deviceId,
 	) {
-		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
+		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
 	}
 
-	return &input, nil
+	return &input, userAuthToken, nil
 }

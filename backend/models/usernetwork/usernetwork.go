@@ -1,6 +1,6 @@
 package usernetwork
 
-type UserNetworkType int8
+type UserNetworkType int
 
 const (
 	Google UserNetworkType = iota
