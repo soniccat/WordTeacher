@@ -12,14 +12,13 @@ const CookieSession = "session"
 const HeaderDeviceId = "deviceId"
 
 type ErrorResponse struct {
-	Error string
-	Code  int
+	Error string `json:"error"`
 }
 
-func SetError(w http.ResponseWriter, err error, code int, logger *logger.Logger) {
+func SetError(w http.ResponseWriter, outErr error, code int, logger *logger.Logger) {
 	w.WriteHeader(code)
 
-	marshaledResponse, err := json.Marshal(ErrorResponse{Error: err.Error()})
+	marshaledResponse, err := json.Marshal(ErrorResponse{Error: outErr.Error()})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -31,7 +30,7 @@ func SetError(w http.ResponseWriter, err error, code int, logger *logger.Logger)
 	}
 
 	if logger.AllowStackTraces {
-		trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
+		trace := fmt.Sprintf("%s\n%s", outErr.Error(), debug.Stack())
 		err = logger.Error.Output(2, trace)
 	}
 }

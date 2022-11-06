@@ -117,7 +117,7 @@ func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken,
 
 	sessionUserMongoId, err := primitive.ObjectIDFromHex(sessionUserMongoIdHex)
 	if err != nil {
-		return nil, errors.New("session user mongo id is missing")
+		return nil, err
 	}
 
 	return &UserAuthToken{

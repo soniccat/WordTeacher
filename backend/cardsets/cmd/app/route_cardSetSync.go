@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"models/apphelpers"
 	"models/cardset"
 	"models/user"
@@ -17,9 +18,9 @@ const (
 type CardSetOperationType int
 
 const (
-	CardSetCreate CardSetOperationType = iota // input: cardSet objects, operation guid for deduplication, result CardSetApi
-	CardSetDelete                             // input: cardSet ids
-	CardSetUpdate                             // input: cardSet objects
+	CardSetCreate CardSetOperationType = iota // input: cardSet objects, operation guid for deduplication; resultOk: created CardSet Id
+	CardSetDelete                             // input: cardSet ids; resultOk: nothing
+	CardSetUpdate                             // input: cardSet objects; resultOk: nothing
 )
 
 type CardSetOperationResultType int
@@ -44,17 +45,25 @@ type CardSetCreateOperation struct {
 	CardSet cardset.CardSetApi
 }
 
-func (i CardSetSyncInput) GetAccessToken() string {
-	return i.AccessToken
+type CardSetUpdateOperation struct {
+	CardSet cardset.CardSetApi
 }
 
-func (i CardSetSyncInput) GetRefreshToken() *string {
+type CardSetDeleteOperation struct {
+	Ids []primitive.ObjectID
+}
+
+func (input *CardSetSyncInput) GetAccessToken() string {
+	return input.AccessToken
+}
+
+func (input *CardSetSyncInput) GetRefreshToken() *string {
 	return nil
 }
 
 type CardSetSyncResponse struct {
 	Results         []CardSetOperationResult `json:"results"`
-	UpdatedCardSets []cardset.CardSetApi     `json:"updatedCardSets"`
+	UpdatedCardSets []cardset.CardSetApi     `json:"updatedCardSets,omitempty"`
 }
 
 type CardSetOperationResult struct {
@@ -97,25 +106,10 @@ func (app *application) cardSetSync(w http.ResponseWriter, r *http.Request) {
 	//	}
 	//}
 
-	// parse input into operations
-	var operations []interface{}
-
-	for _, rawOperation := range input.Operations {
-		if rawOperation.Type == CardSetCreate {
-			var cardSet cardset.CardSetApi
-			err := json.Unmarshal(rawOperation.Arguments, &cardSet)
-
-			if err != nil {
-				apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
-				return
-			} else if cardSet.CreationId == nil {
-				apphelpers.SetError(w, errors.New("CardSetApi CreationId is nil"), http.StatusBadRequest, app.logger)
-				return
-			} else {
-				operations = append(operations, CardSetCreateOperation{CardSet: cardSet})
-			}
-
-		}
+	operations, parseErr := input.parseOperations()
+	if parseErr != nil {
+		apphelpers.SetError(w, parseErr, http.StatusBadRequest, app.logger)
+		return
 	}
 
 	response := CardSetSyncResponse{}
@@ -145,4 +139,70 @@ func (app *application) cardSetSync(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Results = results
+
+	// Build response
+
+	marshaledResponse, err2 := json.Marshal(response)
+	if err != nil {
+		apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
+		return
+	}
+
+	if _, err2 = w.Write(marshaledResponse); err2 != nil {
+		apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
+		return
+	}
+}
+
+func (input *CardSetSyncInput) parseOperations() ([]interface{}, error) {
+	var operations []interface{}
+
+	for _, rawOperation := range input.Operations {
+		switch tp := rawOperation.Type; tp {
+		case CardSetCreate:
+			var cardSet cardset.CardSetApi
+			err := json.Unmarshal(rawOperation.Arguments, &cardSet)
+
+			if err != nil {
+				return nil, err
+			} else if cardSet.CreationId == nil {
+				return nil, errors.New("CardSetCreate: CardSetApi CreationId is nil")
+			} else {
+				operations = append(operations, CardSetCreateOperation{CardSet: cardSet})
+			}
+
+		case CardSetDelete:
+			var cardSetRawIds []string
+			err := json.Unmarshal(rawOperation.Arguments, &cardSetRawIds)
+
+			if err != nil {
+				return nil, err
+			} else {
+				var cardSetIds []primitive.ObjectID
+				for _, stringId := range cardSetRawIds {
+					id, err := primitive.ObjectIDFromHex(stringId)
+					if err != nil {
+						return nil, errors.New("CardSetDelete: wrong cardSet id")
+					} else {
+						cardSetIds = append(cardSetIds, id)
+					}
+				}
+
+				operations = append(operations, CardSetDeleteOperation{Ids: cardSetIds})
+			}
+
+		case CardSetUpdate:
+			var cardSet cardset.CardSetApi
+			err := json.Unmarshal(rawOperation.Arguments, &cardSet)
+
+			if err != nil {
+				return nil, err
+			} else if len(cardSet.Id) == 0 {
+				return nil, errors.New("CardSetUpdate: CardSetApi id is empty")
+			} else {
+				operations = append(operations, CardSetUpdateOperation{CardSet: cardSet})
+			}
+		}
+	}
+	return operations, nil
 }

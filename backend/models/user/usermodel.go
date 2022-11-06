@@ -119,9 +119,10 @@ type ValidateSessionError struct {
 	InnerError error
 }
 
-type TokenHolder interface {
+type TokenHolder[B any] interface {
 	GetAccessToken() string
 	GetRefreshToken() *string
+	*B // non-interface type constraint element
 }
 
 func NewValidateSessionError(code int, err error) *ValidateSessionError {
@@ -135,7 +136,7 @@ func (v *ValidateSessionError) Error() string {
 	return v.InnerError.Error()
 }
 
-func ValidateSession[T TokenHolder](
+func ValidateSession[T any, PT TokenHolder[T]](
 	r *http.Request,
 	sessionManager *scs.SessionManager,
 ) (*T, *userauthtoken.UserAuthToken, *ValidateSessionError) {
@@ -166,9 +167,10 @@ func ValidateSession[T TokenHolder](
 		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
 	}
 
+	p := PT(&input)
 	if !userAuthToken.IsMatched(
-		input.GetAccessToken(),
-		input.GetRefreshToken(),
+		p.GetAccessToken(),
+		p.GetRefreshToken(),
 		deviceId,
 	) {
 		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))

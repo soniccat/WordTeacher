@@ -35,19 +35,19 @@ func (cs *CardApi) IsEqual(a *CardApi) bool {
 	if cs.PartOfSpeech != a.PartOfSpeech {
 		return false
 	}
-	if !tools.SliceComparableEqual(&cs.Definitions, &a.Definitions) {
+	if !tools.SliceComparableEqual(cs.Definitions, a.Definitions) {
 		return false
 	}
-	if !tools.SliceComparableEqual(&cs.Synonyms, &a.Synonyms) {
+	if !tools.SliceComparableEqual(cs.Synonyms, a.Synonyms) {
 		return false
 	}
-	if !tools.SliceComparableEqual(&cs.Examples, &a.Examples) {
+	if !tools.SliceComparableEqual(cs.Examples, a.Examples) {
 		return false
 	}
-	if !tools.DoubleSliceComparableEqual(&cs.DefinitionTermSpans, &a.DefinitionTermSpans) {
+	if !tools.DoubleSliceComparableEqual(cs.DefinitionTermSpans, a.DefinitionTermSpans) {
 		return false
 	}
-	if !tools.DoubleSliceComparableEqual(&cs.ExampleTermSpans, &a.ExampleTermSpans) {
+	if !tools.DoubleSliceComparableEqual(cs.ExampleTermSpans, a.ExampleTermSpans) {
 		return false
 	}
 	if cs.UserId != a.UserId {

@@ -49,8 +49,25 @@ func (m *CardSetModel) DeleteCardSetByCreationId(
 	context context.Context,
 	creationId string,
 ) error {
-	_, err := m.CardSetCollection.DeleteMany(context, bson.M{"creationId": creationId})
-	return err
+	// delete cards first
+	cardSetDb, err := m.LoadCardSetDbByCreationId(context, creationId)
+	if err != mongo.ErrNoDocuments && err != nil {
+		return err
+	}
+
+	if cardSetDb != nil {
+		err = m.CardModel.DeleteByIds(context, cardSetDb.Cards)
+		if err != mongo.ErrNoDocuments && err != nil {
+			return err
+		}
+	}
+
+	_, err = m.CardSetCollection.DeleteMany(context, bson.M{"creationId": creationId})
+	if err != mongo.ErrNoDocuments {
+		return err
+	}
+
+	return nil
 }
 
 func (m *CardSetModel) LoadCardSetApiFromDb(
@@ -68,11 +85,38 @@ func (m *CardSetModel) LoadCardSetApiFromDb(
 	}
 
 	var cardsApi []*card.CardApi
-	for _, cardDb := range *cardsDb {
+	for _, cardDb := range cardsDb {
 		cardsApi = append(cardsApi, cardDb.ToApi())
 	}
 
 	return cardSetDb.ToApi(cardsApi), nil
+}
+
+func (m *CardSetModel) LoadCardSetDbById(
+	context context.Context,
+	id *primitive.ObjectID,
+) (*CardSetDb, error) {
+	return m.loadCardSetDb(context, bson.M{"_id": id})
+}
+
+func (m *CardSetModel) LoadCardSetDbByCreationId(
+	context context.Context,
+	creationId string,
+) (*CardSetDb, error) {
+	return m.loadCardSetDb(context, bson.M{"creationId": creationId})
+}
+
+func (m *CardSetModel) loadCardSetDb(
+	context context.Context,
+	filter interface{},
+) (*CardSetDb, error) {
+	var cardSetDb CardSetDb
+	err := m.CardSetCollection.FindOne(context, filter).Decode(&cardSetDb)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cardSetDb, nil
 }
 
 func (m *CardSetModel) InsertCardSet(
@@ -114,7 +158,7 @@ func (m *CardSetModel) InsertCardSet(
 		context,
 		func(sCtx mongo.SessionContext) (interface{}, error) {
 
-			cardDbIds := make([]primitive.ObjectID, len(cardSet.Cards))
+			var cardDbIds []primitive.ObjectID
 			for _, crd := range cardSet.Cards {
 				cardDb, err := m.CardModel.Insert(sCtx, crd, userId)
 				if err != nil {

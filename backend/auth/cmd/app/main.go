@@ -8,6 +8,7 @@ import (
 	"models/mongowrapper"
 	"models/user"
 	"net/http"
+	"runtime/debug"
 	"time"
 )
 
@@ -17,7 +18,7 @@ func main() {
 	serverAddr := flag.String("serverAddr", "", "HTTP server network address")
 	serverPort := flag.Int("serverPort", 4000, "HTTP server network port")
 
-	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017", "Database hostname url")
+	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
@@ -31,6 +32,12 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
+		}
+	}()
 
 	// Initialize a new http.Server struct.
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)

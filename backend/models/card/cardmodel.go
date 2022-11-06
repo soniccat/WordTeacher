@@ -25,7 +25,7 @@ func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *CardModel {
 	return model
 }
 
-func (cm *CardModel) LoadByIds(context context.Context, ids []primitive.ObjectID) (*[]*CardDb, error) {
+func (cm *CardModel) LoadByIds(context context.Context, ids []primitive.ObjectID) ([]*CardDb, error) {
 	var result []*CardDb
 	cursor, err := cm.CardCollection.Find(context, bson.M{"_id": bson.M{"$in": ids}})
 	if err != nil {
@@ -37,7 +37,12 @@ func (cm *CardModel) LoadByIds(context context.Context, ids []primitive.ObjectID
 		return nil, err
 	}
 
-	return &result, nil
+	return result, nil
+}
+
+func (cm *CardModel) DeleteByIds(context context.Context, ids []primitive.ObjectID) error {
+	_, err := cm.CardCollection.DeleteMany(context, bson.M{"_id": bson.M{"$in": ids}})
+	return err
 }
 
 func (cm *CardModel) Insert(

@@ -11,7 +11,7 @@ type CardSetApi struct {
 	Id               string          `json:"id,omitempty"`
 	Name             string          `json:"name"`
 	Cards            []*card.CardApi `json:"cards"`
-	UserId           string          `json:"userId"`
+	UserId           string          `json:"userId"` // TODO: consider several owners via a permission filed
 	CreationDate     string          `json:"creationDate"`
 	ModificationDate *string         `json:"modificationDate,omitempty"`
 	CreationId       *string         `json:"creationId"`
