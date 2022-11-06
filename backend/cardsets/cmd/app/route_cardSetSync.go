@@ -133,6 +133,8 @@ func (app *application) cardSetSync(w http.ResponseWriter, r *http.Request) {
 					results = append(results, CardSetOperationResult{Type: CardSetOperationResultOk, Arguments: insertedCardSet.Id})
 				}
 			}
+		case CardSetUpdateOperation:
+
 		default:
 
 		}

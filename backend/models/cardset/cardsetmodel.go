@@ -49,21 +49,42 @@ func (m *CardSetModel) DeleteCardSetByCreationId(
 	context context.Context,
 	creationId string,
 ) error {
-	// delete cards first
-	cardSetDb, err := m.LoadCardSetDbByCreationId(context, creationId)
-	if err != mongo.ErrNoDocuments && err != nil {
+	session, err := m.MongoClient.StartSession()
+	if err != nil {
 		return err
 	}
 
-	if cardSetDb != nil {
-		err = m.CardModel.DeleteByIds(context, cardSetDb.Cards)
-		if err != mongo.ErrNoDocuments && err != nil {
-			return err
-		}
-	}
+	defer func() {
+		session.EndSession(context)
+	}()
 
-	_, err = m.CardSetCollection.DeleteMany(context, bson.M{"creationId": creationId})
-	if err != mongo.ErrNoDocuments {
+	_, err = session.WithTransaction(
+		context,
+		func(sCtx mongo.SessionContext) (interface{}, error) {
+
+			// delete cards first
+			cardSetDb, err := m.LoadCardSetDbByCreationId(context, creationId)
+			if err != mongo.ErrNoDocuments && err != nil {
+				return nil, err
+			}
+
+			if cardSetDb != nil {
+				err = m.CardModel.DeleteByIds(context, cardSetDb.Cards)
+				if err != mongo.ErrNoDocuments && err != nil {
+					return nil, err
+				}
+			}
+
+			_, err = m.CardSetCollection.DeleteMany(context, bson.M{"creationId": creationId})
+			if err != mongo.ErrNoDocuments {
+				return nil, err
+			}
+
+			return nil, nil
+		},
+	)
+
+	if err != nil {
 		return err
 	}
 
@@ -90,6 +111,48 @@ func (m *CardSetModel) LoadCardSetApiFromDb(
 	}
 
 	return cardSetDb.ToApi(cardsApi), nil
+}
+
+func (m *CardSetModel) UpdateCardSet(context context.Context, cardSet *CardSetApi) error {
+
+	cardSetId, err := primitive.ObjectIDFromHex(cardSet.Id)
+	if err != nil {
+		return err
+	}
+
+	session, err := m.MongoClient.StartSession()
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		session.EndSession(context)
+	}()
+
+	_, err = session.WithTransaction(
+		context,
+		func(sCtx mongo.SessionContext) (interface{}, error) {
+			cardSetDb, err := m.LoadCardSetDbById(context, &cardSetId)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, cardId := range cardSetDb.Cards {
+
+			}
+
+			// update cardSet info
+			m.CardSetCollection.ReplaceOne()
+
+			return nil, nil
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *CardSetModel) LoadCardSetDbById(

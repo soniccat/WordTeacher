@@ -78,6 +78,47 @@ type CardDb struct {
 	ModificationDate    *primitive.DateTime       `bson:"modificationDate"`
 }
 
+func (cs *CardDb) IsEqual(a *CardDb) bool {
+	if cs.ID != a.ID {
+		return false
+	}
+	if cs.Term != a.Term {
+		return false
+	}
+	if cs.Transcription != a.Transcription {
+		return false
+	}
+	if cs.PartOfSpeech != a.PartOfSpeech {
+		return false
+	}
+	if !tools.SliceComparableEqual(cs.Definitions, a.Definitions) {
+		return false
+	}
+	if !tools.SliceComparableEqual(cs.Synonyms, a.Synonyms) {
+		return false
+	}
+	if !tools.SliceComparableEqual(cs.Examples, a.Examples) {
+		return false
+	}
+	if !tools.DoubleSliceComparableEqual(cs.DefinitionTermSpans, a.DefinitionTermSpans) {
+		return false
+	}
+	if !tools.DoubleSliceComparableEqual(cs.ExampleTermSpans, a.ExampleTermSpans) {
+		return false
+	}
+	if cs.UserId != a.UserId {
+		return false
+	}
+	if cs.CreationDate != a.CreationDate {
+		return false
+	}
+	if cs.ModificationDate != a.ModificationDate {
+		return false
+	}
+
+	return true
+}
+
 type Span struct {
 	start int
 	end   int

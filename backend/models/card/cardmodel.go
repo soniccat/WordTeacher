@@ -25,6 +25,49 @@ func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *CardModel {
 	return model
 }
 
+func (cm *CardModel) SyncCards(
+	ctx context.Context,
+	updatedCards []CardApi,
+	currentCardIds []primitive.ObjectID,
+) ([]CardApi, error) {
+	updatedCardIds, err := tools.MapOrError(updatedCards, func(c *CardApi) (*primitive.ObjectID, error) {
+		cardId, fErr := primitive.ObjectIDFromHex(c.Id)
+		if fErr != nil {
+			return nil, fErr
+		}
+
+		return &cardId, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var resultCards []CardApi
+
+	dbCards, err := cm.LoadByIds(ctx, currentCardIds)
+	if err != nil {
+		return nil, err
+	}
+
+	var newCards []*CardApi
+	var deletedCards []*primitive.ObjectID
+	var updatedCards []*primitive.ObjectID
+
+	for i, updatedCardId := range updatedCardIds {
+		if tools.FindOrNil[CardDb](dbCards, func(c *CardDb) bool { return c.ID == *updatedCardId }) == nil {
+			newCards = append(newCards, &updatedCards[i])
+		}
+	}
+
+	for _, cardDb := range dbCards {
+		if tools.FindOrNil[primitive.ObjectID](updatedCardIds, func(id *primitive.ObjectID) bool { return *id == cardDb.ID }) == nil {
+			deletedCards = append(deletedCards, &cardDb.ID)
+		}
+	}
+
+	return resultCards, nil
+}
+
 func (cm *CardModel) LoadByIds(context context.Context, ids []primitive.ObjectID) ([]*CardDb, error) {
 	var result []*CardDb
 	cursor, err := cm.CardCollection.Find(context, bson.M{"_id": bson.M{"$in": ids}})
