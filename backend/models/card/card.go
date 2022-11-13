@@ -63,6 +63,43 @@ func (cs *CardApi) IsEqual(a *CardApi) bool {
 	return true
 }
 
+func (c *CardApi) ToDb() (*CardDb, error) {
+	cardDbId, err := primitive.ObjectIDFromHex(c.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	cardDbUserId, err := primitive.ObjectIDFromHex(c.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	creationTime, err := tools.ApiDateToDbDate(c.CreationDate)
+	if err != nil {
+		return nil, err
+	}
+
+	mdPtr, err := tools.ApiDatePtrToDbDatePtr(c.ModificationDate)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CardDb{
+		ID:                  cardDbId,
+		Term:                c.Term,
+		Transcription:       c.Transcription,
+		PartOfSpeech:        c.PartOfSpeech,
+		Definitions:         c.Definitions,
+		Synonyms:            c.Synonyms,
+		Examples:            c.Examples,
+		DefinitionTermSpans: c.DefinitionTermSpans,
+		ExampleTermSpans:    c.ExampleTermSpans,
+		UserId:              cardDbUserId,
+		CreationDate:        creationTime,
+		ModificationDate:    mdPtr,
+	}, nil
+}
+
 type CardDb struct {
 	ID                  primitive.ObjectID        `bson:"_id,omitempty"`
 	Term                string                    `bson:"term"`
@@ -73,7 +110,7 @@ type CardDb struct {
 	Examples            []string                  `bson:"examples"`
 	DefinitionTermSpans [][]Span                  `bson:"definitionTermSpans"`
 	ExampleTermSpans    [][]Span                  `bson:"exampleTermSpans"`
-	UserId              *primitive.ObjectID       `bson:"userId"`
+	UserId              primitive.ObjectID        `bson:"userId"`
 	CreationDate        primitive.DateTime        `bson:"creationDate"`
 	ModificationDate    *primitive.DateTime       `bson:"modificationDate"`
 }
@@ -127,7 +164,7 @@ type Span struct {
 func (c *CardDb) ToApi() *CardApi {
 	var md *string
 	if c.ModificationDate != nil {
-		md = tools.Ptr(c.ModificationDate.Time().Format(time.RFC3339))
+		md = tools.Ptr(tools.DbDateToApiDate(*c.ModificationDate))
 	}
 
 	return &CardApi{

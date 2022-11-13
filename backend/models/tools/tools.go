@@ -1,7 +1,38 @@
 package tools
 
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+)
+
 func Ptr[T any](x T) *T {
 	return &x
+}
+
+func ApiDateToDbDate(date string) (primitive.DateTime, error) {
+	dateTime, err := time.Parse(time.RFC3339, date)
+	if err != nil {
+		return 0, err
+	}
+
+	return primitive.NewDateTimeFromTime(dateTime), nil
+}
+
+func ApiDatePtrToDbDatePtr(date *string) (*primitive.DateTime, error) {
+	if date == nil {
+		return nil, nil
+	}
+
+	dbDate, err := ApiDateToDbDate(*date)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dbDate, err
+}
+
+func DbDateToApiDate(date primitive.DateTime) string {
+	return date.Time().Format(time.RFC3339)
 }
 
 func DoubleSliceComparableEqual[T comparable](a [][]T, b [][]T) bool {
@@ -60,6 +91,23 @@ func MapOrError[T, U any](data []T, f func(*T) (U, error)) ([]U, error) {
 		}
 
 		res = append(res, v)
+	}
+
+	return res, nil
+}
+
+func MapNotNilOrError[T, U any](data []T, f func(*T) (*U, error)) ([]*U, error) {
+	res := make([]*U, 0, len(data))
+
+	for _, e := range data {
+		v, err := f(&e)
+		if err != nil {
+			return nil, err
+		}
+
+		if v != nil {
+			res = append(res, v)
+		}
 	}
 
 	return res, nil

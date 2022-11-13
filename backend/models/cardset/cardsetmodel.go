@@ -137,9 +137,11 @@ func (m *CardSetModel) UpdateCardSet(context context.Context, cardSet *CardSetAp
 				return nil, err
 			}
 
-			for _, cardId := range cardSetDb.Cards {
+			m.CardModel.SyncCards(context, cardSet.Cards, cardSetDb.Cards)
 
-			}
+			//for _, cardId := range cardSetDb.Cards {
+			//
+			//}
 
 			// update cardSet info
 			m.CardSetCollection.ReplaceOne()

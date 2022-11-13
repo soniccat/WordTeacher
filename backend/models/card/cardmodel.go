@@ -27,43 +27,67 @@ func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *CardModel {
 
 func (cm *CardModel) SyncCards(
 	ctx context.Context,
-	updatedCards []CardApi,
+	actualCards []*CardApi,
 	currentCardIds []primitive.ObjectID,
-) ([]CardApi, error) {
-	updatedCardIds, err := tools.MapOrError(updatedCards, func(c *CardApi) (*primitive.ObjectID, error) {
-		cardId, fErr := primitive.ObjectIDFromHex(c.Id)
+	userId primitive.ObjectID,
+) ([]*CardApi, error) {
+
+	var newCards []*CardApi
+	var deletedCards []primitive.ObjectID
+	var updatedCards []*CardApi
+	var actualCardsWithIds []*CardApi
+
+	actualCardIds, err := tools.MapNotNilOrError(actualCards, func(c **CardApi) (*primitive.ObjectID, error) {
+		if len((*c).Id) == 0 {
+			newCards = append(newCards, *c)
+			return nil, nil
+		}
+
+		cardId, fErr := primitive.ObjectIDFromHex((*c).Id)
 		if fErr != nil {
 			return nil, fErr
 		}
 
+		actualCardsWithIds = append(actualCardsWithIds, *c)
 		return &cardId, nil
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	var resultCards []CardApi
+	var resultCards []*CardApi
 
 	dbCards, err := cm.LoadByIds(ctx, currentCardIds)
 	if err != nil {
 		return nil, err
 	}
 
-	var newCards []*CardApi
-	var deletedCards []*primitive.ObjectID
-	var updatedCards []*primitive.ObjectID
-
-	for i, updatedCardId := range updatedCardIds {
-		if tools.FindOrNil[CardDb](dbCards, func(c *CardDb) bool { return c.ID == *updatedCardId }) == nil {
-			newCards = append(newCards, &updatedCards[i])
+	for i, actualCardId := range actualCardIds {
+		if tools.FindOrNil[CardDb](dbCards, func(c *CardDb) bool { return c.ID == *actualCardId }) == nil {
+			newCards = append(newCards, actualCardsWithIds[i])
+		} else {
+			updatedCards = append(updatedCards, actualCardsWithIds[i])
 		}
 	}
 
 	for _, cardDb := range dbCards {
-		if tools.FindOrNil[primitive.ObjectID](updatedCardIds, func(id *primitive.ObjectID) bool { return *id == cardDb.ID }) == nil {
-			deletedCards = append(deletedCards, &cardDb.ID)
+		if tools.FindOrNil[primitive.ObjectID](actualCardIds, func(id *primitive.ObjectID) bool { return *id == cardDb.ID }) == nil {
+			deletedCards = append(deletedCards, cardDb.ID)
 		}
 	}
+
+	// perform
+	err = cm.DeleteByIds(ctx, deletedCards)
+	if err != nil {
+		return nil, err
+	}
+
+	insertedDbCards, err := cm.InsertCards(ctx, newCards, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedDbCards, err := cm.ReplaceCards(ctx, updatedCards)
 
 	return resultCards, nil
 }
@@ -88,11 +112,86 @@ func (cm *CardModel) DeleteByIds(context context.Context, ids []primitive.Object
 	return err
 }
 
+func (cm *CardModel) ReplaceCards(
+	context context.Context,
+	cards []*CardApi,
+) ([]*CardDb, error) {
+	var cardDbs []*CardDb
+
+	for _, card := range cards {
+		cardId, err := primitive.ObjectIDFromHex((*card).Id)
+		if err != nil {
+			return nil, err
+		}
+
+		cardDb, err := card.ToDb()
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = cm.CardCollection.ReplaceOne(context, bson.M{"_id": cardId}, cardDb)
+		if err != nil {
+			return nil, err
+		}
+
+		cardDbs = append(cardDbs, cardDb)
+	}
+
+	return cardDbs, nil
+}
+
 func (cm *CardModel) Insert(
 	context context.Context,
 	card *CardApi,
-	userId *primitive.ObjectID,
+	userId primitive.ObjectID,
 ) (*CardDb, error) {
+	cardDb, err := cm.createCardDb(card, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := cm.CardCollection.InsertOne(context, cardDb)
+	if err != nil {
+		return nil, err
+	}
+
+	resId := res.InsertedID.(primitive.ObjectID)
+	card.Id = resId.String()
+	cardDb.ID = resId
+
+	return cardDb, nil
+}
+
+func (cm *CardModel) InsertCards(
+	context context.Context,
+	cards []*CardApi,
+	userId primitive.ObjectID,
+) ([]*CardDb, error) {
+	var cardDbs []*CardDb
+	cardDbs, err := tools.MapOrError(cards, func(c **CardApi) (*CardDb, error) {
+		cardDb, e := cm.createCardDb(*c, userId)
+		return cardDb, e
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	cardDbInterfaces := tools.Map(cardDbs, func(c *CardDb) interface{} { return c })
+	manyResult, err := cm.CardCollection.InsertMany(context, cardDbInterfaces)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, insertedId := range manyResult.InsertedIDs {
+		resId := insertedId.(primitive.ObjectID)
+		cards[i].Id = resId.String()
+		cardDbs[i].ID = resId
+	}
+
+	return cardDbs, nil
+}
+
+func (cm *CardModel) createCardDb(card *CardApi, userId primitive.ObjectID) (*CardDb, error) {
 	creationDate, err := time.Parse(time.RFC3339, card.CreationDate)
 	if err != nil {
 		return nil, err
@@ -118,15 +217,5 @@ func (cm *CardModel) Insert(
 		CreationDate:        primitive.NewDateTimeFromTime(creationDate),
 		ModificationDate:    modificationDateTime,
 	}
-
-	res, err := cm.CardCollection.InsertOne(context, cardDb)
-	if err != nil {
-		return nil, err
-	}
-
-	resId := res.InsertedID.(primitive.ObjectID)
-	card.Id = resId.String()
-	cardDb.ID = resId
-
 	return cardDb, nil
 }
