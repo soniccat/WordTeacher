@@ -11,67 +11,34 @@ import (
 )
 
 const (
-	//ParameterLastSyncDate        = "lastSyncDate"
-	ParameterPullUpdatedCardSets = "pullUpdatedCardSets"
+// ParameterLastSyncDate        = "lastSyncDate"
+// ParameterPullUpdatedCardSets = "pullUpdatedCardSets"
 )
 
-type CardSetOperationType int
-
-const (
-	CardSetCreate CardSetOperationType = iota // input: cardSet objects, operation guid for deduplication; resultOk: created CardSet Id
-	CardSetDelete                             // input: cardSet ids; resultOk: nothing
-	CardSetUpdate                             // input: cardSet objects; resultOk: nothing
-)
-
-type CardSetOperationResultType int
-
-const (
-	CardSetOperationResultOk CardSetOperationResultType = iota
-	//CardSetOperationResultConflict                            // object was already modified, output: two objects
-	CardSetOperationResultError
-)
-
-type CardSetSyncInput struct {
-	AccessToken string                `json:"accessToken"`
-	Operations  []CardSetRawOperation `json:"operations"`
+type CardSetPushInput struct {
+	AccessToken string `json:"accessToken"`
+	// for card sets without id creates a card set or find already inserted one with deduplication Id.
+	// for card sets with id write a card set data
+	UpdatedCardSets []*cardset.CardSetApi `json:"updatedCardSets"`
+	DeletedCardSets []*primitive.ObjectID `json:"deletedCardSets"`
 }
 
-type CardSetRawOperation struct {
-	Type      CardSetOperationType `json:"type"`
-	Arguments json.RawMessage      `json:"arguments"`
-}
-
-type CardSetCreateOperation struct {
-	CardSet cardset.CardSetApi
-}
-
-type CardSetUpdateOperation struct {
-	CardSet cardset.CardSetApi
-}
-
-type CardSetDeleteOperation struct {
-	Ids []primitive.ObjectID
-}
-
-func (input *CardSetSyncInput) GetAccessToken() string {
+func (input *CardSetPushInput) GetAccessToken() string {
 	return input.AccessToken
 }
 
-func (input *CardSetSyncInput) GetRefreshToken() *string {
+func (input *CardSetPushInput) GetRefreshToken() *string {
 	return nil
 }
 
 type CardSetSyncResponse struct {
-	Results         []CardSetOperationResult `json:"results"`
-	UpdatedCardSets []cardset.CardSetApi     `json:"updatedCardSets,omitempty"`
-}
-
-type CardSetOperationResult struct {
-	Type      CardSetOperationResultType `json:"type"`
-	Arguments interface{}                `json:"arguments"`
+	Ids map[string]string `json:"ids"` // deduplication id to primitive.ObjectID
 }
 
 // Purpose:
+//
+//	write passed data in DB, always treat the data as the most recent
+//	doesn't change the passed data
 //
 // In:
 //
@@ -81,8 +48,8 @@ type CardSetOperationResult struct {
 // Out:
 //
 //	RefreshResponse
-func (app *application) cardSetSync(w http.ResponseWriter, r *http.Request) {
-	input, authToken, err := user.ValidateSession[CardSetSyncInput](r, app.sessionManager)
+func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
+	input, authToken, err := user.ValidateSession[CardSetPushInput](r, app.sessionManager)
 	if err != nil {
 		apphelpers.SetError(w, err.InnerError, err.StatusCode, app.logger)
 		return
@@ -118,22 +85,24 @@ func (app *application) cardSetSync(w http.ResponseWriter, r *http.Request) {
 	// execute
 	for _, operation := range operations {
 		switch v := operation.(type) {
-		case CardSetCreateOperation:
-			// delete previously created cards
-			err := app.cardSetModel.DeleteCardSetByCreationId(r.Context(), *v.CardSet.CreationId)
-
-			if err != nil {
-				results = append(results, CardSetOperationResult{Type: CardSetOperationResultError})
-
-			} else {
-				insertedCardSet, err := app.cardSetModel.InsertCardSet(r.Context(), &v.CardSet, authToken.UserMongoId)
-				if err != nil {
-					results = append(results, CardSetOperationResult{Type: CardSetOperationResultError})
-				} else {
-					results = append(results, CardSetOperationResult{Type: CardSetOperationResultOk, Arguments: insertedCardSet.Id})
-				}
-			}
+		//case CardSetCreateOperation:
+		//	// delete previously created cards
+		//	err := app.cardSetModel.DeleteCardSetByCreationId(r.Context(), *v.CardSet.CreationId)
+		//
+		//	if err != nil {
+		//		results = append(results, CardSetOperationResult{Type: CardSetOperationResultError})
+		//
+		//	} else {
+		//		insertedCardSet, err := app.cardSetModel.InsertCardSet(r.Context(), &v.CardSet, authToken.UserMongoId)
+		//		if err != nil {
+		//			results = append(results, CardSetOperationResult{Type: CardSetOperationResultError})
+		//		} else {
+		//			results = append(results, CardSetOperationResult{Type: CardSetOperationResultOk, Arguments: insertedCardSet.Id})
+		//		}
+		//	}
 		case CardSetUpdateOperation:
+
+		case CardSetDeleteOperation:
 
 		default:
 

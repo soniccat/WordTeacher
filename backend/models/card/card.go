@@ -85,7 +85,7 @@ func (c *CardApi) ToDb() (*CardDb, error) {
 	}
 
 	return &CardDb{
-		ID:                  cardDbId,
+		ID:                  &cardDbId,
 		Term:                c.Term,
 		Transcription:       c.Transcription,
 		PartOfSpeech:        c.PartOfSpeech,
@@ -94,14 +94,14 @@ func (c *CardApi) ToDb() (*CardDb, error) {
 		Examples:            c.Examples,
 		DefinitionTermSpans: c.DefinitionTermSpans,
 		ExampleTermSpans:    c.ExampleTermSpans,
-		UserId:              cardDbUserId,
+		UserId:              &cardDbUserId,
 		CreationDate:        creationTime,
 		ModificationDate:    mdPtr,
 	}, nil
 }
 
 type CardDb struct {
-	ID                  primitive.ObjectID        `bson:"_id,omitempty"`
+	ID                  *primitive.ObjectID       `bson:"_id,omitempty"`
 	Term                string                    `bson:"term"`
 	Transcription       *string                   `bson:"transcription,omitempty"`
 	PartOfSpeech        partofspeech.PartOfSpeech `bson:"partOfSpeech"`
@@ -110,7 +110,7 @@ type CardDb struct {
 	Examples            []string                  `bson:"examples"`
 	DefinitionTermSpans [][]Span                  `bson:"definitionTermSpans"`
 	ExampleTermSpans    [][]Span                  `bson:"exampleTermSpans"`
-	UserId              primitive.ObjectID        `bson:"userId"`
+	UserId              *primitive.ObjectID       `bson:"userId"`
 	CreationDate        primitive.DateTime        `bson:"creationDate"`
 	ModificationDate    *primitive.DateTime       `bson:"modificationDate"`
 }

@@ -11,11 +11,15 @@ func (app *application) routes() *mux.Router {
 	// TODO: to get the current status of remote cardsets, should support ifModifiedSince
 	//r.Handle(
 	//	"/api/cardsets/status",
-	//	app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetSync)),
+	//	app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetPush)),
 	//).Methods("POST")
 	r.Handle(
-		"/api/cardsets/sync",
-		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetSync)),
+		"/api/cardsets/push",
+		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetPush)),
+	).Methods("POST")
+	r.Handle(
+		"/api/cardsets/pull",
+		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetPull)),
 	).Methods("POST")
 
 	return r

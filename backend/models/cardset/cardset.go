@@ -49,13 +49,13 @@ func (cs *CardSetApi) IsEqual(a *CardSetApi) bool {
 }
 
 type CardSetDb struct {
-	ID               primitive.ObjectID   `bson:"_id,omitempty"`
-	Name             string               `bson:"name"`
-	Cards            []primitive.ObjectID `bson:"cards"`
-	UserId           *primitive.ObjectID  `bson:"userId"`
-	CreationDate     primitive.DateTime   `bson:"creationDate"`
-	ModificationDate *primitive.DateTime  `bson:"modificationDate,omitempty"`
-	CreationId       *string              `bson:"creationId"`
+	ID               *primitive.ObjectID   `bson:"_id,omitempty"`
+	Name             string                `bson:"name"`
+	Cards            []*primitive.ObjectID `bson:"cards"`
+	UserId           *primitive.ObjectID   `bson:"userId"`
+	CreationDate     primitive.DateTime    `bson:"creationDate"`
+	ModificationDate *primitive.DateTime   `bson:"modificationDate,omitempty"`
+	CreationId       *string               `bson:"creationId"`
 }
 
 func (cs *CardSetDb) ToApi(cards []*card.CardApi) *CardSetApi {

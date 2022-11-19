@@ -47,6 +47,19 @@ func DoubleSliceComparableEqual[T comparable](a [][]T, b [][]T) bool {
 	return true
 }
 
+func SliceAppend[T any](s1 []T, s2 []T) []T {
+	res := make([]T, 0, len(s1)+len(s2))
+	for _, v := range s1 {
+		res = append(res, v)
+	}
+
+	for _, v := range s2 {
+		res = append(res, v)
+	}
+
+	return res
+}
+
 func SliceComparableEqual[T comparable](a []T, b []T) bool {
 	if len(a) != len(b) {
 		return false

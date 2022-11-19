@@ -63,19 +63,19 @@ func (m *CardSetModel) DeleteCardSetByCreationId(
 		func(sCtx mongo.SessionContext) (interface{}, error) {
 
 			// delete cards first
-			cardSetDb, err := m.LoadCardSetDbByCreationId(context, creationId)
+			cardSetDb, err := m.LoadCardSetDbByCreationId(sCtx, creationId)
 			if err != mongo.ErrNoDocuments && err != nil {
 				return nil, err
 			}
 
 			if cardSetDb != nil {
-				err = m.CardModel.DeleteByIds(context, cardSetDb.Cards)
+				err = m.CardModel.DeleteByIds(sCtx, cardSetDb.Cards)
 				if err != mongo.ErrNoDocuments && err != nil {
 					return nil, err
 				}
 			}
 
-			_, err = m.CardSetCollection.DeleteMany(context, bson.M{"creationId": creationId})
+			_, err = m.CardSetCollection.DeleteMany(sCtx, bson.M{"creationId": creationId})
 			if err != mongo.ErrNoDocuments {
 				return nil, err
 			}
@@ -95,7 +95,7 @@ func (m *CardSetModel) LoadCardSetApiFromDb(
 	context context.Context,
 	cardSetDb *CardSetDb,
 ) (*CardSetApi, error) {
-	var ids []primitive.ObjectID
+	var ids []*primitive.ObjectID
 	for _, id := range cardSetDb.Cards {
 		ids = append(ids, id)
 	}
@@ -120,6 +120,11 @@ func (m *CardSetModel) UpdateCardSet(context context.Context, cardSet *CardSetAp
 		return err
 	}
 
+	userId, err := primitive.ObjectIDFromHex(cardSet.UserId)
+	if err != nil {
+		return err
+	}
+
 	session, err := m.MongoClient.StartSession()
 	if err != nil {
 		return err
@@ -132,19 +137,15 @@ func (m *CardSetModel) UpdateCardSet(context context.Context, cardSet *CardSetAp
 	_, err = session.WithTransaction(
 		context,
 		func(sCtx mongo.SessionContext) (interface{}, error) {
-			cardSetDb, err := m.LoadCardSetDbById(context, &cardSetId)
+			cardSetDb, err := m.LoadCardSetDbById(sCtx, &cardSetId)
 			if err != nil {
 				return nil, err
 			}
 
-			m.CardModel.SyncCards(context, cardSet.Cards, cardSetDb.Cards)
-
-			//for _, cardId := range cardSetDb.Cards {
-			//
-			//}
-
-			// update cardSet info
-			m.CardSetCollection.ReplaceOne()
+			_, err = m.CardModel.SyncCards(sCtx, cardSet.Cards, cardSetDb.Cards, &userId)
+			if err != nil {
+				return nil, err
+			}
 
 			return nil, nil
 		},
@@ -223,7 +224,7 @@ func (m *CardSetModel) InsertCardSet(
 		context,
 		func(sCtx mongo.SessionContext) (interface{}, error) {
 
-			var cardDbIds []primitive.ObjectID
+			var cardDbIds []*primitive.ObjectID
 			for _, crd := range cardSet.Cards {
 				cardDb, err := m.CardModel.Insert(sCtx, crd, userId)
 				if err != nil {
@@ -242,7 +243,7 @@ func (m *CardSetModel) InsertCardSet(
 			}
 
 			objId := res.InsertedID.(primitive.ObjectID)
-			cardSetDb.ID = objId
+			cardSetDb.ID = &objId
 
 			cardSet.Id = objId.Hex()
 			cardSet.UserId = userId.Hex()
