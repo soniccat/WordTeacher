@@ -8,7 +8,6 @@ import (
 	"models/logger"
 	"models/mongowrapper"
 	"models/tools"
-	"time"
 )
 
 type CardModel struct {
@@ -26,7 +25,7 @@ func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *CardModel {
 }
 
 func (cm *CardModel) SyncCards(
-	ctx context.Context,
+	ctx context.Context, // transaction is required
 	actualCards []*CardApi,
 	currentCardIds []*primitive.ObjectID,
 	userId *primitive.ObjectID,
@@ -37,9 +36,9 @@ func (cm *CardModel) SyncCards(
 	var updatedCards []*CardApi
 	var actualCardsWithIds []*CardApi
 
-	actualCardIds, err := tools.MapNotNilOrError(actualCards, func(c **CardApi) (*primitive.ObjectID, error) {
+	actualCardIds, err := tools.MapNotNilOrError(actualCards, func(c *CardApi) (*primitive.ObjectID, error) {
 		if len((*c).Id) == 0 {
-			newCards = append(newCards, *c)
+			newCards = append(newCards, c)
 			return nil, nil
 		}
 
@@ -48,7 +47,7 @@ func (cm *CardModel) SyncCards(
 			return nil, fErr
 		}
 
-		actualCardsWithIds = append(actualCardsWithIds, *c)
+		actualCardsWithIds = append(actualCardsWithIds, c)
 		return &cardId, nil
 	})
 	if err != nil {
@@ -61,16 +60,16 @@ func (cm *CardModel) SyncCards(
 	}
 
 	for i, actualCardId := range actualCardIds {
-		if tools.FindOrNil[CardDb](dbCards, func(c *CardDb) bool { return *c.ID == *actualCardId }) == nil {
+		if tools.FindOrNil(dbCards, func(c *CardDb) bool { return *c.ID == *actualCardId }) == nil {
 			newCards = append(newCards, actualCardsWithIds[i])
 		} else {
 			updatedCards = append(updatedCards, actualCardsWithIds[i])
 		}
 	}
 
-	for _, cardDb := range dbCards {
-		if tools.FindOrNil[primitive.ObjectID](actualCardIds, func(id *primitive.ObjectID) bool { return *id == *cardDb.ID }) == nil {
-			deletedCards = append(deletedCards, cardDb.ID)
+	for _, dbCard := range dbCards {
+		if tools.FindOrNil(actualCardIds, func(id *primitive.ObjectID) bool { return *id == *dbCard.ID }) == nil {
+			deletedCards = append(deletedCards, dbCard.ID)
 		}
 	}
 
@@ -80,9 +79,13 @@ func (cm *CardModel) SyncCards(
 		return nil, err
 	}
 
-	_, err = cm.InsertCards(ctx, newCards, userId)
+	dbCards, err = cm.InsertCards(ctx, newCards, userId)
 	if err != nil {
 		return nil, err
+	}
+
+	for i, dbCard := range dbCards {
+		newCards[i].Id = dbCard.ID.Hex()
 	}
 
 	_, err = cm.ReplaceCards(ctx, updatedCards)
@@ -169,8 +172,8 @@ func (cm *CardModel) InsertCards(
 	userId *primitive.ObjectID,
 ) ([]*CardDb, error) {
 	var cardDbs []*CardDb
-	cardDbs, err := tools.MapOrError(cards, func(c **CardApi) (*CardDb, error) {
-		cardDb, e := cm.createCardDb(*c, userId)
+	cardDbs, err := tools.MapOrError(cards, func(c *CardApi) (*CardDb, error) {
+		cardDb, e := cm.createCardDb(c, userId)
 		return cardDb, e
 	})
 	if err != nil {
@@ -193,16 +196,14 @@ func (cm *CardModel) InsertCards(
 }
 
 func (cm *CardModel) createCardDb(card *CardApi, userId *primitive.ObjectID) (*CardDb, error) {
-	creationDate, err := time.Parse(time.RFC3339, card.CreationDate)
+	creationDate, err := tools.ApiDateToDbDate(card.CreationDate)
 	if err != nil {
 		return nil, err
 	}
 
-	var modificationDateTime *primitive.DateTime
-	if card.ModificationDate != nil {
-		if modificationDate, err := time.Parse(time.RFC3339, *card.ModificationDate); err == nil {
-			modificationDateTime = tools.Ptr(primitive.NewDateTimeFromTime(modificationDate))
-		}
+	modificationDateTime, err := tools.ApiDatePtrToDbDatePtr(card.ModificationDate)
+	if err != nil {
+		return nil, err
 	}
 
 	cardDb := &CardDb{
@@ -215,7 +216,7 @@ func (cm *CardModel) createCardDb(card *CardApi, userId *primitive.ObjectID) (*C
 		DefinitionTermSpans: card.DefinitionTermSpans,
 		ExampleTermSpans:    card.ExampleTermSpans,
 		UserId:              userId,
-		CreationDate:        primitive.NewDateTimeFromTime(creationDate),
+		CreationDate:        creationDate,
 		ModificationDate:    modificationDateTime,
 	}
 	return cardDb, nil

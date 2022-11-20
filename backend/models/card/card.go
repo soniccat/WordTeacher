@@ -79,7 +79,7 @@ func (c *CardApi) ToDb() (*CardDb, error) {
 		return nil, err
 	}
 
-	mdPtr, err := tools.ApiDatePtrToDbDatePtr(c.ModificationDate)
+	modificationDate, err := tools.ApiDatePtrToDbDatePtr(c.ModificationDate)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *CardApi) ToDb() (*CardDb, error) {
 		ExampleTermSpans:    c.ExampleTermSpans,
 		UserId:              &cardDbUserId,
 		CreationDate:        creationTime,
-		ModificationDate:    mdPtr,
+		ModificationDate:    modificationDate,
 	}, nil
 }
 

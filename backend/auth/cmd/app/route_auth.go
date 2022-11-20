@@ -84,7 +84,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	if networkType == "google" {
 		aUser, userNetwork, err = app.resolveGoogleUser(r.Context(), &credentials)
 
-		if err, ok := err.(*AuthErrorInvalidToken); ok {
+		if _, ok := err.(*AuthErrorInvalidToken); ok {
 			app.clientError(w, http.StatusBadRequest)
 			return
 

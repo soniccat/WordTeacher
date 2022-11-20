@@ -151,20 +151,21 @@ func ValidateSession[T any, PT TokenHolder[T]](
 		return nil, nil, NewValidateSessionError(http.StatusBadRequest, errors.New("invalid device id"))
 	}
 
+	// Parse session data and check if it's expired
+	userAuthToken, err := userauthtoken.Load(r.Context(), sessionManager)
+	if err != nil {
+		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, err)
+	}
+
+	if !userAuthToken.IsValid() {
+		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
+	}
+
 	// Body params
 	var input T
 	err = json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		return nil, nil, NewValidateSessionError(http.StatusBadRequest, err)
-	}
-
-	userAuthToken, err := userauthtoken.Load(r.Context(), sessionManager)
-	if err != nil {
-		return nil, nil, NewValidateSessionError(http.StatusServiceUnavailable, err)
-	}
-
-	if !userAuthToken.IsValid() {
-		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
 	}
 
 	p := PT(&input)

@@ -11,8 +11,28 @@ import (
 const CookieSession = "session"
 const HeaderDeviceId = "deviceId"
 
+func NewHandlerError(code int, err error) *HandlerError {
+	return &HandlerError{
+		StatusCode: code,
+		InnerError: err,
+	}
+}
+
+func (v *HandlerError) Error() string {
+	return v.InnerError.Error()
+}
+
+func SetHandlerError(w http.ResponseWriter, outErr *HandlerError, logger *logger.Logger) {
+	SetError(w, outErr.InnerError, outErr.StatusCode, logger)
+}
+
 type ErrorResponse struct {
 	Error string `json:"error"`
+}
+
+type HandlerError struct {
+	StatusCode int
+	InnerError error
 }
 
 func SetError(w http.ResponseWriter, outErr error, code int, logger *logger.Logger) {

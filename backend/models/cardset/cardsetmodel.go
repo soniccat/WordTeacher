@@ -2,6 +2,7 @@ package cardset
 
 import (
 	"context"
+	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -9,7 +10,6 @@ import (
 	"models/logger"
 	"models/mongowrapper"
 	"models/tools"
-	"time"
 )
 
 type CardSetModel struct {
@@ -46,45 +46,42 @@ func (m *CardSetModel) FindCardSetByCreationId(
 }
 
 func (m *CardSetModel) DeleteCardSetByCreationId(
-	context context.Context,
+	ctx context.Context, // transaction is required
 	creationId string,
 ) error {
-	session, err := m.MongoClient.StartSession()
-	if err != nil {
+	if len(creationId) == 0 {
+		return errors.New("DeleteCardSetByCreationId: empty creationId")
+	}
+
+	return m.deleteCardSet(ctx, bson.M{"creationId": creationId})
+}
+
+func (m *CardSetModel) DeleteCardSetById(
+	ctx context.Context, // transaction is required
+	id *primitive.ObjectID,
+) error {
+	return m.deleteCardSet(ctx, bson.M{"_id": id})
+}
+
+func (m *CardSetModel) deleteCardSet(
+	context context.Context, // transaction is required
+	filter interface{},
+) error {
+	// delete cards first
+	cardSetDb, err := m.loadCardSetDb(context, filter)
+	if err != mongo.ErrNoDocuments && err != nil {
 		return err
 	}
 
-	defer func() {
-		session.EndSession(context)
-	}()
+	if cardSetDb != nil {
+		err = m.CardModel.DeleteByIds(context, cardSetDb.Cards)
+		if err != mongo.ErrNoDocuments && err != nil {
+			return err
+		}
+	}
 
-	_, err = session.WithTransaction(
-		context,
-		func(sCtx mongo.SessionContext) (interface{}, error) {
-
-			// delete cards first
-			cardSetDb, err := m.LoadCardSetDbByCreationId(sCtx, creationId)
-			if err != mongo.ErrNoDocuments && err != nil {
-				return nil, err
-			}
-
-			if cardSetDb != nil {
-				err = m.CardModel.DeleteByIds(sCtx, cardSetDb.Cards)
-				if err != mongo.ErrNoDocuments && err != nil {
-					return nil, err
-				}
-			}
-
-			_, err = m.CardSetCollection.DeleteMany(sCtx, bson.M{"creationId": creationId})
-			if err != mongo.ErrNoDocuments {
-				return nil, err
-			}
-
-			return nil, nil
-		},
-	)
-
-	if err != nil {
+	_, err = m.CardSetCollection.DeleteMany(context, filter)
+	if err != mongo.ErrNoDocuments {
 		return err
 	}
 
@@ -113,7 +110,10 @@ func (m *CardSetModel) LoadCardSetApiFromDb(
 	return cardSetDb.ToApi(cardsApi), nil
 }
 
-func (m *CardSetModel) UpdateCardSet(context context.Context, cardSet *CardSetApi) error {
+func (m *CardSetModel) UpdateCardSet(
+	ctx context.Context, // transaction is required
+	cardSet *CardSetApi,
+) error {
 
 	cardSetId, err := primitive.ObjectIDFromHex(cardSet.Id)
 	if err != nil {
@@ -125,32 +125,30 @@ func (m *CardSetModel) UpdateCardSet(context context.Context, cardSet *CardSetAp
 		return err
 	}
 
-	session, err := m.MongoClient.StartSession()
+	cardSetDb, err := m.LoadCardSetDbById(ctx, &cardSetId)
 	if err != nil {
 		return err
 	}
 
-	defer func() {
-		session.EndSession(context)
-	}()
+	cardApis, err := m.CardModel.SyncCards(ctx, cardSet.Cards, cardSetDb.Cards, &userId)
+	if err != nil {
+		return err
+	}
 
-	_, err = session.WithTransaction(
-		context,
-		func(sCtx mongo.SessionContext) (interface{}, error) {
-			cardSetDb, err := m.LoadCardSetDbById(sCtx, &cardSetId)
-			if err != nil {
-				return nil, err
-			}
+	cardIds, err := tools.MapOrError(cardApis, func(c *card.CardApi) (*primitive.ObjectID, error) {
+		id, mapErr := primitive.ObjectIDFromHex(c.Id)
+		return &id, mapErr
+	})
 
-			_, err = m.CardModel.SyncCards(sCtx, cardSet.Cards, cardSetDb.Cards, &userId)
-			if err != nil {
-				return nil, err
-			}
-
-			return nil, nil
-		},
+	newCardSetDb, err := m.createCardSetDb(
+		cardSet,
+		cardIds,
 	)
+	if err != nil {
+		return err
+	}
 
+	err = m.replaceCardSet(ctx, newCardSetDb)
 	if err != nil {
 		return err
 	}
@@ -186,75 +184,78 @@ func (m *CardSetModel) loadCardSetDb(
 }
 
 func (m *CardSetModel) InsertCardSet(
-	context context.Context,
+	ctx context.Context, // transaction is required
 	cardSet *CardSetApi,
 	userId *primitive.ObjectID,
 ) (*CardSetApi, error) {
 
-	creationDate, err := time.Parse(time.RFC3339, cardSet.CreationDate)
-	if err != nil {
-		return nil, err
-	}
-
-	var modificationDateTime *primitive.DateTime
-	if cardSet.ModificationDate != nil {
-		if modificationDate, err := time.Parse(time.RFC3339, *cardSet.ModificationDate); err == nil {
-			modificationDateTime = tools.Ptr(primitive.NewDateTimeFromTime(modificationDate))
+	var cardDbIds []*primitive.ObjectID
+	for _, crd := range cardSet.Cards {
+		cardDb, err := m.CardModel.Insert(ctx, crd, userId)
+		if err != nil {
+			return nil, err
 		}
+
+		crd.Id = cardDb.ID.Hex()
+		cardDbIds = append(cardDbIds, cardDb.ID)
 	}
 
-	session, err := m.MongoClient.StartSession()
+	cardSetDb, err := m.createCardSetDb(cardSet, cardDbIds)
 	if err != nil {
 		return nil, err
 	}
 
-	defer func() {
-		session.EndSession(context)
-	}()
+	res, err := m.CardSetCollection.InsertOne(ctx, cardSetDb)
+	if err != nil {
+		return nil, err
+	}
+
+	objId := res.InsertedID.(primitive.ObjectID)
+	cardSetDb.ID = &objId
+	cardSet.Id = objId.Hex()
+	cardSet.UserId = userId.Hex()
+
+	return cardSet, nil
+}
+
+func (m *CardSetModel) replaceCardSet(
+	ctx context.Context, // transaction is required
+	cardSetDb *CardSetDb,
+) error {
+	_, err := m.CardSetCollection.ReplaceOne(ctx, bson.M{"_id": cardSetDb.ID}, cardSetDb)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CardSetModel) createCardSetDb(
+	cardSet *CardSetApi,
+	cardDbIds []*primitive.ObjectID,
+) (*CardSetDb, error) {
+	userId, err := primitive.ObjectIDFromHex(cardSet.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	creationDate, err := tools.ApiDateToDbDate(cardSet.CreationDate)
+	if err != nil {
+		return nil, err
+	}
+
+	modificationDateTime, err := tools.ApiDatePtrToDbDatePtr(cardSet.ModificationDate)
+	if err != nil {
+		return nil, err
+	}
 
 	cardSetDb := &CardSetDb{
 		Name:             cardSet.Name,
-		UserId:           userId,
-		CreationDate:     primitive.NewDateTimeFromTime(creationDate),
+		Cards:            cardDbIds,
+		UserId:           &userId,
+		CreationDate:     creationDate,
 		ModificationDate: modificationDateTime,
 		CreationId:       cardSet.CreationId,
 	}
-
-	_, err = session.WithTransaction(
-		context,
-		func(sCtx mongo.SessionContext) (interface{}, error) {
-
-			var cardDbIds []*primitive.ObjectID
-			for _, crd := range cardSet.Cards {
-				cardDb, err := m.CardModel.Insert(sCtx, crd, userId)
-				if err != nil {
-					return nil, err
-				}
-
-				crd.Id = cardDb.ID.Hex()
-				cardDbIds = append(cardDbIds, cardDb.ID)
-			}
-
-			cardSetDb.Cards = cardDbIds
-
-			res, err := m.CardSetCollection.InsertOne(sCtx, cardSetDb)
-			if err != nil {
-				return nil, err
-			}
-
-			objId := res.InsertedID.(primitive.ObjectID)
-			cardSetDb.ID = &objId
-
-			cardSet.Id = objId.Hex()
-			cardSet.UserId = userId.Hex()
-
-			return nil, nil
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return cardSet, nil
+	return cardSetDb, nil
 }

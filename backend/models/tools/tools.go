@@ -72,18 +72,6 @@ func SliceComparableEqual[T comparable](a []T, b []T) bool {
 	return true
 }
 
-//func SliceComparablePtrEqual[T comparable](a []*T, b []*T) bool {
-//	if len(a) != len(b) {
-//		return false
-//	}
-//	for i, v := range a {
-//		if (*v) != *((b)[i]) {
-//			return false
-//		}
-//	}
-//	return true
-//}
-
 func Map[T, U any](data []T, f func(T) U) []U {
 	res := make([]U, 0, len(data))
 
@@ -94,11 +82,11 @@ func Map[T, U any](data []T, f func(T) U) []U {
 	return res
 }
 
-func MapOrError[T, U any](data []T, f func(*T) (U, error)) ([]U, error) {
+func MapOrError[T, U any](data []T, f func(T) (U, error)) ([]U, error) {
 	res := make([]U, 0, len(data))
 
 	for _, e := range data {
-		v, err := f(&e)
+		v, err := f(e)
 		if err != nil {
 			return nil, err
 		}
@@ -109,11 +97,11 @@ func MapOrError[T, U any](data []T, f func(*T) (U, error)) ([]U, error) {
 	return res, nil
 }
 
-func MapNotNilOrError[T, U any](data []T, f func(*T) (*U, error)) ([]*U, error) {
+func MapNotNilOrError[T, U any](data []T, f func(T) (*U, error)) ([]*U, error) {
 	res := make([]*U, 0, len(data))
 
 	for _, e := range data {
-		v, err := f(&e)
+		v, err := f(e)
 		if err != nil {
 			return nil, err
 		}
@@ -136,10 +124,10 @@ func Filter[T any](s []T, f func(T) bool) []T {
 	return r
 }
 
-func FindOrNil[T any](s []*T, f func(*T) bool) *T {
+func FindOrNil[T any](s []T, f func(T) bool) *T {
 	for _, v := range s {
 		if f(v) {
-			return v
+			return &v
 		}
 	}
 	return nil

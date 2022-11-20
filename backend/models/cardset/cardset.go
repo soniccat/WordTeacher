@@ -14,7 +14,7 @@ type CardSetApi struct {
 	UserId           string          `json:"userId"` // TODO: consider several owners via a permission filed
 	CreationDate     string          `json:"creationDate"`
 	ModificationDate *string         `json:"modificationDate,omitempty"`
-	CreationId       *string         `json:"creationId"`
+	CreationId       string          `json:"creationId"`
 }
 
 func (cs *CardSetApi) IsEqual(a *CardSetApi) bool {
@@ -55,7 +55,7 @@ type CardSetDb struct {
 	UserId           *primitive.ObjectID   `bson:"userId"`
 	CreationDate     primitive.DateTime    `bson:"creationDate"`
 	ModificationDate *primitive.DateTime   `bson:"modificationDate,omitempty"`
-	CreationId       *string               `bson:"creationId"`
+	CreationId       string                `bson:"creationId"`
 }
 
 func (cs *CardSetDb) ToApi(cards []*card.CardApi) *CardSetApi {
