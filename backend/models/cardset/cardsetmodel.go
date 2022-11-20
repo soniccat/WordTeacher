@@ -188,18 +188,24 @@ func (m *CardSetModel) InsertCardSet(
 	cardSet *CardSetApi,
 	userId *primitive.ObjectID,
 ) (*CardSetApi, error) {
+	//for _, crd := range cardSet.Cards {
+	//	cardDb, err := m.CardModel.Insert(ctx, crd, userId)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//
+	//	crd.Id = cardDb.ID.Hex()
+	//	cardDbIds = append(cardDbIds, cardDb.ID)
+	//}
 
-	var cardDbIds []*primitive.ObjectID
-	for _, crd := range cardSet.Cards {
-		cardDb, err := m.CardModel.Insert(ctx, crd, userId)
-		if err != nil {
-			return nil, err
-		}
-
-		crd.Id = cardDb.ID.Hex()
-		cardDbIds = append(cardDbIds, cardDb.ID)
+	cardDbs, err := m.CardModel.InsertCards(ctx, cardSet.Cards, userId)
+	if err != nil {
+		return nil, err
 	}
 
+	cardDbIds := tools.Map(cardDbs, func(c *card.CardDb) *primitive.ObjectID {
+		return c.ID
+	})
 	cardSetDb, err := m.createCardSetDb(cardSet, cardDbIds)
 	if err != nil {
 		return nil, err

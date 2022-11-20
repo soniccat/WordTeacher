@@ -38,11 +38,25 @@ func (input *CardSetPushInput) GetRefreshToken() *string {
 }
 
 type CardSetSyncResponse struct {
-	Ids map[string]string `json:"ids"` // deduplication id to primitive.ObjectID
+	CardSetIds map[string]string `json:"cardSetIds,omitempty"` // deduplication id to primitive.ObjectID
+	CardIds    map[string]string `json:"cardIds,omitempty"`    // deduplication id to primitive.ObjectID
+}
+
+func NewCardSetSyncResponse() *CardSetSyncResponse {
+	return &CardSetSyncResponse{
+		make(map[string]string),
+		make(map[string]string),
+	}
 }
 
 type UserMutex struct {
 	mutexes map[primitive.ObjectID]*sync.Mutex
+}
+
+func NewUserMutex() *UserMutex {
+	return &UserMutex{
+		make(map[primitive.ObjectID]*sync.Mutex),
+	}
 }
 
 func (um *UserMutex) lockForUser(u *primitive.ObjectID) {
@@ -61,7 +75,7 @@ func (um *UserMutex) unlockForUser(u *primitive.ObjectID) {
 	}
 }
 
-var userMutex = UserMutex{}
+var userMutex = NewUserMutex()
 
 // Purpose:
 //
@@ -112,18 +126,16 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := CardSetSyncResponse{}
-
 	defer func() {
 		session.EndSession(ctx)
 	}()
 
 	wc := writeconcern.New(writeconcern.WMajority())
 	txnOpts := options.Transaction().SetWriteConcern(wc)
-	resultIds, err := session.WithTransaction(
+	response, err := session.WithTransaction(
 		ctx,
 		func(sCtx mongo.SessionContext) (interface{}, error) {
-			ids, sErr := app.handleUpdatedCardSets(sCtx, input.UpdatedCardSets, authToken.UserMongoId)
+			response, sErr := app.handleUpdatedCardSets(sCtx, input.UpdatedCardSets, authToken.UserMongoId)
 			if sErr != nil {
 				return nil, sErr
 			}
@@ -133,7 +145,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 				return nil, sErr
 			}
 
-			return ids, nil
+			return response, nil
 		},
 		txnOpts,
 	)
@@ -147,8 +159,6 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	response.Ids = resultIds.(map[string]string)
 
 	// Build response
 
@@ -168,15 +178,28 @@ func (app *application) handleUpdatedCardSets(
 	ctx context.Context, // transaction is required
 	updatedCardSets []*cardset.CardSetApi,
 	userId *primitive.ObjectID,
-) (*map[string]string, error) {
+) (*CardSetSyncResponse, error) {
+
+	cardCreationIdSet := make(map[string]bool)
+
 	// validate
 	for _, cardSet := range updatedCardSets {
 		if len(cardSet.Id) == 0 && len(cardSet.CreationId) == 0 {
-			return nil, apphelpers.NewHandlerError(http.StatusBadRequest, errors.New("card set without id has no creation id too"))
+			return nil, app.NewHandlerError(http.StatusBadRequest, errors.New("card set without id has no creation id too"))
+		}
+
+		for _, card := range cardSet.Cards {
+			if len(card.Id) == 0 {
+				if len(card.CreationId) == 0 {
+					return nil, app.NewHandlerError(http.StatusBadRequest, errors.New("card without id has no creation id too"))
+				}
+
+				cardCreationIdSet[card.CreationId] = true
+			}
 		}
 	}
 
-	var resultIds map[string]string
+	response := NewCardSetSyncResponse()
 
 	for _, cardSet := range updatedCardSets {
 		if len(cardSet.Id) == 0 {
@@ -184,14 +207,20 @@ func (app *application) handleUpdatedCardSets(
 			// delete previously created cards
 			err := app.cardSetModel.DeleteCardSetByCreationId(ctx, cardSet.CreationId)
 			if err != nil {
-				return nil, apphelpers.NewHandlerError(http.StatusInternalServerError, err)
+				return nil, app.NewHandlerError(http.StatusInternalServerError, err)
 
 			} else {
 				insertedCardSet, err := app.cardSetModel.InsertCardSet(ctx, cardSet, userId)
 				if err != nil {
-					return nil, apphelpers.NewHandlerError(http.StatusInternalServerError, err)
+					return nil, app.NewHandlerError(http.StatusInternalServerError, err)
 				} else {
-					resultIds[cardSet.CreationId] = insertedCardSet.Id
+					response.CardSetIds[cardSet.CreationId] = insertedCardSet.Id
+
+					for _, card := range insertedCardSet.Cards {
+						if _, ok := cardCreationIdSet[card.CreationId]; ok {
+							response.CardIds[card.CreationId] = card.Id
+						}
+					}
 				}
 			}
 		} else {
@@ -200,12 +229,18 @@ func (app *application) handleUpdatedCardSets(
 				cardSet,
 			)
 			if err != nil {
-				return nil, apphelpers.NewHandlerError(http.StatusInternalServerError, err)
+				return nil, app.NewHandlerError(http.StatusInternalServerError, err)
+			}
+
+			for _, card := range cardSet.Cards {
+				if _, ok := cardCreationIdSet[card.CreationId]; ok {
+					response.CardIds[card.CreationId] = card.Id
+				}
 			}
 		}
 	}
 
-	return &resultIds, nil
+	return response, nil
 }
 
 func (app *application) handleDeletedCardSets(

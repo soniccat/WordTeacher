@@ -20,6 +20,7 @@ type CardApi struct {
 	UserId              string                    `json:"userId"`
 	CreationDate        string                    `json:"creationDate"`
 	ModificationDate    *string                   `json:"modificationDate,omitempty"`
+	CreationId          string                    `json:"creationId"`
 }
 
 func (cs *CardApi) IsEqual(a *CardApi) bool {
@@ -57,6 +58,9 @@ func (cs *CardApi) IsEqual(a *CardApi) bool {
 		return false
 	}
 	if cs.ModificationDate != a.ModificationDate {
+		return false
+	}
+	if cs.CreationId != a.CreationId {
 		return false
 	}
 
@@ -97,6 +101,7 @@ func (c *CardApi) ToDb() (*CardDb, error) {
 		UserId:              &cardDbUserId,
 		CreationDate:        creationTime,
 		ModificationDate:    modificationDate,
+		CreationId:          c.CreationId,
 	}, nil
 }
 
@@ -113,6 +118,7 @@ type CardDb struct {
 	UserId              *primitive.ObjectID       `bson:"userId"`
 	CreationDate        primitive.DateTime        `bson:"creationDate"`
 	ModificationDate    *primitive.DateTime       `bson:"modificationDate"`
+	CreationId          string                    `bson:"creationId"`
 }
 
 func (cs *CardDb) IsEqual(a *CardDb) bool {
@@ -152,6 +158,9 @@ func (cs *CardDb) IsEqual(a *CardDb) bool {
 	if cs.ModificationDate != a.ModificationDate {
 		return false
 	}
+	if cs.CreationId != a.CreationId {
+		return false
+	}
 
 	return true
 }
@@ -180,5 +189,6 @@ func (c *CardDb) ToApi() *CardApi {
 		UserId:              c.UserId.Hex(),
 		CreationDate:        c.CreationDate.Time().Format(time.RFC3339),
 		ModificationDate:    md,
+		CreationId:          c.CreationId,
 	}
 }

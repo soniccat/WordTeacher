@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/alexedwards/scs/v2"
+	"models/apphelpers"
 	"models/cardset"
 	"models/logger"
 	"models/mongowrapper"
@@ -21,6 +22,14 @@ func (a *application) GetLogger() *logger.Logger {
 
 func (a *application) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
 	a.mongoWrapper = mw
+}
+
+func (a *application) AllowStackTraces() bool {
+	return a.logger.AllowStackTraces
+}
+
+func (a *application) NewHandlerError(code int, err error) *apphelpers.HandlerError {
+	return apphelpers.NewHandlerError(code, err, a.AllowStackTraces())
 }
 
 type service struct {

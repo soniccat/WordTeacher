@@ -31,10 +31,11 @@ func (cm *CardModel) SyncCards(
 	userId *primitive.ObjectID,
 ) ([]*CardApi, error) {
 
-	var newCards []*CardApi
-	var deletedCards []*primitive.ObjectID
-	var updatedCards []*CardApi
-	var actualCardsWithIds []*CardApi
+	// initialize empty slices on purpose as mongo Api will crash
+	newCards := []*CardApi{}
+	deletedCards := []*primitive.ObjectID{}
+	updatedCards := []*CardApi{}
+	actualCardsWithIds := []*CardApi{}
 
 	actualCardIds, err := tools.MapNotNilOrError(actualCards, func(c *CardApi) (*primitive.ObjectID, error) {
 		if len((*c).Id) == 0 {
@@ -103,7 +104,7 @@ func (cm *CardModel) LoadByIds(context context.Context, ids []*primitive.ObjectI
 		return nil, err
 	}
 
-	err = cursor.All(context, result)
+	err = cursor.All(context, &result)
 	if err != nil {
 		return nil, err
 	}
@@ -144,27 +145,27 @@ func (cm *CardModel) ReplaceCards(
 	return cardDbs, nil
 }
 
-func (cm *CardModel) Insert(
-	context context.Context,
-	card *CardApi,
-	userId *primitive.ObjectID,
-) (*CardDb, error) {
-	cardDb, err := cm.createCardDb(card, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := cm.CardCollection.InsertOne(context, cardDb)
-	if err != nil {
-		return nil, err
-	}
-
-	resId := res.InsertedID.(primitive.ObjectID)
-	card.Id = resId.String()
-	cardDb.ID = &resId
-
-	return cardDb, nil
-}
+//func (cm *CardModel) Insert(
+//	context context.Context,
+//	card *CardApi,
+//	userId *primitive.ObjectID,
+//) (*CardDb, error) {
+//	cardDb, err := cm.createCardDb(card, userId)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	res, err := cm.CardCollection.InsertOne(context, cardDb)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	resId := res.InsertedID.(primitive.ObjectID)
+//	card.Id = resId.Hex()
+//	cardDb.ID = &resId
+//
+//	return cardDb, nil
+//}
 
 func (cm *CardModel) InsertCards(
 	context context.Context,
@@ -188,7 +189,7 @@ func (cm *CardModel) InsertCards(
 
 	for i, insertedId := range manyResult.InsertedIDs {
 		resId := insertedId.(primitive.ObjectID)
-		cards[i].Id = resId.String()
+		cards[i].Id = resId.Hex()
 		cardDbs[i].ID = &resId
 	}
 
@@ -218,6 +219,7 @@ func (cm *CardModel) createCardDb(card *CardApi, userId *primitive.ObjectID) (*C
 		UserId:              userId,
 		CreationDate:        creationDate,
 		ModificationDate:    modificationDateTime,
+		CreationId:          card.CreationId,
 	}
 	return cardDb, nil
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"models/logger"
+	"models/tools"
 	"net/http"
 	"runtime/debug"
 )
@@ -11,10 +12,16 @@ import (
 const CookieSession = "session"
 const HeaderDeviceId = "deviceId"
 
-func NewHandlerError(code int, err error) *HandlerError {
+func NewHandlerError(code int, err error, withStack bool) *HandlerError {
+	var stack *[]byte
+	if withStack {
+		stack = tools.Ptr(debug.Stack())
+	}
+
 	return &HandlerError{
 		StatusCode: code,
 		InnerError: err,
+		Stack:      stack,
 	}
 }
 
@@ -23,7 +30,16 @@ func (v *HandlerError) Error() string {
 }
 
 func SetHandlerError(w http.ResponseWriter, outErr *HandlerError, logger *logger.Logger) {
-	SetError(w, outErr.InnerError, outErr.StatusCode, logger)
+	var stack *[]byte
+	if logger.AllowStackTraces {
+		stack = outErr.Stack
+
+		if stack == nil {
+			stack = tools.Ptr(debug.Stack())
+		}
+	}
+
+	SetErrorWithStack(w, outErr.InnerError, outErr.StatusCode, logger, stack)
 }
 
 type ErrorResponse struct {
@@ -33,9 +49,14 @@ type ErrorResponse struct {
 type HandlerError struct {
 	StatusCode int
 	InnerError error
+	Stack      *[]byte
 }
 
 func SetError(w http.ResponseWriter, outErr error, code int, logger *logger.Logger) {
+	SetErrorWithStack(w, outErr, code, logger, tools.Ptr(debug.Stack()))
+}
+
+func SetErrorWithStack(w http.ResponseWriter, outErr error, code int, logger *logger.Logger, stack *[]byte) {
 	w.WriteHeader(code)
 
 	marshaledResponse, err := json.Marshal(ErrorResponse{Error: outErr.Error()})
@@ -50,7 +71,7 @@ func SetError(w http.ResponseWriter, outErr error, code int, logger *logger.Logg
 	}
 
 	if logger.AllowStackTraces {
-		trace := fmt.Sprintf("%s\n%s", outErr.Error(), debug.Stack())
+		trace := fmt.Sprintf("%s\n%s", outErr.Error(), stack)
 		err = logger.Error.Output(2, trace)
 	}
 }
