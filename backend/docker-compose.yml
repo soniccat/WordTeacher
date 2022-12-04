@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  auth:
+    build: ./auth
+    command:
+      - "-mongoURI"
+      - "mongodb://db:27017/"
+  cardset:
+    build: ./cardsets
+    command:
+      - "-mongoURI"
+      - "mongodb://db:27017/"
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server 
+    volumes:
+      - testdb:/sth/to/test1
+    image: mongo:4.2.11
+    ports:
+      - target: 27017
+        published: 27017
+    #     protocol: tcp
+    #     mode: host
+  db:
+    image: mongo:4.2.11
+    ports:
+      - target: 27017
+        published: 27017
+    #     protocol: tcp
+    #     mode: host
+    volumes:
+      - testdb:/sth/to/test2
+volumes:
+  testdb:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./serverdir
+
