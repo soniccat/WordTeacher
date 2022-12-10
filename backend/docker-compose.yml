@@ -2,15 +2,25 @@ version: "3.8"
 
 services:
   auth:
-    build: ./auth
+    build:
+      context: ./
+      dockerfile: ./Auth.Dockerfile
     command:
       - "-mongoURI"
       - "mongodb://db:27017/"
+    ports:
+      - target: 4000
+        published: 4000
   cardset:
-    build: ./cardsets
+    build:
+      context: ./
+      dockerfile: ./CardSets.Dockerfile
     command:
       - "-mongoURI"
       - "mongodb://db:27017/"
+    ports:
+      - target: 4001
+        published: 4001
   cache:
     image: redis:6.2-alpine
     restart: always
