@@ -8,7 +8,7 @@ services:
     image: auth
     command:
       - "-mongoURI"
-      - "mongodb://db:27017/"
+      - "mongodb://db:27017/?replicaSet=rs0"
       - "-redisAddress"
       - "cache:6379"
     ports:
@@ -21,7 +21,7 @@ services:
     image: cardsets
     command:
       - "-mongoURI"
-      - "mongodb://db:27017/"
+      - "mongodb://db:27017/?replicaSet=rs0"
       - "-redisAddress"
       - "cache:6379"
     ports:
@@ -40,8 +40,36 @@ services:
 #        published: 6379
     #     protocol: tcp
     #     mode: host
+
+#  db:
+#    image: mongo:4.2.11
+#    command: --replSet rs0
+#    ports:
+#      - "28017:27017"
+#    environment:
+#      MONGO_INITDB_DATABASE: attachment-api-local-dev
+#    healthcheck:
+#      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/admin --quiet
+#      interval: 2s
+#      timeout: 3s
+#      retries: 5
+#
+#  mongo-init:
+#    image: mongo:5
+#    command: >
+#      mongo --host db:27017 --eval
+#      '
+#      rs.initiate( {
+#         _id : "rs0",
+#         members: [
+#            { _id: 0, host: "localhost:27017" }
+#         ]
+#      })
+#      '
+
   db:
-    image: mongo:4.2.11
+    image: mongo:5
+    command: --replSet rs0
     ports:
       - target: 27017
         published: 27017
