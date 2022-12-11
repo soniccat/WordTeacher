@@ -29,6 +29,11 @@ LABEL org.opencontainers.image.source https://github.com/soniccat/WordTeacher
 COPY --from=builder /etc/passwd /etc/passwd
 # copy the static executable
 COPY --from=builder --chown=elf:1000 /go/bin/app /app
+
+COPY ./application_default_credentials.json ./
+ENV GOOGLE_APPLICATION_CREDENTIALS "/application_default_credentials.json"
+RUN chmod 777 "/application_default_credentials.json"
+
 # use a non-root user
 USER elf
 # run app

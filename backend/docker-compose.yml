@@ -2,22 +2,28 @@ version: "3.8"
 
 services:
   auth:
-    build:
-      context: ./
-      dockerfile: ./Auth.Dockerfile
+#    build:
+#      context: ./
+#      dockerfile: ./Auth.Dockerfile
+    image: auth
     command:
       - "-mongoURI"
       - "mongodb://db:27017/"
+      - "-redisAddress"
+      - "cache:6379"
     ports:
       - target: 4000
         published: 4000
-  cardset:
-    build:
-      context: ./
-      dockerfile: ./CardSets.Dockerfile
+  cardsets:
+#    build:
+#      context: ./
+#      dockerfile: ./CardSets.Dockerfile
+    image: cardsets
     command:
       - "-mongoURI"
       - "mongodb://db:27017/"
+      - "-redisAddress"
+      - "cache:6379"
     ports:
       - target: 4001
         published: 4001
@@ -29,10 +35,9 @@ services:
     command: redis-server 
     volumes:
       - testdb:/sth/to/test1
-    image: mongo:4.2.11
-    ports:
-      - target: 27017
-        published: 27017
+#    ports:
+#      - target: 6379
+#        published: 6379
     #     protocol: tcp
     #     mode: host
   db:
@@ -50,5 +55,5 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: ./serverdir
+      device: /tmp/serverdir
 
