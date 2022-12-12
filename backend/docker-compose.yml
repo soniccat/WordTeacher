@@ -35,37 +35,6 @@ services:
     command: redis-server 
     volumes:
       - testdb:/sth/to/test1
-#    ports:
-#      - target: 6379
-#        published: 6379
-    #     protocol: tcp
-    #     mode: host
-
-#  db:
-#    image: mongo:4.2.11
-#    command: --replSet rs0
-#    ports:
-#      - "28017:27017"
-#    environment:
-#      MONGO_INITDB_DATABASE: attachment-api-local-dev
-#    healthcheck:
-#      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/admin --quiet
-#      interval: 2s
-#      timeout: 3s
-#      retries: 5
-#
-#  mongo-init:
-#    image: mongo:5
-#    command: >
-#      mongo --host db:27017 --eval
-#      '
-#      rs.initiate( {
-#         _id : "rs0",
-#         members: [
-#            { _id: 0, host: "localhost:27017" }
-#         ]
-#      })
-#      '
 
   db:
     image: mongo:5
@@ -73,10 +42,16 @@ services:
     ports:
       - target: 27017
         published: 27017
-    #     protocol: tcp
-    #     mode: host
     volumes:
       - testdb:/sth/to/test2
+
+  mongosetup:
+    image: mongo:5
+    depends_on:
+      - db
+    restart: "no"
+    entrypoint: [ "bash", "-c", "sleep 10 && mongo --host db:27017 --eval 'rs.initiate()'"]
+
 volumes:
   testdb:
     driver: local
