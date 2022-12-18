@@ -2,18 +2,22 @@ version: "3.8"
 
 services:
   auth:
-#    build:
-#      context: ./
-#      dockerfile: ./Auth.Dockerfile
-    image: auth
+    build:
+      context: ./
+      args:
+        PORT: "${SERVICE_AUTH_PORT}"
+      dockerfile: ./Auth.Dockerfile
+    image: "auth"
     command:
+      - "-serverPort"
+      - "${SERVICE_AUTH_PORT}"
       - "-mongoURI"
-      - "mongodb://db:27017/?replicaSet=rs0"
+      - "mongodb://db:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
-      - "cache:6379"
+      - "cache:${REDIS_PORT}"
     ports:
-      - target: 4000
-        published: 4000
+      - target: "${SERVICE_AUTH_PORT}"
+        published: "${SERVICE_AUTH_PORT}"
   cardsets:
 #    build:
 #      context: ./
@@ -21,27 +25,27 @@ services:
     image: cardsets
     command:
       - "-mongoURI"
-      - "mongodb://db:27017/?replicaSet=rs0"
+      - "mongodb://db:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
-      - "cache:6379"
+      - "cache:${REDIS_PORT}"
     ports:
-      - target: 4001
-        published: 4001
+      - target: "${SERVICE_CARDSETS_PORT}"
+        published: "${SERVICE_CARDSETS_PORT}"
   cache:
     image: redis:6.2-alpine
     restart: always
     ports:
-      - '6379:6379'
-    command: redis-server 
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    command: redis-server --port ${REDIS_PORT}
     volumes:
       - testdb:/sth/to/test1
 
   db:
     image: mongo:5
-    command: --replSet rs0
+    command: --replSet rs0 --port ${MONGODB_PORT}
     ports:
-      - target: 27017
-        published: 27017
+      - target: "${MONGODB_PORT}"
+        published: "${MONGODB_PORT}"
     volumes:
       - testdb:/sth/to/test2
 
@@ -50,7 +54,7 @@ services:
     depends_on:
       - db
     restart: "no"
-    entrypoint: [ "bash", "-c", "sleep 10 && mongo --host db:27017 --eval 'rs.initiate()'"]
+    entrypoint: [ "bash", "-c", "sleep 5 && mongo --host db:${MONGODB_PORT} --eval 'rs.initiate()'"]
 
 volumes:
   testdb:
@@ -58,5 +62,5 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /tmp/serverdir
+      device: "${VOLUME}"
 

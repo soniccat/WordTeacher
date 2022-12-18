@@ -96,7 +96,7 @@ func (m *UserModel) insertUserAuthToken(
 		},
 	)
 	if err != nil {
-		m.Logger.Error.Printf("InsertUserToken DeleteMany error %f", err.Error())
+		m.Logger.Error.Printf("InsertUserToken DeleteMany error %s", err.Error())
 	}
 
 	// Add the new one

@@ -8,25 +8,29 @@ ENV_LOCAL_TEST=\
   POSTGRES_HOST=postgres \
   POSTGRES_USER=postgres
 
-# this command will start a docker components that we set in docker-compose.yml
-docker.start.components:
-	docker-compose up -d --remove-orphans postgres;
+up:
+	docker compose --env-file ./prod.env up -d
 
-# shutting down docker components
-docker.stop:
-	docker-compose down;
+down:
+	docker compose --env-file ./prod.env down
+
+uptest:
+	docker compose --env-file ./test.env -f ./docker-compose.yml up -d
+
+downtest:
+	docker compose --env-file ./test.env down
 
 # this command will trigger integration test
 # INTEGRATION_TEST_SUITE_PATH is used for run specific test in Golang, if it's not specified
 # it will run all tests under ./it directory
 test.integration:
 	$(ENV_LOCAL_TEST) \
-go test -tags=integration $(INTEGRATION_TEST_PATH) -count=1 -run=$(INTEGRATION_TEST_SUITE_PATH)
+	go test -tags=integration ./models/user -count=1 -run=$(INTEGRATION_TEST_SUITE_PATH)
 
 # this command will trigger integration test with verbose mode
 test.integration.debug:
 	$(ENV_LOCAL_TEST) \
-go test -tags=integration $(INTEGRATION_TEST_PATH) -count=1 -v -run=$(INTEGRATION_TEST_SUITE_PATH)
+	go test -tags=integration $(INTEGRATION_TEST_PATH) -count=1 -v -run=$(INTEGRATION_TEST_SUITE_PATH)
 
 # auth
 
@@ -65,11 +69,3 @@ cardsetsrun:
 
 cardsetsclearandbuild: cardsetsrm cardsetsbuild
 cardsetsclearandrun: cardsetsclearandbuild cardsetsrun
-
-# all together
-
-up:
-	docker compose up
-
-down:
-	docker compose down

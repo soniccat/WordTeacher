@@ -4,16 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 	"models/apphelpers"
 	"models/cardset"
 	"models/tools"
 	"models/user"
 	"net/http"
 	"sync"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 )
 
 const (
@@ -113,7 +114,6 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
 	}
-
 	// execute all the changes in one transaction
 
 	userMutex.lockForUser(authToken.UserMongoId)
