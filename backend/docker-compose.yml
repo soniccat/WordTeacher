@@ -19,11 +19,15 @@ services:
       - target: "${SERVICE_AUTH_PORT}"
         published: "${SERVICE_AUTH_PORT}"
   cardsets:
-#    build:
-#      context: ./
-#      dockerfile: ./CardSets.Dockerfile
+    build:
+      context: ./
+      args:
+        PORT: "${SERVICE_CARDSETS_PORT}"
+      dockerfile: ./CardSets.Dockerfile
     image: cardsets
     command:
+      - "-serverPort"
+      - "${SERVICE_CARDSETS_PORT}"
       - "-mongoURI"
       - "mongodb://db:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
@@ -38,7 +42,7 @@ services:
       - '${REDIS_PORT}:${REDIS_PORT}'
     command: redis-server --port ${REDIS_PORT}
     volumes:
-      - testdb:/sth/to/test1
+      - ${VOLUME}:/redispath${TEST_NAME}
 
   db:
     image: mongo:5
@@ -47,7 +51,7 @@ services:
       - target: "${MONGODB_PORT}"
         published: "${MONGODB_PORT}"
     volumes:
-      - testdb:/sth/to/test2
+      - ${VOLUME}:/mongopath${TEST_NAME}
 
   mongosetup:
     image: mongo:5
@@ -57,10 +61,16 @@ services:
     entrypoint: [ "bash", "-c", "sleep 5 && mongo --host db:${MONGODB_PORT} --eval 'rs.initiate()'"]
 
 volumes:
+  proddb:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${VOLUME_PROD}"
   testdb:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: "${VOLUME}"
+      device: "${VOLUME_TEST}"
 

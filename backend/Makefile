@@ -11,11 +11,17 @@ ENV_LOCAL_TEST=\
 up:
 	docker compose --env-file ./prod.env up -d
 
+stop:
+	docker compose --env-file ./prod.env stop
+
 down:
 	docker compose --env-file ./prod.env down
 
 uptest:
 	docker compose --env-file ./test.env -f ./docker-compose.yml up -d
+
+stoptest:
+	docker compose --env-file ./test.env stop
 
 downtest:
 	docker compose --env-file ./test.env down
