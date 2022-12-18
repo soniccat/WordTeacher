@@ -35,7 +35,9 @@ services:
     ports:
       - target: "${SERVICE_CARDSETS_PORT}"
         published: "${SERVICE_CARDSETS_PORT}"
+
   cache:
+    container_name: ${REDIS_NAME}
     image: redis:6.2-alpine
     restart: always
     ports:
@@ -43,6 +45,17 @@ services:
     command: redis-server --port ${REDIS_PORT}
     volumes:
       - ${VOLUME}:/redispath${TEST_NAME}
+      - ${VOLUME}:/data
+
+#  cache2:
+#    container_name: redis2
+#    image: redis:6.2-alpine
+#    restart: always
+#    ports:
+#      - '${REDIS_PORT2}:${REDIS_PORT2}'
+#    command: redis-server --port ${REDIS_PORT2}
+#    volumes:
+#      - ${VOLUME2}:/redispath${TEST_NAME}
 
   db:
     image: mongo:5
@@ -67,6 +80,12 @@ volumes:
       o: bind
       type: none
       device: "${VOLUME_PROD}"
+  proddb2:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${VOLUME_PROD2}"
   testdb:
     driver: local
     driver_opts:

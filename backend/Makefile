@@ -18,7 +18,7 @@ down:
 	docker compose --env-file ./prod.env down
 
 uptest:
-	docker compose --env-file ./test.env -f ./docker-compose.yml up -d
+	docker compose --env-file ./test.env up -d
 
 stoptest:
 	docker compose --env-file ./test.env stop
