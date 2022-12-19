@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   auth:
+    container_name: "auth${TEST_SUFFIX}"
     build:
       context: ./
       dockerfile: ./Auth.Dockerfile
@@ -15,12 +16,13 @@ services:
       - "172.16.0.3:${REDIS_PORT}"
     networks:
       mongo_net:
-        ipv4_address: 172.16.0.4
+        ipv4_address: 172.16.0.10
     ports:
       - target: "${SERVICE_AUTH_PORT}"
         published: "${SERVICE_AUTH_PORT}"
 
   cardsets:
+    container_name: "cardsets${TEST_SUFFIX}"
     build:
       context: ./
       args:
@@ -36,13 +38,13 @@ services:
       - "172.16.0.3:${REDIS_PORT}"
     networks:
       mongo_net:
-        ipv4_address: 172.16.0.5
+        ipv4_address: 172.16.0.11
     ports:
       - target: "${SERVICE_CARDSETS_PORT}"
         published: "${SERVICE_CARDSETS_PORT}"
 
-  cache:
-    container_name: ${REDIS_NAME}
+  redis:
+    container_name: "redis${TEST_SUFFIX}"
     image: redis:6.2-alpine
     restart: always
     networks:
@@ -52,10 +54,10 @@ services:
       - '${REDIS_PORT}:${REDIS_PORT}'
     command: redis-server --port ${REDIS_PORT}
     volumes:
-      - ${VOLUME}:/redispath${TEST_NAME}
-      - ${VOLUME}:/data
+      - ${VOLUME_REDIS}:/data
 
-  db:
+  mongo:
+    container_name: "mongo${TEST_SUFFIX}"
     image: mongo:5
     networks:
       mongo_net:
@@ -65,17 +67,17 @@ services:
       - target: "${MONGODB_PORT}"
         published: "${MONGODB_PORT}"
     volumes:
-      - ${VOLUME}:/mongopath${TEST_NAME}
-      - ${VOLUME}:/data/db
-      - ${VOLUME}:/data/configdb
+      - ${VOLUME_MONGODB}:/data/db
+      - ${VOLUME_MONGOCONFIG}:/data/configdb
 
   mongosetup:
+    container_name: "mongo-setup${TEST_SUFFIX}"
     image: mongo:5
     networks:
       mongo_net:
         ipv4_address: 172.16.0.2
     depends_on:
-      - db
+      - mongo
     restart: "no"
     entrypoint: [ "bash", "-c", "sleep 5 && mongo --host 172.16.0.1:${MONGODB_PORT} --eval 'rs.initiate()'"]
 
@@ -88,22 +90,39 @@ networks:
           gateway: 172.16.0.254
 
 volumes:
-  proddb:
+  redis:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: "${VOLUME_PROD}"
-  proddb2:
+      device: "${VOLUME_REDIS_PATH}"
+  mongodb:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: "${VOLUME_PROD2}"
-  testdb:
+      device: "${VOLUME_MONGODB_PATH}"
+  mongoconfig:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: "${VOLUME_TEST}"
-
+      device: "${VOLUME_MONGOCONFIG_PATH}"
+  redis_test:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${VOLUME_REDIS_PATH}"
+  mongodb_test:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${VOLUME_MONGODB_PATH}"
+  mongoconfig_test:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${VOLUME_MONGOCONFIG_PATH}"
