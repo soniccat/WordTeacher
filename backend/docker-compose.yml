@@ -4,20 +4,22 @@ services:
   auth:
     build:
       context: ./
-      args:
-        PORT: "${SERVICE_AUTH_PORT}"
       dockerfile: ./Auth.Dockerfile
     image: "auth"
     command:
       - "-serverPort"
       - "${SERVICE_AUTH_PORT}"
       - "-mongoURI"
-      - "mongodb://db:${MONGODB_PORT}/?replicaSet=rs0"
+      - "mongodb://172.16.0.1:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
-      - "cache:${REDIS_PORT}"
+      - "172.16.0.3:${REDIS_PORT}"
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.4
     ports:
       - target: "${SERVICE_AUTH_PORT}"
         published: "${SERVICE_AUTH_PORT}"
+
   cardsets:
     build:
       context: ./
@@ -29,9 +31,12 @@ services:
       - "-serverPort"
       - "${SERVICE_CARDSETS_PORT}"
       - "-mongoURI"
-      - "mongodb://db:${MONGODB_PORT}/?replicaSet=rs0"
+      - "mongodb://172.16.0.1:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
-      - "cache:${REDIS_PORT}"
+      - "172.16.0.3:${REDIS_PORT}"
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.5
     ports:
       - target: "${SERVICE_CARDSETS_PORT}"
         published: "${SERVICE_CARDSETS_PORT}"
@@ -40,6 +45,9 @@ services:
     container_name: ${REDIS_NAME}
     image: redis:6.2-alpine
     restart: always
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.3
     ports:
       - '${REDIS_PORT}:${REDIS_PORT}'
     command: redis-server --port ${REDIS_PORT}
@@ -47,31 +55,37 @@ services:
       - ${VOLUME}:/redispath${TEST_NAME}
       - ${VOLUME}:/data
 
-#  cache2:
-#    container_name: redis2
-#    image: redis:6.2-alpine
-#    restart: always
-#    ports:
-#      - '${REDIS_PORT2}:${REDIS_PORT2}'
-#    command: redis-server --port ${REDIS_PORT2}
-#    volumes:
-#      - ${VOLUME2}:/redispath${TEST_NAME}
-
   db:
     image: mongo:5
-    command: --replSet rs0 --port ${MONGODB_PORT}
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.1
+    command: --replSet rs0 --port ${MONGODB_PORT} --bind_ip 127.0.0.1,172.16.0.1
     ports:
       - target: "${MONGODB_PORT}"
         published: "${MONGODB_PORT}"
     volumes:
       - ${VOLUME}:/mongopath${TEST_NAME}
+      - ${VOLUME}:/data/db
+      - ${VOLUME}:/data/configdb
 
   mongosetup:
     image: mongo:5
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.2
     depends_on:
       - db
     restart: "no"
-    entrypoint: [ "bash", "-c", "sleep 5 && mongo --host db:${MONGODB_PORT} --eval 'rs.initiate()'"]
+    entrypoint: [ "bash", "-c", "sleep 5 && mongo --host 172.16.0.1:${MONGODB_PORT} --eval 'rs.initiate()'"]
+
+networks:
+  mongo_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.0.0/24
+          gateway: 172.16.0.254
 
 volumes:
   proddb:
