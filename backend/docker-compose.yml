@@ -79,7 +79,7 @@ services:
     depends_on:
       - mongo
     restart: "no"
-    entrypoint: [ "bash", "-c", "sleep 5 && mongo --host 172.16.0.1:${MONGODB_PORT} --eval 'rs.initiate()'"]
+    entrypoint: [ "bash", "-c", "sleep 1 && mongo --host 172.16.0.1:${MONGODB_PORT} --eval 'rs.initiate()'"]
 
 networks:
   mongo_net:
@@ -109,20 +109,20 @@ volumes:
       type: none
       device: "${VOLUME_MONGOCONFIG_PATH}"
   redis_test:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: "${VOLUME_REDIS_PATH}"
+#    driver: local
+#    driver_opts:
+#      o: bind
+#      type: none
+#      device: "${VOLUME_REDIS_PATH}"
   mongodb_test:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: "${VOLUME_MONGODB_PATH}"
+#    driver: local
+#    driver_opts:
+#      o: bind
+#      type: none
+#      device: "${VOLUME_MONGODB_PATH}"
   mongoconfig_test:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: "${VOLUME_MONGOCONFIG_PATH}"
+#    driver: local
+#    driver_opts:
+#      o: bind
+#      type: none
+#      device: "${VOLUME_MONGOCONFIG_PATH}"

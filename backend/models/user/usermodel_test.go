@@ -11,9 +11,6 @@ import (
 	"testing"
 )
 
-// Define the suite, and absorb the built-in basic suite
-// functionality from testify - including a T() method which
-// returns the current testing context
 type ExampleTestSuite struct {
 	suite.Suite
 	UserModel                     *UserModel
@@ -44,7 +41,7 @@ func (suite *ExampleTestSuite) SetupTest() {
 	mongoApp := &TestMongo{
 		logger: logger.New(true),
 	}
-	err := mongowrapper.SetupMongo(mongoApp, tools.Ptr("mongodb://127.0.0.1:27017/?directConnection=true&replicaSet=rs0"), tools.Ptr(false))
+	err := mongowrapper.SetupMongo(mongoApp, tools.Ptr("mongodb://127.0.0.1:27018/?directConnection=true&replicaSet=rs0"), tools.Ptr(false))
 	if err != nil {
 		panic(err)
 	}
@@ -80,7 +77,7 @@ func (suite *ExampleTestSuite) TestUserCreationExample() {
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), insertedUser.ID)
 
-	loadedUser, err := suite.UserModel.FindGoogleUser(ctx, tools.Ptr(insertedUser.ID.Hex()))
+	loadedUser, err := suite.UserModel.FindGoogleUser(ctx, tools.Ptr("testUserId"))
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), insertedUser, loadedUser)
 }

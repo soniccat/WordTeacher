@@ -8,6 +8,16 @@ ENV_LOCAL_TEST=\
   POSTGRES_HOST=postgres \
   POSTGRES_USER=postgres
 
+RUNTESTSSTEPS := downtest removetestvolumes uptest runtests_step up
+
+runtests: $(RUNTESTSSTEPS)
+
+runtests_step:
+	sleep 2 && cd models && go test -tags=integration ./user -count=1 -run=
+
+removetestvolumes:
+	docker volume rm backend_mongodb_test backend_mongoconfig_test backend_redis_test || true
+
 up:
 	docker compose --env-file ./prod.env up -d
 
