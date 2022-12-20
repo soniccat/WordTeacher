@@ -19,11 +19,11 @@ type CardSetModel struct {
 	CardSetCollection *mongo.Collection
 }
 
-func New(logger *logger.Logger, mongoClient *mongo.Client, cardSetDatabase *mongo.Database) *CardSetModel {
+func New(logger *logger.Logger, mongoClient *mongo.Client) *CardSetModel {
 	model := &CardSetModel{
 		Logger:            logger,
 		MongoClient:       mongoClient,
-		CardSetCollection: cardSetDatabase.Collection(mongowrapper.MongoCollectionCardSets),
+		CardSetCollection: mongoClient.Database(mongowrapper.MongoDatabaseCardSets).Collection(mongowrapper.MongoCollectionCardSets),
 	}
 
 	return model
@@ -113,11 +113,14 @@ func (m *CardSetModel) InsertCardSet(
 	cardSet *CardSetApi,
 	userId *primitive.ObjectID,
 ) (*CardSetApi, *apphelpers.ErrorWithCode) {
-
 	cardSet.UserId = userId.Hex()
+	userIdHex := userId.Hex()
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
 			c.Id = primitive.NewObjectID().Hex()
+		}
+		if len(c.UserId) == 0 {
+			c.UserId = userIdHex
 		}
 	}
 

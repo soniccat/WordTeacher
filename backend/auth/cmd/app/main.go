@@ -70,8 +70,7 @@ func createApplication(
 		return nil, err
 	}
 
-	usersDatabase := app.mongoWrapper.Client.Database(mongowrapper.MongoDatabaseUsers)
-	app.userModel = user.New(app.logger, usersDatabase)
+	app.userModel = user.New(app.logger, app.mongoWrapper.Client)
 
 	return app, nil
 }

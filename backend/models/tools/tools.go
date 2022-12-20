@@ -32,7 +32,7 @@ func ApiDatePtrToDbDatePtr(date *string) (*primitive.DateTime, error) {
 }
 
 func DbDateToApiDate(date primitive.DateTime) string {
-	return date.Time().Format(time.RFC3339)
+	return date.Time().UTC().Format(time.RFC3339)
 }
 
 func DoubleSliceComparableEqual[T comparable](a [][]T, b [][]T) bool {

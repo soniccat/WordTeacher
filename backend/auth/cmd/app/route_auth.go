@@ -117,7 +117,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	// Create new access token / refresh token pair
 	token, err := app.GenerateUserAuthToken(
 		r.Context(),
-		&aUser.ID,
+		&aUser.Id,
 		userNetwork.NetworkType,
 		deviceId,
 	)
@@ -133,7 +133,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 			RefreshToken: token.RefreshToken,
 		},
 		User: AuthResponseUser{
-			Id: aUser.ID.Hex(),
+			Id: aUser.Id.Hex(),
 		},
 	}
 

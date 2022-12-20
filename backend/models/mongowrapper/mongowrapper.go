@@ -67,6 +67,7 @@ func (mw *MongoWrapper) Stop() {
 type MongoApp interface {
 	GetLogger() *logger.Logger
 	SetMongoWrapper(*MongoWrapper)
+	GetMongoWrapper() *MongoWrapper
 }
 
 func SetupMongo(app MongoApp, mongoURI *string, enableCredentials *bool) error {

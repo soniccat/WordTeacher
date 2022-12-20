@@ -4,63 +4,41 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"models/logger"
-	"models/mongowrapper"
+	"models/test"
 	"models/tools"
 	"models/usernetwork"
 	"testing"
 )
 
-type ExampleTestSuite struct {
+type UserModelTestSuite struct {
 	suite.Suite
-	UserModel                     *UserModel
-	VariableThatShouldStartAtFive int
+	UserModel *UserModel
+	TestMongo *test.TestMongo
 }
 
-type TestMongo struct {
-	logger       *logger.Logger
-	mongoWrapper *mongowrapper.MongoWrapper
-	userModel    *UserModel
-}
+//type TestMongo struct {
+//	logger       *logger.Logger
+//	mongoWrapper *mongowrapper.MongoWrapper
+//	userModel    *UserModel
+//}
+//
+//func (a *TestMongo) GetLogger() *logger.Logger {
+//	return a.logger
+//}
+//
+//func (a *TestMongo) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
+//	a.mongoWrapper = mw
+//}
 
-func (a *TestMongo) GetLogger() *logger.Logger {
-	return a.logger
-}
-
-func (a *TestMongo) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
-	a.mongoWrapper = mw
-}
-
-// Make sure that VariableThatShouldStartAtFive is set to five
-// before each test
-func (suite *ExampleTestSuite) SetupTest() {
-	suite.VariableThatShouldStartAtFive = 5
-
-	lg := logger.New(true)
-
-	mongoApp := &TestMongo{
-		logger: logger.New(true),
-	}
-	err := mongowrapper.SetupMongo(mongoApp, tools.Ptr("mongodb://127.0.0.1:27018/?directConnection=true&replicaSet=rs0"), tools.Ptr(false))
-	if err != nil {
-		panic(err)
-	}
-
-	usersDatabase := mongoApp.mongoWrapper.Client.Database(mongowrapper.MongoDatabaseUsers)
-
+func (suite *UserModelTestSuite) SetupTest() {
+	suite.TestMongo = test.New()
 	suite.UserModel = New(
-		lg,
-		usersDatabase,
+		suite.TestMongo.GetLogger(),
+		suite.TestMongo.GetMongoWrapper().Client,
 	)
 }
 
-// All methods that begin with "Test" are run as tests within a
-// suite.
-func (suite *ExampleTestSuite) TestExample() {
-	assert.Equal(suite.T(), 5, suite.VariableThatShouldStartAtFive)
-}
-
-func (suite *ExampleTestSuite) TestUserCreationExample() {
+func (suite *UserModelTestSuite) TestUserCreationExample() {
 	ctx := context.Background()
 	user := &User{
 		Networks: []usernetwork.UserNetwork{
@@ -75,21 +53,13 @@ func (suite *ExampleTestSuite) TestUserCreationExample() {
 
 	insertedUser, err := suite.UserModel.InsertUser(ctx, user)
 	assert.NoError(suite.T(), err)
-	assert.NotNil(suite.T(), insertedUser.ID)
+	assert.NotNil(suite.T(), insertedUser.Id)
 
 	loadedUser, err := suite.UserModel.FindGoogleUser(ctx, tools.Ptr("testUserId"))
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), insertedUser, loadedUser)
 }
 
-// In order for 'go test' to run this suite, we need to create
-// a normal test function and pass our suite to suite.Run
-func TestExampleTestSuite(t *testing.T) {
-	suite.Run(t, new(ExampleTestSuite))
+func TestUserModelTestSuite(t *testing.T) {
+	suite.Run(t, new(UserModelTestSuite))
 }
-
-//func TestSomething(t *testing.T) {
-//
-//	assert.True(t, true, "True is true!")
-//
-//}

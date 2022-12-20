@@ -166,8 +166,8 @@ func (cs *CardDb) IsEqual(a *CardDb) bool {
 }
 
 type Span struct {
-	start int
-	end   int
+	Start int
+	End   int
 }
 
 func (c *CardDb) ToApi() *CardApi {
@@ -187,7 +187,7 @@ func (c *CardDb) ToApi() *CardApi {
 		DefinitionTermSpans: c.DefinitionTermSpans,
 		ExampleTermSpans:    c.ExampleTermSpans,
 		UserId:              c.UserId.Hex(),
-		CreationDate:        c.CreationDate.Time().Format(time.RFC3339),
+		CreationDate:        c.CreationDate.Time().UTC().Format(time.RFC3339),
 		ModificationDate:    md,
 		CreationId:          c.CreationId,
 	}

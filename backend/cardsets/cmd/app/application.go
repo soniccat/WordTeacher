@@ -24,6 +24,10 @@ func (a *application) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
 	a.mongoWrapper = mw
 }
 
+func (a *application) GetMongoWrapper() *mongowrapper.MongoWrapper {
+	return a.mongoWrapper
+}
+
 func (a *application) AllowStackTraces() bool {
 	return a.logger.AllowStackTraces
 }

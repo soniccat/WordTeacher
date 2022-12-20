@@ -6,6 +6,6 @@ import (
 )
 
 type User struct {
-	ID       primitive.ObjectID        `bson:"_id,omitempty"`
+	Id       primitive.ObjectID        `bson:"_id,omitempty"`
 	Networks []usernetwork.UserNetwork `bson:"networks"`
 }

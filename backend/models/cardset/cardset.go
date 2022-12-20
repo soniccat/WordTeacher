@@ -61,7 +61,7 @@ type CardSetDb struct {
 func (cs *CardSetDb) ToApi() *CardSetApi {
 	var md *string
 	if cs.ModificationDate != nil {
-		md = tools.Ptr(cs.ModificationDate.Time().Format(time.RFC3339))
+		md = tools.Ptr(cs.ModificationDate.Time().UTC().Format(time.RFC3339))
 	}
 
 	return &CardSetApi{
@@ -69,7 +69,7 @@ func (cs *CardSetDb) ToApi() *CardSetApi {
 		Name:             cs.Name,
 		Cards:            tools.Map(cs.Cards, func(cardDb *card.CardDb) *card.CardApi { return cardDb.ToApi() }),
 		UserId:           cs.UserId.Hex(),
-		CreationDate:     cs.CreationDate.Time().Format(time.RFC3339),
+		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339),
 		ModificationDate: md,
 		CreationId:       cs.CreationId,
 	}

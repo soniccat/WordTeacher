@@ -23,11 +23,12 @@ type UserModel struct {
 	AuthTokens     *mongo.Collection
 }
 
-func New(logger *logger.Logger, usersDatabase *mongo.Database) *UserModel {
+func New(logger *logger.Logger, mongoClient *mongo.Client) *UserModel {
+	database := mongoClient.Database(mongowrapper.MongoDatabaseUsers)
 	model := &UserModel{
 		Logger:         logger,
-		UserCollection: usersDatabase.Collection(mongowrapper.MongoCollectionUsers),
-		AuthTokens:     usersDatabase.Collection(mongowrapper.MongoCollectionAuthTokens),
+		UserCollection: database.Collection(mongowrapper.MongoCollectionUsers),
+		AuthTokens:     database.Collection(mongowrapper.MongoCollectionAuthTokens),
 	}
 
 	return model
@@ -63,7 +64,7 @@ func (m *UserModel) InsertUser(context context.Context, user *User) (*User, erro
 	objId := res.InsertedID.(primitive.ObjectID)
 
 	var newUser = *user
-	newUser.ID = objId
+	newUser.Id = objId
 
 	return &newUser, nil
 }

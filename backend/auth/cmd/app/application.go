@@ -27,6 +27,10 @@ func (a *application) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
 	a.mongoWrapper = mw
 }
 
+func (a *application) GetMongoWrapper() *mongowrapper.MongoWrapper {
+	return a.mongoWrapper
+}
+
 type service struct {
 	serverAddr string
 	serverPort int

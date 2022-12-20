@@ -70,8 +70,7 @@ func createApplication(
 		return nil, err
 	}
 
-	cardSetDatabase := app.mongoWrapper.Client.Database(mongowrapper.MongoDatabaseCardSets)
-	app.cardSetModel = cardset.New(app.logger, app.mongoWrapper.Client, cardSetDatabase)
+	app.cardSetModel = cardset.New(app.logger, app.mongoWrapper.Client)
 
 	return app, nil
 }
