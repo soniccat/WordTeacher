@@ -2,29 +2,28 @@ package cardset
 
 import (
 	"context"
-	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"models/apphelpers"
 	"models/card"
 	"models/logger"
 	"models/mongowrapper"
 	"models/tools"
+	"net/http"
 )
 
 type CardSetModel struct {
 	Logger            *logger.Logger
 	MongoClient       *mongo.Client
 	CardSetCollection *mongo.Collection
-	CardModel         *card.CardModel
 }
 
-func New(logger *logger.Logger, mongoClient *mongo.Client, cardSetDatabase *mongo.Database, cardModel *card.CardModel) *CardSetModel {
+func New(logger *logger.Logger, mongoClient *mongo.Client, cardSetDatabase *mongo.Database) *CardSetModel {
 	model := &CardSetModel{
 		Logger:            logger,
 		MongoClient:       mongoClient,
 		CardSetCollection: cardSetDatabase.Collection(mongowrapper.MongoCollectionCardSets),
-		CardModel:         cardModel,
 	}
 
 	return model
@@ -45,112 +44,38 @@ func (m *CardSetModel) FindCardSetByCreationId(
 	return &result, nil
 }
 
-func (m *CardSetModel) DeleteCardSetByCreationId(
-	ctx context.Context, // transaction is required
-	creationId string,
-) error {
-	if len(creationId) == 0 {
-		return errors.New("DeleteCardSetByCreationId: empty creationId")
-	}
-
-	return m.deleteCardSet(ctx, bson.M{"creationId": creationId})
-}
-
-func (m *CardSetModel) DeleteCardSetById(
-	ctx context.Context, // transaction is required
+func (m *CardSetModel) DeleteCardSet(
+	ctx context.Context,
 	id *primitive.ObjectID,
 ) error {
-	return m.deleteCardSet(ctx, bson.M{"_id": id})
-}
-
-func (m *CardSetModel) deleteCardSet(
-	context context.Context, // transaction is required
-	filter interface{},
-) error {
-	// delete cards first
-	cardSetDb, err := m.loadCardSetDb(context, filter)
-	if err != mongo.ErrNoDocuments && err != nil {
-		return err
-	}
-
-	if cardSetDb != nil {
-		err = m.CardModel.DeleteByIds(context, cardSetDb.Cards)
-		if err != mongo.ErrNoDocuments && err != nil {
-			return err
-		}
-	}
-
-	_, err = m.CardSetCollection.DeleteMany(context, filter)
-	if err != mongo.ErrNoDocuments {
+	_, err := m.CardSetCollection.DeleteOne(ctx, bson.M{"_id": id})
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *CardSetModel) LoadCardSetApiFromDb(
-	context context.Context,
-	cardSetDb *CardSetDb,
-) (*CardSetApi, error) {
-	var ids []*primitive.ObjectID
-	for _, id := range cardSetDb.Cards {
-		ids = append(ids, id)
-	}
-
-	cardsDb, err := m.CardModel.LoadByIds(context, ids)
-	if err != nil {
-		return nil, err
-	}
-
-	var cardsApi []*card.CardApi
-	for _, cardDb := range cardsDb {
-		cardsApi = append(cardsApi, cardDb.ToApi())
-	}
-
-	return cardSetDb.ToApi(cardsApi), nil
-}
-
 func (m *CardSetModel) UpdateCardSet(
-	ctx context.Context, // transaction is required
+	ctx context.Context,
 	cardSet *CardSetApi,
-) error {
-
-	cardSetId, err := primitive.ObjectIDFromHex(cardSet.Id)
-	if err != nil {
-		return err
+) *apphelpers.ErrorWithCode {
+	for _, c := range cardSet.Cards {
+		if len(c.Id) == 0 {
+			c.Id = primitive.NewObjectID().Hex()
+		}
 	}
 
-	userId, err := primitive.ObjectIDFromHex(cardSet.UserId)
-	if err != nil {
-		return err
-	}
-
-	cardSetDb, err := m.LoadCardSetDbById(ctx, &cardSetId)
-	if err != nil {
-		return err
-	}
-
-	cardApis, err := m.CardModel.SyncCards(ctx, cardSet.Cards, cardSetDb.Cards, &userId)
-	if err != nil {
-		return err
-	}
-
-	cardIds, err := tools.MapOrError(cardApis, func(c *card.CardApi) (*primitive.ObjectID, error) {
-		id, mapErr := primitive.ObjectIDFromHex(c.Id)
-		return &id, mapErr
-	})
-
-	newCardSetDb, err := m.createCardSetDb(
+	newCardSetDb, err := m.convertToCardSetDb(
 		cardSet,
-		cardIds,
 	)
 	if err != nil {
-		return err
+		return apphelpers.NewErrorWithCode(http.StatusBadRequest, err)
 	}
 
 	err = m.replaceCardSet(ctx, newCardSetDb)
 	if err != nil {
-		return err
+		return apphelpers.NewErrorWithCode(http.StatusInternalServerError, err)
 	}
 
 	return nil
@@ -184,48 +109,37 @@ func (m *CardSetModel) loadCardSetDb(
 }
 
 func (m *CardSetModel) InsertCardSet(
-	ctx context.Context, // transaction is required
+	ctx context.Context,
 	cardSet *CardSetApi,
 	userId *primitive.ObjectID,
-) (*CardSetApi, error) {
-	//for _, crd := range cardSet.Cards {
-	//	cardDb, err := m.CardModel.Insert(ctx, crd, userId)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//
-	//	crd.Id = cardDb.ID.Hex()
-	//	cardDbIds = append(cardDbIds, cardDb.ID)
-	//}
+) (*CardSetApi, *apphelpers.ErrorWithCode) {
 
-	cardDbs, err := m.CardModel.InsertCards(ctx, cardSet.Cards, userId)
-	if err != nil {
-		return nil, err
+	cardSet.UserId = userId.Hex()
+	for _, c := range cardSet.Cards {
+		if len(c.Id) == 0 {
+			c.Id = primitive.NewObjectID().Hex()
+		}
 	}
 
-	cardDbIds := tools.Map(cardDbs, func(c *card.CardDb) *primitive.ObjectID {
-		return c.ID
-	})
-	cardSetDb, err := m.createCardSetDb(cardSet, cardDbIds)
+	cardSetDb, err := m.convertToCardSetDb(cardSet)
 	if err != nil {
-		return nil, err
+		return nil, apphelpers.NewErrorWithCode(http.StatusBadRequest, err)
 	}
 
 	res, err := m.CardSetCollection.InsertOne(ctx, cardSetDb)
 	if err != nil {
-		return nil, err
+		return nil, apphelpers.NewErrorWithCode(http.StatusInternalServerError, err)
 	}
 
 	objId := res.InsertedID.(primitive.ObjectID)
 	cardSetDb.ID = &objId
 	cardSet.Id = objId.Hex()
-	cardSet.UserId = userId.Hex()
 
 	return cardSet, nil
 }
 
 func (m *CardSetModel) replaceCardSet(
-	ctx context.Context, // transaction is required
+	ctx context.Context,
 	cardSetDb *CardSetDb,
 ) error {
 	_, err := m.CardSetCollection.ReplaceOne(ctx, bson.M{"_id": cardSetDb.ID}, cardSetDb)
@@ -236,9 +150,8 @@ func (m *CardSetModel) replaceCardSet(
 	return nil
 }
 
-func (m *CardSetModel) createCardSetDb(
+func (m *CardSetModel) convertToCardSetDb(
 	cardSet *CardSetApi,
-	cardDbIds []*primitive.ObjectID,
 ) (*CardSetDb, error) {
 	userId, err := primitive.ObjectIDFromHex(cardSet.UserId)
 	if err != nil {
@@ -255,9 +168,16 @@ func (m *CardSetModel) createCardSetDb(
 		return nil, err
 	}
 
+	cardSetDbs, err := tools.MapOrError(cardSet.Cards, func(card *card.CardApi) (*card.CardDb, error) {
+		return card.ToDb()
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	cardSetDb := &CardSetDb{
 		Name:             cardSet.Name,
-		Cards:            cardDbIds,
+		Cards:            cardSetDbs,
 		UserId:           &userId,
 		CreationDate:     creationDate,
 		ModificationDate: modificationDateTime,

@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"models/apphelpers"
-	"models/card"
 	"models/cardset"
 	"models/logger"
 	"models/mongowrapper"
@@ -19,7 +18,7 @@ func main() {
 	serverAddr := flag.String("serverAddr", "", "HTTP server network address")
 	serverPort := flag.Int("serverPort", 4001, "HTTP server network port")
 
-	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?replicaSet=rs0", "Database hostname url")
+	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
@@ -72,8 +71,7 @@ func createApplication(
 	}
 
 	cardSetDatabase := app.mongoWrapper.Client.Database(mongowrapper.MongoDatabaseCardSets)
-	cardModel := card.New(app.logger, cardSetDatabase)
-	app.cardSetModel = cardset.New(app.logger, app.mongoWrapper.Client, cardSetDatabase, cardModel)
+	app.cardSetModel = cardset.New(app.logger, app.mongoWrapper.Client, cardSetDatabase)
 
 	return app, nil
 }

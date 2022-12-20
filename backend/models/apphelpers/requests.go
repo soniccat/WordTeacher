@@ -12,6 +12,15 @@ import (
 const CookieSession = "session"
 const HeaderDeviceId = "deviceId"
 
+type ErrorWithCode struct {
+	Code int
+	Err  error
+}
+
+func NewErrorWithCode(code int, err error) *ErrorWithCode {
+	return &ErrorWithCode{code, err}
+}
+
 func NewHandlerError(code int, err error, withStack bool) *HandlerError {
 	var stack *[]byte
 	if withStack {

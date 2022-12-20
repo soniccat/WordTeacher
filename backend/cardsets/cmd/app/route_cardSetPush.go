@@ -180,9 +180,9 @@ func (app *application) handleUpdatedCardSets(
 	userId *primitive.ObjectID,
 ) (*CardSetSyncResponse, error) {
 
-	cardCreationIdSet := make(map[string]bool)
-
 	// validate
+	cardWithoutIds := make(map[string]bool)
+
 	for _, cardSet := range updatedCardSets {
 		if len(cardSet.Id) == 0 && len(cardSet.CreationId) == 0 {
 			return nil, app.NewHandlerError(http.StatusBadRequest, errors.New("card set without id has no creation id too"))
@@ -194,7 +194,7 @@ func (app *application) handleUpdatedCardSets(
 					return nil, app.NewHandlerError(http.StatusBadRequest, errors.New("card without id has no creation id too"))
 				}
 
-				cardCreationIdSet[card.CreationId] = true
+				cardWithoutIds[card.CreationId] = true
 			}
 		}
 	}
@@ -203,39 +203,73 @@ func (app *application) handleUpdatedCardSets(
 
 	for _, cardSet := range updatedCardSets {
 		if len(cardSet.Id) == 0 {
+			existingCardSet, err := app.cardSetModel.FindCardSetByCreationId(ctx, cardSet.CreationId)
+			if err != nil {
+				return nil, app.NewHandlerError(http.StatusInternalServerError, err)
+			}
+
+			var cardSetId string
+			if existingCardSet != nil {
+				cardSetId = existingCardSet.ID.Hex()
+				cardSet.Id = existingCardSet.ID.Hex()
+				errWithCode := app.cardSetModel.UpdateCardSet(ctx, cardSet)
+				if errWithCode != nil {
+					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
+				}
+			} else {
+				_, errWithCode := app.cardSetModel.InsertCardSet(ctx, cardSet, userId)
+				if errWithCode != nil {
+					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
+				}
+				cardSetId = cardSet.Id
+			}
+
+			response.CardSetIds[cardSet.CreationId] = cardSetId
+
 			// TODO: optimize that with updating instead of deleting
 			// delete previously created cards
-			err := app.cardSetModel.DeleteCardSetByCreationId(ctx, cardSet.CreationId)
-			if err != nil {
-				return nil, app.NewHandlerError(http.StatusInternalServerError, err)
-
-			} else {
-				insertedCardSet, err := app.cardSetModel.InsertCardSet(ctx, cardSet, userId)
-				if err != nil {
-					return nil, app.NewHandlerError(http.StatusInternalServerError, err)
-				} else {
-					response.CardSetIds[cardSet.CreationId] = insertedCardSet.Id
-
-					for _, card := range insertedCardSet.Cards {
-						if _, ok := cardCreationIdSet[card.CreationId]; ok {
-							response.CardIds[card.CreationId] = card.Id
-						}
-					}
-				}
-			}
+			//err := app.cardSetModel.DeleteCardSetByCreationId(ctx, cardSet.CreationId)
+			//if err != nil {
+			//	return nil, app.NewHandlerError(http.StatusInternalServerError, err)
+			//
+			//} else {
+			//	insertedCardSet, err := app.cardSetModel.InsertCardSet(ctx, cardSet, userId)
+			//	if err != nil {
+			//		return nil, app.NewHandlerError(http.StatusInternalServerError, err)
+			//	} else {
+			//		response.CardSetIds[cardSet.CreationId] = insertedCardSet.Id
+			//
+			//		for _, card := range insertedCardSet.Cards {
+			//			if _, ok := cardCreationIdSet[card.CreationId]; ok {
+			//				response.CardIds[card.CreationId] = card.Id
+			//			}
+			//		}
+			//	}
+			//}
 		} else {
-			err := app.cardSetModel.UpdateCardSet(
-				ctx,
-				cardSet,
-			)
-			if err != nil {
-				return nil, app.NewHandlerError(http.StatusInternalServerError, err)
+			errWithCode := app.cardSetModel.UpdateCardSet(ctx, cardSet)
+			if errWithCode != nil {
+				return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
 			}
 
-			for _, card := range cardSet.Cards {
-				if _, ok := cardCreationIdSet[card.CreationId]; ok {
-					response.CardIds[card.CreationId] = card.Id
-				}
+			//err := app.cardSetModel.UpdateCardSet(
+			//	ctx,
+			//	cardSet,
+			//)
+			//if err != nil {
+			//	return nil, app.NewHandlerError(http.StatusInternalServerError, err)
+			//}
+			//
+			//for _, card := range cardSet.Cards {
+			//	if _, ok := cardCreationIdSet[card.CreationId]; ok {
+			//		response.CardIds[card.CreationId] = card.Id
+			//	}
+			//}
+		}
+
+		for _, card := range cardSet.Cards {
+			if _, ok := cardWithoutIds[card.CreationId]; ok {
+				response.CardIds[card.CreationId] = card.Id
 			}
 		}
 	}
@@ -244,11 +278,11 @@ func (app *application) handleUpdatedCardSets(
 }
 
 func (app *application) handleDeletedCardSets(
-	ctx context.Context, // transaction is required
+	ctx context.Context,
 	cardSetIds []*primitive.ObjectID,
 ) error {
 	for _, id := range cardSetIds {
-		err := app.cardSetModel.DeleteCardSetById(ctx, id)
+		err := app.cardSetModel.DeleteCardSet(ctx, id)
 		if err != nil {
 			return err
 		}

@@ -49,16 +49,16 @@ func (cs *CardSetApi) IsEqual(a *CardSetApi) bool {
 }
 
 type CardSetDb struct {
-	ID               *primitive.ObjectID   `bson:"_id,omitempty"`
-	Name             string                `bson:"name"`
-	Cards            []*primitive.ObjectID `bson:"cards"`
-	UserId           *primitive.ObjectID   `bson:"userId"`
-	CreationDate     primitive.DateTime    `bson:"creationDate"`
-	ModificationDate *primitive.DateTime   `bson:"modificationDate,omitempty"`
-	CreationId       string                `bson:"creationId"`
+	ID               *primitive.ObjectID `bson:"_id,omitempty"`
+	Name             string              `bson:"name"`
+	Cards            []*card.CardDb      `bson:"cards"`
+	UserId           *primitive.ObjectID `bson:"userId"`
+	CreationDate     primitive.DateTime  `bson:"creationDate"`
+	ModificationDate *primitive.DateTime `bson:"modificationDate,omitempty"`
+	CreationId       string              `bson:"creationId"`
 }
 
-func (cs *CardSetDb) ToApi(cards []*card.CardApi) *CardSetApi {
+func (cs *CardSetDb) ToApi() *CardSetApi {
 	var md *string
 	if cs.ModificationDate != nil {
 		md = tools.Ptr(cs.ModificationDate.Time().Format(time.RFC3339))
@@ -67,7 +67,7 @@ func (cs *CardSetDb) ToApi(cards []*card.CardApi) *CardSetApi {
 	return &CardSetApi{
 		Id:               cs.ID.Hex(),
 		Name:             cs.Name,
-		Cards:            cards,
+		Cards:            tools.Map(cs.Cards, func(cardDb *card.CardDb) *card.CardApi { return cardDb.ToApi() }),
 		UserId:           cs.UserId.Hex(),
 		CreationDate:     cs.CreationDate.Time().Format(time.RFC3339),
 		ModificationDate: md,
