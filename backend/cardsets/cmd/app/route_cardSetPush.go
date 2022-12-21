@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"models/apphelpers"
 	"models/cardset"
 	"models/tools"
 	"models/user"
 	"net/http"
 	"sync"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,7 +20,6 @@ import (
 
 const (
 	ParameterLastPullDate = "lastPullDate"
-	// ParameterPullUpdatedCardSets = "pullUpdatedCardSets"
 )
 
 type CardSetPushInput struct {
@@ -37,13 +38,13 @@ func (input *CardSetPushInput) GetRefreshToken() *string {
 	return nil
 }
 
-type CardSetSyncResponse struct {
+type CardSetPushResponse struct {
 	CardSetIds map[string]string `json:"cardSetIds,omitempty"` // deduplication id to primitive.ObjectID
 	CardIds    map[string]string `json:"cardIds,omitempty"`    // deduplication id to primitive.ObjectID
 }
 
-func NewCardSetSyncResponse() *CardSetSyncResponse {
-	return &CardSetSyncResponse{
+func NewCardSetSyncResponse() *CardSetPushResponse {
+	return &CardSetPushResponse{
 		make(map[string]string),
 		make(map[string]string),
 	}
@@ -97,13 +98,22 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//lastPullDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLastPullDate))
-	//if err != nil {
-	//	apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
-	//}
+	query := r.URL.Query()
+	if !query.Has(ParameterLastPullDate) {
+		apphelpers.SetError(w, errors.New(fmt.Sprintf("%s is missing", ParameterLastPullDate)), http.StatusBadRequest, app.logger)
+		return
+	}
 
-	//TODO: find the current modification date and compare with lastPullDate
-	// send an error if pulling is required
+	lastPullDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLastPullDate))
+	if err != nil {
+		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
+	}
+
+	hasModifications, err := app.cardSetModel.HasModificationsSince(r.Context(), lastPullDate)
+	if hasModifications {
+		apphelpers.SetError(w, err, http.StatusConflict, app.logger)
+		return
+	}
 
 	// validate DeletedCardSets
 	deletedCardDbIds, err := tools.MapOrError(input.DeletedCardSets, func(cardSetIdString string) (*primitive.ObjectID, error) {
@@ -167,8 +177,7 @@ func (app *application) handleUpdatedCardSets(
 	ctx context.Context, // transaction is required
 	updatedCardSets []*cardset.CardSetApi,
 	userId *primitive.ObjectID,
-) (*CardSetSyncResponse, error) {
-
+) (*CardSetPushResponse, error) {
 	// validate
 	cardWithoutIds := make(map[string]bool)
 
@@ -206,11 +215,11 @@ func (app *application) handleUpdatedCardSets(
 					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
 				}
 			} else {
-				cardSetId = cardSet.Id
 				_, errWithCode := app.cardSetModel.InsertCardSet(ctx, cardSet, userId)
 				if errWithCode != nil {
 					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
 				}
+				cardSetId = cardSet.Id
 			}
 
 			response.CardSetIds[cardSet.CreationId] = cardSetId

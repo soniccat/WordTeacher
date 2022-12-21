@@ -9,6 +9,7 @@ import (
 	"models/logger"
 	"models/mongowrapper"
 	"net/http"
+	"time"
 )
 
 type CardSetModel struct {
@@ -153,4 +154,25 @@ func (m *CardSetModel) replaceCardSet(
 	}
 
 	return nil
+}
+
+func (m *CardSetModel) HasModificationsSince(
+	ctx context.Context,
+	date time.Time,
+) (bool, error) {
+	dbTime := primitive.NewDateTimeFromTime(date)
+	res := m.CardSetCollection.FindOne(
+		ctx,
+		bson.M{"creationDate": bson.M{"$gt": dbTime}},
+	)
+	err := res.Err()
+
+	if err == mongo.ErrNoDocuments {
+		return false, nil
+
+	} else if err != nil {
+		return false, res.Err()
+	}
+
+	return true, nil
 }

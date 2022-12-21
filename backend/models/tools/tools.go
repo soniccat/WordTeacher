@@ -140,3 +140,16 @@ func Reduce[T, U any](s []T, init U, f func(U, T) U) U {
 	}
 	return r
 }
+
+func ParseObjectID(idString string) (*primitive.ObjectID, error) {
+	var cardDbId *primitive.ObjectID
+	if len(idString) != 0 {
+		anId, err := primitive.ObjectIDFromHex(idString)
+		if err != nil {
+			return nil, err
+		}
+		cardDbId = &anId
+	}
+
+	return cardDbId, nil
+}

@@ -111,7 +111,7 @@ func (m *UserModel) insertUserAuthToken(
 
 	objId := res.InsertedID.(primitive.ObjectID)
 
-	token.ID = &objId
+	token.Id = &objId
 	return token, nil
 }
 

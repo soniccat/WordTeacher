@@ -23,7 +23,7 @@ const (
 )
 
 type UserAuthToken struct {
-	ID           *primitive.ObjectID         `bson:"_id,omitempty"`
+	Id           *primitive.ObjectID         `bson:"_id,omitempty"`
 	UserMongoId  *primitive.ObjectID         `bson:"userId,omitempty"`
 	NetworkType  usernetwork.UserNetworkType `bson:"networkType,omitempty"`
 	AccessToken  accesstoken.AccessToken     `bson:"accessToken,omitempty"`

@@ -19,19 +19,7 @@ type CardSetTestSuite struct {
 }
 
 func (suite *CardSetTestSuite) SetupTest() {
-	//lg := logger.New(true)
-
-	//mongoApp := &TestMongo{
-	//	logger: logger.New(true),
-	//}
-	//err := mongowrapper.SetupMongo(mongoApp, tools.Ptr("mongodb://127.0.0.1:27018/?directConnection=true&replicaSet=rs0"), tools.Ptr(false))
-	//if err != nil {
-	//	panic(err)
-	//}
-
 	suite.TestMongo = test.New()
-	//usersDatabase := suite.TestMongo.GetMongoWrapper().Client.Database(mongowrapper.MongoCollectionCardSets)
-
 	suite.CardSetModel = New(
 		suite.TestMongo.GetLogger(),
 		suite.TestMongo.GetMongoWrapper().Client,
@@ -58,9 +46,7 @@ func (suite *CardSetTestSuite) TestCreateCardSet() {
 					[]card.Span{{9, 10}, {11, 12}},
 					[]card.Span{{13, 14}, {15, 16}},
 				},
-				CreationDate:     "2022-11-03T18:30:02Z",
-				ModificationDate: nil,
-				CreationId:       "fb23d60c-02f9-4bae-be86-8359274e0e4e",
+				CreationId: "fb23d60c-02f9-4bae-be86-8359274e0e4e",
 			},
 		},
 		CreationDate:     "2022-11-03T17:30:02Z",
@@ -102,9 +88,7 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 					[]card.Span{{9, 10}, {11, 12}},
 					[]card.Span{{13, 14}, {15, 16}},
 				},
-				CreationDate:     "2022-11-03T18:30:02Z",
-				ModificationDate: nil,
-				CreationId:       "fb23d60c-02f9-4bae-be86-8359274e0e4e",
+				CreationId: "fb23d60c-02f9-4bae-be86-8359274e0e4e",
 			},
 		},
 		CreationDate:     "2022-11-03T17:30:02Z",
@@ -133,9 +117,7 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 				[]card.Span{{90, 100}, {11, 12}},
 				[]card.Span{{130, 140}, {15, 16}},
 			},
-			CreationDate:     "2022-11-03T19:30:02Z",
-			ModificationDate: nil,
-			CreationId:       "1aed98e4-3ec7-403b-8e5e-3d2ca997e5d5",
+			CreationId: "1aed98e4-3ec7-403b-8e5e-3d2ca997e5d5",
 		},
 	)
 

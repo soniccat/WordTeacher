@@ -49,16 +49,12 @@ func (cs *CardSetApi) IsEqual(a *CardSetApi) bool {
 }
 
 func (cs *CardSetApi) toDb() (*CardSetDb, error) {
-	var id *primitive.ObjectID
-	if len(cs.Id) != 0 {
-		rId, err := primitive.ObjectIDFromHex(cs.Id)
-		if err != nil {
-			return nil, err
-		}
-		id = &rId
+	id, err := tools.ParseObjectID(cs.Id)
+	if err != nil {
+		return nil, err
 	}
 
-	userId, err := primitive.ObjectIDFromHex(cs.UserId)
+	userId, err := tools.ParseObjectID(cs.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +80,7 @@ func (cs *CardSetApi) toDb() (*CardSetDb, error) {
 		Id:               id,
 		Name:             cs.Name,
 		Cards:            cardSetDbs,
-		UserId:           &userId,
+		UserId:           userId,
 		CreationDate:     creationDate,
 		ModificationDate: modificationDateTime,
 		CreationId:       cs.CreationId,

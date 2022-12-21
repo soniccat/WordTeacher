@@ -174,7 +174,10 @@ func (cm *CardModel) InsertCards(
 ) ([]*CardDb, error) {
 	var cardDbs []*CardDb
 	cardDbs, err := tools.MapOrError(cards, func(c *CardApi) (*CardDb, error) {
-		cardDb, e := cm.createCardDb(c, userId)
+		cardDb, e := c.ToDb()
+		if cardDb != nil {
+			cardDb.UserId = userId
+		}
 		return cardDb, e
 	})
 	if err != nil {
@@ -196,30 +199,18 @@ func (cm *CardModel) InsertCards(
 	return cardDbs, nil
 }
 
-func (cm *CardModel) createCardDb(card *CardApi, userId *primitive.ObjectID) (*CardDb, error) {
-	creationDate, err := tools.ApiDateToDbDate(card.CreationDate)
-	if err != nil {
-		return nil, err
-	}
-
-	modificationDateTime, err := tools.ApiDatePtrToDbDatePtr(card.ModificationDate)
-	if err != nil {
-		return nil, err
-	}
-
-	cardDb := &CardDb{
-		Term:                card.Term,
-		Transcription:       card.Transcription,
-		PartOfSpeech:        card.PartOfSpeech,
-		Definitions:         card.Definitions,
-		Synonyms:            card.Synonyms,
-		Examples:            card.Examples,
-		DefinitionTermSpans: card.DefinitionTermSpans,
-		ExampleTermSpans:    card.ExampleTermSpans,
-		UserId:              userId,
-		CreationDate:        creationDate,
-		ModificationDate:    modificationDateTime,
-		CreationId:          card.CreationId,
-	}
-	return cardDb, nil
-}
+//func (cm *CardModel) createCardDb(card *CardApi, userId *primitive.ObjectID) (*CardDb, error) {
+//	cardDb := &CardDb{
+//		Term:                card.Term,
+//		Transcription:       card.Transcription,
+//		PartOfSpeech:        card.PartOfSpeech,
+//		Definitions:         card.Definitions,
+//		Synonyms:            card.Synonyms,
+//		Examples:            card.Examples,
+//		DefinitionTermSpans: card.DefinitionTermSpans,
+//		ExampleTermSpans:    card.ExampleTermSpans,
+//		UserId:              userId,
+//		CreationId:          card.CreationId,
+//	}
+//	return cardDb, nil
+//}
