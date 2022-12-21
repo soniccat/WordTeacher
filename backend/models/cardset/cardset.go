@@ -48,8 +48,52 @@ func (cs *CardSetApi) IsEqual(a *CardSetApi) bool {
 	return true
 }
 
+func (cs *CardSetApi) toDb() (*CardSetDb, error) {
+	var id *primitive.ObjectID
+	if len(cs.Id) != 0 {
+		rId, err := primitive.ObjectIDFromHex(cs.Id)
+		if err != nil {
+			return nil, err
+		}
+		id = &rId
+	}
+
+	userId, err := primitive.ObjectIDFromHex(cs.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	creationDate, err := tools.ApiDateToDbDate(cs.CreationDate)
+	if err != nil {
+		return nil, err
+	}
+
+	modificationDateTime, err := tools.ApiDatePtrToDbDatePtr(cs.ModificationDate)
+	if err != nil {
+		return nil, err
+	}
+
+	cardSetDbs, err := tools.MapOrError(cs.Cards, func(card *card.CardApi) (*card.CardDb, error) {
+		return card.ToDb()
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	cardSetDb := &CardSetDb{
+		Id:               id,
+		Name:             cs.Name,
+		Cards:            cardSetDbs,
+		UserId:           &userId,
+		CreationDate:     creationDate,
+		ModificationDate: modificationDateTime,
+		CreationId:       cs.CreationId,
+	}
+	return cardSetDb, nil
+}
+
 type CardSetDb struct {
-	ID               *primitive.ObjectID `bson:"_id,omitempty"`
+	Id               *primitive.ObjectID `bson:"_id,omitempty"`
 	Name             string              `bson:"name"`
 	Cards            []*card.CardDb      `bson:"cards"`
 	UserId           *primitive.ObjectID `bson:"userId"`
@@ -65,7 +109,7 @@ func (cs *CardSetDb) ToApi() *CardSetApi {
 	}
 
 	return &CardSetApi{
-		Id:               cs.ID.Hex(),
+		Id:               cs.Id.Hex(),
 		Name:             cs.Name,
 		Cards:            tools.Map(cs.Cards, func(cardDb *card.CardDb) *card.CardApi { return cardDb.ToApi() }),
 		UserId:           cs.UserId.Hex(),

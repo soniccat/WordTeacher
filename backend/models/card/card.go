@@ -89,7 +89,7 @@ func (c *CardApi) ToDb() (*CardDb, error) {
 	}
 
 	return &CardDb{
-		ID:                  &cardDbId,
+		Id:                  &cardDbId,
 		Term:                c.Term,
 		Transcription:       c.Transcription,
 		PartOfSpeech:        c.PartOfSpeech,
@@ -106,7 +106,7 @@ func (c *CardApi) ToDb() (*CardDb, error) {
 }
 
 type CardDb struct {
-	ID                  *primitive.ObjectID       `bson:"_id,omitempty"`
+	Id                  *primitive.ObjectID       `bson:"_id,omitempty"`
 	Term                string                    `bson:"term"`
 	Transcription       *string                   `bson:"transcription,omitempty"`
 	PartOfSpeech        partofspeech.PartOfSpeech `bson:"partOfSpeech"`
@@ -122,7 +122,7 @@ type CardDb struct {
 }
 
 func (cs *CardDb) IsEqual(a *CardDb) bool {
-	if cs.ID != a.ID {
+	if cs.Id != a.Id {
 		return false
 	}
 	if cs.Term != a.Term {
@@ -177,7 +177,7 @@ func (c *CardDb) ToApi() *CardApi {
 	}
 
 	return &CardApi{
-		Id:                  c.ID.Hex(),
+		Id:                  c.Id.Hex(),
 		Term:                c.Term,
 		Transcription:       c.Transcription,
 		PartOfSpeech:        c.PartOfSpeech,

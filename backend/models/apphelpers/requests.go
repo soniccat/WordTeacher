@@ -94,3 +94,16 @@ func SetJsonData(w http.ResponseWriter, data []byte) error {
 
 	return nil
 }
+
+func WriteResponse(w http.ResponseWriter, response interface{}, logger *logger.Logger) {
+	marshaledResponse, err := json.Marshal(response)
+	if err != nil {
+		SetError(w, err, http.StatusInternalServerError, logger)
+		return
+	}
+
+	if _, err = w.Write(marshaledResponse); err != nil {
+		SetError(w, err, http.StatusInternalServerError, logger)
+		return
+	}
+}

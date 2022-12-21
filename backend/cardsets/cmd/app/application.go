@@ -16,24 +16,24 @@ type application struct {
 	cardSetModel   *cardset.CardSetModel
 }
 
-func (a *application) GetLogger() *logger.Logger {
-	return a.logger
+func (app *application) GetLogger() *logger.Logger {
+	return app.logger
 }
 
-func (a *application) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
-	a.mongoWrapper = mw
+func (app *application) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
+	app.mongoWrapper = mw
 }
 
-func (a *application) GetMongoWrapper() *mongowrapper.MongoWrapper {
-	return a.mongoWrapper
+func (app *application) GetMongoWrapper() *mongowrapper.MongoWrapper {
+	return app.mongoWrapper
 }
 
-func (a *application) AllowStackTraces() bool {
-	return a.logger.AllowStackTraces
+func (app *application) AllowStackTraces() bool {
+	return app.logger.AllowStackTraces
 }
 
-func (a *application) NewHandlerError(code int, err error) *apphelpers.HandlerError {
-	return apphelpers.NewHandlerError(code, err, a.AllowStackTraces())
+func (app *application) NewHandlerError(code int, err error) *apphelpers.HandlerError {
+	return apphelpers.NewHandlerError(code, err, app.AllowStackTraces())
 }
 
 type service struct {

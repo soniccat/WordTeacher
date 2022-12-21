@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"models/apphelpers"
 	"models/cardset"
@@ -114,6 +113,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
 	}
+
 	// execute all the changes in one transaction
 
 	userMutex.lockForUser(authToken.UserMongoId)
@@ -154,24 +154,13 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 		if updatedCardSetsError, ok := err.(*apphelpers.HandlerError); ok {
 			apphelpers.SetHandlerError(w, updatedCardSetsError, app.logger)
 		} else {
-			apphelpers.SetError(w, sessionErr, http.StatusInternalServerError, app.logger)
+			apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
 		}
 
 		return
 	}
 
-	// Build response
-
-	marshaledResponse, err := json.Marshal(response)
-	if err != nil {
-		apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
-		return
-	}
-
-	if _, err = w.Write(marshaledResponse); err != nil {
-		apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
-		return
-	}
+	apphelpers.WriteResponse(w, response, app.logger)
 }
 
 func (app *application) handleUpdatedCardSets(
@@ -210,61 +199,27 @@ func (app *application) handleUpdatedCardSets(
 
 			var cardSetId string
 			if existingCardSet != nil {
-				cardSetId = existingCardSet.ID.Hex()
-				cardSet.Id = existingCardSet.ID.Hex()
+				cardSetId = existingCardSet.Id.Hex()
+				cardSet.Id = existingCardSet.Id.Hex()
 				errWithCode := app.cardSetModel.UpdateCardSet(ctx, cardSet)
 				if errWithCode != nil {
 					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
 				}
 			} else {
+				cardSetId = cardSet.Id
 				_, errWithCode := app.cardSetModel.InsertCardSet(ctx, cardSet, userId)
 				if errWithCode != nil {
 					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
 				}
-				cardSetId = cardSet.Id
 			}
 
 			response.CardSetIds[cardSet.CreationId] = cardSetId
 
-			// TODO: optimize that with updating instead of deleting
-			// delete previously created cards
-			//err := app.cardSetModel.DeleteCardSetByCreationId(ctx, cardSet.CreationId)
-			//if err != nil {
-			//	return nil, app.NewHandlerError(http.StatusInternalServerError, err)
-			//
-			//} else {
-			//	insertedCardSet, err := app.cardSetModel.InsertCardSet(ctx, cardSet, userId)
-			//	if err != nil {
-			//		return nil, app.NewHandlerError(http.StatusInternalServerError, err)
-			//	} else {
-			//		response.CardSetIds[cardSet.CreationId] = insertedCardSet.Id
-			//
-			//		for _, card := range insertedCardSet.Cards {
-			//			if _, ok := cardCreationIdSet[card.CreationId]; ok {
-			//				response.CardIds[card.CreationId] = card.Id
-			//			}
-			//		}
-			//	}
-			//}
 		} else {
 			errWithCode := app.cardSetModel.UpdateCardSet(ctx, cardSet)
 			if errWithCode != nil {
 				return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
 			}
-
-			//err := app.cardSetModel.UpdateCardSet(
-			//	ctx,
-			//	cardSet,
-			//)
-			//if err != nil {
-			//	return nil, app.NewHandlerError(http.StatusInternalServerError, err)
-			//}
-			//
-			//for _, card := range cardSet.Cards {
-			//	if _, ok := cardCreationIdSet[card.CreationId]; ok {
-			//		response.CardIds[card.CreationId] = card.Id
-			//	}
-			//}
 		}
 
 		for _, card := range cardSet.Cards {
@@ -278,7 +233,7 @@ func (app *application) handleUpdatedCardSets(
 }
 
 func (app *application) handleDeletedCardSets(
-	ctx context.Context,
+	ctx context.Context, // transaction is required
 	cardSetIds []*primitive.ObjectID,
 ) error {
 	for _, id := range cardSetIds {

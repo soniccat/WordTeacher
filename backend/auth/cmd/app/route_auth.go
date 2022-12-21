@@ -12,6 +12,7 @@ import (
 	"net/http"
 )
 
+// TODO: move in params
 const GoogleIdTokenAudience = "409354406675-eqcftgj7fi5m4ri5s78r33kguqj2mgo3.apps.googleusercontent.com"
 
 type AuthInput struct {
@@ -137,16 +138,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	marshaledResponse, err := json.Marshal(response)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	if _, err = w.Write(marshaledResponse); err != nil {
-		app.serverError(w, err)
-		return
-	}
+	apphelpers.WriteResponse(w, response, app.logger)
 }
 
 func (app *application) resolveGoogleUser(

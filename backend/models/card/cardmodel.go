@@ -61,7 +61,7 @@ func (cm *CardModel) SyncCards(
 	}
 
 	for i, actualCardId := range actualCardIds {
-		if tools.FindOrNil(dbCards, func(c *CardDb) bool { return *c.ID == *actualCardId }) == nil {
+		if tools.FindOrNil(dbCards, func(c *CardDb) bool { return *c.Id == *actualCardId }) == nil {
 			newCards = append(newCards, actualCardsWithIds[i])
 		} else {
 			updatedCards = append(updatedCards, actualCardsWithIds[i])
@@ -69,8 +69,8 @@ func (cm *CardModel) SyncCards(
 	}
 
 	for _, dbCard := range dbCards {
-		if tools.FindOrNil(actualCardIds, func(id *primitive.ObjectID) bool { return *id == *dbCard.ID }) == nil {
-			deletedCards = append(deletedCards, dbCard.ID)
+		if tools.FindOrNil(actualCardIds, func(id *primitive.ObjectID) bool { return *id == *dbCard.Id }) == nil {
+			deletedCards = append(deletedCards, dbCard.Id)
 		}
 	}
 
@@ -86,7 +86,7 @@ func (cm *CardModel) SyncCards(
 	}
 
 	for i, dbCard := range dbCards {
-		newCards[i].Id = dbCard.ID.Hex()
+		newCards[i].Id = dbCard.Id.Hex()
 	}
 
 	_, err = cm.ReplaceCards(ctx, updatedCards)
@@ -162,7 +162,7 @@ func (cm *CardModel) ReplaceCards(
 //
 //	resId := res.InsertedID.(primitive.ObjectID)
 //	card.Id = resId.Hex()
-//	cardDb.ID = &resId
+//	cardDb.Id = &resId
 //
 //	return cardDb, nil
 //}
@@ -190,7 +190,7 @@ func (cm *CardModel) InsertCards(
 	for i, insertedId := range manyResult.InsertedIDs {
 		resId := insertedId.(primitive.ObjectID)
 		cards[i].Id = resId.Hex()
-		cardDbs[i].ID = &resId
+		cardDbs[i].Id = &resId
 	}
 
 	return cardDbs, nil

@@ -6,10 +6,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"models/apphelpers"
-	"models/card"
 	"models/logger"
 	"models/mongowrapper"
-	"models/tools"
 	"net/http"
 )
 
@@ -64,11 +62,12 @@ func (m *CardSetModel) UpdateCardSet(
 		if len(c.Id) == 0 {
 			c.Id = primitive.NewObjectID().Hex()
 		}
+		if len(c.UserId) == 0 {
+			c.UserId = cardSet.UserId
+		}
 	}
 
-	newCardSetDb, err := m.convertToCardSetDb(
-		cardSet,
-	)
+	newCardSetDb, err := cardSet.toDb()
 	if err != nil {
 		return apphelpers.NewErrorWithCode(http.StatusBadRequest, err)
 	}
@@ -114,17 +113,16 @@ func (m *CardSetModel) InsertCardSet(
 	userId *primitive.ObjectID,
 ) (*CardSetApi, *apphelpers.ErrorWithCode) {
 	cardSet.UserId = userId.Hex()
-	userIdHex := userId.Hex()
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
 			c.Id = primitive.NewObjectID().Hex()
 		}
 		if len(c.UserId) == 0 {
-			c.UserId = userIdHex
+			c.UserId = cardSet.UserId
 		}
 	}
 
-	cardSetDb, err := m.convertToCardSetDb(cardSet)
+	cardSetDb, err := cardSet.toDb()
 	if err != nil {
 		return nil, apphelpers.NewErrorWithCode(http.StatusBadRequest, err)
 	}
@@ -135,7 +133,7 @@ func (m *CardSetModel) InsertCardSet(
 	}
 
 	objId := res.InsertedID.(primitive.ObjectID)
-	cardSetDb.ID = &objId
+	cardSetDb.Id = &objId
 	cardSet.Id = objId.Hex()
 
 	return cardSet, nil
@@ -145,46 +143,14 @@ func (m *CardSetModel) replaceCardSet(
 	ctx context.Context,
 	cardSetDb *CardSetDb,
 ) error {
-	_, err := m.CardSetCollection.ReplaceOne(ctx, bson.M{"_id": cardSetDb.ID}, cardSetDb)
+	res, err := m.CardSetCollection.ReplaceOne(ctx, bson.M{"_id": cardSetDb.Id}, cardSetDb)
 	if err != nil {
 		return err
 	}
 
+	if res.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
 	return nil
-}
-
-func (m *CardSetModel) convertToCardSetDb(
-	cardSet *CardSetApi,
-) (*CardSetDb, error) {
-	userId, err := primitive.ObjectIDFromHex(cardSet.UserId)
-	if err != nil {
-		return nil, err
-	}
-
-	creationDate, err := tools.ApiDateToDbDate(cardSet.CreationDate)
-	if err != nil {
-		return nil, err
-	}
-
-	modificationDateTime, err := tools.ApiDatePtrToDbDatePtr(cardSet.ModificationDate)
-	if err != nil {
-		return nil, err
-	}
-
-	cardSetDbs, err := tools.MapOrError(cardSet.Cards, func(card *card.CardApi) (*card.CardDb, error) {
-		return card.ToDb()
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	cardSetDb := &CardSetDb{
-		Name:             cardSet.Name,
-		Cards:            cardSetDbs,
-		UserId:           &userId,
-		CreationDate:     creationDate,
-		ModificationDate: modificationDateTime,
-		CreationId:       cardSet.CreationId,
-	}
-	return cardSetDb, nil
 }
