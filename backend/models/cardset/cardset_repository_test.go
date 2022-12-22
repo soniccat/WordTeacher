@@ -14,7 +14,7 @@ import (
 
 type CardSetTestSuite struct {
 	suite.Suite
-	CardSetModel *CardSetModel
+	CardSetModel *Repository
 	TestMongo    *test.TestMongo
 }
 

@@ -39,8 +39,8 @@ func DoubleSliceComparableEqual[T comparable](a [][]T, b [][]T) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for i, v := range a {
-		if !SliceComparableEqual(v, (b)[i]) {
+	for i := range a {
+		if !SliceComparableEqual(a[i], (b)[i]) {
 			return false
 		}
 	}
@@ -49,12 +49,12 @@ func DoubleSliceComparableEqual[T comparable](a [][]T, b [][]T) bool {
 
 func SliceAppend[T any](s1 []T, s2 []T) []T {
 	res := make([]T, 0, len(s1)+len(s2))
-	for _, v := range s1 {
-		res = append(res, v)
+	for i := range s1 {
+		res = append(res, s1[i])
 	}
 
-	for _, v := range s2 {
-		res = append(res, v)
+	for i := range s2 {
+		res = append(res, s2[i])
 	}
 
 	return res
@@ -64,8 +64,8 @@ func SliceComparableEqual[T comparable](a []T, b []T) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for i, v := range a {
-		if v != (b)[i] {
+	for i := range a {
+		if a[i] != (b)[i] {
 			return false
 		}
 	}
@@ -75,8 +75,8 @@ func SliceComparableEqual[T comparable](a []T, b []T) bool {
 func Map[T, U any](data []T, f func(T) U) []U {
 	res := make([]U, 0, len(data))
 
-	for _, e := range data {
-		res = append(res, f(e))
+	for i := range data {
+		res = append(res, f(data[i]))
 	}
 
 	return res
@@ -85,8 +85,8 @@ func Map[T, U any](data []T, f func(T) U) []U {
 func MapOrError[T, U any](data []T, f func(T) (U, error)) ([]U, error) {
 	res := make([]U, 0, len(data))
 
-	for _, e := range data {
-		v, err := f(e)
+	for i := range data {
+		v, err := f(data[i])
 		if err != nil {
 			return nil, err
 		}
@@ -100,8 +100,8 @@ func MapOrError[T, U any](data []T, f func(T) (U, error)) ([]U, error) {
 func MapNotNilOrError[T, U any](data []T, f func(T) (*U, error)) ([]*U, error) {
 	res := make([]*U, 0, len(data))
 
-	for _, e := range data {
-		v, err := f(e)
+	for i := range data {
+		v, err := f(data[i])
 		if err != nil {
 			return nil, err
 		}
@@ -116,7 +116,8 @@ func MapNotNilOrError[T, U any](data []T, f func(T) (*U, error)) ([]*U, error) {
 
 func Filter[T any](s []T, f func(T) bool) []T {
 	var r []T
-	for _, v := range s {
+	for i := range s {
+		v := s[i]
 		if f(v) {
 			r = append(r, v)
 		}
@@ -125,9 +126,10 @@ func Filter[T any](s []T, f func(T) bool) []T {
 }
 
 func FindOrNil[T any](s []T, f func(T) bool) *T {
-	for _, v := range s {
-		if f(v) {
-			return &v
+	for i := range s {
+		v := &s[i]
+		if f(*v) {
+			return v
 		}
 	}
 	return nil
@@ -152,4 +154,11 @@ func ParseObjectID(idString string) (*primitive.ObjectID, error) {
 	}
 
 	return cardDbId, nil
+}
+
+func IdsToMongoIds(ids []string) ([]*primitive.ObjectID, error) {
+	return MapOrError(ids, func(hex string) (*primitive.ObjectID, error) {
+		id, err := primitive.ObjectIDFromHex(hex)
+		return &id, err
+	})
 }

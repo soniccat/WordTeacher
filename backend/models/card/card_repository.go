@@ -10,13 +10,13 @@ import (
 	"models/tools"
 )
 
-type CardModel struct {
+type Repository struct {
 	Logger         *logger.Logger
 	CardCollection *mongo.Collection
 }
 
-func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *CardModel {
-	model := &CardModel{
+func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *Repository {
+	model := &Repository{
 		Logger:         logger,
 		CardCollection: cardSetDatabase.Collection(mongowrapper.MongoCollectionCards),
 	}
@@ -24,14 +24,14 @@ func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *CardModel {
 	return model
 }
 
-func (cm *CardModel) SyncCards(
+func (cm *Repository) SyncCards(
 	ctx context.Context, // transaction is required
 	actualCards []*CardApi,
 	currentCardIds []*primitive.ObjectID,
 	userId *primitive.ObjectID,
 ) ([]*CardApi, error) {
 
-	// initialize empty slices on purpose as mongo Api will crash
+	// initialize empty slices on purpose as mongo Api will crash on nils
 	newCards := []*CardApi{}
 	deletedCards := []*primitive.ObjectID{}
 	updatedCards := []*CardApi{}
@@ -97,12 +97,14 @@ func (cm *CardModel) SyncCards(
 	return tools.SliceAppend(newCards, updatedCards), nil
 }
 
-func (cm *CardModel) LoadByIds(context context.Context, ids []*primitive.ObjectID) ([]*CardDb, error) {
+func (cm *Repository) LoadByIds(context context.Context, ids []*primitive.ObjectID) ([]*CardDb, error) {
 	var result []*CardDb
 	cursor, err := cm.CardCollection.Find(context, bson.M{"_id": bson.M{"$in": ids}})
 	if err != nil {
 		return nil, err
 	}
+
+	defer func() { cursor.Close(context) }()
 
 	err = cursor.All(context, &result)
 	if err != nil {
@@ -112,12 +114,12 @@ func (cm *CardModel) LoadByIds(context context.Context, ids []*primitive.ObjectI
 	return result, nil
 }
 
-func (cm *CardModel) DeleteByIds(context context.Context, ids []*primitive.ObjectID) error {
+func (cm *Repository) DeleteByIds(context context.Context, ids []*primitive.ObjectID) error {
 	_, err := cm.CardCollection.DeleteMany(context, bson.M{"_id": bson.M{"$in": ids}})
 	return err
 }
 
-func (cm *CardModel) ReplaceCards(
+func (cm *Repository) ReplaceCards(
 	context context.Context,
 	cards []*CardApi,
 ) ([]*CardDb, error) {
@@ -145,7 +147,7 @@ func (cm *CardModel) ReplaceCards(
 	return cardDbs, nil
 }
 
-//func (cm *CardModel) Insert(
+//func (cm *Repository) Insert(
 //	context context.Context,
 //	card *CardApi,
 //	userId *primitive.ObjectID,
@@ -167,7 +169,7 @@ func (cm *CardModel) ReplaceCards(
 //	return cardDb, nil
 //}
 
-func (cm *CardModel) InsertCards(
+func (cm *Repository) InsertCards(
 	context context.Context,
 	cards []*CardApi,
 	userId *primitive.ObjectID,
@@ -199,7 +201,7 @@ func (cm *CardModel) InsertCards(
 	return cardDbs, nil
 }
 
-//func (cm *CardModel) createCardDb(card *CardApi, userId *primitive.ObjectID) (*CardDb, error) {
+//func (cm *Repository) createCardDb(card *CardApi, userId *primitive.ObjectID) (*CardDb, error) {
 //	cardDb := &CardDb{
 //		Term:                card.Term,
 //		Transcription:       card.Transcription,

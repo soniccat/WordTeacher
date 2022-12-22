@@ -19,15 +19,15 @@ import (
 )
 
 const (
-	ParameterLastPullDate = "lastPullDate"
+	ParameterLatestCardSetModifiedDate = "latestCardSetModifiedDate"
 )
 
 type CardSetPushInput struct {
 	AccessToken string `json:"accessToken"`
 	// for card sets without id creates a card set or find already inserted one with deduplication Id.
 	// for card sets with id write a card set data
-	UpdatedCardSets []*cardset.CardSetApi `json:"updatedCardSets"`
-	DeletedCardSets []string              `json:"deletedCardSets"`
+	UpdatedCardSets   []*cardset.CardSetApi `json:"updatedCardSets"`
+	CurrentCardSetIds []string              `json:"currentCardSetIds"`
 }
 
 func (input *CardSetPushInput) GetAccessToken() string {
@@ -94,34 +94,31 @@ var userMutex = NewUserMutex()
 func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 	input, authToken, validateSessionErr := user.ValidateSession[CardSetPushInput](r, app.sessionManager)
 	if validateSessionErr != nil {
-		apphelpers.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode, app.logger)
+		app.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
 		return
 	}
 
 	query := r.URL.Query()
-	if !query.Has(ParameterLastPullDate) {
-		apphelpers.SetError(w, errors.New(fmt.Sprintf("%s is missing", ParameterLastPullDate)), http.StatusBadRequest, app.logger)
+	if !query.Has(ParameterLatestCardSetModifiedDate) {
+		app.SetError(w, errors.New(fmt.Sprintf("%s is missing", ParameterLatestCardSetModifiedDate)), http.StatusBadRequest)
 		return
 	}
 
-	lastPullDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLastPullDate))
+	lastPullDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLatestCardSetModifiedDate))
 	if err != nil {
-		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
+		app.SetError(w, err, http.StatusBadRequest)
 	}
 
-	hasModifications, err := app.cardSetModel.HasModificationsSince(r.Context(), lastPullDate)
+	hasModifications, err := app.cardSetRepository.HasModificationsSince(r.Context(), lastPullDate)
 	if hasModifications {
-		apphelpers.SetError(w, err, http.StatusConflict, app.logger)
+		app.SetError(w, err, http.StatusConflict)
 		return
 	}
 
 	// validate DeletedCardSets
-	deletedCardDbIds, err := tools.MapOrError(input.DeletedCardSets, func(cardSetIdString string) (*primitive.ObjectID, error) {
-		cardSetDbId, err := primitive.ObjectIDFromHex(cardSetIdString)
-		return &cardSetDbId, err
-	})
+	currentCardSetIds, err := tools.IdsToMongoIds(input.CurrentCardSetIds)
 	if err != nil {
-		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
+		app.SetError(w, err, http.StatusBadRequest)
 	}
 
 	// execute all the changes in one transaction
@@ -130,9 +127,9 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 	defer func() { userMutex.unlockForUser(authToken.UserMongoId) }()
 
 	ctx := r.Context()
-	session, sessionErr := app.cardSetModel.MongoClient.StartSession()
+	session, sessionErr := app.cardSetRepository.MongoClient.StartSession()
 	if sessionErr != nil {
-		apphelpers.SetError(w, sessionErr, http.StatusInternalServerError, app.logger)
+		app.SetError(w, sessionErr, http.StatusInternalServerError)
 		return
 	}
 
@@ -150,7 +147,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 				return nil, sErr
 			}
 
-			sErr = app.handleDeletedCardSets(sCtx, deletedCardDbIds)
+			sErr = app.cardSetRepository.DeleteNotInList(sCtx, currentCardSetIds)
 			if sErr != nil {
 				return nil, sErr
 			}
@@ -162,15 +159,14 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if updatedCardSetsError, ok := err.(*apphelpers.HandlerError); ok {
-			apphelpers.SetHandlerError(w, updatedCardSetsError, app.logger)
+			app.SetHandlerError(w, updatedCardSetsError)
 		} else {
-			apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
+			app.SetError(w, err, http.StatusInternalServerError)
 		}
-
 		return
 	}
 
-	apphelpers.WriteResponse(w, response, app.logger)
+	app.WriteResponse(w, response)
 }
 
 func (app *application) handleUpdatedCardSets(
@@ -201,7 +197,7 @@ func (app *application) handleUpdatedCardSets(
 
 	for _, cardSet := range updatedCardSets {
 		if len(cardSet.Id) == 0 {
-			existingCardSet, err := app.cardSetModel.FindCardSetByCreationId(ctx, cardSet.CreationId)
+			existingCardSet, err := app.cardSetRepository.FindCardSetByCreationId(ctx, cardSet.CreationId)
 			if err != nil {
 				return nil, app.NewHandlerError(http.StatusInternalServerError, err)
 			}
@@ -209,13 +205,13 @@ func (app *application) handleUpdatedCardSets(
 			var cardSetId string
 			if existingCardSet != nil {
 				cardSetId = existingCardSet.Id.Hex()
-				cardSet.Id = existingCardSet.Id.Hex()
-				errWithCode := app.cardSetModel.UpdateCardSet(ctx, cardSet)
+				cardSet.Id = cardSetId
+				errWithCode := app.cardSetRepository.UpdateCardSet(ctx, cardSet)
 				if errWithCode != nil {
 					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
 				}
 			} else {
-				_, errWithCode := app.cardSetModel.InsertCardSet(ctx, cardSet, userId)
+				_, errWithCode := app.cardSetRepository.InsertCardSet(ctx, cardSet, userId)
 				if errWithCode != nil {
 					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
 				}
@@ -225,7 +221,7 @@ func (app *application) handleUpdatedCardSets(
 			response.CardSetIds[cardSet.CreationId] = cardSetId
 
 		} else {
-			errWithCode := app.cardSetModel.UpdateCardSet(ctx, cardSet)
+			errWithCode := app.cardSetRepository.UpdateCardSet(ctx, cardSet)
 			if errWithCode != nil {
 				return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)
 			}
@@ -239,18 +235,4 @@ func (app *application) handleUpdatedCardSets(
 	}
 
 	return response, nil
-}
-
-func (app *application) handleDeletedCardSets(
-	ctx context.Context, // transaction is required
-	cardSetIds []*primitive.ObjectID,
-) error {
-	for _, id := range cardSetIds {
-		err := app.cardSetModel.DeleteCardSet(ctx, id)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

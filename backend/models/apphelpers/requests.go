@@ -13,15 +13,15 @@ const CookieSession = "session"
 const HeaderDeviceId = "deviceId"
 
 type ErrorWithCode struct {
-	Code int
 	Err  error
+	Code int
 }
 
-func NewErrorWithCode(code int, err error) *ErrorWithCode {
-	return &ErrorWithCode{code, err}
+func NewErrorWithCode(err error, code int) *ErrorWithCode {
+	return &ErrorWithCode{err, code}
 }
 
-func NewHandlerError(code int, err error, withStack bool) *HandlerError {
+func NewHandlerError(err error, code int, withStack bool) *HandlerError {
 	var stack *[]byte
 	if withStack {
 		stack = tools.Ptr(debug.Stack())

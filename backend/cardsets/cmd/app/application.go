@@ -6,14 +6,15 @@ import (
 	"models/cardset"
 	"models/logger"
 	"models/mongowrapper"
+	"net/http"
 )
 
 type application struct {
-	service        service
-	logger         *logger.Logger
-	sessionManager *scs.SessionManager
-	mongoWrapper   *mongowrapper.MongoWrapper
-	cardSetModel   *cardset.CardSetModel
+	service           service
+	logger            *logger.Logger
+	sessionManager    *scs.SessionManager
+	mongoWrapper      *mongowrapper.MongoWrapper
+	cardSetRepository *cardset.Repository
 }
 
 func (app *application) GetLogger() *logger.Logger {
@@ -33,7 +34,19 @@ func (app *application) AllowStackTraces() bool {
 }
 
 func (app *application) NewHandlerError(code int, err error) *apphelpers.HandlerError {
-	return apphelpers.NewHandlerError(code, err, app.AllowStackTraces())
+	return apphelpers.NewHandlerError(err, code, app.AllowStackTraces())
+}
+
+func (app *application) SetHandlerError(w http.ResponseWriter, err *apphelpers.HandlerError) {
+	apphelpers.SetHandlerError(w, err, app.GetLogger())
+}
+
+func (app *application) SetError(w http.ResponseWriter, outErr error, code int) {
+	apphelpers.SetError(w, outErr, code, app.GetLogger())
+}
+
+func (app *application) WriteResponse(w http.ResponseWriter, response interface{}) {
+	apphelpers.WriteResponse(w, response, app.GetLogger())
 }
 
 type service struct {
