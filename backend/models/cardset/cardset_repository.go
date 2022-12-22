@@ -14,6 +14,8 @@ import (
 	"time"
 )
 
+var zeroTime = time.Time{}
+
 type Repository struct {
 	Logger            *logger.Logger
 	MongoClient       *mongo.Client
@@ -33,8 +35,8 @@ func New(logger *logger.Logger, mongoClient *mongo.Client) *Repository {
 func (m *Repository) FindCardSetByCreationId(
 	context context.Context,
 	creationId string,
-) (*CardSetDb, error) {
-	var result CardSetDb
+) (*DbCardSet, error) {
+	var result DbCardSet
 	err := m.CardSetCollection.FindOne(context, bson.M{"creationId": creationId}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		return nil, nil
@@ -59,7 +61,7 @@ func (m *Repository) DeleteCardSet(
 
 func (m *Repository) UpdateCardSet(
 	ctx context.Context,
-	cardSet *CardSetApi,
+	cardSet *ApiCardSet,
 ) *apphelpers.ErrorWithCode {
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
@@ -86,22 +88,22 @@ func (m *Repository) UpdateCardSet(
 func (m *Repository) LoadCardSetDbById(
 	context context.Context,
 	id *primitive.ObjectID,
-) (*CardSetDb, error) {
+) (*DbCardSet, error) {
 	return m.loadCardSetDb(context, bson.M{"_id": id})
 }
 
 func (m *Repository) LoadCardSetDbByCreationId(
 	context context.Context,
 	creationId string,
-) (*CardSetDb, error) {
+) (*DbCardSet, error) {
 	return m.loadCardSetDb(context, bson.M{"creationId": creationId})
 }
 
 func (m *Repository) loadCardSetDb(
 	context context.Context,
 	filter interface{},
-) (*CardSetDb, error) {
-	var cardSetDb CardSetDb
+) (*DbCardSet, error) {
+	var cardSetDb DbCardSet
 	err := m.CardSetCollection.FindOne(context, filter).Decode(&cardSetDb)
 	if err != nil {
 		return nil, err
@@ -112,9 +114,9 @@ func (m *Repository) loadCardSetDb(
 
 func (m *Repository) InsertCardSet(
 	ctx context.Context,
-	cardSet *CardSetApi,
+	cardSet *ApiCardSet,
 	userId *primitive.ObjectID,
-) (*CardSetApi, *apphelpers.ErrorWithCode) {
+) (*ApiCardSet, *apphelpers.ErrorWithCode) {
 	cardSet.UserId = userId.Hex()
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
@@ -144,7 +146,7 @@ func (m *Repository) InsertCardSet(
 
 func (m *Repository) replaceCardSet(
 	ctx context.Context,
-	cardSetDb *CardSetDb,
+	cardSetDb *DbCardSet,
 ) error {
 	res, err := m.CardSetCollection.ReplaceOne(ctx, bson.M{"_id": cardSetDb.Id}, cardSetDb)
 	if err != nil {
@@ -160,12 +162,13 @@ func (m *Repository) replaceCardSet(
 
 func (m *Repository) HasModificationsSince(
 	ctx context.Context,
+	userId *primitive.ObjectID,
 	date time.Time,
 ) (bool, error) {
 	dbTime := primitive.NewDateTimeFromTime(date)
 	res := m.CardSetCollection.FindOne(
 		ctx,
-		bson.M{"modificationDate": bson.M{"$gt": dbTime}},
+		bson.M{"userId": userId, "modificationDate": bson.M{"$gt": dbTime}},
 	)
 	err := res.Err()
 
@@ -181,12 +184,20 @@ func (m *Repository) HasModificationsSince(
 
 func (m *Repository) ModifiedCardSetsSince(
 	ctx context.Context,
-	date time.Time,
-) ([]*CardSetApi, error) {
+	userId *primitive.ObjectID,
+	lastModificationDate *time.Time,
+) ([]*ApiCardSet, error) {
+	var date time.Time
+	if lastModificationDate != nil {
+		date = *lastModificationDate
+	} else {
+		date = zeroTime
+	}
+
 	dbTime := primitive.NewDateTimeFromTime(date)
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"modificationDate": bson.M{"$gt": dbTime}},
+		bson.M{"userId": userId, "modificationDate": bson.M{"$gt": dbTime}},
 	)
 	if err != nil {
 		return nil, err
@@ -194,12 +205,13 @@ func (m *Repository) ModifiedCardSetsSince(
 
 	defer func() { cursor.Close(ctx) }()
 
-	var cardSetsDb []*CardSetDb
-	err = cursor.All(ctx, &cardSetsDb)
+	var dbCardSets []*DbCardSet
+	err = cursor.All(ctx, &dbCardSets)
 	if err != nil {
 		return nil, err
 	}
 
+	return DbCardSetsToApi(dbCardSets), nil
 }
 
 func (m *Repository) DeleteNotInList(
@@ -229,25 +241,21 @@ func (m *Repository) DeleteCardSets(
 func (m *Repository) CardSetsNotInList(
 	ctx context.Context,
 	ids []*primitive.ObjectID,
-) ([]*CardSetApi, error) {
-	var cardSetDbs []*CardSetDb
+) ([]*ApiCardSet, error) {
+	var cardSetDbs []*DbCardSet
 	cursor, err := m.CardSetCollection.Find(ctx, bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}})
 	if err != nil {
 		return nil, err
 	}
 
-	defer func() { cursor.Close(context) }()
+	defer func() { cursor.Close(ctx) }()
 
 	err = cursor.All(ctx, &cardSetDbs)
 	if err != nil {
 		return nil, err
 	}
 
-	cardSetApis := tools.Map(cardSetDbs, func(cardSetDb *CardSetDb) *CardSetApi {
-		return cardSetDb.ToApi()
-	})
-
-	return cardSetApis, nil
+	return DbCardSetsToApi(cardSetDbs), nil
 }
 
 func (m *Repository) CardCardSetIds(

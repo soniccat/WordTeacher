@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"github.com/deckarep/golang-set/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"models/apphelpers"
@@ -27,7 +25,7 @@ func (input *CardSetPullInput) GetRefreshToken() *string {
 }
 
 type CardSetPullResponse struct {
-	UpdatedCardSets   []*cardset.CardSetApi `json:"cardSetIds,omitempty"`
+	UpdatedCardSets   []*cardset.ApiCardSet `json:"cardSetIds,omitempty"`
 	DeletedCardSetIds []string              `json:"deletedCardSetIds"`
 }
 
@@ -38,20 +36,18 @@ func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := r.URL.Query()
-	if !query.Has(ParameterLatestCardSetModifiedDate) {
-		app.SetError(w, errors.New(fmt.Sprintf("%s is missing", ParameterLatestCardSetModifiedDate)), http.StatusBadRequest)
-		return
-	}
-
-	var lastPullDate *time.Time = nil
-	if parsedDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLatestCardSetModifiedDate)); err != nil {
-		lastPullDate = &parsedDate
+	var lastModificationDate *time.Time = nil
+	if parsedDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLatestCardSetModificationDate)); err != nil {
+		lastModificationDate = &parsedDate
 	}
 
 	ctx := r.Context()
 
-	app.cardSetRepository.FindCardSetByCreationId()
+	apiCardSets, err := app.cardSetRepository.ModifiedCardSetsSince(ctx, authToken.UserMongoId, lastModificationDate)
+	if err != nil {
+		app.SetError(w, err, http.StatusInternalServerError)
+		return
+	}
 
 	idsToDelete, handlerErr := app.resolveDeletedCardIds(ctx, authToken.UserMongoId, input)
 	if handlerErr != nil {
@@ -59,6 +55,11 @@ func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	response := CardSetPullResponse{
+		UpdatedCardSets:   apiCardSets,
+		DeletedCardSetIds: idsToDelete,
+	}
+	app.WriteResponse(w, response)
 }
 
 func (app *application) resolveDeletedCardIds(

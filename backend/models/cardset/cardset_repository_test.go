@@ -28,7 +28,7 @@ func (suite *CardSetTestSuite) SetupTest() {
 
 func (suite *CardSetTestSuite) TestCreateCardSet() {
 	ctx := context.Background()
-	cardSet := &CardSetApi{
+	cardSet := &ApiCardSet{
 		Name: "testCardSet",
 		Cards: []*card.CardApi{
 			{
@@ -70,7 +70,7 @@ func (suite *CardSetTestSuite) TestCreateCardSet() {
 
 func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 	ctx := context.Background()
-	cardSet := &CardSetApi{
+	cardSet := &ApiCardSet{
 		Name: "testCardSet",
 		Cards: []*card.CardApi{
 			{

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type CardSetApi struct {
+type ApiCardSet struct {
 	Id               string          `json:"id,omitempty"`
 	Name             string          `json:"name"`
 	Cards            []*card.CardApi `json:"cards"`
@@ -17,7 +17,7 @@ type CardSetApi struct {
 	CreationId       string          `json:"creationId"`
 }
 
-func (cs *CardSetApi) IsEqual(a *CardSetApi) bool {
+func (cs *ApiCardSet) IsEqual(a *ApiCardSet) bool {
 	if cs.Id != a.Id {
 		return false
 	}
@@ -48,7 +48,7 @@ func (cs *CardSetApi) IsEqual(a *CardSetApi) bool {
 	return true
 }
 
-func (cs *CardSetApi) toDb() (*CardSetDb, error) {
+func (cs *ApiCardSet) toDb() (*DbCardSet, error) {
 	id, err := tools.ParseObjectID(cs.Id)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (cs *CardSetApi) toDb() (*CardSetDb, error) {
 		return nil, err
 	}
 
-	cardSetDb := &CardSetDb{
+	cardSetDb := &DbCardSet{
 		Id:               id,
 		Name:             cs.Name,
 		Cards:            cardSetDbs,
@@ -88,7 +88,7 @@ func (cs *CardSetApi) toDb() (*CardSetDb, error) {
 	return cardSetDb, nil
 }
 
-type CardSetDb struct {
+type DbCardSet struct {
 	Id               *primitive.ObjectID `bson:"_id,omitempty"`
 	Name             string              `bson:"name"`
 	Cards            []*card.CardDb      `bson:"cards"`
@@ -98,13 +98,13 @@ type CardSetDb struct {
 	CreationId       string              `bson:"creationId"`
 }
 
-func (cs *CardSetDb) ToApi() *CardSetApi {
+func (cs *DbCardSet) ToApi() *ApiCardSet {
 	var md *string
 	if cs.ModificationDate != nil {
 		md = tools.Ptr(cs.ModificationDate.Time().UTC().Format(time.RFC3339))
 	}
 
-	return &CardSetApi{
+	return &ApiCardSet{
 		Id:               cs.Id.Hex(),
 		Name:             cs.Name,
 		Cards:            tools.Map(cs.Cards, func(cardDb *card.CardDb) *card.CardApi { return cardDb.ToApi() }),
@@ -113,4 +113,10 @@ func (cs *CardSetDb) ToApi() *CardSetApi {
 		ModificationDate: md,
 		CreationId:       cs.CreationId,
 	}
+}
+
+func DbCardSetsToApi(cs []*DbCardSet) []*ApiCardSet {
+	return tools.Map(cs, func(cardSetDb *DbCardSet) *ApiCardSet {
+		return cardSetDb.ToApi()
+	})
 }

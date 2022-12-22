@@ -19,14 +19,14 @@ import (
 )
 
 const (
-	ParameterLatestCardSetModifiedDate = "latestCardSetModifiedDate"
+	ParameterLatestCardSetModificationDate = "latestCardSetModificationDate"
 )
 
 type CardSetPushInput struct {
 	AccessToken string `json:"accessToken"`
 	// for card sets without id creates a card set or find already inserted one with deduplication Id.
 	// for card sets with id write a card set data
-	UpdatedCardSets   []*cardset.CardSetApi `json:"updatedCardSets"`
+	UpdatedCardSets   []*cardset.ApiCardSet `json:"updatedCardSets"`
 	CurrentCardSetIds []string              `json:"currentCardSetIds"`
 }
 
@@ -99,17 +99,17 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := r.URL.Query()
-	if !query.Has(ParameterLatestCardSetModifiedDate) {
-		app.SetError(w, errors.New(fmt.Sprintf("%s is missing", ParameterLatestCardSetModifiedDate)), http.StatusBadRequest)
+	if !query.Has(ParameterLatestCardSetModificationDate) {
+		app.SetError(w, errors.New(fmt.Sprintf("%s is missing", ParameterLatestCardSetModificationDate)), http.StatusBadRequest)
 		return
 	}
 
-	lastPullDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLatestCardSetModifiedDate))
+	lastModificationDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLatestCardSetModificationDate))
 	if err != nil {
 		app.SetError(w, err, http.StatusBadRequest)
 	}
 
-	hasModifications, err := app.cardSetRepository.HasModificationsSince(r.Context(), lastPullDate)
+	hasModifications, err := app.cardSetRepository.HasModificationsSince(r.Context(), authToken.Id, lastModificationDate)
 	if hasModifications {
 		app.SetError(w, err, http.StatusConflict)
 		return
@@ -171,7 +171,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) handleUpdatedCardSets(
 	ctx context.Context, // transaction is required
-	updatedCardSets []*cardset.CardSetApi,
+	updatedCardSets []*cardset.ApiCardSet,
 	userId *primitive.ObjectID,
 ) (*CardSetPushResponse, error) {
 	// validate
