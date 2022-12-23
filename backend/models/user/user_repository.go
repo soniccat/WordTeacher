@@ -2,30 +2,25 @@ package user
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
-	"github.com/alexedwards/scs/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"models/apphelpers"
 	"models/logger"
 	"models/mongowrapper"
 	"models/userauthtoken"
 	"models/usernetwork"
-	"net/http"
 )
 
 // TODO: move in auth module
-type UserModel struct {
+type UserRepository struct {
 	Logger         *logger.Logger
 	UserCollection *mongo.Collection
 	AuthTokens     *mongo.Collection
 }
 
-func New(logger *logger.Logger, mongoClient *mongo.Client) *UserModel {
+func New(logger *logger.Logger, mongoClient *mongo.Client) *UserRepository {
 	database := mongoClient.Database(mongowrapper.MongoDatabaseUsers)
-	model := &UserModel{
+	model := &UserRepository{
 		Logger:         logger,
 		UserCollection: database.Collection(mongowrapper.MongoCollectionUsers),
 		AuthTokens:     database.Collection(mongowrapper.MongoCollectionAuthTokens),
@@ -34,7 +29,7 @@ func New(logger *logger.Logger, mongoClient *mongo.Client) *UserModel {
 	return model
 }
 
-func (m *UserModel) FindGoogleUser(context context.Context, googleUserId *string) (*User, error) {
+func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *string) (*User, error) {
 	var user = User{}
 
 	err := m.UserCollection.FindOne(
@@ -55,7 +50,7 @@ func (m *UserModel) FindGoogleUser(context context.Context, googleUserId *string
 	return &user, err
 }
 
-func (m *UserModel) InsertUser(context context.Context, user *User) (*User, error) {
+func (m *UserRepository) InsertUser(context context.Context, user *User) (*User, error) {
 	res, err := m.UserCollection.InsertOne(context, user)
 	if err != nil {
 		return nil, err
@@ -70,7 +65,7 @@ func (m *UserModel) InsertUser(context context.Context, user *User) (*User, erro
 }
 
 // TODO: move in auth module
-func (m *UserModel) GenerateUserAuthToken(
+func (m *UserRepository) GenerateUserAuthToken(
 	context context.Context,
 	userId *primitive.ObjectID,
 	networkType usernetwork.UserNetworkType,
@@ -85,7 +80,7 @@ func (m *UserModel) GenerateUserAuthToken(
 }
 
 // TODO: move in auth module
-func (m *UserModel) insertUserAuthToken(
+func (m *UserRepository) insertUserAuthToken(
 	context context.Context,
 	token *userauthtoken.UserAuthToken,
 ) (*userauthtoken.UserAuthToken, error) {
@@ -135,48 +130,4 @@ func NewValidateSessionError(code int, err error) *ValidateSessionError {
 
 func (v *ValidateSessionError) Error() string {
 	return v.InnerError.Error()
-}
-
-func ValidateSession[T any, PT TokenHolder[T]](
-	r *http.Request,
-	sessionManager *scs.SessionManager,
-) (*T, *userauthtoken.UserAuthToken, *ValidateSessionError) {
-	_, err := r.Cookie(apphelpers.CookieSession)
-	if err != nil {
-		return nil, nil, NewValidateSessionError(http.StatusBadRequest, err)
-	}
-
-	// Header params
-	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
-	if len(deviceId) == 0 {
-		return nil, nil, NewValidateSessionError(http.StatusBadRequest, errors.New("invalid device id"))
-	}
-
-	// Parse session data and check if it's expired
-	userAuthToken, err := userauthtoken.Load(r.Context(), sessionManager)
-	if err != nil {
-		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, err)
-	}
-
-	if !userAuthToken.IsValid() {
-		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
-	}
-
-	// Body params
-	var input T
-	err = json.NewDecoder(r.Body).Decode(&input)
-	if err != nil {
-		return nil, nil, NewValidateSessionError(http.StatusBadRequest, err)
-	}
-
-	p := PT(&input)
-	if !userAuthToken.IsMatched(
-		p.GetAccessToken(),
-		p.GetRefreshToken(),
-		deviceId,
-	) {
-		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
-	}
-
-	return &input, userAuthToken, nil
 }

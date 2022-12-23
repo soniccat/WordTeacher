@@ -24,7 +24,7 @@ func main() {
 
 	flag.Parse()
 
-	app, err := createApplication(*isDebug, redisAddress, mongoURI, enableCredentials)
+	app, err := createApplication(*isDebug, *redisAddress, *mongoURI, *enableCredentials)
 	defer func() {
 		app.stop()
 	}()
@@ -57,9 +57,9 @@ func main() {
 
 func createApplication(
 	isDebug bool,
-	redisAddress *string,
-	mongoURI *string,
-	enableCredentials *bool,
+	redisAddress string,
+	mongoURI string,
+	enableCredentials bool,
 ) (*application, error) {
 	app := &application{
 		logger:         logger.New(isDebug),

@@ -3,10 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/alexedwards/scs/v2"
 	"models/apphelpers"
 	"models/cardset"
 	"models/logger"
 	"models/mongowrapper"
+	"models/user"
 	"net/http"
 	"runtime/debug"
 	"time"
@@ -24,7 +26,15 @@ func main() {
 
 	flag.Parse()
 
-	app, err := createApplication(*isDebug, redisAddress, mongoURI, enableCredentials)
+	sessionManager := apphelpers.CreateSessionManager(*redisAddress)
+	app, err := createApplication(
+		*isDebug,
+		sessionManager,
+		*mongoURI,
+		*enableCredentials,
+		user.NewSessionManagerValidator[CardSetPushInput](sessionManager),
+		user.NewSessionManagerValidator[CardSetPullInput](sessionManager),
+	)
 	defer func() {
 		app.stop()
 	}()
@@ -57,13 +67,17 @@ func main() {
 
 func createApplication(
 	isDebug bool,
-	redisAddress *string,
-	mongoURI *string,
-	enableCredentials *bool,
+	sessionManager *scs.SessionManager,
+	mongoURI string,
+	enableCredentials bool,
+	pushSessionValidator user.SessionValidator[CardSetPushInput],
+	pullSessionValidator user.SessionValidator[CardSetPullInput],
 ) (*application, error) {
 	app := &application{
-		logger:         logger.New(isDebug),
-		sessionManager: apphelpers.CreateSessionManager(redisAddress),
+		logger:               logger.New(isDebug),
+		sessionManager:       sessionManager,
+		pushSessionValidator: pushSessionValidator,
+		pullSessionValidator: pullSessionValidator,
 	}
 	err := mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
 	if err != nil {

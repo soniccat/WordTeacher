@@ -162,3 +162,25 @@ func IdsToMongoIds(ids []string) ([]*primitive.ObjectID, error) {
 		return &id, err
 	})
 }
+
+func MapKeys[T comparable, V any](m map[T]V) []T {
+	i := 0
+	keys := make([]T, len(m))
+	for k := range m {
+		keys[i] = k
+		i++
+	}
+
+	return keys
+}
+
+func MapValues[T comparable, V comparable](m map[T]V) []V {
+	i := 0
+	keys := make([]V, len(m))
+	for _, v := range m {
+		keys[i] = v
+		i++
+	}
+
+	return keys
+}

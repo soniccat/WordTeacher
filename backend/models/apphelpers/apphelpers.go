@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-func CreateSessionManager(redisAddress *string) *scs.SessionManager {
+func CreateSessionManager(redisAddress string) *scs.SessionManager {
 	pool := &redis.Pool{
 		MaxIdle: 10,
 		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", *redisAddress)
+			return redis.Dial("tcp", redisAddress)
 		},
 	}
 

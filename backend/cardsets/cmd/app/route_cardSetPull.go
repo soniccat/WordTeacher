@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"models/apphelpers"
 	"models/cardset"
-	"models/user"
 	"net/http"
 	"time"
 )
@@ -30,7 +29,7 @@ type CardSetPullResponse struct {
 }
 
 func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {
-	input, authToken, validateSessionErr := user.ValidateSession[CardSetPullInput](r, app.sessionManager)
+	input, authToken, validateSessionErr := app.pullSessionValidator.Validate(r)
 	if validateSessionErr != nil {
 		app.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
 		return

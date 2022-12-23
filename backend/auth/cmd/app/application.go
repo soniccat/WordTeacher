@@ -16,7 +16,7 @@ type application struct {
 	logger         *logger.Logger
 	sessionManager *scs.SessionManager
 	mongoWrapper   *mongowrapper.MongoWrapper
-	userModel      *user.UserModel
+	userModel      *user.UserRepository
 }
 
 func (a *application) GetLogger() *logger.Logger {

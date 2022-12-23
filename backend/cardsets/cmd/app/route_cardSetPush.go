@@ -7,7 +7,6 @@ import (
 	"models/apphelpers"
 	"models/cardset"
 	"models/tools"
-	"models/user"
 	"net/http"
 	"sync"
 	"time"
@@ -92,7 +91,7 @@ var userMutex = NewUserMutex()
 //
 //	RefreshResponse
 func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
-	input, authToken, validateSessionErr := user.ValidateSession[CardSetPushInput](r, app.sessionManager)
+	input, authToken, validateSessionErr := app.pushSessionValidator.Validate(r)
 	if validateSessionErr != nil {
 		app.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
 		return
@@ -147,7 +146,13 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 				return nil, sErr
 			}
 
-			sErr = app.cardSetRepository.DeleteNotInList(sCtx, currentCardSetIds)
+			insertedMongoIds, sErr := tools.IdsToMongoIds(tools.MapValues(response.CardSetIds))
+			if sErr != nil {
+				return nil, sErr
+			}
+
+			currentCardSetIdsWithAdded := append(currentCardSetIds, insertedMongoIds...)
+			sErr = app.cardSetRepository.DeleteNotInList(sCtx, currentCardSetIdsWithAdded)
 			if sErr != nil {
 				return nil, sErr
 			}

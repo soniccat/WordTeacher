@@ -87,9 +87,13 @@ func (m *Repository) UpdateCardSet(
 
 func (m *Repository) LoadCardSetDbById(
 	context context.Context,
-	id *primitive.ObjectID,
+	id string,
 ) (*DbCardSet, error) {
-	return m.loadCardSetDb(context, bson.M{"_id": id})
+	cardSetDbId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	return m.loadCardSetDb(context, bson.M{"_id": cardSetDbId})
 }
 
 func (m *Repository) LoadCardSetDbByCreationId(

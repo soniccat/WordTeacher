@@ -12,26 +12,12 @@ import (
 
 type UserModelTestSuite struct {
 	suite.Suite
-	UserModel *UserModel
+	UserModel *UserRepository
 	TestMongo *test.TestMongo
 }
 
-//type TestMongo struct {
-//	logger       *logger.Logger
-//	mongoWrapper *mongowrapper.MongoWrapper
-//	userModel    *UserModel
-//}
-//
-//func (a *TestMongo) GetLogger() *logger.Logger {
-//	return a.logger
-//}
-//
-//func (a *TestMongo) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
-//	a.mongoWrapper = mw
-//}
-
 func (suite *UserModelTestSuite) SetupTest() {
-	suite.TestMongo = test.New()
+	suite.TestMongo = test.NewTestMongo()
 	suite.UserModel = New(
 		suite.TestMongo.GetLogger(),
 		suite.TestMongo.GetMongoWrapper().Client,

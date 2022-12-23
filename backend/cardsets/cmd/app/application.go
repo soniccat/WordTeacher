@@ -6,15 +6,18 @@ import (
 	"models/cardset"
 	"models/logger"
 	"models/mongowrapper"
+	"models/user"
 	"net/http"
 )
 
 type application struct {
-	service           service
-	logger            *logger.Logger
-	sessionManager    *scs.SessionManager
-	mongoWrapper      *mongowrapper.MongoWrapper
-	cardSetRepository *cardset.Repository
+	service              service
+	logger               *logger.Logger
+	sessionManager       *scs.SessionManager
+	mongoWrapper         *mongowrapper.MongoWrapper
+	cardSetRepository    *cardset.Repository
+	pushSessionValidator user.SessionValidator[CardSetPushInput]
+	pullSessionValidator user.SessionValidator[CardSetPullInput]
 }
 
 func (app *application) GetLogger() *logger.Logger {

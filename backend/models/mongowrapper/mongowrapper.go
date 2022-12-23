@@ -30,9 +30,9 @@ type MongoWrapper struct {
 	cancelFunc *context.CancelFunc
 }
 
-func New(mongoURI *string, enableCredentials *bool) (*MongoWrapper, error) {
-	co := options.Client().ApplyURI(*mongoURI)
-	if *enableCredentials {
+func New(mongoURI string, enableCredentials bool) (*MongoWrapper, error) {
+	co := options.Client().ApplyURI(mongoURI)
+	if enableCredentials {
 		co.Auth = &options.Credential{
 			Username: os.Getenv(EnvMongoUsername),
 			Password: os.Getenv(EnvMongoPassword),
@@ -70,7 +70,7 @@ type MongoApp interface {
 	GetMongoWrapper() *MongoWrapper
 }
 
-func SetupMongo(app MongoApp, mongoURI *string, enableCredentials *bool) error {
+func SetupMongo(app MongoApp, mongoURI string, enableCredentials bool) error {
 	mongoWrapper, err := New(mongoURI, enableCredentials)
 	if err != nil {
 		app.GetLogger().Error.Printf("createMongoWrapper failed: %s", err.Error())

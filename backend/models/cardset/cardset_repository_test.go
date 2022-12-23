@@ -19,7 +19,7 @@ type CardSetTestSuite struct {
 }
 
 func (suite *CardSetTestSuite) SetupTest() {
-	suite.TestMongo = test.New()
+	suite.TestMongo = test.NewTestMongo()
 	suite.CardSetModel = New(
 		suite.TestMongo.GetLogger(),
 		suite.TestMongo.GetMongoWrapper().Client,
@@ -62,8 +62,7 @@ func (suite *CardSetTestSuite) TestCreateCardSet() {
 	assert.NotNil(suite.T(), insertedCardSet.Cards[0].Id)
 	assert.Equal(suite.T(), ownerId.Hex(), insertedCardSet.Cards[0].UserId)
 
-	cardSetId, _ := primitive.ObjectIDFromHex(insertedCardSet.Id)
-	loadedCardSetDb, err := suite.CardSetModel.LoadCardSetDbById(ctx, tools.Ptr(cardSetId))
+	loadedCardSetDb, err := suite.CardSetModel.LoadCardSetDbById(ctx, insertedCardSet.Id)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), insertedCardSet, loadedCardSetDb.ToApi())
 }
@@ -124,8 +123,7 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 	errWithCode = suite.CardSetModel.UpdateCardSet(ctx, insertedCardSet)
 	assert.Nil(suite.T(), errWithCode)
 
-	cardSetId, _ := primitive.ObjectIDFromHex(insertedCardSet.Id)
-	loadedCardSetDb, err := suite.CardSetModel.LoadCardSetDbById(ctx, tools.Ptr(cardSetId))
+	loadedCardSetDb, err := suite.CardSetModel.LoadCardSetDbById(ctx, insertedCardSet.Id)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), insertedCardSet, loadedCardSetDb.ToApi())
 }
