@@ -29,6 +29,7 @@ type CardSetPullResponse struct {
 }
 
 func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {
+
 	input, authToken, validateSessionErr := app.pullSessionValidator.Validate(r)
 	if validateSessionErr != nil {
 		app.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)

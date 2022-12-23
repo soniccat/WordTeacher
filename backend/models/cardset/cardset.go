@@ -88,6 +88,12 @@ func (cs *ApiCardSet) toDb() (*DbCardSet, error) {
 	return cardSetDb, nil
 }
 
+type ApiCardSetSortByName []*ApiCardSet
+
+func (a ApiCardSetSortByName) Len() int           { return len(a) }
+func (a ApiCardSetSortByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ApiCardSetSortByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
 type DbCardSet struct {
 	Id               *primitive.ObjectID `bson:"_id,omitempty"`
 	Name             string              `bson:"name"`

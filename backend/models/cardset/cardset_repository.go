@@ -262,11 +262,22 @@ func (m *Repository) CardSetsNotInList(
 	return DbCardSetsToApi(cardSetDbs), nil
 }
 
+type MongoIdWrapper struct {
+	Id primitive.ObjectID `bson:"_id"`
+}
+
+type MongoIdWrapperList []MongoIdWrapper
+
+func (l *MongoIdWrapperList) toMongoIds() []*primitive.ObjectID {
+	return tools.Map[MongoIdWrapper](*l, func(t MongoIdWrapper) *primitive.ObjectID {
+		return &t.Id
+	})
+}
+
 func (m *Repository) CardCardSetIds(
 	ctx context.Context,
 	userId *primitive.ObjectID,
 ) ([]string, error) {
-	var cardSetDbIds []*primitive.ObjectID
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
 		bson.M{"userId": userId},
@@ -280,12 +291,13 @@ func (m *Repository) CardCardSetIds(
 
 	defer func() { cursor.Close(ctx) }()
 
-	err = cursor.All(ctx, &cardSetDbIds)
+	var cardSetDbIds2 MongoIdWrapperList
+	err = cursor.All(ctx, &cardSetDbIds2)
 	if err != nil {
 		return nil, err
 	}
 
-	cardSetApiIds := tools.Map(cardSetDbIds, func(cardSetDbId *primitive.ObjectID) string {
+	cardSetApiIds := tools.Map(cardSetDbIds2.toMongoIds(), func(cardSetDbId *primitive.ObjectID) string {
 		return cardSetDbId.Hex()
 	})
 

@@ -27,8 +27,21 @@ import (
 	"time"
 )
 
+type BaseTestSuite struct {
+	t *testing.T
+}
+
+func (b *BaseTestSuite) createUUID() uuid.UUID {
+	cardSetCreationIdUUID, err := uuid.NewUUID()
+	if err != nil {
+		b.t.Fatal(err)
+	}
+	return cardSetCreationIdUUID
+}
+
 type CardSetPushTestSuite struct {
 	suite.Suite
+	BaseTestSuite
 	application   *application
 	pushValidator *test.MockSessionValidator[CardSetPushInput]
 	pullValidator *test.MockSessionValidator[CardSetPullInput]
@@ -110,12 +123,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 		[]*card.ApiCard{createApiCard()},
 	)
 
-	suite.setupValidatorWithCardSet(tools.Ptr(primitive.NewObjectID()), newCardSet)
+	suite.setupPushValidatorWithCardSet(tools.Ptr(primitive.NewObjectID()), newCardSet)
 	req := suite.createRequest(time.Now(), "testSession")
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
-	response := suite.readResponse(writer)
+	response := suite.readPushResponse(writer)
 
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 	assert.Len(suite.T(), response.CardSetIds, 1)
@@ -143,12 +156,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 	}
 
 	newCardSet.Id = "" // clear Id set from InsertCardSet
-	suite.setupValidatorWithCardSet(userId, newCardSet)
+	suite.setupPushValidatorWithCardSet(userId, newCardSet)
 	req := suite.createRequest(time.Now(), "testSession")
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
-	response := suite.readResponse(writer)
+	response := suite.readPushResponse(writer)
 
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 	assert.Equal(suite.T(), insertedCardSet.Id, response.CardSetIds[cardSetCreationId])
@@ -180,12 +193,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 		[]*card.ApiCard{createApiCard()},
 	)
 
-	suite.setupValidatorWithCardSet(userId, newCardSet)
+	suite.setupPushValidatorWithCardSet(userId, newCardSet)
 	req := suite.createRequest(time.Now(), "testSession")
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
-	response := suite.readResponse(writer)
+	response := suite.readPushResponse(writer)
 
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 
@@ -219,7 +232,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 		[]*card.ApiCard{createApiCard()},
 	)
 
-	suite.setupValidatorWithCardSet(userId, oldCardSet)
+	suite.setupPushValidatorWithCardSet(userId, oldCardSet)
 	req := suite.createRequest(time.Now().Add(-time.Hour*time.Duration(20)), "testSession")
 
 	writer := httptest.NewRecorder()
@@ -227,6 +240,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 
 	assert.Equal(suite.T(), http.StatusConflict, writer.Code)
 }
+
+// TODO: need to check a filled CurrentCardSetIds in Input, that a set won't be deleted if it's listed in CurrentCardSetIds
 
 // Tools
 
@@ -238,13 +253,13 @@ func (suite *CardSetPushTestSuite) loadCardSetDbById(id string) *cardset.DbCardS
 	return dbCardSet
 }
 
-func (suite *CardSetPushTestSuite) createUUID() uuid.UUID {
-	cardSetCreationIdUUID, err := uuid.NewUUID()
-	if err != nil {
-		suite.T().Fatal(err)
-	}
-	return cardSetCreationIdUUID
-}
+//func (suite *CardSetPushTestSuite) createUUID() uuid.UUID {
+//	cardSetCreationIdUUID, err := uuid.NewUUID()
+//	if err != nil {
+//		suite.T().Fatal(err)
+//	}
+//	return cardSetCreationIdUUID
+//}
 
 func (suite *CardSetPushTestSuite) createRequest(lastModificationDate time.Time, session string) *http.Request {
 	req, err := http.NewRequest("POST", fmt.Sprintf("/?%s=%s", ParameterLatestCardSetModificationDate, lastModificationDate.UTC().Format(time.RFC3339)), nil)
@@ -255,7 +270,7 @@ func (suite *CardSetPushTestSuite) createRequest(lastModificationDate time.Time,
 	return req
 }
 
-func (suite *CardSetPushTestSuite) setupValidatorWithCardSet(userId *primitive.ObjectID, newCardSet *cardset.ApiCardSet) {
+func (suite *CardSetPushTestSuite) setupPushValidatorWithCardSet(userId *primitive.ObjectID, newCardSet *cardset.ApiCardSet) {
 	suite.pushValidator.ResponseProvider = func() test.MockSessionValidatorResponse[CardSetPushInput] {
 		return test.MockSessionValidatorResponse[CardSetPushInput]{
 			&CardSetPushInput{
@@ -271,7 +286,7 @@ func (suite *CardSetPushTestSuite) setupValidatorWithCardSet(userId *primitive.O
 	}
 }
 
-func (suite *CardSetPushTestSuite) readResponse(writer *httptest.ResponseRecorder) *CardSetPushResponse {
+func (suite *CardSetPushTestSuite) readPushResponse(writer *httptest.ResponseRecorder) *CardSetPushResponse {
 	var response CardSetPushResponse
 	body, err := io.ReadAll(writer.Result().Body)
 	if err != nil {
