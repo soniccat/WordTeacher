@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"models/user"
 	"models/userauthtoken"
 	"net/http"
@@ -19,7 +20,7 @@ type MockSessionValidator[T any] struct {
 func NewMockSessionValidator[T any]() *MockSessionValidator[T] {
 	return &MockSessionValidator[T]{
 		func() MockSessionValidatorResponse[T] {
-			return MockSessionValidatorResponse[T]{nil, nil, nil}
+			return MockSessionValidatorResponse[T]{nil, nil, user.NewValidateSessionError(http.StatusInternalServerError, errors.New("mock error"))}
 		},
 	}
 }

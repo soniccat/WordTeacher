@@ -108,9 +108,13 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 		app.SetError(w, err, http.StatusBadRequest)
 	}
 
-	hasModifications, err := app.cardSetRepository.HasModificationsSince(r.Context(), authToken.Id, lastModificationDate)
+	hasModifications, err := app.cardSetRepository.HasModificationsSince(r.Context(), authToken.UserMongoId, lastModificationDate)
+	if err != nil {
+		app.SetError(w, err, http.StatusInternalServerError)
+		return
+	}
 	if hasModifications {
-		app.SetError(w, err, http.StatusConflict)
+		app.SetError(w, errors.New("data has been modified, pull is required"), http.StatusConflict)
 		return
 	}
 

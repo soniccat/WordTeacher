@@ -169,10 +169,10 @@ func (m *Repository) HasModificationsSince(
 	userId *primitive.ObjectID,
 	date time.Time,
 ) (bool, error) {
-	dbTime := primitive.NewDateTimeFromTime(date)
+	//dbTime := primitive.NewDateTimeFromTime(date)
 	res := m.CardSetCollection.FindOne(
 		ctx,
-		bson.M{"userId": userId, "modificationDate": bson.M{"$gt": dbTime}},
+		bson.M{"userId": userId, "modificationDate": bson.M{"$gt": date}},
 	)
 	err := res.Err()
 

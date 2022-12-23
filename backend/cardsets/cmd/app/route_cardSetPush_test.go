@@ -63,7 +63,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithoutAnything_ReturnsBadReq
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
 
-	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithCookieButWithoutLastModificationDate_ReturnsBadRequest() {
@@ -76,7 +76,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithCookieButWithoutLastModif
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
 
-	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUnauthorized() {
@@ -196,7 +196,37 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 	assert.Equal(suite.T(), err, mongo.ErrNoDocuments)
 }
 
-// TODO: test push with not pulled changes
+func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsStatusConflict() {
+	newCardSet := createApiCardSet(
+		"newTestCardSet",
+		suite.createUUID().String(),
+		time.Now(),
+		[]*card.ApiCard{createApiCard()},
+	)
+
+	userId := tools.Ptr(primitive.NewObjectID())
+	_, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), newCardSet, userId)
+	if errWithCode != nil {
+		suite.T().Fatal(errWithCode.Err)
+	}
+
+	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationId := cardSetCreationIdUUID.String()
+	oldCardSet := createApiCardSet(
+		"oldTestCardSet",
+		cardSetCreationId,
+		time.Now(),
+		[]*card.ApiCard{createApiCard()},
+	)
+
+	suite.setupValidatorWithCardSet(userId, oldCardSet)
+	req := suite.createRequest(time.Now().Add(-time.Hour*time.Duration(20)), "testSession")
+
+	writer := httptest.NewRecorder()
+	suite.application.cardSetPush(writer, req)
+
+	assert.Equal(suite.T(), http.StatusConflict, writer.Code)
+}
 
 // Tools
 
@@ -261,7 +291,7 @@ func createApiCardSet(name string, creationId string, creationDate time.Time, ca
 		Name:             name,
 		Cards:            cards,
 		CreationDate:     creationDate.UTC().Format(time.RFC3339),
-		ModificationDate: nil,
+		ModificationDate: tools.Ptr(creationDate.UTC().Format(time.RFC3339)),
 		CreationId:       creationId,
 	}
 }
@@ -300,6 +330,6 @@ func createUserAuthToken(userId *primitive.ObjectID) *userauthtoken.UserAuthToke
 	}
 }
 
-func TestUserModelTestSuite(t *testing.T) {
+func TestCardSetPushTestSuite(t *testing.T) {
 	suite.Run(t, new(CardSetPushTestSuite))
 }
