@@ -6,7 +6,7 @@ import (
 	"models/tools"
 )
 
-type CardApi struct {
+type ApiCard struct {
 	Id                  string                    `json:"id"`
 	Term                string                    `json:"term"`
 	Transcription       *string                   `json:"transcription,omitempty"`
@@ -20,7 +20,7 @@ type CardApi struct {
 	CreationId          string                    `json:"creationId"`
 }
 
-func (cs *CardApi) IsEqual(a *CardApi) bool {
+func (cs *ApiCard) IsEqual(a *ApiCard) bool {
 	if cs.Id != a.Id {
 		return false
 	}
@@ -58,7 +58,7 @@ func (cs *CardApi) IsEqual(a *CardApi) bool {
 	return true
 }
 
-func (c *CardApi) ToDb() (*CardDb, error) {
+func (c *ApiCard) ToDb() (*DbCard, error) {
 	cardDbId, err := tools.ParseObjectID(c.Id)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (c *CardApi) ToDb() (*CardDb, error) {
 		return nil, err
 	}
 
-	return &CardDb{
+	return &DbCard{
 		Id:                  cardDbId,
 		Term:                c.Term,
 		Transcription:       c.Transcription,
@@ -84,7 +84,7 @@ func (c *CardApi) ToDb() (*CardDb, error) {
 	}, nil
 }
 
-type CardDb struct {
+type DbCard struct {
 	Id                  *primitive.ObjectID       `bson:"_id,omitempty"`
 	Term                string                    `bson:"term"`
 	Transcription       *string                   `bson:"transcription,omitempty"`
@@ -98,7 +98,7 @@ type CardDb struct {
 	CreationId          string                    `bson:"creationId"`
 }
 
-func (cs *CardDb) IsEqual(a *CardDb) bool {
+func (cs *DbCard) IsEqual(a *DbCard) bool {
 	if cs.Id != a.Id {
 		return false
 	}
@@ -141,8 +141,8 @@ type Span struct {
 	End   int
 }
 
-func (c *CardDb) ToApi() *CardApi {
-	return &CardApi{
+func (c *DbCard) ToApi() *ApiCard {
+	return &ApiCard{
 		Id:                  c.Id.Hex(),
 		Term:                c.Term,
 		Transcription:       c.Transcription,

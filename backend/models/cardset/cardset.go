@@ -10,7 +10,7 @@ import (
 type ApiCardSet struct {
 	Id               string          `json:"id,omitempty"`
 	Name             string          `json:"name"`
-	Cards            []*card.CardApi `json:"cards"`
+	Cards            []*card.ApiCard `json:"cards"`
 	UserId           string          `json:"userId"` // TODO: consider several owners via a permission filed
 	CreationDate     string          `json:"creationDate"`
 	ModificationDate *string         `json:"modificationDate,omitempty"`
@@ -69,7 +69,7 @@ func (cs *ApiCardSet) toDb() (*DbCardSet, error) {
 		return nil, err
 	}
 
-	cardSetDbs, err := tools.MapOrError(cs.Cards, func(card *card.CardApi) (*card.CardDb, error) {
+	cardSetDbs, err := tools.MapOrError(cs.Cards, func(card *card.ApiCard) (*card.DbCard, error) {
 		return card.ToDb()
 	})
 	if err != nil {
@@ -91,7 +91,7 @@ func (cs *ApiCardSet) toDb() (*DbCardSet, error) {
 type DbCardSet struct {
 	Id               *primitive.ObjectID `bson:"_id,omitempty"`
 	Name             string              `bson:"name"`
-	Cards            []*card.CardDb      `bson:"cards"`
+	Cards            []*card.DbCard      `bson:"cards"`
 	UserId           *primitive.ObjectID `bson:"userId"`
 	CreationDate     primitive.DateTime  `bson:"creationDate"`
 	ModificationDate *primitive.DateTime `bson:"modificationDate,omitempty"`
@@ -107,7 +107,7 @@ func (cs *DbCardSet) ToApi() *ApiCardSet {
 	return &ApiCardSet{
 		Id:               cs.Id.Hex(),
 		Name:             cs.Name,
-		Cards:            tools.Map(cs.Cards, func(cardDb *card.CardDb) *card.CardApi { return cardDb.ToApi() }),
+		Cards:            tools.Map(cs.Cards, func(cardDb *card.DbCard) *card.ApiCard { return cardDb.ToApi() }),
 		UserId:           cs.UserId.Hex(),
 		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339),
 		ModificationDate: md,

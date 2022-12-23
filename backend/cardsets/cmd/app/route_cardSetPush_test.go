@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"io"
 	"models/accesstoken"
 	"models/apphelpers"
@@ -53,7 +54,7 @@ func (suite *CardSetPushTestSuite) SetupTest() {
 	suite.application = app
 }
 
-func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsBadRequest_WithoutAnything() {
+func (suite *CardSetPushTestSuite) TestCardSetPush_WithoutAnything_ReturnsBadRequest() {
 	req, err := http.NewRequest("POST", "/", nil)
 	if err != nil {
 		suite.T().Fatal(err)
@@ -65,7 +66,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsBadRequest_WithoutAnyt
 	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
 }
 
-func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsBadRequest_WithCookieButWithoutLastModificationDate() {
+func (suite *CardSetPushTestSuite) TestCardSetPush_WithCookieButWithoutLastModificationDate_ReturnsBadRequest() {
 	req, err := http.NewRequest("POST", "/", nil)
 	req.AddCookie(&http.Cookie{Name: "session", Value: "testSession"})
 	if err != nil {
@@ -78,7 +79,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsBadRequest_WithCookieB
 	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
 }
 
-func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsUnauthorized_WithInvalidSession() {
+func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUnauthorized() {
 	suite.pushValidator.ResponseProvider = func() test.MockSessionValidatorResponse[CardSetPushInput] {
 		return test.MockSessionValidatorResponse[CardSetPushInput]{
 			nil,
@@ -86,6 +87,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsUnauthorized_WithInval
 			user.NewValidateSessionError(http.StatusUnauthorized, errors.New("test error")),
 		}
 	}
+
 	req, err := http.NewRequest("POST", fmt.Sprintf("/?%s=2022-11-03T17:30:02Z", ParameterLatestCardSetModificationDate), nil)
 	if err != nil {
 		suite.T().Fatal(err)
@@ -98,39 +100,132 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsUnauthorized_WithInval
 	assert.Equal(suite.T(), http.StatusUnauthorized, writer.Code)
 }
 
-func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsOk_WithNewCardSet() {
+func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
+	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationId := cardSetCreationIdUUID.String()
+	newCardSet := createApiCardSet(
+		"testCardSet",
+		cardSetCreationId,
+		time.Now(),
+		[]*card.ApiCard{createApiCard()},
+	)
+
+	suite.setupValidatorWithCardSet(tools.Ptr(primitive.NewObjectID()), newCardSet)
+	req := suite.createRequest(time.Now(), "testSession")
+
+	writer := httptest.NewRecorder()
+	suite.application.cardSetPush(writer, req)
+	response := suite.readResponse(writer)
+
+	assert.Equal(suite.T(), http.StatusOK, writer.Code)
+	assert.Len(suite.T(), response.CardSetIds, 1)
+	assert.Equal(suite.T(), cardSetCreationId, tools.MapKeys(response.CardSetIds)[0])
+	assert.NotNil(suite.T(), cardSetCreationId, response.CardSetIds[cardSetCreationId])
+
+	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
+	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi())
+}
+
+func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsAlreadyCreatedCard() {
+	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationId := cardSetCreationIdUUID.String()
+	newCardSet := createApiCardSet(
+		"testCardSet",
+		cardSetCreationId,
+		time.Now(),
+		[]*card.ApiCard{createApiCard()},
+	)
+
+	userId := tools.Ptr(primitive.NewObjectID())
+	insertedCardSet, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), newCardSet, userId)
+	if errWithCode != nil {
+		suite.T().Fatal(errWithCode.Err)
+	}
+
+	newCardSet.Id = "" // clear Id set from InsertCardSet
+	suite.setupValidatorWithCardSet(userId, newCardSet)
+	req := suite.createRequest(time.Now(), "testSession")
+
+	writer := httptest.NewRecorder()
+	suite.application.cardSetPush(writer, req)
+	response := suite.readResponse(writer)
+
+	assert.Equal(suite.T(), http.StatusOK, writer.Code)
+	assert.Equal(suite.T(), insertedCardSet.Id, response.CardSetIds[cardSetCreationId])
+
+	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
+	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi())
+}
+
+func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_ReturnsNewCardSetAndDeleteOldOne() {
+	oldCardSet := createApiCardSet(
+		"oldTestCardSet",
+		suite.createUUID().String(),
+		time.Now().Add(-time.Hour*time.Duration(10)),
+		[]*card.ApiCard{createApiCard()},
+	)
+
+	userId := tools.Ptr(primitive.NewObjectID())
+	_, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), oldCardSet, userId)
+	if errWithCode != nil {
+		suite.T().Fatal(errWithCode.Err)
+	}
+
+	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationId := cardSetCreationIdUUID.String()
+	newCardSet := createApiCardSet(
+		"newTestCardSet",
+		cardSetCreationId,
+		time.Now(),
+		[]*card.ApiCard{createApiCard()},
+	)
+
+	suite.setupValidatorWithCardSet(userId, newCardSet)
+	req := suite.createRequest(time.Now(), "testSession")
+
+	writer := httptest.NewRecorder()
+	suite.application.cardSetPush(writer, req)
+	response := suite.readResponse(writer)
+
+	assert.Equal(suite.T(), http.StatusOK, writer.Code)
+
+	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
+	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi())
+
+	_, err := suite.application.cardSetRepository.LoadCardSetDbById(context.Background(), oldCardSet.Id)
+	assert.Equal(suite.T(), err, mongo.ErrNoDocuments)
+}
+
+// TODO: test push with not pulled changes
+
+// Tools
+
+func (suite *CardSetPushTestSuite) loadCardSetDbById(id string) *cardset.DbCardSet {
+	dbCardSet, err := suite.application.cardSetRepository.LoadCardSetDbById(context.Background(), id)
+	if err != nil {
+		suite.T().Fatal(err)
+	}
+	return dbCardSet
+}
+
+func (suite *CardSetPushTestSuite) createUUID() uuid.UUID {
 	cardSetCreationIdUUID, err := uuid.NewUUID()
 	if err != nil {
 		suite.T().Fatal(err)
 	}
-	cardSetCreationId := cardSetCreationIdUUID.String()
+	return cardSetCreationIdUUID
+}
 
-	newCardSet := &cardset.ApiCardSet{
-		Name: "testCardSet",
-		Cards: []*card.CardApi{
-			{
-				Term:          "testTerm1",
-				Transcription: tools.Ptr("testTranscription"),
-				PartOfSpeech:  partofspeech.Adverb,
-				Definitions:   []string{"testDef1", "testDef2"},
-				Synonyms:      []string{"testSyn1", "testSyn2"},
-				Examples:      []string{"testEx1", "testEx2"},
-				DefinitionTermSpans: [][]card.Span{
-					[]card.Span{{1, 2}, {3, 4}},
-					[]card.Span{{5, 6}, {7, 8}},
-				},
-				ExampleTermSpans: [][]card.Span{
-					[]card.Span{{9, 10}, {11, 12}},
-					[]card.Span{{13, 14}, {15, 16}},
-				},
-				CreationId: "fb23d60c-02f9-4bae-be86-8359274e0e4e",
-			},
-		},
-		CreationDate:     "2022-11-03T17:30:02Z",
-		ModificationDate: nil,
-		CreationId:       cardSetCreationId,
+func (suite *CardSetPushTestSuite) createRequest(lastModificationDate time.Time, session string) *http.Request {
+	req, err := http.NewRequest("POST", fmt.Sprintf("/?%s=%s", ParameterLatestCardSetModificationDate, lastModificationDate.UTC().Format(time.RFC3339)), nil)
+	if err != nil {
+		suite.T().Fatal(err)
 	}
+	req.AddCookie(&http.Cookie{Name: "session", Value: session})
+	return req
+}
 
+func (suite *CardSetPushTestSuite) setupValidatorWithCardSet(userId *primitive.ObjectID, newCardSet *cardset.ApiCardSet) {
 	suite.pushValidator.ResponseProvider = func() test.MockSessionValidatorResponse[CardSetPushInput] {
 		return test.MockSessionValidatorResponse[CardSetPushInput]{
 			&CardSetPushInput{
@@ -140,29 +235,13 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsOk_WithNewCardSet() {
 				},
 				[]string{},
 			},
-			&userauthtoken.UserAuthToken{
-				Id:          tools.Ptr(primitive.NewObjectID()),
-				UserMongoId: tools.Ptr(primitive.NewObjectID()),
-				NetworkType: usernetwork.Google,
-				AccessToken: accesstoken.AccessToken{
-					Value:          "testAccessToken",
-					ExpirationDate: primitive.NewDateTimeFromTime(time.Now()),
-				},
-				RefreshToken: "testRefreshToken",
-				UserDeviceId: "testDeviceId",
-			},
+			createUserAuthToken(userId),
 			nil,
 		}
 	}
-	req, err := http.NewRequest("POST", fmt.Sprintf("/?%s=2022-11-03T17:30:02Z", ParameterLatestCardSetModificationDate), nil)
-	if err != nil {
-		suite.T().Fatal(err)
-	}
-	req.AddCookie(&http.Cookie{Name: "session", Value: "testSession"})
+}
 
-	writer := httptest.NewRecorder()
-	suite.application.cardSetPush(writer, req)
-
+func (suite *CardSetPushTestSuite) readResponse(writer *httptest.ResponseRecorder) *CardSetPushResponse {
 	var response CardSetPushResponse
 	body, err := io.ReadAll(writer.Result().Body)
 	if err != nil {
@@ -174,17 +253,51 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_ReturnsOk_WithNewCardSet() {
 		suite.T().Fatal(err)
 	}
 
-	assert.Equal(suite.T(), http.StatusOK, writer.Code)
-	assert.Len(suite.T(), response.CardSetIds, 1)
-	assert.Equal(suite.T(), cardSetCreationId, tools.MapKeys(response.CardSetIds)[0])
-	assert.NotNil(suite.T(), cardSetCreationId, response.CardSetIds[cardSetCreationId])
+	return &response
+}
 
-	dbCardSet, err := suite.application.cardSetRepository.LoadCardSetDbById(context.Background(), response.CardSetIds[cardSetCreationId])
-	if err != nil {
-		suite.T().Fatal(err)
+func createApiCardSet(name string, creationId string, creationDate time.Time, cards []*card.ApiCard) *cardset.ApiCardSet {
+	return &cardset.ApiCardSet{
+		Name:             name,
+		Cards:            cards,
+		CreationDate:     creationDate.UTC().Format(time.RFC3339),
+		ModificationDate: nil,
+		CreationId:       creationId,
 	}
+}
 
-	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi())
+func createApiCard() *card.ApiCard {
+	return &card.ApiCard{
+		Term:          "testTerm1",
+		Transcription: tools.Ptr("testTranscription"),
+		PartOfSpeech:  partofspeech.Adverb,
+		Definitions:   []string{"testDef1", "testDef2"},
+		Synonyms:      []string{"testSyn1", "testSyn2"},
+		Examples:      []string{"testEx1", "testEx2"},
+		DefinitionTermSpans: [][]card.Span{
+			[]card.Span{{1, 2}, {3, 4}},
+			[]card.Span{{5, 6}, {7, 8}},
+		},
+		ExampleTermSpans: [][]card.Span{
+			[]card.Span{{9, 10}, {11, 12}},
+			[]card.Span{{13, 14}, {15, 16}},
+		},
+		CreationId: "fb23d60c-02f9-4bae-be86-8359274e0e4e",
+	}
+}
+
+func createUserAuthToken(userId *primitive.ObjectID) *userauthtoken.UserAuthToken {
+	return &userauthtoken.UserAuthToken{
+		Id:          tools.Ptr(primitive.NewObjectID()),
+		UserMongoId: userId,
+		NetworkType: usernetwork.Google,
+		AccessToken: accesstoken.AccessToken{
+			Value:          "testAccessToken",
+			ExpirationDate: primitive.NewDateTimeFromTime(time.Now()),
+		},
+		RefreshToken: "testRefreshToken",
+		UserDeviceId: "testDeviceId",
+	}
 }
 
 func TestUserModelTestSuite(t *testing.T) {
