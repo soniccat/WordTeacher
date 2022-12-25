@@ -126,7 +126,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 	)
 
 	suite.setupPushValidatorWithCardSet(tools.Ptr(primitive.NewObjectID()), newCardSet)
-	req := suite.createRequest(time.Now(), "testSession")
+	req := suite.createPushRequest(time.Now())
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -163,7 +163,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 
 	newCardSet.Id = "" // clear Id set from InsertCardSet
 	suite.setupPushValidatorWithCardSet(userId, newCardSet)
-	req := suite.createRequest(time.Now(), "testSession")
+	req := suite.createPushRequest(time.Now())
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -200,7 +200,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 	)
 
 	suite.setupPushValidatorWithCardSet(userId, newCardSet)
-	req := suite.createRequest(time.Now(), "testSession")
+	req := suite.createPushRequest(time.Now())
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -240,7 +240,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 	)
 
 	suite.setupPushValidatorWithCardSet(userId, oldCardSet)
-	req := suite.createRequest(time.Now().Add(-time.Hour*time.Duration(20)), "testSession")
+	req := suite.createPushRequest(time.Now().Add(-time.Hour * time.Duration(20)))
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -273,7 +273,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 	)
 
 	suite.setupPushValidatorWithCardSet(userId, newCardSet)
-	req := suite.createRequest(time.Now().Add(-time.Hour*time.Duration(10)), "testSession")
+	req := suite.createPushRequest(time.Now().Add(-time.Hour * time.Duration(10)))
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -299,20 +299,12 @@ func (suite *CardSetPushTestSuite) loadCardSetDbById(id string) *cardset.DbCardS
 	return dbCardSet
 }
 
-//func (suite *CardSetPushTestSuite) createUUID() uuid.UUID {
-//	cardSetCreationIdUUID, err := uuid.NewUUID()
-//	if err != nil {
-//		suite.T().Fatal(err)
-//	}
-//	return cardSetCreationIdUUID
-//}
-
-func (suite *CardSetPushTestSuite) createRequest(lastModificationDate time.Time, session string) *http.Request {
+func (suite *CardSetPushTestSuite) createPushRequest(lastModificationDate time.Time) *http.Request {
 	req, err := http.NewRequest("POST", fmt.Sprintf("/?%s=%s", ParameterLatestCardSetModificationDate, lastModificationDate.UTC().Format(time.RFC3339)), nil)
 	if err != nil {
 		suite.T().Fatal(err)
 	}
-	req.AddCookie(&http.Cookie{Name: "session", Value: session})
+	req.AddCookie(&http.Cookie{Name: "session", Value: "testSession"})
 	return req
 }
 

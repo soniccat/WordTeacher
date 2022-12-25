@@ -37,7 +37,7 @@ func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var lastModificationDate *time.Time = nil
-	if parsedDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLatestCardSetModificationDate)); err != nil {
+	if parsedDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLatestCardSetModificationDate)); err == nil {
 		lastModificationDate = &parsedDate
 	}
 

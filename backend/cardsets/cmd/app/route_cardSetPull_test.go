@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"models/apphelpers"
 	"models/card"
@@ -104,6 +105,44 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 	assert.Equal(suite.T(), expectedCardSets, actualCardSets)
 }
 
+func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_ReturnsOnlyNewCardSet() {
+	oldCardSet := createApiCardSet(
+		"oldTestCardSet1",
+		suite.createUUID().String(),
+		time.Now().Add(-time.Hour*time.Duration(20)),
+		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+	)
+
+	oldCardSet2 := createApiCardSet(
+		"oldTestCardSet2",
+		suite.createUUID().String(),
+		time.Now().Add(-time.Hour*time.Duration(10)),
+		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+	)
+
+	userId := tools.Ptr(primitive.NewObjectID())
+	_, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), oldCardSet, userId)
+	if errWithCode != nil {
+		suite.T().Fatal(errWithCode.Err)
+	}
+	_, errWithCode = suite.application.cardSetRepository.InsertCardSet(context.Background(), oldCardSet2, userId)
+	if errWithCode != nil {
+		suite.T().Fatal(errWithCode.Err)
+	}
+
+	suite.setupPullValidatorWithCardSetIds(userId, []string{})
+	req := suite.createPullRequest(time.Now().Add(-time.Hour * time.Duration(15)))
+
+	writer := httptest.NewRecorder()
+	suite.application.cardSetPull(writer, req)
+	response := suite.readPullResponse(writer)
+
+	assert.Equal(suite.T(), http.StatusOK, writer.Code)
+	assert.Len(suite.T(), response.DeletedCardSetIds, 0)
+	assert.Len(suite.T(), response.UpdatedCardSets, 1)
+	assert.Equal(suite.T(), oldCardSet2, response.UpdatedCardSets[0])
+}
+
 func TestCardSetPullTestSuite(t *testing.T) {
 	suite.Run(t, new(CardSetPullTestSuite))
 }
@@ -121,6 +160,15 @@ func (suite *CardSetPullTestSuite) setupPullValidatorWithCardSetIds(userId *prim
 			nil,
 		}
 	}
+}
+
+func (suite *CardSetPullTestSuite) createPullRequest(lastModificationDate time.Time) *http.Request {
+	req, err := http.NewRequest("POST", fmt.Sprintf("/?%s=%s", ParameterLatestCardSetModificationDate, lastModificationDate.UTC().Format(time.RFC3339)), nil)
+	if err != nil {
+		suite.T().Fatal(err)
+	}
+	req.AddCookie(&http.Cookie{Name: "session", Value: "testSession"})
+	return req
 }
 
 func (suite *CardSetPullTestSuite) readPullResponse(writer *httptest.ResponseRecorder) *CardSetPullResponse {

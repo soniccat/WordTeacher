@@ -13,7 +13,7 @@ type ApiCardSet struct {
 	Cards            []*card.ApiCard `json:"cards"`
 	UserId           string          `json:"userId"` // TODO: consider several owners via a permission filed
 	CreationDate     string          `json:"creationDate"`
-	ModificationDate *string         `json:"modificationDate,omitempty"`
+	ModificationDate *string         `json:"modificationDate,omitempty"` // TODO: remove pointer
 	CreationId       string          `json:"creationId"`
 }
 
