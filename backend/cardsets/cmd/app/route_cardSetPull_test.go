@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io"
 	"models/apphelpers"
 	"models/card"
@@ -17,6 +14,10 @@ import (
 	"sort"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CardSetPullTestSuite struct {
@@ -62,13 +63,13 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 		"oldTestCardSet1",
 		suite.createUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(10)),
-		[]*card.ApiCard{createApiCard()},
+		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
 	)
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
 		suite.createUUID().String(),
 		time.Now(),
-		[]*card.ApiCard{createApiCard()},
+		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())

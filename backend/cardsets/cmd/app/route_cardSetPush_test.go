@@ -5,11 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"io"
 	"models/accesstoken"
 	"models/apphelpers"
@@ -25,6 +20,12 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type BaseTestSuite struct {
@@ -116,11 +117,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUna
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 	cardSetCreationIdUUID := suite.createUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
+	cardCreationId := suite.createUUID().String()
 	newCardSet := createApiCardSet(
 		"testCardSet",
 		cardSetCreationId,
 		time.Now(),
-		[]*card.ApiCard{createApiCard()},
+		[]*card.ApiCard{createApiCard(cardCreationId)},
 	)
 
 	suite.setupPushValidatorWithCardSet(tools.Ptr(primitive.NewObjectID()), newCardSet)
@@ -134,9 +136,13 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 	assert.Len(suite.T(), response.CardSetIds, 1)
 	assert.Equal(suite.T(), cardSetCreationId, tools.MapKeys(response.CardSetIds)[0])
 	assert.NotNil(suite.T(), cardSetCreationId, response.CardSetIds[cardSetCreationId])
+	assert.Len(suite.T(), response.CardIds, 1)
+	assert.Equal(suite.T(), cardCreationId, tools.MapKeys(response.CardIds)[0])
 
 	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
 	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi())
+	assert.Equal(suite.T(), newCardSet.Id, response.CardSetIds[cardSetCreationId])
+	assert.Equal(suite.T(), response.CardIds[cardCreationId], dbCardSet.Cards[0].Id.Hex())
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsAlreadyCreatedCard() {
@@ -146,7 +152,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 		"testCardSet",
 		cardSetCreationId,
 		time.Now(),
-		[]*card.ApiCard{createApiCard()},
+		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -175,7 +181,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 		"oldTestCardSet",
 		suite.createUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(10)),
-		[]*card.ApiCard{createApiCard()},
+		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -190,7 +196,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 		"newTestCardSet",
 		cardSetCreationId,
 		time.Now(),
-		[]*card.ApiCard{createApiCard()},
+		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
 	)
 
 	suite.setupPushValidatorWithCardSet(userId, newCardSet)
@@ -214,7 +220,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 		"newTestCardSet",
 		suite.createUUID().String(),
 		time.Now(),
-		[]*card.ApiCard{createApiCard()},
+		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -225,11 +231,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 
 	cardSetCreationIdUUID := suite.createUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
+	cardCreationId := suite.createUUID().String()
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet",
 		cardSetCreationId,
 		time.Now(),
-		[]*card.ApiCard{createApiCard()},
+		[]*card.ApiCard{createApiCard(cardCreationId)},
 	)
 
 	suite.setupPushValidatorWithCardSet(userId, oldCardSet)
@@ -241,7 +248,46 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 	assert.Equal(suite.T(), http.StatusConflict, writer.Code)
 }
 
-// TODO: need to check a filled CurrentCardSetIds in Input, that a set won't be deleted if it's listed in CurrentCardSetIds
+func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet_ReturnsOk() {
+	oldCardSet := createApiCardSet(
+		"oldTestCardSet",
+		suite.createUUID().String(),
+		time.Now().Add(-time.Hour*time.Duration(20)),
+		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+	)
+
+	userId := tools.Ptr(primitive.NewObjectID())
+	_, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), oldCardSet, userId)
+	if errWithCode != nil {
+		suite.T().Fatal(errWithCode.Err)
+	}
+
+	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationId := cardSetCreationIdUUID.String()
+	cardCreationId := suite.createUUID().String()
+	newCardSet := createApiCardSet(
+		"newTestCardSet",
+		cardSetCreationId,
+		time.Now(),
+		[]*card.ApiCard{createApiCard(cardCreationId)},
+	)
+
+	suite.setupPushValidatorWithCardSet(userId, newCardSet)
+	req := suite.createRequest(time.Now().Add(-time.Hour*time.Duration(10)), "testSession")
+
+	writer := httptest.NewRecorder()
+	suite.application.cardSetPush(writer, req)
+	response := suite.readPushResponse(writer)
+
+	assert.Equal(suite.T(), http.StatusOK, writer.Code)
+	assert.Len(suite.T(), response.CardSetIds, 1)
+	assert.Equal(suite.T(), cardSetCreationId, tools.MapKeys(response.CardSetIds)[0])
+	assert.NotEmpty(suite.T(), cardSetCreationId, response.CardSetIds[cardSetCreationId])
+	assert.Len(suite.T(), response.CardIds, 1)
+	assert.Equal(suite.T(), cardCreationId, tools.MapKeys(response.CardIds)[0])
+
+	assert.Equal(suite.T(), http.StatusOK, writer.Code)
+}
 
 // Tools
 
@@ -311,7 +357,7 @@ func createApiCardSet(name string, creationId string, creationDate time.Time, ca
 	}
 }
 
-func createApiCard() *card.ApiCard {
+func createApiCard(creationId string) *card.ApiCard {
 	return &card.ApiCard{
 		Term:          "testTerm1",
 		Transcription: tools.Ptr("testTranscription"),
@@ -327,7 +373,7 @@ func createApiCard() *card.ApiCard {
 			[]card.Span{{9, 10}, {11, 12}},
 			[]card.Span{{13, 14}, {15, 16}},
 		},
-		CreationId: "fb23d60c-02f9-4bae-be86-8359274e0e4e",
+		CreationId: creationId,
 	}
 }
 
