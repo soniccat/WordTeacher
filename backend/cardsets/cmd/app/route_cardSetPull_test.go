@@ -8,8 +8,8 @@ import (
 	"models/apphelpers"
 	"models/card"
 	"models/cardset"
-	"models/test"
 	"models/tools"
+	"models/user"
 	"net/http"
 	"net/http/httptest"
 	"sort"
@@ -25,11 +25,11 @@ type CardSetPullTestSuite struct {
 	suite.Suite
 	BaseTestSuite
 	application   *application
-	pullValidator *test.MockSessionValidator[CardSetPullInput]
+	pullValidator *user.MockSessionValidator[CardSetPullInput]
 }
 
 func (suite *CardSetPullTestSuite) SetupTest() {
-	suite.pullValidator = test.NewMockSessionValidator[CardSetPullInput]()
+	suite.pullValidator = user.NewMockSessionValidator[CardSetPullInput]()
 
 	sessionManager := apphelpers.CreateSessionManager("172.16.0.3:6380")
 	app, err := createApplication(
@@ -37,7 +37,7 @@ func (suite *CardSetPullTestSuite) SetupTest() {
 		sessionManager,
 		"mongodb://127.0.0.1:27018/?directConnection=true&replicaSet=rs0",
 		false,
-		test.NewMockSessionValidator[CardSetPushInput](),
+		user.NewMockSessionValidator[CardSetPushInput](),
 		suite.pullValidator,
 	)
 	if err != nil {
@@ -150,8 +150,8 @@ func TestCardSetPullTestSuite(t *testing.T) {
 // Tools
 
 func (suite *CardSetPullTestSuite) setupPullValidatorWithCardSetIds(userId *primitive.ObjectID, cardSetIds []string) {
-	suite.pullValidator.ResponseProvider = func() test.MockSessionValidatorResponse[CardSetPullInput] {
-		return test.MockSessionValidatorResponse[CardSetPullInput]{
+	suite.pullValidator.ResponseProvider = func() user.MockSessionValidatorResponse[CardSetPullInput] {
+		return user.MockSessionValidatorResponse[CardSetPullInput]{
 			&CardSetPullInput{
 				"testAccessToken",
 				cardSetIds,

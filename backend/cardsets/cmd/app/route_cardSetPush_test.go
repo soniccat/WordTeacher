@@ -11,7 +11,6 @@ import (
 	"models/card"
 	"models/cardset"
 	"models/partofspeech"
-	"models/test"
 	"models/tools"
 	"models/user"
 	"models/userauthtoken"
@@ -44,13 +43,13 @@ type CardSetPushTestSuite struct {
 	suite.Suite
 	BaseTestSuite
 	application   *application
-	pushValidator *test.MockSessionValidator[CardSetPushInput]
-	pullValidator *test.MockSessionValidator[CardSetPullInput]
+	pushValidator *user.MockSessionValidator[CardSetPushInput]
+	pullValidator *user.MockSessionValidator[CardSetPullInput]
 }
 
 func (suite *CardSetPushTestSuite) SetupTest() {
-	suite.pushValidator = test.NewMockSessionValidator[CardSetPushInput]()
-	suite.pullValidator = test.NewMockSessionValidator[CardSetPullInput]()
+	suite.pushValidator = user.NewMockSessionValidator[CardSetPushInput]()
+	suite.pullValidator = user.NewMockSessionValidator[CardSetPullInput]()
 
 	sessionManager := apphelpers.CreateSessionManager("172.16.0.3:6380")
 	app, err := createApplication(
@@ -94,8 +93,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithCookieButWithoutLastModif
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUnauthorized() {
-	suite.pushValidator.ResponseProvider = func() test.MockSessionValidatorResponse[CardSetPushInput] {
-		return test.MockSessionValidatorResponse[CardSetPushInput]{
+	suite.pushValidator.ResponseProvider = func() user.MockSessionValidatorResponse[CardSetPushInput] {
+		return user.MockSessionValidatorResponse[CardSetPushInput]{
 			nil,
 			nil,
 			user.NewValidateSessionError(http.StatusUnauthorized, errors.New("test error")),
@@ -309,8 +308,8 @@ func (suite *CardSetPushTestSuite) createPushRequest(lastModificationDate time.T
 }
 
 func (suite *CardSetPushTestSuite) setupPushValidatorWithCardSet(userId *primitive.ObjectID, newCardSet *cardset.ApiCardSet) {
-	suite.pushValidator.ResponseProvider = func() test.MockSessionValidatorResponse[CardSetPushInput] {
-		return test.MockSessionValidatorResponse[CardSetPushInput]{
+	suite.pushValidator.ResponseProvider = func() user.MockSessionValidatorResponse[CardSetPushInput] {
+		return user.MockSessionValidatorResponse[CardSetPushInput]{
 			&CardSetPushInput{
 				"testAccessToken",
 				[]*cardset.ApiCardSet{

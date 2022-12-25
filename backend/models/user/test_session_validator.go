@@ -1,8 +1,7 @@
-package test
+package user
 
 import (
 	"errors"
-	"models/user"
 	"models/userauthtoken"
 	"net/http"
 )
@@ -10,7 +9,7 @@ import (
 type MockSessionValidatorResponse[T any] struct {
 	Input                *T
 	AuthToken            *userauthtoken.UserAuthToken
-	ValidateSessionError *user.ValidateSessionError
+	ValidateSessionError *ValidateSessionError
 }
 
 type MockSessionValidator[T any] struct {
@@ -20,12 +19,12 @@ type MockSessionValidator[T any] struct {
 func NewMockSessionValidator[T any]() *MockSessionValidator[T] {
 	return &MockSessionValidator[T]{
 		func() MockSessionValidatorResponse[T] {
-			return MockSessionValidatorResponse[T]{nil, nil, user.NewValidateSessionError(http.StatusInternalServerError, errors.New("mock error"))}
+			return MockSessionValidatorResponse[T]{nil, nil, NewValidateSessionError(http.StatusInternalServerError, errors.New("mock error"))}
 		},
 	}
 }
 
-func (tsv *MockSessionValidator[T]) Validate(r *http.Request) (*T, *userauthtoken.UserAuthToken, *user.ValidateSessionError) {
+func (tsv *MockSessionValidator[T]) Validate(r *http.Request) (*T, *userauthtoken.UserAuthToken, *ValidateSessionError) {
 	response := tsv.ResponseProvider()
 	return response.Input, response.AuthToken, response.ValidateSessionError
 }
