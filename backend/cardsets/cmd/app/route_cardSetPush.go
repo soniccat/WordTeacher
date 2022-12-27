@@ -99,7 +99,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 
 	query := r.URL.Query()
 	if !query.Has(ParameterLatestCardSetModificationDate) {
-		app.SetError(w, errors.New(fmt.Sprintf("%s is missing", ParameterLatestCardSetModificationDate)), http.StatusBadRequest)
+		app.SetError(w, fmt.Errorf("%s is missing", ParameterLatestCardSetModificationDate), http.StatusBadRequest)
 		return
 	}
 

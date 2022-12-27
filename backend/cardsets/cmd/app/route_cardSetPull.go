@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
-	"github.com/deckarep/golang-set/v2"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"models/apphelpers"
 	"models/cardset"
 	"net/http"
 	"time"
+
+	mapset "github.com/deckarep/golang-set/v2"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CardSetPullInput struct {
@@ -36,7 +38,7 @@ func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var lastModificationDate *time.Time = nil
+	var lastModificationDate *time.Time
 	if parsedDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(ParameterLatestCardSetModificationDate)); err == nil {
 		lastModificationDate = &parsedDate
 	}
