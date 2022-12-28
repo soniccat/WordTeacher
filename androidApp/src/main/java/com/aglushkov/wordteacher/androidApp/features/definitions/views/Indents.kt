@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.androidApp.features.definitions.blueprints
+package com.aglushkov.wordteacher.androidApp.features.definitions.views
 
 import android.content.res.Resources
 import androidx.compose.runtime.Composable

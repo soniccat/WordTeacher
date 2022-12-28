@@ -35,7 +35,6 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.compose.AppTypography
 import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
-import com.aglushkov.wordteacher.androidApp.features.definitions.blueprints.toDp
 import com.aglushkov.wordteacher.androidApp.general.extensions.resolveString
 import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.androidApp.general.views.chooser_dialog.ChooserViewItem
