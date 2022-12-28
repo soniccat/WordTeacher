@@ -80,7 +80,7 @@ actual class ConnectivityManager constructor(
     }
 
     private fun updateCapabilitiesLegacy(networkInfo: NetworkInfo?) {
-        if (networkInfo?.isConnected == true && networkInfo?.isAvailable) {
+        if (networkInfo?.isConnected == true && networkInfo.isAvailable) {
             isDeviceOnline = true
             val isWifi = networkInfo.type == android.net.ConnectivityManager.TYPE_WIFI
             val isWiMax = networkInfo.type == android.net.ConnectivityManager.TYPE_WIMAX

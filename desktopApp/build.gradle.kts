@@ -19,6 +19,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+kotlinOptions {
+    jvmTarget = JavaVersion.VERSION_1_8.toString()
+}
+
 kotlin {
     jvm {
         withJava()
@@ -103,6 +107,6 @@ compose.desktop {
     }
 }
 
-//tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-//    kotlinOptions.jvmTarget = "1.8"
-//}
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions.jvmTarget = "11"
+}

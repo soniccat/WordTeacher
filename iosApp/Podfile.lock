@@ -20,8 +20,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Cleanse: 6bfc62033dcc0e5ba7992f410a5352ddd1283551
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
-  shared: 44e7bfb3d02d7cd10c98b7fd7d76a6a22b0acfd7
+  shared: f9580f9bf2deefbed8bd6753bedeed58c93dbae6
 
 PODFILE CHECKSUM: 7bc57aeecf55687500a98cf55f96bf2ffdeb26bf
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.11.2

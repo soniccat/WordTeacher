@@ -223,6 +223,7 @@ fun CardSetViewItems(
                                 WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(
                                     item.cardId
                                 )
+                                else -> {}
                             }
                         }
                     }

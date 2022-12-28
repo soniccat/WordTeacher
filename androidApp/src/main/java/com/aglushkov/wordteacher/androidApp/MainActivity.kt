@@ -247,6 +247,7 @@ class MainActivity : AppCompatActivity(), Router {
                         }
                     )
                 }
+                else -> {}
             }
         }
     }
