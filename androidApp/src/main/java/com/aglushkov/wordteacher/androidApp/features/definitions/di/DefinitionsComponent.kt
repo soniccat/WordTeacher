@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
-import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -12,7 +11,7 @@ import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
 
-@Component(dependencies = [DefinitionsDependencies::class], modules = [DefinitionsComposeModule::class])
+@Component(dependencies = [DefinitionsDependencies::class], modules = [DefinitionsModule::class])
 public interface DefinitionsComposeComponent {
     fun definitionsDecomposeComponent(): DefinitionsDecomposeComponent
 

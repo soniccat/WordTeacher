@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.androidApp.features.article.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeModule
+import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsModule
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
@@ -15,7 +15,7 @@ import dagger.Component
 @FragmentComp
 @Component(
     dependencies = [ArticleDependencies::class, DefinitionsDependencies::class],
-    modules = [ArticleModule::class, DefinitionsComposeModule::class]
+    modules = [ArticleModule::class, DefinitionsModule::class]
 )
 interface ArticleComposeComponent {
     fun articleDecomposeComponent(): ArticleDecomposeComponent

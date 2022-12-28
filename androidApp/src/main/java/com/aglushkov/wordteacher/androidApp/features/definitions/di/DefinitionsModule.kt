@@ -1,9 +1,6 @@
 package com.aglushkov.wordteacher.androidApp.features.definitions.di
 
-import com.aglushkov.wordteacher.androidApp.general.RouterResolver
-import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -14,7 +11,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class DefinitionsComposeModule {
+class DefinitionsModule {
     @Provides
     fun definitionsDecomposeComponent(
         componentContext: ComponentContext,
