@@ -1,9 +1,13 @@
 package com.aglushkov.wordteacher.androidApp.features.cardsets.di
 
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
+import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -21,4 +25,11 @@ interface CardSetsComposeComponent {
         fun setDeps(deps: CardSetsDependencies): Builder
         fun build(): CardSetsComposeComponent
     }
+}
+
+interface CardSetsDependencies {
+    fun routerResolver(): RouterResolver
+    fun cardSetsRepository(): CardSetsRepository
+    fun idGenerator(): IdGenerator
+    fun timeSource(): TimeSource
 }

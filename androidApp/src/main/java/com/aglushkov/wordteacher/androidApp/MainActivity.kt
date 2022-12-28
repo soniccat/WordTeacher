@@ -33,7 +33,6 @@ import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.androidApp.features.cardset.views.CardSetUI
-import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsFragment
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
@@ -284,42 +283,6 @@ class MainActivity : AppCompatActivity(), Router {
         }
     }
 
-    private fun setupViewLayout() {
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.bottomBar.setOnNavigationItemSelectedListener {
-            val cl = screenClassById(it.itemId)
-            openFragment(cl)
-            true
-        }
-
-        supportFragmentManager.fragmentFactory = object : FragmentFactory() {
-            override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
-                if (DefinitionsFragment::class.java.name == className) {
-                    return DefinitionsFragment()
-                } else if (ArticlesFragment::class.java.name == className) {
-                    return ArticlesFragment()
-                } else if (ArticlesFragment::class.java.name == className) {
-                    return ArticlesFragment()
-                }
-
-                return super.instantiate(classLoader, className)
-            }
-        }
-        supportFragmentManager.addOnBackStackChangedListener {
-            supportFragmentManager.fragments.lastOrNull()?.let {
-                screenIdByClass(it::class)?.let { itemId ->
-                    binding.bottomBar.selectedItemId = itemId
-                }
-            }
-        }
-
-        if (supportFragmentManager.fragments.size == 0) {
-            openFragment(DefinitionsFragment::class)
-        }
-    }
-
 //    override fun onBackPressed() {
 //        if (supportFragmentManager.backStackEntryCount == 1) {
 //            finish()
@@ -327,60 +290,6 @@ class MainActivity : AppCompatActivity(), Router {
 //            super.onBackPressed()
 //        }
 //    }
-
-    private fun openFragment(cl: KClass<*>, arguments: Bundle? = null, isFullscreen: Boolean = false) {
-        val tag = screenNameByClass(cl)
-        val fragment = supportFragmentManager.findFragmentByTag(tag)
-        val topFragment = supportFragmentManager.fragments.lastOrNull()
-        if (fragment == null) {
-            val newFragment = supportFragmentManager.fragmentFactory.instantiate(
-                classLoader,
-                cl.java.name
-            )
-            newFragment.arguments = arguments
-
-            val container = if (isFullscreen) binding.fragmentContainerFullscreen else binding.fragmentContainer
-            supportFragmentManager.beginTransaction()
-                .setReorderingAllowed(true)
-                .addToBackStack(tag)
-                .replace(container.id, newFragment, tag)
-                .commitAllowingStateLoss()
-
-        } else if (topFragment == null || topFragment::class != cl) {
-            supportFragmentManager.popBackStack(tag, 0)
-        }
-    }
-
-    private fun screenClassById(id: Int): KClass<*> = when(id) {
-        R.id.tab_definitions -> DefinitionsFragment::class
-        R.id.tab_articles -> ArticlesFragment::class
-        R.id.tab_cardsets -> CardSetsFragment::class
-        else -> throw IllegalArgumentException("Wrong screen id $id")
-    }
-
-    private fun screenIdByClass(cl: KClass<*>): Int? = when(cl) {
-        DefinitionsFragment::class -> R.id.tab_definitions
-        ArticlesFragment::class -> R.id.tab_articles
-        CardSetsFragment::class -> R.id.tab_cardsets
-        else -> null
-    }
-
-    private fun screenNameByClass(cl: KClass<*>): String = when(cl) {
-        DefinitionsFragment::class -> "definitions"
-        ArticlesFragment::class -> "articles"
-        CardSetsFragment::class -> "cardsets"
-        else -> throw IllegalArgumentException("Wrong screen class $cl")
-    }
-
-    private fun openDialogFragment(cl: KClass<*>) {
-        val tag = screenNameByClass(cl)
-        val newFragment = supportFragmentManager.fragmentFactory.instantiate(
-            classLoader,
-            cl.java.name
-        ) as DialogFragment
-
-        newFragment.show(supportFragmentManager, tag)
-    }
 
     // Router
 
