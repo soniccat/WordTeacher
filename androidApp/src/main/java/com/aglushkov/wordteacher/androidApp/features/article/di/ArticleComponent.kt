@@ -1,30 +1,21 @@
 package com.aglushkov.wordteacher.androidApp.features.article.di
 
-import android.content.Context
 import com.aglushkov.wordteacher.androidApp.di.FragmentComp
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeModule
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
-import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
-import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
-import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
 import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.BindsInstance
 import dagger.Component
-import javax.inject.Qualifier
 
 @FragmentComp
 @Component(
     dependencies = [ArticleDependencies::class, DefinitionsDependencies::class],
-    modules = [ArticleComposeModule::class, DefinitionsComposeModule::class]
+    modules = [ArticleModule::class, DefinitionsComposeModule::class]
 )
 interface ArticleComposeComponent {
     fun articleDecomposeComponent(): ArticleDecomposeComponent

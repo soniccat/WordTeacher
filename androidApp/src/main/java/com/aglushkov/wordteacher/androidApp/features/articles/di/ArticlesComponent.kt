@@ -10,7 +10,7 @@ import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
 
-@Component(dependencies = [ArticlesDependencies::class], modules = [ArticlesComposeModule::class])
+@Component(dependencies = [ArticlesDependencies::class], modules = [ArticlesModule::class])
 public interface ArticlesComposeComponent {
     fun articlesDecomposeComponent(): ArticlesDecomposeComponent
 

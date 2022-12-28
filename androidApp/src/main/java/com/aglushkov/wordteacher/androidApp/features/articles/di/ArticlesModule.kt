@@ -10,7 +10,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class ArticlesComposeModule {
+class ArticlesModule {
     @Provides
     fun articleDecomposeComponent(
         componentContext: ComponentContext,

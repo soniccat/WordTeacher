@@ -1,13 +1,8 @@
 package com.aglushkov.wordteacher.androidApp.features.article.di
 
-import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
-import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -25,7 +20,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class ArticleComposeModule {
+class ArticleModule {
 
     @Provides
     fun articleRepository(
