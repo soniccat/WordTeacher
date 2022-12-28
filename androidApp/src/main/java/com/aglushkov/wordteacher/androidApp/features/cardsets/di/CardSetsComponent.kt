@@ -13,8 +13,8 @@ import dagger.BindsInstance
 import dagger.Component
 
 @FragmentComp
-@Component(dependencies = [CardSetsDependencies::class], modules = [CardSetsComposeModule::class])
-interface CardSetsComposeComponent {
+@Component(dependencies = [CardSetsDependencies::class], modules = [CardSetsModule::class])
+interface CardSetsComponent {
     fun cardSetsDecomposeComponent(): CardSetsDecomposeComponent
 
     @Component.Builder
@@ -23,7 +23,7 @@ interface CardSetsComposeComponent {
         @BindsInstance fun setState(configuration: CardSetsVM.State): Builder
 
         fun setDeps(deps: CardSetsDependencies): Builder
-        fun build(): CardSetsComposeComponent
+        fun build(): CardSetsComponent
     }
 }
 

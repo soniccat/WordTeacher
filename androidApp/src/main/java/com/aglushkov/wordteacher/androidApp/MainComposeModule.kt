@@ -4,7 +4,7 @@ import com.aglushkov.wordteacher.androidApp.features.add_article.di.DaggerAddArt
 import com.aglushkov.wordteacher.androidApp.features.article.di.DaggerArticleComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.cardset.di.DaggerCardSetComponent
-import com.aglushkov.wordteacher.androidApp.features.cardsets.di.DaggerCardSetsComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerTabComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.learning.di.DaggerLearningComponent
@@ -48,7 +48,7 @@ class MainComposeModule {
                         .build()
                         .cardSetDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
-                    DaggerCardSetsComposeComponent.builder()
+                    DaggerCardSetsComponent.builder()
                         .setComponentContext(context)
                         .setState(CardSetsVM.State())
                         .setDeps(appComponent)

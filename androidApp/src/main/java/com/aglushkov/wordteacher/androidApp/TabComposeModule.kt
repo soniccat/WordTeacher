@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.androidApp
 
 import com.aglushkov.wordteacher.androidApp.features.articles.di.DaggerArticlesComposeComponent
-import com.aglushkov.wordteacher.androidApp.features.cardsets.di.DaggerCardSetsComposeComponent
+import com.aglushkov.wordteacher.androidApp.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.notes.di.DaggerNotesComponent
@@ -34,7 +34,7 @@ class TabComposeModule {
                         .build()
                         .definitionsDecomposeComponent()
                 is TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
-                    DaggerCardSetsComposeComponent.builder()
+                    DaggerCardSetsComponent.builder()
                         .setComponentContext(context)
                         .setState(CardSetsVM.State())
                         .setDeps(appComponent)

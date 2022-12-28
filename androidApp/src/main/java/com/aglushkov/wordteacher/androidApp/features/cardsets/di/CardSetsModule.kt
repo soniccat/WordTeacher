@@ -10,7 +10,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class CardSetsComposeModule {
+class CardSetsModule {
 
     @Provides
     fun viewModel(
