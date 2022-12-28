@@ -5,8 +5,6 @@ import com.aglushkov.wordteacher.androidApp.di.FragmentComp
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeModule
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsDependencies
-import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsModule
-import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsAndroidVM
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
@@ -35,12 +33,6 @@ interface ArticleComposeComponent {
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
         @BindsInstance fun setConfiguration(configuration: MainDecomposeComponent.ChildConfiguration.ArticleConfiguration): Builder
-
-//        @BindsInstance fun setVMWrapper(vmWrapper: ArticleAndroidVM): Builder
-//        @BindsInstance fun setVMState(state: ArticleVM.State): Builder
-//        @BindsInstance fun setDefinitionsVMWrapper(vmWrapper: DefinitionsAndroidVM): Builder
-//        @BindsInstance fun setDefinitionsState(state: DefinitionsVM.State): Builder
-//        @BindsInstance fun setViewContext(@ViewContext context: Context): Builder
 
         fun setDeps(deps: ArticleDependencies): Builder
         fun setDefinitionsDeps(deps: DefinitionsDependencies): Builder

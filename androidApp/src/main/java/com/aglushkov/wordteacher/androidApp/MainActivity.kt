@@ -30,12 +30,10 @@ import com.aglushkov.wordteacher.androidApp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.androidApp.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.androidApp.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.androidApp.features.article.views.ArticleUI
-import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesFragment
 import com.aglushkov.wordteacher.androidApp.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.androidApp.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.androidApp.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerMainComposeComponent
-import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsFragment
 import com.aglushkov.wordteacher.androidApp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.androidApp.features.learning.views.LearningUI
 import com.aglushkov.wordteacher.androidApp.features.learning.views.LearningUIDialog

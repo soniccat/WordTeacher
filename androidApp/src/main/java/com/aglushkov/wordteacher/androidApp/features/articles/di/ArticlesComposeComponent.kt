@@ -1,7 +1,11 @@
 package com.aglushkov.wordteacher.androidApp.features.articles.di
 
+import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
+import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -18,4 +22,11 @@ public interface ArticlesComposeComponent {
         fun setDeps(deps: ArticlesDependencies): Builder
         fun build(): ArticlesComposeComponent
     }
+}
+
+interface ArticlesDependencies {
+    fun routerResolver(): RouterResolver
+    fun articlesRepository(): ArticlesRepository
+    fun idGenerator(): IdGenerator
+    fun timeSource(): TimeSource
 }
