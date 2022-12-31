@@ -368,7 +368,9 @@ private fun CardTextField(
         modifier = modifier,
         value = textState,
         placeholder = vm.getPlaceholder(item)?.toString(LocalContext.current).orEmpty(),
-        textStyle = textStyle,
+        textStyle = textStyle.copy(
+            color = LocalContentColor.current
+        ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(
             onNext = {

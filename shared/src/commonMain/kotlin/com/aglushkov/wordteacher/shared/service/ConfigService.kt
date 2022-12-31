@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-
+// TODO: consider to remove in favor for api
 class ConfigService(
     private val baseUrl: String
 ) {
@@ -29,7 +29,7 @@ class ConfigService(
     suspend fun config(): List<Config> {
         Logger.v("Loading", tag = TAG)
 
-        val res: HttpResponse = httpClient.get("${baseUrl}wordteacher/config")
+        val res: HttpResponse = httpClient.get("${baseUrl}wordteacher/config") // TODO: change string to /wordteacher/config
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
             logResponse(res, stringResponse)
