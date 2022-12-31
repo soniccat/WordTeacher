@@ -80,6 +80,10 @@
     <string name="article_side_sheet_selection_cardset_words">Learning progress</string>
     <string name="article_side_sheet_part_of_speech_title">Parts of speech</string>
 
+    <string name="settings_auth_title">Space</string>
+    <string name="settings_auth_signin">Sign In</string>
+    <string name="settings_auth_signout">Sign Out</string>
+
     <string name="notes_error">@string/error_default</string>
     <string name="notes_create_note">Create a note</string>
     <string name="cardsets_create_cardset">Create a card set</string>
