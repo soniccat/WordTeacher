@@ -10,6 +10,7 @@
     <string name="tab_learning">Learning</string>
     <string name="tab_cardsets">Card Sets</string>
     <string name="tab_notes">Notes</string>
+    <string name="tab_settings">Settings</string>
     <string name="search">Search</string>
     <string name="close">Close</string>
     <string name="done">Done</string>
@@ -80,6 +81,7 @@
     <string name="article_side_sheet_selection_cardset_words">Learning progress</string>
     <string name="article_side_sheet_part_of_speech_title">Parts of speech</string>
 
+    <string name="settings_title">Settings</string>
     <string name="settings_auth_title">Space</string>
     <string name="settings_auth_signin">Sign In</string>
     <string name="settings_auth_signout">Sign Out</string>

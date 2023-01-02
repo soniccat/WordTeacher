@@ -20,7 +20,7 @@ class SettingsViewLoading: BaseViewItem<Unit>(Unit, Type) {
     }
 }
 
-class SettingsViewAuthButtonItem(text: StringDesc, type: ButtonType): BaseViewItem<StringDesc>(text, Type) {
+class SettingsViewAuthButtonItem(text: StringDesc, val buttonType: ButtonType): BaseViewItem<StringDesc>(text, Type) {
     enum class ButtonType {
         SignIn,
         SignOut,
@@ -32,7 +32,7 @@ class SettingsViewAuthButtonItem(text: StringDesc, type: ButtonType): BaseViewIt
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        return super.equalsByContent(other) && type == (other as SettingsViewAuthButtonItem).type
+        return super.equalsByContent(other) && buttonType == (other as SettingsViewAuthButtonItem).buttonType
     }
 }
 

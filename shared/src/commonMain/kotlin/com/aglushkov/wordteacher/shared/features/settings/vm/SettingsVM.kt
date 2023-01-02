@@ -31,7 +31,7 @@ interface SettingsVM: Clearable {
     val eventFlow: Flow<Event>
 
     fun restore(newState: State)
-    fun onAuthClicked()
+    fun onAuthButtonClicked(type: SettingsViewAuthButtonItem.ButtonType)
 
     // Created to use in future
     @Parcelize
@@ -76,7 +76,11 @@ open class SettingsVMImpl (
         eventChannel.cancel()
     }
 
-    override fun onAuthClicked() {
-        router?.openGoogleAuth()
+    override fun onAuthButtonClicked(type: SettingsViewAuthButtonItem.ButtonType) {
+        when (type) {
+            SettingsViewAuthButtonItem.ButtonType.SignIn -> router?.openGoogleAuth()
+            SettingsViewAuthButtonItem.ButtonType.SignOut -> { TODO("Not Implemented") }
+            SettingsViewAuthButtonItem.ButtonType.TryAgain -> router?.openGoogleAuth()
+        }
     }
 }

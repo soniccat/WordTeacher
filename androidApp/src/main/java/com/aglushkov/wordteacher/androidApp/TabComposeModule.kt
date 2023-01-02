@@ -5,11 +5,13 @@ import com.aglushkov.wordteacher.androidApp.features.cardsets.di.DaggerCardSetsC
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.androidApp.features.notes.di.DaggerNotesComponent
+import com.aglushkov.wordteacher.androidApp.features.settings.di.DaggerSettingsComponent
 import com.aglushkov.wordteacher.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
+import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -47,6 +49,13 @@ class TabComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .articlesDecomposeComponent()
+                is TabDecomposeComponent.ChildConfiguration.SettingsConfiguration ->
+                    DaggerSettingsComponent.builder()
+                        .setComponentContext(context)
+                        .setState(SettingsVM.State())
+                        .setDeps(appComponent)
+                        .build()
+                        .settingsDecomposeComponent()
                 is TabDecomposeComponent.ChildConfiguration.NotesConfiguration ->
                     DaggerNotesComponent.builder()
                         .setComponentContext(context)

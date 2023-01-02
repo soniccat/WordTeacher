@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.androidApp.features.definitions.di.DefinitionsD
 import com.aglushkov.wordteacher.androidApp.features.learning.di.LearningDependencies
 import com.aglushkov.wordteacher.androidApp.features.learning_session_result.di.LearningSessionResultDependencies
 import com.aglushkov.wordteacher.androidApp.features.notes.di.NotesDependencies
+import com.aglushkov.wordteacher.androidApp.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -27,7 +28,9 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
+import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.ConfigService
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Component
@@ -35,7 +38,7 @@ import dagger.Component
 
 @AppComp
 @Component(modules = [AppModule::class, GeneralModule::class] )
-public interface AppComponent:
+interface AppComponent:
     DefinitionsDependencies,
     ArticlesDependencies,
     AddArticleDependencies,
@@ -44,7 +47,8 @@ public interface AppComponent:
     CardSetDependencies,
     NotesDependencies,
     LearningDependencies,
-    LearningSessionResultDependencies {
+    LearningSessionResultDependencies,
+    SettingsDependencies {
 
     override fun settings(): FlowSettings
     fun configService(): ConfigService
@@ -64,6 +68,9 @@ public interface AppComponent:
     override fun cardSetsRepository(): CardSetsRepository
     override fun wordRepository(): WordDefinitionRepository
     override fun notesRepository(): NotesRepository
+
+    fun spaceAuthService(): SpaceAuthService
+    override fun spaceAuthRepository(): SpaceAuthRepository
 
     override fun idGenerator(): IdGenerator
     override fun timeSource(): TimeSource

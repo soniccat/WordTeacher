@@ -27,7 +27,9 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepositoryImpl
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
+import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.ConfigService
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -35,6 +37,7 @@ import com.russhwolf.settings.datastore.DataStoreSettings
 import okio.FileSystem
 import dagger.Module
 import dagger.Provides
+import okio.Path
 import okio.Path.Companion.toPath
 
 @Module
@@ -183,6 +186,31 @@ class AppModule {
         nlpSentenceProcessor: NLPSentenceProcessor
     ): SpanUpdateWorker {
         return SpanUpdateWorker(database, databaseWorker, nlpCore, nlpSentenceProcessor)
+    }
+
+    @AppComp
+    @Provides
+    fun spaceAuthService(context: Context): SpaceAuthService =
+        SpaceAuthService(context.getString(R.string.api_base_url))
+
+    @AppComp
+    @Provides
+    fun spaceAuthRepository(
+        context: Context,
+        service: SpaceAuthService,
+        fileSystem: FileSystem,
+    ): SpaceAuthRepository {
+        val path = obtainSpaceDirPath(context, fileSystem).div("authData")
+        return SpaceAuthRepository(service, path, fileSystem)
+    }
+
+    private fun obtainSpaceDirPath(context: Context, fileSystem: FileSystem): Path {
+        val spaceDirPath = context.filesDir.absolutePath.toPath().div("space")
+        if (!fileSystem.exists(spaceDirPath)) {
+            fileSystem.createDirectory(spaceDirPath)
+        }
+
+        return spaceDirPath
     }
 
     @AppComp

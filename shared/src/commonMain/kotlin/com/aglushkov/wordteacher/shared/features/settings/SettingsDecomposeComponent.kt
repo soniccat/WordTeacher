@@ -21,12 +21,12 @@ import com.arkivanov.essenty.statekeeper.consume
 
 class SettingsDecomposeComponent (
     componentContext: ComponentContext,
-    word: String?, // TODO: replace with DefinitionsVM.State
+    state: SettingsVM.State,
     connectivityManager: ConnectivityManager,
     spaceAuthRepository: SpaceAuthRepository,
     idGenerator: IdGenerator,
 ) : SettingsVMImpl(
-    SettingsVM.State(),
+    state,
     connectivityManager,
     spaceAuthRepository,
     idGenerator,

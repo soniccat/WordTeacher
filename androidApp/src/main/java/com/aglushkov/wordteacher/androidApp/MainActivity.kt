@@ -40,6 +40,7 @@ import com.aglushkov.wordteacher.androidApp.features.learning.views.LearningUIDi
 import com.aglushkov.wordteacher.androidApp.features.learning_session_result.views.LearningSessionResultUI
 import com.aglushkov.wordteacher.androidApp.features.learning_session_result.views.LearningSessionResultUIDialog
 import com.aglushkov.wordteacher.androidApp.features.notes.NotesUI
+import com.aglushkov.wordteacher.androidApp.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.WindowInsets
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.di.AppComponentOwner
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity(), Router {
         ScreenTab.Definitions,
         ScreenTab.CardSets,
         ScreenTab.Articles,
-        ScreenTab.Notes
+        ScreenTab.Settings
     )
 
     private lateinit var mainDecomposeComponent: MainDecomposeComponent
@@ -190,6 +191,10 @@ class MainActivity : AppCompatActivity(), Router {
                         vm = instance.vm,
                         modifier = Modifier.padding(innerPadding)
                     )
+                    is TabDecomposeComponent.Child.Settings -> SettingsUI(
+                        vm = instance.vm,
+                        modifier = Modifier.padding(innerPadding)
+                    )
                     is TabDecomposeComponent.Child.Notes -> NotesUI(
                         vm = instance.vm,
                         modifier = Modifier.padding(innerPadding)
@@ -263,6 +268,7 @@ class MainActivity : AppCompatActivity(), Router {
                             is ScreenTab.Definitions -> component.openDefinitions()
                             is ScreenTab.CardSets -> component.openCardSets()
                             is ScreenTab.Articles -> component.openArticles()
+                            is ScreenTab.Settings -> component.openSettings()
                             is ScreenTab.Notes -> component.openNotes()
                         }
                     },
@@ -321,6 +327,7 @@ sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: In
     object Definitions : ScreenTab(R.string.tab_definitions, R.drawable.ic_field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
     object CardSets : ScreenTab(R.string.tab_learning, R.drawable.ic_learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
     object Articles : ScreenTab(R.string.tab_articles, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
+    object Settings : ScreenTab(R.string.tab_settings, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
     object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }
 

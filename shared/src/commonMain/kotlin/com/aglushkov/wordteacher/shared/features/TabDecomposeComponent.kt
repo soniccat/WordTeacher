@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeCompo
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.settings.SettingsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.RouterStateChangeHandler
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
@@ -25,6 +26,7 @@ interface TabDecomposeComponent: Clearable {
     fun openDefinitions()
     fun openCardSets()
     fun openArticles()
+    fun openSettings()
     fun openNotes()
     fun back()
 
@@ -34,6 +36,7 @@ interface TabDecomposeComponent: Clearable {
         data class Definitions(val vm: DefinitionsDecomposeComponent): Child(vm)
         data class CardSets(val vm: CardSetsDecomposeComponent): Child(vm)
         data class Articles(val vm: ArticlesDecomposeComponent): Child(vm)
+        data class Settings(val vm: SettingsDecomposeComponent): Child(vm)
         data class Notes(val vm: NotesDecomposeComponent): Child(vm)
 
         override fun onCleared() {
@@ -45,6 +48,7 @@ interface TabDecomposeComponent: Clearable {
         @Parcelize data class DefinitionConfiguration(val word: String? = null) : ChildConfiguration()
         @Parcelize object CardSetsConfiguration : ChildConfiguration()
         @Parcelize object ArticlesConfiguration : ChildConfiguration()
+        @Parcelize object SettingsConfiguration : ChildConfiguration()
         @Parcelize object NotesConfiguration : ChildConfiguration()
     }
 }
@@ -82,6 +86,9 @@ class TabDecomposeComponentImpl(
         is TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration -> TabDecomposeComponent.Child.Articles(
             vm = childComponentFactory(componentContext, configuration) as ArticlesDecomposeComponent
         )
+        is TabDecomposeComponent.ChildConfiguration.SettingsConfiguration -> TabDecomposeComponent.Child.Settings(
+            vm = childComponentFactory(componentContext, configuration) as SettingsDecomposeComponent
+        )
         is TabDecomposeComponent.ChildConfiguration.NotesConfiguration -> TabDecomposeComponent.Child.Notes(
             vm = childComponentFactory(componentContext, configuration) as NotesDecomposeComponent
         )
@@ -95,9 +102,11 @@ class TabDecomposeComponentImpl(
     override fun openArticles() =
         router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
 
-    override fun openNotes() {
+    override fun openSettings() =
+        router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.SettingsConfiguration)
+
+    override fun openNotes() =
         router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.NotesConfiguration)
-    }
 
     override fun back() = router.popIfNotEmpty()
 
