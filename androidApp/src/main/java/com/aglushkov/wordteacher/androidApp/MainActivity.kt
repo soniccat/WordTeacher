@@ -50,6 +50,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRoute
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
+import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.article_parser.ArticleParser
@@ -143,11 +144,7 @@ class MainActivity : AppCompatActivity(), Router {
                     is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)
                     is MainDecomposeComponent.Child.Article -> ArticleUI(
                         vm = instance.vm.apply {
-                            definitionsVM.router = object : DefinitionsRouter {
-                                override fun openCardSets() {
-                                    mainDecomposeComponent.openCardSets()
-                                }
-                            }
+                            definitionsVM.router = mainDecomposeComponent
                         }
                     )
                     is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.vm)
@@ -175,11 +172,7 @@ class MainActivity : AppCompatActivity(), Router {
                 when (val instance = it.instance) {
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
                         vm = instance.vm.apply {
-                            router = object : DefinitionsRouter {
-                                override fun openCardSets() {
-                                    mainDecomposeComponent.openCardSets()
-                                }
-                            }
+                            router = mainDecomposeComponent
                         },
                         modalModifier = Modifier.padding(innerPadding)
                     )
@@ -192,7 +185,9 @@ class MainActivity : AppCompatActivity(), Router {
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Settings -> SettingsUI(
-                        vm = instance.vm,
+                        vm = instance.vm.apply {
+                            router = mainDecomposeComponent
+                        },
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Notes -> NotesUI(
@@ -221,8 +216,6 @@ class MainActivity : AppCompatActivity(), Router {
                     LearningUIDialog(
                         vm = instance.vm.apply {
                             router = object : LearningRouter {
-                                override val isDialog: Boolean = true
-
                                 override fun openSessionResult(results: List<SessionCardResult>) {
                                     mainDecomposeComponent.openLearningSessionResult(results)
                                 }
@@ -240,8 +233,6 @@ class MainActivity : AppCompatActivity(), Router {
                     LearningSessionResultUIDialog(
                         vm = instance.vm.apply {
                             router = object : LearningSessionResultRouter {
-                                override val isDialog: Boolean = true
-
                                 override fun onScreenFinished(inner: Any, result: SimpleRouter.Result) {
                                     mainDecomposeComponent.popDialog(instance)
                                 }

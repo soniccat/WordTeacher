@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -68,7 +69,13 @@ open class SettingsVMImpl (
             is Resource.Uninitialized -> SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.settings_auth_signin), SettingsViewAuthButtonItem.ButtonType.SignIn)
         }
 
-        return listOf(title, button)
+        val items: MutableList<BaseViewItem<*>> = mutableListOf(title, button)
+        generateIds(items)
+        return items
+    }
+
+    private fun generateIds(items: MutableList<BaseViewItem<*>>) {
+        generateViewItemIds(items, this.items.value, idGenerator)
     }
 
     override fun onCleared() {

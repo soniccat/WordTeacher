@@ -7,11 +7,13 @@ import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeCompone
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.LearningSessionResultDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
+import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.RouterStateChangeHandler
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -35,7 +37,7 @@ import kotlin.properties.Delegates
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-interface MainDecomposeComponent {
+interface MainDecomposeComponent: DefinitionsRouter, SettingsRouter {
     val routerState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
@@ -44,9 +46,10 @@ interface MainDecomposeComponent {
     fun popDialog(child: Child)
     fun openArticle(id: Long)
     fun openCardSet(id: Long)
-    fun openCardSets()
+    override fun openCardSets()
     fun openLearning(ids: List<Long>)
     fun openLearningSessionResult(results: List<SessionCardResult>)
+    override fun openGoogleAuth()
     fun back()
 
     sealed class Child(
@@ -166,6 +169,10 @@ class MainDecomposeComponentImpl(
         addDialogConfigIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration(results)
         )
+    }
+
+    override fun openGoogleAuth() {
+        TODO("Open google auth")
     }
 
     override fun back() = router.popIfNotEmpty()
