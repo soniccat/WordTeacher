@@ -186,7 +186,11 @@ class MainActivity : AppCompatActivity(), Router {
                     )
                     is TabDecomposeComponent.Child.Settings -> SettingsUI(
                         vm = instance.vm.apply {
-                            router = mainDecomposeComponent
+                            router = object : SettingsRouter {
+                                override fun openGoogleAuth() {
+
+                                }
+                            }
                         },
                         modifier = Modifier.padding(innerPadding)
                     )

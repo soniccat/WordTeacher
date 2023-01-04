@@ -4,6 +4,7 @@ kotlinxSerializationVersion = "1.3.1"
 kotlinxDateTime = "0.1.0"
 sqlDelight = "1.5.3"
 androidGradlePlugin = "7.0.4"
+
 composeJetpackCompiler = "1.3.2"
 composeJetpackUiTooling = "1.3.2"
 composeJetpack = "1.3.1"
@@ -15,6 +16,9 @@ androidAppCompat = "1.4.2"
 androidConstraintLayout = "2.1.4"
 androidCoreKts = "1.8.0"
 androidLifecycle = "2.4.1"
+dagger = "2.44.2"
+playServicesPlugin = "4.3.13"
+playServicesAuth = "20.4.0"
 
 mokoResources = "0.17.2"
 decomposeVersion = "0.7.0"
@@ -53,6 +57,11 @@ androidComposeActivity = {  module = "androidx.activity:activity-compose", versi
 androidComposeUITooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "composeJetpackUiTooling" }
 androidComposeUIToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "composeJetpackUiTooling" }
 androidComposeDesktop = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "androidComposeDesktop" }
+dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+daggerCompiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
+
+playServicesPlugin = { module = "com.google.gms:google-services", version.ref = "playServicesPlugin" }
+playServicesAuth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decomposeVersion" }
 decomposeJetpack = { module = "com.arkivanov.decompose:extensions-compose-jetpack", version.ref = "decomposeVersion" }

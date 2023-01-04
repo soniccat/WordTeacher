@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.kotlinxSerialization)
     implementation(libs.mokoResourcesGenerator)
     implementation(libs.mokoResourcesLib)
+    implementation(libs.playServicesPlugin)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

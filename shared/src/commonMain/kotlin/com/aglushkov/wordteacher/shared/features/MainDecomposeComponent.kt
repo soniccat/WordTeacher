@@ -37,7 +37,7 @@ import kotlin.properties.Delegates
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-interface MainDecomposeComponent: DefinitionsRouter, SettingsRouter {
+interface MainDecomposeComponent: DefinitionsRouter {
     val routerState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
@@ -49,7 +49,6 @@ interface MainDecomposeComponent: DefinitionsRouter, SettingsRouter {
     override fun openCardSets()
     fun openLearning(ids: List<Long>)
     fun openLearningSessionResult(results: List<SessionCardResult>)
-    override fun openGoogleAuth()
     fun back()
 
     sealed class Child(
@@ -169,10 +168,6 @@ class MainDecomposeComponentImpl(
         addDialogConfigIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration(results)
         )
-    }
-
-    override fun openGoogleAuth() {
-        TODO("Open google auth")
     }
 
     override fun back() = router.popIfNotEmpty()

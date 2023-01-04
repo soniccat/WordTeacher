@@ -5,6 +5,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
+    id("com.google.gms.google-services")
 
     // for compose-jb - uncomment - start
 //    id("org.jetbrains.compose")

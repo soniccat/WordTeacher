@@ -18,7 +18,7 @@ repositories {
 
 android {
     defaultConfig {
-        applicationId = "com.aglushkov.wordteacher.androidApp"
+        applicationId = "com.aglushkov.wordteacher"
         versionCode = 1
         versionName = "1.0"
     }
@@ -103,6 +103,8 @@ dependencies {
     }
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("com.google.dagger:dagger:2.44.2")
-    kapt("com.google.dagger:dagger-compiler:2.44.2")
+    implementation(libs.dagger)
+    kapt(libs.daggerCompiler)
+
+    implementation(libs.playServicesAuth)
 }
