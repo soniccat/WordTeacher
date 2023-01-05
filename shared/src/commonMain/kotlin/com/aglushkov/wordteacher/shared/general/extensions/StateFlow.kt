@@ -37,7 +37,7 @@ fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(
 ): Flow<Resource<T>> {
     return flow {
         try {
-            // TODO: replace with takeWhile/transformWhile
+            // TODO: replace with transformWhile if possible
             collect { newRes ->
                 Logger.v("got value.version(${value.version}) with version(${version}) " + value)
                 applyResValueIfNeeded(

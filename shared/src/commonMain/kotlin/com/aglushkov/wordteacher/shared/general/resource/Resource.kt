@@ -82,7 +82,15 @@ fun Resource<*>?.isLoading(): Boolean {
 
 fun <T> Resource<T>.asLoaded(): Resource.Loaded<T>? {
     return when(this) {
-        is Resource.Loaded -> Resource.Loaded(data, canLoadNextPage, version)
+        is Resource.Loaded -> this
+        else -> null
+    }
+}
+
+fun <T> Resource<T>.asLoadedOrError(): Resource<T>? {
+    return when(this) {
+        is Resource.Loaded -> this
+        is Resource.Error -> this
         else -> null
     }
 }

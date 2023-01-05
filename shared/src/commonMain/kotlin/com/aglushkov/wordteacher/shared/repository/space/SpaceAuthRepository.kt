@@ -66,7 +66,7 @@ class SpaceAuthRepository(
         }
     }
 
-    private fun auth(network: SpaceAuthService.NetworkType, token: String) {
+    fun auth(network: SpaceAuthService.NetworkType, token: String) {
         mainScope.launch {
             authFlow(network, token).onStart {
                 stateFlow.value.toLoading()

@@ -43,6 +43,7 @@ import com.aglushkov.wordteacher.androidApp.features.notes.NotesUI
 import com.aglushkov.wordteacher.androidApp.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.WindowInsets
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
+import com.aglushkov.wordteacher.androidApp.helper.GoogleAuthRepository
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
@@ -54,11 +55,23 @@ import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.article_parser.ArticleParser
+import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
+import com.aglushkov.wordteacher.shared.general.resource.asLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
+import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
 import com.aglushkov.wordteacher.shared.general.v
+import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.childAnimation
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.transformWhile
 import kotlin.reflect.KClass
 import kotlinx.coroutines.launch
 
@@ -74,6 +87,10 @@ class MainActivity : AppCompatActivity(), Router {
         ScreenTab.Articles,
         ScreenTab.Settings
     )
+
+    // TODO: extract theese two repos and related logic into a controller or useCase
+    private lateinit var googleAuthRepository: GoogleAuthRepository
+    private lateinit var spaceAuthRepository: SpaceAuthRepository
 
     private lateinit var mainDecomposeComponent: MainDecomposeComponent
 
@@ -94,13 +111,34 @@ class MainActivity : AppCompatActivity(), Router {
             v.onApplyWindowInsets(insets)
         }
 
+        googleAuthRepository = GoogleAuthRepository(
+            resources.getString(R.string.default_web_client_id)
+        ).apply {
+            bind(this@MainActivity)
+        }.also { repo ->
+            lifecycleScope.launch {
+                val firstValue = repo.googleSignInAccountFlow.value
+                repo.googleSignInAccountFlow.collect {
+                    val loadedRes = it.asLoaded()
+                    if (loadedRes != null && it != firstValue) {
+                        signInWithGoogleAccount(loadedRes.data)
+                    }
+                }
+            }
+        }
         setupComposeLayout()
+    }
+
+    private fun signInWithGoogleAccount(googleAcc: GoogleSignInAccount) {
+        val idToken = googleAcc.idToken ?: return
+        spaceAuthRepository.auth(SpaceAuthService.NetworkType.Google, idToken)
     }
 
     private fun setupComposeLayout() {
         val context = defaultComponentContext()
         val deps = (applicationContext as AppComponentOwner).appComponent
         deps.routerResolver().setRouter(this)
+        deps.spaceAuthRepository()
 
         mainDecomposeComponent = DaggerMainComposeComponent.builder()
             .setComponentContext(context)
@@ -188,7 +226,12 @@ class MainActivity : AppCompatActivity(), Router {
                         vm = instance.vm.apply {
                             router = object : SettingsRouter {
                                 override fun openGoogleAuth() {
-
+                                    val googleSignInAccount = googleAuthRepository.googleSignInAccountFlow.value.asLoaded()
+                                    if (googleSignInAccount == null) {
+                                        googleAuthRepository.signIn()
+                                    } else {
+                                        signInWithGoogleAccount(googleSignInAccount.data)
+                                    }
                                 }
                             }
                         },
