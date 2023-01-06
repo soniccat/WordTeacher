@@ -7,8 +7,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.aglushkov.wordteacher.androidApp.R
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import com.aglushkov.wordteacher.shared.general.resource.*
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
