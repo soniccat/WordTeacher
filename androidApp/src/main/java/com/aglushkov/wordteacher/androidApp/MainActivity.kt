@@ -44,6 +44,7 @@ import com.aglushkov.wordteacher.androidApp.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.androidApp.general.views.compose.WindowInsets
 import com.aglushkov.wordteacher.androidApp.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.androidApp.helper.GoogleAuthRepository
+import com.aglushkov.wordteacher.di.AppComponent
 import com.aglushkov.wordteacher.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
@@ -88,9 +89,8 @@ class MainActivity : AppCompatActivity(), Router {
         ScreenTab.Settings
     )
 
-    // TODO: extract theese two repos and related logic into a controller or useCase
+    // TODO: extract logic between googleAuthRepository and spaceAuthRepository into a controller or useCase
     private lateinit var googleAuthRepository: GoogleAuthRepository
-    private lateinit var spaceAuthRepository: SpaceAuthRepository
 
     private lateinit var mainDecomposeComponent: MainDecomposeComponent
 
@@ -131,14 +131,13 @@ class MainActivity : AppCompatActivity(), Router {
 
     private fun signInWithGoogleAccount(googleAcc: GoogleSignInAccount) {
         val idToken = googleAcc.idToken ?: return
-        spaceAuthRepository.auth(SpaceAuthService.NetworkType.Google, idToken)
+        appComponent().spaceAuthRepository().auth(SpaceAuthService.NetworkType.Google, idToken)
     }
 
     private fun setupComposeLayout() {
         val context = defaultComponentContext()
-        val deps = (applicationContext as AppComponentOwner).appComponent
+        val deps = appComponent()
         deps.routerResolver().setRouter(this)
-        deps.spaceAuthRepository()
 
         mainDecomposeComponent = DaggerMainComposeComponent.builder()
             .setComponentContext(context)
@@ -149,6 +148,11 @@ class MainActivity : AppCompatActivity(), Router {
         setContent {
             ComposeUI()
         }
+    }
+
+    private fun appComponent(): AppComponent {
+        val deps = (applicationContext as AppComponentOwner).appComponent
+        return deps
     }
 
     @Composable

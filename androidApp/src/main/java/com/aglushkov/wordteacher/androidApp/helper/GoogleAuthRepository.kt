@@ -59,15 +59,6 @@ class GoogleAuthRepository(
         }
     }
 
-//    suspend fun loadSignInAccount(): Resource<GoogleSignInAccount> {
-//        var googleSigninAccount: Resource<> = googleSignInAccountFlow.value.asLoaded()
-//        if (googleSigninAccount == null) {
-//            signIn()
-//            googleSigninAccount = googleSignInAccountFlow.takeUntilLoadedOrErrorForVersion().last()
-//        }
-//        return googleSigninAccount
-//    }
-
     fun signIn() {
         if (googleSignInAccountState.value.isLoading()) {
             return
@@ -91,9 +82,6 @@ class GoogleAuthRepository(
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail() // TODO: check if we really need any of them
             .requestProfile()
-            //.requestScopes(new Scope("https://www.googleapis.com/auth/contacts.readonly"))
-            //.requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
-            //.requestServerAuthCode(getResources().getString(R.string.server_client_id))
             .requestIdToken(serverClientId)
             .build()
 }
