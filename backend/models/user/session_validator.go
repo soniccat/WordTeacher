@@ -44,6 +44,11 @@ func validateSession[T any, PT TokenHolder[T]](
 		return nil, nil, NewValidateSessionError(http.StatusBadRequest, errors.New("invalid device id"))
 	}
 
+	var deviceType = r.Header.Get(apphelpers.HeaderDeviceType)
+	if len(deviceType) == 0 {
+		return nil, nil, NewValidateSessionError(http.StatusBadRequest, errors.New("invalid device type"))
+	}
+
 	// Parse session data and check if it's expired
 	userAuthToken, err := userauthtoken.Load(r.Context(), sessionManager)
 	if err != nil {
@@ -65,6 +70,7 @@ func validateSession[T any, PT TokenHolder[T]](
 	if !userAuthToken.IsMatched(
 		p.GetAccessToken(),
 		p.GetRefreshToken(),
+		deviceType,
 		deviceId,
 	) {
 		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))

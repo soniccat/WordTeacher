@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStore
+import com.aglushkov.wordteacher.androidApp.BuildConfig
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.di.AppComp
+import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -20,6 +22,7 @@ import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsSt
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
+import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.dict.DictFactory
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
@@ -190,8 +193,19 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun spaceAuthService(context: Context): SpaceAuthService =
-        SpaceAuthService(context.getString(R.string.api_base_url))
+    fun appInfo(): AppInfo = AppInfo(BuildConfig.VERSION_NAME, "Android")
+
+    @AppComp
+    @Provides
+    fun deviceIdRepository(
+        settings: FlowSettings
+    ): DeviceIdRepository =
+        DeviceIdRepository(settings)
+
+    @AppComp
+    @Provides
+    fun spaceAuthService(context: Context, deviceIdRepository: DeviceIdRepository, appInfo: AppInfo): SpaceAuthService =
+        SpaceAuthService(context.getString(R.string.api_base_url), deviceIdRepository, appInfo)
 
     @AppComp
     @Provides

@@ -76,7 +76,7 @@ class WordnikService(
     private val logger = WordServiceLogger(Config.Type.Wordnik.name)
     private val httpClient = HttpClient {
         val anApiKey = apiKey
-        install(CustomParameter.Feature) {
+        install(CustomParameter) {
             parameterName = "api_key"
             parameterValue = anApiKey
         }

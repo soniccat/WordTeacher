@@ -24,7 +24,7 @@ mokoResources = "0.17.2"
 decomposeVersion = "0.7.0"
 essenty = "0.2.2"
 coroutines = "1.6.0-native-mt"
-ktor = "1.5.4"
+ktor = "2.2.2"
 okio = "3.0.0"
 napier = "1.4.1"
 uuid = "0.3.0"
@@ -84,6 +84,7 @@ coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android
 coroutinesCommonTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 ktorCommonCore = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktorAuth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktorAndroidClient = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktoriOSClient = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
 ktorDesktop = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }

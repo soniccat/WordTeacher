@@ -25,6 +25,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinxSerializationJson)
                 implementation(libs.ktorCommonCore)
+                implementation(libs.ktorAuth)
                 implementation(libs.coroutinesCommon)
                 implementation(libs.okio)
                 implementation(libs.kotlinxDateTime)

@@ -11,6 +11,7 @@ import (
 
 const CookieSession = "session"
 const HeaderDeviceId = "deviceId"
+const HeaderDeviceType = "deviceType"
 
 type ErrorWithCode struct {
 	Err  error

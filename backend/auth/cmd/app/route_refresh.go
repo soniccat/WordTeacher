@@ -45,6 +45,12 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var deviceType = r.Header.Get(apphelpers.HeaderDeviceType)
+	if len(deviceType) == 0 {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
 	// Body params
 	var input RefreshInput
 	err = json.NewDecoder(r.Body).Decode(&input)
@@ -67,6 +73,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 	if !userAuthToken.IsMatched(
 		input.AccessToken,
 		&input.RefreshToken,
+		deviceType,
 		deviceId,
 	) {
 		app.clientError(w, http.StatusUnauthorized)
@@ -79,6 +86,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		userAuthToken.UserMongoId,
 		userAuthToken.NetworkType,
+		deviceType,
 		deviceId,
 	)
 	if err != nil {

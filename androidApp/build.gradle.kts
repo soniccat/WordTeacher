@@ -6,6 +6,9 @@ plugins {
 group = "com.aglushkov.wordteacher"
 version = "1.0-SNAPSHOT"
 
+val appVersionName = property("versionName")!!.toString()
+val appVersionCode = property("versionCode")!!.toString().toInt()
+
 repositories {
     google()
     mavenCentral()
@@ -16,11 +19,12 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+
 android {
     defaultConfig {
         applicationId = "com.aglushkov.wordteacher"
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
     }
 
     buildFeatures {
@@ -51,6 +55,9 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+
+        }
         getByName("release") {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

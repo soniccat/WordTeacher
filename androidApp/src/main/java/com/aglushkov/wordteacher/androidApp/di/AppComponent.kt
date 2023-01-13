@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.androidApp.features.learning_session_result.di.
 import com.aglushkov.wordteacher.androidApp.features.notes.di.NotesDependencies
 import com.aglushkov.wordteacher.androidApp.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.androidApp.general.RouterResolver
+import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -23,6 +24,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
@@ -69,6 +71,8 @@ interface AppComponent:
     override fun wordRepository(): WordDefinitionRepository
     override fun notesRepository(): NotesRepository
 
+    fun appInfo(): AppInfo
+    fun deviceIdRepository(): DeviceIdRepository
     fun spaceAuthService(): SpaceAuthService
     override fun spaceAuthRepository(): SpaceAuthRepository
 

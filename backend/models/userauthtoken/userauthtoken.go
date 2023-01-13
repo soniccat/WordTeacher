@@ -19,16 +19,18 @@ const (
 	SessionRefreshTokenKey              = "refreshToken"
 	SessionNetworkTypeKey               = "networkType"
 	SessionUserMongoIdKey               = "userMongoId"
+	SessionUserDeviceType               = "deviceType"
 	SessionUserDeviceId                 = "deviceId"
 )
 
 type UserAuthToken struct {
-	Id           *primitive.ObjectID         `bson:"_id,omitempty"`
-	UserMongoId  *primitive.ObjectID         `bson:"userId,omitempty"`
-	NetworkType  usernetwork.UserNetworkType `bson:"networkType,omitempty"`
-	AccessToken  accesstoken.AccessToken     `bson:"accessToken,omitempty"`
-	RefreshToken string                      `bson:"refreshToken,omitempty"`
-	UserDeviceId string                      `bson:"deviceId,omitempty"`
+	Id             *primitive.ObjectID         `bson:"_id,omitempty"`
+	UserMongoId    *primitive.ObjectID         `bson:"userId,omitempty"`
+	NetworkType    usernetwork.UserNetworkType `bson:"networkType,omitempty"`
+	AccessToken    accesstoken.AccessToken     `bson:"accessToken,omitempty"`
+	RefreshToken   string                      `bson:"refreshToken,omitempty"`
+	UserDeviceType string                      `bson:"deviceType,omitempty"`
+	UserDeviceId   string                      `bson:"deviceId,omitempty"`
 	// TODO: consider to add last usage date
 }
 
@@ -36,21 +38,24 @@ func New(
 	accessToken *accesstoken.AccessToken,
 	refreshToken *string,
 	networkType usernetwork.UserNetworkType,
-	userDeviceId *string,
+	userDeviceType string,
+	userDeviceId string,
 	userMongoId *primitive.ObjectID,
 ) *UserAuthToken {
 	return &UserAuthToken{
-		AccessToken:  *accessToken,
-		RefreshToken: *refreshToken,
-		NetworkType:  networkType,
-		UserDeviceId: *userDeviceId,
-		UserMongoId:  userMongoId,
+		AccessToken:    *accessToken,
+		RefreshToken:   *refreshToken,
+		NetworkType:    networkType,
+		UserDeviceType: userDeviceType,
+		UserDeviceId:   userDeviceId,
+		UserMongoId:    userMongoId,
 	}
 }
 
 func Generate(
 	userId *primitive.ObjectID,
 	networkType usernetwork.UserNetworkType,
+	deviceType string,
 	deviceId string,
 ) (*UserAuthToken, error) {
 	accessTokenValue, err := uuid.NewRandom()
@@ -70,8 +75,9 @@ func Generate(
 			Value:          accessTokenValue.String(),
 			ExpirationDate: primitive.NewDateTimeFromTime(time.Now().Add(AccessTokenTimeout)),
 		},
-		RefreshToken: refreshTokenValue.String(),
-		UserDeviceId: deviceId,
+		RefreshToken:   refreshTokenValue.String(),
+		UserDeviceType: deviceType,
+		UserDeviceId:   deviceId,
 	}, nil
 }
 
@@ -81,6 +87,7 @@ func (sd *UserAuthToken) SaveAsSession(context context.Context, manager *scs.Ses
 	manager.Put(context, SessionRefreshTokenKey, sd.RefreshToken)
 	manager.Put(context, SessionNetworkTypeKey, int8(sd.NetworkType))
 	manager.Put(context, SessionUserMongoIdKey, sd.UserMongoId.Hex())
+	manager.Put(context, SessionUserDeviceType, sd.UserDeviceType)
 	manager.Put(context, SessionUserDeviceId, sd.UserDeviceId)
 }
 
@@ -105,6 +112,11 @@ func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken,
 		return nil, errors.New("session networkType is missing")
 	}
 
+	sessionDeviceType, ok := manager.Get(context, SessionUserDeviceType).(string)
+	if !ok || len(sessionDeviceType) == 0 {
+		return nil, errors.New("session device type is missing")
+	}
+
 	sessionDeviceId, ok := manager.Get(context, SessionUserDeviceId).(string)
 	if !ok || len(sessionDeviceId) == 0 {
 		return nil, errors.New("session device id is missing")
@@ -125,10 +137,11 @@ func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken,
 			Value:          sessionAccessToken,
 			ExpirationDate: primitive.DateTime(sessionAccessTokenExpirationDate),
 		},
-		RefreshToken: sessionRefreshToken,
-		NetworkType:  usernetwork.UserNetworkType(networkType),
-		UserDeviceId: sessionDeviceId,
-		UserMongoId:  &sessionUserMongoId,
+		RefreshToken:   sessionRefreshToken,
+		NetworkType:    usernetwork.UserNetworkType(networkType),
+		UserDeviceType: sessionDeviceType,
+		UserDeviceId:   sessionDeviceId,
+		UserMongoId:    &sessionUserMongoId,
 	}, nil
 }
 
@@ -139,9 +152,11 @@ func (sd *UserAuthToken) IsValid() bool {
 func (sd *UserAuthToken) IsMatched(
 	accessToken string,
 	refreshToken *string,
+	userDeviceType string,
 	userDeviceId string,
 ) bool {
 	return sd.AccessToken.Value == accessToken &&
 		(refreshToken == nil || sd.RefreshToken == *refreshToken) &&
+		sd.UserDeviceType == userDeviceType &&
 		sd.UserDeviceId == userDeviceId
 }

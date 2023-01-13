@@ -44,12 +44,14 @@ func (app *application) GenerateUserAuthToken(
 	context context.Context,
 	userMongoId *primitive.ObjectID,
 	networkType usernetwork.UserNetworkType,
+	deviceType string,
 	deviceId string,
 ) (*userauthtoken.UserAuthToken, error) {
 	token, err := app.userModel.GenerateUserAuthToken(
 		context,
 		userMongoId,
 		networkType,
+		deviceType,
 		deviceId,
 	)
 	if err != nil {

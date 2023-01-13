@@ -13,7 +13,7 @@ import (
 )
 
 // TODO: move in params
-const GoogleIdTokenAudience = "409354406675-eqcftgj7fi5m4ri5s78r33kguqj2mgo3.apps.googleusercontent.com"
+const GoogleIdTokenAudience = "435809636010-8kf32mn6jdokebe03cd9g8p2giudiq1c.apps.googleusercontent.com"
 
 type AuthInput struct {
 	Token string `json:"token,omitempty"`
@@ -70,6 +70,12 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var deviceType = r.Header.Get(apphelpers.HeaderDeviceType)
+	if len(deviceType) == 0 {
+		apphelpers.SetError(w, errors.New("deviceType is empty"), http.StatusBadRequest, app.logger)
+		return
+	}
+
 	// Body params
 	var credentials AuthInput
 	err := json.NewDecoder(r.Body).Decode(&credentials)
@@ -120,6 +126,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		&aUser.Id,
 		userNetwork.NetworkType,
+		deviceType,
 		deviceId,
 	)
 	if err != nil {

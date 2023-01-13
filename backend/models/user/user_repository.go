@@ -69,9 +69,10 @@ func (m *UserRepository) GenerateUserAuthToken(
 	context context.Context,
 	userId *primitive.ObjectID,
 	networkType usernetwork.UserNetworkType,
+	deviceType string,
 	deviceId string,
 ) (*userauthtoken.UserAuthToken, error) {
-	token, err := userauthtoken.Generate(userId, networkType, deviceId)
+	token, err := userauthtoken.Generate(userId, networkType, deviceType, deviceId)
 	if err != nil {
 		return nil, err
 	}
