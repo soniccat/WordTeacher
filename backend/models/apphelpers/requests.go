@@ -52,8 +52,42 @@ func SetHandlerError(w http.ResponseWriter, outErr *HandlerError, logger *logger
 	SetErrorWithStack(w, outErr.InnerError, outErr.StatusCode, logger, stack)
 }
 
+const (
+	ResponseStatusOk    = "ok"
+	ResponseStatusError = "error"
+)
+
+type responseErrorWrapper struct {
+	Message string `json:"message"`
+}
+
+func newResponseErrorWrapper(err error) *responseErrorWrapper {
+	return &responseErrorWrapper{
+		err.Error(),
+	}
+}
+
+type Response struct {
+	Status string      `json:"status"`
+	Value  interface{} `json:"value"`
+}
+
+func NewResponseOk(data interface{}) *Response {
+	return &Response{
+		ResponseStatusOk,
+		data,
+	}
+}
+
+func NewResponseError(err error) *Response {
+	return &Response{
+		ResponseStatusError,
+		newResponseErrorWrapper(err),
+	}
+}
+
 type ErrorResponse struct {
-	Error string `json:"error"`
+	Message string `json:"message"`
 }
 
 type HandlerError struct {
@@ -69,13 +103,13 @@ func SetError(w http.ResponseWriter, outErr error, code int, logger *logger.Logg
 func SetErrorWithStack(w http.ResponseWriter, outErr error, code int, logger *logger.Logger, stack *[]byte) {
 	w.WriteHeader(code)
 
-	marshaledResponse, err := json.Marshal(ErrorResponse{Error: outErr.Error()})
+	marshaledResponse, err := json.Marshal(NewResponseError(outErr))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err = SetJsonData(w, marshaledResponse); err != nil {
+	if err = setJsonData(w, marshaledResponse); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -86,7 +120,7 @@ func SetErrorWithStack(w http.ResponseWriter, outErr error, code int, logger *lo
 	}
 }
 
-func SetJsonData(w http.ResponseWriter, data []byte) error {
+func setJsonData(w http.ResponseWriter, data []byte) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	if _, err := w.Write(data); err != nil {
@@ -97,7 +131,7 @@ func SetJsonData(w http.ResponseWriter, data []byte) error {
 }
 
 func WriteResponse(w http.ResponseWriter, response interface{}, logger *logger.Logger) {
-	marshaledResponse, err := json.Marshal(response)
+	marshaledResponse, err := json.Marshal(NewResponseOk(response))
 	if err != nil {
 		SetError(w, err, http.StatusInternalServerError, logger)
 		return

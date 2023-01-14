@@ -12,11 +12,11 @@ import io.ktor.client.statement.readBytes
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 
 @Serializable
 data class AuthData(
@@ -34,6 +34,31 @@ data class AuthToken(
 data class AuthUser(
     @SerialName("id") val id: String,
 )
+
+@Serializable
+abstract class Response<out T>
+
+@Serializable
+@SerialName("ok")
+data class OkResponse<out T>(val value: T) : Response<T>()
+
+@Serializable
+data class Error(val message: String)
+
+@Serializable
+@SerialName("error")
+data class ErrResponse(val value: Error) : Response<Error>()
+
+
+class ErrorResponseException(val err: Error): Exception(err.message)
+
+fun <T> Response<T>.ToOkResult(): T {
+    return when(this) {
+        is OkResponse -> value
+        is ErrResponse -> throw ErrorResponseException(value)
+        else -> throw RuntimeException("Unknown response type $this")
+    }
+}
 
 class SpaceAuthService(
     private val baseUrl: String,
@@ -72,12 +97,19 @@ class SpaceAuthService(
 
     private val json = Json {
         ignoreUnknownKeys = true
+        classDiscriminator = "status"
+        serializersModule = SerializersModule {
+            polymorphic(Response::class) {
+                subclass(OkResponse.serializer(AuthData.serializer()))
+                subclass(ErrResponse.serializer())
+            }
+        }
     }
 
     init {
     }
 
-    suspend fun auth(network: NetworkType, token: String): AuthData {
+    suspend fun auth(network: NetworkType, token: String): Response<AuthData> {
         Logger.v("Loading", tag = TAG)
 
         val res: HttpResponse = httpClient.post(urlString = "${baseUrl}/api/auth/social/" + network.value) {

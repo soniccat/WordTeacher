@@ -8,9 +8,7 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
 import com.aglushkov.wordteacher.shared.repository.config.Config
-import com.aglushkov.wordteacher.shared.service.AuthData
-import com.aglushkov.wordteacher.shared.service.ConfigService
-import com.aglushkov.wordteacher.shared.service.SpaceAuthService
+import com.aglushkov.wordteacher.shared.service.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -82,7 +80,7 @@ class SpaceAuthRepository(
 
     private fun authFlow(network: SpaceAuthService.NetworkType, token: String) = flow {
         try {
-            val authData = service.auth(network, token)
+            val authData = service.auth(network, token).ToOkResult()
             emit(Resource.Loaded(authData))
         } catch (e: CancellationException) {
             throw e
