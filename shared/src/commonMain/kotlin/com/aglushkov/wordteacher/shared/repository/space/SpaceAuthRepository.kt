@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.service.*
 import io.ktor.utils.io.core.*
@@ -40,7 +41,13 @@ class SpaceAuthRepository(
     init {
         mainScope.launch(Dispatchers.Default) {
             restore()?.let { authData ->
-                stateFlow.compareAndSet(Resource.Uninitialized(), Resource.Loaded(authData))
+                stateFlow.update {
+                    if (it.isUninitialized()) {
+                        Resource.Loaded(authData)
+                    } else {
+                        it
+                    }
+                }
             }
         }
     }
