@@ -7,11 +7,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.aglushkov.wordteacher.androidApp.BuildConfig
 import com.aglushkov.wordteacher.androidApp.R
 import com.aglushkov.wordteacher.androidApp.di.AppComp
-import com.aglushkov.wordteacher.shared.general.AppInfo
+import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
-import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.TimeSource
-import com.aglushkov.wordteacher.shared.general.TimeSourceImpl
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
@@ -40,6 +37,10 @@ import com.russhwolf.settings.datastore.DataStoreSettings
 import okio.FileSystem
 import dagger.Module
 import dagger.Provides
+import io.ktor.client.*
+import io.ktor.client.plugins.api.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import okio.Path
 import okio.Path.Companion.toPath
 
@@ -193,6 +194,26 @@ class AppModule {
 
     @AppComp
     @Provides
+    @SpaceHttpClient
+    fun spaceHttpClient(
+        deviceIdRepository: DeviceIdRepository,
+        appInfo: AppInfo
+    ) = HttpClient() {
+        install(
+            createClientPlugin("SpacePlugin") {
+                onRequest { request, content ->
+                    request.headers {
+                        set("deviceType", "android")
+                        set("deviceId", deviceIdRepository.deviceId())
+                        set(HttpHeaders.UserAgent, appInfo.getUserAgent())
+                    }
+                }
+            }
+        )
+    }
+
+    @AppComp
+    @Provides
     fun appInfo(): AppInfo = AppInfo(BuildConfig.VERSION_NAME, "Android")
 
     @AppComp
@@ -204,8 +225,11 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun spaceAuthService(context: Context, deviceIdRepository: DeviceIdRepository, appInfo: AppInfo): SpaceAuthService =
-        SpaceAuthService(context.getString(R.string.api_base_url), deviceIdRepository, appInfo)
+    fun spaceAuthService(
+        context: Context,
+        @SpaceHttpClient httpClient: HttpClient,
+    ): SpaceAuthService =
+        SpaceAuthService(context.getString(R.string.api_base_url), httpClient)
 
     @AppComp
     @Provides

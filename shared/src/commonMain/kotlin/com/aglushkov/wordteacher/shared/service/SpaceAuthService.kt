@@ -13,6 +13,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.*
+import kotlinx.serialization.builtins.IntArraySerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -62,8 +63,7 @@ fun <T> Response<T>.ToOkResult(): T {
 
 class SpaceAuthService(
     private val baseUrl: String,
-    private val deviceIdRepository: DeviceIdRepository,
-    private val appInfo: AppInfo
+    private val httpClient: HttpClient
 ) {
     companion object {}
 
@@ -77,19 +77,20 @@ class SpaceAuthService(
         @SerialName("token") val token: String,
     )
 
-    private val httpClient = HttpClient() {
-        install(
-            createClientPlugin("SpacePlugin") {
-                onRequest { request, content ->
-                    request.headers {
-                        set("deviceType", "android")
-                        set("deviceId", deviceIdRepository.deviceId())
-                        set(HttpHeaders.UserAgent, appInfo.getUserAgent())
-                    }
-                }
-            }
-        )
-    }/*.also {
+//    private val httpClient = HttpClient() {
+//        install(
+//            createClientPlugin("SpacePlugin") {
+//                onRequest { request, content ->
+//                    request.headers {
+//                        set("deviceType", "android")
+//                        set("deviceId", deviceIdRepository.deviceId())
+//                        set(HttpHeaders.UserAgent, appInfo.getUserAgent())
+//                    }
+//                }
+//            }
+//        )
+//    }
+    /*.also {
         it.plugin(HttpSend).intercept { request ->
             execute(request)
         }
@@ -106,8 +107,8 @@ class SpaceAuthService(
         }
     }
 
-    init {
-    }
+//    init {
+//    }
 
     suspend fun auth(network: NetworkType, token: String): Response<AuthData> {
         Logger.v("Loading", tag = TAG)
