@@ -50,6 +50,12 @@ test.integration.debug:
 
 # auth
 
+authup:
+	docker stop auth || true
+	docker rm auth || true
+	docker rmi auth || true
+	make up
+
 authstop:
 	docker container stop auth
 

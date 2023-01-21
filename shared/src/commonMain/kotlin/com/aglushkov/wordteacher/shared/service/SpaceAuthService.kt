@@ -45,8 +45,14 @@ class SpaceAuthService(
     }
 
     @Serializable
-    data class Input(
+    data class AuthInput(
         @SerialName("token") val token: String,
+    )
+
+    @Serializable
+    data class RefreshInput(
+        @SerialName("accessToken") val accessToken: String,
+        @SerialName("refreshToken") val refreshToken: String,
     )
 
     private val json = Json {
@@ -65,7 +71,22 @@ class SpaceAuthService(
 
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/auth/social/" + network.value) {
-                this.setBody(json.encodeToString(Input(token)))
+                this.setBody(json.encodeToString(AuthInput(token)))
+            }
+        return withContext(Dispatchers.Default) {
+            val stringResponse = res.readBytes().decodeToString()
+            logResponse(res, stringResponse)
+
+            json.decodeFromString(stringResponse)
+        }
+    }
+
+    suspend fun refresh(token: AuthToken): Response<AuthToken> {
+        Logger.v("Loading", tag = TAG)
+
+        val res: HttpResponse =
+            httpClient.post(urlString = "${baseUrl}/api/auth/refresh") {
+                this.setBody(json.encodeToString(RefreshInput(token.accessToken, token.refreshToken)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()

@@ -8,17 +8,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import com.aglushkov.wordteacher.shared.general.resource.*
+import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
-import com.google.android.gms.auth.api.identity.SignInCredential
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.internal.BaseGmsClient.SignOutCallbacks
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 data class GoogleAuthData(val name: String?, val tokenId: String?, val isSilent: Boolean)
 
@@ -29,20 +29,23 @@ class GoogleAuthRepository(
     private var client: SignInClient? = null
     private var signInRequest: BeginSignInRequest? = null
     private var signInLauncher: ActivityResultLauncher<IntentSenderRequest>? = null
-    private var googleSignInCredentialState: MutableStateFlow<Resource<GoogleAuthData>> = MutableStateFlow(Resource.Uninitialized())
-    var googleSignInCredentialFlow: StateFlow<Resource<GoogleAuthData>> = googleSignInCredentialState
+    private var googleSignInCredentialState: MutableStateFlow<Resource<GoogleAuthData>> =
+        MutableStateFlow(Resource.Uninitialized())
+    var googleSignInCredentialFlow: StateFlow<Resource<GoogleAuthData>> =
+        googleSignInCredentialState
 
     fun bind(activity: ComponentActivity) {
         val safeClient = Identity.getSignInClient(activity)
         client = safeClient
-        signInLauncher = activity.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-            val intent = result.data
-            if (result.resultCode == Activity.RESULT_OK && intent != null) {
-                handleSignInResult(intent, safeClient)
-            } else {
-                googleSignInCredentialState.value = Resource.Uninitialized()
+        signInLauncher =
+            activity.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+                val intent = result.data
+                if (result.resultCode == Activity.RESULT_OK && intent != null) {
+                    handleSignInResult(intent, safeClient)
+                } else {
+                    googleSignInCredentialState.value = Resource.Uninitialized()
+                }
             }
-        }
 
         signInRequest = BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(
@@ -51,7 +54,8 @@ class GoogleAuthRepository(
                     .setServerClientId(serverClientId)
                     // Only show accounts previously used to sign in.
                     .setFilterByAuthorizedAccounts(true)
-                    .build())
+                    .build()
+            )
             // Automatically sign in when exactly one credential is retrieved.
 //            .setAutoSelectEnabled(true)
             .build()
@@ -62,15 +66,16 @@ class GoogleAuthRepository(
         googleSignInCredentialState.value = Resource.Loading()
         safeGoogleSignInClient.silentSignIn()
             .addOnSuccessListener { acc ->
-                Log.e("GoogleAuthRepository", "silentSignIn success ${acc.idToken}")
-                googleSignInCredentialState.value = Resource.Loaded(GoogleAuthData(acc.displayName, acc.idToken, true))
+                Log.v("GoogleAuthRepository", "silentSignIn success ${acc.idToken}")
+                googleSignInCredentialState.value =
+                    Resource.Loaded(GoogleAuthData(acc.displayName, acc.idToken, true))
             }
             .addOnFailureListener {
                 Log.e("GoogleAuthRepository", "silentSignIn failure")
                 googleSignInCredentialState.value = Resource.Error(it, canTryAgain = true)
             }
             .addOnCanceledListener {
-                Log.e("GoogleAuthRepository", "silentSignIn cancelled")
+                Log.v("GoogleAuthRepository", "silentSignIn cancelled")
                 googleSignInCredentialState.value = Resource.Uninitialized()
             }
     }
@@ -90,7 +95,10 @@ class GoogleAuthRepository(
                         IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
                     )
                 } catch (e: IntentSender.SendIntentException) {
-                    Log.e("GoogleAuthRepository", "beginSignIn Couldn't start One Tap UI: ${e.localizedMessage}")
+                    Log.e(
+                        "GoogleAuthRepository",
+                        "beginSignIn Couldn't start One Tap UI: ${e.localizedMessage}"
+                    )
                     googleSignInCredentialState.value = Resource.Error(e, canTryAgain = true)
                 }
             }
@@ -99,7 +107,7 @@ class GoogleAuthRepository(
                 googleSignInCredentialState.value = Resource.Error(it, canTryAgain = true)
             }
             .addOnCanceledListener {
-                Log.e("GoogleAuthRepository", "beginSignIn cancelled")
+                Log.v("GoogleAuthRepository", "beginSignIn cancelled")
                 googleSignInCredentialState.value = Resource.Uninitialized()
             }
     }
@@ -107,7 +115,8 @@ class GoogleAuthRepository(
     private fun handleSignInResult(intent: Intent, client: SignInClient) {
         try {
             val creds = client.getSignInCredentialFromIntent(intent)
-            googleSignInCredentialState.value = Resource.Loaded(GoogleAuthData(creds.displayName, creds.googleIdToken, false))
+            googleSignInCredentialState.value =
+                Resource.Loaded(GoogleAuthData(creds.displayName, creds.googleIdToken, false))
         } catch (e: ApiException) {
             googleSignInCredentialState.value = Resource.Error(e, canTryAgain = true)
         }

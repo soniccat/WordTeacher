@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"models/apphelpers"
 	"models/userauthtoken"
 	"net/http"
@@ -30,24 +31,24 @@ type RefreshResponse struct {
 func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie(apphelpers.CookieSession)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
 		return
 	}
 	if len(session.Value) == 0 {
-		app.clientError(w, http.StatusBadRequest)
+		apphelpers.SetError(w, errors.New("Session is empty"), http.StatusBadRequest, app.logger)
 		return
 	}
 
 	// Header params
 	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
 	if len(deviceId) == 0 {
-		app.clientError(w, http.StatusBadRequest)
+		apphelpers.SetError(w, errors.New("DeviceId is session"), http.StatusBadRequest, app.logger)
 		return
 	}
 
 	var deviceType = r.Header.Get(apphelpers.HeaderDeviceType)
 	if len(deviceType) == 0 {
-		app.clientError(w, http.StatusBadRequest)
+		apphelpers.SetError(w, errors.New("DeviceType is session"), http.StatusBadRequest, app.logger)
 		return
 	}
 
@@ -55,18 +56,18 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 	var input RefreshInput
 	err = json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
 		return
 	}
 
 	userAuthToken, err := userauthtoken.Load(r.Context(), app.sessionManager)
 	if err != nil {
-		app.serverError(w, err)
+		apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
 		return
 	}
 
 	if !userAuthToken.IsValid() {
-		app.clientError(w, http.StatusUnauthorized)
+		apphelpers.SetError(w, errors.New("Token is invalid"), http.StatusUnauthorized, app.logger)
 		return
 	}
 
@@ -76,7 +77,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		deviceType,
 		deviceId,
 	) {
-		app.clientError(w, http.StatusUnauthorized)
+		apphelpers.SetError(w, errors.New("Token is invalid"), http.StatusUnauthorized, app.logger)
 		return
 	}
 
@@ -90,7 +91,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		deviceId,
 	)
 	if err != nil {
-		app.serverError(w, err)
+		apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
 		return
 	}
 
@@ -100,14 +101,5 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		RefreshToken: token.RefreshToken,
 	}
 
-	marshaledResponse, err := json.Marshal(response)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	if _, err = w.Write(marshaledResponse); err != nil {
-		app.serverError(w, err)
-		return
-	}
+	apphelpers.WriteResponse(w, response, app.logger)
 }
