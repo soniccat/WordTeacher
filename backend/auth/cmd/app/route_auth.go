@@ -30,7 +30,8 @@ type AuthResponseToken struct {
 }
 
 type AuthResponseUser struct {
-	Id string `json:"id"`
+	Id          string `json:"id"`
+	NetworkType string `json:"networkType"`
 }
 
 type AuthErrorInvalidToken struct {
@@ -141,7 +142,8 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 			RefreshToken: token.RefreshToken,
 		},
 		User: AuthResponseUser{
-			Id: aUser.Id.Hex(),
+			Id:          aUser.Id.Hex(),
+			NetworkType: networkType,
 		},
 	}
 

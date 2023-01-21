@@ -17,24 +17,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.internal.BaseGmsClient.SignOutCallbacks
 import kotlinx.coroutines.flow.*
-
-//class GoogleAuthResultContract(
-//    private val client: GoogleSignInClient
-//) : ActivityResultContract<Unit, Task<GoogleSignInAccount>?>() {
-//    override fun createIntent(context: Context, input: Unit) =
-//        client.signInIntent
-//
-//    override fun parseResult(resultCode: Int, result: Intent?) : Task<GoogleSignInAccount>? {
-//        if (resultCode != Activity.RESULT_OK) {
-//            return null
-//        }
-//
-//        // The Task returned from this call is always completed, no need to attach
-//        // a listener.
-//        return GoogleSignIn.getSignedInAccountFromIntent(result)
-//    }
-//}
 
 data class GoogleAuthData(val name: String?, val tokenId: String?, val isSilent: Boolean)
 
@@ -74,19 +58,20 @@ class GoogleAuthRepository(
 
         val safeGoogleSignInClient = GoogleSignIn.getClient(activity, createGoogleSignInOptions())
         oldClient = safeGoogleSignInClient
+
+        googleSignInCredentialState.value = Resource.Loading()
         safeGoogleSignInClient.silentSignIn()
             .addOnSuccessListener { acc ->
                 Log.e("GoogleAuthRepository", "silentSignIn success ${acc.idToken}")
                 googleSignInCredentialState.value = Resource.Loaded(GoogleAuthData(acc.displayName, acc.idToken, true))
-
             }
             .addOnFailureListener {
                 Log.e("GoogleAuthRepository", "silentSignIn failure")
-
+                googleSignInCredentialState.value = Resource.Error(it, canTryAgain = true)
             }
             .addOnCanceledListener {
                 Log.e("GoogleAuthRepository", "silentSignIn cancelled")
-
+                googleSignInCredentialState.value = Resource.Uninitialized()
             }
     }
 
@@ -98,27 +83,24 @@ class GoogleAuthRepository(
 
         val client = client ?: return
         val signInRequest = signInRequest ?: return
-//        signInLauncher?.launch(client.signInIntent)
         client.beginSignIn(signInRequest)
             .addOnSuccessListener { result ->
                 try {
                     signInLauncher?.launch(
                         IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
                     )
-//                    signInLauncher.launch(result.pendingIntent.intentSender)
-//                }
-//                    startIntentSenderForResult(
-//                        result.pendingIntent.intentSender, REQ_ONE_TAP,
-//                        null, 0, 0, 0, null)
                 } catch (e: IntentSender.SendIntentException) {
-                    Log.e("GoogleAuthRepository", "Couldn't start One Tap UI: ${e.localizedMessage}")
+                    Log.e("GoogleAuthRepository", "beginSignIn Couldn't start One Tap UI: ${e.localizedMessage}")
+                    googleSignInCredentialState.value = Resource.Error(e, canTryAgain = true)
                 }
             }
             .addOnFailureListener {
-                Log.e("GoogleAuthRepository", "failure")
+                Log.e("GoogleAuthRepository", "beginSignIn failure")
+                googleSignInCredentialState.value = Resource.Error(it, canTryAgain = true)
             }
             .addOnCanceledListener {
-                Log.e("GoogleAuthRepository", "cancelled")
+                Log.e("GoogleAuthRepository", "beginSignIn cancelled")
+                googleSignInCredentialState.value = Resource.Uninitialized()
             }
     }
 
@@ -131,12 +113,25 @@ class GoogleAuthRepository(
         }
     }
 
+    fun signOut() {
+        val prevValue = googleSignInCredentialState.value
+        val safeClient = oldClient ?: return
+        safeClient.signOut()
+            .addOnSuccessListener {
+                googleSignInCredentialState.value = Resource.Uninitialized()
+            }
+            .addOnFailureListener {
+                googleSignInCredentialState.value = prevValue
+            }
+            .addOnCanceledListener {
+                googleSignInCredentialState.value = prevValue
+            }
+    }
+
     private fun createGoogleSignInOptions() =
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail() // TODO: check if we really need any of them
+            .requestEmail()
             .requestProfile()
             .requestIdToken(serverClientId)
             .build()
 }
-
-private const val REQ_ONE_TAP = 2

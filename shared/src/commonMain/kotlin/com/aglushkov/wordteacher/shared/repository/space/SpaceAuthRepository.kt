@@ -41,13 +41,7 @@ class SpaceAuthRepository(
     init {
         mainScope.launch(Dispatchers.Default) {
             restore()?.let { authData ->
-                stateFlow.update {
-                    if (it.isUninitialized()) {
-                        Resource.Loaded(authData)
-                    } else {
-                        it
-                    }
-                }
+                stateFlow.compareAndSet(Resource.Uninitialized(), Resource.Loaded(authData))
             }
         }
     }
@@ -96,6 +90,13 @@ class SpaceAuthRepository(
             Logger.e(e.message.orEmpty(), TAG)
             e.printStackTrace()
             emit(stateFlow.value.toError(e, true))
+        }
+    }
+
+    fun signOut(network: SpaceAuthService.NetworkType) {
+        val loaded = stateFlow.value.asLoaded()?.data
+        if (loaded?.user?.networkType == network) {
+            stateFlow.value = Resource.Uninitialized(version = 1) // version = 1 to distinguish this Uninitialized from a default one
         }
     }
 }

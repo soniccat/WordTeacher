@@ -52,6 +52,7 @@ import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.Lear
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
@@ -106,6 +107,8 @@ class MainActivity : AppCompatActivity(), Router {
                     val loadedRes = it.asLoaded()
                     if (loadedRes != null && it != firstValue && !loadedRes.data.isSilent) {
                         signInWithGoogleAuthData(loadedRes.data)
+                    } else if (it.isUninitialized()) {
+                        signOutFromGoogle()
                     }
                 }
             }
@@ -116,6 +119,10 @@ class MainActivity : AppCompatActivity(), Router {
     private fun signInWithGoogleAuthData(authData: GoogleAuthData) {
         val idToken = authData.tokenId ?: return
         appComponent().spaceAuthRepository().auth(SpaceAuthService.NetworkType.Google, idToken)
+    }
+
+    private fun signOutFromGoogle() {
+        appComponent().spaceAuthRepository().signOut(SpaceAuthService.NetworkType.Google)
     }
 
     private fun setupComposeLayout() {
@@ -220,6 +227,10 @@ class MainActivity : AppCompatActivity(), Router {
                                     } else {
                                         signInWithGoogleAuthData(googleSignInAccount.data)
                                     }
+                                }
+
+                                override fun signOutGoogle() {
+                                    googleAuthRepository.signOut()
                                 }
                             }
                         },

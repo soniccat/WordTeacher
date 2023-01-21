@@ -86,7 +86,7 @@ open class SettingsVMImpl (
     override fun onAuthButtonClicked(type: SettingsViewAuthButtonItem.ButtonType) {
         when (type) {
             SettingsViewAuthButtonItem.ButtonType.SignIn -> router?.openGoogleAuth()
-            SettingsViewAuthButtonItem.ButtonType.SignOut -> { TODO("Not Implemented") }
+            SettingsViewAuthButtonItem.ButtonType.SignOut -> { router?.signOutGoogle() }
             SettingsViewAuthButtonItem.ButtonType.TryAgain -> router?.openGoogleAuth()
         }
     }

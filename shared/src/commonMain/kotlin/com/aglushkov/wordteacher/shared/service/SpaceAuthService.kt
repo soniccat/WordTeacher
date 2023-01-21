@@ -31,6 +31,7 @@ data class AuthToken(
 @Serializable
 data class AuthUser(
     @SerialName("id") val id: String,
+    @SerialName("networkType") val networkType: SpaceAuthService.NetworkType?,
 )
 
 class SpaceAuthService(

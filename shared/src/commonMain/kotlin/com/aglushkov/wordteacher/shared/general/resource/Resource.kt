@@ -6,15 +6,14 @@ import kotlinx.coroutines.CancellationException
 import kotlin.js.JsName
 
 
-sealed class Resource<T>(
-    val canLoadNextPage: Boolean,
-    val version: Int = 0
-) {
+sealed interface Resource<T> {
+    val canLoadNextPage: Boolean
+    val version: Int
 
-    class Uninitialized<T>(version: Int = 0) : Resource<T>(false, version = version)
-    class Loaded<T>(val data: T, canLoadNext: Boolean = false, version: Int = 0) : Resource<T>(canLoadNext, version)
-    class Loading<T>(val data: T? = null, canLoadNext: Boolean = false, version: Int = 0) : Resource<T>(canLoadNext, version)
-    class Error<T>(val throwable: Throwable, val canTryAgain: Boolean, val data: T? = null, canLoadNext: Boolean = false, version: Int = 0) : Resource<T>(canLoadNext, version)
+    data class Uninitialized<T>(override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
+    data class Loaded<T>(val data: T, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
+    data class Loading<T>(val data: T? = null, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
+    data class Error<T>(val throwable: Throwable, val canTryAgain: Boolean, val data: T? = null, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
 
     fun toLoading(data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loading(data, canLoadNext, version)
     fun toLoaded(data: T, canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loaded(data, canLoadNext, version)
@@ -40,7 +39,7 @@ sealed class Resource<T>(
 
     fun copy(data: T? = this.data(), version: Int = this.version): Resource<T> {
         return when(this) {
-            is Uninitialized -> Uninitialized(version)
+            is Uninitialized -> Uninitialized(version = version)
             is Loaded -> Loaded(data!!, canLoadNextPage, version)
             is Loading -> Loading(data, canLoadNextPage, version)
             is Error -> Error(throwable, canTryAgain, data, canLoadNextPage, version)
@@ -49,7 +48,7 @@ sealed class Resource<T>(
 
     fun <R> copyWith(data: R?): Resource<R> {
         return when(this) {
-            is Uninitialized -> Uninitialized(version)
+            is Uninitialized -> Uninitialized(version = version)
             is Loaded -> Loaded(data!!, canLoadNextPage, version)
             is Loading -> Loading(data, canLoadNextPage, version)
             is Error -> Error(throwable, canTryAgain, data, canLoadNextPage, version)
