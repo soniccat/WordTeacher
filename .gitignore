@@ -11,7 +11,7 @@ local.properties
 *.iml
 
 build/
-androidApp/build/
+android_app/build/
 shared/build/
 buildSrc/build/
 

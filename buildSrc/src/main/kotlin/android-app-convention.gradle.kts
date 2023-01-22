@@ -15,7 +15,7 @@ plugins {
 
 // Signing file
 var debugKeystoreProps: Properties? = null
-val debugKeystorePropFile = file("${project.rootDir}/androidApp/keystore.properties")
+val debugKeystorePropFile = file("${project.rootDir}/android_app/keystore.properties")
 if (debugKeystorePropFile.exists()) {
     debugKeystoreProps = Properties().apply {
         load(FileInputStream(debugKeystorePropFile))

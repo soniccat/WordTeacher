@@ -25,6 +25,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinxSerializationJson)
                 implementation(libs.ktorCommonCore)
+                api(libs.ktorLogging)
                 implementation(libs.ktorAuth)
                 implementation(libs.coroutinesCommon)
                 implementation(libs.okio)

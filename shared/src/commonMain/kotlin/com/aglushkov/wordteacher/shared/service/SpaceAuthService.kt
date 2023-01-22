@@ -67,43 +67,24 @@ class SpaceAuthService(
     }
 
     suspend fun auth(network: NetworkType, token: String): Response<AuthData> {
-        Logger.v("Loading", tag = TAG)
-
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/auth/social/" + network.value) {
                 this.setBody(json.encodeToString(AuthInput(token)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            logResponse(res, stringResponse)
-
             json.decodeFromString(stringResponse)
         }
     }
 
     suspend fun refresh(token: AuthToken): Response<AuthToken> {
-        Logger.v("Loading", tag = TAG)
-
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/auth/refresh") {
                 this.setBody(json.encodeToString(RefreshInput(token.accessToken, token.refreshToken)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            logResponse(res, stringResponse)
-
             json.decodeFromString(stringResponse)
-        }
-    }
-
-    private fun logResponse(
-        response: HttpResponse,
-        stringResponse: String
-    ) {
-        if (response.status == HttpStatusCode.OK) {
-            Logger.v("Loaded", tag = TAG)
-        } else {
-            Logger.e("Status: ${response.status} response: $stringResponse", tag = TAG)
         }
     }
 }
