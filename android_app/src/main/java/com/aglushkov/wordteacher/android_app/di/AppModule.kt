@@ -195,10 +195,24 @@ class AppModule {
 
     @AppComp
     @Provides
+    fun cookieStorage(
+        context: Context,
+        fileSystem: FileSystem
+    ): CookiesStorage {
+        val cookieFilePath = context.filesDir.absolutePath.toPath().div("cookies")
+        return FileCookieStorage(
+            fileSystem,
+            cookieFilePath
+        )
+    }
+
+    @AppComp
+    @Provides
     @SpaceHttpClient
     fun spaceHttpClient(
         deviceIdRepository: DeviceIdRepository,
-        appInfo: AppInfo
+        appInfo: AppInfo,
+        cookieStorage: CookiesStorage
     ) = HttpClient {
         if (BuildConfig.DEBUG) {
             install(Logging) {
@@ -211,7 +225,9 @@ class AppModule {
             }
         }
 
-        install(HttpCookies)
+        install(HttpCookies) {
+            storage = cookieStorage
+        }
         install(
             createClientPlugin("SpacePlugin") {
                 onRequest { request, _ ->

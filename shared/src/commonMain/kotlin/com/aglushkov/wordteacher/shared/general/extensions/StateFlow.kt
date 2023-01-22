@@ -27,10 +27,6 @@ suspend fun <T> Flow<Resource<T>>.forward(version: Int, stateFlow: MutableStateF
     }
 }
 
-suspend fun <T> StateFlow<Resource<T>>.collectUntilLoaded(): T {
-    return first { it.isLoaded() }.data()!!
-}
-
 // Take until a resource operation is completed, the last state is emitted
 fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(
     version: Int = value.version
@@ -109,6 +105,10 @@ suspend fun StateFlow<Boolean>.waitUntilFalse() {
 
 suspend fun StateFlow<Boolean>.waitUntilTrue() {
     takeWhile { !it }.collect()
+}
+
+suspend fun <T> StateFlow<Resource<T>>.waitUntilLoaded() {
+    takeWhile { !it.isLoaded() }.collect()
 }
 
 class AbortFlowException constructor(

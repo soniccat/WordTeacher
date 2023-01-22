@@ -55,13 +55,28 @@ class SpaceAuthService(
         @SerialName("refreshToken") val refreshToken: String,
     )
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-        classDiscriminator = "status"
-        serializersModule = SerializersModule {
-            polymorphic(Response::class) {
-                subclass(OkResponse.serializer(AuthData.serializer()))
-                subclass(ErrResponse.serializer())
+    private val authJson by lazy {
+        Json {
+            ignoreUnknownKeys = true
+            classDiscriminator = "status"
+            serializersModule = SerializersModule {
+                polymorphic(Response::class) {
+                    subclass(OkResponse.serializer(AuthData.serializer()))
+                    subclass(ErrResponse.serializer())
+                }
+            }
+        }
+    }
+
+    private val refreshJson by lazy {
+        Json {
+            ignoreUnknownKeys = true
+            classDiscriminator = "status"
+            serializersModule = SerializersModule {
+                polymorphic(Response::class) {
+                    subclass(OkResponse.serializer(AuthToken.serializer()))
+                    subclass(ErrResponse.serializer())
+                }
             }
         }
     }
@@ -69,24 +84,22 @@ class SpaceAuthService(
     suspend fun auth(network: NetworkType, token: String): Response<AuthData> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/auth/social/" + network.value) {
-                this.setBody(json.encodeToString(AuthInput(token)))
+                this.setBody(authJson.encodeToString(AuthInput(token)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            json.decodeFromString(stringResponse)
+            authJson.decodeFromString(stringResponse)
         }
     }
 
     suspend fun refresh(token: AuthToken): Response<AuthToken> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/auth/refresh") {
-                this.setBody(json.encodeToString(RefreshInput(token.accessToken, token.refreshToken)))
+                this.setBody(refreshJson.encodeToString(RefreshInput(token.accessToken, token.refreshToken)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            json.decodeFromString(stringResponse)
+            refreshJson.decodeFromString(stringResponse)
         }
     }
 }
-
-private const val TAG = "SpaceAuth"

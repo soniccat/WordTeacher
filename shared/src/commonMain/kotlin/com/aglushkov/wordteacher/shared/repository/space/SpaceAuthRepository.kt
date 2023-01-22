@@ -64,11 +64,7 @@ class SpaceAuthRepository(
             loadResource(stateFlow.value) {
                 service.auth(network, token).toOkResult()
             }.onEach {
-                it.asLoaded()?.data?.let { authData ->
-                    launch(Dispatchers.Default) {
-                        store(authData)
-                    }
-                }
+                storeAuthDataIfNeeded(it)
             }.collect(stateFlow)
         }
     }
@@ -89,7 +85,17 @@ class SpaceAuthRepository(
                 newTokenRes.transform(authDataRes) { newToken ->
                     authDataRes.data.copy(authToken = newToken)
                 }
+            }.onEach {
+                storeAuthDataIfNeeded(it)
             }.collect(stateFlow)
+        }
+    }
+
+    private fun CoroutineScope.storeAuthDataIfNeeded(it: Resource<AuthData>) {
+        it.asLoaded()?.data?.let { authData ->
+            launch(Dispatchers.Default) {
+                store(authData)
+            }
         }
     }
 }

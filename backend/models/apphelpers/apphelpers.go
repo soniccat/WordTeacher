@@ -18,6 +18,5 @@ func CreateSessionManager(redisAddress string) *scs.SessionManager {
 	sessionManager := scs.New()
 	sessionManager.Store = redisstore.New(pool)
 	sessionManager.Lifetime = 24 * time.Hour
-	sessionManager.Cookie.Path = "/api/"
 	return sessionManager
 }

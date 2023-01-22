@@ -7,9 +7,11 @@ import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.android_app.di.DaggerAppComponent
 import com.aglushkov.wordteacher.android_app.di.GeneralModule
+import com.aglushkov.wordteacher.shared.general.FileCookieStorage
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import io.ktor.client.plugins.cookies.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,7 +26,10 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var nlpCore: NLPCore
     @Inject lateinit var routerResolver: RouterResolver
     @Inject lateinit var activityVisibilityResolver: ActivityVisibilityResolver
+
+    // declare here to force initialization on startup
     @Inject lateinit var databaseCardWorker: DatabaseCardWorker
+    @Inject lateinit var cookieStorage: CookiesStorage
 
     override fun onCreate() {
         super.onCreate()

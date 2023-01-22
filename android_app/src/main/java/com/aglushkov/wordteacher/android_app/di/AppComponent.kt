@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.android_app.di
 
+import android.content.Context
 import com.aglushkov.wordteacher.android_app.GApp
 import com.aglushkov.wordteacher.android_app.di.AppComp
 import com.aglushkov.wordteacher.android_app.features.add_article.di.AddArticleDependencies
@@ -37,6 +38,8 @@ import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Component
 import io.ktor.client.*
+import io.ktor.client.plugins.cookies.*
+import okio.FileSystem
 import javax.inject.Qualifier
 
 
@@ -73,6 +76,7 @@ interface AppComponent:
     override fun wordRepository(): WordDefinitionRepository
     override fun notesRepository(): NotesRepository
 
+    fun cookieStorage(): CookiesStorage
     @SpaceHttpClient
     fun spaceHttpClient(): HttpClient
     fun appInfo(): AppInfo

@@ -4,7 +4,6 @@ import co.touchlab.stately.concurrency.AtomicBoolean
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.extensions.collectUntilLoaded
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isUninitialized
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
