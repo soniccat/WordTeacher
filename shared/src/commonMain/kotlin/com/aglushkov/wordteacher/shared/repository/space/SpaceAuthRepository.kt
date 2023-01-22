@@ -1,15 +1,9 @@
 package com.aglushkov.wordteacher.shared.repository.space
 
-import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.ToOkResult
-import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.extensions.forward
+import com.aglushkov.wordteacher.shared.general.toOkResult
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
-import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
-import com.aglushkov.wordteacher.shared.general.v
-import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.service.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
@@ -17,7 +11,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
 import okio.FileSystem
 import okio.Path
 
@@ -68,35 +61,35 @@ class SpaceAuthRepository(
 
     fun auth(network: SpaceAuthService.NetworkType, token: String) {
         mainScope.launch {
-            authFlow(network, token).onStart {
-                stateFlow.value.toLoading()
+            loadResource(stateFlow.value) {
+                service.auth(network, token).toOkResult()
             }.onEach {
                 it.asLoaded()?.data?.let { authData ->
                     launch(Dispatchers.Default) {
                         store(authData)
                     }
                 }
-            }.forward(stateFlow)
-        }
-    }
-
-    private fun authFlow(network: SpaceAuthService.NetworkType, token: String) = flow {
-        try {
-            val authData = service.auth(network, token).ToOkResult()
-            emit(Resource.Loaded(authData))
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Logger.e(e.message.orEmpty(), TAG)
-            e.printStackTrace()
-            emit(stateFlow.value.toError(e, true))
+            }.collect(stateFlow)
         }
     }
 
     fun signOut(network: SpaceAuthService.NetworkType) {
-        val loaded = stateFlow.value.asLoaded()?.data
-        if (loaded?.user?.networkType == network) {
+        val authData = stateFlow.value.asLoaded()?.data ?: return
+        if (authData.user.networkType == network) {
             stateFlow.value = Resource.Uninitialized(version = 1) // version = 1 to distinguish this Uninitialized from a default one
+        }
+    }
+
+    fun refresh() {
+        val authDataRes = stateFlow.value.asLoaded() ?: return
+        mainScope.launch {
+            loadResource(authDataRes.copyWith(authDataRes.data.authToken)) {
+                service.refresh(authDataRes.data.authToken).toOkResult()
+            }.map { newTokenRes ->
+                newTokenRes.transform(authDataRes) { newToken ->
+                    authDataRes.data.copy(authToken = newToken)
+                }
+            }.collect(stateFlow)
         }
     }
 }

@@ -20,7 +20,7 @@ data class ErrResponse(val value: Error) : Response<Error>()
 
 class ErrorResponseException(val err: Error): Exception(err.message)
 
-fun <T> Response<T>.ToOkResult(): T {
+fun <T> Response<T>.toOkResult(): T {
     return when(this) {
         is OkResponse -> value
         is ErrResponse -> throw ErrorResponseException(value)

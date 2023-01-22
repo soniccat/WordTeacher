@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
+import javax.inject.Qualifier
 
 @Component(dependencies = [SettingsDependencies::class], modules = [SettingsModule::class])
 public interface SettingsComponent {
@@ -18,6 +19,7 @@ public interface SettingsComponent {
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
         @BindsInstance fun setState(state: SettingsVM.State): Builder
+        @BindsInstance fun setIsDebug(@IsDebug isDebug: Boolean): Builder
 
         fun setDeps(deps: SettingsDependencies): Builder
         fun build(): SettingsComponent
@@ -30,3 +32,6 @@ interface SettingsDependencies {
     fun connectivityManager(): ConnectivityManager
     fun idGenerator(): IdGenerator
 }
+
+@Qualifier
+annotation class IsDebug

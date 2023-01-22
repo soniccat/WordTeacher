@@ -25,11 +25,13 @@ class SettingsDecomposeComponent (
     connectivityManager: ConnectivityManager,
     spaceAuthRepository: SpaceAuthRepository,
     idGenerator: IdGenerator,
+    isDebug: Boolean
 ) : SettingsVMImpl(
     state,
     connectivityManager,
     spaceAuthRepository,
     idGenerator,
+    isDebug,
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {

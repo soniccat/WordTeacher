@@ -36,3 +36,9 @@ class SettingsViewAuthButtonItem(text: StringDesc, val buttonType: ButtonType): 
     }
 }
 
+class SettingsViewAuthRefreshButtonItem(text: StringDesc): BaseViewItem<StringDesc>(text, Type) {
+    companion object {
+        const val Type = 1003
+    }
+}
+

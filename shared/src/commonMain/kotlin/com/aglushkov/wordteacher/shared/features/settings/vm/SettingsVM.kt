@@ -1,8 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.settings.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -10,11 +8,7 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
-import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
-import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.service.AuthData
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -24,6 +18,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.*
 import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.desc.Raw
 
 interface SettingsVM: Clearable {
     var router: SettingsRouter?
@@ -33,6 +28,7 @@ interface SettingsVM: Clearable {
 
     fun restore(newState: State)
     fun onAuthButtonClicked(type: SettingsViewAuthButtonItem.ButtonType)
+    fun onAuthRefreshClicked()
 
     // Created to use in future
     @Parcelize
@@ -44,6 +40,7 @@ open class SettingsVMImpl (
     private val connectivityManager: ConnectivityManager,
     private val spaceAuthRepository: SpaceAuthRepository,
     private val idGenerator: IdGenerator,
+    private val isDebug: Boolean
 ): ViewModel(), SettingsVM {
 
     override var router: SettingsRouter? = null
@@ -52,15 +49,15 @@ open class SettingsVMImpl (
     override val eventFlow = eventChannel.receiveAsFlow()
 
     override val items: StateFlow<List<BaseViewItem<*>>> =
-        spaceAuthRepository.authDataFlow.map {
-            buildAuthItems(it)
-        }.stateIn<List<BaseViewItem<*>>>(viewModelScope, SharingStarted.Eagerly, emptyList<BaseViewItem<*>>())
+        spaceAuthRepository.authDataFlow.map { res ->
+            buildItems(res, isDebug)
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     override fun restore(newState: SettingsVM.State) {
         state = newState
     }
 
-    private fun buildAuthItems(authDataRes: Resource<AuthData>): List<BaseViewItem<*>> {
+    private fun buildItems(authDataRes: Resource<AuthData>, isDebug: Boolean): List<BaseViewItem<*>> {
         val title = SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_auth_title))
         val button = when(authDataRes) {
             is Resource.Error -> SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.error_try_again), SettingsViewAuthButtonItem.ButtonType.TryAgain)
@@ -69,9 +66,15 @@ open class SettingsVMImpl (
             is Resource.Uninitialized -> SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.settings_auth_signin), SettingsViewAuthButtonItem.ButtonType.SignIn)
         }
 
-        val items: MutableList<BaseViewItem<*>> = mutableListOf(title, button)
-        generateIds(items)
-        return items
+        val authItems: MutableList<BaseViewItem<*>> = mutableListOf(title, button)
+
+        val resultItems = authItems
+        if (isDebug) {
+            resultItems += SettingsViewAuthRefreshButtonItem(StringDesc.Raw("Refresh"))
+        }
+
+        generateIds(resultItems)
+        return resultItems
     }
 
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
@@ -89,5 +92,9 @@ open class SettingsVMImpl (
             SettingsViewAuthButtonItem.ButtonType.SignOut -> { router?.signOutGoogle() }
             SettingsViewAuthButtonItem.ButtonType.TryAgain -> router?.openGoogleAuth()
         }
+    }
+
+    override fun onAuthRefreshClicked() {
+        spaceAuthRepository.refresh()
     }
 }

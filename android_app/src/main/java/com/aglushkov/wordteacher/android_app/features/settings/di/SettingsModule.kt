@@ -18,11 +18,13 @@ class SettingsModule {
         connectivityManager: ConnectivityManager,
         spaceAuthRepository: SpaceAuthRepository,
         idGenerator: IdGenerator,
+        @IsDebug isDebug: Boolean,
     ) = SettingsDecomposeComponent(
         componentContext,
         state,
         connectivityManager,
         spaceAuthRepository,
-        idGenerator
+        idGenerator,
+        isDebug
     )
 }

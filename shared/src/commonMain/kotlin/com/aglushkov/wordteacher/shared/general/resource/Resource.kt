@@ -3,6 +3,8 @@ package com.aglushkov.wordteacher.shared.general.resource
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlin.js.JsName
 
 
@@ -15,6 +17,7 @@ sealed interface Resource<T> {
     data class Loading<T>(val data: T? = null, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
     data class Error<T>(val throwable: Throwable, val canTryAgain: Boolean, val data: T? = null, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
 
+    fun toUninitialized(canLoadNextPage: Boolean = this.canLoadNextPage, version: Int = this.version) = Uninitialized<T>(canLoadNextPage, version)
     fun toLoading(data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loading(data, canLoadNext, version)
     fun toLoaded(data: T, canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loaded(data, canLoadNext, version)
     fun toError(throwable: Throwable, canTryAgain: Boolean, data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Error(throwable, canTryAgain, data, canLoadNext, version)
@@ -53,6 +56,16 @@ sealed interface Resource<T> {
             is Loading -> Loading(data, canLoadNextPage, version)
             is Error -> Error(throwable, canTryAgain, data, canLoadNextPage, version)
         }
+    }
+
+    fun <R> transform(
+        from: Resource<R> = Uninitialized(),
+        loadedDataTransformer: (T) -> R
+    ): Resource<R> = when (this) {
+        is Loaded -> from.toLoaded(data = loadedDataTransformer(data))
+        is Loading -> from.toLoading()
+        is Error -> from.toError(throwable, canTryAgain)
+        is Uninitialized -> from.toUninitialized()
     }
 
     fun bumpVersion() = copy(version = this.version + 1)
@@ -155,12 +168,30 @@ fun <D, T> Resource<T>.toPair(res2: Resource<D>) = Pair(data(), res2.data())
 fun <D, T, P> Resource<T>.toTriple(res2: Resource<D>, res3: Resource<P>) = Triple(data(), res2.data(), res3.data())
 
 fun <T> tryInResource(canTryAgain: Boolean = false, code: () -> T): Resource<T> {
-    try {
-        return Resource.Loaded(code())
+    return try {
+        Resource.Loaded(code())
     } catch (e: CancellationException) {
         throw e
     } catch (e: Throwable) {
         Logger.e(e.message.toString(), "tryInResource")
-        return Resource.Error(throwable = e, canTryAgain)
+        Resource.Error(throwable = e, canTryAgain)
+    }
+}
+
+fun <T> loadResource(
+    initialValue: Resource<T> = Resource.Uninitialized(),
+    canTryAgain: Boolean = true,
+    loader: suspend () -> T
+): Flow<Resource<T>> = flow {
+    try {
+        emit(initialValue.toLoading())
+        val result = loader()
+        emit(Resource.Loaded(result))
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Logger.e(e.message.orEmpty(), "resourceLoadingFlow")
+        e.printStackTrace()
+        emit(initialValue.toError(e, canTryAgain))
     }
 }

@@ -13,10 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
-import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewAuthButtonItem
-import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewLoading
-import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
+import com.aglushkov.wordteacher.shared.features.settings.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 
 @ExperimentalFoundationApi
@@ -79,6 +76,11 @@ private fun showSettingsItem(
     }
     is SettingsViewAuthButtonItem -> {
         Button(onClick = { vm.onAuthButtonClicked(item.buttonType) }) {
+            Text(text = item.firstItem().toString(LocalContext.current))
+        }
+    }
+    is SettingsViewAuthRefreshButtonItem -> {
+        Button(onClick = { vm.onAuthRefreshClicked() }) {
             Text(text = item.firstItem().toString(LocalContext.current))
         }
     }

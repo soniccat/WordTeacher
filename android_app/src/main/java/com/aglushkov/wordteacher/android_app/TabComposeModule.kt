@@ -53,6 +53,7 @@ class TabComposeModule {
                     DaggerSettingsComponent.builder()
                         .setComponentContext(context)
                         .setState(SettingsVM.State())
+                        .setIsDebug(BuildConfig.DEBUG)
                         .setDeps(appComponent)
                         .build()
                         .settingsDecomposeComponent()

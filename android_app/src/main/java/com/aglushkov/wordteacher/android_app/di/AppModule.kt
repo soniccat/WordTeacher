@@ -37,6 +37,7 @@ import dagger.Module
 import dagger.Provides
 import io.ktor.client.*
 import io.ktor.client.plugins.api.*
+import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.request.*
@@ -210,6 +211,7 @@ class AppModule {
             }
         }
 
+        install(HttpCookies)
         install(
             createClientPlugin("SpacePlugin") {
                 onRequest { request, _ ->
