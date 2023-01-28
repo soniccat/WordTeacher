@@ -94,9 +94,7 @@ class MainActivity : AppCompatActivity(), Router {
             v.onApplyWindowInsets(insets)
         }
 
-        googleAuthRepository = GoogleAuthRepository(
-            resources.getString(R.string.default_web_client_id)
-        ).apply {
+        googleAuthRepository = appComponent().googleAuthRepository().apply {
             bind(this@MainActivity)
         }.also { repo ->
             lifecycleScope.launch {
@@ -116,7 +114,7 @@ class MainActivity : AppCompatActivity(), Router {
 
     private fun signInWithGoogleAuthData(authData: GoogleAuthData) {
         val idToken = authData.tokenId ?: return
-        appComponent().spaceAuthRepository().auth(SpaceAuthService.NetworkType.Google, idToken)
+        appComponent().spaceAuthRepository().launchAuth(SpaceAuthService.NetworkType.Google, idToken)
     }
 
     private fun signOutFromGoogle() {
@@ -139,10 +137,8 @@ class MainActivity : AppCompatActivity(), Router {
         }
     }
 
-    private fun appComponent(): AppComponent {
-        val deps = (applicationContext as AppComponentOwner).appComponent
-        return deps
-    }
+    private fun appComponent(): AppComponent =
+        (applicationContext as AppComponentOwner).appComponent
 
     @Composable
     private fun ComposeUI() {

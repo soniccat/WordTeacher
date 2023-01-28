@@ -9,7 +9,7 @@ func (app *application) routes() *mux.Router {
 	// Register handler functions.
 	r := mux.NewRouter()
 	r.Handle(
-		"/api/auth/social/{networkType}",
+		"/api/auth/social/{networkType}", // TODO: adds versioning
 		app.sessionManager.LoadAndSave(http.HandlerFunc(app.auth)),
 	).Methods("POST")
 

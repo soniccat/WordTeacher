@@ -31,11 +31,11 @@ type RefreshResponse struct {
 func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie(apphelpers.CookieSession)
 	if err != nil {
-		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
+		apphelpers.SetError(w, err, http.StatusUnauthorized, app.logger)
 		return
 	}
 	if len(session.Value) == 0 {
-		apphelpers.SetError(w, errors.New("Session is empty"), http.StatusBadRequest, app.logger)
+		apphelpers.SetError(w, errors.New("session is empty"), http.StatusBadRequest, app.logger)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !userAuthToken.IsValid() {
-		apphelpers.SetError(w, errors.New("Token is invalid"), http.StatusUnauthorized, app.logger)
+		apphelpers.SetError(w, errors.New("token is invalid"), http.StatusUnauthorized, app.logger)
 		return
 	}
 
@@ -77,7 +77,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		deviceType,
 		deviceId,
 	) {
-		apphelpers.SetError(w, errors.New("Token is invalid"), http.StatusUnauthorized, app.logger)
+		apphelpers.SetError(w, errors.New("token is invalid"), http.StatusUnauthorized, app.logger)
 		return
 	}
 

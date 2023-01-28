@@ -95,6 +95,6 @@ open class SettingsVMImpl (
     }
 
     override fun onAuthRefreshClicked() {
-        spaceAuthRepository.refresh()
+        spaceAuthRepository.launchRefresh()
     }
 }

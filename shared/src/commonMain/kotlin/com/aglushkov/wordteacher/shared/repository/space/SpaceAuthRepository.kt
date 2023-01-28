@@ -59,14 +59,25 @@ class SpaceAuthRepository(
         }
     }
 
-    fun auth(network: SpaceAuthService.NetworkType, token: String) {
+    fun launchAuth(network: SpaceAuthService.NetworkType, token: String) {
         mainScope.launch {
-            loadResource(stateFlow.value) {
-                service.auth(network, token).toOkResult()
-            }.onEach {
-                storeAuthDataIfNeeded(it)
-            }.collect(stateFlow)
+            auth(network, token)
         }
+    }
+
+    suspend fun auth(
+        network: SpaceAuthService.NetworkType,
+        token: String
+    ): Resource<AuthData> {
+        var res: Resource<AuthData> = stateFlow.value
+        loadResource(res) {
+            service.auth(network, token).toOkResult()
+        }.onEach {
+            storeAuthDataIfNeeded(it)
+            res = it
+        }.collect(stateFlow)
+
+        return res
     }
 
     fun signOut(network: SpaceAuthService.NetworkType) {
@@ -76,24 +87,33 @@ class SpaceAuthRepository(
         }
     }
 
-    fun refresh() {
-        val authDataRes = stateFlow.value.asLoaded() ?: return
+    fun launchRefresh() {
         mainScope.launch {
-            loadResource(authDataRes.copyWith(authDataRes.data.authToken)) {
-                service.refresh(authDataRes.data.authToken).toOkResult()
-            }.map { newTokenRes ->
-                newTokenRes.transform(authDataRes) { newToken ->
-                    authDataRes.data.copy(authToken = newToken)
-                }
-            }.onEach {
-                storeAuthDataIfNeeded(it)
-            }.collect(stateFlow)
+            refresh()
         }
     }
 
-    private fun CoroutineScope.storeAuthDataIfNeeded(it: Resource<AuthData>) {
+    suspend fun refresh(): Resource<AuthData> {
+        var stateValue = stateFlow.value
+        val authDataRes = stateValue.asLoaded() ?: return stateValue
+
+        loadResource(authDataRes.copyWith(authDataRes.data.authToken)) {
+            service.refresh(authDataRes.data.authToken).toOkResult()
+        }.map { newTokenRes ->
+            newTokenRes.transform(authDataRes) { newToken ->
+                authDataRes.data.copy(authToken = newToken)
+            }
+        }.onEach {
+            storeAuthDataIfNeeded(it)
+            stateValue = it
+        }.collect(stateFlow)
+
+        return stateValue
+    }
+
+    private fun storeAuthDataIfNeeded(it: Resource<AuthData>) {
         it.asLoaded()?.data?.let { authData ->
-            launch(Dispatchers.Default) {
+            mainScope.launch(Dispatchers.Default) {
                 store(authData)
             }
         }

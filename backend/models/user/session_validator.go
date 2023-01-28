@@ -35,7 +35,7 @@ func validateSession[T any, PT TokenHolder[T]](
 ) (*T, *userauthtoken.UserAuthToken, *ValidateSessionError) {
 	_, err := r.Cookie(apphelpers.CookieSession)
 	if err != nil {
-		return nil, nil, NewValidateSessionError(http.StatusBadRequest, err)
+		return nil, nil, NewValidateSessionError(http.StatusUnauthorized, err)
 	}
 
 	// Header params

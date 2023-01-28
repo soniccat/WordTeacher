@@ -111,6 +111,11 @@ suspend fun <T> StateFlow<Resource<T>>.waitUntilLoaded() {
     takeWhile { !it.isLoaded() }.collect()
 }
 
+suspend fun <T> StateFlow<Resource<T>>.waitUntilLoadedOrError() {
+    takeWhile { !it.isLoadedOrError() }.collect()
+}
+
+
 class AbortFlowException constructor(
     val owner: FlowCollector<*>
 ) : CancellationException("Flow was aborted, no more elements needed")

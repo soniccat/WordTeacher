@@ -5,9 +5,15 @@ import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.aglushkov.wordteacher.android_app.BuildConfig
 import com.aglushkov.wordteacher.android_app.R
+import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepository
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
+import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.asLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isError
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
@@ -26,6 +32,7 @@ import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.service.AuthData
 import com.aglushkov.wordteacher.shared.service.ConfigService
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
@@ -36,11 +43,13 @@ import okio.FileSystem
 import dagger.Module
 import dagger.Provides
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import okio.Path
 import okio.Path.Companion.toPath
@@ -212,7 +221,9 @@ class AppModule {
     fun spaceHttpClient(
         deviceIdRepository: DeviceIdRepository,
         appInfo: AppInfo,
-        cookieStorage: CookiesStorage
+        cookieStorage: CookiesStorage,
+        googleAuthRepository: dagger.Lazy<GoogleAuthRepository>,
+        spaceRepository: dagger.Lazy<SpaceAuthRepository>,
     ) = HttpClient {
         if (BuildConfig.DEBUG) {
             install(Logging) {
@@ -224,7 +235,6 @@ class AppModule {
                 level = LogLevel.ALL
             }
         }
-
         install(HttpCookies) {
             storage = cookieStorage
         }
@@ -239,11 +249,69 @@ class AppModule {
                 }
             }
         )
+        install(
+            createClientPlugin("AuthInterceptor for 401 error") {
+                on(Send) { request ->
+                    val originalCall = proceed(request)
+                    originalCall.response.run { // this: HttpResponse
+                        val googleAuthRepository = googleAuthRepository.get()
+                        val spaceRepository = spaceRepository.get()
+
+                        if(status == HttpStatusCode.Unauthorized) {
+                            try {
+                                var result: Resource<AuthData> = Resource.Uninitialized()
+
+                                // if we have valid cookies then we can call refresh
+                                val session = cookieStorage.get(this.request.url).firstOrNull { it.name == "session" }?.value
+                                if (session != null && !this.request.url.isAuthRefreshUrl()) {
+                                    result = spaceRepository.refresh()
+                                }
+
+                                val call = if (!result.isLoaded()) {
+                                    // try to reauth
+                                    if (googleAuthRepository.googleSignInCredentialFlow.value.isError()) {
+                                        googleAuthRepository.signIn()
+                                    }
+
+                                    googleAuthRepository.googleSignInCredentialFlow.waitUntilLoadedOrError()
+                                    googleAuthRepository.googleSignInCredentialFlow.value.asLoaded()?.data?.tokenId?.let { tokenId ->
+                                        spaceRepository.auth(
+                                            SpaceAuthService.NetworkType.Google,
+                                            tokenId
+                                        )
+                                        spaceRepository.value.asLoaded()?.let {
+                                            request.setBody()
+                                        }
+                                        proceed(request)
+                                    }
+                                } else { null }
+                                call ?: originalCall
+                            } catch (e: Exception) {
+                                originalCall
+                            }
+                        } else {
+                            originalCall
+                        }
+                    }
+                }
+            }
+        )
+    }
+
+    private fun Url.isAuthRefreshUrl(): Boolean {
+        return pathSegments.size >= 2 && pathSegments.subList(pathSegments.size - 2, pathSegments.size) == listOf("auth", "refresh")
     }
 
     @AppComp
     @Provides
     fun appInfo(): AppInfo = AppInfo(BuildConfig.VERSION_NAME, "Android")
+
+    @AppComp
+    @Provides
+    fun googleAuthRepository(
+        context: Context
+    ): GoogleAuthRepository =
+        GoogleAuthRepository(context.getString(R.string.default_web_client_id))
 
     @AppComp
     @Provides

@@ -24,8 +24,8 @@ import kotlin.math.min
 
 // Based on AcceptAllCookiesStorage source code
 public class FileCookieStorage(
-    val fileSystem: FileSystem,
-    val path: Path
+    private val fileSystem: FileSystem,
+    private val path: Path
 ) : CookiesStorage {
 
     private val containerState = MutableStateFlow<Resource<MutableList<Cookie>>>(Resource.Uninitialized())
