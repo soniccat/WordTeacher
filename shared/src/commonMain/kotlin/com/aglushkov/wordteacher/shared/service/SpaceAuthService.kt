@@ -16,6 +16,11 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 
+const val CookieSession = "session"
+const val HeaderDeviceId = "X-Device-Id"
+const val HeaderDeviceType = "X-Device-Type"
+const val HeaderAccessToken = "X-Access-Token"
+
 @Serializable
 data class AuthData(
     @SerialName("token") val authToken: AuthToken,

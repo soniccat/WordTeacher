@@ -99,19 +99,19 @@ fun <T> StateFlow<T?>.takeWhileNonNull(
         takeWhile { it != null }.collect(this as FlowCollector<T?>)
     }
 
-suspend fun StateFlow<Boolean>.waitUntilFalse() {
+suspend fun Flow<Boolean>.waitUntilFalse() {
     takeWhile { it }.collect()
 }
 
-suspend fun StateFlow<Boolean>.waitUntilTrue() {
+suspend fun Flow<Boolean>.waitUntilTrue() {
     takeWhile { !it }.collect()
 }
 
-suspend fun <T> StateFlow<Resource<T>>.waitUntilLoaded() {
+suspend fun <T> Flow<Resource<T>>.waitUntilLoaded() {
     takeWhile { !it.isLoaded() }.collect()
 }
 
-suspend fun <T> StateFlow<Resource<T>>.waitUntilLoadedOrError() {
+suspend fun <T> Flow<Resource<T>>.waitUntilLoadedOrError() {
     takeWhile { !it.isLoadedOrError() }.collect()
 }
 

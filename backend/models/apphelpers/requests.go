@@ -9,7 +9,7 @@ import (
 	"runtime/debug"
 )
 
-const CookieSession = "X-Session"
+const CookieSession = "session"
 const HeaderDeviceId = "X-Device-Id"
 const HeaderDeviceType = "X-Device-Type"
 const HeaderAccessToken = "X-Access-Token"

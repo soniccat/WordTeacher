@@ -42,13 +42,13 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 	// Header params
 	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
 	if len(deviceId) == 0 {
-		apphelpers.SetError(w, errors.New("DeviceId is session"), http.StatusBadRequest, app.logger)
+		apphelpers.SetError(w, errors.New("DeviceId is empty"), http.StatusBadRequest, app.logger)
 		return
 	}
 
 	var deviceType = r.Header.Get(apphelpers.HeaderDeviceType)
 	if len(deviceType) == 0 {
-		apphelpers.SetError(w, errors.New("DeviceType is session"), http.StatusBadRequest, app.logger)
+		apphelpers.SetError(w, errors.New("DeviceType is empty"), http.StatusBadRequest, app.logger)
 		return
 	}
 

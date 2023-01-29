@@ -32,9 +32,7 @@ import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
-import com.aglushkov.wordteacher.shared.service.AuthData
-import com.aglushkov.wordteacher.shared.service.ConfigService
-import com.aglushkov.wordteacher.shared.service.SpaceAuthService
+import com.aglushkov.wordteacher.shared.service.*
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -43,7 +41,6 @@ import okio.FileSystem
 import dagger.Module
 import dagger.Provides
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
@@ -223,7 +220,7 @@ class AppModule {
         appInfo: AppInfo,
         cookieStorage: CookiesStorage,
         googleAuthRepository: dagger.Lazy<GoogleAuthRepository>,
-        spaceRepository: dagger.Lazy<SpaceAuthRepository>,
+        spaceAuthRepository: dagger.Lazy<SpaceAuthRepository>,
     ) = HttpClient {
         if (BuildConfig.DEBUG) {
             install(Logging) {
@@ -242,8 +239,11 @@ class AppModule {
             createClientPlugin("SpacePlugin") {
                 onRequest { request, _ ->
                     request.headers {
-                        set("deviceType", "android")
-                        set("deviceId", deviceIdRepository.deviceId())
+                        set(HeaderDeviceType, "android")
+                        set(HeaderDeviceId, deviceIdRepository.deviceId())
+                        spaceAuthRepository.get().value.asLoaded()?.data?.let { authData ->
+                            set(HeaderAccessToken, authData.authToken.accessToken)
+                        }
                         set(HttpHeaders.UserAgent, appInfo.getUserAgent())
                     }
                 }
@@ -255,34 +255,36 @@ class AppModule {
                     val originalCall = proceed(request)
                     originalCall.response.run { // this: HttpResponse
                         val googleAuthRepository = googleAuthRepository.get()
-                        val spaceRepository = spaceRepository.get()
+                        val spaceRepository = spaceAuthRepository.get()
 
                         if(status == HttpStatusCode.Unauthorized) {
                             try {
                                 var result: Resource<AuthData> = Resource.Uninitialized()
 
                                 // if we have valid cookies then we can call refresh
-                                val session = cookieStorage.get(this.request.url).firstOrNull { it.name == "session" }?.value
-                                if (session != null && !this.request.url.isAuthRefreshUrl()) {
+                                val session = cookieStorage.get(this.request.url).firstOrNull { it.name == CookieSession }?.value
+                                val isRefreshUrl = this.request.url.isAuthRefreshUrl()
+                                if (session != null && !isRefreshUrl) {
                                     result = spaceRepository.refresh()
                                 }
 
                                 val call = if (!result.isLoaded()) {
                                     // try to reauth
-                                    if (googleAuthRepository.googleSignInCredentialFlow.value.isError()) {
+                                    if (googleAuthRepository.googleSignInCredentialFlow.value.isError() || googleAuthRepository.googleSignInCredentialFlow.value.isUninitialized()) {
                                         googleAuthRepository.signIn()
+                                        googleAuthRepository.googleSignInCredentialFlow.waitUntilLoadedOrError()
+                                        spaceRepository.authDataFlow.waitUntilLoadedOrError()
+                                    } else {
+                                        googleAuthRepository.googleSignInCredentialFlow.waitUntilLoadedOrError()
+                                        googleAuthRepository.googleSignInCredentialFlow.value.asLoaded()?.data?.tokenId?.let { tokenId ->
+                                            spaceRepository.auth(SpaceAuthService.NetworkType.Google, tokenId)
+                                        }
                                     }
 
-                                    googleAuthRepository.googleSignInCredentialFlow.waitUntilLoadedOrError()
-                                    googleAuthRepository.googleSignInCredentialFlow.value.asLoaded()?.data?.tokenId?.let { tokenId ->
-                                        spaceRepository.auth(
-                                            SpaceAuthService.NetworkType.Google,
-                                            tokenId
-                                        )
-                                        spaceRepository.value.asLoaded()?.let {
-                                            request.setBody()
-                                        }
+                                    if (!isRefreshUrl) {
                                         proceed(request)
+                                    } else {
+                                        null
                                     }
                                 } else { null }
                                 call ?: originalCall
