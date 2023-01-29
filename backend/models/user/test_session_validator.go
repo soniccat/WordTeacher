@@ -6,25 +6,24 @@ import (
 	"net/http"
 )
 
-type MockSessionValidatorResponse[T any] struct {
-	Input                *T
+type MockSessionValidatorResponse struct {
 	AuthToken            *userauthtoken.UserAuthToken
 	ValidateSessionError *ValidateSessionError
 }
 
-type MockSessionValidator[T any] struct {
-	ResponseProvider func() MockSessionValidatorResponse[T]
+type MockSessionValidator struct {
+	ResponseProvider func() MockSessionValidatorResponse
 }
 
-func NewMockSessionValidator[T any]() *MockSessionValidator[T] {
-	return &MockSessionValidator[T]{
-		func() MockSessionValidatorResponse[T] {
-			return MockSessionValidatorResponse[T]{nil, nil, NewValidateSessionError(http.StatusInternalServerError, errors.New("mock error"))}
+func NewMockSessionValidator() *MockSessionValidator {
+	return &MockSessionValidator{
+		func() MockSessionValidatorResponse {
+			return MockSessionValidatorResponse{nil, NewValidateSessionError(http.StatusInternalServerError, errors.New("MockSessionValidator error"))}
 		},
 	}
 }
 
-func (tsv *MockSessionValidator[T]) Validate(r *http.Request) (*T, *userauthtoken.UserAuthToken, *ValidateSessionError) {
+func (tsv *MockSessionValidator) Validate(r *http.Request) (*userauthtoken.UserAuthToken, *ValidateSessionError) {
 	response := tsv.ResponseProvider()
-	return response.Input, response.AuthToken, response.ValidateSessionError
+	return response.AuthToken, response.ValidateSessionError
 }

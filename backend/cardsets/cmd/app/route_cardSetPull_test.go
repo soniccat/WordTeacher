@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"models/apphelpers"
 	"models/card"
 	"models/cardset"
+	"models/test"
 	"models/tools"
 	"models/user"
 	"net/http"
@@ -23,13 +23,13 @@ import (
 
 type CardSetPullTestSuite struct {
 	suite.Suite
-	BaseTestSuite
-	application   *application
-	pullValidator *user.MockSessionValidator[CardSetPullInput]
+	test.BaseTestSuite
+	application      *application
+	sessionValidator *user.MockSessionValidator
 }
 
 func (suite *CardSetPullTestSuite) SetupTest() {
-	suite.pullValidator = user.NewMockSessionValidator[CardSetPullInput]()
+	suite.sessionValidator = user.NewMockSessionValidator()
 
 	sessionManager := apphelpers.CreateSessionManager("172.16.0.3:6380")
 	app, err := createApplication(
@@ -37,8 +37,7 @@ func (suite *CardSetPullTestSuite) SetupTest() {
 		sessionManager,
 		"mongodb://127.0.0.1:27018/?directConnection=true&replicaSet=rs0",
 		false,
-		user.NewMockSessionValidator[CardSetPushInput](),
-		suite.pullValidator,
+		suite.sessionValidator,
 	)
 	if err != nil {
 		suite.T().Fatal(err)
@@ -62,15 +61,15 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutAnything_ReturnsBadReq
 func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_ReturnsAllCardSets() {
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet1",
-		suite.createUUID().String(),
+		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(10)),
-		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
-		suite.createUUID().String(),
+		suite.CreateUUID().String(),
 		time.Now(),
-		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -83,12 +82,9 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 		suite.T().Fatal(errWithCode.Err)
 	}
 
-	suite.setupPullValidatorWithCardSetIds(userId, []string{})
-	req, err := http.NewRequest("POST", "/", nil)
-	if err != nil {
-		suite.T().Fatal(err)
-	}
+	suite.setupPullValidator(userId)
 
+	req := suite.createPullRequest(nil, CardSetPullInput{[]string{}})
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPull(writer, req)
 	response := suite.readPullResponse(writer)
@@ -108,16 +104,16 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_ReturnsOnlyNewCardSet() {
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet1",
-		suite.createUUID().String(),
+		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(20)),
-		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
-		suite.createUUID().String(),
+		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(10)),
-		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -130,8 +126,8 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_Retu
 		suite.T().Fatal(errWithCode.Err)
 	}
 
-	suite.setupPullValidatorWithCardSetIds(userId, []string{})
-	req := suite.createPullRequest(time.Now().Add(-time.Hour * time.Duration(15)))
+	suite.setupPullValidator(userId)
+	req := suite.createPullRequest(tools.Ptr(time.Now().Add(-time.Hour*time.Duration(15))), CardSetPullInput{})
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPull(writer, req)
@@ -149,39 +145,30 @@ func TestCardSetPullTestSuite(t *testing.T) {
 
 // Tools
 
-func (suite *CardSetPullTestSuite) setupPullValidatorWithCardSetIds(userId *primitive.ObjectID, cardSetIds []string) {
-	suite.pullValidator.ResponseProvider = func() user.MockSessionValidatorResponse[CardSetPullInput] {
-		return user.MockSessionValidatorResponse[CardSetPullInput]{
-			&CardSetPullInput{
-				"testAccessToken",
-				cardSetIds,
-			},
+func (suite *CardSetPullTestSuite) setupPullValidator(userId *primitive.ObjectID) {
+	suite.sessionValidator.ResponseProvider = func() user.MockSessionValidatorResponse {
+		return user.MockSessionValidatorResponse{
 			createUserAuthToken(userId),
 			nil,
 		}
 	}
 }
 
-func (suite *CardSetPullTestSuite) createPullRequest(lastModificationDate time.Time) *http.Request {
-	req, err := http.NewRequest("POST", fmt.Sprintf("/?%s=%s", ParameterLatestCardSetModificationDate, lastModificationDate.UTC().Format(time.RFC3339)), nil)
+func (suite *CardSetPullTestSuite) createPullRequest(lastModificationDate *time.Time, input CardSetPullInput) *http.Request {
+	var resultPath = ""
+	if lastModificationDate != nil {
+		resultPath = fmt.Sprintf("/?%s=%s", ParameterLatestCardSetModificationDate, lastModificationDate.UTC().Format(time.RFC3339))
+	}
+
+	req, err := http.NewRequest("POST", resultPath, bytes.NewReader(test.TestMarshal(input)))
 	if err != nil {
 		suite.T().Fatal(err)
 	}
+
 	req.AddCookie(&http.Cookie{Name: "session", Value: "testSession"})
 	return req
 }
 
 func (suite *CardSetPullTestSuite) readPullResponse(writer *httptest.ResponseRecorder) *CardSetPullResponse {
-	var response CardSetPullResponse
-	body, err := io.ReadAll(writer.Result().Body)
-	if err != nil {
-		suite.T().Fatal(err)
-	}
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		suite.T().Fatal(err)
-	}
-
-	return &response
+	return test.TestReadResponse[CardSetPullResponse](writer)
 }

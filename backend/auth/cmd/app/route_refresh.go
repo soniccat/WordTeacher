@@ -81,8 +81,6 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: consider changing current auth token and refresh token
-	// Create new access token / refresh token pair
 	token, err := app.GenerateUserAuthToken(
 		r.Context(),
 		userAuthToken.UserMongoId,

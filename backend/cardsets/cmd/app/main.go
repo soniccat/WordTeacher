@@ -32,8 +32,7 @@ func main() {
 		sessionManager,
 		*mongoURI,
 		*enableCredentials,
-		user.NewSessionManagerValidator[CardSetPushInput](sessionManager),
-		user.NewSessionManagerValidator[CardSetPullInput](sessionManager),
+		user.NewSessionManagerValidator(sessionManager),
 	)
 	defer func() {
 		app.stop()
@@ -70,14 +69,12 @@ func createApplication(
 	sessionManager *scs.SessionManager,
 	mongoURI string,
 	enableCredentials bool,
-	pushSessionValidator user.SessionValidator[CardSetPushInput],
-	pullSessionValidator user.SessionValidator[CardSetPullInput],
+	sessionValidator user.SessionValidator,
 ) (*application, error) {
 	app := &application{
-		logger:               logger.New(isDebug),
-		sessionManager:       sessionManager,
-		pushSessionValidator: pushSessionValidator,
-		pullSessionValidator: pullSessionValidator,
+		logger:           logger.New(isDebug),
+		sessionManager:   sessionManager,
+		sessionValidator: sessionValidator,
 	}
 	err := mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
 	if err != nil {

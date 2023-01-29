@@ -116,12 +116,6 @@ type ValidateSessionError struct {
 	InnerError error
 }
 
-type TokenHolder[B any] interface {
-	GetAccessToken() string
-	GetRefreshToken() *string
-	*B // non-interface type constraint element
-}
-
 func NewValidateSessionError(code int, err error) *ValidateSessionError {
 	return &ValidateSessionError{
 		StatusCode: code,

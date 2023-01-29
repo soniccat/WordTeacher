@@ -58,6 +58,22 @@ func (cs *ApiCard) IsEqual(a *ApiCard) bool {
 	return true
 }
 
+func (c *ApiCard) WithoutIds() *ApiCard {
+	return &ApiCard{
+		Id:                  "",
+		Term:                c.Term,
+		Transcription:       c.Transcription,
+		PartOfSpeech:        c.PartOfSpeech,
+		Definitions:         c.Definitions,
+		Synonyms:            c.Synonyms,
+		Examples:            c.Examples,
+		DefinitionTermSpans: c.DefinitionTermSpans,
+		ExampleTermSpans:    c.ExampleTermSpans,
+		UserId:              "",
+		CreationId:          c.CreationId,
+	}
+}
+
 func (c *ApiCard) ToDb() (*DbCard, error) {
 	cardDbId, err := tools.ParseObjectID(c.Id)
 	if err != nil {

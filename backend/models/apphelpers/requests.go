@@ -9,9 +9,10 @@ import (
 	"runtime/debug"
 )
 
-const CookieSession = "session"
-const HeaderDeviceId = "deviceId"
-const HeaderDeviceType = "deviceType"
+const CookieSession = "X-Session"
+const HeaderDeviceId = "X-Device-Id"
+const HeaderDeviceType = "X-Device-Type"
+const HeaderAccessToken = "X-Access-Token"
 
 type ErrorWithCode struct {
 	Err  error

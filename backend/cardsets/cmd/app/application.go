@@ -11,13 +11,12 @@ import (
 )
 
 type application struct {
-	service              service
-	logger               *logger.Logger
-	sessionManager       *scs.SessionManager
-	mongoWrapper         *mongowrapper.MongoWrapper
-	cardSetRepository    *cardset.Repository
-	pushSessionValidator user.SessionValidator[CardSetPushInput]
-	pullSessionValidator user.SessionValidator[CardSetPullInput]
+	service           service
+	logger            *logger.Logger
+	sessionManager    *scs.SessionManager
+	mongoWrapper      *mongowrapper.MongoWrapper
+	cardSetRepository *cardset.Repository
+	sessionValidator  user.SessionValidator
 }
 
 func (app *application) GetLogger() *logger.Logger {

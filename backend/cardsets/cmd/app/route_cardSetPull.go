@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"models/apphelpers"
 	"models/cardset"
 	"net/http"
@@ -13,28 +15,30 @@ import (
 )
 
 type CardSetPullInput struct {
-	AccessToken       string   `json:"accessToken"`
-	CurrentCardSetIds []string `json:"currentCardSetIds"`
-}
-
-func (input *CardSetPullInput) GetAccessToken() string {
-	return input.AccessToken
-}
-
-func (input *CardSetPullInput) GetRefreshToken() *string {
-	return nil
+	CurrentCardSetIds []string `json:"currentCardSetIds,omitempty"`
 }
 
 type CardSetPullResponse struct {
 	UpdatedCardSets   []*cardset.ApiCardSet `json:"cardSetIds,omitempty"`
-	DeletedCardSetIds []string              `json:"deletedCardSetIds"`
+	DeletedCardSetIds []string              `json:"deletedCardSetIds,omitempty"`
 }
 
 func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {
-
-	input, authToken, validateSessionErr := app.pullSessionValidator.Validate(r)
+	authToken, validateSessionErr := app.sessionValidator.Validate(r)
 	if validateSessionErr != nil {
 		app.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
+		return
+	}
+
+	if r.Body == nil {
+		app.SetError(w, errors.New("body is empty"), http.StatusBadRequest)
+		return
+	}
+
+	var input CardSetPullInput
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		app.SetError(w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -51,7 +55,7 @@ func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idsToDelete, handlerErr := app.resolveDeletedCardIds(ctx, authToken.UserMongoId, input)
+	idsToDelete, handlerErr := app.resolveDeletedCardIds(ctx, authToken.UserMongoId, &input)
 	if handlerErr != nil {
 		app.SetHandlerError(w, handlerErr)
 		return

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"models/apphelpers"
@@ -22,19 +23,10 @@ const (
 )
 
 type CardSetPushInput struct {
-	AccessToken string `json:"accessToken"`
 	// for card sets without id creates a card set or find already inserted one with deduplication Id.
 	// for card sets with id write a card set data
 	UpdatedCardSets   []*cardset.ApiCardSet `json:"updatedCardSets"`
 	CurrentCardSetIds []string              `json:"currentCardSetIds"`
-}
-
-func (input *CardSetPushInput) GetAccessToken() string {
-	return input.AccessToken
-}
-
-func (input *CardSetPushInput) GetRefreshToken() *string {
-	return nil
 }
 
 type CardSetPushResponse struct {
@@ -91,9 +83,16 @@ var userMutex = NewUserMutex()
 //
 //	RefreshResponse
 func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
-	input, authToken, validateSessionErr := app.pushSessionValidator.Validate(r)
+	authToken, validateSessionErr := app.sessionValidator.Validate(r)
 	if validateSessionErr != nil {
 		app.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
+		return
+	}
+
+	var input CardSetPushInput
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		app.SetError(w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -125,7 +124,6 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// execute all the changes in one transaction
-
 	userMutex.lockForUser(authToken.UserMongoId)
 	defer func() { userMutex.unlockForUser(authToken.UserMongoId) }()
 
@@ -215,6 +213,7 @@ func (app *application) handleUpdatedCardSets(
 			if existingCardSet != nil {
 				cardSetId = existingCardSet.Id.Hex()
 				cardSet.Id = cardSetId
+				cardSet.UserId = userId.Hex()
 				errWithCode := app.cardSetRepository.UpdateCardSet(ctx, cardSet)
 				if errWithCode != nil {
 					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)

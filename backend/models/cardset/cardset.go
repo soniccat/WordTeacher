@@ -89,6 +89,20 @@ func (cs *ApiCardSet) toDb() (*DbCardSet, error) {
 	return cardSetDb, nil
 }
 
+func (cs *ApiCardSet) WithoutIDs() *ApiCardSet {
+	return &ApiCardSet{
+		Id:   "",
+		Name: cs.Name,
+		Cards: tools.Map(cs.Cards, func(c *card.ApiCard) *card.ApiCard {
+			return c.WithoutIds()
+		}),
+		UserId:           "",
+		CreationDate:     cs.CreationDate,
+		ModificationDate: cs.ModificationDate,
+		CreationId:       cs.CreationId,
+	}
+}
+
 type ApiCardSetSortByName []*ApiCardSet
 
 func (a ApiCardSetSortByName) Len() int           { return len(a) }

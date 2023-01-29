@@ -1,16 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"models/accesstoken"
 	"models/apphelpers"
 	"models/card"
 	"models/cardset"
 	"models/partofspeech"
+	"models/test"
 	"models/tools"
 	"models/user"
 	"models/userauthtoken"
@@ -20,36 +20,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type BaseTestSuite struct {
-	t *testing.T
-}
-
-func (b *BaseTestSuite) createUUID() uuid.UUID {
-	cardSetCreationIdUUID, err := uuid.NewUUID()
-	if err != nil {
-		b.t.Fatal(err)
-	}
-	return cardSetCreationIdUUID
-}
-
 type CardSetPushTestSuite struct {
 	suite.Suite
-	BaseTestSuite
-	application   *application
-	pushValidator *user.MockSessionValidator[CardSetPushInput]
-	pullValidator *user.MockSessionValidator[CardSetPullInput]
+	test.BaseTestSuite
+	application      *application
+	sessionValidator *user.MockSessionValidator
 }
 
 func (suite *CardSetPushTestSuite) SetupTest() {
-	suite.pushValidator = user.NewMockSessionValidator[CardSetPushInput]()
-	suite.pullValidator = user.NewMockSessionValidator[CardSetPullInput]()
+	suite.sessionValidator = user.NewMockSessionValidator()
 
 	sessionManager := apphelpers.CreateSessionManager("172.16.0.3:6380")
 	app, err := createApplication(
@@ -57,8 +42,7 @@ func (suite *CardSetPushTestSuite) SetupTest() {
 		sessionManager,
 		"mongodb://127.0.0.1:27018/?directConnection=true&replicaSet=rs0",
 		false,
-		suite.pushValidator,
-		suite.pullValidator,
+		suite.sessionValidator,
 	)
 	if err != nil {
 		suite.T().Fatal(err)
@@ -93,9 +77,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithCookieButWithoutLastModif
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUnauthorized() {
-	suite.pushValidator.ResponseProvider = func() user.MockSessionValidatorResponse[CardSetPushInput] {
-		return user.MockSessionValidatorResponse[CardSetPushInput]{
-			nil,
+	suite.sessionValidator.ResponseProvider = func() user.MockSessionValidatorResponse {
+		return user.MockSessionValidatorResponse{
 			nil,
 			user.NewValidateSessionError(http.StatusUnauthorized, errors.New("test error")),
 		}
@@ -114,9 +97,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUna
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
-	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
-	cardCreationId := suite.createUUID().String()
+	cardCreationId := suite.CreateUUID().String()
 	newCardSet := createApiCardSet(
 		"testCardSet",
 		cardSetCreationId,
@@ -124,8 +107,11 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 		[]*card.ApiCard{createApiCard(cardCreationId)},
 	)
 
-	suite.setupPushValidatorWithCardSet(tools.Ptr(primitive.NewObjectID()), newCardSet)
-	req := suite.createPushRequest(time.Now())
+	suite.setupPushValidator(tools.Ptr(primitive.NewObjectID()))
+	req := suite.createPushRequest(
+		tools.Ptr(time.Now()),
+		CardSetPushInput{[]*cardset.ApiCardSet{newCardSet}, []string{}},
+	)
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -139,19 +125,22 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 	assert.Equal(suite.T(), cardCreationId, tools.MapKeys(response.CardIds)[0])
 
 	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
-	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi())
-	assert.Equal(suite.T(), newCardSet.Id, response.CardSetIds[cardSetCreationId])
+	assert.NotNil(suite.T(), dbCardSet.UserId)
+	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi().WithoutIDs())
+	assert.Equal(suite.T(), response.CardSetIds[cardSetCreationId], dbCardSet.Id.Hex())
 	assert.Equal(suite.T(), response.CardIds[cardCreationId], dbCardSet.Cards[0].Id.Hex())
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsAlreadyCreatedCard() {
-	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
+	apiCardCreationId := suite.CreateUUID().String()
+	modificationDate := time.Now()
 	newCardSet := createApiCardSet(
 		"testCardSet",
 		cardSetCreationId,
-		time.Now(),
-		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+		modificationDate,
+		[]*card.ApiCard{createApiCard(apiCardCreationId)},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -160,9 +149,17 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 		suite.T().Fatal(errWithCode.Err)
 	}
 
-	newCardSet.Id = "" // clear Id set from InsertCardSet
-	suite.setupPushValidatorWithCardSet(userId, newCardSet)
-	req := suite.createPushRequest(time.Now())
+	newCardSet = createApiCardSet(
+		"testCardSet",
+		cardSetCreationId,
+		modificationDate,
+		[]*card.ApiCard{createApiCard(apiCardCreationId)},
+	)
+	suite.setupPushValidator(userId)
+	req := suite.createPushRequest(
+		tools.Ptr(time.Now()),
+		CardSetPushInput{[]*cardset.ApiCardSet{newCardSet}, []string{}},
+	)
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -172,15 +169,16 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 	assert.Equal(suite.T(), insertedCardSet.Id, response.CardSetIds[cardSetCreationId])
 
 	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
-	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi())
+	assert.NotNil(suite.T(), dbCardSet.UserId)
+	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi().WithoutIDs())
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_ReturnsNewCardSetAndDeleteOldOne() {
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet",
-		suite.createUUID().String(),
+		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(10)),
-		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -189,17 +187,20 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 		suite.T().Fatal(errWithCode.Err)
 	}
 
-	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
 	newCardSet := createApiCardSet(
 		"newTestCardSet",
 		cardSetCreationId,
 		time.Now(),
-		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
-	suite.setupPushValidatorWithCardSet(userId, newCardSet)
-	req := suite.createPushRequest(time.Now())
+	suite.setupPushValidator(userId)
+	req := suite.createPushRequest(
+		tools.Ptr(time.Now()),
+		CardSetPushInput{[]*cardset.ApiCardSet{newCardSet}, []string{}},
+	)
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -208,7 +209,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 
 	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
-	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi())
+	assert.Equal(suite.T(), newCardSet, dbCardSet.ToApi().WithoutIDs())
 
 	_, err := suite.application.cardSetRepository.LoadCardSetDbById(context.Background(), oldCardSet.Id)
 	assert.Equal(suite.T(), err, mongo.ErrNoDocuments)
@@ -217,9 +218,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsStatusConflict() {
 	newCardSet := createApiCardSet(
 		"newTestCardSet",
-		suite.createUUID().String(),
+		suite.CreateUUID().String(),
 		time.Now(),
-		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -228,9 +229,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 		suite.T().Fatal(errWithCode.Err)
 	}
 
-	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
-	cardCreationId := suite.createUUID().String()
+	cardCreationId := suite.CreateUUID().String()
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet",
 		cardSetCreationId,
@@ -238,8 +239,11 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 		[]*card.ApiCard{createApiCard(cardCreationId)},
 	)
 
-	suite.setupPushValidatorWithCardSet(userId, oldCardSet)
-	req := suite.createPushRequest(time.Now().Add(-time.Hour * time.Duration(20)))
+	suite.setupPushValidator(userId)
+	req := suite.createPushRequest(
+		tools.Ptr(time.Now().Add(-time.Hour*time.Duration(20))),
+		CardSetPushInput{[]*cardset.ApiCardSet{oldCardSet}, []string{}},
+	)
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -250,9 +254,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet_ReturnsOk() {
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet",
-		suite.createUUID().String(),
+		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(20)),
-		[]*card.ApiCard{createApiCard(suite.createUUID().String())},
+		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -261,9 +265,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 		suite.T().Fatal(errWithCode.Err)
 	}
 
-	cardSetCreationIdUUID := suite.createUUID()
+	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
-	cardCreationId := suite.createUUID().String()
+	cardCreationId := suite.CreateUUID().String()
 	newCardSet := createApiCardSet(
 		"newTestCardSet",
 		cardSetCreationId,
@@ -271,8 +275,11 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 		[]*card.ApiCard{createApiCard(cardCreationId)},
 	)
 
-	suite.setupPushValidatorWithCardSet(userId, newCardSet)
-	req := suite.createPushRequest(time.Now().Add(-time.Hour * time.Duration(10)))
+	suite.setupPushValidator(userId)
+	req := suite.createPushRequest(
+		tools.Ptr(time.Now().Add(-time.Hour*time.Duration(10))),
+		CardSetPushInput{[]*cardset.ApiCardSet{newCardSet}, []string{}},
+	)
 
 	writer := httptest.NewRecorder()
 	suite.application.cardSetPush(writer, req)
@@ -298,8 +305,13 @@ func (suite *CardSetPushTestSuite) loadCardSetDbById(id string) *cardset.DbCardS
 	return dbCardSet
 }
 
-func (suite *CardSetPushTestSuite) createPushRequest(lastModificationDate time.Time) *http.Request {
-	req, err := http.NewRequest("POST", fmt.Sprintf("/?%s=%s", ParameterLatestCardSetModificationDate, lastModificationDate.UTC().Format(time.RFC3339)), nil)
+func (suite *CardSetPushTestSuite) createPushRequest(lastModificationDate *time.Time, input CardSetPushInput) *http.Request {
+	var resultPath = ""
+	if lastModificationDate != nil {
+		resultPath = fmt.Sprintf("/?%s=%s", ParameterLatestCardSetModificationDate, lastModificationDate.UTC().Format(time.RFC3339))
+	}
+
+	req, err := http.NewRequest("POST", resultPath, bytes.NewReader(test.TestMarshal(input)))
 	if err != nil {
 		suite.T().Fatal(err)
 	}
@@ -307,16 +319,9 @@ func (suite *CardSetPushTestSuite) createPushRequest(lastModificationDate time.T
 	return req
 }
 
-func (suite *CardSetPushTestSuite) setupPushValidatorWithCardSet(userId *primitive.ObjectID, newCardSet *cardset.ApiCardSet) {
-	suite.pushValidator.ResponseProvider = func() user.MockSessionValidatorResponse[CardSetPushInput] {
-		return user.MockSessionValidatorResponse[CardSetPushInput]{
-			&CardSetPushInput{
-				"testAccessToken",
-				[]*cardset.ApiCardSet{
-					newCardSet,
-				},
-				[]string{},
-			},
+func (suite *CardSetPushTestSuite) setupPushValidator(userId *primitive.ObjectID) {
+	suite.sessionValidator.ResponseProvider = func() user.MockSessionValidatorResponse {
+		return user.MockSessionValidatorResponse{
 			createUserAuthToken(userId),
 			nil,
 		}
@@ -324,18 +329,7 @@ func (suite *CardSetPushTestSuite) setupPushValidatorWithCardSet(userId *primiti
 }
 
 func (suite *CardSetPushTestSuite) readPushResponse(writer *httptest.ResponseRecorder) *CardSetPushResponse {
-	var response CardSetPushResponse
-	body, err := io.ReadAll(writer.Result().Body)
-	if err != nil {
-		suite.T().Fatal(err)
-	}
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		suite.T().Fatal(err)
-	}
-
-	return &response
+	return test.TestReadResponse[CardSetPushResponse](writer)
 }
 
 func createApiCardSet(name string, creationId string, creationDate time.Time, cards []*card.ApiCard) *cardset.ApiCardSet {
