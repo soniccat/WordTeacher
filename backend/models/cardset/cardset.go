@@ -14,7 +14,7 @@ type ApiCardSet struct {
 	Cards            []*card.ApiCard `json:"cards"`
 	UserId           string          `json:"userId"` // TODO: consider several owners via a permission filed
 	CreationDate     string          `json:"creationDate"`
-	ModificationDate *string         `json:"modificationDate,omitempty"` // TODO: remove pointer
+	ModificationDate string          `json:"modificationDate"`
 	CreationId       string          `json:"creationId"`
 }
 
@@ -65,7 +65,7 @@ func (cs *ApiCardSet) toDb() (*DbCardSet, error) {
 		return nil, err
 	}
 
-	modificationDateTime, err := tools.ApiDatePtrToDbDatePtr(cs.ModificationDate)
+	modificationDateTime, err := tools.ApiDateToDbDate(cs.ModificationDate)
 	if err != nil {
 		return nil, err
 	}
@@ -115,23 +115,18 @@ type DbCardSet struct {
 	Cards            []*card.DbCard      `bson:"cards"`
 	UserId           *primitive.ObjectID `bson:"userId"`
 	CreationDate     primitive.DateTime  `bson:"creationDate"`
-	ModificationDate *primitive.DateTime `bson:"modificationDate,omitempty"`
+	ModificationDate primitive.DateTime  `bson:"modificationDate"`
 	CreationId       string              `bson:"creationId"`
 }
 
 func (cs *DbCardSet) ToApi() *ApiCardSet {
-	var md *string
-	if cs.ModificationDate != nil {
-		md = tools.Ptr(cs.ModificationDate.Time().UTC().Format(time.RFC3339))
-	}
-
 	return &ApiCardSet{
 		Id:               cs.Id.Hex(),
 		Name:             cs.Name,
 		Cards:            tools.Map(cs.Cards, func(cardDb *card.DbCard) *card.ApiCard { return cardDb.ToApi() }),
 		UserId:           cs.UserId.Hex(),
 		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339),
-		ModificationDate: md,
+		ModificationDate: cs.ModificationDate.Time().UTC().Format(time.RFC3339),
 		CreationId:       cs.CreationId,
 	}
 }

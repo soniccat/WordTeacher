@@ -1,7 +1,7 @@
 [versions]
 kotlinVersion = "1.7.20"
 kotlinxSerializationVersion = "1.4.1"
-kotlinxDateTime = "0.1.0"
+kotlinxDateTime = "0.4.0"
 sqlDelight = "1.5.3"
 androidGradlePlugin = "7.0.4"
 

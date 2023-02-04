@@ -61,7 +61,7 @@ class CardSetRepository(
         return databaseWorker.run {
             database.cards.insertCard(
                 setId = loadedCardSet.id,
-                date = timeSource.getTimeInMilliseconds(),
+                creationDate = timeSource.getTimeInstant(),
                 term = term,
                 definitions = definitions,
                 partOfSpeech = partOfSpeech,

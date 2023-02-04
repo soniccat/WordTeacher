@@ -15,7 +15,7 @@ import com.aglushkov.wordteacher.shared.general.toLong
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
-import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.benasher44.uuid.uuid4
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.TransactionWithoutReturn
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -142,12 +143,12 @@ class AppDatabase(
     }
 
     inner class CardSets {
-        fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date)
+        fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString())
 
         fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
             // TODO: reorganize db to pull progress from it instead of loading all the cards
-            val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date ->
-                ShortCardSet(id, name, date, 0f, 0f)
+            val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, _ ->
+                ShortCardSet(id, name, date, modificationDate, 0f, 0f)
             }).asFlow()
             val setsWithCardsFlow = selectSetIdsWithCards().asFlow()
 
@@ -173,7 +174,17 @@ class AppDatabase(
                 }
             )
         }
-        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id, mapper = ::CardSet)
+        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id) { id, name, date, modificationDate, creationId ->
+            CardSet(
+                id,
+                name,
+                Instant.fromEpochMilliseconds(date),
+                Instant.fromEpochMilliseconds(modificationDate),
+                emptyList(),
+                creationId
+            )
+        }
+
         fun removeCardSet(cardSetId: Long) {
             db.transaction {
                 db.dBCardQueries.removeCardsBySetId(cardSetId)
@@ -182,8 +193,8 @@ class AppDatabase(
             }
         }
 
-        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate ->
-            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate)
+        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId ->
+            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId)
         }
     }
 
@@ -217,12 +228,15 @@ class AppDatabase(
             definitionTermSpans: List<List<Pair<Int, Int>>>?,
             exampleTermSpans: List<List<Pair<Int, Int>>>?,
             needToUpdateDefinitionSpans: Long?,
-            needToUpdateExampleSpans: Long?
+            needToUpdateExampleSpans: Long?,
+            modificationDate: Long?,
+            creationId: String?,
         ) -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans ->
+            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId ->
                 Card(
                     id!!,
-                    date!!,
+                    Instant.fromEpochMilliseconds(date!!),
+                    Instant.fromEpochMilliseconds(modificationDate!!),
                     term!!,
                     definitions.orEmpty(),
                     definitionTermSpans.orEmpty(),
@@ -237,14 +251,16 @@ class AppDatabase(
                         progressLastLessonDate ?: 0L
                     ),
                     needToUpdateDefinitionSpans = needToUpdateDefinitionSpans!! != 0L,
-                    needToUpdateExampleSpans = needToUpdateExampleSpans!! != 0L
+                    needToUpdateExampleSpans = needToUpdateExampleSpans!! != 0L,
+                    creationId = creationId!!
                 )
             }
 
         fun insertCard(
             setId: Long,
             term: String = "",
-            date: Long = 0,
+            creationDate: Instant = Instant.fromEpochMilliseconds(0),
+            modificationDate: Instant = creationDate,
             definitions: List<String> = listOf(),
             definitionTermSpans: List<List<Pair<Int, Int>>> = listOf(),
             partOfSpeech: WordTeacherWord.PartOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
@@ -254,11 +270,13 @@ class AppDatabase(
             exampleTermSpans: List<List<Pair<Int, Int>>> = listOf(),
             progress: CardProgress = CardProgress.EMPTY,
             needToUpdateDefinitionSpans: Boolean = false,
-            needToUpdateExampleSpans: Boolean = false
+            needToUpdateExampleSpans: Boolean = false,
+            creationId: String = uuid4().toString()
         ): Card {
             var newCard = Card(
                 id = -1,
-                date = date,
+                creationDate = creationDate,
+                modificationDate = modificationDate,
                 term = term,
                 definitions = definitions,
                 definitionTermSpans = definitionTermSpans,
@@ -269,7 +287,8 @@ class AppDatabase(
                 exampleTermSpans = exampleTermSpans,
                 progress = progress,
                 needToUpdateDefinitionSpans = needToUpdateDefinitionSpans,
-                needToUpdateExampleSpans = needToUpdateExampleSpans
+                needToUpdateExampleSpans = needToUpdateExampleSpans,
+                creationId = creationId,
             )
 
             cards.insertCardInternal(setId, newCard)
@@ -280,7 +299,8 @@ class AppDatabase(
         private fun insertCardInternal(setId: Long, newCard: Card) {
             cards.insertCardInternal(
                 setId = setId,
-                date = newCard.date,
+                creationDate = newCard.creationDate.toEpochMilliseconds(),
+                modificationDate = newCard.modificationDate.toEpochMilliseconds(),
                 term = newCard.term,
                 definitions = newCard.definitions,
                 definitionTermSpans = newCard.definitionTermSpans,
@@ -291,13 +311,15 @@ class AppDatabase(
                 exampleTermSpans = newCard.exampleTermSpans,
                 progress = newCard.progress,
                 needToUpdateDefinitionSpans = newCard.needToUpdateDefinitionSpans,
-                needToUpdateExampleSpans = newCard.needToUpdateExampleSpans
+                needToUpdateExampleSpans = newCard.needToUpdateExampleSpans,
+                creationId = newCard.creationId
             )
         }
 
         private fun insertCardInternal(
             setId: Long,
-            date: Long,
+            creationDate: Long,
+            modificationDate: Long,
             term: String,
             definitions: List<String>,
             definitionTermSpans: List<List<Pair<Int, Int>>> = listOf(),
@@ -308,11 +330,12 @@ class AppDatabase(
             exampleTermSpans: List<List<Pair<Int, Int>>> = listOf(),
             progress: CardProgress,
             needToUpdateDefinitionSpans: Boolean,
-            needToUpdateExampleSpans: Boolean
+            needToUpdateExampleSpans: Boolean,
+            creationId: String,
         ) {
             db.transaction {
                 db.dBCardQueries.insert(
-                    date,
+                    creationDate,
                     term,
                     partOfSpeech.toString(),
                     transcription,
@@ -325,7 +348,9 @@ class AppDatabase(
                     definitionTermSpans,
                     exampleTermSpans,
                     needToUpdateDefinitionSpans.toLong(),
-                    needToUpdateExampleSpans.toLong()
+                    needToUpdateExampleSpans.toLong(),
+                    modificationDate,
+                    creationId
                 )
 
                 val cardId = db.dBCardQueries.lastInsertedRowId().firstLong()!!
@@ -338,7 +363,8 @@ class AppDatabase(
         ): Card {
             updateCard(
                 cardId = card.id,
-                date = card.date,
+                creationDate = card.creationDate.toEpochMilliseconds(),
+                modificationDate = card.modificationDate.toEpochMilliseconds(),
                 term = card.term,
                 definitions = card.definitions,
                 definitionTermSpans = card.definitionTermSpans,
@@ -351,14 +377,15 @@ class AppDatabase(
                 progressLastMistakeCount = card.progress.lastMistakeCount,
                 progressLastLessonDate = card.progress.lastLessonDate,
                 needToUpdateDefinitionSpans = card.needToUpdateDefinitionSpans.toLong(),
-                needToUpdateExampleSpans = card.needToUpdateExampleSpans.toLong()
+                needToUpdateExampleSpans = card.needToUpdateExampleSpans.toLong(),
             )
             return card
         }
 
         private fun updateCard(
             cardId: Long,
-            date: Long,
+            creationDate: Long,
+            modificationDate: Long,
             term: String,
             definitions: List<String>,
             definitionTermSpans: List<List<Pair<Int, Int>>>,
@@ -371,9 +398,9 @@ class AppDatabase(
             progressLastMistakeCount: Int,
             progressLastLessonDate: Long,
             needToUpdateDefinitionSpans: Long,
-            needToUpdateExampleSpans: Long
+            needToUpdateExampleSpans: Long,
         ) = db.dBCardQueries.updateCard(
-            date,
+            creationDate,
             term,
             partOfSpeech.toString(),
             transcription,
@@ -387,6 +414,7 @@ class AppDatabase(
             exampleTermSpans,
             needToUpdateDefinitionSpans,
             needToUpdateExampleSpans,
+            modificationDate,
             cardId
         )
 

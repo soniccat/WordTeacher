@@ -184,3 +184,14 @@ func MapValues[T comparable, V comparable](m map[T]V) []V {
 
 	return keys
 }
+
+func ComparePtrs[T comparable](a *T, b *T) bool {
+	if b != a && (b == nil || a == nil) {
+		return false
+	}
+	if b != nil && a != nil && *b != *a {
+		return false
+	}
+
+	return true
+}

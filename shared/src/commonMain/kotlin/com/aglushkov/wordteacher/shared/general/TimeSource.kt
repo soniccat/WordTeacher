@@ -8,6 +8,7 @@ import kotlinx.datetime.toLocalDateTime
 interface TimeSource {
     fun stringDate(dateLong: Long): String
     fun getTimeInMilliseconds(): Long
+    fun getTimeInstant(): Instant
 }
 
 class TimeSourceImpl: TimeSource {
@@ -18,5 +19,7 @@ class TimeSourceImpl: TimeSource {
         return "${dateTime.dayOfMonth}.${dateTime.monthNumber}.${dateTime.year}"
     }
 
-    override fun getTimeInMilliseconds() = Clock.System.now().toEpochMilliseconds()
+    override fun getTimeInMilliseconds() = getTimeInstant().toEpochMilliseconds()
+
+    override fun getTimeInstant(): Instant = Clock.System.now()
 }

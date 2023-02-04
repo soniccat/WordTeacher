@@ -1,7 +1,9 @@
 CREATE TABLE IF NOT EXISTS DBCardSet (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT NOT NULL,
-  date INTEGER NOT NULL
+  date INTEGER NOT NULL, -- creation date
+  modificationDate INTEGER NOT NULL DEFAULT 0,
+  creationId TEXT NOT NULL DEFAULT ""
 );
 
 selectAll:
@@ -21,11 +23,11 @@ FROM DBCardSet
 WHERE DBCardSet.id = ?;
 
 insert:
-INSERT INTO DBCardSet(name, date)
-VALUES (?, ?);
+INSERT INTO DBCardSet(name, date, modificationDate, creationId)
+VALUES (?, ?, ?, ?);
 
 insertCardSet:
-INSERT INTO DBCardSet(name, date)
+INSERT INTO DBCardSet(name, date, modificationDate, creationId)
 VALUES ?;
 
 lastInsertedRowId:

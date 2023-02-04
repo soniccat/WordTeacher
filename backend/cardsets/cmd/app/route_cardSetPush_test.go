@@ -337,7 +337,7 @@ func createApiCardSet(name string, creationId string, creationDate time.Time, ca
 		Name:             name,
 		Cards:            cards,
 		CreationDate:     creationDate.UTC().Format(time.RFC3339),
-		ModificationDate: tools.Ptr(creationDate.UTC().Format(time.RFC3339)),
+		ModificationDate: creationDate.UTC().Format(time.RFC3339),
 		CreationId:       creationId,
 	}
 }

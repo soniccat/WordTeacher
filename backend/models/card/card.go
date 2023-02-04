@@ -6,6 +6,12 @@ import (
 	"models/tools"
 )
 
+type CardProgress struct {
+	CurrentLevel     int
+	LastMistakeCount int
+	LastLessonDate   string
+}
+
 type ApiCard struct {
 	Id                  string                    `json:"id"`
 	Term                string                    `json:"term"`
@@ -18,40 +24,52 @@ type ApiCard struct {
 	ExampleTermSpans    [][]Span                  `json:"exampleTermSpans"`
 	UserId              string                    `json:"userId"`
 	CreationId          string                    `json:"creationId"`
+	Progress            *CardProgress             `json:"progress"`
+	CreationDate        string                    `json:"creationDate"`
+	ModificationDate    string                    `json:"modificationDate"`
 }
 
-func (cs *ApiCard) IsEqual(a *ApiCard) bool {
-	if cs.Id != a.Id {
+func (c *ApiCard) IsEqual(a *ApiCard) bool {
+	if c.Id != a.Id {
 		return false
 	}
-	if cs.Term != a.Term {
+	if c.Term != a.Term {
 		return false
 	}
-	if cs.Transcription != a.Transcription {
+	if c.Transcription != a.Transcription {
 		return false
 	}
-	if cs.PartOfSpeech != a.PartOfSpeech {
+	if c.PartOfSpeech != a.PartOfSpeech {
 		return false
 	}
-	if !tools.SliceComparableEqual(cs.Definitions, a.Definitions) {
+	if !tools.SliceComparableEqual(c.Definitions, a.Definitions) {
 		return false
 	}
-	if !tools.SliceComparableEqual(cs.Synonyms, a.Synonyms) {
+	if !tools.SliceComparableEqual(c.Synonyms, a.Synonyms) {
 		return false
 	}
-	if !tools.SliceComparableEqual(cs.Examples, a.Examples) {
+	if !tools.SliceComparableEqual(c.Examples, a.Examples) {
 		return false
 	}
-	if !tools.DoubleSliceComparableEqual(cs.DefinitionTermSpans, a.DefinitionTermSpans) {
+	if !tools.DoubleSliceComparableEqual(c.DefinitionTermSpans, a.DefinitionTermSpans) {
 		return false
 	}
-	if !tools.DoubleSliceComparableEqual(cs.ExampleTermSpans, a.ExampleTermSpans) {
+	if !tools.DoubleSliceComparableEqual(c.ExampleTermSpans, a.ExampleTermSpans) {
 		return false
 	}
-	if cs.UserId != a.UserId {
+	if c.UserId != a.UserId {
 		return false
 	}
-	if cs.CreationId != a.CreationId {
+	if c.CreationId != a.CreationId {
+		return false
+	}
+	if !tools.ComparePtrs(c.Progress, a.Progress) {
+		return false
+	}
+	if c.CreationDate != a.CreationDate {
+		return false
+	}
+	if c.ModificationDate != a.ModificationDate {
 		return false
 	}
 
@@ -71,6 +89,9 @@ func (c *ApiCard) WithoutIds() *ApiCard {
 		ExampleTermSpans:    c.ExampleTermSpans,
 		UserId:              "",
 		CreationId:          c.CreationId,
+		Progress:            c.Progress,
+		CreationDate:        c.CreationDate,
+		ModificationDate:    c.ModificationDate,
 	}
 }
 
@@ -97,6 +118,9 @@ func (c *ApiCard) ToDb() (*DbCard, error) {
 		ExampleTermSpans:    c.ExampleTermSpans,
 		UserId:              cardDbUserId,
 		CreationId:          c.CreationId,
+		Progress:            c.Progress,
+		CreationDate:        c.CreationDate,
+		ModificationDate:    c.ModificationDate,
 	}, nil
 }
 
@@ -112,40 +136,46 @@ type DbCard struct {
 	ExampleTermSpans    [][]Span                  `bson:"exampleTermSpans"`
 	UserId              *primitive.ObjectID       `bson:"userId"`
 	CreationId          string                    `bson:"creationId"`
+	Progress            *CardProgress             `bson:"progress"`
+	CreationDate        string                    `bson:"creationDate"`
+	ModificationDate    string                    `bson:"modificationDate"`
 }
 
-func (cs *DbCard) IsEqual(a *DbCard) bool {
-	if cs.Id != a.Id {
+func (c *DbCard) IsEqual(a *DbCard) bool {
+	if c.Id != a.Id {
 		return false
 	}
-	if cs.Term != a.Term {
+	if c.Term != a.Term {
 		return false
 	}
-	if cs.Transcription != a.Transcription {
+	if c.Transcription != a.Transcription {
 		return false
 	}
-	if cs.PartOfSpeech != a.PartOfSpeech {
+	if c.PartOfSpeech != a.PartOfSpeech {
 		return false
 	}
-	if !tools.SliceComparableEqual(cs.Definitions, a.Definitions) {
+	if !tools.SliceComparableEqual(c.Definitions, a.Definitions) {
 		return false
 	}
-	if !tools.SliceComparableEqual(cs.Synonyms, a.Synonyms) {
+	if !tools.SliceComparableEqual(c.Synonyms, a.Synonyms) {
 		return false
 	}
-	if !tools.SliceComparableEqual(cs.Examples, a.Examples) {
+	if !tools.SliceComparableEqual(c.Examples, a.Examples) {
 		return false
 	}
-	if !tools.DoubleSliceComparableEqual(cs.DefinitionTermSpans, a.DefinitionTermSpans) {
+	if !tools.DoubleSliceComparableEqual(c.DefinitionTermSpans, a.DefinitionTermSpans) {
 		return false
 	}
-	if !tools.DoubleSliceComparableEqual(cs.ExampleTermSpans, a.ExampleTermSpans) {
+	if !tools.DoubleSliceComparableEqual(c.ExampleTermSpans, a.ExampleTermSpans) {
 		return false
 	}
-	if cs.UserId != a.UserId {
+	if c.UserId != a.UserId {
 		return false
 	}
-	if cs.CreationId != a.CreationId {
+	if c.CreationId != a.CreationId {
+		return false
+	}
+	if !tools.ComparePtrs(c.Progress, a.Progress) {
 		return false
 	}
 
@@ -170,5 +200,8 @@ func (c *DbCard) ToApi() *ApiCard {
 		ExampleTermSpans:    c.ExampleTermSpans,
 		UserId:              c.UserId.Hex(),
 		CreationId:          c.CreationId,
+		Progress:            c.Progress,
+		CreationDate:        c.CreationDate,
+		ModificationDate:    c.ModificationDate,
 	}
 }

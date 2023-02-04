@@ -3,10 +3,12 @@ package com.aglushkov.wordteacher.shared.model
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.e
+import kotlinx.datetime.Instant
 
 data class Card (
     val id: Long,
-    val date: Long,
+    val creationDate: Instant,
+    val modificationDate: Instant,
     val term: String,
     val definitions: List<String>,
     val definitionTermSpans: List<List<Pair<Int, Int>>>,
@@ -18,6 +20,7 @@ data class Card (
     val progress: CardProgress,
     val needToUpdateDefinitionSpans: Boolean,
     val needToUpdateExampleSpans: Boolean,
+    val creationId: String,
 ) {
     fun withRightAnswer(timeSource: TimeSource) =
         copy(

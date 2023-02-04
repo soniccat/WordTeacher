@@ -19,7 +19,7 @@ type CardSetPullInput struct {
 }
 
 type CardSetPullResponse struct {
-	UpdatedCardSets   []*cardset.ApiCardSet `json:"cardSetIds,omitempty"`
+	UpdatedCardSets   []*cardset.ApiCardSet `json:"updatedCardSets,omitempty"`
 	DeletedCardSetIds []string              `json:"deletedCardSetIds,omitempty"`
 }
 

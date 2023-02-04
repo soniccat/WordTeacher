@@ -2,12 +2,10 @@ package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.Clearable
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -124,7 +122,7 @@ open class CardSetsVMImpl(
                 CardSetViewItem(
                     it.id,
                     it.name,
-                    timeSource.stringDate(it.date),
+                    timeSource.stringDate(it.creationDate),
                     it.readyToLearnProgress,
                     it.totalProgress
                 )

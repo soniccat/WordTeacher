@@ -63,7 +63,7 @@ class CardSetsRepository(
             database.cards.insertCard(
                 setId = setId,
                 term = term,
-                date = timeSource.getTimeInMilliseconds(),
+                creationDate = timeSource.getTimeInstant(),
                 definitions = definitions,
                 definitionTermSpans = definitionSpans,
                 partOfSpeech = partOfSpeech,

@@ -4,7 +4,7 @@ import kotlin.Int;
 
 CREATE TABLE IF NOT EXISTS DBCard (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  date INTEGER NOT NULL,
+  date INTEGER NOT NULL, -- creation date
   term TEXT NOT NULL,
   partOfSpeech TEXT NOT NULL,
   transcription TEXT,
@@ -19,7 +19,10 @@ CREATE TABLE IF NOT EXISTS DBCard (
   definitionTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT "",
   exampleTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT "",
   needToUpdateDefinitionSpans INTEGER NOT NULL DEFAULT 0,
-  needToUpdateExampleDefinitionSpans INTEGER NOT NULL DEFAULT 0
+  needToUpdateExampleDefinitionSpans INTEGER NOT NULL DEFAULT 0,
+
+  modificationDate INTEGER NOT NULL DEFAULT 0,
+  creationId TEXT NOT NULL DEFAULT ""
 );
 
 selectAllCardIds:
@@ -41,16 +44,16 @@ FROM DBCard
 WHERE DBCard.needToUpdateDefinitionSpans OR DBCard.needToUpdateExampleDefinitionSpans;
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId)
 VALUES ?;
 
 updateCard:
 UPDATE DBCard
-SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?, needToUpdateDefinitionSpans = ?, needToUpdateExampleDefinitionSpans = ?
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?, needToUpdateDefinitionSpans = ?, needToUpdateExampleDefinitionSpans = ?, modificationDate = ?
 WHERE id = ?;
 
 lastInsertedRowId:

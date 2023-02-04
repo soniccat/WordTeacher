@@ -2,12 +2,16 @@ package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.sumOf
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
 
 data class CardSet (
     val id: Long,
     val name: String,
-    val date: Long,
-    val cards: List<Card> = emptyList()
+    val creationDate: Instant,
+    val modificationDate: Instant,
+    val cards: List<Card> = emptyList(),
+    val creationId: String,
 ) {
     fun findCard(id: Long) =
         cards.firstOrNull { it.id == id }
