@@ -1,8 +1,6 @@
 package com.aglushkov.wordteacher.android_app.di
 
-import android.content.Context
 import com.aglushkov.wordteacher.android_app.GApp
-import com.aglushkov.wordteacher.android_app.di.AppComp
 import com.aglushkov.wordteacher.android_app.features.add_article.di.AddArticleDependencies
 import com.aglushkov.wordteacher.android_app.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.android_app.features.articles.di.ArticlesDependencies
@@ -14,7 +12,7 @@ import com.aglushkov.wordteacher.android_app.features.learning_session_result.di
 import com.aglushkov.wordteacher.android_app.features.notes.di.NotesDependencies
 import com.aglushkov.wordteacher.android_app.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
-import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepository
+import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -40,7 +38,6 @@ import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Component
 import io.ktor.client.*
 import io.ktor.client.plugins.cookies.*
-import okio.FileSystem
 import javax.inject.Qualifier
 
 
@@ -77,7 +74,7 @@ interface AppComponent:
     override fun wordRepository(): WordDefinitionRepository
     override fun notesRepository(): NotesRepository
 
-    fun googleAuthRepository(): GoogleAuthRepository
+    fun googleAuthRepository(): GoogleAuthRepositoryImpl
     fun cookieStorage(): CookiesStorage
     @SpaceHttpClient
     fun spaceHttpClient(): HttpClient

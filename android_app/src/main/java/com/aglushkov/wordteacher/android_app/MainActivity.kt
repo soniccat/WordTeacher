@@ -40,8 +40,7 @@ import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
 import com.aglushkov.wordteacher.android_app.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.android_app.general.views.compose.WindowInsets
 import com.aglushkov.wordteacher.android_app.general.views.compose.slideFromRight
-import com.aglushkov.wordteacher.android_app.helper.GoogleAuthData
-import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepository
+import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
@@ -50,6 +49,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
+import com.aglushkov.wordteacher.shared.general.GoogleAuthData
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity(), Router {
     )
 
     // TODO: extract logic between googleAuthRepository and spaceAuthRepository into a controller or useCase
-    private lateinit var googleAuthRepository: GoogleAuthRepository
+    private lateinit var googleAuthRepository: GoogleAuthRepositoryImpl
 
     private lateinit var mainDecomposeComponent: MainDecomposeComponent
 

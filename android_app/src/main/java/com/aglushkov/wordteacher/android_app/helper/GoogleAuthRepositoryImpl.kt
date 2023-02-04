@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import com.aglushkov.wordteacher.shared.general.GoogleAuthData
+import com.aglushkov.wordteacher.shared.general.GoogleAuthRepository
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -20,18 +22,16 @@ import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-data class GoogleAuthData(val name: String?, val tokenId: String?, val isSilent: Boolean)
-
-class GoogleAuthRepository(
+class GoogleAuthRepositoryImpl(
     private val serverClientId: String
-) {
+): GoogleAuthRepository {
     private var oldClient: GoogleSignInClient? = null
     private var client: SignInClient? = null
     private var signInRequest: BeginSignInRequest? = null
     private var signInLauncher: ActivityResultLauncher<IntentSenderRequest>? = null
     private var googleSignInCredentialState: MutableStateFlow<Resource<GoogleAuthData>> =
         MutableStateFlow(Resource.Uninitialized())
-    var googleSignInCredentialFlow: StateFlow<Resource<GoogleAuthData>> =
+    override var googleSignInCredentialFlow: StateFlow<Resource<GoogleAuthData>> =
         googleSignInCredentialState
 
     fun bind(activity: ComponentActivity) {
@@ -80,7 +80,7 @@ class GoogleAuthRepository(
             }
     }
 
-    fun signIn() {
+    override fun signIn() {
         if (googleSignInCredentialState.value.isLoading()) {
             return
         }

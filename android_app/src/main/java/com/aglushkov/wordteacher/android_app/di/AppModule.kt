@@ -5,15 +5,11 @@ import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.aglushkov.wordteacher.android_app.BuildConfig
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepository
+import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
-import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.asLoaded
-import com.aglushkov.wordteacher.shared.general.resource.isError
-import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.space_httpclient.SpaceHttpClientBuilder
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
@@ -41,13 +37,7 @@ import okio.FileSystem
 import dagger.Module
 import dagger.Provides
 import io.ktor.client.*
-import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.cookies.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 import okio.Path
 import okio.Path.Companion.toPath
 
@@ -219,90 +209,16 @@ class AppModule {
         deviceIdRepository: DeviceIdRepository,
         appInfo: AppInfo,
         cookieStorage: CookiesStorage,
-        googleAuthRepository: dagger.Lazy<GoogleAuthRepository>,
+        googleAuthRepository: dagger.Lazy<GoogleAuthRepositoryImpl>,
         spaceAuthRepository: dagger.Lazy<SpaceAuthRepository>,
-    ) = HttpClient {
-        if (BuildConfig.DEBUG) {
-            install(Logging) {
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        com.aglushkov.wordteacher.shared.general.Logger.v(message, "SpaceHttpClient")
-                    }
-                }
-                level = LogLevel.ALL
-            }
-        }
-        install(HttpCookies) {
-            storage = cookieStorage
-        }
-        install(
-            createClientPlugin("SpacePlugin") {
-                onRequest { request, _ ->
-                    request.headers {
-                        set(HeaderDeviceType, "android")
-                        set(HeaderDeviceId, deviceIdRepository.deviceId())
-                        spaceAuthRepository.get().value.asLoaded()?.data?.let { authData ->
-                            set(HeaderAccessToken, authData.authToken.accessToken)
-                        }
-                        set(HttpHeaders.UserAgent, appInfo.getUserAgent())
-                    }
-                }
-            }
-        )
-        install(
-            createClientPlugin("AuthInterceptor for 401 error") {
-                on(Send) { request ->
-                    val originalCall = proceed(request)
-                    originalCall.response.run { // this: HttpResponse
-                        val googleAuthRepository = googleAuthRepository.get()
-                        val spaceRepository = spaceAuthRepository.get()
-
-                        if(status == HttpStatusCode.Unauthorized) {
-                            try {
-                                var result: Resource<AuthData> = Resource.Uninitialized()
-
-                                // if we have valid cookies then we can call refresh
-                                val session = cookieStorage.get(this.request.url).firstOrNull { it.name == CookieSession }?.value
-                                val isRefreshUrl = this.request.url.isAuthRefreshUrl()
-                                if (session != null && !isRefreshUrl) {
-                                    result = spaceRepository.refresh()
-                                }
-
-                                val call = if (!result.isLoaded()) {
-                                    // try to reauth
-                                    if (googleAuthRepository.googleSignInCredentialFlow.value.isError() || googleAuthRepository.googleSignInCredentialFlow.value.isUninitialized()) {
-                                        googleAuthRepository.signIn()
-                                        googleAuthRepository.googleSignInCredentialFlow.waitUntilLoadedOrError()
-                                        spaceRepository.authDataFlow.waitUntilLoadedOrError()
-                                    } else {
-                                        googleAuthRepository.googleSignInCredentialFlow.waitUntilLoadedOrError()
-                                        googleAuthRepository.googleSignInCredentialFlow.value.asLoaded()?.data?.tokenId?.let { tokenId ->
-                                            spaceRepository.auth(SpaceAuthService.NetworkType.Google, tokenId)
-                                        }
-                                    }
-
-                                    if (!isRefreshUrl) {
-                                        proceed(request)
-                                    } else {
-                                        null
-                                    }
-                                } else { null }
-                                call ?: originalCall
-                            } catch (e: Exception) {
-                                originalCall
-                            }
-                        } else {
-                            originalCall
-                        }
-                    }
-                }
-            }
-        )
-    }
-
-    private fun Url.isAuthRefreshUrl(): Boolean {
-        return pathSegments.size >= 2 && pathSegments.subList(pathSegments.size - 2, pathSegments.size) == listOf("auth", "refresh")
-    }
+    ): HttpClient = SpaceHttpClientBuilder(
+        deviceIdRepository,
+        appInfo,
+        cookieStorage,
+        { googleAuthRepository.get() },
+        { spaceAuthRepository.get() },
+        BuildConfig.DEBUG,
+    ).build()
 
     @AppComp
     @Provides
@@ -312,8 +228,8 @@ class AppModule {
     @Provides
     fun googleAuthRepository(
         context: Context
-    ): GoogleAuthRepository =
-        GoogleAuthRepository(context.getString(R.string.default_web_client_id))
+    ): GoogleAuthRepositoryImpl =
+        GoogleAuthRepositoryImpl(context.getString(R.string.default_web_client_id))
 
     @AppComp
     @Provides
