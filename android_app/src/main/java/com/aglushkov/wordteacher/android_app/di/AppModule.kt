@@ -9,7 +9,7 @@ import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.general.space_httpclient.SpaceHttpClientBuilder
+import com.aglushkov.wordteacher.shared.service.SpaceHttpClientBuilder
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository

@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.general.space_httpclient
+package com.aglushkov.wordteacher.shared.service
 
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.GoogleAuthRepository
@@ -11,7 +11,6 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
-import com.aglushkov.wordteacher.shared.service.*
 import io.ktor.client.*
 import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.cookies.*
