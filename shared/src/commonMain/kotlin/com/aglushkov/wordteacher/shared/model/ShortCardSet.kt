@@ -7,6 +7,8 @@ data class ShortCardSet (
     val modificationDate: Long,
     val readyToLearnProgress: Float,
     val totalProgress: Float,
+    val creationId: String,
+    val remoteId: String,
 ) {
 
 }

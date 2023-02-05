@@ -32,6 +32,7 @@ class DatabaseWorker {
     // cancellable runnables with different ids could be run in parallel, so it's already might be dangerous...
     // And also now it seems using SerialQueue with this pendingRunnable might lead to a live lock
     // because of a different execution order, in launchPendingIfNeeded we run pendingRunnable first... need to check it!
+    // On the other hand as we don't block treads and use suspended instead, probably everything will work fine
     // As an alternative we need to create one queue here instead of two
     private val pendingRunnable = mutableListOf<WorkerRunnableInternal<*>>()
 

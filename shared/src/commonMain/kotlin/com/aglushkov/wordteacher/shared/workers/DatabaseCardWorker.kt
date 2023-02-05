@@ -145,10 +145,6 @@ class DatabaseCardWorker(
         updateCardCancellableInternal(card, delay)
     }
 
-    suspend fun updateCardCancellableAndWait(card: Card, delay: Long) = serialQueue.sendAndWait {
-        updateCardCancellableInternal(card, delay)
-    }
-
     private suspend fun updateCardCancellableInternal(
         card: Card,
         delay: Long

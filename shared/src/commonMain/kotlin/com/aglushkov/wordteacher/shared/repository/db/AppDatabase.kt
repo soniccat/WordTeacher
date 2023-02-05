@@ -145,10 +145,16 @@ class AppDatabase(
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString())
 
+        fun selectShortCardSets(): List<ShortCardSet> {
+            return db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId ->
+                ShortCardSet(id, name, date, modificationDate, 0f, 0f, creationId, remoteId)
+            }).executeAsList()
+        }
+
         fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
             // TODO: reorganize db to pull progress from it instead of loading all the cards
-            val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, _ ->
-                ShortCardSet(id, name, date, modificationDate, 0f, 0f)
+            val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId ->
+                ShortCardSet(id, name, date, modificationDate, 0f, 0f, creationId, remoteId)
             }).asFlow()
             val setsWithCardsFlow = selectSetIdsWithCards().asFlow()
 
@@ -174,7 +180,7 @@ class AppDatabase(
                 }
             )
         }
-        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id) { id, name, date, modificationDate, creationId ->
+        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id) { id, name, date, modificationDate, creationId, _ ->
             CardSet(
                 id,
                 name,
@@ -193,11 +199,63 @@ class AppDatabase(
             }
         }
 
-        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId ->
-            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId)
+        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId ->
+            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId)
         }
 
         fun lastModificationDate() = db.dBCardSetQueries.lastModificationDate().executeAsList().firstOrNull()?.MAX ?: 0L
+
+        fun remoteIds() = db.dBCardSetQueries.selectRemoteIds().executeAsList()
+
+        fun updateCardSet(
+            cardSet: CardSet
+        ): Card {
+            updateCardSet(
+                cardId = card.id,
+                creationDate = card.creationDate.toEpochMilliseconds(),
+                modificationDate = card.modificationDate.toEpochMilliseconds(),
+                term = card.term,
+                definitions = card.definitions,
+                definitionTermSpans = card.definitionTermSpans,
+                partOfSpeech = card.partOfSpeech,
+                transcription = card.transcription,
+                synonyms = card.synonyms,
+                examples = card.examples,
+                exampleTermSpans = card.exampleTermSpans,
+                progressLevel = card.progress.currentLevel,
+                progressLastMistakeCount = card.progress.lastMistakeCount,
+                progressLastLessonDate = card.progress.lastLessonDate,
+                needToUpdateDefinitionSpans = card.needToUpdateDefinitionSpans.toLong(),
+                needToUpdateExampleSpans = card.needToUpdateExampleSpans.toLong(),
+            )
+            return card
+        }
+
+        private fun updateCardSet(
+            name: String,
+            date: Long,
+            modificationDate: Long,
+            creationId: String,
+            remoteId: String,
+            id: Long
+        ) = db.dBCardSetQueries.updateCardSet(
+            creationDate,
+            term,
+            partOfSpeech.toString(),
+            transcription,
+            definitions,
+            synonyms,
+            examples,
+            progressLevel,
+            progressLastMistakeCount,
+            progressLastLessonDate,
+            definitionTermSpans,
+            exampleTermSpans,
+            needToUpdateDefinitionSpans,
+            needToUpdateExampleSpans,
+            modificationDate,
+            cardId
+        )
     }
 
     inner class Cards {
@@ -233,8 +291,9 @@ class AppDatabase(
             needToUpdateExampleSpans: Long?,
             modificationDate: Long?,
             creationId: String?,
+            remoteId: String?
         ) -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId ->
+            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId ->
                 Card(
                     id!!,
                     Instant.fromEpochMilliseconds(date!!),

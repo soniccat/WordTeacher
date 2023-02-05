@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.toOkResult
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
@@ -87,20 +88,43 @@ class CardSetSyncWorker(
             return
         }
 
+        // TODO: save/store last sync date not to overwrite changes after the last sync
+
         state.value = State.Pulling
         lastPullDate = timeSource.getTimeInstant()
         try {
-            var lastModificationDate: Instant? = null
-            val lastModificationDateLong = withContext(Dispatchers.Default) {
-                serialQueue.sendAndWait {
-                    databaseWorker.run {
-                        database.cardSets.lastModificationDate()
+            val (cardSetRemoteIds, lastModificationDate) = withContext(Dispatchers.Default) {
+                val lastModificationDateLong = databaseWorker.run {
+                    database.cardSets.lastModificationDate()
+                }
+                val lastModificationDate = lastModificationDateLong.takeIf { it != 0L }?.let { milliseconds ->
+                    Instant.fromEpochMilliseconds(milliseconds)
+                }
+                val cardSetRemoteIds = databaseWorker.run {
+                    database.cardSets.remoteIds()
+                }
+                cardSetRemoteIds to lastModificationDate
+            }
+
+            val pullResponse = spaceCardSetService.pull(cardSetRemoteIds, lastModificationDate).toOkResult()
+
+            databaseWorker.run {
+                database.transaction {
+                    val dbCardSets = database.cardSets.selectShortCardSets()
+                    pullResponse.updatedCardSets.map { remoteCardSet ->
+                        dbCardSets.firstOrNull {
+                            it.creationId == remoteCardSet.creationId
+                        }?.let { dbCardSet ->
+                            if (dbCardSet.modificationDate > remoteCardSet.modificationDate.toEpochMilliseconds()) {
+                                // TODO: need to check last sync date
+                                // TODO: merge
+                            } else if (dbCardSet.remoteId.isEmpty() || dbCardSet.modificationDate > remoteCardSet.modificationDate.toEpochMilliseconds()) {
+                                database.cardSets.
+                            }
+                        }
                     }
                 }
             }
-
-            // TODO:
-            //spaceCardSetService.pull()
 
             //TODO update modificationdate for unsent cardset
 
