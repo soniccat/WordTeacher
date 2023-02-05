@@ -1,7 +1,9 @@
 package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CardProgress(
     val currentLevel: Int = 0,
     val lastMistakeCount: Int = 0,
