@@ -196,6 +196,8 @@ class AppDatabase(
         fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId ->
             setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId)
         }
+
+        fun lastModificationDate() = db.dBCardSetQueries.lastModificationDate().executeAsList().firstOrNull()?.MAX ?: 0L
     }
 
     inner class Cards {

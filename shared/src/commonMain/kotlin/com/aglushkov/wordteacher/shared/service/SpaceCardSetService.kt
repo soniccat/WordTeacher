@@ -72,10 +72,12 @@ class SpaceCardSetService(
         }
     }
 
-    suspend fun pull(currentCardSetIds: List<String>, lastModificationDate: Instant): Response<AuthData> {
+    suspend fun pull(currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<AuthData> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/cardsets/pull") {
-                this.parameter(LastModificationDateKey, lastModificationDate.toString())
+                lastModificationDate?.let { date ->
+                    this.parameter(LastModificationDateKey, date.toString())
+                }
                 this.setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds)))
             }
         return withContext(Dispatchers.Default) {
@@ -84,10 +86,12 @@ class SpaceCardSetService(
         }
     }
 
-    suspend fun push(updatedCardSets: List<CardSet>, currentCardSetIds: List<String>, lastModificationDate: Instant): Response<AuthData> {
+    suspend fun push(updatedCardSets: List<CardSet>, currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<AuthData> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/cardsets/push") {
-                this.parameter(LastModificationDateKey, lastModificationDate.toString())
+                lastModificationDate?.let { date ->
+                    this.parameter(LastModificationDateKey, date.toString())
+                }
                 this.setBody(pullJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds)))
             }
         return withContext(Dispatchers.Default) {

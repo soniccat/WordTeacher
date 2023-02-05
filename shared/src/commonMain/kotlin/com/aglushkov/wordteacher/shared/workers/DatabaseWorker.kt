@@ -26,6 +26,13 @@ class DatabaseWorker {
     private val pendingCancellableRunnable = mutableMapOf<String, CancellableRunnable<*>>()
 
     private val deferredSet = mutableSetOf<Deferred<*>>()
+
+    //TODO: probably we can remove that for performance and use SerialQueue when it's required
+    // it's strange that we have another kinda queue and only for non cancellable runnables...
+    // cancellable runnables with different ids could be run in parallel, so it's already might be dangerous...
+    // And also now it seems using SerialQueue with this pendingRunnable might lead to a live lock
+    // because of a different execution order, in launchPendingIfNeeded we run pendingRunnable first... need to check it!
+    // As an alternative we need to create one queue here instead of two
     private val pendingRunnable = mutableListOf<WorkerRunnableInternal<*>>()
 
     suspend fun <T> runCancellable(id: String, runnable: WorkerRunnable<T>, delay: Long = UPDATE_DELAY): T {
@@ -138,6 +145,7 @@ class DatabaseWorker {
 
         // now we expect to have only one pending queue filled
         if (pendingRunnable.isNotEmpty() && pendingCancellableRunnable.isNotEmpty()) {
+            // TODO: now I see it won't be a problem if we get here...
             Logger.e("DatabaseWorker", "We've got two filled worker queues (runnables: ${pendingRunnable.size} cancellable runnables: ${pendingCancellableRunnable.size})")
         }
 

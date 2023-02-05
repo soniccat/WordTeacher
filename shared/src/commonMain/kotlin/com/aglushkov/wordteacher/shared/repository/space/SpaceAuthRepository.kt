@@ -27,6 +27,10 @@ class SpaceAuthRepository(
         return stateFlow.value
     }
 
+    fun isAuthorized(): Boolean {
+        return value.asLoaded() != null
+    }
+
     private val json = Json {
         ignoreUnknownKeys = true
     }

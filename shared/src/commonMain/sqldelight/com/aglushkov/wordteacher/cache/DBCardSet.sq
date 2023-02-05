@@ -41,3 +41,7 @@ WHERE id = ?;
 removeAll:
 DELETE
 FROM DBCardSet;
+
+lastModificationDate:
+SELECT MAX(modificationDate)
+FROM DBCardSet;

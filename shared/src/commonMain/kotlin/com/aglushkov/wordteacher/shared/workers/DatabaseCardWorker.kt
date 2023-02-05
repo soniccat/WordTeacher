@@ -18,7 +18,6 @@ class DatabaseCardWorker(
     private val databaseWorker: DatabaseWorker,
     private val spanUpdateWorker: SpanUpdateWorker
 ) {
-    //private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val serialQueue = SerialQueue()
     private val editOperationCount = MutableStateFlow(0)
     private var stateStack by Delegates.observable(listOf(DEFAULT_STATE)) { _, _, new ->
@@ -100,10 +99,6 @@ class DatabaseCardWorker(
         }
     }
 
-//    suspend fun waitUntilUpdatingSpansIsStarted() {
-//        spanUpdateWorker.waitUntilStarted()
-//    }
-
     suspend fun waitUntilUpdatingSpansIsDone() {
         spanUpdateWorker.waitUntilDone()
     }
@@ -146,20 +141,6 @@ class DatabaseCardWorker(
         }
     }
 
-//    suspend fun updateCardSafely(card: Card) = sequentialWorker.sendAndWait {
-//        performEditOperation {
-//            try {
-//                updateCard(card)
-//            } catch (e: CancellationException) {
-//                throw e
-//            } catch (e: Throwable) {
-//                // TODO: handle error
-//                Logger.e("DatabaseCardWorker.updateCardSafely", e.toString())
-//                throw e
-//            }
-//        }
-//    }
-
     fun updateCardCancellable(card: Card, delay: Long) = serialQueue.send {
         updateCardCancellableInternal(card, delay)
     }
@@ -167,18 +148,6 @@ class DatabaseCardWorker(
     suspend fun updateCardCancellableAndWait(card: Card, delay: Long) = serialQueue.sendAndWait {
         updateCardCancellableInternal(card, delay)
     }
-
-//    suspend fun updateCardCancellableSafely(card: Card, delay: Long): Card {
-//        return try {
-//            updateCardCancellable(card, delay)
-//        } catch (e: CancellationException) {
-//            throw e
-//        } catch (e: Throwable) {
-//            // TODO: handle error
-//            Logger.e("DatabaseCardWorker.updateCardSafely", e.toString())
-//            throw e
-//        }
-//    }
 
     private suspend fun updateCardCancellableInternal(
         card: Card,
@@ -191,9 +160,6 @@ class DatabaseCardWorker(
             },
             delay
         )
-        //        databaseWorker.run {
-        //            database.cards.updateCard(card)
-        //        }
     }
 
     private suspend fun <T> performEditOperation(block: suspend () -> T): T {
