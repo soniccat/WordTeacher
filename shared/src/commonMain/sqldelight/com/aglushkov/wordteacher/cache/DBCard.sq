@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS DBCard (
 
   modificationDate INTEGER NOT NULL DEFAULT 0,
   creationId TEXT NOT NULL DEFAULT "",
-  remoteId TEXT NOT NULL DEFAULT "" why do we need it?
+  remoteId TEXT NOT NULL DEFAULT "" -- consider to remove it
 );
 
 selectAllCardIds:
@@ -64,6 +64,11 @@ removeCard:
 DELETE
 FROM DBCard
 WHERE id = ?;
+
+removeCards:
+DELETE
+FROM DBCard
+WHERE id IN ?;
 
 removeCardsBySetId:
 DELETE

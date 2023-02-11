@@ -1,10 +1,12 @@
 package com.aglushkov.wordteacher.shared.model
 
+import kotlinx.datetime.Instant
+
 data class ShortCardSet (
     val id: Long,
     val name: String,
-    val creationDate: Long,
-    val modificationDate: Long,
+    val creationDate: Instant,
+    val modificationDate: Instant,
     val readyToLearnProgress: Float,
     val totalProgress: Float,
     val creationId: String,

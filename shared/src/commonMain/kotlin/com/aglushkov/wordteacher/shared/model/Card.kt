@@ -3,12 +3,14 @@ package com.aglushkov.wordteacher.shared.model
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.extensions.merge
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Card (
     val id: Long,
+    val remoteId: String,
     val creationDate: Instant,
     val modificationDate: Instant,
     val term: String,
@@ -54,6 +56,28 @@ data class Card (
                 resString.toString()
             } ?: str
         }
+}
+
+fun List<Card>.mergeCards(anotherCards: List<Card>): List<Card> {
+    val anotherCardsMap = anotherCards.associateBy { it.remoteId }.toMutableMap()
+    return buildList<Card> {
+        this.onEach { thisCard ->
+            anotherCardsMap[thisCard.remoteId]?.let { remoteCard ->
+                if (thisCard.modificationDate > remoteCard.modificationDate) {
+                    add(thisCard)
+                } else {
+                    add(remoteCard)
+                }
+            } ?: run {
+                add(thisCard)
+            }
+            anotherCardsMap.remove(thisCard.remoteId)
+        }
+
+        anotherCardsMap.onEach {
+            add(it.value)
+        }
+    }
 }
 
 private const val TERM_REPLACEMENT = "___"

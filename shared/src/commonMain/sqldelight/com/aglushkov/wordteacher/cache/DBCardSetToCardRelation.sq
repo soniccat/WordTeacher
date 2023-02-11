@@ -45,6 +45,11 @@ DELETE
 FROM DBCardSetToCardRelation
 WHERE cardId = ?;
 
+removeCards:
+DELETE
+FROM DBCardSetToCardRelation
+WHERE cardId IN ?;
+
 removeAll:
 DELETE
 FROM DBCardSetToCardRelation;

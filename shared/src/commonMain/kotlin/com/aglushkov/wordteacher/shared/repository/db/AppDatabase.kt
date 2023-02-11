@@ -145,16 +145,18 @@ class AppDatabase(
     inner class CardSets {
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString())
 
+        private fun insertedCardSetId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
+
         fun selectShortCardSets(): List<ShortCardSet> {
             return db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId ->
-                ShortCardSet(id, name, date, modificationDate, 0f, 0f, creationId, remoteId)
+                ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId)
             }).executeAsList()
         }
 
         fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
             // TODO: reorganize db to pull progress from it instead of loading all the cards
             val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId ->
-                ShortCardSet(id, name, date, modificationDate, 0f, 0f, creationId, remoteId)
+                ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId)
             }).asFlow()
             val setsWithCardsFlow = selectSetIdsWithCards().asFlow()
 
@@ -180,9 +182,11 @@ class AppDatabase(
                 }
             )
         }
-        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id) { id, name, date, modificationDate, creationId, _ ->
+
+        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id) { id, name, date, modificationDate, creationId, remoteId ->
             CardSet(
                 id,
+                remoteId,
                 name,
                 Instant.fromEpochMilliseconds(date),
                 Instant.fromEpochMilliseconds(modificationDate),
@@ -207,54 +211,73 @@ class AppDatabase(
 
         fun remoteIds() = db.dBCardSetQueries.selectRemoteIds().executeAsList()
 
+        fun insert(cardSet: CardSet): CardSet {
+            db.transaction {
+                db.dBCardSetQueries.insert(
+                    name = cardSet.name,
+                    date = cardSet.creationDate.toEpochMilliseconds(),
+                    modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
+                    creationId = cardSet.creationId
+                )
+                cardSet.cards.onEach { card ->
+                    cards.insertCard(cardSet.requireId(), card)
+                }
+            }
+
+            return cardSet.copy(
+                id = insertedCardSetId()!!
+            )
+        }
+
         fun updateCardSet(
             cardSet: CardSet
-        ): Card {
-            updateCardSet(
-                cardId = card.id,
-                creationDate = card.creationDate.toEpochMilliseconds(),
-                modificationDate = card.modificationDate.toEpochMilliseconds(),
-                term = card.term,
-                definitions = card.definitions,
-                definitionTermSpans = card.definitionTermSpans,
-                partOfSpeech = card.partOfSpeech,
-                transcription = card.transcription,
-                synonyms = card.synonyms,
-                examples = card.examples,
-                exampleTermSpans = card.exampleTermSpans,
-                progressLevel = card.progress.currentLevel,
-                progressLastMistakeCount = card.progress.lastMistakeCount,
-                progressLastLessonDate = card.progress.lastLessonDate,
-                needToUpdateDefinitionSpans = card.needToUpdateDefinitionSpans.toLong(),
-                needToUpdateExampleSpans = card.needToUpdateExampleSpans.toLong(),
-            )
-            return card
+        ): CardSet {
+            db.transaction {
+                updateCardSet(
+                    id = cardSet.requireId(),
+                    name = cardSet.name,
+                    date = cardSet.creationDate.toEpochMilliseconds(),
+                    modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
+                    creationId = cardSet.creationId,
+                    remoteId = cardSet.creationId,
+                )
+
+                val currentCards = cards.selectCards(cardSet.requireId()).executeAsList()
+                val currentCardSet = currentCards.toMutableSet()
+                val intersect = cardSet.cards.intersect(currentCardSet)
+
+                // skip intersected cards
+                // currentCards - intersect -> old cards to delete
+                // cardSet.cards - intersect -> new cards to insert
+
+                val cardIdsToDelete = (currentCards - intersect).map { it.id }
+                if (cardIdsToDelete.isNotEmpty()) {
+                    db.dBCardSetToCardRelationQueries.removeCards(cardIdsToDelete)
+                    db.dBCardQueries.removeCards(cardIdsToDelete)
+                }
+
+                (cardSet.cards - intersect).onEach { card ->
+                    cards.insertCard(cardSet.requireId(), card)
+                }
+            }
+
+            return cardSet
         }
 
         private fun updateCardSet(
+            id: Long,
             name: String,
             date: Long,
             modificationDate: Long,
             creationId: String,
             remoteId: String,
-            id: Long
         ) = db.dBCardSetQueries.updateCardSet(
-            creationDate,
-            term,
-            partOfSpeech.toString(),
-            transcription,
-            definitions,
-            synonyms,
-            examples,
-            progressLevel,
-            progressLastMistakeCount,
-            progressLastLessonDate,
-            definitionTermSpans,
-            exampleTermSpans,
-            needToUpdateDefinitionSpans,
-            needToUpdateExampleSpans,
-            modificationDate,
-            cardId
+            name = name,
+            date = date,
+            modificationDate = modificationDate,
+            creationId = creationId,
+            remoteId = remoteId,
+            id = id,
         )
     }
 
@@ -296,6 +319,7 @@ class AppDatabase(
             { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId ->
                 Card(
                     id!!,
+                    remoteId.orEmpty(),
                     Instant.fromEpochMilliseconds(date!!),
                     Instant.fromEpochMilliseconds(modificationDate!!),
                     term!!,
@@ -336,6 +360,7 @@ class AppDatabase(
         ): Card {
             var newCard = Card(
                 id = -1,
+                remoteId = "",
                 creationDate = creationDate,
                 modificationDate = modificationDate,
                 term = term,
@@ -352,12 +377,12 @@ class AppDatabase(
                 creationId = creationId,
             )
 
-            cards.insertCardInternal(setId, newCard)
+            cards.insertCard(setId, newCard)
             newCard = newCard.copy(id = cards.insertedCardId()!!)
             return newCard
         }
 
-        private fun insertCardInternal(setId: Long, newCard: Card) {
+        fun insertCard(setId: Long, newCard: Card) {
             cards.insertCardInternal(
                 setId = setId,
                 creationDate = newCard.creationDate.toEpochMilliseconds(),
@@ -424,6 +449,7 @@ class AppDatabase(
         ): Card {
             updateCard(
                 cardId = card.id,
+                remoteId = card.remoteId,
                 creationDate = card.creationDate.toEpochMilliseconds(),
                 modificationDate = card.modificationDate.toEpochMilliseconds(),
                 term = card.term,
@@ -445,6 +471,7 @@ class AppDatabase(
 
         private fun updateCard(
             cardId: Long,
+            remoteId: String,
             creationDate: Long,
             modificationDate: Long,
             term: String,
@@ -476,6 +503,7 @@ class AppDatabase(
             needToUpdateDefinitionSpans,
             needToUpdateExampleSpans,
             modificationDate,
+            remoteId,
             cardId
         )
 

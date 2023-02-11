@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.workers
 
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -26,6 +28,7 @@ class CardSetSyncWorker(
     private val settings: FlowSettings,
 ) {
     private sealed interface State {
+        object Initializing: State
         object AuthRequired: State
         data class PullRequired(val e: Exception? = null): State
         object Pulling: State
@@ -35,20 +38,33 @@ class CardSetSyncWorker(
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val serialQueue = SerialQueue()
-    private var state = MutableStateFlow<State>(State.AuthRequired)
+    private var state = MutableStateFlow<State>(State.Initializing)
     private var errpr: Exception? = null
     private var lastPullDate: Instant = Instant.fromEpochMilliseconds(0)
 
-    //private var lastSyncModificationDate: Instant = Instant.fromEpochMilliseconds(0)
+    private var lastSyncDate: Instant = Instant.fromEpochMilliseconds(0) // from settings
 
     init {
+        // handle initialising
+        scope.launch {
+            lastSyncDate = Instant.fromEpochMilliseconds(settings.getLong(LAST_SYNC_DATE_KEY))
+
+            if (spaceAuthRepository.isAuthorized()) {
+                state.value = State.AuthRequired
+            } else {
+                state.value = State.PullRequired()
+            }
+        }
+
         // handle authorizing
         scope.launch {
             spaceAuthRepository.authDataFlow.collect {
-                if (spaceAuthRepository.isAuthorized()) {
-                    state.value = State.PullRequired()
-                } else {
-                    state.value = State.AuthRequired
+                if (state.value != State.Initializing) {
+                    if (spaceAuthRepository.isAuthorized()) {
+                        state.value = State.PullRequired()
+                    } else {
+                        state.value = State.AuthRequired
+                    }
                 }
             }
         }
@@ -88,10 +104,9 @@ class CardSetSyncWorker(
             return
         }
 
-        // TODO: save/store last sync date not to overwrite changes after the last sync
-
         state.value = State.Pulling
         lastPullDate = timeSource.getTimeInstant()
+
         try {
             val (cardSetRemoteIds, lastModificationDate) = withContext(Dispatchers.Default) {
                 val lastModificationDateLong = databaseWorker.run {
@@ -107,26 +122,40 @@ class CardSetSyncWorker(
             }
 
             val pullResponse = spaceCardSetService.pull(cardSetRemoteIds, lastModificationDate).toOkResult()
-
             databaseWorker.run {
                 database.transaction {
                     val dbCardSets = database.cardSets.selectShortCardSets()
-                    pullResponse.updatedCardSets.map { remoteCardSet ->
+                    val creationIdToId = dbCardSets.associate { it.creationId to it.id }
+
+                    pullResponse.updatedCardSets.map {
+                        it.copy(id = creationIdToId[it.creationId] ?: 0L)
+                    }.map { remoteCardSet ->
                         dbCardSets.firstOrNull {
                             it.creationId == remoteCardSet.creationId
                         }?.let { dbCardSet ->
-                            if (dbCardSet.modificationDate > remoteCardSet.modificationDate.toEpochMilliseconds()) {
-                                // TODO: need to check last sync date
+                            if (remoteCardSet.modificationDate > lastSyncDate && dbCardSet.modificationDate > lastSyncDate) {
+                                // there're local and remote changes, need to merge
                                 // TODO: merge
-                            } else if (dbCardSet.remoteId.isEmpty() || dbCardSet.modificationDate > remoteCardSet.modificationDate.toEpochMilliseconds()) {
-                                database.cardSets.
+
+                            } else if (remoteCardSet.modificationDate > lastSyncDate && dbCardSet.modificationDate < lastSyncDate) {
+                                // there's only remote change
+                                database.cardSets.updateCardSet(remoteCardSet)
+                            } else {
+                                Logger.e("Strange cardSet state")
                             }
+                        } ?: run {
+                            database.cardSets.insert(remoteCardSet)
                         }
                     }
+
+                    // TODO:
+                    // pullResponse.deletedCardSetIds
                 }
             }
 
             //TODO update modificationdate for unsent cardset
+
+            settings.putLong(LAST_SYNC_DATE_KEY, lastSyncDate.toEpochMilliseconds())
 
             if (state.value == State.Pulling) {
                 state.value = State.Idle
@@ -144,3 +173,5 @@ class CardSetSyncWorker(
         state.takeWhile { !canPull() }.collect()
     }
 }
+
+private const val LAST_SYNC_DATE_KEY = "LAST_SYNC_DATE_KEY"
