@@ -12,16 +12,20 @@ SELECT *
 FROM DBCardSet
 ORDER BY date DESC;
 
+selectUpdated:
+SELECT *
+FROM DBCardSet
+WHERE modificationDate > ? AND remoteId != "";
+
+selectWithouRemoteId:
+SELECT *
+FROM DBCardSet
+WHERE remoteId != "";
+
 selectCardSet:
 SELECT *
 FROM DBCardSet
-WHERE id = ?
-ORDER BY date DESC;
-
-selectCardSetWithCards:
-SELECT *
-FROM DBCardSet
-WHERE DBCardSet.id = ?;
+WHERE id = ?;
 
 insert:
 INSERT INTO DBCardSet(name, date, modificationDate, creationId)

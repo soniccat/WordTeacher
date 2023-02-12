@@ -153,12 +153,20 @@ class AppDatabase(
             }).executeAsList()
         }
 
+        fun selectUpdatedCardSets(afterDate: Long): List<CardSet> = db.dBCardSetQueries.selectUpdated(afterDate, mapper = { id, name, date, modificationDate, creationId, remoteId ->
+            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), creationId)
+        }).executeAsList()
+
+        fun selectWithoutRemoteId(): List<CardSet> = db.dBCardSetQueries.selectWithouRemoteId(mapper = { id, name, date, modificationDate, creationId, remoteId ->
+            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), creationId)
+        }).executeAsList()
+
         fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
             // TODO: reorganize db to pull progress from it instead of loading all the cards
             val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId ->
                 ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId)
             }).asFlow()
-            val setsWithCardsFlow = selectSetIdsWithCards().asFlow()
+            val setsWithCardsFlow = selectAllSetIdsWithCards().asFlow()
 
             return combine(
                 flow = shortCardSetsFlow.map {
@@ -183,16 +191,8 @@ class AppDatabase(
             )
         }
 
-        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSetWithCards(id) { id, name, date, modificationDate, creationId, remoteId ->
-            CardSet(
-                id,
-                remoteId,
-                name,
-                Instant.fromEpochMilliseconds(date),
-                Instant.fromEpochMilliseconds(modificationDate),
-                emptyList(),
-                creationId
-            )
+        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSet(id) { id, name, date, modificationDate, creationId, remoteId ->
+            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), creationId)
         }
 
         fun removeCardSet(cardSetId: Long) {
@@ -203,7 +203,11 @@ class AppDatabase(
             }
         }
 
-        fun selectSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId ->
+        fun selectAllSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectAllSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId ->
+            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId)
+        }
+
+        fun selectSetIdsWithCards(setIds: List<Long>) = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards(setIds) { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId ->
             setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId)
         }
 

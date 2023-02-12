@@ -13,10 +13,16 @@ SELECT COUNT(id)
 FROM DBCardSetToCardRelation
 WHERE setId = ?;
 
-selectSetIdsWithCards:
+selectAllSetIdsWithCards:
 SELECT setId, DBCard.*
 FROM DBCardSetToCardRelation
     LEFT JOIN DBCard ON DBCardSetToCardRelation.cardId = DBCard.id;
+
+selectSetIdsWithCards:
+SELECT setId, DBCard.*
+FROM DBCardSetToCardRelation
+    LEFT JOIN DBCard ON DBCardSetToCardRelation.cardId = DBCard.id
+WHERE setId IN ?;
 
 selectCards:
 SELECT DBCard.*
