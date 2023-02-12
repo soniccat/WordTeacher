@@ -92,6 +92,7 @@ class DatabaseWorker {
         }
     }
 
+    //TODO: set this to database
     suspend fun <T> run(runnable: WorkerRunnable<T>) : T {
         return runInternal(WorkerRunnableInternal(runnable), shouldRunNext = true)
     }

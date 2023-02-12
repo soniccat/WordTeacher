@@ -28,6 +28,7 @@ class CardSetSyncWorker(
         object AuthRequired: State
         data class PullRequired(val e: Exception? = null): State
         object Pulling: State
+        data class PushRequired(val e: Exception? = null): State
         object Pushing: State
         object Idle: State
     }
@@ -35,10 +36,11 @@ class CardSetSyncWorker(
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val serialQueue = SerialQueue()
     private var state = MutableStateFlow<State>(State.Initializing)
-    private var errpr: Exception? = null
     private var lastPullDate: Instant = Instant.fromEpochMilliseconds(0)
+    private var lastPushDate: Instant = Instant.fromEpochMilliseconds(0)
 
-    private var lastSyncDate: Instant = Instant.fromEpochMilliseconds(0) // from settings
+    // last push/pull date, stored in settings
+    private var lastSyncDate: Instant = Instant.fromEpochMilliseconds(0)
 
     init {
         // handle initialising
@@ -65,13 +67,13 @@ class CardSetSyncWorker(
             }
         }
 
-        // handle initial pulling and pulling requests
+        // handle PullRequired
         scope.launch {
             state.collect { st ->
                 if (st is State.PullRequired) {
                     val interval = timeSource.getTimeInstant() - lastPullDate
-                    if (interval.inWholeSeconds <= 60L) {
-                        delay(60L - interval.inWholeSeconds)
+                    if (interval.inWholeSeconds <= PULL_RETRY_INTERVAL) {
+                        delay(PULL_RETRY_INTERVAL - interval.inWholeSeconds)
                     }
 
                     if (state.value is State.PullRequired) {
@@ -81,7 +83,35 @@ class CardSetSyncWorker(
             }
         }
 
-        // handle pushing from time to time
+        // handle PushRequired
+        scope.launch {
+            state.collect { st ->
+                if (st is State.PushRequired) {
+                    val interval = timeSource.getTimeInstant() - lastPushDate
+                    if (interval.inWholeSeconds <= PUSH_RETRY_INTERVAL) {
+                        delay(PUSH_RETRY_INTERVAL - interval.inWholeSeconds)
+                    }
+
+                    if (state.value is State.PushRequired) {
+                        pushInternal()
+                    }
+                }
+            }
+        }
+
+        // handle Idle
+        scope.launch {
+            state.collect { st ->
+                if (st is State.Idle) {
+                    while (state.value == State.Idle) {
+                        delay(PUSH_DELAY_INTERVAL)
+                        if (canPush()) {
+                            push()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun pull() {
@@ -106,20 +136,12 @@ class CardSetSyncWorker(
 
         try {
             withContext(Dispatchers.Default) {
-//                val lastModificationDateLong = databaseWorker.run {
-//                    database.cardSets.lastModificationDate()
-//                }
-//                val lastModificationDate =
-//                    lastModificationDateLong.takeIf { it != 0L }?.let { milliseconds ->
-//                        Instant.fromEpochMilliseconds(milliseconds)
-//                    }
                 val cardSetRemoteIds = databaseWorker.run {
                     database.cardSets.remoteIds()
                 }
 
                 val pullResponse = spaceCardSetService.pull(cardSetRemoteIds, lastSyncDate).toOkResult()
-                // as we pull we store max remote date here, we store max local date on push
-                newSyncDate = timeSource.getTimeInstant() //pullResponse.updatedCardSets.maxOfOrNull { it.modificationDate } ?: lastSyncDate
+                newSyncDate = timeSource.getTimeInstant()
 
                 databaseWorker.run {
                     database.transaction {
@@ -163,10 +185,11 @@ class CardSetSyncWorker(
 
                 // NO: //TODO update modificationdate for unsent cardset in push
                 settings.putLong(LAST_SYNC_DATE_KEY, newSyncDate.toEpochMilliseconds())
+                lastSyncDate = newSyncDate
             }
 
             if (state.value == State.Pulling) {
-                state.value = State.Idle
+                state.value = State.PushRequired()
             }
         } catch (e: Exception) {
             if (state.value == State.Pulling) {
@@ -175,11 +198,107 @@ class CardSetSyncWorker(
         }
     }
 
-    private fun canPull() = spaceAuthRepository.isAuthorized() && (state.value is State.PullRequired || state.value == State.Idle)
+    fun canPull() = spaceAuthRepository.isAuthorized() && (state.value is State.PullRequired || state.value == State.Idle)
+
+    fun push() {
+        if (!canPush()) {
+            return
+        }
+
+        scope.launch {
+            pushInternal()
+        }
+    }
+
+    private suspend fun pushInternal() {
+        if (!canPush()) {
+//            waitUntilCanPull()
+            return
+        }
+
+        state.value = State.Pushing
+        lastPushDate = timeSource.getTimeInstant()
+        val newSyncDate: Instant?
+
+        try {
+            withContext(Dispatchers.Default) {
+                val newCardSets = databaseWorker.run {
+                    database.cardSets.sele
+                }
+
+                val cardSetRemoteIds = databaseWorker.run {
+                    database.cardSets.remoteIds()
+                }
+
+                val pushResponse = spaceCardSetService.push(cardSetRemoteIds, lastSyncDate).toOkResult()
+                newSyncDate = timeSource.getTimeInstant()
+
+                databaseWorker.run {
+                    database.transaction {
+                        val dbCardSets = database.cardSets.selectShortCardSets()
+                        val remoteIdToId = dbCardSets.associate { it.remoteId to it.id }
+
+                        pullResponse.updatedCardSets.map {
+                            it.copy(id = remoteIdToId[it.remoteId] ?: 0L)
+                        }.map { remoteCardSet ->
+                            dbCardSets.firstOrNull {
+                                it.remoteId == remoteCardSet.remoteId
+                            }?.let { dbCardSet ->
+                                // as we got these cardSets from the back it means that remoteCardSet.modificationDate > lastSyncDate
+                                if (dbCardSet.modificationDate > lastSyncDate) {
+                                    // there're local and remote changes, need to merge
+                                    val fullCardSet = database.cardSets.selectCardSet(dbCardSet.id).executeAsOne()
+                                    val mergedCardSet = fullCardSet.merge(remoteCardSet, newSyncDate)
+                                    database.cardSets.updateCardSet(mergedCardSet)
+
+                                } else if (dbCardSet.modificationDate < lastSyncDate) {
+                                    // there's only remote change
+                                    database.cardSets.updateCardSet(remoteCardSet)
+                                } else {
+                                    Logger.e("Strange cardSet state")
+                                }
+                            } ?: run {
+                                database.cardSets.insert(remoteCardSet)
+                            }
+                        }
+
+                        pullResponse.deletedCardSetIds.onEach { remoteCardSetId ->
+                            dbCardSets.firstOrNull {
+                                it.remoteId == remoteCardSetId
+                            }?.let { dbCardSet ->
+                                // delete here without checks as we sent all the local cardSet remote ids
+                                database.cardSets.removeCardSet(dbCardSet.id)
+                            }
+                        }
+                    }
+                }
+
+                settings.putLong(LAST_SYNC_DATE_KEY, newSyncDate.toEpochMilliseconds())
+                lastSyncDate = newSyncDate
+            }
+
+            if (state.value == State.Pushing) {
+                state.value = State.Idle
+            }
+        } catch (e: Exception) {
+            if (state.value == State.Pushing) {
+                state.value = State.PushRequired(e)
+            }
+        }
+    }
+
+    fun canPush() = spaceAuthRepository.isAuthorized() && (state.value is State.PushRequired || state.value == State.Idle)
 
     private suspend fun waitUntilCanPull() {
         state.takeWhile { !canPull() }.collect()
     }
+
+    private suspend fun waitUntilNotPulling() {
+        state.takeWhile { it is State.Pulling }.collect()
+    }
 }
 
 private const val LAST_SYNC_DATE_KEY = "LAST_SYNC_DATE_KEY"
+private const val PULL_RETRY_INTERVAL = 5L
+private const val PUSH_RETRY_INTERVAL = 15L
+private const val PUSH_DELAY_INTERVAL = 30L
