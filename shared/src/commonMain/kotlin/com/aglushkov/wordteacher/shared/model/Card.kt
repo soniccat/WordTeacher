@@ -58,6 +58,7 @@ data class Card (
         }
 }
 
+// here we don't merge the content of two cards, we just choose the newest one
 fun List<Card>.mergeCards(anotherCards: List<Card>): List<Card> {
     val anotherCardsMap = anotherCards.associateBy { it.remoteId }.toMutableMap()
     return buildList<Card> {

@@ -3,10 +3,8 @@ package com.aglushkov.wordteacher.shared.workers
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.resource.asLoaded
-import com.aglushkov.wordteacher.shared.general.resource.isLoaded
-import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.toOkResult
+import com.aglushkov.wordteacher.shared.model.merge
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
@@ -15,9 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.flow.update
 import kotlinx.datetime.Instant
-import kotlinx.datetime.asTimeSource
 
 class CardSetSyncWorker(
     private val spaceAuthRepository: SpaceAuthRepository,
@@ -106,56 +102,68 @@ class CardSetSyncWorker(
 
         state.value = State.Pulling
         lastPullDate = timeSource.getTimeInstant()
+        val newSyncDate: Instant?
 
         try {
-            val (cardSetRemoteIds, lastModificationDate) = withContext(Dispatchers.Default) {
-                val lastModificationDateLong = databaseWorker.run {
-                    database.cardSets.lastModificationDate()
-                }
-                val lastModificationDate = lastModificationDateLong.takeIf { it != 0L }?.let { milliseconds ->
-                    Instant.fromEpochMilliseconds(milliseconds)
-                }
+            withContext(Dispatchers.Default) {
+//                val lastModificationDateLong = databaseWorker.run {
+//                    database.cardSets.lastModificationDate()
+//                }
+//                val lastModificationDate =
+//                    lastModificationDateLong.takeIf { it != 0L }?.let { milliseconds ->
+//                        Instant.fromEpochMilliseconds(milliseconds)
+//                    }
                 val cardSetRemoteIds = databaseWorker.run {
                     database.cardSets.remoteIds()
                 }
-                cardSetRemoteIds to lastModificationDate
-            }
 
-            val pullResponse = spaceCardSetService.pull(cardSetRemoteIds, lastModificationDate).toOkResult()
-            databaseWorker.run {
-                database.transaction {
-                    val dbCardSets = database.cardSets.selectShortCardSets()
-                    val creationIdToId = dbCardSets.associate { it.creationId to it.id }
+                val pullResponse = spaceCardSetService.pull(cardSetRemoteIds, lastSyncDate).toOkResult()
+                // as we pull we store max remote date here, we store max local date on push
+                newSyncDate = timeSource.getTimeInstant() //pullResponse.updatedCardSets.maxOfOrNull { it.modificationDate } ?: lastSyncDate
 
-                    pullResponse.updatedCardSets.map {
-                        it.copy(id = creationIdToId[it.creationId] ?: 0L)
-                    }.map { remoteCardSet ->
-                        dbCardSets.firstOrNull {
-                            it.creationId == remoteCardSet.creationId
-                        }?.let { dbCardSet ->
-                            if (remoteCardSet.modificationDate > lastSyncDate && dbCardSet.modificationDate > lastSyncDate) {
-                                // there're local and remote changes, need to merge
-                                // TODO: merge
+                databaseWorker.run {
+                    database.transaction {
+                        val dbCardSets = database.cardSets.selectShortCardSets()
+                        val remoteIdToId = dbCardSets.associate { it.remoteId to it.id }
 
-                            } else if (remoteCardSet.modificationDate > lastSyncDate && dbCardSet.modificationDate < lastSyncDate) {
-                                // there's only remote change
-                                database.cardSets.updateCardSet(remoteCardSet)
-                            } else {
-                                Logger.e("Strange cardSet state")
+                        pullResponse.updatedCardSets.map {
+                            it.copy(id = remoteIdToId[it.remoteId] ?: 0L)
+                        }.map { remoteCardSet ->
+                            dbCardSets.firstOrNull {
+                                it.remoteId == remoteCardSet.remoteId
+                            }?.let { dbCardSet ->
+                                // as we got these cardSets from the back it means that remoteCardSet.modificationDate > lastSyncDate
+                                if (dbCardSet.modificationDate > lastSyncDate) {
+                                    // there're local and remote changes, need to merge
+                                    val fullCardSet = database.cardSets.selectCardSet(dbCardSet.id).executeAsOne()
+                                    val mergedCardSet = fullCardSet.merge(remoteCardSet, newSyncDate)
+                                    database.cardSets.updateCardSet(mergedCardSet)
+
+                                } else if (dbCardSet.modificationDate < lastSyncDate) {
+                                    // there's only remote change
+                                    database.cardSets.updateCardSet(remoteCardSet)
+                                } else {
+                                    Logger.e("Strange cardSet state")
+                                }
+                            } ?: run {
+                                database.cardSets.insert(remoteCardSet)
                             }
-                        } ?: run {
-                            database.cardSets.insert(remoteCardSet)
+                        }
+
+                        pullResponse.deletedCardSetIds.onEach { remoteCardSetId ->
+                            dbCardSets.firstOrNull {
+                                it.remoteId == remoteCardSetId
+                            }?.let { dbCardSet ->
+                                // delete here without checks as we sent all the local cardSet remote ids
+                                database.cardSets.removeCardSet(dbCardSet.id)
+                            }
                         }
                     }
-
-                    // TODO:
-                    // pullResponse.deletedCardSetIds
                 }
+
+                // NO: //TODO update modificationdate for unsent cardset in push
+                settings.putLong(LAST_SYNC_DATE_KEY, newSyncDate.toEpochMilliseconds())
             }
-
-            //TODO update modificationdate for unsent cardset
-
-            settings.putLong(LAST_SYNC_DATE_KEY, lastSyncDate.toEpochMilliseconds())
 
             if (state.value == State.Pulling) {
                 state.value = State.Idle

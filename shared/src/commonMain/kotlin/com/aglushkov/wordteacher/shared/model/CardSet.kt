@@ -30,7 +30,7 @@ fun List<Card>.readyToLearnProgress(timeSource: TimeSource) =
 private fun calcProgress(aListOfCards: List<Card>): Float =
     aListOfCards.sumOf { it.progress.progress() } / aListOfCards.size.toFloat()
 
-private fun CardSet.merge(anotherCardSet: CardSet, timeSource: TimeSource): CardSet {
+fun CardSet.merge(anotherCardSet: CardSet, newModificationDate: Instant): CardSet {
     if (remoteId != anotherCardSet.remoteId) {
         throw RuntimeException("CardSet remoteId ($remoteId) != remoteCardSet remoteId (${anotherCardSet.remoteId})")
     }
@@ -54,7 +54,7 @@ private fun CardSet.merge(anotherCardSet: CardSet, timeSource: TimeSource): Card
         remoteId = newCardSet.remoteId,
         name = newCardSet.name,
         creationDate = newCardSet.creationDate,
-        modificationDate = timeSource.getTimeInstant(),
+        modificationDate = newModificationDate,
         cards = oldCardSet.cards.mergeCards(newCardSet.cards),
         creationId = newCardSet.creationId,
     )
