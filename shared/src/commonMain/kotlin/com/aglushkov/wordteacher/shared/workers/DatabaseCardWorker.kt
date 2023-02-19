@@ -48,22 +48,23 @@ class DatabaseCardWorker(
         scope.launch {
             cardSetSyncWorker.stateFlow.collect {
                 when (it) {
-                    is CardSetSyncWorker.State.PullRequired,
-                    is CardSetSyncWorker.State.PushRequired -> {
-                        //if (it.prevState is CardSetSyncWorker.State.PullRequired || it.prevState is CardSetSyncWorker.State.PushRequired) {
-                        if (currentState != State.SYNCING) {
-                            if (currentState != State.EDITING) {
-                                pushState(State.SYNCING)
-                            } else {
-                                stateStack = stateStack.subList(
-                                    0,
-                                    stateStack.size - 1
-                                ) + State.SYNCING + currentState
+                    is CardSetSyncWorker.State.Paused -> {
+                        if (it.prevState is CardSetSyncWorker.State.PullRequired ||
+                            it.prevState is CardSetSyncWorker.State.PushRequired) {
+                            if (currentState != State.SYNCING) {
+                                if (currentState != State.EDITING) {
+                                    pushState(State.SYNCING)
+                                } else if (!stateStack.contains(State.SYNCING)) {
+                                    stateStack = stateStack.subList(
+                                        0,
+                                        stateStack.size - 1
+                                    ) + State.SYNCING + currentState
+                                }
                             }
                         }
-                       // }
                     }
                     is CardSetSyncWorker.State.Idle -> {
+                        cardSetSyncWorker.pause()
                         popState(State.SYNCING)
                     }
                     else -> {}
@@ -78,7 +79,7 @@ class DatabaseCardWorker(
                     val cs = currentState
                     if (cs != State.EDITING && cs != State.SYNCING) {
                         pushState(State.UPDATING_SPANS)
-                    } else {
+                    } else if (!stateStack.contains(State.UPDATING_SPANS)) {
                         stateStack = listOf(State.UPDATING_SPANS, *stateStack.toTypedArray())
                     }
                 } else if (it.isDone()) {

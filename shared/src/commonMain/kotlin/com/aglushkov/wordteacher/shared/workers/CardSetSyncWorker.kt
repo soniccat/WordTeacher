@@ -52,6 +52,15 @@ class CardSetSyncWorker(
                 else -> newState
             }
         }
+
+        fun isPausedOrPausedIdle(): Boolean {
+            return when (this) {
+                is Paused -> prevState == State.Idle
+                is Idle -> true
+                else -> false
+            }
+        }
+
     }
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -123,11 +132,11 @@ class CardSetSyncWorker(
         // handle Idle
         scope.launch {
             state.collect { st ->
-                if (st is State.Idle) {
-                    while (state.value == State.Idle) {
+                if (st.isPausedOrPausedIdle()) {
+                    while (state.value.isPausedOrPausedIdle()) {
                         delay(PUSH_DELAY_INTERVAL)
                         if (canPush()) { // TODO: push only when there were changes (modification after the last sync)
-                            push()
+                            toState(State.PushRequired())
                         }
                     }
                 }
