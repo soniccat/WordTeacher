@@ -29,6 +29,7 @@ import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.*
+import com.aglushkov.wordteacher.shared.workers.CardSetSyncWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -173,9 +174,10 @@ class AppModule {
     fun databaseCardWorker(
         database: AppDatabase,
         databaseWorker: DatabaseWorker,
-        spanUpdateWorker: SpanUpdateWorker
+        spanUpdateWorker: SpanUpdateWorker,
+        cardSetSyncWorker: CardSetSyncWorker
     ): DatabaseCardWorker {
-        return DatabaseCardWorker(database, databaseWorker, spanUpdateWorker)
+        return DatabaseCardWorker(database, databaseWorker, spanUpdateWorker, cardSetSyncWorker)
     }
 
     @AppComp
@@ -187,6 +189,26 @@ class AppModule {
         nlpSentenceProcessor: NLPSentenceProcessor
     ): SpanUpdateWorker {
         return SpanUpdateWorker(database, databaseWorker, nlpCore, nlpSentenceProcessor)
+    }
+
+    @AppComp
+    @Provides
+    fun cardSetSyncWorker(
+        spaceAuthRepository: SpaceAuthRepository,
+        spaceCardSetService: SpaceCardSetService,
+        database: AppDatabase,
+        databaseWorker: DatabaseWorker,
+        timeSource: TimeSource,
+        settings: FlowSettings,
+    ): CardSetSyncWorker {
+        return CardSetSyncWorker(
+            spaceAuthRepository,
+            spaceCardSetService,
+            database,
+            databaseWorker,
+            timeSource,
+            settings,
+        )
     }
 
     @AppComp
@@ -245,6 +267,14 @@ class AppModule {
         @SpaceHttpClient httpClient: HttpClient,
     ): SpaceAuthService =
         SpaceAuthService(context.getString(R.string.api_base_url), httpClient)
+
+    @AppComp
+    @Provides
+    fun spaceCardSetService(
+        context: Context,
+        @SpaceHttpClient httpClient: HttpClient,
+    ): SpaceCardSetService =
+        SpaceCardSetService(context.getString(R.string.api_base_url), httpClient)
 
     @AppComp
     @Provides

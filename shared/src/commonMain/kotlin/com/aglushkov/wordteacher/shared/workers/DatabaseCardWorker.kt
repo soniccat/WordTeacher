@@ -29,17 +29,17 @@ class DatabaseCardWorker(
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val serialQueue = SerialQueue()
     private val editOperationCount = MutableStateFlow(0)
-    private var stateStack by Delegates.observable(listOf(DEFAULT_STATE)) { _, _, new ->
+    private var stateStack by Delegates.observable(listOf<State>()) { _, _, new ->
         currentStateFlow.value = currentState
         Logger.v("state: ${new}", "DatabaseCardWorker")
     }
 
-    val currentStateFlow = MutableStateFlow(DEFAULT_STATE)
+    val currentStateFlow = MutableStateFlow(State.NONE)
     val currentState: State
-        get() = stateStack.lastOrNull() ?: DEFAULT_STATE
+        get() = stateStack.lastOrNull() ?: State.NONE
     val previousState: State
         get() {
-            if (stateStack.size <= 1) return DEFAULT_STATE // TODO: rework
+            if (stateStack.size <= 1) return State.NONE
             return stateStack[stateStack.size - 2]
         }
 
@@ -48,16 +48,46 @@ class DatabaseCardWorker(
         scope.launch {
             cardSetSyncWorker.stateFlow.collect {
                 when (it) {
-                    is CardSetSyncWorker.State.PushRequired,
-                    is CardSetSyncWorker.State.PullRequired -> {
-
+                    is CardSetSyncWorker.State.PullRequired,
+                    is CardSetSyncWorker.State.PushRequired -> {
+                        //if (it.prevState is CardSetSyncWorker.State.PullRequired || it.prevState is CardSetSyncWorker.State.PushRequired) {
+                            if (currentState != State.EDITING) {
+                                pushState(State.SYNCING)
+                            } else {
+                                stateStack = stateStack.subList(0, stateStack.size - 1) + State.SYNCING + currentState
+                            }
+                       // }
+                    }
+                    is CardSetSyncWorker.State.Idle -> {
+                        popState(State.SYNCING)
                     }
                     else -> {}
                 }
             }
         }
 
+        // handle requests from spanUpdateWorker
+        scope.launch {
+            spanUpdateWorker.stateFlow.collect {
+                if (it is com.aglushkov.wordteacher.shared.workers.State.Paused && it.hasWorkToDo) {
+                    val cs = currentState
+                    if (cs != State.EDITING && cs != State.SYNCING) {
+                        pushState(State.UPDATING_SPANS)
+                    } else {
+                        stateStack = listOf(State.UPDATING_SPANS, *stateStack.toTypedArray())
+                    }
+                } else if (it.isDone()) {
+                    popState(State.UPDATING_SPANS)
+                }
+            }
+        }
 
+        // initial work queue
+        serialQueue.send {
+            val initialStack = listOf(State.UPDATING_SPANS, State.SYNCING)
+            prepareToNewState(initialStack.last(), State.NONE)
+            stateStack = stateStack + listOf(State.UPDATING_SPANS, State.SYNCING)
+        }
     }
 
     fun untilFirstEditingFlow() = flow {
@@ -131,6 +161,7 @@ class DatabaseCardWorker(
                 Logger.v("cardSetSyncWorker.pauseAndWaitUntilDone", "DatabaseCardWorker")
                 cardSetSyncWorker.pauseAndWaitUntilDone()
             }
+            State.NONE -> {}
         }
 
         when(newState) {
@@ -142,8 +173,7 @@ class DatabaseCardWorker(
                 Logger.v("cardSetSyncWorker.resume()", "DatabaseCardWorker")
                 cardSetSyncWorker.resume()
             }
-            else -> {
-            }
+            State.EDITING, State.NONE -> {}
         }
     }
 
@@ -236,10 +266,10 @@ class DatabaseCardWorker(
     }
 
     enum class State {
+        NONE,
         SYNCING,
         EDITING,
         UPDATING_SPANS
     }
 }
 
-private val DEFAULT_STATE = DatabaseCardWorker.State.SYNCING

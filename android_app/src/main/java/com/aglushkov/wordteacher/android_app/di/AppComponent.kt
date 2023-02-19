@@ -32,6 +32,7 @@ import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.service.ConfigService
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
+import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -81,6 +82,7 @@ interface AppComponent:
     fun appInfo(): AppInfo
     fun deviceIdRepository(): DeviceIdRepository
     fun spaceAuthService(): SpaceAuthService
+    fun spaceCardSetService(): SpaceCardSetService
     override fun spaceAuthRepository(): SpaceAuthRepository
 
     override fun idGenerator(): IdGenerator

@@ -18,6 +18,7 @@ class SpanUpdateWorker (
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val state = MutableStateFlow<State>(State.Paused(State.Done))
+    val stateFlow: Flow<State> = state
 
     init {
         scope.launch {
@@ -31,7 +32,9 @@ class SpanUpdateWorker (
                     } else if (state.value.isPaused()) {
                         state.update {
                             if (it.isPaused()) {
-
+                                it.toPaused(true)
+                            } else {
+                                it
                             }
                         }
                     }
@@ -133,22 +136,21 @@ class SpanUpdateWorker (
     }
 }
 
-private sealed interface State {
+sealed interface State {
     object Done: State // no requests to execute
     object InProgress: State // working with cards right now
     data class PendingPause(val pendingPrevState: State): State // pause request is in progress
-    data class Paused(val pausedPrevState: State): State // interrupted working with cards, will proceed after resuming
+    data class Paused(val pausedPrevState: State, val hasWorkToDo: Boolean = false): State // interrupted working with cards, will proceed after resuming
     //data class ResumeRequired(val pausedPrevState: State): State // like paused but we know that there's work to do and want to proceed
 
-    fun toPaused() = when(this) {
-        is Paused -> this
+    fun toPaused(hasWorkToDo: Boolean = false) = when(this) {
+        is Paused -> this.copy(hasWorkToDo = hasWorkToDo)
         else -> Paused(this.getPrevState())
     }
 
     fun resume() = when(this) {
         is Paused -> pausedPrevState
         is PendingPause -> pendingPrevState
-        is ResumeRequired -> pausedPrevState
         else -> this
     }
 
@@ -159,7 +161,6 @@ private sealed interface State {
 
     fun isPaused() = when(this) {
         is Paused -> true
-        is ResumeRequired -> true
         else -> false
     }
 
