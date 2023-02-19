@@ -51,11 +51,16 @@ class DatabaseCardWorker(
                     is CardSetSyncWorker.State.PullRequired,
                     is CardSetSyncWorker.State.PushRequired -> {
                         //if (it.prevState is CardSetSyncWorker.State.PullRequired || it.prevState is CardSetSyncWorker.State.PushRequired) {
+                        if (currentState != State.SYNCING) {
                             if (currentState != State.EDITING) {
                                 pushState(State.SYNCING)
                             } else {
-                                stateStack = stateStack.subList(0, stateStack.size - 1) + State.SYNCING + currentState
+                                stateStack = stateStack.subList(
+                                    0,
+                                    stateStack.size - 1
+                                ) + State.SYNCING + currentState
                             }
+                        }
                        // }
                     }
                     is CardSetSyncWorker.State.Idle -> {

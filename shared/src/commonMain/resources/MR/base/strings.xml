@@ -2,7 +2,7 @@
 <resources>
     <string name="config_base_url">https://soniccat.ru/</string>
     <string name="api_base_url">http://193.168.0.1:4000</string>
-
+    <string name="api_base_url_cardsets">http://193.168.0.1:4001</string>
     <string name="app_name">WordTeacher</string>
     <string name="tab_definitions">Words</string>
     <string name="tab_add_article">@string/add_article_title</string>

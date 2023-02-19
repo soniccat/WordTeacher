@@ -274,7 +274,7 @@ class AppModule {
         context: Context,
         @SpaceHttpClient httpClient: HttpClient,
     ): SpaceCardSetService =
-        SpaceCardSetService(context.getString(R.string.api_base_url), httpClient)
+        SpaceCardSetService(context.getString(R.string.api_base_url_cardsets), httpClient)
 
     @AppComp
     @Provides

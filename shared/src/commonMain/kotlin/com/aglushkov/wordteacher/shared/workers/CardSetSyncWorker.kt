@@ -32,6 +32,13 @@ class CardSetSyncWorker(
         object Idle: State
         data class Paused(val prevState: State): State
 
+        fun resume(): State {
+            return when (this) {
+                is Paused -> this.prevState
+                else -> this
+            }
+        }
+
         fun toPaused(): State {
             return when (this) {
                 is Paused -> Paused(this)
@@ -119,7 +126,7 @@ class CardSetSyncWorker(
                 if (st is State.Idle) {
                     while (state.value == State.Idle) {
                         delay(PUSH_DELAY_INTERVAL)
-                        if (canPush()) {
+                        if (canPush()) { // TODO: push only when there were changes (modification after the last sync)
                             push()
                         }
                     }
@@ -129,17 +136,11 @@ class CardSetSyncWorker(
     }
 
     fun pause() {
-        state.update {
-            if (it is State.Paused) {
-                it
-            } else {
-                State.Paused(it)
-            }
-        }
+        state.update { it.toPaused() }
     }
 
     fun resume() {
-        state.update { it.toPaused() }
+        state.update { it.resume() }
     }
 
     private fun toState(st: State) {
@@ -180,9 +181,9 @@ class CardSetSyncWorker(
                         val dbCardSets = database.cardSets.selectShortCardSets()
                         val remoteIdToId = dbCardSets.associate { it.remoteId to it.id }
 
-                        pullResponse.updatedCardSets.map {
+                        pullResponse.updatedCardSets?.map {
                             it.copy(id = remoteIdToId[it.remoteId] ?: 0L)
-                        }.map { remoteCardSet ->
+                        }?.map { remoteCardSet ->
                             dbCardSets.firstOrNull {
                                 it.remoteId == remoteCardSet.remoteId
                             }?.let { dbCardSet ->
@@ -204,7 +205,7 @@ class CardSetSyncWorker(
                             }
                         }
 
-                        pullResponse.deletedCardSetIds.onEach { remoteCardSetId ->
+                        pullResponse.deletedCardSetIds?.onEach { remoteCardSetId ->
                             dbCardSets.firstOrNull {
                                 it.remoteId == remoteCardSetId
                             }?.let { dbCardSet ->
@@ -276,11 +277,11 @@ class CardSetSyncWorker(
 
                 databaseWorker.run {
                     database.transaction {
-                        pushResponse.cardSetIds.onEach { (creationId, remoteId) ->
+                        pushResponse.cardSetIds?.onEach { (creationId, remoteId) ->
                             database.cardSets.updateCardSetRemoteId(remoteId, newSyncDate.toEpochMilliseconds(), creationId)
                         }
 
-                        pushResponse.cardIds.onEach { (creationId, remoteId) ->
+                        pushResponse.cardIds?.onEach { (creationId, remoteId) ->
                             database.cards.updateCardSetRemoteId(remoteId, newSyncDate.toEpochMilliseconds(), creationId)
                         }
                     }
@@ -323,6 +324,6 @@ class CardSetSyncWorker(
 }
 
 private const val LAST_SYNC_DATE_KEY = "LAST_SYNC_DATE_KEY"
-private const val PULL_RETRY_INTERVAL = 5L
-private const val PUSH_RETRY_INTERVAL = 15L
-private const val PUSH_DELAY_INTERVAL = 30L
+private const val PULL_RETRY_INTERVAL = 5000L
+private const val PUSH_RETRY_INTERVAL = 15000L
+private const val PUSH_DELAY_INTERVAL = 30000L

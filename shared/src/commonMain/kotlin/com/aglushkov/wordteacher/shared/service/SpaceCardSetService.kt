@@ -26,8 +26,8 @@ data class CardSetPullInput(
 
 @Serializable
 data class CardSetPullResponse(
-    @SerialName("updatedCardSets") val updatedCardSets: List<CardSet>,
-    @SerialName("deletedCardSetIds") val deletedCardSetIds: List<String>,
+    @SerialName("updatedCardSets") val updatedCardSets: List<CardSet>?,
+    @SerialName("deletedCardSetIds") val deletedCardSetIds: List<String>?,
 )
 
 @Serializable
@@ -38,8 +38,8 @@ data class CardSetPushInput(
 
 @Serializable
 data class CardSetPushResponse(
-    @SerialName("cardSetIds") val cardSetIds: Map<String,String>,
-    @SerialName("cardIds") val cardIds: Map<String,String>,
+    @SerialName("cardSetIds") val cardSetIds: Map<String,String>?,
+    @SerialName("cardIds") val cardIds: Map<String,String>?,
 )
 
 class SpaceCardSetService(
@@ -48,6 +48,7 @@ class SpaceCardSetService(
 ) {
     private val pullJson by lazy {
         Json {
+            explicitNulls = false
             ignoreUnknownKeys = true
             classDiscriminator = "status"
             serializersModule = SerializersModule {
@@ -61,11 +62,12 @@ class SpaceCardSetService(
 
     private val pushJson by lazy {
         Json {
+            explicitNulls = false
             ignoreUnknownKeys = true
             classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
-                    subclass(OkResponse.serializer(CardSetPullResponse.serializer()))
+                    subclass(OkResponse.serializer(CardSetPushResponse.serializer()))
                     subclass(ErrResponse.serializer())
                 }
             }
@@ -92,11 +94,11 @@ class SpaceCardSetService(
                 lastModificationDate?.let { date ->
                     this.parameter(LastModificationDateKey, date.toString())
                 }
-                this.setBody(pullJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds)))
+                this.setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            pullJson.decodeFromString(stringResponse)
+            pushJson.decodeFromString(stringResponse)
         }
     }
 }
