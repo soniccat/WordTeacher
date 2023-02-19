@@ -283,6 +283,9 @@ class AppDatabase(
             remoteId = remoteId,
             id = id,
         )
+
+        fun updateCardSetRemoteId(remoteId: String, modificationDate: Long, creationId: String) =
+            db.dBCardSetQueries.updateCardSetRemoteId(remoteId, modificationDate, creationId)
     }
 
     inner class Cards {
@@ -519,6 +522,9 @@ class AppDatabase(
                 db.dBCardQueries.removeCard(cardId)
             }
         }
+
+        fun updateCardSetRemoteId(remoteId: String, modificationDate: Long, creationId: String) =
+            db.dBCardQueries.updateCardRemoteId(remoteId, modificationDate, creationId)
     }
 
     inner class Notes {

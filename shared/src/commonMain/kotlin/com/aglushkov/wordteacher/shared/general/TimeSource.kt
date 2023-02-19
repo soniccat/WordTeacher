@@ -7,13 +7,18 @@ import kotlinx.datetime.toLocalDateTime
 
 interface TimeSource {
     fun stringDate(dateLong: Long): String
+    fun stringDate(instant: Instant): String
     fun getTimeInMilliseconds(): Long
     fun getTimeInstant(): Instant
 }
 
 class TimeSourceImpl: TimeSource {
     override fun stringDate(dateLong: Long): String {
-        val dateTime = Instant.fromEpochMilliseconds(dateLong).toLocalDateTime(
+        return stringDate(Instant.fromEpochMilliseconds(dateLong))
+    }
+
+    override fun stringDate(instant: Instant): String {
+        val dateTime = instant.toLocalDateTime(
             TimeZone.currentSystemDefault()
         )
         return "${dateTime.dayOfMonth}.${dateTime.monthNumber}.${dateTime.year}"

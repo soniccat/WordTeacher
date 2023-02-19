@@ -83,3 +83,8 @@ setProgress:
 UPDATE DBCard
 SET progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?
 WHERE id = ?;
+
+updateCardRemoteId:
+UPDATE DBCard
+SET remoteId = ?, modificationDate = ?
+WHERE creationId = ?;

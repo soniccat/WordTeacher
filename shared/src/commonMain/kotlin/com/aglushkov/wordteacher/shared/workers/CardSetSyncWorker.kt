@@ -184,7 +184,6 @@ class CardSetSyncWorker(
                     }
                 }
 
-                // NO: //TODO update modificationdate for unsent cardset in push
                 settings.putLong(LAST_SYNC_DATE_KEY, newSyncDate.toEpochMilliseconds())
                 lastSyncDate = newSyncDate
             }
@@ -246,43 +245,13 @@ class CardSetSyncWorker(
 
                 databaseWorker.run {
                     database.transaction {
-                        pushResponse.
+                        pushResponse.cardSetIds.onEach { (creationId, remoteId) ->
+                            database.cardSets.updateCardSetRemoteId(remoteId, newSyncDate.toEpochMilliseconds(), creationId)
+                        }
 
-//                        val dbCardSets = database.cardSets.selectShortCardSets()
-//                        val remoteIdToId = dbCardSets.associate { it.remoteId to it.id }
-//
-//                        pushResponse.updatedCardSets.map {
-//                            it.copy(id = remoteIdToId[it.remoteId] ?: 0L)
-//                        }.map { remoteCardSet ->
-//                            dbCardSets.firstOrNull {
-//                                it.remoteId == remoteCardSet.remoteId
-//                            }?.let { dbCardSet ->
-//                                // as we got these cardSets from the back it means that remoteCardSet.modificationDate > lastSyncDate
-//                                if (dbCardSet.modificationDate > lastSyncDate) {
-//                                    // there're local and remote changes, need to merge
-//                                    val fullCardSet = database.cardSets.selectCardSet(dbCardSet.id).executeAsOne()
-//                                    val mergedCardSet = fullCardSet.merge(remoteCardSet, newSyncDate)
-//                                    database.cardSets.updateCardSet(mergedCardSet)
-//
-//                                } else if (dbCardSet.modificationDate < lastSyncDate) {
-//                                    // there's only remote change
-//                                    database.cardSets.updateCardSet(remoteCardSet)
-//                                } else {
-//                                    Logger.e("Strange cardSet state")
-//                                }
-//                            } ?: run {
-//                                database.cardSets.insert(remoteCardSet)
-//                            }
-//                        }
-//
-//                        pullResponse.deletedCardSetIds.onEach { remoteCardSetId ->
-//                            dbCardSets.firstOrNull {
-//                                it.remoteId == remoteCardSetId
-//                            }?.let { dbCardSet ->
-//                                // delete here without checks as we sent all the local cardSet remote ids
-//                                database.cardSets.removeCardSet(dbCardSet.id)
-//                            }
-//                        }
+                        pushResponse.cardIds.onEach { (creationId, remoteId) ->
+                            database.cards.updateCardSetRemoteId(remoteId, newSyncDate.toEpochMilliseconds(), creationId)
+                        }
                     }
                 }
 
