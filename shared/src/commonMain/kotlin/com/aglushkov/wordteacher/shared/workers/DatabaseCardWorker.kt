@@ -5,19 +5,28 @@ import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.properties.Delegates
 
-// Represents 2 states of card state management
-// 1 - we're editing cards on the editing screen or the learning screen
-// 2 - we're updating spans
+// Represents 3 states of card state management
+// SYNCING - pulling new state, merging and pushing a new state
+// EDITING - we're editing cards on the editing screen or the learning screen
+// UPDATING_SPANS - we're calculating spans
+//
 // Card updating queries shouldn't intersect to avoid data loss. Therefore, we need to be sure that they arent'
 // executed in parallel. So, this class provides a state switching interface
 class DatabaseCardWorker(
     private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
-    private val spanUpdateWorker: SpanUpdateWorker
+    private val spanUpdateWorker: SpanUpdateWorker,
+    private val cardSetSyncWorker: CardSetSyncWorker,
 ) {
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val serialQueue = SerialQueue()
     private val editOperationCount = MutableStateFlow(0)
     private var stateStack by Delegates.observable(listOf(DEFAULT_STATE)) { _, _, new ->
@@ -30,9 +39,26 @@ class DatabaseCardWorker(
         get() = stateStack.lastOrNull() ?: DEFAULT_STATE
     val previousState: State
         get() {
-            if (stateStack.size <= 1) return DEFAULT_STATE
+            if (stateStack.size <= 1) return DEFAULT_STATE // TODO: rework
             return stateStack[stateStack.size - 2]
         }
+
+    init {
+        // handle requests from cardSetSyncWorker
+        scope.launch {
+            cardSetSyncWorker.stateFlow.collect {
+                when (it) {
+                    is CardSetSyncWorker.State.PushRequired,
+                    is CardSetSyncWorker.State.PullRequired -> {
+
+                    }
+                    else -> {}
+                }
+            }
+        }
+
+
+    }
 
     fun untilFirstEditingFlow() = flow {
         currentStateFlow.takeWhile { it != State.EDITING }.collect {
@@ -65,7 +91,7 @@ class DatabaseCardWorker(
             return
         }
 
-        prepareToNewState(newState)
+        prepareToNewState(newState, currentState)
         stateStack = stateStack + newState
     }
 
@@ -79,22 +105,44 @@ class DatabaseCardWorker(
 
     private suspend fun popStateInternal(state: State) {
         if (currentState == state && stateStack.isNotEmpty()) {
-            prepareToNewState(previousState)
+            prepareToNewState(previousState, currentState)
             stateStack = stateStack.take(stateStack.size - 1)
+        } else {
+            Logger.e("Trying to pop a wrong state ${state} when the current is ${currentState}", "DatabaseCardWorker")
         }
     }
 
-    private suspend fun prepareToNewState(newState: State) {
-        when (newState) {
-            State.EDITING -> {
-                Logger.v("pauseAndWaitUntilPausedOrDone", "DatabaseCardWorker")
+    private suspend fun prepareToNewState(newState: State, fromState: State) {
+        if (newState == fromState) {
+            Logger.e("Trying to prepare for the same state ${newState}", "DatabaseCardWorker")
+            return
+        }
+
+        when (fromState) {
+            State.UPDATING_SPANS -> {
+                Logger.v("spanUpdateWorker.pauseAndWaitUntilPausedOrDone", "DatabaseCardWorker")
                 spanUpdateWorker.pauseAndWaitUntilPausedOrDone()
             }
-            State.UPDATING_SPANS -> {
+            State.EDITING -> {
                 Logger.v("waitUntilEditingIsDone", "DatabaseCardWorker")
                 waitUntilEditingIsDone()
+            }
+            State.SYNCING -> {
+                Logger.v("cardSetSyncWorker.pauseAndWaitUntilDone", "DatabaseCardWorker")
+                cardSetSyncWorker.pauseAndWaitUntilDone()
+            }
+        }
+
+        when(newState) {
+            State.UPDATING_SPANS -> {
                 Logger.v("spanUpdateWorker.resume()", "DatabaseCardWorker")
                 spanUpdateWorker.resume()
+            }
+            State.SYNCING -> {
+                Logger.v("cardSetSyncWorker.resume()", "DatabaseCardWorker")
+                cardSetSyncWorker.resume()
+            }
+            else -> {
             }
         }
     }
@@ -105,6 +153,10 @@ class DatabaseCardWorker(
 
     suspend fun waitUntilEditingIsDone() {
         editOperationCount.takeWhile { it > 0 }.collect()
+    }
+
+    suspend fun waitUntilSyncIsDone() {
+        cardSetSyncWorker.waitUntilDone()
     }
 
     // Editing State Operation
@@ -184,9 +236,10 @@ class DatabaseCardWorker(
     }
 
     enum class State {
+        SYNCING,
         EDITING,
         UPDATING_SPANS
     }
 }
 
-private val DEFAULT_STATE = DatabaseCardWorker.State.UPDATING_SPANS
+private val DEFAULT_STATE = DatabaseCardWorker.State.SYNCING

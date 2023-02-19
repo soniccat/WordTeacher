@@ -11,9 +11,7 @@ import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.russhwolf.settings.coroutines.FlowSettings
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 
 class CardSetSyncWorker(
@@ -24,7 +22,7 @@ class CardSetSyncWorker(
     private val timeSource: TimeSource,
     private val settings: FlowSettings,
 ) {
-    private sealed interface State {
+    sealed interface State {
         object Initializing: State
         object AuthRequired: State
         data class PullRequired(val e: Exception? = null): State
@@ -32,16 +30,31 @@ class CardSetSyncWorker(
         data class PushRequired(val e: Exception? = null): State
         object Pushing: State
         object Idle: State
+        data class Paused(val prevState: State): State
+
+        fun toPaused(): State {
+            return when (this) {
+                is Paused -> Paused(this)
+                else -> this
+            }
+        }
+
+        fun toState(newState: State): State {
+            return when (this) {
+                is Paused -> Paused(newState)
+                else -> newState
+            }
+        }
     }
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val serialQueue = SerialQueue()
-    private var state = MutableStateFlow<State>(State.Initializing)
+    private var state = MutableStateFlow<State>(State.Paused(State.Initializing))
+    val stateFlow: Flow<State> = state
     private var lastPullDate: Instant = Instant.fromEpochMilliseconds(0)
     private var lastPushDate: Instant = Instant.fromEpochMilliseconds(0)
 
     // last push/pull date, stored in settings
-    private var lastSyncDate: Instant = Instant.fromEpochMilliseconds(0)
+    var lastSyncDate: Instant = Instant.fromEpochMilliseconds(0)
 
     init {
         // handle initialising
@@ -49,9 +62,9 @@ class CardSetSyncWorker(
             lastSyncDate = Instant.fromEpochMilliseconds(settings.getLong(LAST_SYNC_DATE_KEY))
 
             if (spaceAuthRepository.isAuthorized()) {
-                state.value = State.AuthRequired
+                toState(State.AuthRequired)
             } else {
-                state.value = State.PullRequired()
+                toState(State.PullRequired())
             }
         }
 
@@ -60,9 +73,9 @@ class CardSetSyncWorker(
             spaceAuthRepository.authDataFlow.collect {
                 if (state.value != State.Initializing) {
                     if (spaceAuthRepository.isAuthorized()) {
-                        state.value = State.PullRequired()
+                        toState(State.PullRequired())
                     } else {
-                        state.value = State.AuthRequired
+                        toState(State.AuthRequired)
                     }
                 }
             }
@@ -115,6 +128,24 @@ class CardSetSyncWorker(
         }
     }
 
+    fun pause() {
+        state.update {
+            if (it is State.Paused) {
+                it
+            } else {
+                State.Paused(it)
+            }
+        }
+    }
+
+    fun resume() {
+        state.update { it.toPaused() }
+    }
+
+    private fun toState(st: State) {
+        state.update { it.toState(st) }
+    }
+
     fun pull() {
         if (!canPull()) {
             return
@@ -131,7 +162,7 @@ class CardSetSyncWorker(
             return
         }
 
-        state.value = State.Pulling
+        toState(State.Pulling)
         lastPullDate = timeSource.getTimeInstant()
         val newSyncDate: Instant?
 
@@ -189,11 +220,11 @@ class CardSetSyncWorker(
             }
 
             if (state.value == State.Pulling) {
-                state.value = State.PushRequired()
+                toState(State.PushRequired())
             }
         } catch (e: Exception) {
             if (state.value == State.Pulling) {
-                state.value = State.PullRequired(e)
+                toState(State.PullRequired(e))
             }
         }
     }
@@ -216,7 +247,7 @@ class CardSetSyncWorker(
             return
         }
 
-        state.value = State.Pushing
+        toState(State.Pushing)
         lastPushDate = timeSource.getTimeInstant()
         val newSyncDate: Instant?
 
@@ -260,13 +291,13 @@ class CardSetSyncWorker(
             }
 
             if (state.value == State.Pushing) {
-                state.value = State.Idle
+                toState(State.Idle)
             }
         } catch (e: Exception) {
             // TODO: handle pull required error code
 
             if (state.value == State.Pushing) {
-                state.value = State.PushRequired(e)
+                toState(State.PushRequired(e))
             }
         }
     }
@@ -279,6 +310,15 @@ class CardSetSyncWorker(
 
     private suspend fun waitUntilNotPulling() {
         state.takeWhile { it is State.Pulling }.collect()
+    }
+
+    suspend fun waitUntilDone() {
+        state.takeWhile { it !is State.Pulling && it !is State.Pushing }.collect()
+    }
+
+    suspend fun pauseAndWaitUntilDone() {
+        pause()
+        waitUntilDone()
     }
 }
 

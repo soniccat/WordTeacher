@@ -17,7 +17,7 @@ class SpanUpdateWorker (
     private val nlpSentenceProcessor: NLPSentenceProcessor
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    private val state = MutableStateFlow<State>(State.Done)
+    private val state = MutableStateFlow<State>(State.Paused(State.Done))
 
     init {
         scope.launch {
@@ -25,6 +25,17 @@ class SpanUpdateWorker (
             val nlpCoreCopy = nlpCore.clone()
             database.cards.selectCardsWithOutdatedSpans().asFlow().collect { query ->
                 do {
+                    val cards = query.executeAsList() // execute or re-execute the query
+                    if (cards.isEmpty()) {
+                        break
+                    } else if (state.value.isPaused()) {
+                        state.update {
+                            if (it.isPaused()) {
+
+                            }
+                        }
+                    }
+
                     Logger.v("wait until not paused", "SpanUpdateWorker")
                     state.takeWhile { it.isPaused() }.collect()
                     state.update {
@@ -35,8 +46,8 @@ class SpanUpdateWorker (
                         }
                     }
 
-                    val cards = query.executeAsList() // execute or re-execute the query
                     Logger.v("is in progress or pending pause (${cards.size}, ${state.value})", "SpanUpdateWorker")
+
 
                     cards.forEach { card ->
                         if (state.tryPauseIfPendingPause()) {
@@ -127,6 +138,7 @@ private sealed interface State {
     object InProgress: State // working with cards right now
     data class PendingPause(val pendingPrevState: State): State // pause request is in progress
     data class Paused(val pausedPrevState: State): State // interrupted working with cards, will proceed after resuming
+    //data class ResumeRequired(val pausedPrevState: State): State // like paused but we know that there's work to do and want to proceed
 
     fun toPaused() = when(this) {
         is Paused -> this
@@ -136,6 +148,7 @@ private sealed interface State {
     fun resume() = when(this) {
         is Paused -> pausedPrevState
         is PendingPause -> pendingPrevState
+        is ResumeRequired -> pausedPrevState
         else -> this
     }
 
@@ -146,6 +159,7 @@ private sealed interface State {
 
     fun isPaused() = when(this) {
         is Paused -> true
+        is ResumeRequired -> true
         else -> false
     }
 
