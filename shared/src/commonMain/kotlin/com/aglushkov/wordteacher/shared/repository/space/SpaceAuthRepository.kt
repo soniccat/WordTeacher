@@ -112,10 +112,7 @@ class SpaceAuthRepository(
         }
     }
 
-    private suspend fun auth(
-        network: SpaceAuthService.NetworkType,
-        token: String
-    ): Resource<AuthData> {
+    private suspend fun auth(network: SpaceAuthService.NetworkType, token: String): Resource<AuthData> {
         var res: Resource<AuthData> = stateFlow.value
         loadResource(res) {
             service.auth(network, token).toOkResult()

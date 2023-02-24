@@ -21,7 +21,6 @@ class SpaceHttpClientBuilder(
     private val deviceIdRepository: DeviceIdRepository,
     private val appInfo: AppInfo,
     private val cookieStorage: CookiesStorage,
-    private val googleAuthRepositoryProvider: () -> GoogleAuthRepository,
     private val spaceAuthRepositoryProvider: () -> SpaceAuthRepository,
     private val isDebug: Boolean
 ) {
@@ -80,7 +79,6 @@ class SpaceHttpClientBuilder(
                     }
 
                     return@on originalCall.response.run { // this: HttpResponse
-                        val googleAuthRepository = googleAuthRepositoryProvider()
                         val oldAutData = spaceRepository.currentAuthData.asLoaded()
 
                         if(status == HttpStatusCode.Unauthorized) {
@@ -89,8 +87,7 @@ class SpaceHttpClientBuilder(
 
                                 // if we have valid cookies then we can call refresh
                                 val session = cookieStorage.get(this.request.url).firstOrNull { it.name == CookieSession }?.value
-                                val isRefreshUrl = this.request.url.isAuthRefreshUrl()
-                                if (session != null && !isRefreshUrl) {
+                                if (session != null) {
                                     result = spaceRepository.refresh()
                                 }
 
@@ -108,7 +105,7 @@ class SpaceHttpClientBuilder(
                                     }
 
                                     val newAutData = spaceRepository.currentAuthData.asLoaded()
-                                    if (!isRefreshUrl && newAutData?.data?.user == oldAutData?.data?.user) {
+                                    if (newAutData?.data?.user == oldAutData?.data?.user) {
                                         proceed(request)
                                     } else {
                                         null
