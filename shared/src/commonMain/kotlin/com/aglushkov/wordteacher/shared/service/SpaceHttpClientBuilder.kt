@@ -1,20 +1,18 @@
 package com.aglushkov.wordteacher.shared.service
 
-import com.aglushkov.wordteacher.shared.general.AppInfo
-import com.aglushkov.wordteacher.shared.general.GoogleAuthRepository
+import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
-import com.aglushkov.wordteacher.shared.general.getUserAgent
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import io.ktor.client.*
 import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -60,7 +58,7 @@ class SpaceHttpClientBuilder(
                     request.headers {
                         set(HeaderDeviceType, "android")
                         set(HeaderDeviceId, deviceIdRepository.deviceId())
-                        spaceAuthRepositoryProvider().value.asLoaded()?.data?.let { authData ->
+                        spaceAuthRepositoryProvider().currentAuthData.asLoaded()?.data?.let { authData ->
                             set(HeaderAccessToken, authData.authToken.accessToken)
                         }
                         set(HttpHeaders.UserAgent, appInfo.getUserAgent())
@@ -75,10 +73,15 @@ class SpaceHttpClientBuilder(
             createClientPlugin("AuthInterceptor for 401 error") {
                 on(Send) { request ->
                     val originalCall = proceed(request)
-                    originalCall.response.run { // this: HttpResponse
+
+                    val spaceRepository = spaceAuthRepositoryProvider()
+                    if (spaceRepository.isAuthUrl(originalCall.request.url)) {
+                        return@on originalCall // handle them SpaceAuthRepository
+                    }
+
+                    return@on originalCall.response.run { // this: HttpResponse
                         val googleAuthRepository = googleAuthRepositoryProvider()
-                        val spaceRepository = spaceAuthRepositoryProvider()
-                        val oldAutData = spaceRepository.value.asLoaded()
+                        val oldAutData = spaceRepository.currentAuthData.asLoaded()
 
                         if(status == HttpStatusCode.Unauthorized) {
                             try {
@@ -93,18 +96,18 @@ class SpaceHttpClientBuilder(
 
                                 val call = if (!result.isLoaded()) {
                                     // try to reauth
-                                    if (googleAuthRepository.googleSignInCredentialFlow.value.isError() || googleAuthRepository.googleSignInCredentialFlow.value.isUninitialized()) {
-                                        googleAuthRepository.signIn()
-                                        googleAuthRepository.googleSignInCredentialFlow.waitUntilLoadedOrError()
+                                    if (googleAuthRepository.googleAuthDataFlow.value.isError() || googleAuthRepository.googleAuthDataFlow.value.isUninitialized()) {
+                                        googleAuthRepository.launchSignIn()
+                                        googleAuthRepository.googleAuthDataFlow.waitUntilLoadedOrError()
                                         spaceRepository.authDataFlow.waitUntilLoadedOrError()
                                     } else {
-                                        googleAuthRepository.googleSignInCredentialFlow.waitUntilLoadedOrError()
-                                        googleAuthRepository.googleSignInCredentialFlow.value.asLoaded()?.data?.tokenId?.let { tokenId ->
+                                        googleAuthRepository.googleAuthDataFlow.waitUntilLoadedOrError()
+                                        googleAuthRepository.googleAuthDataFlow.value.asLoaded()?.data?.tokenId?.let { tokenId ->
                                             spaceRepository.auth(SpaceAuthService.NetworkType.Google, tokenId)
                                         }
                                     }
 
-                                    val newAutData = spaceRepository.value.asLoaded()
+                                    val newAutData = spaceRepository.currentAuthData.asLoaded()
                                     if (!isRefreshUrl && newAutData?.data?.user == oldAutData?.data?.user) {
                                         proceed(request)
                                     } else {
@@ -124,9 +127,5 @@ class SpaceHttpClientBuilder(
                 }
             }
         )
-    }
-
-    private fun Url.isAuthRefreshUrl(): Boolean {
-        return pathSegments.size >= 2 && pathSegments.subList(pathSegments.size - 2, pathSegments.size) == listOf("auth", "refresh")
     }
 }

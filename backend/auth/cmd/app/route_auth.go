@@ -93,7 +93,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 		aUser, userNetwork, err = app.resolveGoogleUser(r.Context(), &credentials)
 
 		if _, ok := err.(*AuthErrorInvalidToken); ok {
-			apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
+			apphelpers.SetError(w, err, http.StatusUnauthorized, app.logger)
 			return
 
 		} else if err != nil {

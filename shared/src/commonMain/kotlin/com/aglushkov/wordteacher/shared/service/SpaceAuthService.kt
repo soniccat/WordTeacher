@@ -66,8 +66,8 @@ class SpaceAuthService(
             classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
-                    subclass(OkResponse.serializer(AuthData.serializer()))
-                    subclass(ErrResponse.serializer())
+                    subclass(Response.Ok.serializer(AuthData.serializer()))
+                    subclass(Response.Err.serializer())
                 }
             }
         }
@@ -79,8 +79,8 @@ class SpaceAuthService(
             classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
-                    subclass(OkResponse.serializer(AuthToken.serializer()))
-                    subclass(ErrResponse.serializer())
+                    subclass(Response.Ok.serializer(AuthToken.serializer()))
+                    subclass(Response.Err.serializer())
                 }
             }
         }
@@ -93,7 +93,7 @@ class SpaceAuthService(
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            authJson.decodeFromString(stringResponse)
+            authJson.decodeFromString<Response<AuthData>>(stringResponse).setStatusCode(res.status.value)
         }
     }
 
@@ -104,7 +104,19 @@ class SpaceAuthService(
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            refreshJson.decodeFromString(stringResponse)
+            refreshJson.decodeFromString<Response<AuthToken>>(stringResponse).setStatusCode(res.status.value)
         }
+    }
+
+    fun isAuthUrl(url: Url): Boolean {
+        return url.isAuthSocialUrl() || url.isAuthRefreshUrl()
+    }
+
+    private fun Url.isAuthRefreshUrl(): Boolean {
+        return pathSegments.size >= 2 && pathSegments.subList(pathSegments.size - 2, pathSegments.size) == listOf("auth", "refresh")
+    }
+
+    private fun Url.isAuthSocialUrl(): Boolean {
+        return pathSegments.size >= 3 && pathSegments.subList(pathSegments.size - 3, pathSegments.size - 1) == listOf("auth", "social")
     }
 }

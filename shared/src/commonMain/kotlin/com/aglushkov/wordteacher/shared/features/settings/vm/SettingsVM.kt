@@ -18,6 +18,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.*
 import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import dev.icerock.moko.resources.desc.Raw
 
 interface SettingsVM: Clearable {
@@ -88,9 +89,9 @@ open class SettingsVMImpl (
 
     override fun onAuthButtonClicked(type: SettingsViewAuthButtonItem.ButtonType) {
         when (type) {
-            SettingsViewAuthButtonItem.ButtonType.SignIn -> router?.openGoogleAuth()
-            SettingsViewAuthButtonItem.ButtonType.SignOut -> { router?.signOutGoogle() }
-            SettingsViewAuthButtonItem.ButtonType.TryAgain -> router?.openGoogleAuth()
+            SettingsViewAuthButtonItem.ButtonType.SignIn,
+            SettingsViewAuthButtonItem.ButtonType.TryAgain -> spaceAuthRepository.launchSignIn(SpaceAuthService.NetworkType.Google)
+            SettingsViewAuthButtonItem.ButtonType.SignOut -> spaceAuthRepository.signOut(SpaceAuthService.NetworkType.Google)
         }
     }
 

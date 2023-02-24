@@ -99,6 +99,13 @@ fun <T> Resource<T>.asLoaded(): Resource.Loaded<T>? {
     }
 }
 
+fun <T> Resource<T>.asError(): Resource.Error<T>? {
+    return when(this) {
+        is Resource.Error -> this
+        else -> null
+    }
+}
+
 fun <T> Resource<T>.asLoadedOrError(): Resource<T>? {
     return when(this) {
         is Resource.Loaded -> this

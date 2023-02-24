@@ -22,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.databinding.ActivityMainBinding
 import com.aglushkov.wordteacher.android_app.features.add_article.views.AddArticleUIDialog
@@ -40,7 +39,6 @@ import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
 import com.aglushkov.wordteacher.android_app.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.android_app.general.views.compose.WindowInsets
 import com.aglushkov.wordteacher.android_app.general.views.compose.slideFromRight
-import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
@@ -49,15 +47,12 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
-import com.aglushkov.wordteacher.shared.general.GoogleAuthData
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
-import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.childAnimation
 import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
-import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -73,7 +68,7 @@ class MainActivity : AppCompatActivity(), Router {
     )
 
     // TODO: extract logic between googleAuthRepository and spaceAuthRepository into a controller or useCase
-    private lateinit var googleAuthRepository: GoogleAuthRepositoryImpl
+//    private lateinit var googleAuthRepository: GoogleAuthRepositoryImpl
 
     private lateinit var mainDecomposeComponent: MainDecomposeComponent
 
@@ -94,32 +89,27 @@ class MainActivity : AppCompatActivity(), Router {
             v.onApplyWindowInsets(insets)
         }
 
-        googleAuthRepository = appComponent().googleAuthRepository().apply {
-            bind(this@MainActivity)
-        }.also { repo ->
-            lifecycleScope.launch {
-                val firstValue = repo.googleSignInCredentialFlow.value
-                repo.googleSignInCredentialFlow.collect {
-                    val loadedRes = it.asLoaded()
-                    if (loadedRes != null && it != firstValue && !loadedRes.data.isSilent) {
-                        signInWithGoogleAuthData(loadedRes.data)
-                    } else if (it.isUninitialized()) {
-                        signOutFromGoogle()
-                    }
-                }
-            }
-        }
+//        googleAuthRepository = appComponent().googleAuthRepository().apply {
+//            bind(this@MainActivity)
+//        }.also { repo ->
+//            lifecycleScope.launch {
+//                val firstValue = repo.googleAuthDataFlow.value
+//                repo.googleAuthDataFlow.collect {
+//                    val loadedRes = it.asLoaded()
+//                    if (loadedRes != null && it != firstValue && !loadedRes.data.isSilent) {
+//                        signInWithGoogleAuthData(loadedRes.data)
+//                    } else if (it.isUninitialized()) {
+//                        signOutFromGoogle()
+//                    }
+//                }
+//            }
+//        }
         setupComposeLayout()
     }
 
-    private fun signInWithGoogleAuthData(authData: GoogleAuthData) {
-        val idToken = authData.tokenId ?: return
-        appComponent().spaceAuthRepository().launchAuth(SpaceAuthService.NetworkType.Google, idToken)
-    }
-
-    private fun signOutFromGoogle() {
-        appComponent().spaceAuthRepository().signOut(SpaceAuthService.NetworkType.Google)
-    }
+//    private fun signOutFromGoogle() {
+//        appComponent().spaceAuthRepository().signOut(SpaceAuthService.NetworkType.Google)
+//    }
 
     private fun setupComposeLayout() {
         val context = defaultComponentContext()
@@ -214,17 +204,12 @@ class MainActivity : AppCompatActivity(), Router {
                     is TabDecomposeComponent.Child.Settings -> SettingsUI(
                         vm = instance.vm.apply {
                             router = object : SettingsRouter {
-                                override fun openGoogleAuth() {
-                                    val googleSignInAccount = googleAuthRepository.googleSignInCredentialFlow.value.asLoaded()
-                                    if (googleSignInAccount == null) {
-                                        googleAuthRepository.signIn()
-                                    } else {
-                                        signInWithGoogleAuthData(googleSignInAccount.data)
-                                    }
+                                override fun signInGoogle() {
+                                    appComponent().spaceAuthRepository().launchSignIn(SpaceAuthService.NetworkType.Google)
                                 }
 
                                 override fun signOutGoogle() {
-                                    googleAuthRepository.signOut()
+                                    appComponent().spaceAuthRepository().signOut(SpaceAuthService.NetworkType.Google)
                                 }
                             }
                         },

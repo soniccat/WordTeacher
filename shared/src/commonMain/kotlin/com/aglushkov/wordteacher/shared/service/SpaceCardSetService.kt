@@ -1,8 +1,7 @@
 package com.aglushkov.wordteacher.shared.service
 
-import com.aglushkov.wordteacher.shared.general.ErrResponse
-import com.aglushkov.wordteacher.shared.general.OkResponse
 import com.aglushkov.wordteacher.shared.general.Response
+import com.aglushkov.wordteacher.shared.general.setStatusCode
 import com.aglushkov.wordteacher.shared.model.CardSet
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -53,8 +52,8 @@ class SpaceCardSetService(
             classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
-                    subclass(OkResponse.serializer(CardSetPullResponse.serializer()))
-                    subclass(ErrResponse.serializer())
+                    subclass(Response.Ok.serializer(CardSetPullResponse.serializer()))
+                    subclass(Response.Err.serializer())
                 }
             }
         }
@@ -67,8 +66,8 @@ class SpaceCardSetService(
             classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
-                    subclass(OkResponse.serializer(CardSetPushResponse.serializer()))
-                    subclass(ErrResponse.serializer())
+                    subclass(Response.Ok.serializer(CardSetPushResponse.serializer()))
+                    subclass(Response.Err.serializer())
                 }
             }
         }
@@ -84,7 +83,7 @@ class SpaceCardSetService(
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            pullJson.decodeFromString(stringResponse)
+            pullJson.decodeFromString<Response<CardSetPullResponse>>(stringResponse).setStatusCode(res.status.value)
         }
     }
 
@@ -98,7 +97,7 @@ class SpaceCardSetService(
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            pushJson.decodeFromString(stringResponse)
+            pushJson.decodeFromString<Response<CardSetPushResponse>>(stringResponse).setStatusCode(res.status.value)
         }
     }
 }
