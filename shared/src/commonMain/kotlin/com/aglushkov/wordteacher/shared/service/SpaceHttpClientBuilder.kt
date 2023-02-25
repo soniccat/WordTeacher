@@ -2,10 +2,7 @@ package com.aglushkov.wordteacher.shared.service
 
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
-import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.asLoaded
-import com.aglushkov.wordteacher.shared.general.resource.isError
-import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import io.ktor.client.*
@@ -58,7 +55,7 @@ class SpaceHttpClientBuilder(
                         set(HeaderDeviceType, "android")
                         set(HeaderDeviceId, deviceIdRepository.deviceId())
                         spaceAuthRepositoryProvider().currentAuthData.asLoaded()?.data?.let { authData ->
-                            set(HeaderAccessToken, authData.authToken.accessToken)
+                            request.setAuthData(authData)
                         }
                         set(HttpHeaders.UserAgent, appInfo.getUserAgent())
                     }
@@ -91,7 +88,10 @@ class SpaceHttpClientBuilder(
                                     result = spaceRepository.refresh()
                                 }
 
-                                val call = if (!result.isLoaded() && result.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
+                                val newCall = if (result.isLoaded()) {
+                                    proceed(request.setAuthData(result.data()!!))
+
+                                } else if (result.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
                                     // wordteacher space token is outdated
                                     spaceRepository.networkType?.let { networkType ->
                                         spaceRepository.signIn(networkType)
@@ -99,14 +99,14 @@ class SpaceHttpClientBuilder(
 
                                     val newAutData = spaceRepository.currentAuthData.asLoaded()
                                     if (newAutData?.data?.user == oldAutData?.data?.user) {
-                                        proceed(request)
+                                        proceed(request.setAuthData(newAutData?.data!!))
                                     } else {
                                         null
                                     }
                                 } else {
                                     null
                                 }
-                                call ?: originalCall
+                                newCall ?: originalCall
                             } catch (e: Exception) {
                                 originalCall
                             }
@@ -117,5 +117,12 @@ class SpaceHttpClientBuilder(
                 }
             }
         )
+    }
+
+    private fun HttpRequestBuilder.setAuthData(authData: AuthData): HttpRequestBuilder {
+        headers {
+            set(HeaderAccessToken, authData.authToken.accessToken)
+        }
+        return this
     }
 }

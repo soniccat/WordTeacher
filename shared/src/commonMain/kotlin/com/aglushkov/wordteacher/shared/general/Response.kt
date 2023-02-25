@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Response<out T> {
+abstract class Response<out T> {
 
     @Serializable
     @SerialName("ok")
@@ -33,12 +33,14 @@ fun <T> Response<T>.toResource(): Resource<T> {
     return when(this) {
         is Response.Ok -> Resource.Loaded(value)
         is Response.Err -> Resource.Error(ErrorResponseException(value, statusCode))
+        else -> throw RuntimeException("Unsupported response type $this")
     }
 }
 
 fun <T> Response<T>.setStatusCode(code: Int): Response<T> = when (this) {
     is Response.Ok -> this
-    is Response.Err -> Response.Err(value, statusCode) as Response<T>
+    is Response.Err -> Response.Err(value, code) as Response<T>
+    else -> throw RuntimeException("Unsupported response type $this")
 }
 
 fun Resource<*>?.errorStatusCode(): Int? {

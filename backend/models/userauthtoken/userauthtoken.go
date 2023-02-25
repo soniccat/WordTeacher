@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const AccessTokenTimeout = time.Hour
+const AccessTokenTimeout = time.Hour // TODO: change to several days
 
 const (
 	SessionAccessTokenKey               = "accessToken"
