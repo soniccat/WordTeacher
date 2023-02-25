@@ -3,7 +3,7 @@ package com.aglushkov.wordteacher.shared.repository.space
 import com.aglushkov.wordteacher.shared.general.ErrorResponseException
 import com.aglushkov.wordteacher.shared.general.GoogleAuthRepository
 import com.aglushkov.wordteacher.shared.general.resource.*
-import com.aglushkov.wordteacher.shared.general.toOkResult
+import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.service.*
 import io.ktor.http.*
 import io.ktor.utils.io.core.*
@@ -37,6 +37,11 @@ class SpaceAuthRepository(
     val currentAuthData: Resource<AuthData>
     get() {
         return stateFlow.value
+    }
+
+    val networkType: SpaceAuthService.NetworkType?
+    get() {
+        return currentAuthData.data()?.user?.networkType
     }
 
     fun isAuthorized(): Boolean {
@@ -113,9 +118,9 @@ class SpaceAuthRepository(
     }
 
     private suspend fun auth(network: SpaceAuthService.NetworkType, token: String): Resource<AuthData> {
-        var res: Resource<AuthData> = stateFlow.value
+        var res: Resource<AuthData> = currentAuthData
         loadResource(res) {
-            service.auth(network, token).toOkResult()
+            service.auth(network, token).toOkResponse()
         }.onEach {
             storeAuthDataIfNeeded(it)
             res = it
@@ -141,11 +146,11 @@ class SpaceAuthRepository(
     }
 
     suspend fun refresh(): Resource<AuthData> {
-        var stateValue = stateFlow.value
+        var stateValue = currentAuthData
         val authDataRes = stateValue.asLoaded() ?: return stateValue
 
         loadResource(authDataRes.copyWith(authDataRes.data.authToken)) {
-            service.refresh(authDataRes.data.authToken).toOkResult()
+            service.refresh(authDataRes.data.authToken).toOkResponse()
         }.map { newTokenRes ->
             newTokenRes.transform(authDataRes) { newToken ->
                 authDataRes.data.copy(authToken = newToken)

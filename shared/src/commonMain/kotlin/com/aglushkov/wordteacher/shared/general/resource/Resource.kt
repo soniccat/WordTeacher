@@ -15,7 +15,7 @@ sealed interface Resource<T> {
     data class Uninitialized<T>(override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
     data class Loaded<T>(val data: T, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
     data class Loading<T>(val data: T? = null, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
-    data class Error<T>(val throwable: Throwable, val canTryAgain: Boolean, val data: T? = null, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
+    data class Error<T>(val throwable: Throwable, val canTryAgain: Boolean = true, val data: T? = null, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
 
     fun toUninitialized(canLoadNextPage: Boolean = this.canLoadNextPage, version: Int = this.version) = Uninitialized<T>(canLoadNextPage, version)
     fun toLoading(data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loading(data, canLoadNext, version)

@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.general
 
+import com.aglushkov.wordteacher.shared.general.resource.Resource
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -20,7 +21,7 @@ data class Error(val message: String)
 
 class ErrorResponseException(val err: Error, val statusCode: Int): Exception(err.message)
 
-fun <T> Response<T>.toOkResult(): T {
+fun <T> Response<T>.toOkResponse(): T {
     return when(this) {
         is Response.Ok -> value
         is Response.Err -> throw ErrorResponseException(value, statusCode)
@@ -28,7 +29,21 @@ fun <T> Response<T>.toOkResult(): T {
     }
 }
 
+fun <T> Response<T>.toResource(): Resource<T> {
+    return when(this) {
+        is Response.Ok -> Resource.Loaded(value)
+        is Response.Err -> Resource.Error(ErrorResponseException(value, statusCode))
+    }
+}
+
 fun <T> Response<T>.setStatusCode(code: Int): Response<T> = when (this) {
     is Response.Ok -> this
     is Response.Err -> Response.Err(value, statusCode) as Response<T>
+}
+
+fun Resource<*>?.errorStatusCode(): Int? {
+    return when(this) {
+        is Resource.Error -> (throwable as? ErrorResponseException)?.statusCode
+        else -> null
+    }
 }

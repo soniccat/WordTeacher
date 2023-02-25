@@ -231,13 +231,11 @@ class AppModule {
         deviceIdRepository: DeviceIdRepository,
         appInfo: AppInfo,
         cookieStorage: CookiesStorage,
-        googleAuthRepository: dagger.Lazy<GoogleAuthRepositoryImpl>,
         spaceAuthRepository: dagger.Lazy<SpaceAuthRepository>,
     ): HttpClient = SpaceHttpClientBuilder(
         deviceIdRepository,
         appInfo,
         cookieStorage,
-        { googleAuthRepository.get() },
         { spaceAuthRepository.get() },
         BuildConfig.DEBUG,
     ).build()
@@ -246,12 +244,19 @@ class AppModule {
     @Provides
     fun appInfo(): AppInfo = AppInfo(BuildConfig.VERSION_NAME, "Android")
 
+    // TODO: replace with bind
     @AppComp
     @Provides
-    fun googleAuthRepository(
+    fun googleAuthRepositoryImpl(
         context: Context
     ): GoogleAuthRepositoryImpl =
         GoogleAuthRepositoryImpl(context.getString(R.string.default_web_client_id))
+
+    @AppComp
+    @Provides
+    fun googleAuthRepository(
+        impl: GoogleAuthRepositoryImpl
+    ): GoogleAuthRepository = impl
 
     @AppComp
     @Provides
@@ -281,10 +286,11 @@ class AppModule {
     fun spaceAuthRepository(
         context: Context,
         service: SpaceAuthService,
+        googleAuthRepository: GoogleAuthRepository,
         fileSystem: FileSystem,
     ): SpaceAuthRepository {
         val path = obtainSpaceDirPath(context, fileSystem).div("authData")
-        return SpaceAuthRepository(service, path, fileSystem)
+        return SpaceAuthRepository(service, googleAuthRepository, path, fileSystem)
     }
 
     private fun obtainSpaceDirPath(context: Context, fileSystem: FileSystem): Path {

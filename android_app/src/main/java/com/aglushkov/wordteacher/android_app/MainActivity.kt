@@ -89,6 +89,7 @@ class MainActivity : AppCompatActivity(), Router {
             v.onApplyWindowInsets(insets)
         }
 
+        appComponent().googleAuthRepository().bind(this@MainActivity)
 //        googleAuthRepository = appComponent().googleAuthRepository().apply {
 //            bind(this@MainActivity)
 //        }.also { repo ->
@@ -202,17 +203,7 @@ class MainActivity : AppCompatActivity(), Router {
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Settings -> SettingsUI(
-                        vm = instance.vm.apply {
-                            router = object : SettingsRouter {
-                                override fun signInGoogle() {
-                                    appComponent().spaceAuthRepository().launchSignIn(SpaceAuthService.NetworkType.Google)
-                                }
-
-                                override fun signOutGoogle() {
-                                    appComponent().spaceAuthRepository().signOut(SpaceAuthService.NetworkType.Google)
-                                }
-                            }
-                        },
+                        vm = instance.vm,
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Notes -> NotesUI(

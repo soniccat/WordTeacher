@@ -91,17 +91,10 @@ class SpaceHttpClientBuilder(
                                     result = spaceRepository.refresh()
                                 }
 
-                                val call = if (!result.isLoaded()) {
-                                    // try to reauth
-                                    if (googleAuthRepository.googleAuthDataFlow.value.isError() || googleAuthRepository.googleAuthDataFlow.value.isUninitialized()) {
-                                        googleAuthRepository.launchSignIn()
-                                        googleAuthRepository.googleAuthDataFlow.waitUntilLoadedOrError()
-                                        spaceRepository.authDataFlow.waitUntilLoadedOrError()
-                                    } else {
-                                        googleAuthRepository.googleAuthDataFlow.waitUntilLoadedOrError()
-                                        googleAuthRepository.googleAuthDataFlow.value.asLoaded()?.data?.tokenId?.let { tokenId ->
-                                            spaceRepository.auth(SpaceAuthService.NetworkType.Google, tokenId)
-                                        }
+                                val call = if (!result.isLoaded() && result.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
+                                    // wordteacher space token is outdated
+                                    spaceRepository.networkType?.let { networkType ->
+                                        spaceRepository.signIn(networkType)
                                     }
 
                                     val newAutData = spaceRepository.currentAuthData.asLoaded()

@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.android_app.features.settings.di.SettingsDepend
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
 import com.aglushkov.wordteacher.shared.general.AppInfo
+import com.aglushkov.wordteacher.shared.general.GoogleAuthRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager

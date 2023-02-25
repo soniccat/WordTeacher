@@ -3,7 +3,7 @@ package com.aglushkov.wordteacher.shared.workers
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.toOkResult
+import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.merge
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -182,7 +182,7 @@ class CardSetSyncWorker(
                     database.cardSets.remoteIds()
                 }
 
-                val pullResponse = spaceCardSetService.pull(cardSetRemoteIds, lastSyncDate).toOkResult()
+                val pullResponse = spaceCardSetService.pull(cardSetRemoteIds, lastSyncDate).toOkResponse()
                 newSyncDate = timeSource.getTimeInstant()
 
                 databaseWorker.run {
@@ -281,7 +281,7 @@ class CardSetSyncWorker(
                     database.cardSets.remoteIds()
                 }
 
-                val pushResponse = spaceCardSetService.push(updatedCardSets + notPushedCardSets, cardSetRemoteIds, lastSyncDate).toOkResult()
+                val pushResponse = spaceCardSetService.push(updatedCardSets + notPushedCardSets, cardSetRemoteIds, lastSyncDate).toOkResponse()
                 newSyncDate = timeSource.getTimeInstant()
 
                 databaseWorker.run {
