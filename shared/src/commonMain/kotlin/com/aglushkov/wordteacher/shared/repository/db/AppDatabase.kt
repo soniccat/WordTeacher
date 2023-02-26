@@ -291,7 +291,8 @@ class AppDatabase(
     inner class Cards {
         fun selectAllCardIds() = db.dBCardQueries.selectAllCardIds()
         fun selectAllCards() = db.dBCardQueries.selectAllCards(mapper = cardMapper())
-        fun selectCardsWithOutdatedSpans() = db.dBCardQueries.selectCardsWithOutdatedSpans(mapper = cardMapper())
+        fun selectCardsWithOutdatedSpans() =
+            db.dBCardQueries.selectCardsWithOutdatedSpans(mapper = cardMapper())
 
         fun selectCards(ids: List<Long>) = db.dBCardQueries.selectCards(
             ids,
@@ -303,7 +304,7 @@ class AppDatabase(
             mapper = cardMapper()
         )
 
-        fun cardMapper() : (
+        fun cardMapper(): (
             id: Long?,
             date: Long?,
             term: String?,
@@ -494,25 +495,34 @@ class AppDatabase(
             progressLastLessonDate: Long,
             needToUpdateDefinitionSpans: Long,
             needToUpdateExampleSpans: Long,
-        ) = db.dBCardQueries.updateCard(
-            creationDate,
-            term,
-            partOfSpeech.toString(),
-            transcription,
-            definitions,
-            synonyms,
-            examples,
-            progressLevel,
-            progressLastMistakeCount,
-            progressLastLessonDate,
-            definitionTermSpans,
-            exampleTermSpans,
-            needToUpdateDefinitionSpans,
-            needToUpdateExampleSpans,
-            modificationDate,
-            remoteId,
-            cardId
-        )
+        ) {
+            db.transaction {
+                db.dBCardSetQueries.selectCardIdSetByCardId(cardId).executeAsOneOrNull()?.let {
+
+                }
+
+                db.dBCardQueries.updateCard(
+                    creationDate,
+                    term,
+                    partOfSpeech.toString(),
+                    transcription,
+                    definitions,
+                    synonyms,
+                    examples,
+                    progressLevel,
+                    progressLastMistakeCount,
+                    progressLastLessonDate,
+                    definitionTermSpans,
+                    exampleTermSpans,
+                    needToUpdateDefinitionSpans,
+                    needToUpdateExampleSpans,
+                    modificationDate,
+                    remoteId,
+                    cardId
+                )
+
+            }
+        }
 
         private fun insertedCardId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
 

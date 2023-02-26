@@ -28,12 +28,14 @@ data class Card (
 ) {
     fun withRightAnswer(timeSource: TimeSource) =
         copy(
-            progress = progress.withRightAnswer(timeSource)
+            progress = progress.withRightAnswer(timeSource),
+            modificationDate = timeSource.getTimeInstant(),
         )
 
     fun withWrongAnswer(timeSource: TimeSource) =
         copy(
-            progress = progress.withWrongAnswer(timeSource)
+            progress = progress.withWrongAnswer(timeSource),
+            modificationDate = timeSource.getTimeInstant(),
         )
 
     fun resolveDefinitionsWithHiddenTerm(): List<String> =

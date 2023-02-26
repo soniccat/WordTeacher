@@ -210,9 +210,9 @@ class DatabaseCardWorker(
         }
     }
 
-    suspend fun updateCard(card: Card) = serialQueue.send {
-        updateCardInternal(card)
-    }
+//    suspend fun updateCard(card: Card) = serialQueue.send {
+//        updateCardInternal(card)
+//    }
 
     suspend fun updateCardAndWait(card: Card) = serialQueue.sendAndWait {
         performEditOperation {
@@ -222,11 +222,11 @@ class DatabaseCardWorker(
         }
     }
 
-    private suspend fun updateCardInternal(card: Card) = performEditOperation {
-        databaseWorker.run {
-            database.cards.updateCard(card)
-        }
-    }
+//    private suspend fun updateCardInternal(card: Card) = performEditOperation {
+//        databaseWorker.run {
+//            database.cards.updateCard(card)
+//        }
+//    }
 
     fun updateCardCancellable(card: Card, delay: Long) = serialQueue.send {
         updateCardCancellableInternal(card, delay)

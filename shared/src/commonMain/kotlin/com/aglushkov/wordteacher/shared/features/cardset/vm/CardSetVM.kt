@@ -268,7 +268,8 @@ open class CardSetVMImpl(
                             text
                         } else {
                             card.term
-                        }
+                        },
+                        modificationDate = timeSource.getTimeInstant(),
                     )
                 is WordTranscriptionViewItem ->
                     card.copy(
@@ -276,7 +277,8 @@ open class CardSetVMImpl(
                             text
                         } else {
                             card.transcription
-                        }
+                        },
+                        modificationDate = timeSource.getTimeInstant(),
                     )
                 is WordDefinitionViewItem -> {
                     card.copy(
@@ -291,7 +293,8 @@ open class CardSetVMImpl(
                                 }
                             }
                         },
-                        needToUpdateDefinitionSpans = true
+                        needToUpdateDefinitionSpans = true,
+                        modificationDate = timeSource.getTimeInstant(),
                     )
                 }
                 is WordExampleViewItem ->
@@ -303,7 +306,8 @@ open class CardSetVMImpl(
                                 s
                             }
                         },
-                        needToUpdateExampleSpans = true
+                        needToUpdateExampleSpans = true,
+                        modificationDate = timeSource.getTimeInstant(),
                     )
                 is WordSynonymViewItem ->
                     card.copy(
@@ -313,7 +317,8 @@ open class CardSetVMImpl(
                             } else {
                                 s
                             }
-                        }
+                        },
+                        modificationDate = timeSource.getTimeInstant(),
                     )
                 else -> card
             }
@@ -335,7 +340,8 @@ open class CardSetVMImpl(
                     } else {
                         it
                     }
-                }
+                },
+                modificationDate = timeSource.getTimeInstant(),
             )
         }
     }
@@ -364,7 +370,8 @@ open class CardSetVMImpl(
                     it.definitions + ""
                 } else {
                     it.definitions
-                }
+                },
+                modificationDate = timeSource.getTimeInstant(),
             )
         }
     }
@@ -377,7 +384,8 @@ open class CardSetVMImpl(
                 } else {
                     it.definitions.filterIndexed { i, _ -> i != item.index }
                 },
-                needToUpdateDefinitionSpans = true
+                needToUpdateDefinitionSpans = true,
+                modificationDate = timeSource.getTimeInstant(),
             ).apply {
                 updateCard(this, delay = 0)
             }
@@ -391,7 +399,8 @@ open class CardSetVMImpl(
                     it.examples + ""
                 } else {
                     it.examples
-                }
+                },
+                modificationDate = timeSource.getTimeInstant(),
             )
         }
     }
@@ -400,7 +409,8 @@ open class CardSetVMImpl(
         editCard(cardId) {
             it.copy(
                 examples = it.examples.filterIndexed { i, _ -> i != item.index },
-                needToUpdateExampleSpans = true
+                needToUpdateExampleSpans = true,
+                modificationDate = timeSource.getTimeInstant(),
             ).apply {
                 updateCard(this, delay = 0)
             }
@@ -414,7 +424,8 @@ open class CardSetVMImpl(
                     it.synonyms + ""
                 } else {
                     it.synonyms
-                }
+                },
+                modificationDate = timeSource.getTimeInstant(),
             )
         }
     }
@@ -422,7 +433,8 @@ open class CardSetVMImpl(
     override fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long) =
         editCard(cardId) {
             it.copy(
-                synonyms = it.synonyms.filterIndexed { i, _ -> i != item.index }
+                synonyms = it.synonyms.filterIndexed { i, _ -> i != item.index },
+                modificationDate = timeSource.getTimeInstant(),
             ).apply {
                 updateCard(this, delay = 0)
             }
@@ -445,7 +457,8 @@ open class CardSetVMImpl(
     override fun onPartOfSpeechChanged(newPartOfSpeech: WordTeacherWord.PartOfSpeech, cardId: Long) =
         editCard(cardId) {
             it.copy(
-                partOfSpeech = newPartOfSpeech
+                partOfSpeech = newPartOfSpeech,
+                modificationDate = timeSource.getTimeInstant(),
             ).apply {
                 updateCard(this)
             }
