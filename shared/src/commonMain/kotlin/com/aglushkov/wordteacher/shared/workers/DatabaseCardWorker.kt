@@ -47,19 +47,18 @@ class DatabaseCardWorker(
         // handle requests from cardSetSyncWorker
         scope.launch {
             cardSetSyncWorker.stateFlow.collect {
-                when (it) {
-                    is CardSetSyncWorker.State.Paused -> {
-                        if (it.prevState is CardSetSyncWorker.State.PullRequired ||
-                            it.prevState is CardSetSyncWorker.State.PushRequired) {
-                            if (currentState != State.SYNCING) {
-                                if (currentState != State.EDITING) {
-                                    pushState(State.SYNCING)
-                                } else if (!stateStack.contains(State.SYNCING)) {
-                                    stateStack = stateStack.subList(
-                                        0,
-                                        stateStack.size - 1
-                                    ) + State.SYNCING + currentState
-                                }
+                val isPaused = it is CardSetSyncWorker.State.Paused
+                when (it.innerState()) {
+                    is CardSetSyncWorker.State.PullRequired,
+                    is CardSetSyncWorker.State.PushRequired -> {
+                        if (isPaused && currentState != State.SYNCING) {
+                            if (currentState != State.EDITING) {
+                                pushState(State.SYNCING)
+                            } else if (!stateStack.contains(State.SYNCING)) {
+                                stateStack = stateStack.subList(
+                                    0,
+                                    stateStack.size - 1
+                                ) + State.SYNCING + currentState
                             }
                         }
                     }

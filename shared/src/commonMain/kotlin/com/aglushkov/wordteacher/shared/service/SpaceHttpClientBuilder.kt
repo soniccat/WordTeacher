@@ -91,7 +91,7 @@ class SpaceHttpClientBuilder(
                                 val newCall = if (result.isLoaded()) {
                                     proceed(request.setAuthData(result.data()!!))
 
-                                } else if (result.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
+                                } else if (result.isUninitialized() || result.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
                                     // wordteacher space token is outdated, need to sign-in again
                                     spaceRepository.networkType?.let { networkType ->
                                         spaceRepository.signIn(networkType)
@@ -99,6 +99,11 @@ class SpaceHttpClientBuilder(
 
                                     val newAutData = spaceRepository.currentAuthData.asLoaded()
                                     if (newAutData?.data?.user == oldAutData?.data?.user) {
+                                        val newCookies = cookieStorage.get(this.request.url)
+                                        request.headers {
+                                            set(HttpHeaders.Cookie, renderClientCookies(newCookies))
+                                        }
+                                        com.aglushkov.wordteacher.shared.general.Logger.v("newAuthData ${newAutData?.data!!}", tag = "SpaceHttpClientBuilder")
                                         proceed(request.setAuthData(newAutData?.data!!))
                                     } else {
                                         null
@@ -126,3 +131,6 @@ class SpaceHttpClientBuilder(
         return this
     }
 }
+
+private fun renderClientCookies(cookies: List<Cookie>): String =
+    cookies.joinToString("; ", transform = ::renderCookieHeader)

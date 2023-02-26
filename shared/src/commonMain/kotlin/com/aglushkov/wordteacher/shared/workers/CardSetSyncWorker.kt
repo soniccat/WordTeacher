@@ -58,6 +58,12 @@ class CardSetSyncWorker(
             }
         }
 
+        fun innerState(): State {
+            return when (this) {
+                is Paused -> prevState
+                else -> this
+            }
+        }
     }
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -239,7 +245,7 @@ class CardSetSyncWorker(
         }
     }
 
-    fun canPull() = spaceAuthRepository.isAuthorized() && (state.value is State.PullRequired || state.value == State.Idle)
+    fun canPull() = spaceAuthRepository.isAuthorized() && (state.value.innerState() is State.PullRequired || state.value.innerState() == State.Idle)
 
     fun push() {
         if (!canPush()) {
@@ -312,18 +318,18 @@ class CardSetSyncWorker(
         }
     }
 
-    fun canPush() = spaceAuthRepository.isAuthorized() && (state.value is State.PushRequired || state.value == State.Idle)
+    fun canPush() = spaceAuthRepository.isAuthorized() && (state.value.innerState() is State.PushRequired || state.value.innerState() == State.Idle)
 
-    private suspend fun waitUntilCanPull() {
-        state.takeWhile { !canPull() }.collect()
-    }
+//    private suspend fun waitUntilCanPull() {
+//        state.takeWhile { !canPull() }.collect()
+//    }
 
-    private suspend fun waitUntilNotPulling() {
-        state.takeWhile { it is State.Pulling }.collect()
-    }
+//    private suspend fun waitUntilNotPulling() {
+//        state.takeWhile { it is State.Pulling }.collect()
+//    }
 
     suspend fun waitUntilDone() {
-        state.takeWhile { it !is State.Pulling && it !is State.Pushing }.collect()
+        state.takeWhile { it is State.Pulling || it is State.Pushing }.collect()
     }
 
     suspend fun pauseAndWaitUntilDone() {
