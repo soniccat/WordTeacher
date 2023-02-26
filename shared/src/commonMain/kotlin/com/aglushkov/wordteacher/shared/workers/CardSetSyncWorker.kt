@@ -1,9 +1,6 @@
 package com.aglushkov.wordteacher.shared.workers
 
-import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.TimeSource
-import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.toOkResponse
+import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.merge
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -39,10 +36,10 @@ class CardSetSyncWorker(
             }
         }
 
-        fun toPaused(): State {
+        fun pause(): State {
             return when (this) {
-                is Paused -> Paused(this)
-                else -> this
+                is Paused -> Paused(prevState)
+                else -> Paused(this)
             }
         }
 
@@ -145,14 +142,17 @@ class CardSetSyncWorker(
     }
 
     fun pause() {
-        state.update { it.toPaused() }
+        Logger.v("toState ${state.value.pause()}", "cardSetSyncWorker")
+        state.update { it.pause() }
     }
 
     fun resume() {
+        Logger.v("toState ${state.value.resume()}", "cardSetSyncWorker")
         state.update { it.resume() }
     }
 
     private fun toState(st: State) {
+        Logger.v("toState ${state.value.toState(st)}", "cardSetSyncWorker")
         state.update { it.toState(st) }
     }
 

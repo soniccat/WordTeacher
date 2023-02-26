@@ -92,7 +92,7 @@ class SpaceHttpClientBuilder(
                                     proceed(request.setAuthData(result.data()!!))
 
                                 } else if (result.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
-                                    // wordteacher space token is outdated
+                                    // wordteacher space token is outdated, need to sign-in again
                                     spaceRepository.networkType?.let { networkType ->
                                         spaceRepository.signIn(networkType)
                                     }

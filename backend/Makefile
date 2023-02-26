@@ -75,6 +75,12 @@ authclearandrun: authclearandbuild authrun
 
 # cardsets
 
+cardsetsup:
+	docker stop cardsets || true
+	docker rm cardsets || true
+	docker rmi cardsets || true
+	make up
+
 cardsetsstop:
 	docker container stop cardsets
 
@@ -83,11 +89,26 @@ cardsetsrm: cardsetsstop
 	docker image rm cardsets
 
 cardsetsbuild:
-	docker build -t cardsets -f ./CardSets.Dockerfile .
+	docker build -t cardsets -f ./Auth.Dockerfile .
 	docker container create -p 4001:4001 --name cardsets cardsets
 
 cardsetsrun:
 	docker start cardsets
 
-cardsetsclearandbuild: cardsetsrm cardsetsbuild
-cardsetsclearandrun: cardsetsclearandbuild cardsetsrun
+#
+#cardsetsstop:
+#	docker container stop cardsets
+#
+#cardsetsrm: cardsetsstop
+#	docker container rm cardsets
+#	docker image rm cardsets
+#
+#cardsetsbuild:
+#	docker build -t cardsets -f ./CardSets.Dockerfile .
+#	docker container create -p 4001:4001 --name cardsets cardsets
+#
+#cardsetsrun:
+#	docker start cardsets
+#
+#cardsetsclearandbuild: cardsetsrm cardsetsbuild
+#cardsetsclearandrun: cardsetsclearandbuild cardsetsrun
