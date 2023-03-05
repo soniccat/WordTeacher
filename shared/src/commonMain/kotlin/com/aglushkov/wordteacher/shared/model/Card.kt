@@ -3,14 +3,15 @@ package com.aglushkov.wordteacher.shared.model
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.extensions.merge
 import kotlinx.datetime.Instant
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class Card (
-    val id: Long,
-    val remoteId: String,
+    @Transient val id: Long = 0,
+    @SerialName("id") val remoteId: String,
     val creationDate: Instant,
     val modificationDate: Instant,
     val term: String,
@@ -29,13 +30,11 @@ data class Card (
     fun withRightAnswer(timeSource: TimeSource) =
         copy(
             progress = progress.withRightAnswer(timeSource),
-            modificationDate = timeSource.getTimeInstant(),
         )
 
     fun withWrongAnswer(timeSource: TimeSource) =
         copy(
             progress = progress.withWrongAnswer(timeSource),
-            modificationDate = timeSource.getTimeInstant(),
         )
 
     fun resolveDefinitionsWithHiddenTerm(): List<String> =

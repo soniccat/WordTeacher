@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.workers
 
 import com.aglushkov.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
@@ -14,7 +15,8 @@ class SpanUpdateWorker (
     private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
     private val nlpCore: NLPCore,
-    private val nlpSentenceProcessor: NLPSentenceProcessor
+    private val nlpSentenceProcessor: NLPSentenceProcessor,
+    private val timeSource: TimeSource
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val state = MutableStateFlow<State>(State.Paused(State.Done))
@@ -92,7 +94,8 @@ class SpanUpdateWorker (
                                     exampleTermSpans = exampleSpans,
                                     needToUpdateDefinitionSpans = false,
                                     needToUpdateExampleSpans = false
-                                )
+                                ),
+                                modificationDate = timeSource.timeInMilliseconds()
                             )
                         }
                     }

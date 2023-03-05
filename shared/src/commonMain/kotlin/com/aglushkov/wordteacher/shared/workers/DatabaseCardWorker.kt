@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.properties.Delegates
 
@@ -214,10 +215,10 @@ class DatabaseCardWorker(
 //        updateCardInternal(card)
 //    }
 
-    suspend fun updateCardAndWait(card: Card) = serialQueue.sendAndWait {
+    suspend fun updateCardAndWait(card: Card, modificationDate: Long?) = serialQueue.sendAndWait {
         performEditOperation {
             databaseWorker.run {
-                database.cards.updateCard(card)
+                database.cards.updateCard(card, modificationDate)
             }
         }
     }
@@ -228,18 +229,19 @@ class DatabaseCardWorker(
 //        }
 //    }
 
-    fun updateCardCancellable(card: Card, delay: Long) = serialQueue.send {
-        updateCardCancellableInternal(card, delay)
+    fun updateCardCancellable(card: Card, delay: Long, modificationDate: Long?) = serialQueue.send {
+        updateCardCancellableInternal(card, delay, modificationDate)
     }
 
     private suspend fun updateCardCancellableInternal(
         card: Card,
-        delay: Long
+        delay: Long,
+        modificationDate: Long?
     ) = performEditOperation {
         databaseWorker.runCancellable(
             id = "updateCard_" + card.id.toString(),
             runnable = {
-                database.cards.updateCard(card)
+                database.cards.updateCard(card, modificationDate)
             },
             delay
         )

@@ -20,11 +20,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class ArticlesRepository(
     private val database: AppDatabase,
@@ -92,7 +89,7 @@ class ArticlesRepository(
         var article: Article? = null
         database.transaction {
             val articleId = database.articles.run {
-                insert(title, timeSource.getTimeInMilliseconds(), style)
+                insert(title, timeSource.timeInMilliseconds(), style)
                 insertedArticleId()
             } ?: 0L
 
@@ -107,7 +104,7 @@ class ArticlesRepository(
             article = Article(
                 articleId,
                 title,
-                timeSource.getTimeInMilliseconds(),
+                timeSource.timeInMilliseconds(),
                 sentences = sentences,
                 style = style
             )

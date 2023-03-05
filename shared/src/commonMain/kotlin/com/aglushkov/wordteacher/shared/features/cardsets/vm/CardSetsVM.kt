@@ -71,7 +71,7 @@ open class CardSetsVMImpl(
 
         viewModelScope.launch {
             try {
-                cardSetsRepository.createCardSet(name, timeSource.getTimeInMilliseconds())
+                cardSetsRepository.createCardSet(name, timeSource.timeInMilliseconds())
             } catch (e: Exception) {
                 showError(e)
             }
@@ -89,7 +89,7 @@ open class CardSetsVMImpl(
 
     fun onCardSetNameEntered(name: String) {
         viewModelScope.launch {
-            cardSetsRepository.createCardSet(name, timeSource.getTimeInMilliseconds())
+            cardSetsRepository.createCardSet(name, timeSource.timeInMilliseconds())
         }
     }
 

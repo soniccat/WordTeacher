@@ -104,7 +104,7 @@ class CardSetSyncWorker(
         scope.launch {
             state.collect { st ->
                 if (st is State.PullRequired) {
-                    val interval = timeSource.getTimeInstant() - lastPullDate
+                    val interval = timeSource.timeInstant() - lastPullDate
                     if (interval.inWholeSeconds <= PULL_RETRY_INTERVAL) {
                         delay(PULL_RETRY_INTERVAL - interval.inWholeSeconds)
                     }
@@ -120,7 +120,7 @@ class CardSetSyncWorker(
         scope.launch {
             state.collect { st ->
                 if (st is State.PushRequired) {
-                    val interval = timeSource.getTimeInstant() - lastPushDate
+                    val interval = timeSource.timeInstant() - lastPushDate
                     if (interval.inWholeSeconds <= PUSH_RETRY_INTERVAL) {
                         delay(PUSH_RETRY_INTERVAL - interval.inWholeSeconds)
                     }
@@ -179,7 +179,7 @@ class CardSetSyncWorker(
         }
 
         toState(State.Pulling)
-        lastPullDate = timeSource.getTimeInstant()
+        lastPullDate = timeSource.timeInstant()
         val newSyncDate: Instant?
 
         try {
@@ -189,7 +189,7 @@ class CardSetSyncWorker(
                 }
 
                 val pullResponse = spaceCardSetService.pull(cardSetRemoteIds, lastSyncDate).toOkResponse()
-                newSyncDate = timeSource.getTimeInstant()
+                newSyncDate = timeSource.timeInstant()
 
                 databaseWorker.run {
                     database.transaction {
@@ -216,7 +216,7 @@ class CardSetSyncWorker(
                                     Logger.e("Strange cardSet state")
                                 }
                             } ?: run {
-                                database.cardSets.insert(remoteCardSet)
+                                database.cardSets.insert(remoteCardSet, remoteCardSet.creationDate, remoteCardSet.modificationDate)
                             }
                         }
 
@@ -264,7 +264,7 @@ class CardSetSyncWorker(
         }
 
         toState(State.Pushing)
-        lastPushDate = timeSource.getTimeInstant()
+        lastPushDate = timeSource.timeInstant()
         val newSyncDate: Instant?
 
         try {
@@ -288,7 +288,7 @@ class CardSetSyncWorker(
                 }
 
                 val pushResponse = spaceCardSetService.push(updatedCardSets + notPushedCardSets, cardSetRemoteIds, lastSyncDate).toOkResponse()
-                newSyncDate = timeSource.getTimeInstant()
+                newSyncDate = timeSource.timeInstant()
 
                 databaseWorker.run {
                     database.transaction {

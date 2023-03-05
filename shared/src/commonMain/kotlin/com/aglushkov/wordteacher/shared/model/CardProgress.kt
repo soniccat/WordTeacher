@@ -30,7 +30,7 @@ data class CardProgress(
         } else {
             val newLessonDate: Long = nextLessonDate()
             if (newLessonDate != 0L) {
-                timeSource.getTimeInMilliseconds() >= newLessonDate
+                timeSource.timeInMilliseconds() >= newLessonDate
             } else {
                 true
             }
@@ -78,7 +78,7 @@ data class CardProgress(
 //        lastLessonDate = timeSource.getTimeInMilliseconds()
 //    }
 
-    fun getNewLastLessonDate(timeSource: TimeSource) = timeSource.getTimeInMilliseconds()
+    fun getNewLastLessonDate(timeSource: TimeSource) = timeSource.timeInMilliseconds()
 
 //    fun set(progress: CardProgress) {
 //        currentLevel = progress.currentLevel

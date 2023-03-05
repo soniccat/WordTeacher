@@ -131,7 +131,7 @@ open class AddArticleVMImpl(
         runSafely {
             cardSetsRepository.createCardSet(
                 title.value,
-                timeSource.getTimeInMilliseconds()
+                timeSource.timeInMilliseconds()
             )
         }
     }

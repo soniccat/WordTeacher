@@ -5,10 +5,11 @@ import com.aglushkov.wordteacher.shared.general.extensions.sumOf
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class CardSet (
-    @SerialName("_id")val id: Long?,
+    @Transient val id: Long? = null,
     @SerialName("id") val remoteId: String,
     val name: String,
     val creationDate: Instant,

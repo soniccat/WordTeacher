@@ -3,12 +3,10 @@ package com.aglushkov.wordteacher.shared.features.notes.vm
 import com.aglushkov.wordteacher.shared.general.Clearable
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Note
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -16,7 +14,6 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Raw
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -80,7 +77,7 @@ open class NotesVMImpl(
 
         viewModelScope.launch {
             try {
-                notesRepository.createNote(timeSource.getTimeInMilliseconds(), text)
+                notesRepository.createNote(timeSource.timeInMilliseconds(), text)
             } catch (e: Exception) {
                 showError(e)
             }

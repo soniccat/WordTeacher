@@ -1,16 +1,11 @@
 package com.aglushkov.wordteacher.shared.features.learning.vm
 
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
-import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.takeWhileNonNull
 import com.aglushkov.wordteacher.shared.model.Card
-import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
-import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -161,13 +156,13 @@ class CardTeacher(
     private suspend fun countWrongAnswer() {
         if (isWrongAnswerCounted) return
 
-        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.withWrongAnswer(timeSource))
+        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.withWrongAnswer(timeSource), timeSource.timeInMilliseconds())
         currentSession!!.updateProgress(updatedCard, false)
         isWrongAnswerCounted = true
     }
 
     private suspend fun countRightAnswer() {
-        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.withRightAnswer(timeSource))
+        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.withRightAnswer(timeSource), timeSource.timeInMilliseconds())
         currentSession!!.updateProgress(updatedCard, true)
     }
 

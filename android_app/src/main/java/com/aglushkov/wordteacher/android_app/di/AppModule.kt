@@ -186,9 +186,10 @@ class AppModule {
         database: AppDatabase,
         databaseWorker: DatabaseWorker,
         nlpCore: NLPCore,
-        nlpSentenceProcessor: NLPSentenceProcessor
+        nlpSentenceProcessor: NLPSentenceProcessor,
+        timeSource: TimeSource
     ): SpanUpdateWorker {
-        return SpanUpdateWorker(database, databaseWorker, nlpCore, nlpSentenceProcessor)
+        return SpanUpdateWorker(database, databaseWorker, nlpCore, nlpSentenceProcessor, timeSource)
     }
 
     @AppComp

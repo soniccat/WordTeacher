@@ -215,16 +215,16 @@ class AppDatabase(
 
         fun remoteIds() = db.dBCardSetQueries.selectRemoteIds().executeAsList()
 
-        fun insert(cardSet: CardSet): CardSet {
+        fun insert(cardSet: CardSet, creationDate: Instant, modificationDate: Instant): CardSet {
             db.transaction {
                 db.dBCardSetQueries.insert(
                     name = cardSet.name,
-                    date = cardSet.creationDate.toEpochMilliseconds(),
-                    modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
+                    date = creationDate.toEpochMilliseconds(),
+                    modificationDate = modificationDate.toEpochMilliseconds(),
                     creationId = cardSet.creationId
                 )
                 cardSet.cards.onEach { card ->
-                    cards.insertCard(cardSet.requireId(), card)
+                    cards.insertCard(cardSet.requireId(), card, card.creationDate, card.modificationDate)
                 }
             }
 
@@ -261,7 +261,7 @@ class AppDatabase(
                 }
 
                 (cardSet.cards - intersect).onEach { card ->
-                    cards.insertCard(cardSet.requireId(), card)
+                    cards.insertCard(cardSet.requireId(), card, card.creationDate, card.modificationDate)
                 }
             }
 
@@ -391,22 +391,26 @@ class AppDatabase(
         }
 
         fun insertCard(setId: Long, newCard: Card) {
+            insertCard(setId, newCard, newCard.creationDate, newCard.modificationDate)
+        }
+
+        fun insertCard(setId: Long, card: Card, creationDate: Instant, modificationDate: Instant) {
             cards.insertCardInternal(
                 setId = setId,
-                creationDate = newCard.creationDate.toEpochMilliseconds(),
-                modificationDate = newCard.modificationDate.toEpochMilliseconds(),
-                term = newCard.term,
-                definitions = newCard.definitions,
-                definitionTermSpans = newCard.definitionTermSpans,
-                partOfSpeech = newCard.partOfSpeech,
-                transcription = newCard.transcription,
-                synonyms = newCard.synonyms,
-                examples = newCard.examples,
-                exampleTermSpans = newCard.exampleTermSpans,
-                progress = newCard.progress,
-                needToUpdateDefinitionSpans = newCard.needToUpdateDefinitionSpans,
-                needToUpdateExampleSpans = newCard.needToUpdateExampleSpans,
-                creationId = newCard.creationId
+                creationDate = creationDate.toEpochMilliseconds(),
+                modificationDate = modificationDate.toEpochMilliseconds(),
+                term = card.term,
+                definitions = card.definitions,
+                definitionTermSpans = card.definitionTermSpans,
+                partOfSpeech = card.partOfSpeech,
+                transcription = card.transcription,
+                synonyms = card.synonyms,
+                examples = card.examples,
+                exampleTermSpans = card.exampleTermSpans,
+                progress = card.progress,
+                needToUpdateDefinitionSpans = card.needToUpdateDefinitionSpans,
+                needToUpdateExampleSpans = card.needToUpdateExampleSpans,
+                creationId = card.creationId
             )
         }
 
@@ -453,13 +457,14 @@ class AppDatabase(
         }
 
         fun updateCard(
-            card: Card
+            card: Card,
+            modificationDate: Long?
         ): Card {
             updateCard(
                 cardId = card.id,
                 remoteId = card.remoteId,
                 creationDate = card.creationDate.toEpochMilliseconds(),
-                modificationDate = card.modificationDate.toEpochMilliseconds(),
+                modificationDate = modificationDate ?: card.modificationDate.toEpochMilliseconds(),
                 term = card.term,
                 definitions = card.definitions,
                 definitionTermSpans = card.definitionTermSpans,
@@ -497,8 +502,8 @@ class AppDatabase(
             needToUpdateExampleSpans: Long,
         ) {
             db.transaction {
-                db.dBCardSetQueries.selectCardIdSetByCardId(cardId).executeAsOneOrNull()?.let {
-
+                db.dBCardSetQueries.selectCardSetIdByCardId(cardId).executeAsOneOrNull()?.let { cardSetId ->
+                    db.dBCardSetQueries.updateCardSetModificationDate(modificationDate, cardSetId)
                 }
 
                 db.dBCardQueries.updateCard(
@@ -520,7 +525,6 @@ class AppDatabase(
                     remoteId,
                     cardId
                 )
-
             }
         }
 
