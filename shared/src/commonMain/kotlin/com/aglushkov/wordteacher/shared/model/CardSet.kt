@@ -9,7 +9,7 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class CardSet (
-    @Transient val id: Long? = null,
+    @Transient val id: Long = 0,
     @SerialName("id") val remoteId: String,
     val name: String,
     val creationDate: Instant,
@@ -17,8 +17,6 @@ data class CardSet (
     val cards: List<Card> = emptyList(),
     val creationId: String,
 ) {
-    fun requireId(): Long = id!!
-
     fun findCard(id: Long) =
         cards.firstOrNull { it.id == id }
 }

@@ -276,7 +276,7 @@ class CardSetSyncWorker(
                     updatedCardSets = database.cardSets.selectUpdatedCardSets(lastSyncDate.toEpochMilliseconds())
                     notPushedCardSets = database.cardSets.selectWithoutRemoteId()
 
-                    val allCardSetsIds = updatedCardSets.map { it.requireId() } + notPushedCardSets.map { it.requireId() }
+                    val allCardSetsIds = updatedCardSets.map { it.id } + notPushedCardSets.map { it.id }
                     val setIdToCards = database.cardSets.selectSetIdsWithCards(allCardSetsIds).executeAsList().groupBy({it.first},{it.second})
 
                     updatedCardSets = updatedCardSets.map { it.copy(cards = setIdToCards[it.id].orEmpty()) }

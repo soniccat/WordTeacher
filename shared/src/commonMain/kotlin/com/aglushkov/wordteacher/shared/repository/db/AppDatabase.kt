@@ -224,7 +224,7 @@ class AppDatabase(
                     creationId = cardSet.creationId
                 )
                 cardSet.cards.onEach { card ->
-                    cards.insertCard(cardSet.requireId(), card, card.creationDate, card.modificationDate)
+                    cards.insertCard(cardSet.id, card, card.creationDate, card.modificationDate)
                 }
             }
 
@@ -238,7 +238,7 @@ class AppDatabase(
         ): CardSet {
             db.transaction {
                 updateCardSet(
-                    id = cardSet.requireId(),
+                    id = cardSet.id,
                     name = cardSet.name,
                     date = cardSet.creationDate.toEpochMilliseconds(),
                     modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
@@ -246,7 +246,7 @@ class AppDatabase(
                     remoteId = cardSet.creationId,
                 )
 
-                val currentCards = cards.selectCards(cardSet.requireId()).executeAsList()
+                val currentCards = cards.selectCards(cardSet.id).executeAsList()
                 val currentCardSet = currentCards.toMutableSet()
                 val intersect = cardSet.cards.intersect(currentCardSet)
 
@@ -261,7 +261,7 @@ class AppDatabase(
                 }
 
                 (cardSet.cards - intersect).onEach { card ->
-                    cards.insertCard(cardSet.requireId(), card, card.creationDate, card.modificationDate)
+                    cards.insertCard(cardSet.id, card, card.creationDate, card.modificationDate)
                 }
             }
 
@@ -432,6 +432,8 @@ class AppDatabase(
             creationId: String,
         ) {
             db.transaction {
+                db.dBCardSetQueries.updateCardSetModificationDate(modificationDate, setId)
+
                 db.dBCardQueries.insert(
                     creationDate,
                     term,

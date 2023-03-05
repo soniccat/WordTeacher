@@ -1,11 +1,13 @@
 package com.aglushkov.wordteacher.shared.model
 
+import com.aglushkov.wordteacher.shared.general.serialization.EnumAsIntSerializer
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import kotlinx.serialization.Serializable
 
 @Parcelize
 data class WordTeacherWord(
@@ -15,20 +17,27 @@ data class WordTeacherWord(
     val types: List<Config.Type>
 ) : Parcelable {
 
-    enum class PartOfSpeech {
-        Undefined,
-        Noun,
-        Verb,
-        Adjective,
-        Adverb,
-        Pronoun,
-        Preposition,
-        Conjunction,
-        Interjection,
-        Abbreviation,
-        Exclamation,
-        Determiner,
-        PhrasalVerb;
+    private class PartOfSpeechSerializer: EnumAsIntSerializer<PartOfSpeech>(
+        "partOfSpeech",
+        { it.value },
+        { v -> PartOfSpeech.values().first { it.value == v } }
+    )
+
+    @Serializable(with = PartOfSpeechSerializer::class)
+    enum class PartOfSpeech(val value: Int) {
+        Undefined(0),
+        Noun(1),
+        Verb(2),
+        Adjective(3),
+        Adverb(4),
+        Pronoun(5),
+        Preposition(6),
+        Conjunction(7),
+        Interjection(8),
+        Abbreviation(9),
+        Exclamation(10),
+        Determiner(11),
+        PhrasalVerb(12);
 
         companion object
     }

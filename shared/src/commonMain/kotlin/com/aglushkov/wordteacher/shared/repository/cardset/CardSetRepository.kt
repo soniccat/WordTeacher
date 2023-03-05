@@ -60,7 +60,7 @@ class CardSetRepository(
         val loadedCardSet = cardSet.value.data()!!
         return databaseWorker.run {
             database.cards.insertCard(
-                setId = loadedCardSet.requireId(),
+                setId = loadedCardSet.id,
                 creationDate = timeSource.timeInstant(),
                 term = term,
                 definitions = definitions,
