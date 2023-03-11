@@ -43,8 +43,8 @@ class AppDatabase(
             StringListAdapter(),
             StringListAdapter(),
             StringListAdapter(),
-            SpanListAdapter(),
-            SpanListAdapter(),
+            CardSpanListAdapter(),
+            CardSpanListAdapter(),
         ),
         DBNLPSentenceAdapter = DBNLPSentence.Adapter(
             StringListAdapter(),
@@ -337,8 +337,8 @@ class AppDatabase(
             progressLevel: Int?,
             progressLastMistakeCount: Int?,
             progressLastLessonDate: Long?,
-            definitionTermSpans: List<List<Pair<Int, Int>>>?,
-            exampleTermSpans: List<List<Pair<Int, Int>>>?,
+            definitionTermSpans: List<List<CardSpan>>?,
+            exampleTermSpans: List<List<CardSpan>>?,
             needToUpdateDefinitionSpans: Long?,
             needToUpdateExampleSpans: Long?,
             modificationDate: Long?,
@@ -362,7 +362,10 @@ class AppDatabase(
                     progress = CardProgress(
                         progressLevel ?: 0,
                         progressLastMistakeCount ?: 0,
-                        progressLastLessonDate ?: 0L
+                        progressLastLessonDate.takeIf { it != 0L }?.let {
+                            Instant.fromEpochMilliseconds(it)
+                        }
+
                     ),
                     needToUpdateDefinitionSpans = needToUpdateDefinitionSpans!! != 0L,
                     needToUpdateExampleSpans = needToUpdateExampleSpans!! != 0L,
@@ -376,12 +379,12 @@ class AppDatabase(
             creationDate: Instant = Instant.fromEpochMilliseconds(0),
             modificationDate: Instant = creationDate,
             definitions: List<String> = listOf(),
-            definitionTermSpans: List<List<Pair<Int, Int>>> = listOf(),
+            definitionTermSpans: List<List<CardSpan>> = listOf(),
             partOfSpeech: WordTeacherWord.PartOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
             transcription: String? = "",
             synonyms: List<String> = mutableListOf(),
             examples: List<String> = mutableListOf(),
-            exampleTermSpans: List<List<Pair<Int, Int>>> = listOf(),
+            exampleTermSpans: List<List<CardSpan>> = listOf(),
             progress: CardProgress = CardProgress.EMPTY,
             needToUpdateDefinitionSpans: Boolean = false,
             needToUpdateExampleSpans: Boolean = false,
@@ -441,12 +444,12 @@ class AppDatabase(
             modificationDate: Long,
             term: String,
             definitions: List<String>,
-            definitionTermSpans: List<List<Pair<Int, Int>>> = listOf(),
+            definitionTermSpans: List<List<CardSpan>> = listOf(),
             partOfSpeech: WordTeacherWord.PartOfSpeech,
             transcription: String?,
             synonyms: List<String>,
             examples: List<String>,
-            exampleTermSpans: List<List<Pair<Int, Int>>> = listOf(),
+            exampleTermSpans: List<List<CardSpan>> = listOf(),
             progress: CardProgress,
             needToUpdateDefinitionSpans: Boolean,
             needToUpdateExampleSpans: Boolean,
@@ -465,7 +468,7 @@ class AppDatabase(
                     examples,
                     progress.currentLevel,
                     progress.lastMistakeCount,
-                    progress.lastLessonDate,
+                    progress.lastLessonDate?.toEpochMilliseconds() ?: 0L,
                     definitionTermSpans,
                     exampleTermSpans,
                     needToUpdateDefinitionSpans.toLong(),
@@ -498,7 +501,7 @@ class AppDatabase(
                 exampleTermSpans = card.exampleTermSpans,
                 progressLevel = card.progress.currentLevel,
                 progressLastMistakeCount = card.progress.lastMistakeCount,
-                progressLastLessonDate = card.progress.lastLessonDate,
+                progressLastLessonDate = card.progress.lastLessonDate?.toEpochMilliseconds() ?: 0L,
                 needToUpdateDefinitionSpans = card.needToUpdateDefinitionSpans.toLong(),
                 needToUpdateExampleSpans = card.needToUpdateExampleSpans.toLong(),
             )
@@ -512,12 +515,12 @@ class AppDatabase(
             modificationDate: Long,
             term: String,
             definitions: List<String>,
-            definitionTermSpans: List<List<Pair<Int, Int>>>,
+            definitionTermSpans: List<List<CardSpan>>,
             partOfSpeech: WordTeacherWord.PartOfSpeech,
             transcription: String?,
             synonyms: List<String>,
             examples: List<String>,
-            exampleTermSpans: List<List<Pair<Int, Int>>>,
+            exampleTermSpans: List<List<CardSpan>>,
             progressLevel: Int,
             progressLastMistakeCount: Int,
             progressLastLessonDate: Long,
@@ -684,21 +687,21 @@ private class StringListAdapter(
     }
 }
 
-private class SpanListAdapter: ColumnAdapter<List<List<Pair<Int, Int>>>, String> {
+private class CardSpanListAdapter: ColumnAdapter<List<List<CardSpan>>, String> {
     private val outerAdapter = StringListAdapter()
     private val innerAdapter = StringListAdapter(
         divider = '#',
         escape = '$'
     )
 
-    override fun decode(databaseValue: String): List<List<Pair<Int, Int>>> =
+    override fun decode(databaseValue: String): List<List<CardSpan>> =
         outerAdapter.decode(databaseValue).map { sentence ->
             innerAdapter.decode(sentence).map { stringSpan ->
                 stringSpan.decodePair()
             }
         }
 
-    override fun encode(value: List<List<Pair<Int, Int>>>): String =
+    override fun encode(value: List<List<CardSpan>>): String =
         outerAdapter.encode(
             value.map { listOfSpans ->
                 innerAdapter.encode(
@@ -708,14 +711,14 @@ private class SpanListAdapter: ColumnAdapter<List<List<Pair<Int, Int>>>, String>
         )
 }
 
-private fun Pair<Int,Int>.encode(): String =
-    "$first$PAIR_DIVIDER$second"
+private fun CardSpan.encode(): String =
+    "$start$PAIR_DIVIDER$end"
 
-private fun String.decodePair(): Pair<Int, Int> {
+private fun String.decodePair(): CardSpan {
     val numbers = split(PAIR_DIVIDER)
-    return Pair(
-        first = numbers[0].toInt(),
-        second = numbers[1].toInt()
+    return CardSpan(
+        start = numbers[0].toInt(),
+        end = numbers[1].toInt()
     )
 }
 

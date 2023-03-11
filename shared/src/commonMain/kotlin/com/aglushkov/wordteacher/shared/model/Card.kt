@@ -16,12 +16,12 @@ data class Card (
     val modificationDate: Instant,
     val term: String,
     val definitions: List<String>,
-    val definitionTermSpans: List<List<Pair<Int, Int>>>,
+    val definitionTermSpans: List<List<CardSpan>>,
     val partOfSpeech: WordTeacherWord.PartOfSpeech,
     val transcription: String?,
     val synonyms: List<String>,
     val examples: List<String>,
-    val exampleTermSpans: List<List<Pair<Int, Int>>>,
+    val exampleTermSpans: List<List<CardSpan>>,
     val progress: CardProgress,
     val needToUpdateDefinitionSpans: Boolean = false,
     val needToUpdateExampleSpans: Boolean = false,
@@ -43,15 +43,15 @@ data class Card (
     fun resolveExamplesWithHiddenTerm(): List<String> =
         resolveWithHiddenTerm(examples, exampleTermSpans)
 
-    fun resolveWithHiddenTerm(strings: List<String>, spans: List<List<Pair<Int, Int>>>): List<String> =
+    fun resolveWithHiddenTerm(strings: List<String>, spans: List<List<CardSpan>>): List<String> =
         strings.mapIndexed { i, str ->
             spans.getOrNull(i)?.let { spans ->
                 var resString: CharSequence = str
                 spans.asReversed().forEach { span ->
-                    if (span.second <= resString.length) {
-                        resString = resString.replaceRange(span.first, span.second, TERM_REPLACEMENT)
+                    if (span.end <= resString.length) {
+                        resString = resString.replaceRange(span.start, span.end, TERM_REPLACEMENT)
                     } else {
-                        Logger.e("$resString is shorter than expected span ${span.first}:${span.second}")
+                        Logger.e("$resString is shorter than expected span ${span.start}:${span.end}")
                     }
                 }
                 resString.toString()
@@ -81,5 +81,11 @@ fun List<Card>.mergeCards(anotherCards: List<Card>): List<Card> {
         }
     }
 }
+
+@Serializable
+data class CardSpan(
+    val start: Int,
+    val end: Int
+)
 
 private const val TERM_REPLACEMENT = "___"

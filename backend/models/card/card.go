@@ -7,9 +7,9 @@ import (
 )
 
 type CardProgress struct {
-	CurrentLevel     int
-	LastMistakeCount int
-	LastLessonDate   string
+	CurrentLevel     int    `json:"currentLevel" bson:"_id,omitempty"`
+	LastMistakeCount int    `json:"lastMistakeCount" bson:"lastMistakeCount"`
+	LastLessonDate   string `json:"lastLessonDate,omitempty" bson:"lastLessonDate,omitempty"`
 }
 
 type ApiCard struct {
@@ -203,8 +203,8 @@ func (c *DbCard) IsEqual(a *DbCard) bool {
 }
 
 type Span struct {
-	Start int
-	End   int
+	Start int `json:"start" bson:"start"`
+	End   int `json:"end" bson:"end"`
 }
 
 func (c *DbCard) ToApi() *ApiCard {

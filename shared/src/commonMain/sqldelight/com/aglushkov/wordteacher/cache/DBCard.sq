@@ -1,6 +1,6 @@
-import kotlin.collections.List;
-import kotlin.Pair;
+import com.aglushkov.wordteacher.shared.model.CardSpan;
 import kotlin.Int;
+import kotlin.collections.List;
 
 CREATE TABLE IF NOT EXISTS DBCard (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS DBCard (
   progressLastMistakeCount INTEGER AS Int DEFAULT 0,
   progressLastLessonDate INTEGER DEFAULT 0,
 -- Spans
-  definitionTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT "",
-  exampleTermSpans TEXT AS List<List<Pair<Int, Int>>> NOT NULL DEFAULT "",
+  definitionTermSpans TEXT AS List<List<CardSpan>> NOT NULL DEFAULT "",
+  exampleTermSpans TEXT AS List<List<CardSpan>> NOT NULL DEFAULT "",
   needToUpdateDefinitionSpans INTEGER NOT NULL DEFAULT 0,
   needToUpdateExampleDefinitionSpans INTEGER NOT NULL DEFAULT 0,
 

@@ -1,13 +1,14 @@
 package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class CardProgress(
     val currentLevel: Int = 0,
     val lastMistakeCount: Int = 0,
-    val lastLessonDate: Long = 0
+    val lastLessonDate: Instant? = null
 ) {
 
     companion object {
@@ -39,9 +40,9 @@ data class CardProgress(
 
     fun nextLessonDate(): Long {
         var result: Long = 0
-        if (lastLessonDate != 0L) {
+        if (lastLessonDate != null) {
             val interval = CardProgressTable.nextLessonInterval(currentLevel)
-            result = lastLessonDate + interval
+            result = lastLessonDate.toEpochMilliseconds() + interval
         }
 
         return result
@@ -78,7 +79,7 @@ data class CardProgress(
 //        lastLessonDate = timeSource.getTimeInMilliseconds()
 //    }
 
-    fun getNewLastLessonDate(timeSource: TimeSource) = timeSource.timeInMilliseconds()
+    fun getNewLastLessonDate(timeSource: TimeSource) = timeSource.timeInstant()
 
 //    fun set(progress: CardProgress) {
 //        currentLevel = progress.currentLevel

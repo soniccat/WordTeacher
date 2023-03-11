@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.repository.cardset
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.CardSpan
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
@@ -75,7 +76,7 @@ class CardSetsRepository(
         }.await()
     }
 
-    private fun findTermSpans(sentence: String, term: String, nlpCore: NLPCore): List<Pair<Int,Int>> =
+    private fun findTermSpans(sentence: String, term: String, nlpCore: NLPCore): List<CardSpan> =
         findTermSpans(sentence, term, nlpCore, nlpSentenceProcessor)
 
     suspend fun allCardIds(): List<Long> {

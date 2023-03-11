@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.repository.cardset
 
+import com.aglushkov.wordteacher.shared.model.CardSpan
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSpan
@@ -10,7 +11,7 @@ fun findTermSpans(
     term: String,
     nlpCore: NLPCore,
     nlpSentenceProcessor: NLPSentenceProcessor
-): List<Pair<Int,Int>> {
+): List<CardSpan> {
     val nlpSentence = nlpSentenceProcessor.processString(sentence, nlpCore)
     val words = term.split(' ')
     var tokenI = 0
@@ -47,6 +48,6 @@ fun findTermSpans(
     }
 
     return foundTokenSpans.map {
-        Pair(it.start, it.end)
+        CardSpan(it.start, it.end)
     }
 }

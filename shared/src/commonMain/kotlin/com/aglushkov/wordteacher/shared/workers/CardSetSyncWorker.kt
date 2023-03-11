@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.russhwolf.settings.coroutines.FlowSettings
+import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
@@ -318,10 +319,12 @@ class CardSetSyncWorker(
                 toState(State.Idle)
             }
         } catch (e: Exception) {
-            // TODO: handle pull required error code
-
-            if (state.value == State.Pushing) {
-                toState(State.PushRequired(e))
+             if (state.value == State.Pushing) {
+                 if (e is ErrorResponseException && e.statusCode == HttpStatusCode.Conflict.value) {
+                     toState(State.PullRequired(e))
+                 } else {
+                     toState(State.PushRequired(e))
+                 }
             }
         }
     }

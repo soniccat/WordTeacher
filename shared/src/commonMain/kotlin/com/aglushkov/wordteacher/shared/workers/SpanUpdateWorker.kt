@@ -4,6 +4,7 @@ import com.aglushkov.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.v
+import com.aglushkov.wordteacher.shared.model.CardSpan
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.cardset.findTermSpans
@@ -60,7 +61,7 @@ class SpanUpdateWorker (
                             return@forEach
                         }
 
-                        var defSpans = emptyList<List<Pair<Int, Int>>>()
+                        var defSpans = emptyList<List<CardSpan>>()
                         if (card.needToUpdateDefinitionSpans) {
                             defSpans = card.definitions.map {
                                 if (state.tryPauseIfPendingPause()) {
@@ -71,7 +72,7 @@ class SpanUpdateWorker (
                             }
                         }
 
-                        var exampleSpans = emptyList<List<Pair<Int, Int>>>()
+                        var exampleSpans = emptyList<List<CardSpan>>()
                         if (card.needToUpdateExampleSpans) {
                             exampleSpans = card.examples.map {
                                 if (state.tryPauseIfPendingPause()) {
