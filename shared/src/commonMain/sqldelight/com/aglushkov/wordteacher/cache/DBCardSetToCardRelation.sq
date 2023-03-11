@@ -8,6 +8,10 @@ selectAll:
 SELECT *
 FROM DBCardSetToCardRelation;
 
+selectAllIds:
+SELECT id
+FROM DBCardSetToCardRelation;
+
 selectCardCount:
 SELECT COUNT(id)
 FROM DBCardSetToCardRelation

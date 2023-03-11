@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.repository.db
 
 import com.aglushkov.extensions.asFlow
 import com.aglushkov.extensions.firstLong
+import com.aglushkov.extensions.readAsFlow
 import com.aglushkov.wordteacher.cache.DBCard
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
@@ -33,6 +34,7 @@ class AppDatabase(
     private val timeSource: TimeSource
 ) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val defaultScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     private val driver = driverFactory.createDriver()
     private var db = SQLDelightDatabase(
@@ -160,6 +162,11 @@ class AppDatabase(
         fun selectWithoutRemoteId(): List<CardSet> = db.dBCardSetQueries.selectWithouRemoteId(mapper = { id, name, date, modificationDate, creationId, remoteId ->
             CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), creationId)
         }).executeAsList()
+
+        fun changeFlow(): Flow<Int> {
+            var changeCount = 0
+            return db.dBCardSetQueries.selectAllIds().asFlow().map { ++changeCount }
+        }
 
         fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
             // TODO: reorganize db to pull progress from it instead of loading all the cards
@@ -291,6 +298,20 @@ class AppDatabase(
     inner class Cards {
         fun selectAllCardIds() = db.dBCardQueries.selectAllCardIds()
         fun selectAllCards() = db.dBCardQueries.selectAllCards(mapper = cardMapper())
+        fun cardChangeFlow(): Flow<Int> {
+            var changeCount = 0
+            return db.dBCardQueries.selectAllCardIds().asFlow().map { ++changeCount }
+        }
+        fun cardSetToCardRelationChangeFlow(): Flow<Int> {
+            var changeCount = 0
+            return db.dBCardSetToCardRelationQueries.selectAllIds().asFlow().map { ++changeCount }
+        }
+        fun changeFlow(): Flow<Int> = combine(
+            cardChangeFlow(),
+            cardSetToCardRelationChangeFlow(),
+        ) { a, b ->
+            a + b
+        }
         fun selectCardsWithOutdatedSpans() =
             db.dBCardQueries.selectCardsWithOutdatedSpans(mapper = cardMapper())
 

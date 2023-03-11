@@ -203,6 +203,8 @@ func (app *application) handleUpdatedCardSets(
 	response := NewCardSetSyncResponse()
 
 	for _, cardSet := range updatedCardSets {
+		cardSet.UserId = userId.Hex()
+
 		if len(cardSet.Id) == 0 {
 			existingCardSet, err := app.cardSetRepository.FindCardSetByCreationId(ctx, cardSet.CreationId)
 			if err != nil {
@@ -213,7 +215,6 @@ func (app *application) handleUpdatedCardSets(
 			if existingCardSet != nil {
 				cardSetId = existingCardSet.Id.Hex()
 				cardSet.Id = cardSetId
-				cardSet.UserId = userId.Hex()
 				errWithCode := app.cardSetRepository.UpdateCardSet(ctx, cardSet)
 				if errWithCode != nil {
 					return nil, app.NewHandlerError(errWithCode.Code, errWithCode.Err)

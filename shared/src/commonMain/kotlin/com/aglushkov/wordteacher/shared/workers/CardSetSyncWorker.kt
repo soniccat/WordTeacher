@@ -31,7 +31,7 @@ class CardSetSyncWorker(
 
         fun resume(): State {
             return when (this) {
-                is Paused -> this.prevState
+                is Paused -> prevState
                 else -> this
             }
         }
@@ -104,13 +104,15 @@ class CardSetSyncWorker(
         scope.launch {
             state.collect { st ->
                 if (st is State.PullRequired) {
-                    val interval = timeSource.timeInstant() - lastPullDate
-                    if (interval.inWholeSeconds <= PULL_RETRY_INTERVAL) {
-                        delay(PULL_RETRY_INTERVAL - interval.inWholeSeconds)
-                    }
+                    while (state.value is State.PullRequired) {
+                        val interval = timeSource.timeInstant() - lastPullDate
+                        if (interval.inWholeSeconds <= PULL_RETRY_INTERVAL) {
+                            delay(PULL_RETRY_INTERVAL - interval.inWholeSeconds)
+                        }
 
-                    if (state.value is State.PullRequired) {
-                        pullInternal()
+                        if (state.value is State.PullRequired) {
+                            pullInternal()
+                        }
                     }
                 }
             }
@@ -120,25 +122,31 @@ class CardSetSyncWorker(
         scope.launch {
             state.collect { st ->
                 if (st is State.PushRequired) {
-                    val interval = timeSource.timeInstant() - lastPushDate
-                    if (interval.inWholeSeconds <= PUSH_RETRY_INTERVAL) {
-                        delay(PUSH_RETRY_INTERVAL - interval.inWholeSeconds)
-                    }
+                    while (state.value is State.PushRequired) {
+                        val interval = timeSource.timeInstant() - lastPushDate
+                        if (interval.inWholeSeconds <= PUSH_RETRY_INTERVAL) {
+                            delay(PUSH_RETRY_INTERVAL - interval.inWholeSeconds)
+                        }
 
-                    if (state.value is State.PushRequired) {
-                        pushInternal()
+                        if (state.value is State.PushRequired) {
+                            pushInternal()
+                        }
                     }
                 }
             }
         }
 
-        // handle Idle
+        // watch database changes
         scope.launch {
-            state.collect { st ->
-                if (st.isPausedOrPausedIdle()) {
-                    while (state.value.isPausedOrPausedIdle()) {
-                        delay(PUSH_DELAY_INTERVAL)
-                        if (canPush()) { // TODO: push only when there were changes (modification after the last sync)
+            withContext(Dispatchers.Default) {
+                var pushRequestJob: Job? = null
+                combine(database.cardSets.changeFlow(), database.cards.changeFlow()) { a, b ->
+                    a + b
+                }.collect {
+                    pushRequestJob?.cancel()
+                    pushRequestJob = launch(Dispatchers.Main) {
+                        delay(PUSH_DELAY)
+                        if (state.value.isPausedOrPausedIdle()) {
                             toState(State.PushRequired())
                         }
                     }
@@ -340,5 +348,5 @@ class CardSetSyncWorker(
 
 private const val LAST_SYNC_DATE_KEY = "LAST_SYNC_DATE_KEY"
 private const val PULL_RETRY_INTERVAL = 5000L
-private const val PUSH_RETRY_INTERVAL = 15000L
-private const val PUSH_DELAY_INTERVAL = 30000L
+private const val PUSH_RETRY_INTERVAL = 20000L
+private const val PUSH_DELAY = 10000L

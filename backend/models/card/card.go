@@ -13,20 +13,22 @@ type CardProgress struct {
 }
 
 type ApiCard struct {
-	Id                  string                    `json:"id"`
-	Term                string                    `json:"term"`
-	Transcription       *string                   `json:"transcription,omitempty"`
-	PartOfSpeech        partofspeech.PartOfSpeech `json:"partOfSpeech"`
-	Definitions         []string                  `json:"definitions"`
-	Synonyms            []string                  `json:"synonyms"`
-	Examples            []string                  `json:"examples"`
-	DefinitionTermSpans [][]Span                  `json:"definitionTermSpans"`
-	ExampleTermSpans    [][]Span                  `json:"exampleTermSpans"`
-	UserId              string                    `json:"userId"`
-	CreationId          string                    `json:"creationId"`
-	Progress            *CardProgress             `json:"progress"`
-	CreationDate        string                    `json:"creationDate"`
-	ModificationDate    string                    `json:"modificationDate"`
+	Id                          string                    `json:"id"`
+	Term                        string                    `json:"term"`
+	Transcription               *string                   `json:"transcription,omitempty"`
+	PartOfSpeech                partofspeech.PartOfSpeech `json:"partOfSpeech"`
+	Definitions                 []string                  `json:"definitions"`
+	Synonyms                    []string                  `json:"synonyms"`
+	Examples                    []string                  `json:"examples"`
+	DefinitionTermSpans         [][]Span                  `json:"definitionTermSpans"`
+	ExampleTermSpans            [][]Span                  `json:"exampleTermSpans"`
+	UserId                      string                    `json:"userId"`
+	CreationId                  string                    `json:"creationId"`
+	Progress                    *CardProgress             `json:"progress"`
+	CreationDate                string                    `json:"creationDate"`
+	ModificationDate            string                    `json:"modificationDate"`
+	NeedToUpdateDefinitionSpans bool                      `json:"needToUpdateDefinitionSpans"`
+	NeedToUpdateExampleSpans    bool                      `json:"needToUpdateExampleSpans"`
 }
 
 func (c *ApiCard) IsEqual(a *ApiCard) bool {
@@ -72,26 +74,34 @@ func (c *ApiCard) IsEqual(a *ApiCard) bool {
 	if c.ModificationDate != a.ModificationDate {
 		return false
 	}
+	if c.NeedToUpdateDefinitionSpans != a.NeedToUpdateDefinitionSpans {
+		return false
+	}
+	if c.NeedToUpdateExampleSpans != a.NeedToUpdateExampleSpans {
+		return false
+	}
 
 	return true
 }
 
 func (c *ApiCard) WithoutIds() *ApiCard {
 	return &ApiCard{
-		Id:                  "",
-		Term:                c.Term,
-		Transcription:       c.Transcription,
-		PartOfSpeech:        c.PartOfSpeech,
-		Definitions:         c.Definitions,
-		Synonyms:            c.Synonyms,
-		Examples:            c.Examples,
-		DefinitionTermSpans: c.DefinitionTermSpans,
-		ExampleTermSpans:    c.ExampleTermSpans,
-		UserId:              "",
-		CreationId:          c.CreationId,
-		Progress:            c.Progress,
-		CreationDate:        c.CreationDate,
-		ModificationDate:    c.ModificationDate,
+		Id:                          "",
+		Term:                        c.Term,
+		Transcription:               c.Transcription,
+		PartOfSpeech:                c.PartOfSpeech,
+		Definitions:                 c.Definitions,
+		Synonyms:                    c.Synonyms,
+		Examples:                    c.Examples,
+		DefinitionTermSpans:         c.DefinitionTermSpans,
+		ExampleTermSpans:            c.ExampleTermSpans,
+		UserId:                      "",
+		CreationId:                  c.CreationId,
+		Progress:                    c.Progress,
+		CreationDate:                c.CreationDate,
+		ModificationDate:            c.ModificationDate,
+		NeedToUpdateDefinitionSpans: c.NeedToUpdateDefinitionSpans,
+		NeedToUpdateExampleSpans:    c.NeedToUpdateExampleSpans,
 	}
 }
 
@@ -107,38 +117,42 @@ func (c *ApiCard) ToDb() (*DbCard, error) {
 	}
 
 	return &DbCard{
-		Id:                  cardDbId,
-		Term:                c.Term,
-		Transcription:       c.Transcription,
-		PartOfSpeech:        c.PartOfSpeech,
-		Definitions:         c.Definitions,
-		Synonyms:            c.Synonyms,
-		Examples:            c.Examples,
-		DefinitionTermSpans: c.DefinitionTermSpans,
-		ExampleTermSpans:    c.ExampleTermSpans,
-		UserId:              cardDbUserId,
-		CreationId:          c.CreationId,
-		Progress:            c.Progress,
-		CreationDate:        c.CreationDate,
-		ModificationDate:    c.ModificationDate,
+		Id:                          cardDbId,
+		Term:                        c.Term,
+		Transcription:               c.Transcription,
+		PartOfSpeech:                c.PartOfSpeech,
+		Definitions:                 c.Definitions,
+		Synonyms:                    c.Synonyms,
+		Examples:                    c.Examples,
+		DefinitionTermSpans:         c.DefinitionTermSpans,
+		ExampleTermSpans:            c.ExampleTermSpans,
+		UserId:                      cardDbUserId,
+		CreationId:                  c.CreationId,
+		Progress:                    c.Progress,
+		CreationDate:                c.CreationDate,
+		ModificationDate:            c.ModificationDate,
+		NeedToUpdateDefinitionSpans: c.NeedToUpdateDefinitionSpans,
+		NeedToUpdateExampleSpans:    c.NeedToUpdateExampleSpans,
 	}, nil
 }
 
 type DbCard struct {
-	Id                  *primitive.ObjectID       `bson:"_id,omitempty"`
-	Term                string                    `bson:"term"`
-	Transcription       *string                   `bson:"transcription,omitempty"`
-	PartOfSpeech        partofspeech.PartOfSpeech `bson:"partOfSpeech"`
-	Definitions         []string                  `bson:"definitions"`
-	Synonyms            []string                  `bson:"synonyms"`
-	Examples            []string                  `bson:"examples"`
-	DefinitionTermSpans [][]Span                  `bson:"definitionTermSpans"`
-	ExampleTermSpans    [][]Span                  `bson:"exampleTermSpans"`
-	UserId              *primitive.ObjectID       `bson:"userId"`
-	CreationId          string                    `bson:"creationId"`
-	Progress            *CardProgress             `bson:"progress"`
-	CreationDate        string                    `bson:"creationDate"`
-	ModificationDate    string                    `bson:"modificationDate"`
+	Id                          *primitive.ObjectID       `bson:"_id,omitempty"`
+	Term                        string                    `bson:"term"`
+	Transcription               *string                   `bson:"transcription,omitempty"`
+	PartOfSpeech                partofspeech.PartOfSpeech `bson:"partOfSpeech"`
+	Definitions                 []string                  `bson:"definitions"`
+	Synonyms                    []string                  `bson:"synonyms"`
+	Examples                    []string                  `bson:"examples"`
+	DefinitionTermSpans         [][]Span                  `bson:"definitionTermSpans"`
+	ExampleTermSpans            [][]Span                  `bson:"exampleTermSpans"`
+	UserId                      *primitive.ObjectID       `bson:"userId"`
+	CreationId                  string                    `bson:"creationId"`
+	Progress                    *CardProgress             `bson:"progress"`
+	CreationDate                string                    `bson:"creationDate"`
+	ModificationDate            string                    `bson:"modificationDate"`
+	NeedToUpdateDefinitionSpans bool                      `bson:"needToUpdateDefinitionSpans"`
+	NeedToUpdateExampleSpans    bool                      `bson:"needToUpdateExampleSpans"`
 }
 
 func (c *DbCard) IsEqual(a *DbCard) bool {
@@ -178,6 +192,12 @@ func (c *DbCard) IsEqual(a *DbCard) bool {
 	if !tools.ComparePtrs(c.Progress, a.Progress) {
 		return false
 	}
+	if c.NeedToUpdateDefinitionSpans != a.NeedToUpdateDefinitionSpans {
+		return false
+	}
+	if c.NeedToUpdateExampleSpans != a.NeedToUpdateExampleSpans {
+		return false
+	}
 
 	return true
 }
@@ -189,19 +209,21 @@ type Span struct {
 
 func (c *DbCard) ToApi() *ApiCard {
 	return &ApiCard{
-		Id:                  c.Id.Hex(),
-		Term:                c.Term,
-		Transcription:       c.Transcription,
-		PartOfSpeech:        c.PartOfSpeech,
-		Definitions:         c.Definitions,
-		Synonyms:            c.Synonyms,
-		Examples:            c.Examples,
-		DefinitionTermSpans: c.DefinitionTermSpans,
-		ExampleTermSpans:    c.ExampleTermSpans,
-		UserId:              c.UserId.Hex(),
-		CreationId:          c.CreationId,
-		Progress:            c.Progress,
-		CreationDate:        c.CreationDate,
-		ModificationDate:    c.ModificationDate,
+		Id:                          c.Id.Hex(),
+		Term:                        c.Term,
+		Transcription:               c.Transcription,
+		PartOfSpeech:                c.PartOfSpeech,
+		Definitions:                 c.Definitions,
+		Synonyms:                    c.Synonyms,
+		Examples:                    c.Examples,
+		DefinitionTermSpans:         c.DefinitionTermSpans,
+		ExampleTermSpans:            c.ExampleTermSpans,
+		UserId:                      c.UserId.Hex(),
+		CreationId:                  c.CreationId,
+		Progress:                    c.Progress,
+		CreationDate:                c.CreationDate,
+		ModificationDate:            c.ModificationDate,
+		NeedToUpdateDefinitionSpans: c.NeedToUpdateDefinitionSpans,
+		NeedToUpdateExampleSpans:    c.NeedToUpdateExampleSpans,
 	}
 }

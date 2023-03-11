@@ -12,6 +12,10 @@ SELECT *
 FROM DBCardSet
 ORDER BY date DESC;
 
+selectAllIds:
+SELECT id
+FROM DBCardSet;
+
 selectUpdated:
 SELECT *
 FROM DBCardSet

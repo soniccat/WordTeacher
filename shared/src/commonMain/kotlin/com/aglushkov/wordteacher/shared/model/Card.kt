@@ -23,8 +23,8 @@ data class Card (
     val examples: List<String>,
     val exampleTermSpans: List<List<Pair<Int, Int>>>,
     val progress: CardProgress,
-    val needToUpdateDefinitionSpans: Boolean,
-    val needToUpdateExampleSpans: Boolean,
+    val needToUpdateDefinitionSpans: Boolean = false,
+    val needToUpdateExampleSpans: Boolean = false,
     val creationId: String,
 ) {
     fun withRightAnswer(timeSource: TimeSource) =
