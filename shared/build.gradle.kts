@@ -26,6 +26,7 @@ kotlin {
                 implementation(libs.kotlinxSerializationJson)
                 implementation(libs.ktorCommonCore)
                 api(libs.ktorLogging)
+                api(libs.ktorContentEncoding)
                 implementation(libs.ktorAuth)
                 implementation(libs.coroutinesCommon)
                 implementation(libs.okio)

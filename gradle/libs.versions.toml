@@ -89,6 +89,7 @@ ktorAndroidClient = { module = "io.ktor:ktor-client-android", version.ref = "kto
 ktoriOSClient = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
 ktorDesktop = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktorLogging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktorContentEncoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
 statelyCommon = { module = "co.touchlab:stately-common", version.ref = "stately" }
 statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }

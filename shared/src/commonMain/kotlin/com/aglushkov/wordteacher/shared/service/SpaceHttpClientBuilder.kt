@@ -1,18 +1,20 @@
 package com.aglushkov.wordteacher.shared.service
 
 import com.aglushkov.wordteacher.shared.general.*
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.*
+import com.aglushkov.wordteacher.shared.general.serialization.GZip
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import io.ktor.client.*
 import io.ktor.client.plugins.api.*
+import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.http.content.*
 
 class SpaceHttpClientBuilder(
     private val deviceIdRepository: DeviceIdRepository,
@@ -25,9 +27,36 @@ class SpaceHttpClientBuilder(
         if (isDebug) {
             installLogger()
         }
+        installGzipForResponse()
+//        installGzipForRequest()
         installCookies()
         installHeaders()
         install401Handler()
+    }
+
+    private fun HttpClientConfig<*>.installGzipForResponse() {
+        install(ContentEncoding) {
+            gzip()
+        }
+    }
+
+    private fun HttpClientConfig<*>.installGzipForRequest() {
+        val gzip = GZip()
+
+        install(
+            createClientPlugin("Gzip for request") {
+                transformRequestBody { request, content, bodyType ->
+                    if (content is String) {
+                        ByteArrayContent(
+                            bytes = gzip.compress(content),
+                            contentType = ContentType.Application.GZip,
+                        )
+                    } else {
+                        null
+                    }
+                }
+            }
+        )
     }
 
     private fun HttpClientConfig<*>.installLogger() {
@@ -103,7 +132,7 @@ class SpaceHttpClientBuilder(
                                         request.headers {
                                             set(HttpHeaders.Cookie, renderClientCookies(newCookies))
                                         }
-                                        com.aglushkov.wordteacher.shared.general.Logger.v("newAuthData ${newAutData?.data!!}", tag = "SpaceHttpClientBuilder")
+                                        com.aglushkov.wordteacher.shared.general.Logger.v("newAuthData ${newAutData?.data}", tag = "SpaceHttpClientBuilder")
                                         proceed(request.setAuthData(newAutData?.data!!))
                                     } else {
                                         null
