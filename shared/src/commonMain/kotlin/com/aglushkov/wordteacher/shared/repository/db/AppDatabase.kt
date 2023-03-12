@@ -2,7 +2,6 @@ package com.aglushkov.wordteacher.shared.repository.db
 
 import com.aglushkov.extensions.asFlow
 import com.aglushkov.extensions.firstLong
-import com.aglushkov.extensions.readAsFlow
 import com.aglushkov.wordteacher.cache.DBCard
 import com.aglushkov.wordteacher.cache.DBNLPSentence
 import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
@@ -198,8 +197,14 @@ class AppDatabase(
             )
         }
 
-        fun selectCardSet(id: Long) = db.dBCardSetQueries.selectCardSet(id) { id, name, date, modificationDate, creationId, remoteId ->
+        fun selectCardSetWithoutCards(id: Long) = db.dBCardSetQueries.selectCardSet(id) { id, name, date, modificationDate, creationId, remoteId ->
             CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), creationId)
+        }
+
+        fun loadCardSetWithCards(id: Long): CardSet? {
+            val cardSet = cardSets.selectCardSetWithoutCards(id).executeAsOneOrNull() ?: return null
+            val cards = cards.selectCards(id).executeAsList()
+            return cardSet.copy(cards = cards)
         }
 
         fun removeCardSet(cardSetId: Long) {
@@ -250,7 +255,7 @@ class AppDatabase(
                     date = cardSet.creationDate.toEpochMilliseconds(),
                     modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
                     creationId = cardSet.creationId,
-                    remoteId = cardSet.creationId,
+                    remoteId = cardSet.remoteId,
                 )
 
                 val currentCards = cards.selectCards(cardSet.id).executeAsList()

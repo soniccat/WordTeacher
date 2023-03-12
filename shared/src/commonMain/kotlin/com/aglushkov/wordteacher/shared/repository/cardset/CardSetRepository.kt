@@ -28,7 +28,7 @@ class CardSetRepository(
         loadJob?.cancel()
         loadJob = scope.launch(Dispatchers.Default) {
             combine(
-                flow = database.cardSets.selectCardSet(id).asFlow().map {
+                flow = database.cardSets.selectCardSetWithoutCards(id).asFlow().map {
                     tryInResource(canTryAgain = true) { it.executeAsOne() }
                 },
                 flow2 = database.cards.selectCards(id).asFlow().map {

@@ -72,7 +72,9 @@ WHERE creationId = ?;
 
 selectCardSetIdByCardId:
 SELECT DBCardSet.id
-FROM DBCardSet LEFT JOIN DBCardSetToCardRelation ON DBCardSet.id = DBCardSetToCardRelation.setId AND DBCardSetToCardRelation.cardId = ?;
+FROM DBCardSet LEFT JOIN DBCardSetToCardRelation
+ON DBCardSet.id = DBCardSetToCardRelation.setId
+WHERE DBCardSetToCardRelation.cardId = ?;
 
 updateCardSetModificationDate:
 UPDATE DBCardSet

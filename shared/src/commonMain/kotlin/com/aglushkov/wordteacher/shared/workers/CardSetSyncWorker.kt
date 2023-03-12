@@ -125,8 +125,8 @@ class CardSetSyncWorker(
                 if (st is State.PushRequired) {
                     while (state.value is State.PushRequired) {
                         val interval = timeSource.timeInstant() - lastPushDate
-                        if (interval.inWholeSeconds <= PUSH_RETRY_INTERVAL) {
-                            delay(PUSH_RETRY_INTERVAL - interval.inWholeSeconds)
+                        if (interval.inWholeMilliseconds <= PUSH_RETRY_INTERVAL) {
+                            delay(PUSH_RETRY_INTERVAL - interval.inWholeMilliseconds)
                         }
 
                         if (state.value is State.PushRequired) {
@@ -146,7 +146,7 @@ class CardSetSyncWorker(
                 }.collect {
                     pushRequestJob?.cancel()
                     pushRequestJob = launch(Dispatchers.Main) {
-                        delay(PUSH_DELAY)
+                        delay(1000)
                         if (state.value.isPausedOrPausedIdle()) {
                             toState(State.PushRequired())
                         }
@@ -214,7 +214,7 @@ class CardSetSyncWorker(
                                 // as we got these cardSets from the back it means that remoteCardSet.modificationDate > lastSyncDate
                                 if (dbCardSet.modificationDate > lastSyncDate) {
                                     // there're local and remote changes, need to merge
-                                    val fullCardSet = database.cardSets.selectCardSet(dbCardSet.id).executeAsOne()
+                                    val fullCardSet = database.cardSets.loadCardSetWithCards(dbCardSet.id)!!
                                     val mergedCardSet = fullCardSet.merge(remoteCardSet, newSyncDate)
                                     database.cardSets.updateCardSet(mergedCardSet)
 
@@ -352,4 +352,3 @@ class CardSetSyncWorker(
 private const val LAST_SYNC_DATE_KEY = "LAST_SYNC_DATE_KEY"
 private const val PULL_RETRY_INTERVAL = 5000L
 private const val PUSH_RETRY_INTERVAL = 20000L
-private const val PUSH_DELAY = 10000L
