@@ -88,3 +88,8 @@ updateCardRemoteId:
 UPDATE DBCard
 SET remoteId = ?, modificationDate = ?
 WHERE creationId = ?;
+
+setCreationId:
+UPDATE DBCard
+SET creationId = ?, modificationDate = ?
+WHERE id = ?;

@@ -80,3 +80,8 @@ updateCardSetModificationDate:
 UPDATE DBCardSet
 SET modificationDate = ?
 WHERE id = ?;
+
+setCreationId:
+UPDATE DBCardSet
+SET creationId = ?, modificationDate = ?
+WHERE id = ?;

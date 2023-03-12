@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.general.toLong
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
+import com.benasher44.uuid.Uuid
 import com.benasher44.uuid.uuid4
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.TransactionWithoutReturn
@@ -76,6 +77,28 @@ class AppDatabase(
         mainScope.launch(Dispatchers.Default) {
             try {
                 createDb()
+                val time = timeSource.timeInMilliseconds()
+
+                db.dBCardSetQueries.selectAll().executeAsList().onEach {
+                    if (it.remoteId.isEmpty() && it.creationId.isEmpty()) {
+                        db.dBCardSetQueries.setCreationId(
+                            uuid4().toString(),
+                            time,
+                            it.id
+                        )
+                    }
+                }
+
+                db.dBCardQueries.selectAllCards().executeAsList().onEach {
+                    if (it.remoteId.isEmpty() && it.creationId.isEmpty()) {
+                        db.dBCardQueries.setCreationId(
+                            uuid4().toString(),
+                            time,
+                            it.id
+                        )
+                    }
+                }
+
                 state.value = Resource.Loaded(this@AppDatabase)
             } catch (e: Exception) {
                 state.value = Resource.Error(e, true)
