@@ -68,9 +68,6 @@ class MainActivity : AppCompatActivity(), Router {
         ScreenTab.Settings
     )
 
-    // TODO: extract logic between googleAuthRepository and spaceAuthRepository into a controller or useCase
-//    private lateinit var googleAuthRepository: GoogleAuthRepositoryImpl
-
     private lateinit var mainDecomposeComponent: MainDecomposeComponent
 
     private var windowInsets by mutableStateOf(WindowInsets())
@@ -97,21 +94,6 @@ class MainActivity : AppCompatActivity(), Router {
         }
 
         appComponent().googleAuthRepository().bind(this@MainActivity)
-//        googleAuthRepository = appComponent().googleAuthRepository().apply {
-//            bind(this@MainActivity)
-//        }.also { repo ->
-//            lifecycleScope.launch {
-//                val firstValue = repo.googleAuthDataFlow.value
-//                repo.googleAuthDataFlow.collect {
-//                    val loadedRes = it.asLoaded()
-//                    if (loadedRes != null && it != firstValue && !loadedRes.data.isSilent) {
-//                        signInWithGoogleAuthData(loadedRes.data)
-//                    } else if (it.isUninitialized()) {
-//                        signOutFromGoogle()
-//                    }
-//                }
-//            }
-//        }
         setupComposeLayout()
         handleIntent()
     }
@@ -127,10 +109,6 @@ class MainActivity : AppCompatActivity(), Router {
         }
         intent = null
     }
-
-//    private fun signOutFromGoogle() {
-//        appComponent().spaceAuthRepository().signOut(SpaceAuthService.NetworkType.Google)
-//    }
 
     private fun setupComposeLayout() {
         val context = defaultComponentContext()
@@ -314,14 +292,6 @@ class MainActivity : AppCompatActivity(), Router {
         }
     }
 
-//    override fun onBackPressed() {
-//        if (supportFragmentManager.backStackEntryCount == 1) {
-//            finish()
-//        } else {
-//            super.onBackPressed()
-//        }
-//    }
-
     // Router
 
     override fun openAddArticle() {
@@ -334,7 +304,6 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun closeArticle() {
         mainDecomposeComponent.back()
-//        supportFragmentManager.popBackStack()
     }
 
     override fun openCardSet(id: Long) {
