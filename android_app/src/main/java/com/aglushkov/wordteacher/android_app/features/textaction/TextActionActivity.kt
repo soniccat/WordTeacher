@@ -23,6 +23,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.android_app.EXTRA_ARTICLE_ID
+import com.aglushkov.wordteacher.android_app.MainActivity
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.android_app.features.definitions.views.DefinitionsUI
@@ -131,12 +133,22 @@ class TextActionActivity: AppCompatActivity() {
                         )
                         is TextActionDecomposeComponent.Child.AddArticle -> {
                             val articleCreatedString = StringDesc.Resource(MR.strings.articles_action_article_created).toString(LocalContext.current)
+                            val openActionText = StringDesc.Resource(MR.strings.articles_action_open).toString(LocalContext.current)
                             AddArticleUI(
                                 vm = instance.vm,
                                 modifier = Modifier.padding(innerPadding),
-                                onArticleCreated = {
+                                onArticleCreated = { articleId ->
                                     coroutineScope.launch {
-                                        showSnackbar(articleCreatedString)
+                                        if (showSnackbar(articleCreatedString, actionLabel = openActionText) == SnackbarResult.ActionPerformed) {
+                                            this@TextActionActivity.startActivity(
+                                                Intent(this@TextActionActivity, MainActivity::class.java).apply {
+                                                    articleId?.let {
+                                                        putExtra(EXTRA_ARTICLE_ID, it)
+                                                    }
+                                                }
+                                            )
+                                            this@TextActionActivity.finish()
+                                        }
                                     }
                                 }
                             )

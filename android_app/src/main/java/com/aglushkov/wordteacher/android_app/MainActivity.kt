@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.android_app
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
@@ -74,6 +75,12 @@ class MainActivity : AppCompatActivity(), Router {
 
     private var windowInsets by mutableStateOf(WindowInsets())
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        this.intent = intent
+        handleIntent()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -106,6 +113,19 @@ class MainActivity : AppCompatActivity(), Router {
 //            }
 //        }
         setupComposeLayout()
+        handleIntent()
+    }
+
+    private fun handleIntent() {
+        intent?.extras?.getLong(EXTRA_ARTICLE_ID, 0L).takeIf { it != 0L }?.let { articleId ->
+            mainDecomposeComponent.popToRoot()
+            (mainDecomposeComponent.routerState.value.activeChild.instance as? MainDecomposeComponent.Child.Tabs)?.let { tabs ->
+                tabs.vm.openArticles()
+                mainDecomposeComponent.openArticle(articleId)
+            }
+
+        }
+        intent = null
     }
 
 //    private fun signOutFromGoogle() {
@@ -339,3 +359,5 @@ sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: In
 }
 
 val LocalWindowInset = staticCompositionLocalOf { WindowInsets() }
+
+const val EXTRA_ARTICLE_ID = "articleId"

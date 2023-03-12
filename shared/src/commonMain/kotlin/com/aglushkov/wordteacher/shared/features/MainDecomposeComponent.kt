@@ -14,12 +14,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.LearningSessionResultDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
-import com.aglushkov.wordteacher.shared.general.Clearable
-import com.aglushkov.wordteacher.shared.general.RouterStateChangeHandler
-import com.aglushkov.wordteacher.shared.general.ViewModel
-import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
-import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
-import com.aglushkov.wordteacher.shared.general.toClearables
+import com.aglushkov.wordteacher.shared.general.*
 import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
@@ -42,7 +37,7 @@ interface MainDecomposeComponent: DefinitionsRouter {
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
     fun openAddArticleDialog()
-    fun popDialog(inner: Any)
+//    fun popDialog(inner: Any)
     fun popDialog(child: Child)
     fun openArticle(id: Long)
     fun openCardSet(id: Long)
@@ -50,6 +45,7 @@ interface MainDecomposeComponent: DefinitionsRouter {
     fun openLearning(ids: List<Long>)
     fun openLearningSessionResult(results: List<SessionCardResult>)
     fun back()
+    fun popToRoot()
 
     sealed class Child(
         val inner: Clearable?
@@ -78,7 +74,7 @@ interface MainDecomposeComponent: DefinitionsRouter {
         @Parcelize object TabsConfiguration : ChildConfiguration()
 
         @Parcelize object AddArticleConfiguration : ChildConfiguration()
-        @Parcelize object EmptyDialogConfiguration : ChildConfiguration()
+        @Parcelize object EmptyDialogConfiguration : ChildConfiguration() // TODO: it seems we can remove that
     }
 }
 
@@ -171,6 +167,11 @@ class MainDecomposeComponentImpl(
     }
 
     override fun back() = router.popIfNotEmpty()
+    override fun popToRoot() {
+        closeDialogs()
+        router.popToRoot()
+
+    }
 
     // Dialogs
 
@@ -186,11 +187,11 @@ class MainDecomposeComponentImpl(
         dialogHolders = dialogHolders + dialogHolder(config)
     }
 
-    override fun popDialog(inner: Any) {
-        findChildByInner(inner)?.let { child ->
-            popDialog(child)
-        }
-    }
+//    override fun popDialog(inner: Any) {
+//        findChildByInner(inner)?.let { child ->
+//            popDialog(child)
+//        }
+//    }
 
     override fun popDialog(child: MainDecomposeComponent.Child) {
         val index = dialogHolders.indexOfLast { it.child.instance == child }
@@ -201,9 +202,20 @@ class MainDecomposeComponentImpl(
         }
     }
 
-    private fun findChildByInner(inner: Any): Child<*, *>? {
-        return dialogHolders.lastOrNull { it.child.instance.inner == inner }?.child
+    private fun closeDialogs() {
+        if (dialogHolders.isEmpty()) {
+            return
+        }
+
+        dialogHolders.onEach { holder ->
+            holder.lifecycle.destroy()
+        }
+        dialogHolders = emptyList()
     }
+
+//    private fun findChildByInner(inner: Any): Child<*, *>? {
+//        return dialogHolders.lastOrNull { it.child.instance.inner == inner }?.child
+//    }
 
     private fun dialogHolder(config: MainDecomposeComponent.ChildConfiguration): DialogHolder {
         val lifecycle = LifecycleRegistry() // An instance of LifecycleRegistry associated with the new child

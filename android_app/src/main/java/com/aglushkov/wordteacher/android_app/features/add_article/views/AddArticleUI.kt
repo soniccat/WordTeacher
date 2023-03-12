@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.general.views.compose.CustomDialogUI
+import com.aglushkov.wordteacher.shared.events.CompletionData
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
@@ -64,7 +65,7 @@ fun AddArticleUI(
     vm: AddArticleVM,
     modifier: Modifier = Modifier,
     actions: @Composable RowScope.() -> Unit = {},
-    onArticleCreated: SnackbarHostState.() -> Unit
+    onArticleCreated: SnackbarHostState.(articleId: Long?) -> Unit
 ) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -117,7 +118,7 @@ fun AddArticleUI(
             when (it) {
                 is CompletionEvent -> with(snackbarHostState) {
                 // TODO: handle cancellation
-                    onArticleCreated()
+                    onArticleCreated((it.data as? CompletionData.Article)?.id)
                 }
                 is ErrorEvent -> {
                     launch {
@@ -204,17 +205,6 @@ private fun AddArticlesFieldsUI(
             }
         }
 
-        OutlinedTextField(
-            value = text,
-            onValueChange = { vm.onTextChanged(it) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .sizeIn(minHeight = with(LocalDensity.current) {
-                    (42 * 2).sp.toDp()
-                }),
-            label = { Text(stringResource(id = R.string.add_article_field_text_hint)) }
-        )
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -232,5 +222,16 @@ private fun AddArticlesFieldsUI(
                 onCheckedChange = null
             )
         }
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = { vm.onTextChanged(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .sizeIn(minHeight = with(LocalDensity.current) {
+                    (42 * 2).sp.toDp()
+                }),
+            label = { Text(stringResource(id = R.string.add_article_field_text_hint)) }
+        )
     }
 }

@@ -1,12 +1,9 @@
 package com.aglushkov.wordteacher.shared.features.add_article.vm
 
+import com.aglushkov.wordteacher.shared.events.*
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import com.aglushkov.wordteacher.shared.events.CompletionEvent
-import com.aglushkov.wordteacher.shared.events.CompletionResult
-import com.aglushkov.wordteacher.shared.events.ErrorEvent
-import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
@@ -139,8 +136,8 @@ open class AddArticleVMImpl(
     private fun createArticle() = viewModelScope.launch {
         runSafely {
             // TODO: show loading, adding might take for a while
-            articlesRepository.createArticle(title.value, text.value)
-            eventChannel.trySend(CompletionEvent(CompletionResult.COMPLETED))
+            val article = articlesRepository.createArticle(title.value, text.value)
+            eventChannel.trySend(CompletionEvent(CompletionResult.COMPLETED, CompletionData.Article(article.id)))
         }
     }
 
