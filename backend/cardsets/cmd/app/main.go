@@ -5,13 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
-	"models/apphelpers"
-	"models/logger"
-	"models/mongowrapper"
 	"models/user"
 	"net/http"
 	"runtime/debug"
 	"time"
+	"tools/apphelpers"
+	"tools/logger"
+	"tools/mongowrapper"
 )
 
 func main() {

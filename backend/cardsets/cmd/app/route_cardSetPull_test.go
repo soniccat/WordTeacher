@@ -5,8 +5,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"models/apphelpers"
-	"models/test"
 	"models/user"
 	"net/http"
 	"net/http/httptest"
@@ -14,6 +12,8 @@ import (
 	"testing"
 	"time"
 	"tools"
+	"tools/apphelpers"
+	"tools/test"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"

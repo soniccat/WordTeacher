@@ -3,11 +3,11 @@ package main
 import (
 	"cardsets/cmd/internal/cardset"
 	"github.com/alexedwards/scs/v2"
-	"models/apphelpers"
-	"models/logger"
-	"models/mongowrapper"
 	"models/user"
 	"net/http"
+	"tools/apphelpers"
+	"tools/logger"
+	"tools/mongowrapper"
 )
 
 type application struct {

@@ -4,10 +4,10 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"models/test"
 	"models/tools"
 	"models/usernetwork"
 	"testing"
+	"tools/test"
 )
 
 type UserModelTestSuite struct {

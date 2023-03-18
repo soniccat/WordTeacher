@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"models/test"
 	"testing"
 	"tools"
+	"tools/test"
 )
 
 type CardSetTestSuite struct {

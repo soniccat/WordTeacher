@@ -5,10 +5,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"models/logger"
-	"models/mongowrapper"
 	"models/userauthtoken"
 	"models/usernetwork"
+	"tools/logger"
+	"tools/mongowrapper"
 )
 
 // TODO: move in auth module

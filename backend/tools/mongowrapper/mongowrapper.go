@@ -4,9 +4,9 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"models/logger"
 	"os"
 	"time"
+	"tools/logger"
 )
 
 const EnvMongoUsername = "MONGODB_USERNAME"

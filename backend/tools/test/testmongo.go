@@ -1,8 +1,8 @@
 package test
 
 import (
-	"models/logger"
-	"models/mongowrapper"
+	"tools/logger"
+	"tools/mongowrapper"
 )
 
 type TestMongo struct {

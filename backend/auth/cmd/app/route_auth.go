@@ -6,10 +6,10 @@ import (
 	"errors"
 	"github.com/gorilla/mux"
 	"google.golang.org/api/idtoken"
-	"models/apphelpers"
 	"models/user"
 	"models/usernetwork"
 	"net/http"
+	"tools/apphelpers"
 )
 
 // TODO: move in params

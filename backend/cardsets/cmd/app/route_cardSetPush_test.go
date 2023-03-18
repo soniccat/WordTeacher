@@ -9,9 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"models/accesstoken"
-	"models/apphelpers"
 	"models/cardset"
-	"models/test"
 	"models/tools"
 	"models/user"
 	"models/userauthtoken"
@@ -20,6 +18,8 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+	"tools/apphelpers"
+	"tools/test"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"

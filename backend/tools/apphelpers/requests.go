@@ -3,10 +3,10 @@ package apphelpers
 import (
 	"encoding/json"
 	"fmt"
-	"models/logger"
 	"net/http"
 	"runtime/debug"
 	"tools"
+	"tools/logger"
 )
 
 const CookieSession = "session"
