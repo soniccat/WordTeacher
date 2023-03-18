@@ -2,6 +2,7 @@ package main
 
 import (
 	"auth/internal"
+	appUsearAuthToken "auth/internal/userauthtoken"
 	"context"
 	"github.com/alexedwards/scs/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -58,6 +59,6 @@ func (app *application) GenerateUserAuthToken(
 		return nil, err
 	}
 
-	token.SaveAsSession(context, app.sessionManager)
+	appUsearAuthToken.SaveUserAuthTokenAsSession(token, context, app.sessionManager)
 	return token, nil
 }

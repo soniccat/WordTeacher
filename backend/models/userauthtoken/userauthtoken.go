@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/alexedwards/scs/v2"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"models/accesstoken"
 	"models/usernetwork"
@@ -50,45 +49,6 @@ func New(
 		UserDeviceId:   userDeviceId,
 		UserMongoId:    userMongoId,
 	}
-}
-
-func Generate(
-	userId *primitive.ObjectID,
-	networkType usernetwork.UserNetworkType,
-	deviceType string,
-	deviceId string,
-) (*UserAuthToken, error) {
-	accessTokenValue, err := uuid.NewRandom()
-	if err != nil {
-		return nil, err
-	}
-
-	refreshTokenValue, err := uuid.NewRandom()
-	if err != nil {
-		return nil, err
-	}
-
-	return &UserAuthToken{
-		UserMongoId: userId,
-		NetworkType: networkType,
-		AccessToken: accesstoken.AccessToken{
-			Value:          accessTokenValue.String(),
-			ExpirationDate: primitive.NewDateTimeFromTime(time.Now().Add(AccessTokenTimeout)),
-		},
-		RefreshToken:   refreshTokenValue.String(),
-		UserDeviceType: deviceType,
-		UserDeviceId:   deviceId,
-	}, nil
-}
-
-func (sd *UserAuthToken) SaveAsSession(context context.Context, manager *scs.SessionManager) {
-	manager.Put(context, SessionAccessTokenKey, sd.AccessToken.Value)
-	manager.Put(context, SessionAccessTokenExpirationDateKey, int64(sd.AccessToken.ExpirationDate))
-	manager.Put(context, SessionRefreshTokenKey, sd.RefreshToken)
-	manager.Put(context, SessionNetworkTypeKey, int8(sd.NetworkType))
-	manager.Put(context, SessionUserMongoIdKey, sd.UserMongoId.Hex())
-	manager.Put(context, SessionUserDeviceType, sd.UserDeviceType)
-	manager.Put(context, SessionUserDeviceId, sd.UserDeviceId)
 }
 
 func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken, error) {

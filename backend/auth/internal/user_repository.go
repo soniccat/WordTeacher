@@ -1,6 +1,7 @@
 package internal
 
 import (
+	appUsearAuthToken "auth/internal/userauthtoken"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -71,7 +72,7 @@ func (m *UserRepository) GenerateUserAuthToken(
 	deviceType string,
 	deviceId string,
 ) (*userauthtoken.UserAuthToken, error) {
-	token, err := userauthtoken.Generate(userId, networkType, deviceType, deviceId)
+	token, err := appUsearAuthToken.GenerateUserAuthToken(userId, networkType, deviceType, deviceId)
 	if err != nil {
 		return nil, err
 	}
