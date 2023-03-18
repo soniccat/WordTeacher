@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"models/user"
+	"models"
 	"net/http"
 	"net/http/httptest"
 	"sort"
@@ -24,11 +24,11 @@ type CardSetPullTestSuite struct {
 	suite.Suite
 	test.BaseTestSuite
 	application      *application
-	sessionValidator *user.MockSessionValidator
+	sessionValidator *models.MockSessionValidator
 }
 
 func (suite *CardSetPullTestSuite) SetupTest() {
-	suite.sessionValidator = user.NewMockSessionValidator()
+	suite.sessionValidator = models.NewMockSessionValidator()
 
 	sessionManager := apphelpers.CreateSessionManager("172.16.0.3:6380")
 	app, err := createApplication(
@@ -145,8 +145,8 @@ func TestCardSetPullTestSuite(t *testing.T) {
 // Tools
 
 func (suite *CardSetPullTestSuite) setupPullValidator(userId *primitive.ObjectID) {
-	suite.sessionValidator.ResponseProvider = func() user.MockSessionValidatorResponse {
-		return user.MockSessionValidatorResponse{
+	suite.sessionValidator.ResponseProvider = func() models.MockSessionValidatorResponse {
+		return models.MockSessionValidatorResponse{
 			createUserAuthToken(userId),
 			nil,
 		}

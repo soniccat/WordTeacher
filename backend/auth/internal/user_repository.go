@@ -6,9 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"models/user"
-	"models/userauthtoken"
-	"models/usernetwork"
+	"models"
 	"tools/logger"
 	"tools/mongowrapper"
 )
@@ -30,15 +28,15 @@ func New(logger *logger.Logger, mongoClient *mongo.Client) *UserRepository {
 	return model
 }
 
-func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *string) (*user.User, error) {
-	var user = user.User{}
+func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *string) (*models.User, error) {
+	var user = models.User{}
 
 	err := m.UserCollection.FindOne(
 		context,
 		bson.M{
 			"networks": bson.M{
 				"$elemMatch": bson.M{
-					"type":          usernetwork.Google,
+					"type":          models.Google,
 					"networkUserId": *googleUserId,
 				},
 			},
@@ -51,7 +49,7 @@ func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *s
 	return &user, err
 }
 
-func (m *UserRepository) InsertUser(context context.Context, user *user.User) (*user.User, error) {
+func (m *UserRepository) InsertUser(context context.Context, user *models.User) (*models.User, error) {
 	res, err := m.UserCollection.InsertOne(context, user)
 	if err != nil {
 		return nil, err
@@ -68,10 +66,10 @@ func (m *UserRepository) InsertUser(context context.Context, user *user.User) (*
 func (m *UserRepository) GenerateUserAuthToken(
 	context context.Context,
 	userId *primitive.ObjectID,
-	networkType usernetwork.UserNetworkType,
+	networkType models.UserNetworkType,
 	deviceType string,
 	deviceId string,
-) (*userauthtoken.UserAuthToken, error) {
+) (*models.UserAuthToken, error) {
 	token, err := appUsearAuthToken.GenerateUserAuthToken(userId, networkType, deviceType, deviceId)
 	if err != nil {
 		return nil, err
@@ -82,8 +80,8 @@ func (m *UserRepository) GenerateUserAuthToken(
 
 func (m *UserRepository) insertUserAuthToken(
 	context context.Context,
-	token *userauthtoken.UserAuthToken,
-) (*userauthtoken.UserAuthToken, error) {
+	token *models.UserAuthToken,
+) (*models.UserAuthToken, error) {
 	// Remove stale auth tokens
 	_, err := m.AuthTokens.DeleteMany(
 		context,

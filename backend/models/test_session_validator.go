@@ -1,13 +1,12 @@
-package user
+package models
 
 import (
 	"errors"
-	"models/userauthtoken"
 	"net/http"
 )
 
 type MockSessionValidatorResponse struct {
-	AuthToken            *userauthtoken.UserAuthToken
+	AuthToken            *UserAuthToken
 	ValidateSessionError *ValidateSessionError
 }
 
@@ -23,7 +22,7 @@ func NewMockSessionValidator() *MockSessionValidator {
 	}
 }
 
-func (tsv *MockSessionValidator) Validate(r *http.Request) (*userauthtoken.UserAuthToken, *ValidateSessionError) {
+func (tsv *MockSessionValidator) Validate(r *http.Request) (*UserAuthToken, *ValidateSessionError) {
 	response := tsv.ResponseProvider()
 	return response.AuthToken, response.ValidateSessionError
 }

@@ -1,12 +1,10 @@
-package userauthtoken
+package models
 
 import (
 	"context"
 	"errors"
 	"github.com/alexedwards/scs/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"models/accesstoken"
-	"models/usernetwork"
 	"time"
 )
 
@@ -23,20 +21,20 @@ const (
 )
 
 type UserAuthToken struct {
-	Id             *primitive.ObjectID         `bson:"_id,omitempty"`
-	UserMongoId    *primitive.ObjectID         `bson:"userId,omitempty"`
-	NetworkType    usernetwork.UserNetworkType `bson:"networkType,omitempty"`
-	AccessToken    accesstoken.AccessToken     `bson:"accessToken,omitempty"`
-	RefreshToken   string                      `bson:"refreshToken,omitempty"`
-	UserDeviceType string                      `bson:"deviceType,omitempty"`
-	UserDeviceId   string                      `bson:"deviceId,omitempty"`
+	Id             *primitive.ObjectID `bson:"_id,omitempty"`
+	UserMongoId    *primitive.ObjectID `bson:"userId,omitempty"`
+	NetworkType    UserNetworkType     `bson:"networkType,omitempty"`
+	AccessToken    AccessToken         `bson:"accessToken,omitempty"`
+	RefreshToken   string              `bson:"refreshToken,omitempty"`
+	UserDeviceType string              `bson:"deviceType,omitempty"`
+	UserDeviceId   string              `bson:"deviceId,omitempty"`
 	// TODO: consider to add last usage date
 }
 
 func New(
-	accessToken *accesstoken.AccessToken,
+	accessToken *AccessToken,
 	refreshToken *string,
-	networkType usernetwork.UserNetworkType,
+	networkType UserNetworkType,
 	userDeviceType string,
 	userDeviceId string,
 	userMongoId *primitive.ObjectID,
@@ -93,12 +91,12 @@ func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken,
 	}
 
 	return &UserAuthToken{
-		AccessToken: accesstoken.AccessToken{
+		AccessToken: AccessToken{
 			Value:          sessionAccessToken,
 			ExpirationDate: primitive.DateTime(sessionAccessTokenExpirationDate),
 		},
 		RefreshToken:   sessionRefreshToken,
-		NetworkType:    usernetwork.UserNetworkType(networkType),
+		NetworkType:    UserNetworkType(networkType),
 		UserDeviceType: sessionDeviceType,
 		UserDeviceId:   sessionDeviceId,
 		UserMongoId:    &sessionUserMongoId,

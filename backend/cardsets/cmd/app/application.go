@@ -3,7 +3,7 @@ package main
 import (
 	"cardsets/cmd/internal/cardset"
 	"github.com/alexedwards/scs/v2"
-	"models/user"
+	"models"
 	"net/http"
 	"tools/apphelpers"
 	"tools/logger"
@@ -16,7 +16,7 @@ type application struct {
 	sessionManager    *scs.SessionManager
 	mongoWrapper      *mongowrapper.MongoWrapper
 	cardSetRepository *cardset.Repository
-	sessionValidator  user.SessionValidator
+	sessionValidator  models.SessionValidator
 }
 
 func (app *application) GetLogger() *logger.Logger {

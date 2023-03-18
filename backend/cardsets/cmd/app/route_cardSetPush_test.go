@@ -7,10 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"models/accesstoken"
-	"models/user"
-	"models/userauthtoken"
-	"models/usernetwork"
+	"models"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,11 +26,11 @@ type CardSetPushTestSuite struct {
 	suite.Suite
 	test.BaseTestSuite
 	application      *application
-	sessionValidator *user.MockSessionValidator
+	sessionValidator *models.MockSessionValidator
 }
 
 func (suite *CardSetPushTestSuite) SetupTest() {
-	suite.sessionValidator = user.NewMockSessionValidator()
+	suite.sessionValidator = models.NewMockSessionValidator()
 
 	sessionManager := apphelpers.CreateSessionManager("172.16.0.3:6380")
 	app, err := createApplication(
@@ -76,10 +73,10 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithCookieButWithoutLastModif
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUnauthorized() {
-	suite.sessionValidator.ResponseProvider = func() user.MockSessionValidatorResponse {
-		return user.MockSessionValidatorResponse{
+	suite.sessionValidator.ResponseProvider = func() models.MockSessionValidatorResponse {
+		return models.MockSessionValidatorResponse{
 			nil,
-			user.NewValidateSessionError(http.StatusUnauthorized, errors.New("test error")),
+			models.NewValidateSessionError(http.StatusUnauthorized, errors.New("test error")),
 		}
 	}
 
@@ -319,8 +316,8 @@ func (suite *CardSetPushTestSuite) createPushRequest(lastModificationDate *time.
 }
 
 func (suite *CardSetPushTestSuite) setupPushValidator(userId *primitive.ObjectID) {
-	suite.sessionValidator.ResponseProvider = func() user.MockSessionValidatorResponse {
-		return user.MockSessionValidatorResponse{
+	suite.sessionValidator.ResponseProvider = func() models.MockSessionValidatorResponse {
+		return models.MockSessionValidatorResponse{
 			createUserAuthToken(userId),
 			nil,
 		}
@@ -361,12 +358,12 @@ func createApiCard(creationId string) *api.ApiCard {
 	}
 }
 
-func createUserAuthToken(userId *primitive.ObjectID) *userauthtoken.UserAuthToken {
-	return &userauthtoken.UserAuthToken{
+func createUserAuthToken(userId *primitive.ObjectID) *models.UserAuthToken {
+	return &models.UserAuthToken{
 		Id:          tools.Ptr(primitive.NewObjectID()),
 		UserMongoId: userId,
-		NetworkType: usernetwork.Google,
-		AccessToken: accesstoken.AccessToken{
+		NetworkType: models.Google,
+		AccessToken: models.AccessToken{
 			Value:          "testAccessToken",
 			ExpirationDate: primitive.NewDateTimeFromTime(time.Now()),
 		},

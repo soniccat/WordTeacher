@@ -1,9 +1,8 @@
-package user
+package models
 
 import (
 	"errors"
 	"github.com/alexedwards/scs/v2"
-	"models/userauthtoken"
 	"net/http"
 	"tools/apphelpers"
 )
@@ -25,7 +24,7 @@ func (v *ValidateSessionError) Error() string {
 }
 
 type SessionValidator interface {
-	Validate(r *http.Request) (*userauthtoken.UserAuthToken, *ValidateSessionError)
+	Validate(r *http.Request) (*UserAuthToken, *ValidateSessionError)
 }
 
 type SessionManagerValidator struct {
@@ -40,14 +39,14 @@ func NewSessionManagerValidator(sm *scs.SessionManager) SessionValidator {
 //	return v
 //}
 
-func (v *SessionManagerValidator) Validate(r *http.Request) (*userauthtoken.UserAuthToken, *ValidateSessionError) {
+func (v *SessionManagerValidator) Validate(r *http.Request) (*UserAuthToken, *ValidateSessionError) {
 	return validateSession(r, v.SessionManager)
 }
 
 func validateSession(
 	r *http.Request,
 	sessionManager *scs.SessionManager,
-) (*userauthtoken.UserAuthToken, *ValidateSessionError) {
+) (*UserAuthToken, *ValidateSessionError) {
 	_, err := r.Cookie(apphelpers.CookieSession)
 	if err != nil {
 		return nil, NewValidateSessionError(http.StatusUnauthorized, err)
@@ -65,7 +64,7 @@ func validateSession(
 	}
 
 	// Parse session data and check if it's expired
-	userAuthToken, err := userauthtoken.Load(r.Context(), sessionManager)
+	userAuthToken, err := Load(r.Context(), sessionManager)
 	if err != nil {
 		return nil, NewValidateSessionError(http.StatusUnauthorized, err)
 	}

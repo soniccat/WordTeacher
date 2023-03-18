@@ -6,8 +6,7 @@ import (
 	"errors"
 	"github.com/gorilla/mux"
 	"google.golang.org/api/idtoken"
-	"models/user"
-	"models/usernetwork"
+	"models"
 	"net/http"
 	"tools/apphelpers"
 )
@@ -86,8 +85,8 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Resolve user and userNetwork
-	var aUser *user.User
-	var userNetwork *usernetwork.UserNetwork
+	var aUser *models.User
+	var userNetwork *models.UserNetwork
 
 	if networkType == "google" {
 		aUser, userNetwork, err = app.resolveGoogleUser(r.Context(), &credentials)
@@ -108,8 +107,8 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 
 	// Create user if needed
 	if aUser == nil {
-		aUser = &user.User{
-			Networks: []usernetwork.UserNetwork{*userNetwork},
+		aUser = &models.User{
+			Networks: []models.UserNetwork{*userNetwork},
 		}
 		newUser, err := app.userModel.InsertUser(r.Context(), aUser)
 		if err != nil {
@@ -153,7 +152,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 func (app *application) resolveGoogleUser(
 	context context.Context,
 	credentials *AuthInput,
-) (*user.User, *usernetwork.UserNetwork, error) {
+) (*models.User, *models.UserNetwork, error) {
 
 	validator, err := idtoken.NewValidator(context)
 	if err != nil {
@@ -187,8 +186,8 @@ func (app *application) resolveGoogleUser(
 	}
 
 	// TODO: if user exists, update its network if it changed
-	userNetwork := &usernetwork.UserNetwork{
-		NetworkType:   usernetwork.Google,
+	userNetwork := &models.UserNetwork{
+		NetworkType:   models.Google,
 		NetworkUserId: googleUserId,
 		Email:         googleEmail,
 		Name:          googleName,

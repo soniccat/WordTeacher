@@ -4,9 +4,8 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"models"
 	"models/tools"
-	user2 "models/user"
-	"models/usernetwork"
 	"testing"
 	"tools/test"
 )
@@ -27,10 +26,10 @@ func (suite *UserModelTestSuite) SetupTest() {
 
 func (suite *UserModelTestSuite) TestUserCreationExample() {
 	ctx := context.Background()
-	user := &user2.User{
-		Networks: []usernetwork.UserNetwork{
+	user := &models.User{
+		Networks: []models.UserNetwork{
 			{
-				usernetwork.Google,
+				models.Google,
 				"testUserId",
 				"testEmail",
 				"testName",

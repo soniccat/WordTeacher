@@ -5,18 +5,16 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"models/accesstoken"
-	"models/userauthtoken"
-	"models/usernetwork"
+	"models"
 	"time"
 )
 
 func GenerateUserAuthToken(
 	userId *primitive.ObjectID,
-	networkType usernetwork.UserNetworkType,
+	networkType models.UserNetworkType,
 	deviceType string,
 	deviceId string,
-) (*userauthtoken.UserAuthToken, error) {
+) (*models.UserAuthToken, error) {
 	accessTokenValue, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
@@ -27,12 +25,12 @@ func GenerateUserAuthToken(
 		return nil, err
 	}
 
-	return &userauthtoken.UserAuthToken{
+	return &models.UserAuthToken{
 		UserMongoId: userId,
 		NetworkType: networkType,
-		AccessToken: accesstoken.AccessToken{
+		AccessToken: models.AccessToken{
 			Value:          accessTokenValue.String(),
-			ExpirationDate: primitive.NewDateTimeFromTime(time.Now().Add(userauthtoken.AccessTokenTimeout)),
+			ExpirationDate: primitive.NewDateTimeFromTime(time.Now().Add(models.AccessTokenTimeout)),
 		},
 		RefreshToken:   refreshTokenValue.String(),
 		UserDeviceType: deviceType,
@@ -40,12 +38,12 @@ func GenerateUserAuthToken(
 	}, nil
 }
 
-func SaveUserAuthTokenAsSession(sd *userauthtoken.UserAuthToken, context context.Context, manager *scs.SessionManager) {
-	manager.Put(context, userauthtoken.SessionAccessTokenKey, sd.AccessToken.Value)
-	manager.Put(context, userauthtoken.SessionAccessTokenExpirationDateKey, int64(sd.AccessToken.ExpirationDate))
-	manager.Put(context, userauthtoken.SessionRefreshTokenKey, sd.RefreshToken)
-	manager.Put(context, userauthtoken.SessionNetworkTypeKey, int8(sd.NetworkType))
-	manager.Put(context, userauthtoken.SessionUserMongoIdKey, sd.UserMongoId.Hex())
-	manager.Put(context, userauthtoken.SessionUserDeviceType, sd.UserDeviceType)
-	manager.Put(context, userauthtoken.SessionUserDeviceId, sd.UserDeviceId)
+func SaveUserAuthTokenAsSession(sd *models.UserAuthToken, context context.Context, manager *scs.SessionManager) {
+	manager.Put(context, models.SessionAccessTokenKey, sd.AccessToken.Value)
+	manager.Put(context, models.SessionAccessTokenExpirationDateKey, int64(sd.AccessToken.ExpirationDate))
+	manager.Put(context, models.SessionRefreshTokenKey, sd.RefreshToken)
+	manager.Put(context, models.SessionNetworkTypeKey, int8(sd.NetworkType))
+	manager.Put(context, models.SessionUserMongoIdKey, sd.UserMongoId.Hex())
+	manager.Put(context, models.SessionUserDeviceType, sd.UserDeviceType)
+	manager.Put(context, models.SessionUserDeviceId, sd.UserDeviceId)
 }

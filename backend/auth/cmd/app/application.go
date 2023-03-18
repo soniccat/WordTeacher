@@ -6,8 +6,7 @@ import (
 	"context"
 	"github.com/alexedwards/scs/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"models/userauthtoken"
-	"models/usernetwork"
+	"models"
 	"tools/logger"
 	"tools/mongowrapper"
 )
@@ -44,10 +43,10 @@ func (app *application) stop() {
 func (app *application) GenerateUserAuthToken(
 	context context.Context,
 	userMongoId *primitive.ObjectID,
-	networkType usernetwork.UserNetworkType,
+	networkType models.UserNetworkType,
 	deviceType string,
 	deviceId string,
-) (*userauthtoken.UserAuthToken, error) {
+) (*models.UserAuthToken, error) {
 	token, err := app.userModel.GenerateUserAuthToken(
 		context,
 		userMongoId,

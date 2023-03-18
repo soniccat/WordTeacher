@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"models/userauthtoken"
+	"models"
 	"net/http"
 	"tools/apphelpers"
 )
@@ -60,7 +60,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userAuthToken, err := userauthtoken.Load(r.Context(), app.sessionManager)
+	userAuthToken, err := models.Load(r.Context(), app.sessionManager)
 	if err != nil {
 		apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
 		return

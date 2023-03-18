@@ -1,4 +1,4 @@
-package usernetwork
+package models
 
 type UserNetworkType int
 

@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
-	"models/user"
+	"models"
 	"net/http"
 	"runtime/debug"
 	"time"
@@ -32,7 +32,7 @@ func main() {
 		sessionManager,
 		*mongoURI,
 		*enableCredentials,
-		user.NewSessionManagerValidator(sessionManager),
+		models.NewSessionManagerValidator(sessionManager),
 	)
 	defer func() {
 		app.stop()
@@ -69,7 +69,7 @@ func createApplication(
 	sessionManager *scs.SessionManager,
 	mongoURI string,
 	enableCredentials bool,
-	sessionValidator user.SessionValidator,
+	sessionValidator models.SessionValidator,
 ) (*application, error) {
 	app := &application{
 		logger:           logger.New(isDebug),
