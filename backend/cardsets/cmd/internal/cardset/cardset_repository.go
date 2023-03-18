@@ -1,6 +1,7 @@
 package cardset
 
 import (
+	"api"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -9,9 +10,9 @@ import (
 	"models/apphelpers"
 	"models/logger"
 	"models/mongowrapper"
-	"models/tools"
 	"net/http"
 	"time"
+	"tools"
 )
 
 var zeroTime = time.Time{}
@@ -61,7 +62,7 @@ func (m *Repository) DeleteCardSet(
 
 func (m *Repository) UpdateCardSet(
 	ctx context.Context,
-	cardSet *ApiCardSet,
+	cardSet *api.ApiCardSet,
 ) *apphelpers.ErrorWithCode {
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
@@ -72,7 +73,7 @@ func (m *Repository) UpdateCardSet(
 		}
 	}
 
-	newCardSetDb, err := cardSet.toDb()
+	newCardSetDb, err := ApiCardSetToDb(cardSet)
 	if err != nil {
 		return apphelpers.NewErrorWithCode(err, http.StatusBadRequest)
 	}
@@ -118,9 +119,9 @@ func (m *Repository) loadCardSetDb(
 
 func (m *Repository) InsertCardSet(
 	ctx context.Context,
-	cardSet *ApiCardSet,
+	cardSet *api.ApiCardSet,
 	userId *primitive.ObjectID,
-) (*ApiCardSet, *apphelpers.ErrorWithCode) {
+) (*api.ApiCardSet, *apphelpers.ErrorWithCode) {
 	cardSet.UserId = userId.Hex()
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
@@ -131,7 +132,7 @@ func (m *Repository) InsertCardSet(
 		}
 	}
 
-	cardSetDb, err := cardSet.toDb()
+	cardSetDb, err := ApiCardSetToDb(cardSet)
 	if err != nil {
 		return nil, apphelpers.NewErrorWithCode(err, http.StatusBadRequest)
 	}
@@ -190,7 +191,7 @@ func (m *Repository) ModifiedCardSetsSince(
 	ctx context.Context,
 	userId *primitive.ObjectID,
 	lastModificationDate *time.Time,
-) ([]*ApiCardSet, error) {
+) ([]*api.ApiCardSet, error) {
 	var date time.Time
 	if lastModificationDate != nil {
 		date = *lastModificationDate
@@ -245,7 +246,7 @@ func (m *Repository) DeleteCardSets(
 func (m *Repository) CardSetsNotInList(
 	ctx context.Context,
 	ids []*primitive.ObjectID,
-) ([]*ApiCardSet, error) {
+) ([]*api.ApiCardSet, error) {
 	var cardSetDbs []*DbCardSet
 	cursor, err := m.CardSetCollection.Find(ctx, bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}})
 	if err != nil {

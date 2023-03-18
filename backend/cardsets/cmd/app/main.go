@@ -1,11 +1,11 @@
 package main
 
 import (
+	"cardsets/cmd/internal/cardset"
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
 	"models/apphelpers"
-	"models/cardset"
 	"models/logger"
 	"models/mongowrapper"
 	"models/user"

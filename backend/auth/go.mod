@@ -2,6 +2,9 @@ module auth
 
 go 1.19
 
+require tools v0.0.1
+replace tools => ../tools
+
 require models v0.0.1
 replace models => ../models
 

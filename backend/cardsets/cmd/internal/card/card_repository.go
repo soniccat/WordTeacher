@@ -1,13 +1,14 @@
 package card
 
 import (
+	"api"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"models/logger"
 	"models/mongowrapper"
-	"models/tools"
+	"tools"
 )
 
 type Repository struct {
@@ -26,18 +27,18 @@ func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *Repository {
 
 func (cm *Repository) SyncCards(
 	ctx context.Context, // transaction is required
-	actualCards []*ApiCard,
+	actualCards []*api.ApiCard,
 	currentCardIds []*primitive.ObjectID,
 	userId *primitive.ObjectID,
-) ([]*ApiCard, error) {
+) ([]*api.ApiCard, error) {
 
 	// initialize empty slices on purpose as mongo Api will crash on nils
-	newCards := []*ApiCard{}
+	newCards := []*api.ApiCard{}
 	deletedCards := []*primitive.ObjectID{}
-	updatedCards := []*ApiCard{}
-	actualCardsWithIds := []*ApiCard{}
+	updatedCards := []*api.ApiCard{}
+	actualCardsWithIds := []*api.ApiCard{}
 
-	actualCardIds, err := tools.MapNotNilOrError(actualCards, func(c *ApiCard) (*primitive.ObjectID, error) {
+	actualCardIds, err := tools.MapNotNilOrError(actualCards, func(c *api.ApiCard) (*primitive.ObjectID, error) {
 		if len((*c).Id) == 0 {
 			newCards = append(newCards, c)
 			return nil, nil
@@ -121,7 +122,7 @@ func (cm *Repository) DeleteByIds(context context.Context, ids []*primitive.Obje
 
 func (cm *Repository) ReplaceCards(
 	context context.Context,
-	cards []*ApiCard,
+	cards []*api.ApiCard,
 ) ([]*DbCard, error) {
 	var cardDbs []*DbCard
 
@@ -131,7 +132,7 @@ func (cm *Repository) ReplaceCards(
 			return nil, err
 		}
 
-		cardDb, err := card.ToDb()
+		cardDb, err := ApiCardToDb(card)
 		if err != nil {
 			return nil, err
 		}
@@ -171,12 +172,12 @@ func (cm *Repository) ReplaceCards(
 
 func (cm *Repository) InsertCards(
 	context context.Context,
-	cards []*ApiCard,
+	cards []*api.ApiCard,
 	userId *primitive.ObjectID,
 ) ([]*DbCard, error) {
 	var cardDbs []*DbCard
-	cardDbs, err := tools.MapOrError(cards, func(c *ApiCard) (*DbCard, error) {
-		cardDb, e := c.ToDb()
+	cardDbs, err := tools.MapOrError(cards, func(c *api.ApiCard) (*DbCard, error) {
+		cardDb, e := ApiCardToDb(c)
 		if cardDb != nil {
 			cardDb.UserId = userId
 		}

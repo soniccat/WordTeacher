@@ -2,8 +2,13 @@ module cardsets
 
 go 1.19
 
-require models v0.0.0
+require tools v0.0.0
+replace tools => ../tools
 
+require api v0.0.0
+replace api => ../api
+
+require models v0.0.0
 replace models => ../models
 
 require (

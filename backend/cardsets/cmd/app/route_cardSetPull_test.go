@@ -1,20 +1,19 @@
 package main
 
 import (
+	"api"
 	"bytes"
 	"context"
 	"fmt"
 	"models/apphelpers"
-	"models/card"
-	"models/cardset"
 	"models/test"
-	"models/tools"
 	"models/user"
 	"net/http"
 	"net/http/httptest"
 	"sort"
 	"testing"
 	"time"
+	"tools"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -63,13 +62,13 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 		"oldTestCardSet1",
 		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(10)),
-		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
+		[]*api.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
 		suite.CreateUUID().String(),
 		time.Now(),
-		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
+		[]*api.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -93,9 +92,9 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 	assert.Len(suite.T(), response.DeletedCardSetIds, 0)
 	assert.Len(suite.T(), response.UpdatedCardSets, 2)
 
-	expectedCardSets := cardset.ApiCardSetSortByName([]*cardset.ApiCardSet{oldCardSet, oldCardSet2})
+	expectedCardSets := api.ApiCardSetSortByName([]*api.ApiCardSet{oldCardSet, oldCardSet2})
 	sort.Sort(expectedCardSets)
-	actualCardSets := cardset.ApiCardSetSortByName(response.UpdatedCardSets)
+	actualCardSets := api.ApiCardSetSortByName(response.UpdatedCardSets)
 	sort.Sort(actualCardSets)
 
 	assert.Equal(suite.T(), expectedCardSets, actualCardSets)
@@ -106,14 +105,14 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_Retu
 		"oldTestCardSet1",
 		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(20)),
-		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
+		[]*api.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
 		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(10)),
-		[]*card.ApiCard{createApiCard(suite.CreateUUID().String())},
+		[]*api.ApiCard{createApiCard(suite.CreateUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())

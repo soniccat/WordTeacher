@@ -1,11 +1,11 @@
 package main
 
 import (
+	"api"
 	"context"
 	"encoding/json"
 	"errors"
 	"models/apphelpers"
-	"models/cardset"
 	"net/http"
 	"time"
 
@@ -19,8 +19,8 @@ type CardSetPullInput struct {
 }
 
 type CardSetPullResponse struct {
-	UpdatedCardSets   []*cardset.ApiCardSet `json:"updatedCardSets,omitempty"`
-	DeletedCardSetIds []string              `json:"deletedCardSetIds,omitempty"`
+	UpdatedCardSets   []*api.ApiCardSet `json:"updatedCardSets,omitempty"`
+	DeletedCardSetIds []string          `json:"deletedCardSetIds,omitempty"`
 }
 
 func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {

@@ -2,6 +2,9 @@ module models
 
 go 1.19
 
+require tools v0.0.0
+replace tools => ../tools
+
 require (
 	github.com/alexedwards/scs/redisstore v0.0.0-20220528130143-d93ace5be94b
 	github.com/alexedwards/scs/v2 v2.5.0

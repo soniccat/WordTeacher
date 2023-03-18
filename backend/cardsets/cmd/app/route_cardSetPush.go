@@ -1,16 +1,16 @@
 package main
 
 import (
+	"api"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"models/apphelpers"
-	"models/cardset"
-	"models/tools"
 	"net/http"
 	"sync"
 	"time"
+	"tools"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -25,8 +25,8 @@ const (
 type CardSetPushInput struct {
 	// for card sets without id creates a card set or find already inserted one with deduplication Id.
 	// for card sets with id write a card set data
-	UpdatedCardSets   []*cardset.ApiCardSet `json:"updatedCardSets"`
-	CurrentCardSetIds []string              `json:"currentCardSetIds"`
+	UpdatedCardSets   []*api.ApiCardSet `json:"updatedCardSets"`
+	CurrentCardSetIds []string          `json:"currentCardSetIds"`
 }
 
 type CardSetPushResponse struct {
@@ -178,7 +178,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) handleUpdatedCardSets(
 	ctx context.Context, // transaction is required
-	updatedCardSets []*cardset.ApiCardSet,
+	updatedCardSets []*api.ApiCardSet,
 	userId *primitive.ObjectID,
 ) (*CardSetPushResponse, error) {
 	// validate

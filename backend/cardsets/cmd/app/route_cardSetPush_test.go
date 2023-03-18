@@ -1,15 +1,16 @@
 package main
 
 import (
+	"api"
 	"bytes"
+	"cardsets/cmd/internal/card"
+	cardset2 "cardsets/cmd/internal/cardset"
 	"context"
 	"errors"
 	"fmt"
 	"models/accesstoken"
 	"models/apphelpers"
-	"models/card"
 	"models/cardset"
-	"models/partofspeech"
 	"models/test"
 	"models/tools"
 	"models/user"
@@ -297,7 +298,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 
 // Tools
 
-func (suite *CardSetPushTestSuite) loadCardSetDbById(id string) *cardset.DbCardSet {
+func (suite *CardSetPushTestSuite) loadCardSetDbById(id string) *cardset2.DbCardSet {
 	dbCardSet, err := suite.application.cardSetRepository.LoadCardSetDbById(context.Background(), id)
 	if err != nil {
 		suite.T().Fatal(err)
@@ -346,7 +347,7 @@ func createApiCard(creationId string) *card.ApiCard {
 	return &card.ApiCard{
 		Term:          "testTerm1",
 		Transcription: tools.Ptr("testTranscription"),
-		PartOfSpeech:  partofspeech.Adverb,
+		PartOfSpeech:  api.Adverb,
 		Definitions:   []string{"testDef1", "testDef2"},
 		Synonyms:      []string{"testSyn1", "testSyn2"},
 		Examples:      []string{"testEx1", "testEx2"},

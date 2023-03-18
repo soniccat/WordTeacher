@@ -1,4 +1,4 @@
-package partofspeech
+package api
 
 type PartOfSpeech = uint8
 
