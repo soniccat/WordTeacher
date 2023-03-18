@@ -12,7 +12,6 @@ import (
 	"tools/mongowrapper"
 )
 
-// TODO: move in auth module
 type UserRepository struct {
 	Logger         *logger.Logger
 	UserCollection *mongo.Collection
@@ -65,7 +64,6 @@ func (m *UserRepository) InsertUser(context context.Context, user *user.User) (*
 	return &newUser, nil
 }
 
-// TODO: move in auth module
 func (m *UserRepository) GenerateUserAuthToken(
 	context context.Context,
 	userId *primitive.ObjectID,
@@ -81,7 +79,6 @@ func (m *UserRepository) GenerateUserAuthToken(
 	return m.insertUserAuthToken(context, token)
 }
 
-// TODO: move in auth module
 func (m *UserRepository) insertUserAuthToken(
 	context context.Context,
 	token *userauthtoken.UserAuthToken,
