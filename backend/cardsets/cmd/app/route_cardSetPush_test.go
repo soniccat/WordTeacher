@@ -2,6 +2,7 @@ package main
 
 import (
 	"api"
+	"auth/internal"
 	"bytes"
 	"cardsets/cmd/internal/card"
 	cardset2 "cardsets/cmd/internal/cardset"
@@ -81,7 +82,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUna
 	suite.sessionValidator.ResponseProvider = func() user.MockSessionValidatorResponse {
 		return user.MockSessionValidatorResponse{
 			nil,
-			user.NewValidateSessionError(http.StatusUnauthorized, errors.New("test error")),
+			internal.NewValidateSessionError(http.StatusUnauthorized, errors.New("test error")),
 		}
 	}
 

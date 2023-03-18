@@ -1,9 +1,9 @@
 package main
 
 import (
+	"auth/internal"
 	"flag"
 	"fmt"
-	"models/user"
 	"net/http"
 	"runtime/debug"
 	"time"
@@ -70,7 +70,7 @@ func createApplication(
 		return nil, err
 	}
 
-	app.userModel = user.New(app.logger, app.mongoWrapper.Client)
+	app.userModel = internal.New(app.logger, app.mongoWrapper.Client)
 
 	return app, nil
 }

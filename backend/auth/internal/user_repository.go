@@ -1,10 +1,11 @@
-package user
+package internal
 
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"models/user"
 	"models/userauthtoken"
 	"models/usernetwork"
 	"tools/logger"
@@ -29,8 +30,8 @@ func New(logger *logger.Logger, mongoClient *mongo.Client) *UserRepository {
 	return model
 }
 
-func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *string) (*User, error) {
-	var user = User{}
+func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *string) (*user.User, error) {
+	var user = user.User{}
 
 	err := m.UserCollection.FindOne(
 		context,
@@ -50,7 +51,7 @@ func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *s
 	return &user, err
 }
 
-func (m *UserRepository) InsertUser(context context.Context, user *User) (*User, error) {
+func (m *UserRepository) InsertUser(context context.Context, user *user.User) (*user.User, error) {
 	res, err := m.UserCollection.InsertOne(context, user)
 	if err != nil {
 		return nil, err
@@ -109,20 +110,4 @@ func (m *UserRepository) insertUserAuthToken(
 
 	token.Id = &objId
 	return token, nil
-}
-
-type ValidateSessionError struct {
-	StatusCode int
-	InnerError error
-}
-
-func NewValidateSessionError(code int, err error) *ValidateSessionError {
-	return &ValidateSessionError{
-		StatusCode: code,
-		InnerError: err,
-	}
-}
-
-func (v *ValidateSessionError) Error() string {
-	return v.InnerError.Error()
 }

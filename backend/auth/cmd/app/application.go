@@ -1,10 +1,10 @@
 package main
 
 import (
+	"auth/internal"
 	"context"
 	"github.com/alexedwards/scs/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"models/user"
 	"models/userauthtoken"
 	"models/usernetwork"
 	"tools/logger"
@@ -16,7 +16,7 @@ type application struct {
 	logger         *logger.Logger
 	sessionManager *scs.SessionManager
 	mongoWrapper   *mongowrapper.MongoWrapper
-	userModel      *user.UserRepository
+	userModel      *internal.UserRepository
 }
 
 func (a *application) GetLogger() *logger.Logger {

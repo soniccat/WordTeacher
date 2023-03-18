@@ -1,10 +1,11 @@
-package user
+package internal
 
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"models/tools"
+	user2 "models/user"
 	"models/usernetwork"
 	"testing"
 	"tools/test"
@@ -26,7 +27,7 @@ func (suite *UserModelTestSuite) SetupTest() {
 
 func (suite *UserModelTestSuite) TestUserCreationExample() {
 	ctx := context.Background()
-	user := &User{
+	user := &user2.User{
 		Networks: []usernetwork.UserNetwork{
 			{
 				usernetwork.Google,

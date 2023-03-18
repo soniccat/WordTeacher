@@ -8,6 +8,22 @@ import (
 	"tools/apphelpers"
 )
 
+type ValidateSessionError struct {
+	StatusCode int
+	InnerError error
+}
+
+func NewValidateSessionError(code int, err error) *ValidateSessionError {
+	return &ValidateSessionError{
+		StatusCode: code,
+		InnerError: err,
+	}
+}
+
+func (v *ValidateSessionError) Error() string {
+	return v.InnerError.Error()
+}
+
 type SessionValidator interface {
 	Validate(r *http.Request) (*userauthtoken.UserAuthToken, *ValidateSessionError)
 }
