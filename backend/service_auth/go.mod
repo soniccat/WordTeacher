@@ -1,4 +1,4 @@
-module auth
+module service_auth
 
 go 1.19
 

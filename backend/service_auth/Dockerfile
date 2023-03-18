@@ -4,7 +4,7 @@ FROM golang:1.19.2-alpine AS builder
 RUN adduser --disabled-password --gecos '' elf
 # create workspace
 WORKDIR /opt/app/
-COPY ./cardsets/go.mod ./cardsets/go.sum ./
+COPY ./auth/go.mod ./auth/go.sum ./
 RUN mkdir /opt/models
 COPY ../models/go.mod ../models/go.sum ../models
 # fetch dependancies
@@ -14,12 +14,12 @@ COPY . .
 # build binary
 RUN pwd
 RUN ls -alh
-RUN ls -alh ./cardsets
+RUN ls -alh ./service_auth
 RUN ls -alh ./models
-WORKDIR /opt/app/cardsets
+WORKDIR /opt/app/auth
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo -o /go/bin/ ./cmd/app
 
-EXPOSE 4001
+EXPOSE 4000
 
 # build a small image
 FROM alpine:3.14.1

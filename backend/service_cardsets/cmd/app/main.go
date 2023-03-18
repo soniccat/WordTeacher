@@ -1,11 +1,13 @@
 package main
 
 import (
-	"auth/internal"
 	"flag"
 	"fmt"
+	"github.com/alexedwards/scs/v2"
+	"models"
 	"net/http"
 	"runtime/debug"
+	"service_cardsets/cmd/internal/cardset"
 	"time"
 	"tools/apphelpers"
 	"tools/logger"
@@ -16,15 +18,22 @@ func main() {
 	// Define command-line flags
 	isDebug := flag.Bool("debugMode", false, "Shows stack traces in logs")
 	serverAddr := flag.String("serverAddr", "", "HTTP server network address")
-	serverPort := flag.Int("serverPort", 4000, "HTTP server network port")
+	serverPort := flag.Int("serverPort", 4001, "HTTP server network port")
 
-	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?replicaSet=rs0", "Database hostname url")
+	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
 	flag.Parse()
 
-	app, err := createApplication(*isDebug, *redisAddress, *mongoURI, *enableCredentials)
+	sessionManager := apphelpers.CreateSessionManager(*redisAddress)
+	app, err := createApplication(
+		*isDebug,
+		sessionManager,
+		*mongoURI,
+		*enableCredentials,
+		models.NewSessionManagerValidator(sessionManager),
+	)
 	defer func() {
 		app.stop()
 	}()
@@ -57,20 +66,22 @@ func main() {
 
 func createApplication(
 	isDebug bool,
-	redisAddress string,
+	sessionManager *scs.SessionManager,
 	mongoURI string,
 	enableCredentials bool,
+	sessionValidator models.SessionValidator,
 ) (*application, error) {
 	app := &application{
-		logger:         logger.New(isDebug),
-		sessionManager: apphelpers.CreateSessionManager(redisAddress),
+		logger:           logger.New(isDebug),
+		sessionManager:   sessionManager,
+		sessionValidator: sessionValidator,
 	}
 	err := mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
 	if err != nil {
 		return nil, err
 	}
 
-	app.userModel = internal.New(app.logger, app.mongoWrapper.Client)
+	app.cardSetRepository = cardset.New(app.logger, app.mongoWrapper.Client)
 
 	return app, nil
 }

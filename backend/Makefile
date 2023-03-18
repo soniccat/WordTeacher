@@ -48,7 +48,7 @@ test.integration.debug:
 	$(ENV_LOCAL_TEST) \
 	go test -tags=integration $(INTEGRATION_TEST_PATH) -count=1 -v -run=$(INTEGRATION_TEST_SUITE_PATH)
 
-# auth
+# service_auth
 
 authup:
 	docker stop auth || true
@@ -73,7 +73,7 @@ authrun:
 authclearandbuild: authrm authbuild
 authclearandrun: authclearandbuild authrun
 
-# cardsets
+# service_cardsets
 
 cardsetsup:
 	docker stop cardsets || true
@@ -97,18 +97,18 @@ cardsetsrun:
 
 #
 #cardsetsstop:
-#	docker container stop cardsets
+#	docker container stop service_cardsets
 #
 #cardsetsrm: cardsetsstop
-#	docker container rm cardsets
-#	docker image rm cardsets
+#	docker container rm service_cardsets
+#	docker image rm service_cardsets
 #
 #cardsetsbuild:
-#	docker build -t cardsets -f ./CardSets.Dockerfile .
-#	docker container create -p 4001:4001 --name cardsets cardsets
+#	docker build -t service_cardsets -f ./CardSets.Dockerfile .
+#	docker container create -p 4001:4001 --name service_cardsets service_cardsets
 #
 #cardsetsrun:
-#	docker start cardsets
+#	docker start service_cardsets
 #
 #cardsetsclearandbuild: cardsetsrm cardsetsbuild
 #cardsetsclearandrun: cardsetsclearandbuild cardsetsrun

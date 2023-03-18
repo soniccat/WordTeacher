@@ -70,7 +70,7 @@ func validateSession(
 	}
 
 	if !userAuthToken.IsValid() {
-		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
+		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid service_auth token"))
 	}
 
 	if !userAuthToken.IsMatched(
@@ -79,7 +79,7 @@ func validateSession(
 		deviceType,
 		deviceId,
 	) {
-		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
+		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid service_auth token"))
 	}
 
 	return userAuthToken, nil

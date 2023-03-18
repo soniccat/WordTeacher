@@ -1,4 +1,4 @@
-module cardsets
+module service_cardsets
 
 go 1.19
 

@@ -1,12 +1,12 @@
 package main
 
 import (
-	"auth/internal"
-	appUsearAuthToken "auth/internal/userauthtoken"
 	"context"
 	"github.com/alexedwards/scs/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"models"
+	"service_auth/internal"
+	appUsearAuthToken "service_auth/internal/userauthtoken"
 	"tools/logger"
 	"tools/mongowrapper"
 )

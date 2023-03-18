@@ -1,10 +1,10 @@
 package main
 
 import (
-	"cardsets/cmd/internal/cardset"
 	"github.com/alexedwards/scs/v2"
 	"models"
 	"net/http"
+	"service_cardsets/cmd/internal/cardset"
 	"tools/apphelpers"
 	"tools/logger"
 	"tools/mongowrapper"

@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   auth:
-    container_name: "auth${TEST_SUFFIX}"
+    container_name: "service_auth${TEST_SUFFIX}"
     build:
       context: ./
       dockerfile: ./Auth.Dockerfile
@@ -22,7 +22,7 @@ services:
         published: "${SERVICE_AUTH_PORT}"
 
   cardsets:
-    container_name: "cardsets${TEST_SUFFIX}"
+    container_name: "service_cardsets${TEST_SUFFIX}"
     build:
       context: ./
       args:

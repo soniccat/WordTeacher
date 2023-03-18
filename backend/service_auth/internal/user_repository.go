@@ -1,12 +1,12 @@
 package internal
 
 import (
-	appUsearAuthToken "auth/internal/userauthtoken"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"models"
+	appUsearAuthToken "service_auth/internal/userauthtoken"
 	"tools/logger"
 	"tools/mongowrapper"
 )
@@ -82,7 +82,7 @@ func (m *UserRepository) insertUserAuthToken(
 	context context.Context,
 	token *models.UserAuthToken,
 ) (*models.UserAuthToken, error) {
-	// Remove stale auth tokens
+	// Remove stale service_auth tokens
 	_, err := m.AuthTokens.DeleteMany(
 		context,
 		bson.M{
