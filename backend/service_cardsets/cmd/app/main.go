@@ -4,12 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
-	"models"
+	"models/helpers"
 	"net/http"
 	"runtime/debug"
-	"service_cardsets/cmd/internal/cardset"
+	"service_cardsets/internal/cardset"
 	"time"
-	"tools/apphelpers"
+	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
 )
@@ -26,13 +26,13 @@ func main() {
 
 	flag.Parse()
 
-	sessionManager := apphelpers.CreateSessionManager(*redisAddress)
+	sessionManager := tools.CreateSessionManager(*redisAddress)
 	app, err := createApplication(
 		*isDebug,
 		sessionManager,
 		*mongoURI,
 		*enableCredentials,
-		models.NewSessionManagerValidator(sessionManager),
+		helpers.NewSessionManagerValidator(sessionManager),
 	)
 	defer func() {
 		app.stop()
@@ -69,7 +69,7 @@ func createApplication(
 	sessionManager *scs.SessionManager,
 	mongoURI string,
 	enableCredentials bool,
-	sessionValidator models.SessionValidator,
+	sessionValidator helpers.SessionValidator,
 ) (*application, error) {
 	app := &application{
 		logger:           logger.New(isDebug),

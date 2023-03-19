@@ -1,11 +1,10 @@
-package apphelpers
+package tools
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"runtime/debug"
-	"tools"
 	"tools/logger"
 )
 
@@ -26,7 +25,7 @@ func NewErrorWithCode(err error, code int) *ErrorWithCode {
 func NewHandlerError(err error, code int, withStack bool) *HandlerError {
 	var stack *[]byte
 	if withStack {
-		stack = tools.Ptr(debug.Stack())
+		stack = Ptr(debug.Stack())
 	}
 
 	return &HandlerError{
@@ -46,7 +45,7 @@ func SetHandlerError(w http.ResponseWriter, outErr *HandlerError, logger *logger
 		stack = outErr.Stack
 
 		if stack == nil {
-			stack = tools.Ptr(debug.Stack())
+			stack = Ptr(debug.Stack())
 		}
 	}
 
@@ -98,7 +97,7 @@ type HandlerError struct {
 }
 
 func SetError(w http.ResponseWriter, outErr error, code int, logger *logger.Logger) {
-	SetErrorWithStack(w, outErr, code, logger, tools.Ptr(debug.Stack()))
+	SetErrorWithStack(w, outErr, code, logger, Ptr(debug.Stack()))
 }
 
 func SetErrorWithStack(w http.ResponseWriter, outErr error, code int, logger *logger.Logger, stack *[]byte) {

@@ -1,10 +1,11 @@
-package models
+package helpers
 
 import (
 	"errors"
 	"github.com/alexedwards/scs/v2"
+	"models"
 	"net/http"
-	"tools/apphelpers"
+	"tools"
 )
 
 type ValidateSessionError struct {
@@ -24,7 +25,7 @@ func (v *ValidateSessionError) Error() string {
 }
 
 type SessionValidator interface {
-	Validate(r *http.Request) (*UserAuthToken, *ValidateSessionError)
+	Validate(r *http.Request) (*models.UserAuthToken, *ValidateSessionError)
 }
 
 type SessionManagerValidator struct {
@@ -39,32 +40,32 @@ func NewSessionManagerValidator(sm *scs.SessionManager) SessionValidator {
 //	return v
 //}
 
-func (v *SessionManagerValidator) Validate(r *http.Request) (*UserAuthToken, *ValidateSessionError) {
+func (v *SessionManagerValidator) Validate(r *http.Request) (*models.UserAuthToken, *ValidateSessionError) {
 	return validateSession(r, v.SessionManager)
 }
 
 func validateSession(
 	r *http.Request,
 	sessionManager *scs.SessionManager,
-) (*UserAuthToken, *ValidateSessionError) {
-	_, err := r.Cookie(apphelpers.CookieSession)
+) (*models.UserAuthToken, *ValidateSessionError) {
+	_, err := r.Cookie(tools.CookieSession)
 	if err != nil {
 		return nil, NewValidateSessionError(http.StatusUnauthorized, err)
 	}
 
 	// Header params
-	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
+	var deviceId = r.Header.Get(tools.HeaderDeviceId)
 	if len(deviceId) == 0 {
 		return nil, NewValidateSessionError(http.StatusBadRequest, errors.New("invalid device id"))
 	}
 
-	var deviceType = r.Header.Get(apphelpers.HeaderDeviceType)
+	var deviceType = r.Header.Get(tools.HeaderDeviceType)
 	if len(deviceType) == 0 {
 		return nil, NewValidateSessionError(http.StatusBadRequest, errors.New("invalid device type"))
 	}
 
 	// Parse session data and check if it's expired
-	userAuthToken, err := Load(r.Context(), sessionManager)
+	userAuthToken, err := models.Load(r.Context(), sessionManager)
 	if err != nil {
 		return nil, NewValidateSessionError(http.StatusUnauthorized, err)
 	}
@@ -74,7 +75,7 @@ func validateSession(
 	}
 
 	if !userAuthToken.IsMatched(
-		r.Header.Get(apphelpers.HeaderAccessToken),
+		r.Header.Get(tools.HeaderAccessToken),
 		nil,
 		deviceType,
 		deviceId,

@@ -8,7 +8,7 @@ import (
 	"google.golang.org/api/idtoken"
 	"models"
 	"net/http"
-	"tools/apphelpers"
+	"tools"
 )
 
 // TODO: move in params
@@ -64,15 +64,15 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	networkType := params["networkType"]
 
 	// Header params
-	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
+	var deviceId = r.Header.Get(tools.HeaderDeviceId)
 	if len(deviceId) == 0 {
-		apphelpers.SetError(w, errors.New("deviceId is empty"), http.StatusBadRequest, app.logger)
+		tools.SetError(w, errors.New("deviceId is empty"), http.StatusBadRequest, app.logger)
 		return
 	}
 
-	var deviceType = r.Header.Get(apphelpers.HeaderDeviceType)
+	var deviceType = r.Header.Get(tools.HeaderDeviceType)
 	if len(deviceType) == 0 {
-		apphelpers.SetError(w, errors.New("deviceType is empty"), http.StatusBadRequest, app.logger)
+		tools.SetError(w, errors.New("deviceType is empty"), http.StatusBadRequest, app.logger)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	var credentials AuthInput
 	err := json.NewDecoder(r.Body).Decode(&credentials)
 	if err != nil {
-		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
+		tools.SetError(w, err, http.StatusBadRequest, app.logger)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 		aUser, userNetwork, err = app.resolveGoogleUser(r.Context(), &credentials)
 
 		if _, ok := err.(*AuthErrorInvalidToken); ok {
-			apphelpers.SetError(w, err, http.StatusUnauthorized, app.logger)
+			tools.SetError(w, err, http.StatusUnauthorized, app.logger)
 			return
 
 		} else if err != nil {
@@ -146,7 +146,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	apphelpers.WriteResponse(w, response, app.logger)
+	tools.WriteResponse(w, response, app.logger)
 }
 
 func (app *application) resolveGoogleUser(

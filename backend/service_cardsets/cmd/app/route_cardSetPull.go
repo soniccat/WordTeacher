@@ -5,11 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	mapset "github.com/deckarep/golang-set/v2"
 	"net/http"
 	"time"
-	"tools/apphelpers"
-
-	mapset "github.com/deckarep/golang-set/v2"
+	"tools"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -72,7 +71,7 @@ func (app *application) resolveDeletedCardIds(
 	ctx context.Context,
 	userId *primitive.ObjectID,
 	input *CardSetPullInput,
-) ([]string, *apphelpers.HandlerError) {
+) ([]string, *tools.HandlerError) {
 	userCardSetIds, err := app.cardSetRepository.CardCardSetIds(ctx, userId)
 	if err != nil {
 		return nil, app.NewHandlerError(http.StatusInternalServerError, err)

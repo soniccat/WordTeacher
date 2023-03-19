@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 	"service_auth/internal"
 	"time"
-	"tools/apphelpers"
+	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
 )
@@ -63,7 +63,7 @@ func createApplication(
 ) (*application, error) {
 	app := &application{
 		logger:         logger.New(isDebug),
-		sessionManager: apphelpers.CreateSessionManager(redisAddress),
+		sessionManager: tools.CreateSessionManager(redisAddress),
 	}
 	err := mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
 	if err != nil {

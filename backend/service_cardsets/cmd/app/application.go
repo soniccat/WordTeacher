@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/alexedwards/scs/v2"
-	"models"
+	"models/helpers"
 	"net/http"
-	"service_cardsets/cmd/internal/cardset"
-	"tools/apphelpers"
+	"service_cardsets/internal/cardset"
+	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
 )
@@ -16,7 +16,7 @@ type application struct {
 	sessionManager    *scs.SessionManager
 	mongoWrapper      *mongowrapper.MongoWrapper
 	cardSetRepository *cardset.Repository
-	sessionValidator  models.SessionValidator
+	sessionValidator  helpers.SessionValidator
 }
 
 func (app *application) GetLogger() *logger.Logger {
@@ -35,20 +35,20 @@ func (app *application) AllowStackTraces() bool {
 	return app.logger.AllowStackTraces
 }
 
-func (app *application) NewHandlerError(code int, err error) *apphelpers.HandlerError {
-	return apphelpers.NewHandlerError(err, code, app.AllowStackTraces())
+func (app *application) NewHandlerError(code int, err error) *tools.HandlerError {
+	return tools.NewHandlerError(err, code, app.AllowStackTraces())
 }
 
-func (app *application) SetHandlerError(w http.ResponseWriter, err *apphelpers.HandlerError) {
-	apphelpers.SetHandlerError(w, err, app.GetLogger())
+func (app *application) SetHandlerError(w http.ResponseWriter, err *tools.HandlerError) {
+	tools.SetHandlerError(w, err, app.GetLogger())
 }
 
 func (app *application) SetError(w http.ResponseWriter, outErr error, code int) {
-	apphelpers.SetError(w, outErr, code, app.GetLogger())
+	tools.SetError(w, outErr, code, app.GetLogger())
 }
 
 func (app *application) WriteResponse(w http.ResponseWriter, response interface{}) {
-	apphelpers.WriteResponse(w, response, app.GetLogger())
+	tools.WriteResponse(w, response, app.GetLogger())
 }
 
 type service struct {

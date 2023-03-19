@@ -2,7 +2,7 @@ package cardset
 
 import (
 	"api"
-	"service_cardsets/cmd/internal/card"
+	"service_cardsets/internal/card"
 	"time"
 	"tools"
 

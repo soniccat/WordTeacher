@@ -3,16 +3,19 @@ module service_cardsets
 go 1.19
 
 require tools v0.0.0
+
 replace tools => ../tools
 
 require api v0.0.0
+
 replace api => ../api
 
 require models v0.0.0
+
 replace models => ../models
 
 require (
-	github.com/alexedwards/scs/v2 v2.5.0
+	github.com/alexedwards/scs/v2 v2.5.1
 	github.com/deckarep/golang-set/v2 v2.1.0
 	github.com/gorilla/mux v1.8.0
 	github.com/stretchr/testify v1.7.0
@@ -20,7 +23,7 @@ require (
 )
 
 require (
-	github.com/alexedwards/scs/redisstore v0.0.0-20220528130143-d93ace5be94b // indirect
+	github.com/alexedwards/scs/redisstore v0.0.0-20230305153148-62e546ce9d2d // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect

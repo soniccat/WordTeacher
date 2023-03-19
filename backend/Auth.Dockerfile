@@ -3,9 +3,11 @@ FROM golang:1.19.2-alpine AS builder
 RUN adduser --disabled-password --gecos '' elf
 # create workspace
 WORKDIR /opt/app/
-COPY service_auth/go.mod ./auth/go.sum ./
+COPY ./service_auth/go.mod ./service_auth/go.sum ./
 RUN mkdir /opt/models
 COPY ../models/go.mod ../models/go.sum ../models
+RUN mkdir /opt/tools
+COPY ../tools/go.mod ../tools/go.sum ../tools
 # fetch dependancies
 RUN go mod download # add verify after resolving issue with local models module
 # copy the source code as the last step
@@ -15,7 +17,8 @@ RUN pwd
 RUN ls -alh
 RUN ls -alh ./service_auth
 RUN ls -alh ./models
-WORKDIR /opt/app/auth
+RUN ls -alh ./tools
+WORKDIR /opt/app/service_auth
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo -o /go/bin/ ./cmd/app
 
 # build a small image

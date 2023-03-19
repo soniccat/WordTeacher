@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"time"
 	"tools"
-	"tools/apphelpers"
 	"tools/logger"
 	"tools/mongowrapper"
 )
@@ -63,7 +62,7 @@ func (m *Repository) DeleteCardSet(
 func (m *Repository) UpdateCardSet(
 	ctx context.Context,
 	cardSet *api.ApiCardSet,
-) *apphelpers.ErrorWithCode {
+) *tools.ErrorWithCode {
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
 			c.Id = primitive.NewObjectID().Hex()
@@ -75,12 +74,12 @@ func (m *Repository) UpdateCardSet(
 
 	newCardSetDb, err := ApiCardSetToDb(cardSet)
 	if err != nil {
-		return apphelpers.NewErrorWithCode(err, http.StatusBadRequest)
+		return tools.NewErrorWithCode(err, http.StatusBadRequest)
 	}
 
 	err = m.replaceCardSet(ctx, newCardSetDb)
 	if err != nil {
-		return apphelpers.NewErrorWithCode(err, http.StatusInternalServerError)
+		return tools.NewErrorWithCode(err, http.StatusInternalServerError)
 	}
 
 	return nil
@@ -121,7 +120,7 @@ func (m *Repository) InsertCardSet(
 	ctx context.Context,
 	cardSet *api.ApiCardSet,
 	userId *primitive.ObjectID,
-) (*api.ApiCardSet, *apphelpers.ErrorWithCode) {
+) (*api.ApiCardSet, *tools.ErrorWithCode) {
 	cardSet.UserId = userId.Hex()
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
@@ -134,12 +133,12 @@ func (m *Repository) InsertCardSet(
 
 	cardSetDb, err := ApiCardSetToDb(cardSet)
 	if err != nil {
-		return nil, apphelpers.NewErrorWithCode(err, http.StatusBadRequest)
+		return nil, tools.NewErrorWithCode(err, http.StatusBadRequest)
 	}
 
 	res, err := m.CardSetCollection.InsertOne(ctx, cardSetDb)
 	if err != nil {
-		return nil, apphelpers.NewErrorWithCode(err, http.StatusInternalServerError)
+		return nil, tools.NewErrorWithCode(err, http.StatusInternalServerError)
 	}
 
 	objId := res.InsertedID.(primitive.ObjectID)

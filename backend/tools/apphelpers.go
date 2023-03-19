@@ -1,4 +1,4 @@
-package apphelpers
+package tools
 
 import (
 	"github.com/alexedwards/scs/redisstore"

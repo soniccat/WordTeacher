@@ -6,16 +6,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"sync"
-	"time"
-	"tools"
-	"tools/apphelpers"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
+	"net/http"
+	"sync"
+	"time"
+	"tools"
 )
 
 const (
@@ -165,7 +163,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		if updatedCardSetsError, ok := err.(*apphelpers.HandlerError); ok {
+		if updatedCardSetsError, ok := err.(*tools.HandlerError); ok {
 			app.SetHandlerError(w, updatedCardSetsError)
 		} else {
 			app.SetError(w, err, http.StatusInternalServerError)

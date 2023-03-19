@@ -8,12 +8,12 @@ import (
 	"errors"
 	"fmt"
 	"models"
+	"models/helpers"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 	"tools"
-	"tools/apphelpers"
 	"tools/test"
 
 	"github.com/stretchr/testify/assert"
@@ -26,13 +26,13 @@ type CardSetPushTestSuite struct {
 	suite.Suite
 	test.BaseTestSuite
 	application      *application
-	sessionValidator *models.MockSessionValidator
+	sessionValidator *helpers.MockSessionValidator
 }
 
 func (suite *CardSetPushTestSuite) SetupTest() {
-	suite.sessionValidator = models.NewMockSessionValidator()
+	suite.sessionValidator = helpers.NewMockSessionValidator()
 
-	sessionManager := apphelpers.CreateSessionManager("172.16.0.3:6380")
+	sessionManager := tools.CreateSessionManager("172.16.0.3:6380")
 	app, err := createApplication(
 		true,
 		sessionManager,
@@ -73,10 +73,10 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithCookieButWithoutLastModif
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUnauthorized() {
-	suite.sessionValidator.ResponseProvider = func() models.MockSessionValidatorResponse {
-		return models.MockSessionValidatorResponse{
+	suite.sessionValidator.ResponseProvider = func() helpers.MockSessionValidatorResponse {
+		return helpers.MockSessionValidatorResponse{
 			nil,
-			models.NewValidateSessionError(http.StatusUnauthorized, errors.New("test error")),
+			helpers.NewValidateSessionError(http.StatusUnauthorized, errors.New("test error")),
 		}
 	}
 
@@ -316,8 +316,8 @@ func (suite *CardSetPushTestSuite) createPushRequest(lastModificationDate *time.
 }
 
 func (suite *CardSetPushTestSuite) setupPushValidator(userId *primitive.ObjectID) {
-	suite.sessionValidator.ResponseProvider = func() models.MockSessionValidatorResponse {
-		return models.MockSessionValidatorResponse{
+	suite.sessionValidator.ResponseProvider = func() helpers.MockSessionValidatorResponse {
+		return helpers.MockSessionValidatorResponse{
 			createUserAuthToken(userId),
 			nil,
 		}

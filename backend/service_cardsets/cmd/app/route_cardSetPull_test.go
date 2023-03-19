@@ -5,14 +5,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"models"
+	"models/helpers"
 	"net/http"
 	"net/http/httptest"
 	"sort"
 	"testing"
 	"time"
 	"tools"
-	"tools/apphelpers"
 	"tools/test"
 
 	"github.com/stretchr/testify/assert"
@@ -24,13 +23,13 @@ type CardSetPullTestSuite struct {
 	suite.Suite
 	test.BaseTestSuite
 	application      *application
-	sessionValidator *models.MockSessionValidator
+	sessionValidator *helpers.MockSessionValidator
 }
 
 func (suite *CardSetPullTestSuite) SetupTest() {
-	suite.sessionValidator = models.NewMockSessionValidator()
+	suite.sessionValidator = helpers.NewMockSessionValidator()
 
-	sessionManager := apphelpers.CreateSessionManager("172.16.0.3:6380")
+	sessionManager := tools.CreateSessionManager("172.16.0.3:6380")
 	app, err := createApplication(
 		true,
 		sessionManager,
@@ -145,8 +144,8 @@ func TestCardSetPullTestSuite(t *testing.T) {
 // Tools
 
 func (suite *CardSetPullTestSuite) setupPullValidator(userId *primitive.ObjectID) {
-	suite.sessionValidator.ResponseProvider = func() models.MockSessionValidatorResponse {
-		return models.MockSessionValidatorResponse{
+	suite.sessionValidator.ResponseProvider = func() helpers.MockSessionValidatorResponse {
+		return helpers.MockSessionValidatorResponse{
 			createUserAuthToken(userId),
 			nil,
 		}

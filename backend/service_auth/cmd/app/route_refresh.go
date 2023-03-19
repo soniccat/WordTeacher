@@ -5,7 +5,7 @@ import (
 	"errors"
 	"models"
 	"net/http"
-	"tools/apphelpers"
+	"tools"
 )
 
 type RefreshInput struct {
@@ -29,26 +29,26 @@ type RefreshResponse struct {
 //
 //	RefreshResponse
 func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie(apphelpers.CookieSession)
+	session, err := r.Cookie(tools.CookieSession)
 	if err != nil {
-		apphelpers.SetError(w, err, http.StatusUnauthorized, app.logger)
+		tools.SetError(w, err, http.StatusUnauthorized, app.logger)
 		return
 	}
 	if len(session.Value) == 0 {
-		apphelpers.SetError(w, errors.New("session is empty"), http.StatusBadRequest, app.logger)
+		tools.SetError(w, errors.New("session is empty"), http.StatusBadRequest, app.logger)
 		return
 	}
 
 	// Header params
-	var deviceId = r.Header.Get(apphelpers.HeaderDeviceId)
+	var deviceId = r.Header.Get(tools.HeaderDeviceId)
 	if len(deviceId) == 0 {
-		apphelpers.SetError(w, errors.New("DeviceId is empty"), http.StatusBadRequest, app.logger)
+		tools.SetError(w, errors.New("DeviceId is empty"), http.StatusBadRequest, app.logger)
 		return
 	}
 
-	var deviceType = r.Header.Get(apphelpers.HeaderDeviceType)
+	var deviceType = r.Header.Get(tools.HeaderDeviceType)
 	if len(deviceType) == 0 {
-		apphelpers.SetError(w, errors.New("DeviceType is empty"), http.StatusBadRequest, app.logger)
+		tools.SetError(w, errors.New("DeviceType is empty"), http.StatusBadRequest, app.logger)
 		return
 	}
 
@@ -56,18 +56,18 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 	var input RefreshInput
 	err = json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		apphelpers.SetError(w, err, http.StatusBadRequest, app.logger)
+		tools.SetError(w, err, http.StatusBadRequest, app.logger)
 		return
 	}
 
 	userAuthToken, err := models.Load(r.Context(), app.sessionManager)
 	if err != nil {
-		apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
+		tools.SetError(w, err, http.StatusInternalServerError, app.logger)
 		return
 	}
 
 	if !userAuthToken.IsValid() {
-		apphelpers.SetError(w, errors.New("token is invalid"), http.StatusUnauthorized, app.logger)
+		tools.SetError(w, errors.New("token is invalid"), http.StatusUnauthorized, app.logger)
 		return
 	}
 
@@ -77,7 +77,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		deviceType,
 		deviceId,
 	) {
-		apphelpers.SetError(w, errors.New("token is invalid"), http.StatusUnauthorized, app.logger)
+		tools.SetError(w, errors.New("token is invalid"), http.StatusUnauthorized, app.logger)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		deviceId,
 	)
 	if err != nil {
-		apphelpers.SetError(w, err, http.StatusInternalServerError, app.logger)
+		tools.SetError(w, err, http.StatusInternalServerError, app.logger)
 		return
 	}
 
@@ -99,5 +99,5 @@ func (app *application) refresh(w http.ResponseWriter, r *http.Request) {
 		RefreshToken: token.RefreshToken,
 	}
 
-	apphelpers.WriteResponse(w, response, app.logger)
+	tools.WriteResponse(w, response, app.logger)
 }
