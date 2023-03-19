@@ -27,9 +27,9 @@ func (suite *CardSetTestSuite) SetupTest() {
 
 func (suite *CardSetTestSuite) TestCreateCardSet() {
 	ctx := context.Background()
-	cardSet := &api.ApiCardSet{
+	cardSet := &api.CardSet{
 		Name: "testCardSet",
-		Cards: []*api.ApiCard{
+		Cards: []*api.Card{
 			{
 				Term:          "testTerm1",
 				Transcription: tools.Ptr("testTranscription"),
@@ -68,9 +68,9 @@ func (suite *CardSetTestSuite) TestCreateCardSet() {
 
 func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 	ctx := context.Background()
-	cardSet := &api.ApiCardSet{
+	cardSet := &api.CardSet{
 		Name: "testCardSet",
-		Cards: []*api.ApiCard{
+		Cards: []*api.Card{
 			{
 				Term:          "testTerm1",
 				Transcription: tools.Ptr("testTranscription"),
@@ -100,7 +100,7 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 
 	insertedCardSet.Cards = append(
 		insertedCardSet.Cards,
-		&api.ApiCard{
+		&api.Card{
 			Term:          "testTerm2",
 			Transcription: tools.Ptr("testTranscription2"),
 			PartOfSpeech:  api.Adverb,

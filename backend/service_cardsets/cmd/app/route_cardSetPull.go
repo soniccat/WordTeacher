@@ -18,8 +18,8 @@ type CardSetPullInput struct {
 }
 
 type CardSetPullResponse struct {
-	UpdatedCardSets   []*api.ApiCardSet `json:"updatedCardSets,omitempty"`
-	DeletedCardSetIds []string          `json:"deletedCardSetIds,omitempty"`
+	UpdatedCardSets   []*api.CardSet `json:"updatedCardSets,omitempty"`
+	DeletedCardSetIds []string       `json:"deletedCardSetIds,omitempty"`
 }
 
 func (app *application) cardSetPull(w http.ResponseWriter, r *http.Request) {

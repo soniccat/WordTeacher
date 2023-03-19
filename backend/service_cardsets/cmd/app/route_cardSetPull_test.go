@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"models/helpers"
+	"models/session_validator"
 	"net/http"
 	"net/http/httptest"
 	"sort"
@@ -23,11 +23,11 @@ type CardSetPullTestSuite struct {
 	suite.Suite
 	test.BaseTestSuite
 	application      *application
-	sessionValidator *helpers.MockSessionValidator
+	sessionValidator *session_validator.MockSessionValidator
 }
 
 func (suite *CardSetPullTestSuite) SetupTest() {
-	suite.sessionValidator = helpers.NewMockSessionValidator()
+	suite.sessionValidator = session_validator.NewMockSessionValidator()
 
 	sessionManager := tools.CreateSessionManager("172.16.0.3:6380")
 	app, err := createApplication(
@@ -61,13 +61,13 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 		"oldTestCardSet1",
 		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(10)),
-		[]*api.ApiCard{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
 		suite.CreateUUID().String(),
 		time.Now(),
-		[]*api.ApiCard{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -91,9 +91,9 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 	assert.Len(suite.T(), response.DeletedCardSetIds, 0)
 	assert.Len(suite.T(), response.UpdatedCardSets, 2)
 
-	expectedCardSets := api.ApiCardSetSortByName([]*api.ApiCardSet{oldCardSet, oldCardSet2})
+	expectedCardSets := api.CardSetSortByName([]*api.CardSet{oldCardSet, oldCardSet2})
 	sort.Sort(expectedCardSets)
-	actualCardSets := api.ApiCardSetSortByName(response.UpdatedCardSets)
+	actualCardSets := api.CardSetSortByName(response.UpdatedCardSets)
 	sort.Sort(actualCardSets)
 
 	assert.Equal(suite.T(), expectedCardSets, actualCardSets)
@@ -104,14 +104,14 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_Retu
 		"oldTestCardSet1",
 		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(20)),
-		[]*api.ApiCard{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
 		suite.CreateUUID().String(),
 		time.Now().Add(-time.Hour*time.Duration(10)),
-		[]*api.ApiCard{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 
 	userId := tools.Ptr(primitive.NewObjectID())
@@ -144,8 +144,8 @@ func TestCardSetPullTestSuite(t *testing.T) {
 // Tools
 
 func (suite *CardSetPullTestSuite) setupPullValidator(userId *primitive.ObjectID) {
-	suite.sessionValidator.ResponseProvider = func() helpers.MockSessionValidatorResponse {
-		return helpers.MockSessionValidatorResponse{
+	suite.sessionValidator.ResponseProvider = func() session_validator.MockSessionValidatorResponse {
+		return session_validator.MockSessionValidatorResponse{
 			createUserAuthToken(userId),
 			nil,
 		}

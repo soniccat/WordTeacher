@@ -57,11 +57,20 @@ func (mw *MongoWrapper) Connect() error {
 	return mw.Client.Connect(*mw.Context)
 }
 
-func (mw *MongoWrapper) Stop() {
-	(*mw.cancelFunc)()
-	if err := mw.Client.Disconnect(*mw.Context); err != nil {
-		panic(err)
+func (mw *MongoWrapper) Stop() error {
+	if mw.cancelFunc != nil {
+		(*mw.cancelFunc)()
+		mw.cancelFunc = nil
 	}
+
+	if mw.Client != nil {
+		if err := mw.Client.Disconnect(*mw.Context); err != nil {
+			return err
+		}
+		mw.Client = nil
+	}
+
+	return nil
 }
 
 type MongoApp interface {
@@ -73,12 +82,12 @@ type MongoApp interface {
 func SetupMongo(app MongoApp, mongoURI string, enableCredentials bool) error {
 	mongoWrapper, err := New(mongoURI, enableCredentials)
 	if err != nil {
-		app.GetLogger().Error.Printf("createMongoWrapper failed: %s", err.Error())
+		app.GetLogger().Error.Printf("createMongoWrapper failed: %s\n", err.Error())
 		return err
 	}
 
 	if err = mongoWrapper.Connect(); err != nil {
-		app.GetLogger().Error.Printf("mongoWrapper.connect() failed: %s", err.Error())
+		app.GetLogger().Error.Printf("mongoWrapper.connect() failed: %s\n", err.Error())
 		return err
 	}
 

@@ -61,7 +61,7 @@ func (m *Repository) DeleteCardSet(
 
 func (m *Repository) UpdateCardSet(
 	ctx context.Context,
-	cardSet *api.ApiCardSet,
+	cardSet *api.CardSet,
 ) *tools.ErrorWithCode {
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
@@ -118,9 +118,9 @@ func (m *Repository) loadCardSetDb(
 
 func (m *Repository) InsertCardSet(
 	ctx context.Context,
-	cardSet *api.ApiCardSet,
+	cardSet *api.CardSet,
 	userId *primitive.ObjectID,
-) (*api.ApiCardSet, *tools.ErrorWithCode) {
+) (*api.CardSet, *tools.ErrorWithCode) {
 	cardSet.UserId = userId.Hex()
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
@@ -190,7 +190,7 @@ func (m *Repository) ModifiedCardSetsSince(
 	ctx context.Context,
 	userId *primitive.ObjectID,
 	lastModificationDate *time.Time,
-) ([]*api.ApiCardSet, error) {
+) ([]*api.CardSet, error) {
 	var date time.Time
 	if lastModificationDate != nil {
 		date = *lastModificationDate
@@ -245,7 +245,7 @@ func (m *Repository) DeleteCardSets(
 func (m *Repository) CardSetsNotInList(
 	ctx context.Context,
 	ids []*primitive.ObjectID,
-) ([]*api.ApiCardSet, error) {
+) ([]*api.CardSet, error) {
 	var cardSetDbs []*DbCardSet
 	cursor, err := m.CardSetCollection.Find(ctx, bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}})
 	if err != nil {

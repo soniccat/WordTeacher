@@ -23,8 +23,8 @@ const (
 type CardSetPushInput struct {
 	// for card sets without id creates a card set or find already inserted one with deduplication Id.
 	// for card sets with id write a card set data
-	UpdatedCardSets   []*api.ApiCardSet `json:"updatedCardSets"`
-	CurrentCardSetIds []string          `json:"currentCardSetIds"`
+	UpdatedCardSets   []*api.CardSet `json:"updatedCardSets"`
+	CurrentCardSetIds []string       `json:"currentCardSetIds"`
 }
 
 type CardSetPushResponse struct {
@@ -176,7 +176,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) handleUpdatedCardSets(
 	ctx context.Context, // transaction is required
-	updatedCardSets []*api.ApiCardSet,
+	updatedCardSets []*api.CardSet,
 	userId *primitive.ObjectID,
 ) (*CardSetPushResponse, error) {
 	// validate

@@ -15,7 +15,7 @@ type Span struct {
 	End   int `json:"end" bson:"end"`
 }
 
-type ApiCard struct {
+type Card struct {
 	Id                          string        `json:"id"`
 	Term                        string        `json:"term"`
 	Transcription               *string       `json:"transcription,omitempty"`
@@ -34,7 +34,7 @@ type ApiCard struct {
 	NeedToUpdateExampleSpans    bool          `json:"needToUpdateExampleSpans"`
 }
 
-func (c *ApiCard) IsEqual(a *ApiCard) bool {
+func (c *Card) IsEqual(a *Card) bool {
 	if c.Id != a.Id {
 		return false
 	}
@@ -87,8 +87,8 @@ func (c *ApiCard) IsEqual(a *ApiCard) bool {
 	return true
 }
 
-func (c *ApiCard) WithoutIds() *ApiCard {
-	return &ApiCard{
+func (c *Card) WithoutIds() *Card {
+	return &Card{
 		Id:                          "",
 		Term:                        c.Term,
 		Transcription:               c.Transcription,

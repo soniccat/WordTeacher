@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
-	"models/helpers"
+	"models/session_validator"
 	"net/http"
 	"runtime/debug"
 	"service_cardsets/internal/cardset"
@@ -22,6 +22,7 @@ func main() {
 
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
+	rabbitMQUrl := flag.String("rabbitMQ", "amqp://guest:guest@localhost:5672/", "RabbitMQ url")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
 	flag.Parse()
@@ -32,7 +33,8 @@ func main() {
 		sessionManager,
 		*mongoURI,
 		*enableCredentials,
-		helpers.NewSessionManagerValidator(sessionManager),
+		rabbitMQUrl,
+		session_validator.NewSessionManagerValidator(sessionManager),
 	)
 	defer func() {
 		app.stop()
@@ -69,7 +71,8 @@ func createApplication(
 	sessionManager *scs.SessionManager,
 	mongoURI string,
 	enableCredentials bool,
-	sessionValidator helpers.SessionValidator,
+	rabbitMQUrl string,
+	sessionValidator session_validator.SessionValidator,
 ) (*application, error) {
 	app := &application{
 		logger:           logger.New(isDebug),

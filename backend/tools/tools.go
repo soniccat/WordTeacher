@@ -195,3 +195,18 @@ func ComparePtrs[T comparable](a *T, b *T) bool {
 
 	return true
 }
+
+func CompareSlices[T comparable](a []T, b []T) bool {
+	var aLen = len(a)
+	if aLen != len(b) {
+		return false
+	}
+
+	for i := 0; i < aLen; i++ {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
+}

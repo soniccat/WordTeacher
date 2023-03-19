@@ -27,18 +27,18 @@ func New(logger *logger.Logger, cardSetDatabase *mongo.Database) *Repository {
 
 func (cm *Repository) SyncCards(
 	ctx context.Context, // transaction is required
-	actualCards []*api.ApiCard,
+	actualCards []*api.Card,
 	currentCardIds []*primitive.ObjectID,
 	userId *primitive.ObjectID,
-) ([]*api.ApiCard, error) {
+) ([]*api.Card, error) {
 
 	// initialize empty slices on purpose as mongo Api will crash on nils
-	newCards := []*api.ApiCard{}
+	newCards := []*api.Card{}
 	deletedCards := []*primitive.ObjectID{}
-	updatedCards := []*api.ApiCard{}
-	actualCardsWithIds := []*api.ApiCard{}
+	updatedCards := []*api.Card{}
+	actualCardsWithIds := []*api.Card{}
 
-	actualCardIds, err := tools.MapNotNilOrError(actualCards, func(c *api.ApiCard) (*primitive.ObjectID, error) {
+	actualCardIds, err := tools.MapNotNilOrError(actualCards, func(c *api.Card) (*primitive.ObjectID, error) {
 		if len((*c).Id) == 0 {
 			newCards = append(newCards, c)
 			return nil, nil
@@ -122,7 +122,7 @@ func (cm *Repository) DeleteByIds(context context.Context, ids []*primitive.Obje
 
 func (cm *Repository) ReplaceCards(
 	context context.Context,
-	cards []*api.ApiCard,
+	cards []*api.Card,
 ) ([]*DbCard, error) {
 	var cardDbs []*DbCard
 
@@ -150,7 +150,7 @@ func (cm *Repository) ReplaceCards(
 
 //func (cm *Repository) Insert(
 //	context context.Context,
-//	card *ApiCard,
+//	card *Card,
 //	userId *primitive.ObjectID,
 //) (*DbCard, error) {
 //	cardDb, err := cm.createCardDb(card, userId)
@@ -172,11 +172,11 @@ func (cm *Repository) ReplaceCards(
 
 func (cm *Repository) InsertCards(
 	context context.Context,
-	cards []*api.ApiCard,
+	cards []*api.Card,
 	userId *primitive.ObjectID,
 ) ([]*DbCard, error) {
 	var cardDbs []*DbCard
-	cardDbs, err := tools.MapOrError(cards, func(c *api.ApiCard) (*DbCard, error) {
+	cardDbs, err := tools.MapOrError(cards, func(c *api.Card) (*DbCard, error) {
 		cardDb, e := ApiCardToDb(c)
 		if cardDb != nil {
 			cardDb.UserId = userId
@@ -202,7 +202,7 @@ func (cm *Repository) InsertCards(
 	return cardDbs, nil
 }
 
-//func (cm *Repository) createCardDb(card *ApiCard, userId *primitive.ObjectID) (*DbCard, error) {
+//func (cm *Repository) createCardDb(card *Card, userId *primitive.ObjectID) (*DbCard, error) {
 //	cardDb := &DbCard{
 //		Term:                card.Term,
 //		Transcription:       card.Transcription,

@@ -4,21 +4,29 @@ import (
 	"tools"
 )
 
-type ApiCardSet struct {
-	Id               string     `json:"id,omitempty"`
-	Name             string     `json:"name"`
-	Cards            []*ApiCard `json:"cards"`
-	UserId           string     `json:"userId"` // TODO: consider several owners via a permission filed
-	CreationDate     string     `json:"creationDate"`
-	ModificationDate string     `json:"modificationDate"`
-	CreationId       string     `json:"creationId"`
+type CardSet struct {
+	Id               string   `json:"id,omitempty"`
+	Name             string   `json:"name"`
+	Description      string   `json:"description"`
+	Tags             []string `json:"tags"`
+	Cards            []*Card  `json:"cards"`
+	UserId           string   `json:"userId"` // TODO: consider several owners via a permission filed
+	CreationDate     string   `json:"creationDate"`
+	ModificationDate string   `json:"modificationDate"`
+	CreationId       string   `json:"creationId"`
 }
 
-func (cs *ApiCardSet) IsEqual(a *ApiCardSet) bool {
+func (cs *CardSet) IsEqual(a *CardSet) bool {
 	if cs.Id != a.Id {
 		return false
 	}
 	if cs.Name != a.Name {
+		return false
+	}
+	if cs.Description != a.Description {
+		return false
+	}
+	if !tools.CompareSlices(cs.Tags, a.Tags) {
 		return false
 	}
 	if cs.UserId != a.UserId {
@@ -45,11 +53,13 @@ func (cs *ApiCardSet) IsEqual(a *ApiCardSet) bool {
 	return true
 }
 
-func (cs *ApiCardSet) WithoutIDs() *ApiCardSet {
-	return &ApiCardSet{
-		Id:   "",
-		Name: cs.Name,
-		Cards: tools.Map(cs.Cards, func(c *ApiCard) *ApiCard {
+func (cs *CardSet) WithoutIDs() *CardSet {
+	return &CardSet{
+		Id:          "",
+		Name:        cs.Name,
+		Description: cs.Description,
+		Tags:        cs.Tags,
+		Cards: tools.Map(cs.Cards, func(c *Card) *Card {
 			return c.WithoutIds()
 		}),
 		UserId:           "",
@@ -59,8 +69,8 @@ func (cs *ApiCardSet) WithoutIDs() *ApiCardSet {
 	}
 }
 
-type ApiCardSetSortByName []*ApiCardSet
+type CardSetSortByName []*CardSet
 
-func (a ApiCardSetSortByName) Len() int           { return len(a) }
-func (a ApiCardSetSortByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ApiCardSetSortByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+func (a CardSetSortByName) Len() int           { return len(a) }
+func (a CardSetSortByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CardSetSortByName) Less(i, j int) bool { return a[i].Name < a[j].Name }

@@ -1,4 +1,4 @@
-package helpers
+package session_validator
 
 import (
 	"errors"

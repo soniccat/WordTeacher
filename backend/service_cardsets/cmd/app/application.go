@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/alexedwards/scs/v2"
-	"models/helpers"
+	"models/session_validator"
 	"net/http"
 	"service_cardsets/internal/cardset"
 	"tools"
@@ -16,7 +16,7 @@ type application struct {
 	sessionManager    *scs.SessionManager
 	mongoWrapper      *mongowrapper.MongoWrapper
 	cardSetRepository *cardset.Repository
-	sessionValidator  helpers.SessionValidator
+	sessionValidator  session_validator.SessionValidator
 }
 
 func (app *application) GetLogger() *logger.Logger {
