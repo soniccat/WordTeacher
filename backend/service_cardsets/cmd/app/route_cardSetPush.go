@@ -171,6 +171,17 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: move to gorutine
+	for i, _ := range input.UpdatedCardSets {
+		bytes, err := input.UpdatedCardSets[i].ToJson()
+		if err == nil {
+			err = app.cardSetQueue.Publish(bytes)
+			if err != nil {
+				app.logger.Error.Printf("cardSetQueue.Publish: " + err.Error())
+			}
+		}
+	}
+
 	app.WriteResponse(w, response)
 }
 
@@ -237,15 +248,6 @@ func (app *application) handleUpdatedCardSets(
 		for _, card := range cardSet.Cards {
 			if _, ok := cardWithoutIds[card.CreationId]; ok {
 				response.CardIds[card.CreationId] = card.Id
-			}
-		}
-
-		// TODO: move to gorutine
-		bytes, err := cardSet.ToJson()
-		if err == nil {
-			err = app.cardSetQueue.Publish(bytes)
-			if err != nil {
-				app.logger.Error.Printf("cardSetQueue.Publish: " + err.Error())
 			}
 		}
 	}
