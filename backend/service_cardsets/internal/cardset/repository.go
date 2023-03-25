@@ -218,16 +218,40 @@ func (m *Repository) ModifiedCardSetsSince(
 	return DbCardSetsToApi(dbCardSets), nil
 }
 
-func (m *Repository) DeleteNotInList(
+func (m *Repository) DeleteByIds(
 	ctx context.Context,
-	ids []*primitive.ObjectID,
+	ids []primitive.ObjectID,
 ) error {
-	_, err := m.CardSetCollection.DeleteMany(ctx, bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}})
+	_, err := m.CardSetCollection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (m *Repository) IdsNotInList(
+	ctx context.Context,
+	ids []primitive.ObjectID,
+) ([]primitive.ObjectID, error) {
+	cursor, err := m.CardSetCollection.Find(
+		ctx,
+		bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}},
+		&options.FindOptions{
+			Projection: bson.M{"_id": 1},
+		},
+	)
+	if err != nil {
+		return []primitive.ObjectID{}, err
+	}
+
+	var result MongoIdWrapperList
+	err = cursor.All(ctx, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.toMongoIds(), err
 }
 
 func (m *Repository) DeleteCardSets(
@@ -268,9 +292,9 @@ type MongoIdWrapper struct {
 
 type MongoIdWrapperList []MongoIdWrapper
 
-func (l *MongoIdWrapperList) toMongoIds() []*primitive.ObjectID {
-	return tools.Map[MongoIdWrapper](*l, func(t MongoIdWrapper) *primitive.ObjectID {
-		return &t.Id
+func (l *MongoIdWrapperList) toMongoIds() []primitive.ObjectID {
+	return tools.Map[MongoIdWrapper](*l, func(t MongoIdWrapper) primitive.ObjectID {
+		return t.Id
 	})
 }
 
@@ -297,7 +321,7 @@ func (m *Repository) CardCardSetIds(
 		return nil, err
 	}
 
-	cardSetApiIds := tools.Map(cardSetDbIds2.toMongoIds(), func(cardSetDbId *primitive.ObjectID) string {
+	cardSetApiIds := tools.Map(cardSetDbIds2.toMongoIds(), func(cardSetDbId primitive.ObjectID) string {
 		return cardSetDbId.Hex()
 	})
 

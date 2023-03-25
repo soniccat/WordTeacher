@@ -156,10 +156,10 @@ func ParseObjectID(idString string) (*primitive.ObjectID, error) {
 	return cardDbId, nil
 }
 
-func IdsToMongoIds(ids []string) ([]*primitive.ObjectID, error) {
-	return MapOrError(ids, func(hex string) (*primitive.ObjectID, error) {
+func IdsToMongoIds(ids []string) ([]primitive.ObjectID, error) {
+	return MapOrError(ids, func(hex string) (primitive.ObjectID, error) {
 		id, err := primitive.ObjectIDFromHex(hex)
-		return &id, err
+		return id, err
 	})
 }
 

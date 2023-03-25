@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 	"net/http"
+	"service_cardsets/pkg/rabbitmq"
 	"sync"
 	"time"
 	"tools"
@@ -136,6 +137,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 		session.EndSession(ctx)
 	}()
 
+	var deletedIds []primitive.ObjectID
 	wc := writeconcern.New(writeconcern.WMajority())
 	txnOpts := options.Transaction().SetWriteConcern(wc)
 	response, err := session.WithTransaction(
@@ -152,7 +154,8 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 			}
 
 			currentCardSetIdsWithAdded := append(currentCardSetIds, insertedMongoIds...)
-			sErr = app.cardSetRepository.DeleteNotInList(sCtx, currentCardSetIdsWithAdded)
+			deletedIds, sErr = app.cardSetRepository.IdsNotInList(sCtx, currentCardSetIdsWithAdded)
+			sErr = app.cardSetRepository.DeleteByIds(sCtx, deletedIds)
 			if sErr != nil {
 				return nil, sErr
 			}
@@ -172,17 +175,42 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: move to gorutine
+	app.publishInQueue(input, deletedIds)
+
+	app.WriteResponse(w, response)
+}
+
+func (app *application) publishInQueue(input CardSetPushInput, deletedIds []primitive.ObjectID) {
 	for i, _ := range input.UpdatedCardSets {
-		bytes, err := input.UpdatedCardSets[i].ToJson()
+		updateMessage, err := rabbitmq.NewWithUpdate(
+			rabbitmq.CardSetFromApiCardSet(input.UpdatedCardSets[i]),
+		)
+
 		if err == nil {
-			err = app.cardSetQueue.Publish(bytes)
-			if err != nil {
-				app.logger.Error.Printf("cardSetQueue.Publish: " + err.Error())
+			bytes, err := json.Marshal(updateMessage)
+			if err == nil {
+				err = app.cardSetQueue.Publish(bytes)
 			}
+		}
+
+		if err != nil {
+			app.logger.Error.Printf("public cardSet NewWithUpdate message: " + err.Error())
 		}
 	}
 
-	app.WriteResponse(w, response)
+	for i, _ := range deletedIds {
+		deleteMessage, err := rabbitmq.NewWithDelete(deletedIds[i].Hex())
+		if err == nil {
+			bytes, err := json.Marshal(deleteMessage)
+			if err == nil {
+				err = app.cardSetQueue.Publish(bytes)
+			}
+		}
+
+		if err != nil {
+			app.logger.Error.Printf("public cardSet NewWithDelete message: " + err.Error())
+		}
+	}
 }
 
 func (app *application) handleUpdatedCardSets(
