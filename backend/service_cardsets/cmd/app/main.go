@@ -12,6 +12,7 @@ import (
 	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
+	"tools/rabbitmq"
 )
 
 func main() {
@@ -33,7 +34,7 @@ func main() {
 		sessionManager,
 		*mongoURI,
 		*enableCredentials,
-		rabbitMQUrl,
+		*rabbitMQUrl,
 		session_validator.NewSessionManagerValidator(sessionManager),
 	)
 	defer func() {
@@ -80,6 +81,16 @@ func createApplication(
 		sessionValidator: sessionValidator,
 	}
 	err := mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
+	if err != nil {
+		return nil, err
+	}
+
+	err = rabbitmq.SetupApp(app, rabbitMQUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	app.cardSetQueue, err = app.rabbitMQ.QueueDeclare(rabbitmq.RabbitMQQueueCardSets)
 	if err != nil {
 		return nil, err
 	}

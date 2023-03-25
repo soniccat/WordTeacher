@@ -239,6 +239,15 @@ func (app *application) handleUpdatedCardSets(
 				response.CardIds[card.CreationId] = card.Id
 			}
 		}
+
+		// TODO: move to gorutine
+		bytes, err := cardSet.ToJson()
+		if err == nil {
+			err = app.cardSetQueue.Publish(bytes)
+			if err != nil {
+				app.logger.Error.Printf("cardSetQueue.Publish: " + err.Error())
+			}
+		}
 	}
 
 	return response, nil

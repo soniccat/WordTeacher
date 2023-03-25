@@ -2,14 +2,14 @@ version: "3.8"
 
 services:
   auth:
-    container_name: "service_auth${TEST_SUFFIX}"
+    container_name: "auth${TEST_SUFFIX}"
     build:
       context: ./
       dockerfile: ./Auth.Dockerfile
     image: "auth"
     command:
       - "-serverPort"
-      - "${SERVICE_AUTH_PORT}"
+      - "${AUTH_PORT}"
       - "-mongoURI"
       - "mongodb://172.16.0.1:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
@@ -18,20 +18,20 @@ services:
       mongo_net:
         ipv4_address: 172.16.0.10
     ports:
-      - target: "${SERVICE_AUTH_PORT}"
-        published: "${SERVICE_AUTH_PORT}"
+      - target: "${AUTH_PORT}"
+        published: "${AUTH_PORT}"
 
   cardsets:
-    container_name: "service_cardsets${TEST_SUFFIX}"
+    container_name: "cardsets${TEST_SUFFIX}"
     build:
       context: ./
       args:
-        PORT: "${SERVICE_CARDSETS_PORT}"
+        PORT: "${CARDSETS_PORT}"
       dockerfile: ./CardSets.Dockerfile
     image: cardsets
     command:
       - "-serverPort"
-      - "${SERVICE_CARDSETS_PORT}"
+      - "${CARDSETS_PORT}"
       - "-mongoURI"
       - "mongodb://172.16.0.1:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
@@ -42,8 +42,8 @@ services:
       mongo_net:
         ipv4_address: 172.16.0.11
     ports:
-      - target: "${SERVICE_CARDSETS_PORT}"
-        published: "${SERVICE_CARDSETS_PORT}"
+      - target: "${CARDSETS_PORT}"
+        published: "${CARDSETS_PORT}"
 
   redis:
     container_name: "redis${TEST_SUFFIX}"

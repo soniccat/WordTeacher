@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"tools"
 )
 
@@ -67,6 +68,10 @@ func (cs *CardSet) WithoutIDs() *CardSet {
 		ModificationDate: cs.ModificationDate,
 		CreationId:       cs.CreationId,
 	}
+}
+
+func (cs *CardSet) ToJson() ([]byte, error) {
+	return json.Marshal(cs)
 }
 
 type CardSetSortByName []*CardSet

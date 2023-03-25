@@ -8,6 +8,7 @@ import (
 	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
+	"tools/rabbitmq"
 )
 
 type application struct {
@@ -15,20 +16,14 @@ type application struct {
 	logger            *logger.Logger
 	sessionManager    *scs.SessionManager
 	mongoWrapper      *mongowrapper.MongoWrapper
+	rabbitMQ          *rabbitmq.RabbitMQ
+	cardSetQueue      *rabbitmq.Queue
 	cardSetRepository *cardset.Repository
 	sessionValidator  session_validator.SessionValidator
 }
 
 func (app *application) GetLogger() *logger.Logger {
 	return app.logger
-}
-
-func (app *application) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
-	app.mongoWrapper = mw
-}
-
-func (app *application) GetMongoWrapper() *mongowrapper.MongoWrapper {
-	return app.mongoWrapper
 }
 
 func (app *application) AllowStackTraces() bool {
@@ -51,11 +46,39 @@ func (app *application) WriteResponse(w http.ResponseWriter, response interface{
 	tools.WriteResponse(w, response, app.GetLogger())
 }
 
+// Mongo
+
+func (app *application) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
+	app.mongoWrapper = mw
+}
+
+func (app *application) GetMongoWrapper() *mongowrapper.MongoWrapper {
+	return app.mongoWrapper
+}
+
+// RabbitMQ
+
+func (app *application) SetRabbitMQWrapper(wrapper *rabbitmq.RabbitMQ) {
+	app.rabbitMQ = wrapper
+}
+
+func (app *application) GetRabbitMQWrapper() *rabbitmq.RabbitMQ {
+	return app.rabbitMQ
+}
+
 type service struct {
 	serverAddr string
 	serverPort int
 }
 
 func (app *application) stop() {
-	app.mongoWrapper.Stop()
+	err := app.mongoWrapper.Stop()
+	if err != nil {
+		app.logger.Error.Print("application mongoWrapper.Stop():" + err.Error())
+	}
+
+	err = app.rabbitMQ.Stop()
+	if err != nil {
+		app.logger.Error.Print("application rabbitMQ.Stop():" + err.Error())
+	}
 }

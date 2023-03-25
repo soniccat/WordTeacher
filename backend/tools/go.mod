@@ -7,7 +7,7 @@ require (
 	github.com/alexedwards/scs/v2 v2.5.1
 	github.com/gomodule/redigo v1.8.9
 	github.com/google/uuid v1.3.0
-	github.com/streadway/amqp v1.0.0
+	github.com/rabbitmq/amqp091-go v1.8.0
 	go.mongodb.org/mongo-driver v1.10.3
 )
 
