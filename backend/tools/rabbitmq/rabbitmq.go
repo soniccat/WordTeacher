@@ -29,8 +29,9 @@ func (r *Queue) Publish(body []byte) error {
 		false,        // mandatory
 		false,        // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        body,
+			ContentType:  "text/plain",
+			Body:         body,
+			DeliveryMode: 2, // persistent
 		},
 	)
 }
@@ -105,7 +106,7 @@ func (rw *RabbitMQ) QueueDeclare(name string) (*Queue, error) {
 
 	queue, err := channel.QueueDeclare(
 		name,  // name
-		false, // durable
+		true,  // durable for persistence
 		false, // delete when unused
 		false, // exclusive
 		false, // no-wait
