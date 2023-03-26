@@ -561,8 +561,15 @@ class AppDatabase(
 
         private fun insertedCardId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
 
-        fun removeCard(cardId: Long) {
+        fun removeCard(
+            cardId: Long,
+            modificationDate: Long
+        ) {
             db.transaction {
+                db.dBCardSetQueries.selectCardSetIdByCardId(cardId).executeAsOneOrNull()?.let { cardSetId ->
+                    db.dBCardSetQueries.updateCardSetModificationDate(modificationDate, cardSetId)
+                }
+
                 db.dBCardSetToCardRelationQueries.removeCard(cardId)
                 db.dBCardQueries.removeCard(cardId)
             }

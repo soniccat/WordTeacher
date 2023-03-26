@@ -155,6 +155,10 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 
 			currentCardSetIdsWithAdded := append(currentCardSetIds, insertedMongoIds...)
 			deletedIds, sErr = app.cardSetRepository.IdsNotInList(sCtx, currentCardSetIdsWithAdded)
+			if sErr != nil {
+				return nil, sErr
+			}
+
 			sErr = app.cardSetRepository.DeleteByIds(sCtx, deletedIds)
 			if sErr != nil {
 				return nil, sErr

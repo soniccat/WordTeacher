@@ -197,17 +197,17 @@ class DatabaseCardWorker(
 
     // Editing State Operation
 
-    fun deleteCard(card: Card) = serialQueue.send {
-        deleteCardInternal(card)
+    fun deleteCard(card: Card, modificationDate: Long) = serialQueue.send {
+        deleteCardInternal(card, modificationDate)
     }
 
-    suspend fun deleteCardAndWait(card: Card) = serialQueue.sendAndWait {
-        deleteCardInternal(card)
+    suspend fun deleteCardAndWait(card: Card, modificationDate: Long) = serialQueue.sendAndWait {
+        deleteCardInternal(card, modificationDate)
     }
 
-    private suspend fun deleteCardInternal(card: Card) = performEditOperation {
+    private suspend fun deleteCardInternal(card: Card, modificationDate: Long) = performEditOperation {
         databaseWorker.run {
-            database.cards.removeCard(card.id)
+            database.cards.removeCard(card.id, modificationDate)
         }
     }
 

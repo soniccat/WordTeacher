@@ -436,7 +436,7 @@ open class CardSetVMImpl(
     override fun onCardDeleted(cardId: Long) {
         findCard(cardId)?.let { card ->
             viewModelScope.launch {
-                databaseCardWorker.deleteCard(card)
+                databaseCardWorker.deleteCard(card, timeSource.timeInMilliseconds())
             }
         }
     }
