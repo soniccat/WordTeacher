@@ -89,7 +89,7 @@ cardsetsrm: cardsetsstop
 	docker image rm cardsets
 
 cardsetsbuild:
-	docker build -t cardsets -f ./Auth.Dockerfile .
+	docker build -t cardsets -f ./CardSets.Dockerfile .
 	docker container create -p 4001:4001 --name cardsets cardsets
 
 cardsetsrun:

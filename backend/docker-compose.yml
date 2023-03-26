@@ -37,7 +37,9 @@ services:
       - "-redisAddress"
       - "172.16.0.3:${REDIS_PORT}"
       - "-rabbitMQ"
-      - "amqp://guest:guest@rabbitmq:5672/"
+      - "amqp://guest:guest@172.16.0.4:5672/"
+    depends_on:
+      - rabbitmq
     networks:
       mongo_net:
         ipv4_address: 172.16.0.11
@@ -96,10 +98,6 @@ services:
     volumes:
       - ${VOLUME_RABBITMQDATA_PATH}:/var/lib/rabbitmq/
       - ${VOLUME_RABBITMQLOG_PATH}:/var/log/rabbitmq
-#    dns:
-#      - 172.16.0.4
-#    networks:
-#      - rabbitmq_go_net
 
 networks:
   mongo_net:
@@ -109,8 +107,6 @@ networks:
       config:
         - subnet: 172.16.0.0/24
           gateway: 172.16.0.254
-#  rabbitmq_net:
-#    driver: bridge
 
 volumes:
   redis:
