@@ -35,6 +35,18 @@ func (r *Queue) Publish(body []byte) error {
 	)
 }
 
+func (r *Queue) Consume() (<-chan amqp.Delivery, error) {
+	return r.channel.Consume(
+		r.queue.Name, // queue
+		"",           // consumer
+		false,        // auto-ack
+		false,        // exclusive
+		false,        // no-local
+		false,        // no-wait
+		nil,          // args
+	)
+}
+
 func (r *Queue) Close() error {
 	if r.channel != nil {
 		if err := r.channel.Close(); err != nil {

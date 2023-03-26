@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
+	"log"
 	"models/session_validator"
 	"net/http"
 	"runtime/debug"
@@ -12,6 +13,7 @@ import (
 	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
+	"tools/rabbitmq"
 )
 
 func main() {
@@ -22,6 +24,7 @@ func main() {
 
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
+	rabbitMQUrl := flag.String("rabbitMQ", "amqp://guest:guest@localhost:5672/", "RabbitMQ url")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
 	flag.Parse()
@@ -32,6 +35,7 @@ func main() {
 		sessionManager,
 		*mongoURI,
 		*enableCredentials,
+		*rabbitMQUrl,
 		session_validator.NewSessionManagerValidator(sessionManager),
 	)
 	defer func() {
@@ -45,6 +49,21 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
+		}
+	}()
+
+	msgs, err := app.cardSetQueue.Consume()
+	if err != nil {
+		panic(err)
+	}
+
+	go func() {
+		for d := range msgs {
+			log.Printf("Received a message: %s", d.Body)
+			err = d.Ack(false)
+			if err != nil {
+				app.logger.Error.Print("Ack error " + err.Error())
+			}
 		}
 	}()
 
@@ -69,6 +88,7 @@ func createApplication(
 	sessionManager *scs.SessionManager,
 	mongoURI string,
 	enableCredentials bool,
+	rabbitMQUrl string,
 	sessionValidator session_validator.SessionValidator,
 ) (*application, error) {
 	app := &application{
@@ -81,7 +101,17 @@ func createApplication(
 		return nil, err
 	}
 
-	app.cardSetSearchRepository = cardset.New(app.logger, app.mongoWrapper.Client)
+	err = rabbitmq.SetupApp(app, rabbitMQUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	app.cardSetQueue, err = app.rabbitMQ.QueueDeclare(rabbitmq.RabbitMQQueueCardSets)
+	if err != nil {
+		return nil, err
+	}
+
+	app.cardSetSearchRepository = cardsetsearch.New(app.logger, app.mongoWrapper.Client)
 
 	return app, nil
 }

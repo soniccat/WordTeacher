@@ -37,7 +37,7 @@ services:
       - "-redisAddress"
       - "172.16.0.3:${REDIS_PORT}"
       - "-rabbitMQ"
-      - "amqp://guest:guest@localhost:5672/"
+      - "amqp://guest:guest@rabbitmq:5672/"
     networks:
       mongo_net:
         ipv4_address: 172.16.0.11
@@ -84,26 +84,33 @@ services:
     entrypoint: [ "bash", "-c", "sleep 1 && mongo --host 172.16.0.1:${MONGODB_PORT} --eval 'rs.initiate()'"]
 
   rabbitmq:
-    image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
+    hostname: 'rabbitmq'
+    image: rabbitmq:3-management-alpine
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.4
     ports:
-      - 5672:5672
-      - 15672:15672
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - ${VOLUME_RABBITMQDATA_PATH}:/var/lib/rabbitmq/
       - ${VOLUME_RABBITMQLOG_PATH}:/var/log/rabbitmq
-    networks:
-      - rabbitmq_go_net
+#    dns:
+#      - 172.16.0.4
+#    networks:
+#      - rabbitmq_go_net
 
 networks:
   mongo_net:
     driver: bridge
     ipam:
+      driver: default
       config:
         - subnet: 172.16.0.0/24
           gateway: 172.16.0.254
-  rabbitmq_go_net:
-    driver: bridge
+#  rabbitmq_net:
+#    driver: bridge
 
 volumes:
   redis:
