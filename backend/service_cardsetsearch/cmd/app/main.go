@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -31,8 +32,11 @@ func main() {
 
 	flag.Parse()
 
+	ctx := context.Background()
+
 	sessionManager := tools.CreateSessionManager(*redisAddress)
 	app, err := createApplication(
+		ctx,
 		*isDebug,
 		sessionManager,
 		*mongoURI,
@@ -42,6 +46,7 @@ func main() {
 	)
 
 	if err != nil {
+		fmt.Println("app creation error: " + err.Error())
 		return
 	}
 
@@ -55,7 +60,7 @@ func main() {
 		}
 	}()
 
-	err = app.launchCardSetQueueConsuming(err)
+	err = app.launchCardSetQueueConsuming(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -76,7 +81,7 @@ func main() {
 	app.logger.Error.Fatal(err)
 }
 
-func (app *application) launchCardSetQueueConsuming(err error) error {
+func (app *application) launchCardSetQueueConsuming(ctx context.Context) error {
 	messages, err := app.cardSetQueue.Consume()
 	if err != nil {
 		return err
@@ -93,7 +98,7 @@ func (app *application) launchCardSetQueueConsuming(err error) error {
 				continue
 			}
 
-			err = app.handleMessage(parsedMessage)
+			err = app.handleMessage(ctx, parsedMessage)
 			if err != nil {
 				app.logger.Error.Print("error in error handling %s", err.Error())
 				continue
@@ -110,7 +115,7 @@ func (app *application) launchCardSetQueueConsuming(err error) error {
 	return nil
 }
 
-func (app *application) handleMessage(parsedMessage cardSetsRabbitmq.Message) error {
+func (app *application) handleMessage(ctx context.Context, parsedMessage cardSetsRabbitmq.Message) error {
 	switch parsedMessage.Type {
 	case cardSetsRabbitmq.TypeUpdate:
 		cardSet, err := parsedMessage.GetCardSet()
@@ -118,7 +123,7 @@ func (app *application) handleMessage(parsedMessage cardSetsRabbitmq.Message) er
 			return err
 		}
 
-		err = app.handleUpdatedCardSet(cardSet)
+		err = app.cardSetSearchRepository.UpsertCardSet(ctx, cardSet) //app.handleUpdatedCardSet(ctx, cardSet)
 		if err != nil {
 			return err
 		}
@@ -127,24 +132,31 @@ func (app *application) handleMessage(parsedMessage cardSetsRabbitmq.Message) er
 		if err != nil {
 			return err
 		}
+
+		mongoId, err := tools.ParseObjectID(*cardSetId)
+		if err != nil {
+			return err
+		}
+
+		err = app.cardSetSearchRepository.DeleteCardSet(ctx, mongoId)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (app *application) handleUpdatedCardSet(cardSet *cardSetsRabbitmq.CardSet) error {
-	app.mongoWrapper.Client.
-}
-
 func createApplication(
+	ctx context.Context,
 	isDebug bool,
 	sessionManager *scs.SessionManager,
 	mongoURI string,
 	enableCredentials bool,
 	rabbitMQUrl string,
 	sessionValidator session_validator.SessionValidator,
-) (app *application, err error) {
-	app = &application{
+) (_ *application, err error) {
+	app := &application{
 		logger:           logger.New(isDebug),
 		sessionManager:   sessionManager,
 		sessionValidator: sessionValidator,
@@ -172,6 +184,10 @@ func createApplication(
 	}
 
 	app.cardSetSearchRepository = cardsetsearch.New(app.logger, app.mongoWrapper.Client)
+	err = app.cardSetSearchRepository.CreateTextIndexIfNeeded(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	return app, nil
 }

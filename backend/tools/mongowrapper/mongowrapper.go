@@ -21,11 +21,10 @@ const (
 
 	MongoDatabaseCardSets     = "cardSets"
 	MongoCollectionCardSets   = "cardSets"
-	MongoCollectionCards      = "cards"
 	MongoCollectionAuthTokens = "authTokens"
 
-	MongoDatabaseCardSetSearch = "cardSetSearch"
-	MongoCollectionCardSetSearch
+	MongoDatabaseCardSetSearch   = "cardSetSearch"
+	MongoCollectionCardSetSearch = "cardSets"
 )
 
 type MongoWrapper struct {

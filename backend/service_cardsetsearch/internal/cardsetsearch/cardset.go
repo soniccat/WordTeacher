@@ -2,13 +2,14 @@ package cardsetsearch
 
 import (
 	"api"
+	cardSetsRabbitmq "service_cardsets/pkg/rabbitmq"
 	"time"
 	"tools"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func ApiCardSetToDb(cs *api.CardSet) (*DbCardSet, error) {
+func MessageCardSetToDb(cs *cardSetsRabbitmq.CardSet) (*DbCardSet, error) {
 	id, err := tools.ParseObjectID(cs.Id)
 	if err != nil {
 		return nil, err
@@ -29,9 +30,9 @@ func ApiCardSetToDb(cs *api.CardSet) (*DbCardSet, error) {
 		return nil, err
 	}
 
-	if err != nil {
-		return nil, err
-	}
+	terms := tools.Map(cs.Cards, func(c *cardSetsRabbitmq.Card) string {
+		return c.Term
+	})
 
 	cardSetDb := &DbCardSet{
 		Id:               id,
@@ -41,6 +42,7 @@ func ApiCardSetToDb(cs *api.CardSet) (*DbCardSet, error) {
 		UserId:           userId,
 		CreationDate:     creationDate,
 		ModificationDate: modificationDateTime,
+		Terms:            terms,
 	}
 	return cardSetDb, nil
 }

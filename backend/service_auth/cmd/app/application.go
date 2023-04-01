@@ -37,8 +37,10 @@ type service struct {
 }
 
 func (app *application) stop() {
-	err := app.mongoWrapper.Stop()
-	app.GetLogger().Error.Printf("mongoWrapper.Stop() failed: %s\n", err.Error())
+	if app.mongoWrapper != nil {
+		err := app.mongoWrapper.Stop()
+		app.GetLogger().Error.Printf("mongoWrapper.Stop() failed: %s\n", err.Error())
+	}
 }
 
 func (app *application) GenerateUserAuthToken(

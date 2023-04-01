@@ -27,6 +27,7 @@ func main() {
 	app, err := createApplication(*isDebug, *redisAddress, *mongoURI, *enableCredentials)
 
 	if err != nil {
+		fmt.Println("app creation error: " + err.Error())
 		return
 	}
 
@@ -61,8 +62,8 @@ func createApplication(
 	redisAddress string,
 	mongoURI string,
 	enableCredentials bool,
-) (app *application, err error) {
-	app = &application{
+) (_ *application, err error) {
+	app := &application{
 		logger:         logger.New(isDebug),
 		sessionManager: tools.CreateSessionManager(redisAddress),
 	}

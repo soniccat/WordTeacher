@@ -39,6 +39,7 @@ func main() {
 	)
 
 	if err != nil {
+		fmt.Println("app creation error: " + err.Error())
 		return
 	}
 
@@ -75,8 +76,8 @@ func createApplication(
 	enableCredentials bool,
 	rabbitMQUrl string,
 	sessionValidator session_validator.SessionValidator,
-) (app *application, err error) {
-	app = &application{
+) (_ *application, err error) {
+	app := &application{
 		logger:           logger.New(isDebug),
 		sessionManager:   sessionManager,
 		sessionValidator: sessionValidator,

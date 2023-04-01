@@ -13,6 +13,11 @@ const HeaderDeviceId = "X-Device-Id"
 const HeaderDeviceType = "X-Device-Type"
 const HeaderAccessToken = "X-Access-Token"
 
+const (
+	ErrorWrongInput = 1000
+	ErrorInnerError = 1001
+)
+
 type ErrorWithCode struct {
 	Err  error
 	Code int

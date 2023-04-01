@@ -70,13 +70,17 @@ type service struct {
 }
 
 func (app *application) stop() {
-	err := app.mongoWrapper.Stop()
-	if err != nil {
-		app.logger.Error.Print("application mongoWrapper.Stop():" + err.Error())
+	if app.mongoWrapper != nil {
+		err := app.mongoWrapper.Stop()
+		if err != nil {
+			app.logger.Error.Print("application mongoWrapper.Stop():" + err.Error())
+		}
 	}
 
-	err = app.rabbitMQ.Stop()
-	if err != nil {
-		app.logger.Error.Print("application rabbitMQ.Stop():" + err.Error())
+	if app.rabbitMQ != nil {
+		err := app.rabbitMQ.Stop()
+		if err != nil {
+			app.logger.Error.Print("application rabbitMQ.Stop():" + err.Error())
+		}
 	}
 }
