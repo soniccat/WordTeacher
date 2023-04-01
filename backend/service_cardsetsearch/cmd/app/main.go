@@ -127,21 +127,22 @@ func (app *application) handleMessage(ctx context.Context, parsedMessage cardSet
 		if err != nil {
 			return err
 		}
-	case cardSetsRabbitmq.TypeDelete:
-		cardSetId, err := parsedMessage.GetDeletedCardSetId()
-		if err != nil {
-			return err
-		}
-
-		mongoId, err := tools.ParseObjectID(*cardSetId)
-		if err != nil {
-			return err
-		}
-
-		err = app.cardSetSearchRepository.DeleteCardSet(ctx, mongoId)
-		if err != nil {
-			return err
-		}
+		// ignore for now
+		//case cardSetsRabbitmq.TypeDelete:
+		//	cardSetId, err := parsedMessage.GetDeletedCardSetId()
+		//	if err != nil {
+		//		return err
+		//	}
+		//
+		//	mongoId, err := tools.ParseObjectID(*cardSetId)
+		//	if err != nil {
+		//		return err
+		//	}
+		//
+		//	err = app.cardSetSearchRepository.DeleteCardSet(ctx, mongoId)
+		//	if err != nil {
+		//		return err
+		//	}
 	}
 
 	return nil

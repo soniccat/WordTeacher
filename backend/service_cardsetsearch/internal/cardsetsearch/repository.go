@@ -72,11 +72,11 @@ func (m *Repository) CreateTextIndexIfNeeded(ctx context.Context) error {
 	return nil
 }
 
-func (m *Repository) DeleteCardSet(
+func (m *Repository) DeleteSearchCardSetByCardSetId(
 	ctx context.Context,
-	id *primitive.ObjectID,
+	cardSetId *primitive.ObjectID,
 ) error {
-	_, err := m.CardSetCollection.DeleteOne(ctx, bson.M{"_id": id})
+	_, err := m.CardSetCollection.DeleteOne(ctx, bson.M{"cardSetId": cardSetId})
 	if err != nil {
 		return err
 	}
@@ -164,7 +164,7 @@ func (m *Repository) upsertCardSet(
 ) error {
 	_, err := m.CardSetCollection.ReplaceOne(
 		ctx,
-		bson.M{"_id": cardSetDb.Id},
+		bson.M{"cardSetId": cardSetDb.Id},
 		cardSetDb,
 		options.Replace().SetUpsert(true),
 	)
