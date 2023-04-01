@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
@@ -8,6 +9,7 @@ import (
 	"models/session_validator"
 	"net/http"
 	"runtime/debug"
+	cardSetsRabbitmq "service_cardsets/pkg/rabbitmq"
 	"service_cardsetsearch/internal/cardsetsearch"
 	"time"
 	"tools"
@@ -38,13 +40,14 @@ func main() {
 		*rabbitMQUrl,
 		session_validator.NewSessionManagerValidator(sessionManager),
 	)
-	defer func() {
-		app.stop()
-	}()
 
 	if err != nil {
 		return
 	}
+
+	defer func() {
+		app.stop()
+	}()
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -52,20 +55,10 @@ func main() {
 		}
 	}()
 
-	msgs, err := app.cardSetQueue.Consume()
+	err = app.launchCardSetQueueConsuming(err)
 	if err != nil {
 		panic(err)
 	}
-
-	go func() {
-		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
-			err = d.Ack(false)
-			if err != nil {
-				app.logger.Error.Print("Ack error " + err.Error())
-			}
-		}
-	}()
 
 	// Initialize a new http.Server struct.
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)
@@ -83,6 +76,66 @@ func main() {
 	app.logger.Error.Fatal(err)
 }
 
+func (app *application) launchCardSetQueueConsuming(err error) error {
+	messages, err := app.cardSetQueue.Consume()
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		for m := range messages {
+			log.Printf("Received a message from cardSetQueue: %s", m.Body)
+
+			var parsedMessage cardSetsRabbitmq.Message
+			err = json.Unmarshal(m.Body, &parsedMessage)
+			if err != nil {
+				app.logger.Error.Print("Unmarshal error for %s", m.Body)
+				continue
+			}
+
+			err = app.handleMessage(parsedMessage)
+			if err != nil {
+				app.logger.Error.Print("error in error handling %s", err.Error())
+				continue
+			}
+
+			err = m.Ack(false)
+			if err != nil {
+				app.logger.Error.Print("Ack error " + err.Error())
+				continue
+			}
+		}
+	}()
+
+	return nil
+}
+
+func (app *application) handleMessage(parsedMessage cardSetsRabbitmq.Message) error {
+	switch parsedMessage.Type {
+	case cardSetsRabbitmq.TypeUpdate:
+		cardSet, err := parsedMessage.GetCardSet()
+		if err != nil {
+			return err
+		}
+
+		err = app.handleUpdatedCardSet(cardSet)
+		if err != nil {
+			return err
+		}
+	case cardSetsRabbitmq.TypeDelete:
+		cardSetId, err := parsedMessage.GetDeletedCardSetId()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (app *application) handleUpdatedCardSet(cardSet *cardSetsRabbitmq.CardSet) error {
+	app.mongoWrapper.Client.
+}
+
 func createApplication(
 	isDebug bool,
 	sessionManager *scs.SessionManager,
@@ -90,13 +143,20 @@ func createApplication(
 	enableCredentials bool,
 	rabbitMQUrl string,
 	sessionValidator session_validator.SessionValidator,
-) (*application, error) {
-	app := &application{
+) (app *application, err error) {
+	app = &application{
 		logger:           logger.New(isDebug),
 		sessionManager:   sessionManager,
 		sessionValidator: sessionValidator,
 	}
-	err := mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
+
+	defer func() {
+		if err != nil {
+			app.stop()
+		}
+	}()
+
+	err = mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
 	if err != nil {
 		return nil, err
 	}

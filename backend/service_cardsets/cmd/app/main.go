@@ -37,13 +37,14 @@ func main() {
 		*rabbitMQUrl,
 		session_validator.NewSessionManagerValidator(sessionManager),
 	)
-	defer func() {
-		app.stop()
-	}()
 
 	if err != nil {
 		return
 	}
+
+	defer func() {
+		app.stop()
+	}()
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -74,13 +75,20 @@ func createApplication(
 	enableCredentials bool,
 	rabbitMQUrl string,
 	sessionValidator session_validator.SessionValidator,
-) (*application, error) {
-	app := &application{
+) (app *application, err error) {
+	app = &application{
 		logger:           logger.New(isDebug),
 		sessionManager:   sessionManager,
 		sessionValidator: sessionValidator,
 	}
-	err := mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
+
+	defer func() {
+		if err != nil {
+			app.stop()
+		}
+	}()
+
+	err = mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
 	if err != nil {
 		return nil, err
 	}

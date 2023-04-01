@@ -25,13 +25,14 @@ func main() {
 	flag.Parse()
 
 	app, err := createApplication(*isDebug, *redisAddress, *mongoURI, *enableCredentials)
-	defer func() {
-		app.stop()
-	}()
 
 	if err != nil {
 		return
 	}
+
+	defer func() {
+		app.stop()
+	}()
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -60,12 +61,19 @@ func createApplication(
 	redisAddress string,
 	mongoURI string,
 	enableCredentials bool,
-) (*application, error) {
-	app := &application{
+) (app *application, err error) {
+	app = &application{
 		logger:         logger.New(isDebug),
 		sessionManager: tools.CreateSessionManager(redisAddress),
 	}
-	err := mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
+
+	defer func() {
+		if err != nil {
+			app.stop()
+		}
+	}()
+
+	err = mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
 	if err != nil {
 		return nil, err
 	}
