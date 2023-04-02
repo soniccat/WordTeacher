@@ -198,7 +198,6 @@ open class CardSetVMImpl(
             )
 
             card.synonyms.onEachIndexed { index, synonym ->
-                Logger.v("Card synonym $index ($synonym)")
                 cardViewItems += WordSynonymViewItem(synonym, Indent.SMALL, index, isLast = index == card.synonyms.size - 1, cardId = card.id).also {
                     lastSynViewItem = it
                 }

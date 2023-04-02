@@ -37,7 +37,13 @@ func (m *Repository) FindCardSetByCreationId(
 	creationId string,
 ) (*DbCardSet, error) {
 	var result DbCardSet
-	err := m.CardSetCollection.FindOne(context, bson.M{"creationId": creationId}).Decode(&result)
+	err := m.CardSetCollection.FindOne(
+		context,
+		bson.M{
+			"creationId": creationId,
+			"isDeleted":  bson.M{"$not": bson.M{"$eq": true}},
+		},
+	).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		return nil, nil
 	} else if err != nil {
@@ -201,7 +207,11 @@ func (m *Repository) ModifiedCardSetsSince(
 	dbTime := primitive.NewDateTimeFromTime(date)
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"userId": userId, "modificationDate": bson.M{"$gt": dbTime}},
+		bson.M{
+			"userId":           userId,
+			"modificationDate": bson.M{"$gt": dbTime},
+			"isDeleted":        bson.M{"$not": bson.M{"$eq": true}},
+		},
 	)
 	if err != nil {
 		return nil, err
@@ -230,13 +240,29 @@ func (m *Repository) DeleteByIds(
 	return nil
 }
 
+func (m *Repository) MarkAsDeletedByIds(
+	ctx context.Context,
+	ids []primitive.ObjectID,
+) error {
+	_, err := m.CardSetCollection.UpdateMany(
+		ctx,
+		bson.M{"_id": bson.M{"$in": ids}},
+		bson.M{"$set": bson.M{"isDeleted": true}},
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Repository) IdsNotInList(
 	ctx context.Context,
 	ids []primitive.ObjectID,
 ) ([]primitive.ObjectID, error) {
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}},
+		bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
 		&options.FindOptions{
 			Projection: bson.M{"_id": 1},
 		},
@@ -254,24 +280,15 @@ func (m *Repository) IdsNotInList(
 	return result.toMongoIds(), err
 }
 
-func (m *Repository) DeleteCardSets(
-	ctx context.Context,
-	ids []*primitive.ObjectID,
-) error {
-	_, err := m.CardSetCollection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (m *Repository) CardSetsNotInList(
 	ctx context.Context,
 	ids []*primitive.ObjectID,
 ) ([]*api.CardSet, error) {
 	var cardSetDbs []*DbCardSet
-	cursor, err := m.CardSetCollection.Find(ctx, bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}})
+	cursor, err := m.CardSetCollection.Find(
+		ctx,
+		bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -304,7 +321,7 @@ func (m *Repository) CardCardSetIds(
 ) ([]string, error) {
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"userId": userId},
+		bson.M{"userId": userId, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
 		&options.FindOptions{
 			Projection: bson.M{"_id": 1},
 		},

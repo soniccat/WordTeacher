@@ -159,7 +159,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 				return nil, sErr
 			}
 
-			sErr = app.cardSetRepository.DeleteByIds(sCtx, deletedIds)
+			sErr = app.cardSetRepository.MarkAsDeletedByIds(sCtx, deletedIds)
 			if sErr != nil {
 				return nil, sErr
 			}

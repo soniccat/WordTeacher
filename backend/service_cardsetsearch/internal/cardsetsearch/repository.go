@@ -164,7 +164,7 @@ func (m *Repository) upsertCardSet(
 ) error {
 	_, err := m.CardSetCollection.ReplaceOne(
 		ctx,
-		bson.M{"cardSetId": cardSetDb.Id},
+		bson.M{"cardSetId": cardSetDb.CardSetId},
 		cardSetDb,
 		options.Replace().SetUpsert(true),
 	)
