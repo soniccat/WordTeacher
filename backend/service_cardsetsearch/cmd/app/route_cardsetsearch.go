@@ -11,8 +11,7 @@ const (
 )
 
 type CardSetSearchResponse struct {
-	UpdatedCardSets   []*api.CardSet `json:"updatedCardSets,omitempty"`
-	DeletedCardSetIds []string       `json:"deletedCardSetIds,omitempty"`
+	CardSets []*api.CardSet `json:"cardSets,omitempty"`
 }
 
 func (app *application) cardSetSearch(w http.ResponseWriter, r *http.Request) {
@@ -33,11 +32,14 @@ func (app *application) cardSetSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//ctx := r.Context()
-	//
-	//apiCardSets, err := app.cardSetSearchRepository.ModifiedCardSetsSince(ctx, authToken.UserMongoId, lastModificationDate)
-	//if err != nil {
-	//	app.SetError(w, err, http.StatusInternalServerError)
-	//	return
-	//}
+	cardSets, err := app.cardSetSearchRepository.SearchCardSets(r.Context(), query)
+	if err != nil {
+		app.SetError(w, errors.New("query is empty"), http.StatusInternalServerError)
+		return
+	}
+
+	response := CardSetSearchResponse{
+		CardSets: cardSets,
+	}
+	app.WriteResponse(w, response)
 }

@@ -1,6 +1,7 @@
 package cardsetsearch
 
 import (
+	"api"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -126,38 +127,6 @@ func (m *Repository) loadCardSetDb(
 	return &cardSetDb, nil
 }
 
-//func (m *Repository) InsertCardSet(
-//	ctx context.Context,
-//	cardSet *cardSetsRabbitmq.CardSet,
-//	userId *primitive.ObjectID,
-//) (*cardSetsRabbitmq.CardSet, *tools.ErrorWithCode) {
-//	cardSet.UserId = userId.Hex()
-//	for _, c := range cardSet.Cards {
-//		if len(c.Id) == 0 {
-//			c.Id = primitive.NewObjectID().Hex()
-//		}
-//		if len(c.UserId) == 0 {
-//			c.UserId = cardSet.UserId
-//		}
-//	}
-//
-//	cardSetDb, err := MessageCardSetToDb(cardSet)
-//	if err != nil {
-//		return nil, tools.NewErrorWithCode(err, http.StatusBadRequest)
-//	}
-//
-//	res, err := m.CardSetCollection.InsertOne(ctx, cardSetDb)
-//	if err != nil {
-//		return nil, tools.NewErrorWithCode(err, http.StatusInternalServerError)
-//	}
-//
-//	objId := res.InsertedID.(primitive.ObjectID)
-//	cardSetDb.Id = &objId
-//	cardSet.Id = objId.Hex()
-//
-//	return cardSet, nil
-//}
-
 func (m *Repository) upsertCardSet(
 	ctx context.Context,
 	cardSetDb *DbCardSet,
@@ -186,4 +155,29 @@ func (m *Repository) DeleteCardSets(
 	}
 
 	return nil
+}
+
+func (m *Repository) SearchCardSets(
+	ctx context.Context,
+	query string,
+) ([]*api.CardSet, error) {
+	cursor, err := m.CardSetCollection.Find(
+		ctx,
+		bson.M{
+			"$text": bson.M{"$search": query, "$diacriticSensitive": true},
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() { cursor.Close(ctx) }()
+
+	var dbCardSets []*DbCardSet
+	err = cursor.All(ctx, &dbCardSets)
+	if err != nil {
+		return nil, err
+	}
+
+	return DbCardSetsToApi(dbCardSets), nil
 }

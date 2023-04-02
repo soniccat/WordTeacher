@@ -53,6 +53,8 @@ func main() {
 		}
 	}()
 
+	go app.handleCardSetChannel()
+
 	// Initialize a new http.Server struct.
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)
 	srv := &http.Server{
@@ -78,9 +80,10 @@ func createApplication(
 	sessionValidator session_validator.SessionValidator,
 ) (_ *application, err error) {
 	app := &application{
-		logger:           logger.New(isDebug),
-		sessionManager:   sessionManager,
-		sessionValidator: sessionValidator,
+		logger:                logger.New(isDebug),
+		sessionManager:        sessionManager,
+		sessionValidator:      sessionValidator,
+		cardSetMessageChannel: make(chan []byte),
 	}
 
 	defer func() {
@@ -95,11 +98,6 @@ func createApplication(
 	}
 
 	err = rabbitmq.SetupApp(app, rabbitMQUrl)
-	if err != nil {
-		return nil, err
-	}
-
-	app.cardSetQueue, err = app.rabbitMQ.QueueDeclare(rabbitmq.RabbitMQQueueCardSets)
 	if err != nil {
 		return nil, err
 	}

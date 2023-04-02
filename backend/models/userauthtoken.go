@@ -21,8 +21,8 @@ const (
 )
 
 type UserAuthToken struct {
-	Id             *primitive.ObjectID `bson:"_id,omitempty"`
-	UserMongoId    *primitive.ObjectID `bson:"userId,omitempty"`
+	Id             *primitive.ObjectID `bson:"_id,omitempty"`    // TODO: use just string not to bind with mongo
+	UserMongoId    *primitive.ObjectID `bson:"userId,omitempty"` // TODO: use just string not to bind with mongo
 	NetworkType    UserNetworkType     `bson:"networkType,omitempty"`
 	AccessToken    AccessToken         `bson:"accessToken,omitempty"`
 	RefreshToken   string              `bson:"refreshToken,omitempty"`

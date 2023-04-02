@@ -178,13 +178,12 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: move to gorutine
-	app.publishInQueue(input, deletedIds)
+	go app.sendMessageInCardSetChannel(input, deletedIds)
 
 	app.WriteResponse(w, response)
 }
 
-func (app *application) publishInQueue(input CardSetPushInput, deletedIds []primitive.ObjectID) {
+func (app *application) sendMessageInCardSetChannel(input CardSetPushInput, deletedIds []primitive.ObjectID) {
 	for i, _ := range input.UpdatedCardSets {
 		updateMessage, err := rabbitmq.NewWithUpdate(
 			rabbitmq.CardSetFromApiCardSet(input.UpdatedCardSets[i]),
@@ -193,7 +192,7 @@ func (app *application) publishInQueue(input CardSetPushInput, deletedIds []prim
 		if err == nil {
 			bytes, err := json.Marshal(updateMessage)
 			if err == nil {
-				err = app.cardSetQueue.Publish(bytes)
+				app.cardSetMessageChannel <- bytes
 			}
 		}
 
@@ -207,7 +206,7 @@ func (app *application) publishInQueue(input CardSetPushInput, deletedIds []prim
 		if err == nil {
 			bytes, err := json.Marshal(deleteMessage)
 			if err == nil {
-				err = app.cardSetQueue.Publish(bytes)
+				app.cardSetMessageChannel <- bytes
 			}
 		}
 

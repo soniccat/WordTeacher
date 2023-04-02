@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"tools"
 )
 
@@ -11,6 +10,7 @@ type CardSet struct {
 	Description      string   `json:"description"`
 	Tags             []string `json:"tags"`
 	Cards            []*Card  `json:"cards"`
+	Terms            []string `json:"terms,omitempty"`
 	UserId           string   `json:"userId"` // TODO: consider several owners via a permission filed
 	CreationDate     string   `json:"creationDate"`
 	ModificationDate string   `json:"modificationDate"`
@@ -45,6 +45,9 @@ func (cs *CardSet) IsEqual(a *CardSet) bool {
 	if len(cs.Cards) != len(a.Cards) {
 		return false
 	}
+	if !tools.CompareSlices(cs.Terms, a.Terms) {
+		return false
+	}
 	for i, c := range cs.Cards {
 		if !c.IsEqual(a.Cards[i]) {
 			return false
@@ -63,15 +66,12 @@ func (cs *CardSet) WithoutIDs() *CardSet {
 		Cards: tools.Map(cs.Cards, func(c *Card) *Card {
 			return c.WithoutIds()
 		}),
+		Terms:            cs.Terms,
 		UserId:           "",
 		CreationDate:     cs.CreationDate,
 		ModificationDate: cs.ModificationDate,
 		CreationId:       cs.CreationId,
 	}
-}
-
-func (cs *CardSet) ToJson() ([]byte, error) {
-	return json.Marshal(cs)
 }
 
 type CardSetSortByName []*CardSet

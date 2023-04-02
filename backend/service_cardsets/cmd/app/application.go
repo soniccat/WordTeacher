@@ -12,14 +12,14 @@ import (
 )
 
 type application struct {
-	service           service
-	logger            *logger.Logger
-	sessionManager    *scs.SessionManager
-	mongoWrapper      *mongowrapper.MongoWrapper
-	rabbitMQ          *rabbitmq.RabbitMQ
-	cardSetQueue      *rabbitmq.Queue
-	cardSetRepository *cardset.Repository
-	sessionValidator  session_validator.SessionValidator
+	service               service
+	logger                *logger.Logger
+	sessionManager        *scs.SessionManager
+	mongoWrapper          *mongowrapper.MongoWrapper
+	rabbitMQ              *rabbitmq.RabbitMQ
+	cardSetMessageChannel chan []byte
+	cardSetRepository     *cardset.Repository
+	sessionValidator      session_validator.SessionValidator
 }
 
 func (app *application) GetLogger() *logger.Logger {
@@ -44,6 +44,17 @@ func (app *application) SetError(w http.ResponseWriter, outErr error, code int) 
 
 func (app *application) WriteResponse(w http.ResponseWriter, response interface{}) {
 	tools.WriteResponse(w, response, app.GetLogger())
+}
+
+func (app *application) handleCardSetChannel() {
+	cardSetQueue, err := app.rabbitMQ.QueueDeclare(rabbitmq.RabbitMQQueueCardSets)
+
+	for bytes := range app.cardSetMessageChannel {
+		err = cardSetQueue.Publish(bytes)
+		if err != nil {
+			app.logger.Error.Print("Error in publish: " + err.Error())
+		}
+	}
 }
 
 // Mongo
