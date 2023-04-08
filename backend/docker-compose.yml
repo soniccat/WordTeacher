@@ -109,7 +109,10 @@ services:
     depends_on:
       - mongo
     restart: "no"
-    entrypoint: [ "bash", "-c", "sleep 1 && mongo --host 172.16.0.1:${MONGODB_PORT} --eval 'rs.initiate()'"]
+    entrypoint: [ "bash", "-c", "sleep 5 && mongo --host 172.16.0.1:${MONGODB_PORT} --eval 'rs.initiate()'"]
+    volumes:
+      - /tmp/mongodatadb:/data/db
+      - /tmp/mongodataconfigdb:/data/configdb
 
   rabbitmq:
     container_name: 'rabbitmq'
