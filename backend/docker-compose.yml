@@ -1,8 +1,30 @@
 version: "3.8"
 
 services:
+  nginx:
+    container_name: "apigateway"
+    hostname: "apigateway"
+    image: nginx:alpine
+    volumes:
+      - ./nginx:/etc/nginx/templates
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.12
+    ports:
+      - 9090:9090
+    environment:
+      - AUTH_PORT=${AUTH_PORT}
+      - CARDSETS_PORT=${CARDSETS_PORT}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "5"
+    restart: always
+
   auth:
     container_name: "auth${TEST_SUFFIX}"
+    hostname: "auth"
     build:
       context: ./
       dockerfile: ./Auth.Dockerfile
@@ -23,6 +45,7 @@ services:
 
   cardsets:
     container_name: "cardsets${TEST_SUFFIX}"
+    hostname: "cardsets"
     build:
       context: ./
       args:
@@ -49,6 +72,7 @@ services:
 
   redis:
     container_name: "redis${TEST_SUFFIX}"
+    hostname: "redis"
     image: redis:6.2-alpine
     restart: always
     networks:
@@ -62,6 +86,7 @@ services:
 
   mongo:
     container_name: "mongo${TEST_SUFFIX}"
+    hostname: "mongo"
     image: mongo:5
     networks:
       mongo_net:
@@ -76,6 +101,7 @@ services:
 
   mongosetup:
     container_name: "mongo-setup${TEST_SUFFIX}"
+    hostname: "mongosetup"
     image: mongo:5
     networks:
       mongo_net:
