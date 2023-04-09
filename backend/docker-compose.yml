@@ -33,9 +33,9 @@ services:
       - "-serverPort"
       - "${AUTH_PORT}"
       - "-mongoURI"
-      - "mongodb://172.16.0.1:${MONGODB_PORT}/?replicaSet=rs0"
+      - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
-      - "172.16.0.3:${REDIS_PORT}"
+      - "redis:${REDIS_PORT}"
     networks:
       mongo_net:
         ipv4_address: 172.16.0.10
@@ -56,11 +56,11 @@ services:
       - "-serverPort"
       - "${CARDSETS_PORT}"
       - "-mongoURI"
-      - "mongodb://172.16.0.1:${MONGODB_PORT}/?replicaSet=rs0"
+      - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
-      - "172.16.0.3:${REDIS_PORT}"
+      - "redis:${REDIS_PORT}"
       - "-rabbitMQ"
-      - "amqp://guest:guest@172.16.0.4:5672/"
+      - "amqp://guest:guest@rabbitmq:${RABBITMQ_PORT}/"
     depends_on:
       - rabbitmq
     networks:
@@ -83,11 +83,11 @@ services:
       - "-serverPort"
       - "${CARDSETSEARCH_PORT}"
       - "-mongoURI"
-      - "mongodb://172.16.0.1:${MONGODB_PORT}/?replicaSet=rs0"
+      - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
-      - "172.16.0.3:${REDIS_PORT}"
+      - "redis:${REDIS_PORT}"
       - "-rabbitMQ"
-      - "amqp://guest:guest@172.16.0.4:5672/"
+      - "amqp://guest:guest@rabbitmq:${RABBITMQ_PORT}/"
     depends_on:
       - rabbitmq
     networks:
@@ -136,7 +136,7 @@ services:
     depends_on:
       - mongo
     restart: "no"
-    entrypoint: [ "bash", "-c", "sleep 5 && mongo --host 172.16.0.1:${MONGODB_PORT} --eval 'rs.initiate()'"]
+    entrypoint: [ "bash", "-c", "sleep 5 && mongo --host mongo:${MONGODB_PORT} --eval 'rs.initiate()'"]
     volumes:
       - /tmp/mongodatadb:/data/db
       - /tmp/mongodataconfigdb:/data/configdb

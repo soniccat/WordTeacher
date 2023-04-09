@@ -95,7 +95,7 @@ cardsetsbuild:
 cardsetsrun:
 	docker start cardsets
 
-# service_cardsets
+# service_cardsetsearch
 
 cardsetsearchup:
 	docker stop cardsetsearch || true
