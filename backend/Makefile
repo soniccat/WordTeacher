@@ -95,6 +95,28 @@ cardsetsbuild:
 cardsetsrun:
 	docker start cardsets
 
+# service_cardsets
+
+cardsetsearchup:
+	docker stop cardsetsearch || true
+	docker rm cardsetsearch || true
+	docker rmi cardsetsearch || true
+	make up
+
+cardsetsearchstop:
+	docker container stop cardsetsearch
+
+cardsetsearchrm: cardsetsstop
+	docker container rm cardsetsearch
+	docker image rm cardsetsearch
+
+cardsetsearchbuild:
+	docker build -t cardsetsearch -f ./CardSetSearch.Dockerfile .
+	docker container create -p 4002:4002 --name cardsetsearch cardsetsearch
+
+cardsetsearchrun:
+	docker start cardsetsearch
+
 #
 #cardsetsstop:
 #	docker container stop service_cardsets

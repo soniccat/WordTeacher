@@ -70,6 +70,33 @@ services:
       - target: "${CARDSETS_PORT}"
         published: "${CARDSETS_PORT}"
 
+  cardsetsearch:
+    container_name: "cardsetsearch${TEST_SUFFIX}"
+    hostname: "cardsetsearch"
+    build:
+      context: ./
+      args:
+        PORT: "${CARDSETSEARCH_PORT}"
+      dockerfile: ./CardSetSearch.Dockerfile
+    image: cardsetsearch
+    command:
+      - "-serverPort"
+      - "${CARDSETSEARCH_PORT}"
+      - "-mongoURI"
+      - "mongodb://172.16.0.1:${MONGODB_PORT}/?replicaSet=rs0"
+      - "-redisAddress"
+      - "172.16.0.3:${REDIS_PORT}"
+      - "-rabbitMQ"
+      - "amqp://guest:guest@172.16.0.4:5672/"
+    depends_on:
+      - rabbitmq
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.13
+    ports:
+      - target: "${CARDSETSEARCH_PORT}"
+        published: "${CARDSETSEARCH_PORT}"
+
   redis:
     container_name: "redis${TEST_SUFFIX}"
     hostname: "redis"
