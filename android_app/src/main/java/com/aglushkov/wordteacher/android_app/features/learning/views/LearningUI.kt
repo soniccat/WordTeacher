@@ -36,6 +36,7 @@ import com.aglushkov.wordteacher.android_app.features.definitions.views.WordPart
 import com.aglushkov.wordteacher.android_app.features.definitions.views.WordSubHeaderView
 import com.aglushkov.wordteacher.android_app.features.definitions.views.WordSynonymView
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
+import com.aglushkov.wordteacher.android_app.general.extensions.toStableResource
 import com.aglushkov.wordteacher.android_app.general.views.compose.CustomDialogUI
 import com.aglushkov.wordteacher.android_app.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
@@ -162,7 +163,7 @@ fun LearningUI(
                 }
             } else {
                 LoadingStatusView(
-                    resource = viewItemsRes,
+                    resource = viewItemsRes.toStableResource(),
                     loadingText = null,
                     errorText = vm.getErrorText(viewItemsRes)?.resolveString()
                 ) {

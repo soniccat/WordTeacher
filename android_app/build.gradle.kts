@@ -44,7 +44,7 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs = freeCompilerArgs + "-Xinline-classes"
+        freeCompilerArgs = freeCompilerArgs + "-Xinline-classes" + "-P" + "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=/Users/aoglushkov/androidProjects/WordTeacher/composedebug"
     }
 
     composeOptions {

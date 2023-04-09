@@ -27,6 +27,9 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -97,6 +100,8 @@ open class DefinitionsVMImpl(
     final override var displayModeStateFlow = MutableStateFlow(DefinitionsDisplayMode.BySource)
     final override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(emptyList())
 
+    private val wordDefinitionViewDataMap = mutableMapOf<String, WordDefinitionViewData>()
+
     override val definitions = combine(
         definitionWords,
         displayModeStateFlow,
@@ -115,7 +120,7 @@ open class DefinitionsVMImpl(
         }.flatten().distinct()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    private val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
+    private val displayModes: ImmutableList<DefinitionsDisplayMode> = persistentListOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     private var loadJob: Job? = null
     private var observeJob: Job? = null
     private var definitionsContext: DefinitionsContext? = null
@@ -245,13 +250,14 @@ open class DefinitionsVMImpl(
             items.add(WordDividerViewItem())
         }
 
+        wordDefinitionViewDataMap.clear()
         when (displayMode) {
             DefinitionsDisplayMode.Merged -> addMergedWords(words, partsOfSpeechFilter, items)
             else -> addWordsGroupedBySource(words, partsOfSpeechFilter, items)
         }
 
-        generateIds(items)
-        return items
+        val itemsWithIds = generateIds(items)
+        return itemsWithIds
     }
 
     private fun getPartOfSpeechChipText(
@@ -265,8 +271,8 @@ open class DefinitionsVMImpl(
         }
     }
 
-    private fun generateIds(items: MutableList<BaseViewItem<*>>) {
-        generateViewItemIds(items, definitions.value.data().orEmpty(), idGenerator)
+    private fun generateIds(items: MutableList<BaseViewItem<*>>): List<BaseViewItem<*>> {
+        return generateViewItemIds(items, definitions.value.data().orEmpty(), idGenerator)
     }
 
     private fun addMergedWords(
@@ -306,14 +312,16 @@ open class DefinitionsVMImpl(
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
                 for (d in def.definitions) {
+                    val key = word.word + partOfSpeech.name + def.hashCode().toString()
+                    wordDefinitionViewDataMap[key] = WordDefinitionViewData(
+                        word = word,
+                        partOfSpeech = partOfSpeech,
+                        def = def
+                    )
                     items.add(
                         WordDefinitionViewItem(
                             definition = d,
-                            data = WordDefinitionViewData(
-                                word = word,
-                                partOfSpeech = partOfSpeech,
-                                def = def
-                            )
+                            dataKey = key
                         )
                     )
                 }
@@ -342,7 +350,7 @@ open class DefinitionsVMImpl(
 
         val hasNewItems = items.size - topIndex > 0
         if (hasNewItems) {
-            items.add(topIndex, WordTitleViewItem(word.word, word.types))
+            items.add(topIndex, WordTitleViewItem(word.word, word.types.toImmutableList()))
             word.transcription?.let {
                 items.add(topIndex + 1, WordTranscriptionViewItem(it))
             }
@@ -438,7 +446,7 @@ open class DefinitionsVMImpl(
         wordDefinitionViewItem: WordDefinitionViewItem,
         cardSetViewItem: CardSetViewItem
     ) {
-        val viewData = wordDefinitionViewItem.data as WordDefinitionViewData
+        val viewData = wordDefinitionViewDataMap[wordDefinitionViewItem.dataKey] ?: return
         val contextExamples = definitionsContext?.wordContexts?.get(viewData.partOfSpeech)?.examples ?:
         definitionsContext?.wordContexts?.values?.map { it.examples }?.flatten() ?: emptyList()
 
@@ -466,12 +474,11 @@ open class DefinitionsVMImpl(
         var i = 0L
         val entries = dictRepository.wordsStartWith(word, 20).map {
             WordSuggestViewItem(
+                id = i++,
                 word = it.word,
                 definition = "", // TODO: support first definition
                 source = it.dict.name
-            ).apply {
-                id = i++
-            }
+            )
         }
         suggests.value = Resource.Loaded(entries)
     }

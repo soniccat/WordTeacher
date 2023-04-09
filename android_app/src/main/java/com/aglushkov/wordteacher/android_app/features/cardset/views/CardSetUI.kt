@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.features.definitions.views.*
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
+import com.aglushkov.wordteacher.android_app.general.extensions.toStableResource
 import com.aglushkov.wordteacher.android_app.general.views.compose.*
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
@@ -102,7 +103,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 }
             } else {
                 LoadingStatusView(
-                    resource = viewItemsRes,
+                    resource = viewItemsRes.toStableResource(),
                     loadingText = null,
                     errorText = vm.getErrorText(viewItemsRes)?.resolveString()
                 ) {

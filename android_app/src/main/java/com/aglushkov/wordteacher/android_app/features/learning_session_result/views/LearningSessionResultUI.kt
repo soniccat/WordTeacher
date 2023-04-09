@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.AppTypography
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
+import com.aglushkov.wordteacher.android_app.general.extensions.toStableResource
 import com.aglushkov.wordteacher.android_app.general.views.compose.CustomDialogUI
 import com.aglushkov.wordteacher.android_app.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
@@ -97,7 +98,7 @@ fun LearningSessionResultUI(
                 }
             } else {
                 LoadingStatusView(
-                    resource = viewItemsRes,
+                    resource = viewItemsRes.toStableResource(),
                     loadingText = null,
                     errorText = vm.getErrorText(viewItemsRes)?.resolveString()
                 ) {

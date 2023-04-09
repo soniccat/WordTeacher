@@ -86,7 +86,7 @@ open class LearningSessionResultVMImpl(
     private fun buildItems(results: List<LoadedSessionCardResult>): List<BaseViewItem<*>> {
         val viewItems = results.map {
             LearningSessionTermResultViewItem(
-                cardId = it.card.id,
+                id = it.card.id,
                 term = it.card.term,
                 newProgress = it.newProgress,
                 isRight = it.isRight

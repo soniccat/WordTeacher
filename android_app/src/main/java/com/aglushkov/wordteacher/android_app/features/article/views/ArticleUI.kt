@@ -37,6 +37,7 @@ import com.aglushkov.wordteacher.android_app.features.definitions.views.BottomSh
 import com.aglushkov.wordteacher.android_app.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.android_app.features.definitions.views.HandleUI
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
+import com.aglushkov.wordteacher.android_app.general.extensions.toStableResource
 import com.aglushkov.wordteacher.android_app.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.android_app.general.views.compose.ModalSideSheet
 import com.aglushkov.wordteacher.android_app.general.views.compose.SideSheetValue
@@ -137,7 +138,7 @@ fun ArticleUI(
                     }
                 } else {
                     LoadingStatusView(
-                        resource = paragraphs,
+                        resource = paragraphs.toStableResource(),
                         loadingText = null,
                         errorText = vm.getErrorText(paragraphs)?.resolveString(),
                         emptyText = LocalContext.current.getString(R.string.article_empty)

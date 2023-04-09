@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
+import com.aglushkov.wordteacher.android_app.general.extensions.toStableResource
 import com.aglushkov.wordteacher.android_app.general.views.compose.CustomTopAppBar
 import com.aglushkov.wordteacher.android_app.general.views.compose.DeletableCell
 import com.aglushkov.wordteacher.android_app.general.views.compose.LoadingStatusView
@@ -59,7 +60,7 @@ fun ArticlesUI(
                 }
             } else {
                 LoadingStatusView(
-                    resource = articles,
+                    resource = articles.toStableResource(),
                     loadingText = null,
                     errorText = vm.getErrorText(articles)?.resolveString(),
                     emptyText = LocalContext.current.getString(R.string.articles_no_articles)

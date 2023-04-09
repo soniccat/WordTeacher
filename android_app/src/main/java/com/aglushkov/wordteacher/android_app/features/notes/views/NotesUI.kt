@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.AppTypography
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
+import com.aglushkov.wordteacher.android_app.general.extensions.toStableResource
 import com.aglushkov.wordteacher.android_app.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.notes.vm.CreateNoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
@@ -73,7 +74,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
                 }
             } else {
                 LoadingStatusView(
-                    resource = notes,
+                    resource = notes.toStableResource(),
                     loadingText = null,
                     errorText = vm.getErrorText(notes)?.resolveString()
                 ) {

@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.js.JsName
 
-
 sealed interface Resource<T> {
     val canLoadNextPage: Boolean
     val version: Int

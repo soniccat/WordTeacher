@@ -1,5 +1,8 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.PersistentList
+
 interface NLPSpan {
     val start: Int
     val end: Int
@@ -24,7 +27,7 @@ fun CharSequence.split(spans: List<NLPSpan>): List<CharSequence> {
     return strings
 }
 
-fun <T> List<T>.split(span: NLPSpan): List<T> {
+fun <T> ImmutableList<T>.split(span: NLPSpan): ImmutableList<T> {
     return subList(span.start, span.end)
 }
 

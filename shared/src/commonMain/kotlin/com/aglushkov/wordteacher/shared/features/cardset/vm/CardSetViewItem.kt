@@ -1,12 +1,16 @@
 package com.aglushkov.wordteacher.shared.features.cardset.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
-class CreateCardViewItem(
-): BaseViewItem<Unit>(Unit, Type, -1) {
-    companion object {
-        const val Type = 700
-    }
+data class CreateCardViewItem(
+    override val id: Long = 0L,
+    override val type: Int = 700
+): BaseViewItem<Unit> {
+    override val items: ImmutableList<Unit> = persistentListOf()
+
+    override fun copyWithId(id: Long): BaseViewItem<Unit> = this.copy(id = id)
 }
 
 //class CardViewItem(

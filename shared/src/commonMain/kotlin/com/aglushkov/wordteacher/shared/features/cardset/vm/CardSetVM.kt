@@ -15,6 +15,7 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -159,7 +160,7 @@ open class CardSetVMImpl(
             var lastSynViewItem: BaseViewItem<*>? = null
 
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
-            cardViewItems += WordTitleViewItem(card.term, providers = emptyList(), cardId = card.id)
+            cardViewItems += WordTitleViewItem(card.term, providers = persistentListOf(), cardId = card.id)
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty(), cardId = card.id)
             cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech, cardId = card.id)
 
@@ -210,9 +211,8 @@ open class CardSetVMImpl(
         }
 
         result += CreateCardViewItem()
-        generateIds(result)
 
-        return result
+        return generateIds(result)
     }
 
     private fun makeFocusEvents(cardId: Long, lastDefViewItem: BaseViewItem<*>?, lastExViewItem: BaseViewItem<*>?, lastSynViewItem: BaseViewItem<*>?) {
@@ -240,15 +240,15 @@ open class CardSetVMImpl(
         }
     }
 
-    private fun generateIds(items: MutableList<BaseViewItem<*>>) {
+    private fun generateIds(items: List<BaseViewItem<*>>): List<BaseViewItem<*>> {
         val prevItems = viewItems.value.data().orEmpty()
-        if (items.size == prevItems.size) { // keep ids not to recompose text fields being edited
-            prevItems.onEachIndexed { index, baseViewItem ->
-                items[index].id = baseViewItem.id
+        return if (items.size == prevItems.size) { // keep ids not to recompose text fields being edited
+            prevItems.mapIndexed { index, baseViewItem ->
+                items[index].copyWithId(baseViewItem.id)
             }
         } else { // regenerate not to mix up with current ids where swipeable cells are in hidden state
-            items.onEach {
-                it.id = idGenerator.nextId()
+            items.map {
+                it.copyWithId(id = idGenerator.nextId())
             }
         }
     }

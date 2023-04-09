@@ -40,6 +40,7 @@ kotlin {
                 implementation(libs.decompose)
                 implementation(libs.statelyCommon)
                 implementation(libs.statelyConcurrency)
+                api("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
                 api(libs.settingsCoroutinesMt)
                 api(libs.mokoResourcesLib)
             }

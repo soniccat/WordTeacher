@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.model.nlp.split
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -105,7 +106,7 @@ class ArticlesRepository(
                 articleId,
                 title,
                 timeSource.timeInMilliseconds(),
-                sentences = sentences,
+                sentences = sentences.toImmutableList(),
                 style = style
             )
         }

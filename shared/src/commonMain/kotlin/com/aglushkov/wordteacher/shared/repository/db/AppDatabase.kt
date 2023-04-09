@@ -18,6 +18,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
 import com.benasher44.uuid.uuid4
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.TransactionWithoutReturn
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -109,7 +110,7 @@ class AppDatabase(
             .executeAsList()
             .map {
                 it.toNLPSentence()
-            }
+            }.toImmutableList()
 
         fun removeAll() = db.dBNLPSentenceQueries.removeAll()
     }

@@ -27,6 +27,9 @@ import com.arkivanov.essenty.parcelable.Parcelize
 import com.russhwolf.settings.coroutines.FlowSettings
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -180,7 +183,9 @@ open class ArticleVMImpl(
 
     private val cardProgress = MutableStateFlow<Resource<Map<Pair<String, WordTeacherWord.PartOfSpeech>, Card>>>(
         Resource.Uninitialized())
-    private val annotations = MutableStateFlow<List<List<ArticleAnnotation>>>(emptyList())
+    private val annotations = MutableStateFlow<ImmutableList<ImmutableList<ArticleAnnotation>>>(
+        persistentListOf()
+    )
 
     override val paragraphs = combine(article, annotations) { a, b -> a to b }
         .map { (article, annotations) ->
@@ -208,9 +213,9 @@ open class ArticleVMImpl(
                     if (article is Resource.Loaded && cards is Resource.Loaded) {
                         article.data.sentences.map {
                             resolveAnnotations(it, cards, dicts.data().orEmpty(), state.selectionState)
-                        }
+                        }.toImmutableList()
                     } else {
-                        emptyList()
+                        persistentListOf()
                     }
                 }.collect(annotations)
         }
@@ -221,7 +226,7 @@ open class ArticleVMImpl(
         cards: Resource.Loaded<Map<Pair<String, WordTeacherWord.PartOfSpeech>, Card>>,
         dicts: List<Dict>,
         selectionState: ArticleVM.SelectionState
-    ): List<ArticleAnnotation> {
+    ): ImmutableList<ArticleAnnotation> {
         val progressAndPartOfSpeechAnnotations = sentence.tokenSpans.indices.mapNotNull { i ->
             val span = sentence.tokenSpans[i]
             val term = sentence.lemmaOrToken(i)
@@ -271,7 +276,7 @@ open class ArticleVMImpl(
         val dictAnnotationResolver = DictAnnotationResolver()
         val dictAnnotations = dictAnnotationResolver.resolve(actualDicts, sentence, phrases)
 
-        return progressAndPartOfSpeechAnnotations + phraseAnnotations + dictAnnotations
+        return (progressAndPartOfSpeechAnnotations + phraseAnnotations + dictAnnotations).toImmutableList()
     }
 
     fun restore(newState: ArticleVM.State) {
@@ -282,7 +287,7 @@ open class ArticleVMImpl(
 
     private fun buildViewItems(
         article: Resource<Article>,
-        annotations: List<List<ArticleAnnotation>>
+        annotations: ImmutableList<ImmutableList<ArticleAnnotation>>
     ): List<BaseViewItem<*>> {
         return when (article) {
             is Resource.Loaded -> {
@@ -294,7 +299,7 @@ open class ArticleVMImpl(
 
     private fun makeParagraphs(
         article: Resource.Loaded<Article>,
-        annotations: List<List<ArticleAnnotation>>
+        annotations: ImmutableList<ImmutableList<ArticleAnnotation>>
     ): MutableList<BaseViewItem<*>> {
         val paragraphList = mutableListOf<BaseViewItem<*>>()
 
@@ -302,7 +307,7 @@ open class ArticleVMImpl(
             paragraphList.add(
                 ParagraphViewItem(
                     idGenerator.nextId(),
-                    sentences = article.data.sentences.split(paragraph),
+                    items = article.data.sentences.split(paragraph),
                     annotations = if (annotations.isNotEmpty()) {
                         annotations.split(paragraph)
                     } else {

@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
+import com.aglushkov.wordteacher.android_app.general.extensions.toStableResource
 import com.aglushkov.wordteacher.android_app.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
@@ -74,7 +75,7 @@ fun CardSetsUI(
                 }
             } else {
                 LoadingStatusView(
-                    resource = cardSets,
+                    resource = cardSets.toStableResource(),
                     loadingText = null,
                     errorText = vm.getErrorText(cardSets)?.resolveString()
                 ) {
@@ -184,7 +185,7 @@ private fun CardSetTitleView(
 fun CardSetTitleViewPreviews() {
     CardSetTitleView(
         CardSetViewItem(
-            setId = 0L,
+            id = 0L,
             name = "My card set",
             date = "Today",
             readyToLearnProgress = 0.3f,

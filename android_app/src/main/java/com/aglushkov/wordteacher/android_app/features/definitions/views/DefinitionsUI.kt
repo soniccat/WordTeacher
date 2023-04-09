@@ -35,6 +35,7 @@ import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.AppTypography
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
+import com.aglushkov.wordteacher.android_app.general.extensions.toStableResource
 import com.aglushkov.wordteacher.android_app.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.android_app.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.android_app.general.views.compose.*
@@ -46,6 +47,7 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
@@ -177,7 +179,7 @@ private fun DefinitionsWordUI(
                     bottom = 300.dp
                 )
             ) {
-                items(suggestsData, key = { it.id }) { item ->
+                items(suggestsData, key = { it.id }, contentType = { it.type }) { item ->
                     showSuggestItem(
                         Modifier.animateItemPlacement(),
                         item,
@@ -210,7 +212,7 @@ private fun DefinitionsWordUI(
                 }
             } else {
                 LoadingStatusView(
-                    resource = defsValue,
+                    resource = defsValue.toStableResource(),
                     loadingText = null,
                     errorText = vm.getErrorText(defsValue)?.resolveString(),
                     emptyText = LocalContext.current.getString(R.string.error_no_definitions)
@@ -599,17 +601,17 @@ private fun DefinitionsUIPreviewWithResponse() {
                         DefinitionsDisplayModeViewItem(
                             partsOfSpeechFilterText = StringDesc.Raw("Noun"),
                             canClearPartsOfSpeechFilter = true,
-                            modes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged),
+                            items = persistentListOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged),
                             selectedIndex = 0
                         ),
                         WordDividerViewItem(),
                         WordTitleViewItem(
                             title = "Word",
-                            providers = listOf(Config.Type.Yandex)
+                            providers = persistentListOf(Config.Type.Yandex)
                         ),
                         WordTitleViewItem(
                             title = "Word 2",
-                            providers = listOf(Config.Type.Yandex, Config.Type.Google, Config.Type.OwlBot)
+                            providers = persistentListOf(Config.Type.Yandex, Config.Type.Google, Config.Type.OwlBot)
                         ),
                         WordTranscriptionViewItem("[omg]"),
                         WordPartOfSpeechViewItem(StringDesc.Raw("Noun"), WordTeacherWord.PartOfSpeech.Noun),
