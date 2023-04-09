@@ -19,7 +19,7 @@ FROM DBCardSet;
 selectUpdated:
 SELECT *
 FROM DBCardSet
-WHERE modificationDate > ? AND remoteId != "";
+WHERE modificationDate >= ?;
 
 selectWithouRemoteId:
 SELECT *
@@ -67,7 +67,7 @@ WHERE remoteId != "";
 
 updateCardSetRemoteId:
 UPDATE DBCardSet
-SET remoteId = ?, modificationDate = ?
+SET remoteId = ?
 WHERE creationId = ?;
 
 selectCardSetIdByCardId:
@@ -80,3 +80,8 @@ updateCardSetModificationDate:
 UPDATE DBCardSet
 SET modificationDate = ?
 WHERE id = ?;
+
+shiftCardSetModificationDate:
+UPDATE DBCardSet
+SET modificationDate = ?
+WHERE modificationDate >= ?;

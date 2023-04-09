@@ -237,6 +237,9 @@ class CardSetSyncWorker(
                                 database.cardSets.removeCardSet(dbCardSet.id)
                             }
                         }
+
+                        // updates modificationDate for changed locally or just created but not pushed cardsets not to lose the changes
+                        database.cardSets.shiftCardSetModificationDate(newSyncDate.toEpochMilliseconds(), lastSyncDate.toEpochMilliseconds())
                     }
                 }
 
@@ -279,34 +282,32 @@ class CardSetSyncWorker(
         try {
             withContext(Dispatchers.Default) {
                 var updatedCardSets: List<CardSet> = emptyList()
-                var notPushedCardSets: List<CardSet> = emptyList()
 
                 databaseWorker.run {
+                    // get updated and not pushed cardsets
                     updatedCardSets = database.cardSets.selectUpdatedCardSets(lastSyncDate.toEpochMilliseconds())
-                    notPushedCardSets = database.cardSets.selectWithoutRemoteId()
 
-                    val allCardSetsIds = updatedCardSets.map { it.id } + notPushedCardSets.map { it.id }
+                    val allCardSetsIds = updatedCardSets.map { it.id }
                     val setIdToCards = database.cardSets.selectSetIdsWithCards(allCardSetsIds).executeAsList().groupBy({it.first},{it.second})
 
                     updatedCardSets = updatedCardSets.map { it.copy(cards = setIdToCards[it.id].orEmpty()) }
-                    notPushedCardSets = notPushedCardSets.map { it.copy(cards = setIdToCards[it.id].orEmpty()) }
                 }
 
                 val cardSetRemoteIds = databaseWorker.run {
                     database.cardSets.remoteIds()
                 }
 
-                val pushResponse = spaceCardSetService.push(updatedCardSets + notPushedCardSets, cardSetRemoteIds, lastSyncDate).toOkResponse()
+                val pushResponse = spaceCardSetService.push(updatedCardSets, cardSetRemoteIds, lastSyncDate).toOkResponse()
                 newSyncDate = timeSource.timeInstant()
 
                 databaseWorker.run {
                     database.transaction {
                         pushResponse.cardSetIds?.onEach { (creationId, remoteId) ->
-                            database.cardSets.updateCardSetRemoteId(remoteId, newSyncDate.toEpochMilliseconds(), creationId)
+                            database.cardSets.updateCardSetRemoteId(remoteId, creationId)
                         }
 
                         pushResponse.cardIds?.onEach { (creationId, remoteId) ->
-                            database.cards.updateCardSetRemoteId(remoteId, newSyncDate.toEpochMilliseconds(), creationId)
+                            database.cards.updateCardSetRemoteId(remoteId, creationId)
                         }
                     }
                 }

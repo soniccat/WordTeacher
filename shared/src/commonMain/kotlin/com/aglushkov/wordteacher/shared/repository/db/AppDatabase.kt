@@ -296,8 +296,11 @@ class AppDatabase(
             id = id,
         )
 
-        fun updateCardSetRemoteId(remoteId: String, modificationDate: Long, creationId: String) =
-            db.dBCardSetQueries.updateCardSetRemoteId(remoteId, modificationDate, creationId)
+        fun updateCardSetRemoteId(remoteId: String, creationId: String) =
+            db.dBCardSetQueries.updateCardSetRemoteId(remoteId, creationId)
+
+        fun shiftCardSetModificationDate(toDate: Long, sinceDate: Long) =
+            db.dBCardSetQueries.shiftCardSetModificationDate(toDate, sinceDate)
     }
 
     inner class Cards {
@@ -575,8 +578,8 @@ class AppDatabase(
             }
         }
 
-        fun updateCardSetRemoteId(remoteId: String, modificationDate: Long, creationId: String) =
-            db.dBCardQueries.updateCardRemoteId(remoteId, modificationDate, creationId)
+        fun updateCardSetRemoteId(remoteId: String, creationId: String) =
+            db.dBCardQueries.updateCardRemoteId(remoteId, creationId)
     }
 
     inner class Notes {
