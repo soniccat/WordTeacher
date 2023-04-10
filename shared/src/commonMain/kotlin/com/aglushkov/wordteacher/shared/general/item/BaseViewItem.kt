@@ -1,7 +1,9 @@
 package com.aglushkov.wordteacher.shared.general.item
 
+import androidx.compose.runtime.Stable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 
+@Stable
 abstract class BaseViewItem<T> {
     var id = 0L // a unique id, required for NSDiffableDataSourceSnapshot and Compose LazyList key
     var type = 0

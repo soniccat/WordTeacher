@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
+import androidx.compose.runtime.Stable
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord

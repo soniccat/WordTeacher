@@ -40,6 +40,7 @@ kotlin {
                 implementation(libs.decompose)
                 implementation(libs.statelyCommon)
                 implementation(libs.statelyConcurrency)
+                implementation(compose.runtime)
                 api(libs.settingsCoroutinesMt)
                 api(libs.mokoResourcesLib)
             }
@@ -60,9 +61,8 @@ kotlin {
                 implementation("org.jsoup:jsoup:1.14.3")
 
                 // for compose-jb - uncomment - start
-//                implementation(compose.runtime)
-//                implementation(compose.foundation)
-//                implementation(compose.material)
+                implementation(compose.foundation)
+                implementation(compose.material)
                 // for compose-jb - uncomment - end
             }
         }
@@ -94,9 +94,9 @@ kotlin {
             dependencies {
                 implementation(libs.ktorDesktop)
                 // for compose-jb - uncomment - start
-//                implementation(compose.runtime)
-//                implementation(compose.foundation)
-//                implementation(compose.material)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
                 // for compose-jb - uncomment - end
 
 //                implementation(compose.uiTooling)

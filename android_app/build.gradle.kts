@@ -44,13 +44,14 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs = freeCompilerArgs + "-Xinline-classes"
+        freeCompilerArgs = freeCompilerArgs + "-Xinline-classes" + "-P" + "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=/Users/aoglushkov/androidProjects/WordTeacher/composedebug"
+
     }
 
     composeOptions {
         kotlinCompilerVersion = libs.versions.kotlinVersion.get()
         // for compose-jb - comment - start
-        kotlinCompilerExtensionVersion = libs.versions.composeJetpackCompiler.get()
+//        kotlinCompilerExtensionVersion = libs.versions.composeJetpackCompiler.get()
         // for compose-jb - comment - end
     }
 
@@ -92,12 +93,12 @@ dependencies {
     implementation("com.google.accompanist:accompanist-insets:0.17.0")
 
     // for compose-jb - comment - start
-    implementation(libs.androidComposeFoundation)
-    implementation(libs.androidComposeMaterial)
-    implementation(libs.androidComposeCompiler)
+//    implementation(libs.androidComposeFoundation)
+//    implementation(libs.androidComposeMaterial)
+//    implementation(libs.androidComposeCompiler)
     // for compose-jb - comment - end
     // for compose-jb - uncomment - start
-//    implementation(compose.material)
+    implementation(compose.material)
     // for compose-jb - uncomment - end
 
     implementation(libs.coroutinesCommon)

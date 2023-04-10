@@ -9,7 +9,7 @@ plugins {
     id("com.google.gms.google-services")
 
     // for compose-jb - uncomment - start
-//    id("org.jetbrains.compose")
+    id("org.jetbrains.compose")
     // for compose-jb - uncomment - end
 }
 
