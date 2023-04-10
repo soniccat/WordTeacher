@@ -43,6 +43,8 @@ import com.aglushkov.wordteacher.android_app.general.views.compose.ChipColors
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.TestBaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.TestViewItemImpl
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -172,6 +174,7 @@ private fun DefinitionsWordUI(
 
         val suggestsRes = suggests.value
         val suggestsData = suggestsRes.data()
+        val tv by remember{ mutableStateOf(TestViewItemImpl())}
         if (needShowSuggests && suggestsData?.isNotEmpty() == true) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
@@ -203,6 +206,7 @@ private fun DefinitionsWordUI(
                         showViewItem(
                             Modifier.animateItemPlacement(),
                             item,
+                            tv,
                             vm,
                             onPartOfSpeechFilterClicked,
                             { vm.onPartOfSpeechFilterCloseClicked(it) },
@@ -252,6 +256,7 @@ private fun showSuggestItem(
 private fun showViewItem(
     modifier: Modifier,
     item: BaseViewItem<*>,
+    testViewItem: TestBaseViewItem,
     vm: DefinitionsVM,
     onPartOfSpeechFilterClicked: (DefinitionsDisplayModeViewItem) -> Unit,
     onPartOfSpeechFilterCloseClicked: (DefinitionsDisplayModeViewItem) -> Unit,
@@ -266,7 +271,7 @@ private fun showViewItem(
     )
     is WordDividerViewItem -> WordDividerView(modifier)
     is WordTitleViewItem -> WordTitleView(item, modifier)
-    is WordTranscriptionViewItem -> WordTranscriptionView(item, modifier)
+    is WordTranscriptionViewItem -> WordTranscriptionView(item, testViewItem, modifier)
     is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier)
     is WordDefinitionViewItem -> WordDefinitionView(
         item,
@@ -448,6 +453,7 @@ fun WordTitleView(
 @Composable
 fun WordTranscriptionView(
     viewItem: WordTranscriptionViewItem,
+    testViewItem: TestBaseViewItem,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = AppTypography.wordDefinitionTranscripton,
     textContent: @Composable BoxScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
@@ -465,7 +471,7 @@ fun WordTranscriptionView(
                 end = dimensionResource(id = R.dimen.word_horizontalPadding)
             )
     ) {
-        textContent(viewItem.firstItem(), textStyle)
+        textContent(viewItem.firstItem() + testViewItem.items.first(), textStyle)
     }
 }
 
