@@ -56,7 +56,6 @@ import com.aglushkov.wordteacher.shared.model.toStringDesc
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @ExperimentalUnitApi
 @ExperimentalMaterialApi
 @Composable
@@ -71,7 +70,8 @@ fun ArticleUI(
     val data = paragraphs.data()
 
     val sideSheetState = rememberSideSheetState(SideSheetValue.Closed)
-    val lazyColumnState = rememberLazyListState(state.lastFirstVisibleItem)
+    val restoredLastFirstVisibleItem = remember { state.lastFirstVisibleItem }
+    val lazyColumnState = rememberLazyListState(restoredLastFirstVisibleItem)
 
     LaunchedEffect(lazyColumnState) {
         snapshotFlow { lazyColumnState.firstVisibleItemIndex }

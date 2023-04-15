@@ -203,11 +203,11 @@ open class ArticleVMImpl(
         }
 
         viewModelScope.launch(Dispatchers.Default) {
-            combine(article, cardProgress, dicts, state) { a, b, c, d -> Quadruple(a, b, c, d) }
-                .map { (article, cards, dicts, state) ->
+            combine(article, cardProgress, dicts, state.map { it.selectionState }.distinctUntilChanged()) { a, b, c, d -> Quadruple(a, b, c, d) }
+                .map { (article, cards, dicts, selectionState) ->
                     if (article is Resource.Loaded && cards is Resource.Loaded) {
                         article.data.sentences.map {
-                            resolveAnnotations(it, cards, dicts.data().orEmpty(), state.selectionState)
+                            resolveAnnotations(it, cards, dicts.data().orEmpty(), selectionState)
                         }
                     } else {
                         emptyList()
