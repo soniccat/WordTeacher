@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatFile
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
@@ -152,6 +153,14 @@ class AppModule {
 
     @AppComp
     @Provides
+    fun cardSetSearchRepository(
+        service: SpaceCardSetSearchService,
+    ): CardSetSearchRepository {
+        return CardSetSearchRepository(service)
+    }
+
+    @AppComp
+    @Provides
     fun notesRepository(
         database: AppDatabase,
         nlpCore: NLPCore,
@@ -281,6 +290,14 @@ class AppModule {
         @SpaceHttpClient httpClient: HttpClient,
     ): SpaceCardSetService =
         SpaceCardSetService(context.getString(R.string.api_base_url), httpClient)
+
+    @AppComp
+    @Provides
+    fun spaceCardSetSearchService(
+        context: Context,
+        @SpaceHttpClient httpClient: HttpClient,
+    ): SpaceCardSetSearchService =
+        SpaceCardSetSearchService(context.getString(R.string.api_base_url), httpClient)
 
     @AppComp
     @Provides

@@ -49,6 +49,7 @@ sealed interface Resource<T> {
         }
     }
 
+    // it's better to use transform instead not to access this.data outside
     fun <R> copyWith(data: R?): Resource<R> {
         return when(this) {
             is Uninitialized -> Uninitialized(version = version)
@@ -63,8 +64,8 @@ sealed interface Resource<T> {
         loadedDataTransformer: (T) -> R
     ): Resource<R> = when (this) {
         is Loaded -> from.toLoaded(data = loadedDataTransformer(data))
-        is Loading -> from.toLoading()
-        is Error -> from.toError(throwable, canTryAgain)
+        is Loading -> from.toLoading(data = data?.let{ loadedDataTransformer(it) }, canLoadNextPage, version)
+        is Error -> from.toError(throwable, canTryAgain, data = data?.let{ loadedDataTransformer(it) }, canLoadNextPage, version)
         is Uninitialized -> from.toUninitialized()
     }
 
@@ -140,6 +141,10 @@ fun <T> Resource<T>?.isLoadedAndNotEmpty(): Boolean where T : Collection<*> {
 
 fun Resource<*>?.isLoadedOrError(): Boolean {
     return if (this == null) false else (this is Resource.Loaded || this is Resource.Error)
+}
+
+fun Resource<*>?.isLoadedOrLoading(): Boolean {
+    return if (this == null) false else (this !is Resource.Loaded || this !is Resource.Error)
 }
 
 fun <T, D> Resource<T>.merge(res2: Resource<D>): Resource<Pair<T?, D?>> =

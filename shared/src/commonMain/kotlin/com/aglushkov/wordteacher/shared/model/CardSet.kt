@@ -15,6 +15,7 @@ data class CardSet (
     val creationDate: Instant,
     val modificationDate: Instant,
     val cards: List<Card> = emptyList(),
+    var terms: List<String> = emptyList(), // for cardsets from search
     val creationId: String,
 ) {
     fun findCard(id: Long) =

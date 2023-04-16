@@ -18,6 +18,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.android_app.BuildConfig
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.android_app.general.views.compose.*
@@ -26,6 +27,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
 import io.ktor.utils.io.streams.*
 import okio.FileSystem
 import okio.Path.Companion.toPath
@@ -39,9 +41,10 @@ fun CardSetsUI(
     modifier: Modifier = Modifier
 ) {
     val cardSets by vm.cardSets.collectAsState()
+    val searchCardSets by vm.searchCardSets.collectAsState()
     var searchText by remember { mutableStateOf("") }
-    val data = cardSets.data()
 
+    val needShowSearch by remember(searchCardSets) { derivedStateOf { !searchCardSets.isUninitialized() } }
     val newCardSetTextState = vm.stateFlow.collectAsState()
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { newCardSetTextState.value.newCardSetText }) }
 
@@ -57,28 +60,57 @@ fun CardSetsUI(
                 }
             }
 
-            if (cardSets.isLoaded() && data != null) {
-                if (data.size == 1) {
-                    importDBButton()
-                }
-
-                LazyColumn(
-                    contentPadding = PaddingValues(bottom = 100.dp)
-                ) {
-                    items(
-                        data,
-                        key = { it.id }
-                    ) { item ->
-                        CardSetsViewItem(item, vm, newCardSetState)
+            // search result
+            if (needShowSearch) {
+                val data = searchCardSets.data()
+                if (searchCardSets.isLoadedAndNotEmpty() && data != null) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = 100.dp)
+                    ) {
+                        items(
+                            data,
+                            key = { it.id }
+                        ) { item ->
+                            ShowSearchCardSets(item, vm)
+                        }
+                    }
+                } else {
+                    LoadingStatusView(
+                        resource = searchCardSets,
+                        loadingText = null,
+                        errorText = vm.getErrorText().resolveString(),
+                        emptyText = vm.getEmptySearchText().resolveString(),
+                    ) {
+                        vm.onTryAgainSearchClicked()
                     }
                 }
+
             } else {
-                LoadingStatusView(
-                    resource = cardSets,
-                    loadingText = null,
-                    errorText = vm.getErrorText(cardSets)?.resolveString()
-                ) {
-                    vm.onTryAgainClicked()
+                // local cardsets
+                val data = cardSets.data()
+                if (cardSets.isLoaded() && data != null) {
+                    if (data.size == 1 && BuildConfig.DEBUG) {
+                        importDBButton()
+                    }
+
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = 100.dp)
+                    ) {
+                        items(
+                            data,
+                            key = { it.id }
+                        ) { item ->
+                            CardSetsViewItem(item, vm, newCardSetState)
+                        }
+                    }
+                } else {
+                    LoadingStatusView(
+                        resource = cardSets,
+                        loadingText = null,
+                        errorText = vm.getErrorText().resolveString(),
+                    ) {
+                        vm.onTryAgainClicked()
+                    }
                 }
             }
         }
@@ -98,6 +130,29 @@ fun CardSetsUI(
                     contentDescription = null
                 )
             }
+        }
+    }
+}
+
+@ExperimentalAnimationApi
+@ExperimentalMaterialApi
+@Composable
+private fun ShowSearchCardSets(
+    item: BaseViewItem<*>,
+    vm: CardSetsVM
+) {
+    when (item) {
+        is CardSetViewItem -> {
+            CardSetTitleView(
+                item,
+                onClick = { vm.onCardSetClicked(item) },
+                onDeleted = { vm.onCardSetRemoved(item) }
+            )
+        }
+        else -> {
+            Text(
+                text = "unknown item $item"
+            )
         }
     }
 }

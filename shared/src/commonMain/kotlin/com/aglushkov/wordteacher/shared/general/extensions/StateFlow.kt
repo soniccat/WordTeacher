@@ -60,7 +60,7 @@ fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(
     }
 }
 
-private suspend fun <T> applyResValueIfNeeded(
+suspend fun <T> applyResValueIfNeeded(
     startVersion: Int,
     newRes: Resource<T>,
     applyFun: suspend () -> Unit

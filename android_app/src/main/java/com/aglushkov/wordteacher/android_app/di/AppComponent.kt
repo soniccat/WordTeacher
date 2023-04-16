@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
@@ -73,6 +74,7 @@ interface AppComponent:
     override fun routerResolver(): RouterResolver
     override fun articlesRepository(): ArticlesRepository
     override fun cardSetsRepository(): CardSetsRepository
+    override fun cardSetSearchRepository(): CardSetSearchRepository
     override fun wordRepository(): WordDefinitionRepository
     override fun notesRepository(): NotesRepository
 

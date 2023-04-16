@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -30,6 +31,7 @@ interface CardSetsComponent {
 interface CardSetsDependencies {
     fun routerResolver(): RouterResolver
     fun cardSetsRepository(): CardSetsRepository
+    fun cardSetSearchRepository(): CardSetSearchRepository
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
 }

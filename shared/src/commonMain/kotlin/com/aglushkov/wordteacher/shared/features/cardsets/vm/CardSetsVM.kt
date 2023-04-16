@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -22,6 +23,7 @@ interface CardSetsVM: Clearable {
     val stateFlow: StateFlow<State>
     val eventFlow: Flow<Event>
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
+    val searchCardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
 
     fun restore(newState: State)
     fun onCardSetAdded(text: String)
@@ -29,18 +31,24 @@ interface CardSetsVM: Clearable {
     fun onStartLearningClicked()
     fun onCardSetClicked(item: CardSetViewItem)
     fun onCardSetRemoved(item: CardSetViewItem)
-    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+    fun getErrorText(): StringDesc
+    fun getEmptySearchText(): StringDesc
     fun onTryAgainClicked()
+    fun onSearch(query: String)
+    fun onSearchClosed()
+    fun onTryAgainSearchClicked()
 
     @Parcelize
     data class State (
+        val searchQuery: String? = null,
         val newCardSetText: String? = null
     ): Parcelable
 }
 
 open class CardSetsVMImpl(
-    var state: CardSetsVM.State = CardSetsVM.State(),
-    val cardSetsRepository: CardSetsRepository,
+    state: CardSetsVM.State = CardSetsVM.State(),
+    private val cardSetsRepository: CardSetsRepository,
+    private val cardSetSearchRepository: CardSetSearchRepository,
     private val router: CardSetsRouter,
     private val timeSource: TimeSource
 ): ViewModel(), CardSetsVM {
@@ -49,12 +57,23 @@ open class CardSetsVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
     override val cardSets = cardSetsRepository.cardSets.map {
-        //Logger.v("build view items")
         it.copyWith(buildViewItems(it.data() ?: emptyList(), state.newCardSetText))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
+    override val searchCardSets = cardSetSearchRepository.cardSets.map {
+        it.transform {
+            it.map {
+                CardSetViewItem(
+                    it.id,
+                    it.name,
+                    timeSource.stringDate(it.creationDate),
+                ) as BaseViewItem<*>
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+
     override fun restore(newState: CardSetsVM.State) {
-        state = newState
+        updateState(newState)
     }
 
     override fun onCleared() {
@@ -63,11 +82,11 @@ open class CardSetsVMImpl(
     }
 
     override fun onNewCardSetTextChange(text: String) {
-        updateState(state.copy(newCardSetText = text))
+        stateFlow.update { it.copy(newCardSetText = text) }
     }
 
     override fun onCardSetAdded(name: String) {
-        updateState(state.copy(newCardSetText = null))
+        stateFlow.update { it.copy(newCardSetText = null) }
 
         viewModelScope.launch {
             try {
@@ -79,8 +98,8 @@ open class CardSetsVMImpl(
     }
 
     private fun updateState(newState: CardSetsVM.State) {
-        state = newState
-        stateFlow.value = state
+        //state = newState
+        stateFlow.update { newState }
     }
 
     fun onCreateTextCardSetClicked() {
@@ -137,8 +156,12 @@ open class CardSetsVMImpl(
             *items.toTypedArray())
     }
 
-    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
+    override fun getErrorText(): StringDesc {
         return StringDesc.Resource(MR.strings.cardsets_error)
+    }
+
+    override fun getEmptySearchText(): StringDesc {
+        return StringDesc.Resource(MR.strings.empty_search_result)
     }
 
     override fun onTryAgainClicked() {
@@ -152,6 +175,24 @@ open class CardSetsVMImpl(
 
         // TODO: pass an error message
         //eventChannel.offer(ErrorEvent(errorText))
+    }
+
+    override fun onSearch(query: String) {
+        startSearch(query)
+    }
+
+    private fun startSearch(query: String) {
+        stateFlow.update { it.copy(searchQuery = query) }
+        cardSetSearchRepository.search(query)
+    }
+
+    override fun onSearchClosed() {
+        stateFlow.update { it.copy(searchQuery = null) }
+        cardSetSearchRepository.clear()
+    }
+
+    override fun onTryAgainSearchClicked() {
+        cardSetSearchRepository.search()
     }
 }
 

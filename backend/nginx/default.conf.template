@@ -1,25 +1,29 @@
 server {
-   listen 9090 default_server;
-   listen [::]:9090 default_server;
+    listen 9090 default_server;
+    listen [::]:9090 default_server;
 
-   # set DNS resolver as Docker internal DNS
-   resolver 127.0.0.11 valid=10s;
-   resolver_timeout 5s;
+    # set DNS resolver as Docker internal DNS
+    resolver 127.0.0.11 valid=10s;
+    resolver_timeout 5s;
 
-   location /api/auth {
-       set $auth http://auth:${AUTH_PORT};
-       proxy_pass $auth;
-   }
+    location /api/auth {
+        set $auth http://auth:${AUTH_PORT};
+        proxy_pass $auth;
+    }
 
-   #
-   # CardSets
-   #
-   location /api/cardsets {
-      set $cardsets http://cardsets:${CARDSETS_PORT};
-      proxy_pass $cardsets;
-   }
+    #
+    # CardSets Search
+    #
+    location /api/cardsets/search {
+        set $cardsetsearch http://cardsets:${CARDSETS_PORT};
+        proxy_pass $cardsets;
+    }
 
-   #
-   # CardSets Search
-   #
+    #
+    # CardSets
+    #
+    location /api/cardsets {
+        set $cardsetsearch http://cardsetsearch:${CARDSETS_PORT};
+        proxy_pass $cardsetsearch;
+    }
 }
