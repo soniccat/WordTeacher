@@ -92,4 +92,8 @@ class CardSetsRepository(
             }.map { it.id }
         }
     }
+
+    fun addRemoteCardSet(id: String) {
+
+    }
 }

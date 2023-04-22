@@ -23,6 +23,10 @@ type ErrorWithCode struct {
 	Code int
 }
 
+func (e ErrorWithCode) Error() string {
+	return e.Err.Error()
+}
+
 func NewErrorWithCode(err error, code int) *ErrorWithCode {
 	return &ErrorWithCode{err, code}
 }

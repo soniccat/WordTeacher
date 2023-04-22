@@ -16,6 +16,10 @@ func (app *application) routes() *mux.Router {
 		"/api/cardsets/pull",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetPull)),
 	).Methods("POST")
+	r.Handle(
+		"/api/cardsets/{id}",
+		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetById)),
+	).Methods("GET")
 
 	return r
 }

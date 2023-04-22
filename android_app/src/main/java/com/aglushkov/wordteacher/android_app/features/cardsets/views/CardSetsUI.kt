@@ -4,6 +4,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,7 +29,6 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewIt
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
-import io.ktor.utils.io.streams.*
 import okio.FileSystem
 import okio.Path.Companion.toPath
 
@@ -42,7 +42,7 @@ fun CardSetsUI(
 ) {
     val cardSets by vm.cardSets.collectAsState()
     val searchCardSets by vm.searchCardSets.collectAsState()
-    var searchText by remember { mutableStateOf("") }
+    var searchText by remember { mutableStateOf(vm.stateFlow.value.searchQuery.orEmpty()) }
 
     val needShowSearch by remember(searchCardSets) { derivedStateOf { !searchCardSets.isUninitialized() } }
     val newCardSetTextState = vm.stateFlow.collectAsState()
@@ -55,8 +55,16 @@ fun CardSetsUI(
     ) {
         Column{
             CustomTopAppBar {
-                SearchView(searchText, onTextChanged = { searchText = it }) {
-                    //vm.onWordSubmitted(searchText)
+                SearchView(
+                    searchText,
+                    onTextChanged = {
+                        searchText = it
+                        if (it.isEmpty()) {
+                            vm.onSearchClosed()
+                        }
+                    }
+                ) {
+                    vm.onSearch(searchText)
                 }
             }
 
@@ -143,10 +151,10 @@ private fun ShowSearchCardSets(
 ) {
     when (item) {
         is CardSetViewItem -> {
-            CardSetTitleView(
+            CardSetSearchItemView(
                 item,
                 onClick = { vm.onCardSetClicked(item) },
-                onDeleted = { vm.onCardSetRemoved(item) }
+                onAdd = { vm.onSearchCardSetAddClicked(item) }
             )
         }
         else -> {
@@ -177,7 +185,7 @@ private fun CardSetsViewItem(
             vm.onCardSetAdded(it)
         }
     )
-    is CardSetViewItem -> CardSetTitleView(
+    is CardSetViewItem -> CardSetItemView(
         item,
         onClick = { vm.onCardSetClicked(item) },
         onDeleted = { vm.onCardSetRemoved(item) }
@@ -193,7 +201,7 @@ private fun CardSetsViewItem(
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
-private fun CardSetTitleView(
+private fun CardSetItemView(
     item: CardSetViewItem,
     onClick: () -> Unit = {},
     onDeleted: () -> Unit = {}
@@ -233,11 +241,38 @@ private fun CardSetTitleView(
     }
 }
 
+@ExperimentalAnimationApi
+@ExperimentalMaterialApi
+@Composable
+private fun CardSetSearchItemView(
+    item: CardSetViewItem,
+    onClick: () -> Unit = {},
+    onAdd: () -> Unit = {},
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
+    ) {
+        ListItem(
+            text = { Text(item.name) },
+            secondaryText = { item.items.joinToString() },
+            trailing = {
+                AddIcon {
+                    onAdded()
+                }
+            }
+        )
+    }
+}
+
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun CardSetTitleViewPreviews() {
-    CardSetTitleView(
+    CardSetItemView(
         CardSetViewItem(
             setId = 0L,
             name = "My card set",

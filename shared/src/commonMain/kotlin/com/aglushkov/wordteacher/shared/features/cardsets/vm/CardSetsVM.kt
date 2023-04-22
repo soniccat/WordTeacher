@@ -37,6 +37,7 @@ interface CardSetsVM: Clearable {
     fun onSearch(query: String)
     fun onSearchClosed()
     fun onTryAgainSearchClicked()
+    fun onSearchCardSetAddClicked(item: CardSetViewItem)
 
     @Parcelize
     data class State (
@@ -193,6 +194,10 @@ open class CardSetsVMImpl(
 
     override fun onTryAgainSearchClicked() {
         cardSetSearchRepository.search()
+    }
+
+    override fun onSearchCardSetAddClicked(item: CardSetViewItem) {
+
     }
 }
 

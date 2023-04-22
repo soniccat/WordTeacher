@@ -15,15 +15,15 @@ server {
     # CardSets Search
     #
     location /api/cardsets/search {
-        set $cardsetsearch http://cardsets:${CARDSETS_PORT};
-        proxy_pass $cardsets;
+        set $cardsetsearch http://cardsetsearch:${CARDSETSEARCH_PORT};
+        proxy_pass $cardsetsearch;
     }
 
     #
     # CardSets
     #
     location /api/cardsets {
-        set $cardsetsearch http://cardsetsearch:${CARDSETS_PORT};
-        proxy_pass $cardsetsearch;
+        set $cardsets http://cardsets:${CARDSETS_PORT};
+        proxy_pass $cardsets;
     }
 }

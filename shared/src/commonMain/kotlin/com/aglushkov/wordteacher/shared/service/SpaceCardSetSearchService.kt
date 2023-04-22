@@ -30,9 +30,10 @@ class SpaceCardSetSearchService(
             explicitNulls = false
             ignoreUnknownKeys = true
             classDiscriminator = "status"
+            coerceInputValues = true
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
-                    subclass(Response.Ok.serializer(CardSetPullResponse.serializer()))
+                    subclass(Response.Ok.serializer(CardSetSearchResponse.serializer()))
                     subclass(Response.Err.serializer())
                 }
             }

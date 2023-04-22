@@ -39,7 +39,11 @@ func (app *application) SetHandlerError(w http.ResponseWriter, err *tools.Handle
 }
 
 func (app *application) SetError(w http.ResponseWriter, outErr error, code int) {
-	tools.SetError(w, outErr, code, app.GetLogger())
+	if handlerError, ok := outErr.(*tools.HandlerError); ok {
+		app.SetHandlerError(w, handlerError)
+	} else {
+		tools.SetError(w, outErr, code, app.GetLogger())
+	}
 }
 
 func (app *application) WriteResponse(w http.ResponseWriter, response interface{}) {

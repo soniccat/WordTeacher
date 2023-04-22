@@ -14,7 +14,7 @@ data class CardSet (
     val name: String,
     val creationDate: Instant,
     val modificationDate: Instant,
-    val cards: List<Card> = emptyList(),
+    @SerialName("cards") val cards: List<Card> = emptyList(),
     var terms: List<String> = emptyList(), // for cardsets from search
     val creationId: String,
 ) {

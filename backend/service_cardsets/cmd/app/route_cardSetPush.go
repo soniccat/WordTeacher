@@ -170,11 +170,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		if updatedCardSetsError, ok := err.(*tools.HandlerError); ok {
-			app.SetHandlerError(w, updatedCardSetsError)
-		} else {
-			app.SetError(w, err, http.StatusInternalServerError)
-		}
+		app.SetError(w, err, http.StatusInternalServerError)
 		return
 	}
 
