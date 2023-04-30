@@ -227,21 +227,23 @@ class AppDatabase(
 
         fun remoteIds() = db.dBCardSetQueries.selectRemoteIds().executeAsList()
 
-        fun insert(cardSet: CardSet, creationDate: Instant, modificationDate: Instant): CardSet {
+        fun insert(cardSet: CardSet): CardSet {
+            var insertedCarSetId: Long = 0
             db.transaction {
                 db.dBCardSetQueries.insert(
                     name = cardSet.name,
-                    date = creationDate.toEpochMilliseconds(),
-                    modificationDate = modificationDate.toEpochMilliseconds(),
+                    date = cardSet.creationDate.toEpochMilliseconds(),
+                    modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
                     creationId = cardSet.creationId
                 )
+                insertedCarSetId = insertedCardSetId()!!
                 cardSet.cards.onEach { card ->
-                    cards.insertCard(cardSet.id, card, card.creationDate, card.modificationDate)
+                    cards.insertCard(insertedCarSetId, card, card.creationDate, card.modificationDate)
                 }
             }
 
             return cardSet.copy(
-                id = insertedCardSetId()!!
+                id = insertedCarSetId
             )
         }
 

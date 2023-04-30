@@ -6,6 +6,8 @@ import (
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
+	"service_cardsets/internal/card"
+	"tools"
 )
 
 type CardSetGetByIdResponse struct {
@@ -38,6 +40,17 @@ func (app *application) cardSetById(w http.ResponseWriter, r *http.Request) {
 		app.SetError(w, err, http.StatusServiceUnavailable)
 		return
 	}
+
+	// cut progress data
+	defaultCardProgress := &api.CardProgress{
+		CurrentLevel:     0,
+		LastMistakeCount: 0,
+		LastLessonDate:   "",
+	}
+	dbCardSet.Cards = tools.Map(dbCardSet.Cards, func(c *card.DbCard) *card.DbCard {
+		c.Progress = defaultCardProgress
+		return c
+	})
 
 	apiCardSet := dbCardSet.ToApi()
 	response := CardSetGetByIdResponse{

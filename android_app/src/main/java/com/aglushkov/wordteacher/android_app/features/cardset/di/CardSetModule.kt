@@ -18,10 +18,9 @@ class CardSetModule {
 
     @Provides
     fun cardSetRepository(
-        database: AppDatabase,
         databaseWorker: DatabaseWorker,
         timeSource: TimeSource
-    ) = CardSetRepository(database, databaseWorker, timeSource)
+    ) = CardSetRepository(databaseWorker, timeSource)
 
     @Provides
     fun cardSetDecomposeComponent(

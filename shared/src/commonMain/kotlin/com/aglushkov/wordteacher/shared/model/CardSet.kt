@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.sumOf
+import com.benasher44.uuid.uuid4
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,7 +21,23 @@ data class CardSet (
 ) {
     fun findCard(id: Long) =
         cards.firstOrNull { it.id == id }
-}
+
+    fun copyWithDate(creationDate: Instant) =
+        this.copy(
+            creationDate = creationDate,
+            modificationDate = creationDate,
+            creationId = uuid4().toString(),
+            remoteId = "",
+            cards = cards.map {
+                it.copy(
+                    creationDate = creationDate,
+                    modificationDate = creationDate,
+                    creationId = uuid4().toString(),
+                    remoteId = "",
+                )
+            }
+        )
+    }
 
 fun List<Card>.totalProgress(): Float = calcProgress(this)
 

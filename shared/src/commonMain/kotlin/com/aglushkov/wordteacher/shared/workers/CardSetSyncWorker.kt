@@ -225,7 +225,7 @@ class CardSetSyncWorker(
                                     Logger.e("Strange cardSet state")
                                 }
                             } ?: run {
-                                database.cardSets.insert(remoteCardSet, remoteCardSet.creationDate, remoteCardSet.modificationDate)
+                                database.cardSets.insert(remoteCardSet)
                             }
                         }
 

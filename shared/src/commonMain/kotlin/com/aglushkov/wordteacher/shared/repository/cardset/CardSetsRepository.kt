@@ -2,32 +2,39 @@ package com.aglushkov.wordteacher.shared.repository.cardset
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.data
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.CardSpan
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 
 class CardSetsRepository(
-    private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource,
     private val nlpCore: NLPCore,
-    private val nlpSentenceProcessor: NLPSentenceProcessor
+    private val nlpSentenceProcessor: NLPSentenceProcessor,
+    private val cardSetService: SpaceCardSetService
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    val cardSets = database.cardSets.selectAll().stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
+    val cardSets = databaseWorker.database.cardSets.selectAll().stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     suspend fun createCardSet(name: String, date: Long) = supervisorScope {
         // Async in the scope to avoid retaining the parent coroutine and to cancel immediately
         // when it cancels (when corresponding ViewModel is cleared for example)
         scope.async(Dispatchers.Default) {
-            database.cardSets.insert(name, date)
+            databaseWorker.run {
+                it.cardSets.insert(name, date)
+            }
         }.await()
     }
 
@@ -38,8 +45,10 @@ class CardSetsRepository(
     }
 
     private fun removeCardSetInternal(cardSetId: Long) {
-        database.cardSets.run {
-            removeCardSet(cardSetId)
+        databaseWorker.launch {
+            it.cardSets.run {
+                removeCardSet(cardSetId)
+            }
         }
     }
 
@@ -61,18 +70,20 @@ class CardSetsRepository(
                 findTermSpans(sentence, term, nlpCoreCopy)
             }
 
-            database.cards.insertCard(
-                setId = setId,
-                term = term,
-                creationDate = timeSource.timeInstant(),
-                definitions = definitions,
-                definitionTermSpans = definitionSpans,
-                partOfSpeech = partOfSpeech,
-                transcription = transcription,
-                synonyms = synonyms,
-                examples = examples,
-                exampleTermSpans = exampleSpans
-            )
+            databaseWorker.run {
+                it.cards.insertCard(
+                    setId = setId,
+                    term = term,
+                    creationDate = timeSource.timeInstant(),
+                    definitions = definitions,
+                    definitionTermSpans = definitionSpans,
+                    partOfSpeech = partOfSpeech,
+                    transcription = transcription,
+                    synonyms = synonyms,
+                    examples = examples,
+                    exampleTermSpans = exampleSpans
+                )
+            }
         }.await()
     }
 
@@ -81,19 +92,29 @@ class CardSetsRepository(
 
     suspend fun allCardIds(): List<Long> {
         return databaseWorker.run {
-            database.cards.selectAllCardIds().executeAsList()
+            it.cards.selectAllCardIds().executeAsList()
         }
     }
 
     suspend fun allReadyToLearnCardIds(): List<Long> {
-        return databaseWorker.run {
+        return databaseWorker.run { database ->
             database.cards.selectAllCards().executeAsList().filter {
                 it.progress.isReadyToLearn(timeSource)
             }.map { it.id }
         }
     }
 
-    fun addRemoteCardSet(id: String) {
-
+    fun addRemoteCardSet(id: String): Flow<Resource<CardSet>> {
+        return loadResource {
+            cardSetService.getById(id).toOkResponse().cardSet
+        }.onEach {
+            if (it.isLoaded()) {
+                it.data()?.let { cardSet ->
+                    databaseWorker.launch {  database ->
+                        database.cardSets.insert(cardSet.copyWithDate(timeSource.timeInstant()))
+                    }
+                }
+            }
+        }.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
     }
 }

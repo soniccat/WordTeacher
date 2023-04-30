@@ -14,7 +14,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class CardSetRepository(
-    private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource
 ) {
@@ -28,10 +27,10 @@ class CardSetRepository(
         loadJob?.cancel()
         loadJob = scope.launch(Dispatchers.Default) {
             combine(
-                flow = database.cardSets.selectCardSetWithoutCards(id).asFlow().map {
+                flow = databaseWorker.database.cardSets.selectCardSetWithoutCards(id).asFlow().map {
                     tryInResource(canTryAgain = true) { it.executeAsOne() }
                 },
-                flow2 = database.cards.selectCards(id).asFlow().map {
+                flow2 = databaseWorker.database.cards.selectCards(id).asFlow().map {
                     tryInResource(canTryAgain = true) { it.executeAsList() }
                 },
                 transform = { cardSetRes, cardsRes ->
@@ -59,7 +58,7 @@ class CardSetRepository(
     ): Card {
         val loadedCardSet = cardSet.value.data()!!
         return databaseWorker.run {
-            database.cards.insertCard(
+            it.cards.insertCard(
                 setId = loadedCardSet.id,
                 creationDate = timeSource.timeInstant(),
                 term = term,

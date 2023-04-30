@@ -26,6 +26,7 @@ import com.aglushkov.wordteacher.android_app.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
@@ -150,11 +151,11 @@ private fun ShowSearchCardSets(
     vm: CardSetsVM
 ) {
     when (item) {
-        is CardSetViewItem -> {
+        is RemoteCardSetViewItem -> {
             CardSetSearchItemView(
                 item,
-                onClick = { vm.onCardSetClicked(item) },
-                onAdd = { vm.onSearchCardSetAddClicked(item) }
+                onClick = { vm.onSearchCardSetClicked(item) },
+                onAdded = { vm.onSearchCardSetAddClicked(item) }
             )
         }
         else -> {
@@ -245,9 +246,9 @@ private fun CardSetItemView(
 @ExperimentalMaterialApi
 @Composable
 private fun CardSetSearchItemView(
-    item: CardSetViewItem,
+    item: RemoteCardSetViewItem,
     onClick: () -> Unit = {},
-    onAdd: () -> Unit = {},
+    onAdded: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -258,7 +259,7 @@ private fun CardSetSearchItemView(
     ) {
         ListItem(
             text = { Text(item.name) },
-            secondaryText = { item.items.joinToString() },
+            secondaryText = { Text(item.terms.joinToString()) },
             trailing = {
                 AddIcon {
                     onAdded()

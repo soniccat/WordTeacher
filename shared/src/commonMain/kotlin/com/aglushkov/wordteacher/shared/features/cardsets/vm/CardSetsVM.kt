@@ -37,7 +37,8 @@ interface CardSetsVM: Clearable {
     fun onSearch(query: String)
     fun onSearchClosed()
     fun onTryAgainSearchClicked()
-    fun onSearchCardSetAddClicked(item: CardSetViewItem)
+    fun onSearchCardSetClicked(item: RemoteCardSetViewItem)
+    fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem)
 
     @Parcelize
     data class State (
@@ -63,11 +64,11 @@ open class CardSetsVMImpl(
 
     override val searchCardSets = cardSetSearchRepository.cardSets.map {
         it.transform {
-            it.map {
-                CardSetViewItem(
-                    it.id,
-                    it.name,
-                    timeSource.stringDate(it.creationDate),
+            it.map { cardSet ->
+                RemoteCardSetViewItem(
+                    cardSet.remoteId,
+                    cardSet.name,
+                    cardSet.terms,
                 ) as BaseViewItem<*>
             }
         }
@@ -196,8 +197,11 @@ open class CardSetsVMImpl(
         cardSetSearchRepository.search()
     }
 
-    override fun onSearchCardSetAddClicked(item: CardSetViewItem) {
+    override fun onSearchCardSetClicked(item: RemoteCardSetViewItem) {
+    }
 
+    override fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem) {
+        cardSetsRepository.addRemoteCardSet(item.remoteCardSetId)
     }
 }
 

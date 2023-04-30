@@ -18,3 +18,18 @@ class CardSetViewItem(
         return super.equalsByContent(other) && date == other.date
     }
 }
+
+class RemoteCardSetViewItem(
+    val remoteCardSetId: String,
+    val name: String,
+    val terms: List<String>,
+): BaseViewItem<String>(name, Type) {
+    companion object {
+        const val Type = 401
+    }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        other as RemoteCardSetViewItem
+        return super.equalsByContent(other) && terms == other.terms
+    }
+}

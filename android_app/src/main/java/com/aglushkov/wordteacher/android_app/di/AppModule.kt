@@ -142,13 +142,13 @@ class AppModule {
     @AppComp
     @Provides
     fun cardSetsRepository(
-        database: AppDatabase,
         databaseWorker: DatabaseWorker,
         timeSource: TimeSource,
         nlpCore: NLPCore,
         nlpSentenceProcessor: NLPSentenceProcessor,
+        cardSetService: SpaceCardSetService,
     ): CardSetsRepository {
-        return CardSetsRepository(database, databaseWorker, timeSource, nlpCore, nlpSentenceProcessor)
+        return CardSetsRepository(databaseWorker, timeSource, nlpCore, nlpSentenceProcessor, cardSetService)
     }
 
     @AppComp
@@ -181,12 +181,11 @@ class AppModule {
     @AppComp
     @Provides
     fun databaseCardWorker(
-        database: AppDatabase,
         databaseWorker: DatabaseWorker,
         spanUpdateWorker: SpanUpdateWorker,
         cardSetSyncWorker: CardSetSyncWorker
     ): DatabaseCardWorker {
-        return DatabaseCardWorker(database, databaseWorker, spanUpdateWorker, cardSetSyncWorker)
+        return DatabaseCardWorker(databaseWorker, spanUpdateWorker, cardSetSyncWorker)
     }
 
     @AppComp
@@ -322,8 +321,10 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun databaseWorker(): DatabaseWorker {
-        return DatabaseWorker()
+    fun databaseWorker(
+        database: AppDatabase
+    ): DatabaseWorker {
+        return DatabaseWorker(database)
     }
 
     @AppComp

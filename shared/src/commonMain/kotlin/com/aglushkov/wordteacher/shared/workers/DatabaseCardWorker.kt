@@ -22,13 +22,12 @@ import kotlin.properties.Delegates
 // Card updating queries shouldn't intersect to avoid data loss. Therefore, we need to be sure that they arent'
 // executed in parallel. So, this class provides a state switching interface
 class DatabaseCardWorker(
-    private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
     private val spanUpdateWorker: SpanUpdateWorker,
     private val cardSetSyncWorker: CardSetSyncWorker,
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val serialQueue = SerialQueue()
+    private val serialQueue = SerialQueue(Dispatchers.Main)
     private val editOperationCount = MutableStateFlow(0)
     private var stateStack by Delegates.observable(listOf<State>()) { _, _, new ->
         currentStateFlow.value = currentState
@@ -207,7 +206,7 @@ class DatabaseCardWorker(
 
     private suspend fun deleteCardInternal(card: Card, modificationDate: Long) = performEditOperation {
         databaseWorker.run {
-            database.cards.removeCard(card.id, modificationDate)
+            it.cards.removeCard(card.id, modificationDate)
         }
     }
 
@@ -218,7 +217,7 @@ class DatabaseCardWorker(
     suspend fun updateCardAndWait(card: Card, modificationDate: Long?) = serialQueue.sendAndWait {
         performEditOperation {
             databaseWorker.run {
-                database.cards.updateCard(card, modificationDate)
+                it.cards.updateCard(card, modificationDate)
             }
         }
     }
@@ -240,11 +239,10 @@ class DatabaseCardWorker(
     ) = performEditOperation {
         databaseWorker.runCancellable(
             id = "updateCard_" + card.id.toString(),
-            runnable = {
-                database.cards.updateCard(card, modificationDate)
-            },
             delay
-        )
+        ) {
+            it.cards.updateCard(card, modificationDate)
+        }
     }
 
     private suspend fun <T> performEditOperation(block: suspend () -> T): T {

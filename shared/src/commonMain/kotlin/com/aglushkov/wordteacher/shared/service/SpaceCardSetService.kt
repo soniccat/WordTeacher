@@ -41,6 +41,11 @@ data class CardSetPushResponse(
     @SerialName("cardIds") val cardIds: Map<String,String>?,
 )
 
+@Serializable
+data class CardSetByIdResponse(
+    @SerialName("cardSet") val cardSet: CardSet,
+)
+
 class SpaceCardSetService(
     private val baseUrl: String,
     private val httpClient: HttpClient
@@ -73,6 +78,20 @@ class SpaceCardSetService(
         }
     }
 
+    private val cardSetByIdJson by lazy {
+        Json {
+            explicitNulls = false
+            ignoreUnknownKeys = true
+            classDiscriminator = "status"
+            serializersModule = SerializersModule {
+                polymorphic(Response::class) {
+                    subclass(Response.Ok.serializer(CardSetByIdResponse.serializer()))
+                    subclass(Response.Err.serializer())
+                }
+            }
+        }
+    }
+
     suspend fun pull(currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<CardSetPullResponse> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/cardsets/pull") {
@@ -98,6 +117,15 @@ class SpaceCardSetService(
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
             pushJson.decodeFromString<Response<CardSetPushResponse>>(stringResponse).setStatusCode(res.status.value)
+        }
+    }
+
+    suspend fun getById(id: String): Response<CardSetByIdResponse> {
+        val res: HttpResponse =
+            httpClient.get(urlString = "${baseUrl}/api/cardsets/" + id)
+        return withContext(Dispatchers.Default) {
+            val stringResponse = res.readBytes().decodeToString()
+            cardSetByIdJson.decodeFromString<Response<CardSetByIdResponse>>(stringResponse).setStatusCode(res.status.value)
         }
     }
 }
