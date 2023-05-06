@@ -2,9 +2,11 @@ package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.Clearable
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -52,7 +54,8 @@ open class CardSetsVMImpl(
     private val cardSetsRepository: CardSetsRepository,
     private val cardSetSearchRepository: CardSetSearchRepository,
     private val router: CardSetsRouter,
-    private val timeSource: TimeSource
+    private val timeSource: TimeSource,
+    private val idGenerator: IdGenerator
 ): ViewModel(), CardSetsVM {
 
     final override val stateFlow = MutableStateFlow(state)
@@ -64,15 +67,21 @@ open class CardSetsVMImpl(
 
     override val searchCardSets = cardSetSearchRepository.cardSets.map {
         it.transform {
-            it.map { cardSet ->
+            val viewItems = it.map { cardSet ->
                 RemoteCardSetViewItem(
                     cardSet.remoteId,
                     cardSet.name,
                     cardSet.terms,
                 ) as BaseViewItem<*>
             }
+            generateSearchViewItemIds(viewItems)
+            viewItems
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+
+    private fun generateSearchViewItemIds(viewItems: List<BaseViewItem<*>>) {
+        generateViewItemIds(viewItems, searchCardSets.value.data().orEmpty(), idGenerator)
+    }
 
     override fun restore(newState: CardSetsVM.State) {
         updateState(newState)

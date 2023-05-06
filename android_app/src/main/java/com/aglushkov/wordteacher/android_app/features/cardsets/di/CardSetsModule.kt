@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.android_app.features.cardsets.di
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
@@ -20,7 +21,8 @@ class CardSetsModule {
         cardSetSearchRepository: CardSetSearchRepository,
         routerResolver: RouterResolver,
         componentContext: ComponentContext,
-        timeSource: TimeSource
+        timeSource: TimeSource,
+        idGenerator: IdGenerator,
     ): CardSetsDecomposeComponent {
         return CardSetsDecomposeComponent(
             state,
@@ -28,7 +30,8 @@ class CardSetsModule {
             cardSetSearchRepository,
             routerResolver.router!!.get()!!, 
             componentContext,
-            timeSource
+            timeSource,
+            idGenerator
         )
     }
 }
