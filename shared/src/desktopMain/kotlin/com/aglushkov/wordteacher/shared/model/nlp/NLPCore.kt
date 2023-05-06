@@ -16,3 +16,7 @@ actual class NLPCore {
         TODO("isn't implemented")
     }
 }
+
+actual fun phrasesAsSpanList(
+    tokenStrings: List<String>, tags: List<String>, chunks: List<String>
+): List<PhraseSpan> = emptyList()

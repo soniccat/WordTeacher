@@ -29,7 +29,7 @@ kotlin {
                 api(libs.ktorContentEncoding)
                 implementation(libs.ktorAuth)
                 implementation(libs.coroutinesCommon)
-                implementation(libs.okio)
+                api(libs.okio)
                 implementation(libs.kotlinxDateTime)
                 implementation(libs.logger)
                 implementation(libs.sqlDelightRuntime)
@@ -41,6 +41,7 @@ kotlin {
                 implementation(libs.statelyCommon)
                 implementation(libs.statelyConcurrency)
                 implementation(compose.runtime)
+                api(libs.settings)
                 api(libs.settingsCoroutinesMt)
                 api(libs.mokoResourcesLib)
             }
@@ -93,6 +94,7 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation(libs.ktorDesktop)
+                implementation("org.jsoup:jsoup:1.14.3")
                 // for compose-jb - uncomment - start
                 implementation(compose.runtime)
                 implementation(compose.foundation)

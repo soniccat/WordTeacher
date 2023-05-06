@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.desktopapp.di
 
 import com.aglushkov.wordteacher.desktopapp.features.definitions.di.DefinitionsComposeDependencies
-import com.aglushkov.wordteacher.desktopapp.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.desktopapp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -11,6 +10,7 @@ import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
@@ -22,7 +22,7 @@ import dagger.Component
 @AppComp
 @Component(modules = [AppModule::class, GeneralModule::class] )
 public interface AppComponent:
-    DefinitionsDependencies,
+    //DefinitionsDependencies,
     DefinitionsComposeDependencies {
 
     fun configService(): ConfigService
@@ -33,9 +33,10 @@ public interface AppComponent:
     fun database(): AppDatabase
     fun nlpCore(): NLPCore
 
-    fun routerResolver(): RouterResolver
-    fun articlesRepository(): ArticlesRepository
-    fun cardSetsRepository(): CardSetsRepository
+    override fun dictRepository(): DictRepository
+    override fun routerResolver(): RouterResolver
+//    fun articlesRepository(): ArticlesRepository
+    override fun cardSetsRepository(): CardSetsRepository
     override fun wordRepository(): WordDefinitionRepository
     override fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource

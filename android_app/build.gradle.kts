@@ -104,7 +104,7 @@ dependencies {
     implementation(libs.coroutinesCommon)
     implementation(libs.coroutinesAndroid)
     implementation(libs.ktorAndroidClient)
-    implementation(libs.okio)
+//    implementation(libs.okio)
     implementation(libs.settingsDataStore) {
         // as we use mt coroutines
         exclude(group = "com.russhwolf", module = "multiplatform-settings-coroutines-android-debug")

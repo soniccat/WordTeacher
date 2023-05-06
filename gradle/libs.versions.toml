@@ -16,7 +16,7 @@ androidAppCompat = "1.4.2"
 androidConstraintLayout = "2.1.4"
 androidCoreKts = "1.8.0"
 androidLifecycle = "2.4.1"
-dagger = "2.44.2"
+dagger = "2.46"
 playServicesPlugin = "4.3.13"
 playServicesAuth = "20.4.0"
 

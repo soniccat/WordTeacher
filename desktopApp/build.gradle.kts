@@ -19,9 +19,9 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
-}
+//kotlinOptions {
+//    jvmTarget = JavaVersion.VERSION_1_8.toString()
+//}
 
 kotlin {
     jvm {
@@ -49,14 +49,14 @@ kotlin {
                 implementation(compose.ui)
                 implementation(project(":shared"))
 
-                implementation("com.google.dagger:dagger:2.38.1")
+                implementation(libs.dagger)
             }
         }
     }
 }
 
 dependencies {
-    add("kapt", "com.google.dagger:dagger-compiler:2.38.1")
+    add("kapt", libs.daggerCompiler)
 }
 
 //compose.desktop {
