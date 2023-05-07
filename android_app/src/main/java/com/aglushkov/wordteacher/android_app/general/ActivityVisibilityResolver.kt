@@ -3,7 +3,7 @@ package com.aglushkov.wordteacher.android_app.general
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import com.aglushkov.wordteacher.android_app.di.AppComp
+import com.aglushkov.wordteacher.shared.di.AppComp
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 

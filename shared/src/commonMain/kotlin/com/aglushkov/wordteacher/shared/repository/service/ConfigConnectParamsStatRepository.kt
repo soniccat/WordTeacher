@@ -15,9 +15,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.FileSystem
+import okio.Path
 
 class ConfigConnectParamsStatRepository(
-    private val file: ConfigConnectParamsStatFile
+    private val fileSystem: FileSystem,
+    private val filePath: Path
 ) {
     private val stateFlow = MutableStateFlow<Resource<List<ConfigConnectParamsStat>>>(Resource.Uninitialized())
     val flow: StateFlow<Resource<List<ConfigConnectParamsStat>>> = stateFlow
@@ -56,8 +59,9 @@ class ConfigConnectParamsStatRepository(
     private fun loadConfigConnectParamsStatFlow() = flow {
         try {
             val configs = withContext(Dispatchers.Default) {
-                val bytes = file.loadContent()
-                ConfigConnectParamsStat.fromByteArray(bytes)
+                fileSystem.read(filePath) {
+                    ConfigConnectParamsStat.fromByteArray(readByteArray())
+                }
             }
             emit(Resource.Loaded(configs))
         } catch (e: CancellationException) {
@@ -74,8 +78,9 @@ class ConfigConnectParamsStatRepository(
 
         try {
             withContext(Dispatchers.Default) {
-                val bytes = value.toByteArray()
-                file.saveContent(bytes)
+                fileSystem.write(filePath) {
+                    write(value.toByteArray())
+                }
             }
         } catch (e: CancellationException) {
             throw e

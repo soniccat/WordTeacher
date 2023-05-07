@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import com.aglushkov.wordteacher.android_app.Router
-import com.aglushkov.wordteacher.android_app.di.AppComp
+import com.aglushkov.wordteacher.shared.di.AppComp
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 

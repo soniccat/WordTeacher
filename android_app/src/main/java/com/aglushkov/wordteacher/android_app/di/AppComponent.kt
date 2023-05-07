@@ -13,6 +13,8 @@ import com.aglushkov.wordteacher.android_app.features.notes.di.NotesDependencies
 import com.aglushkov.wordteacher.android_app.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
+import com.aglushkov.wordteacher.shared.di.AppComp
+import com.aglushkov.wordteacher.shared.di.SpaceHttpClient
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.GoogleAuthRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -101,6 +103,3 @@ interface AppComponent:
         fun build(): AppComponent
     }
 }
-
-@Qualifier
-annotation class SpaceHttpClient

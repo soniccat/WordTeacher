@@ -1,4 +1,5 @@
 import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 plugins {
     id("kmmlib-convention")
@@ -6,6 +7,7 @@ plugins {
     id("resources-convention")
     id("sqldelight-convention")
     id("dev.icerock.mobile.multiplatform-resources")
+    id("kotlin-kapt")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -17,6 +19,10 @@ repositories {
     gradlePluginPortal()
 
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+}
+
+dependencies {
+    add("kapt", libs.daggerCompiler)
 }
 
 kotlin {
@@ -54,7 +60,14 @@ kotlin {
                 implementation(libs.coroutinesCommonTest)
             }
         }
+        val composeSharedMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                implementation(libs.dagger)
+            }
+        }
         val androidMain by getting {
+            dependsOn(composeSharedMain)
             dependencies {
                 implementation(libs.androidMaterial)
                 implementation(libs.sqlDelightAndroidDriver)
@@ -92,6 +105,7 @@ kotlin {
         }
         val iosTest by getting
         val desktopMain by getting {
+            dependsOn(composeSharedMain)
             dependencies {
                 implementation(libs.ktorDesktop)
                 implementation("org.jsoup:jsoup:1.14.3")
