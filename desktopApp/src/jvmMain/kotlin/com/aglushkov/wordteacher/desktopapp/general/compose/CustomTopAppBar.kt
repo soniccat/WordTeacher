@@ -18,32 +18,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-
-@Composable
-// custom top app bar to get wrap content height
-fun CustomTopAppBar(
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
-    contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = AppBarDefaults.TopAppBarElevation,
-    contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
-    shape: Shape = RectangleShape,
-    content: @Composable RowScope.() -> Unit
-) {
-    Surface(
-        color = backgroundColor,
-        contentColor = contentColor,
-        elevation = elevation,
-        shape = shape,
-        modifier = modifier
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(contentPadding),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-            content = content
-        )
-    }
-}
+//
+//@Composable
+//// custom top app bar to get wrap content height
+//fun CustomTopAppBar(
+//    modifier: Modifier = Modifier,
+//    backgroundColor: Color = MaterialTheme.colors.primarySurface,
+//    contentColor: Color = contentColorFor(backgroundColor),
+//    elevation: Dp = AppBarDefaults.TopAppBarElevation,
+//    contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
+//    shape: Shape = RectangleShape,
+//    content: @Composable RowScope.() -> Unit
+//) {
+//    Surface(
+//        color = backgroundColor,
+//        contentColor = contentColor,
+//        elevation = elevation,
+//        shape = shape,
+//        modifier = modifier
+//    ) {
+//        Row(
+//            Modifier
+//                .fillMaxWidth()
+//                .padding(contentPadding),
+//            horizontalArrangement = Arrangement.Start,
+//            verticalAlignment = Alignment.CenterVertically,
+//            content = content
+//        )
+//    }
+//}

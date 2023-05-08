@@ -26,64 +26,64 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 
 
-
-@Composable
-fun SearchView(
-    text: String,
-    onTextChanged: (String) -> Unit,
-    onImeAction: () -> Unit
-) {
-    TextField(
-        value = text,
-        onValueChange = onTextChanged,
-        modifier = Modifier
-//            .onPreviewKeyEvent {
-//                if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
-//                    onImeAction()
-//                    true
-//                } else {
-//                    false
-//                }
+//
+//@Composable
+//fun SearchView(
+//    text: String,
+//    onTextChanged: (String) -> Unit,
+//    onImeAction: () -> Unit
+//) {
+//    TextField(
+//        value = text,
+//        onValueChange = onTextChanged,
+//        modifier = Modifier
+////            .onPreviewKeyEvent {
+////                if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
+////                    onImeAction()
+////                    true
+////                } else {
+////                    false
+////                }
+////            }
+//            .padding(8.dp)
+//            .fillMaxWidth()
+//            .background(
+//                color = MaterialTheme.colors.surface,
+//                shape = RoundedCornerShape(2.dp)
+//            ),
+//        textStyle = LocalTextStyle.current.copy(
+//            color = MaterialTheme.colors.onSurface
+//        ),
+//        leadingIcon = {
+////            Icon(
+////                painter = painterResource(15),
+////                contentDescription = null,
+////                tint = LocalContentColor.current
+////            )
+//        },
+//        trailingIcon = {
+//            if (text.isNotEmpty()) {
+////                Icon(
+////                    painter = painterResource(R.drawable.ic_field_close_24),
+////                    contentDescription = null,
+////                    modifier = Modifier.clickable {
+////                        onTextChanged("")
+////                    },
+////                    tint = LocalContentColor.current
+////                )
 //            }
-            .padding(8.dp)
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colors.surface,
-                shape = RoundedCornerShape(2.dp)
-            ),
-        textStyle = LocalTextStyle.current.copy(
-            color = MaterialTheme.colors.onSurface
-        ),
-        leadingIcon = {
-//            Icon(
-//                painter = painterResource(15),
-//                contentDescription = null,
-//                tint = LocalContentColor.current
-//            )
-        },
-        trailingIcon = {
-            if (text.isNotEmpty()) {
-//                Icon(
-//                    painter = painterResource(R.drawable.ic_field_close_24),
-//                    contentDescription = null,
-//                    modifier = Modifier.clickable {
-//                        onTextChanged("")
-//                    },
-//                    tint = LocalContentColor.current
-//                )
-            }
-        },
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(
-            onSearch = {
-                onImeAction()
-            }
-        ),
-        singleLine = true,
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        )
-    )
-}
+//        },
+//        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+//        keyboardActions = KeyboardActions(
+//            onSearch = {
+//                onImeAction()
+//            }
+//        ),
+//        singleLine = true,
+//        colors = TextFieldDefaults.textFieldColors(
+//            backgroundColor = Color.Transparent,
+//            focusedIndicatorColor = Color.Transparent,
+//            unfocusedIndicatorColor = Color.Transparent
+//        )
+//    )
+//}
