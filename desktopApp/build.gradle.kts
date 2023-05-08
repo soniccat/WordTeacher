@@ -1,5 +1,7 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.gradle.api.NamedDomainObjectContainer
 
 repositories {
     google()
@@ -9,7 +11,7 @@ repositories {
 }
 
 plugins {
-    kotlin("multiplatform") // kotlin("jvm") doesn't work well in IDEA/AndroidStudio (https://github.com/JetBrains/compose-jb/issues/22)
+    kotlin("multiplatform")
     id("kotlin-kapt")
     id("org.jetbrains.compose")
 }
@@ -26,6 +28,19 @@ java {
 kotlin {
     jvm {
         withJava()
+        val javaPluginConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
+        javaPluginConvention.sourceSets.all { javaSourceSet ->
+            // HACK: adds Dagger generated classes
+//            println("java sourceSet:" + javaSourceSet.name + " " + javaSourceSet.java.srcDirs.size)
+            javaSourceSet.java.srcDir(project.rootDir.absolutePath + "/shared/build/generated/source/kapt/main/")
+//            javaSourceSet.java.srcDirs.onEach { dir ->
+//                println("srcDir file:" + dir.absolutePath)
+//            }
+//            javaSourceSet.allJava.onEach { file ->
+//                println("java file:" + file.absolutePath)
+//            }
+            true
+        }
     }
 
     sourceSets {
@@ -37,7 +52,7 @@ kotlin {
 //            }
 //        }
 
-        named("jvmMain") {
+        val jvmMain by getting {
             dependencies {
                 implementation(project(":shared"))
 

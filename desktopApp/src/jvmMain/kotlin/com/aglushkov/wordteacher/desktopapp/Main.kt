@@ -12,6 +12,7 @@ import androidx.compose.material.Button
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.aglushkov.wordteacher.cache.DBArticle
 import com.aglushkov.wordteacher.desktopapp.di.GeneralModule
 import com.aglushkov.wordteacher.desktopapp.features.definitions.DefinitionsUI
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -28,6 +29,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
 import com.aglushkov.wordteacher.desktopapp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
+import com.aglushkov.wordteacher.shared.di.SharedAppModule
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 
 fun main() = application {
