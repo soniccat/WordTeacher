@@ -20,7 +20,7 @@ dagger = "2.46"
 playServicesPlugin = "4.3.13"
 playServicesAuth = "20.4.0"
 
-mokoResources = "0.17.2"
+mokoResources = "0.22.0"
 decomposeVersion = "0.7.0"
 essenty = "0.2.2"
 coroutines = "1.6.0-native-mt"

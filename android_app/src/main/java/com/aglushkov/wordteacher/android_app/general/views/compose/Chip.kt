@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
+import com.aglushkov.wordteacher.shared.res.MR
 
 // TODO: replace with material one
 @Composable
@@ -52,7 +53,7 @@ fun Chip(
     ) {
         if (isChecked) {
             Icon(
-                painter = painterResource(R.drawable.ic_check_24),
+                painter = painterResource(MR.images.check.drawableResId),
                 contentDescription = null,
                 tint = Color.Unspecified
             )
@@ -71,7 +72,7 @@ fun Chip(
         )
         if (isCloseIconVisible && closeBlock != null) {
             Icon(
-                painter = painterResource(R.drawable.ic_close_18),
+                painter = painterResource(MR.images.close_18.drawableResId),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(end = 2.dp)

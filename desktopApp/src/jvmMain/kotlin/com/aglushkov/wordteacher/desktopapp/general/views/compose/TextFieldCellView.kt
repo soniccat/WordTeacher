@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.desktopapp.general.views.compose
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,8 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.compose.AppTypography
+import com.aglushkov.wordteacher.desktopapp.compose.AppTypography
 
 
 @Composable
