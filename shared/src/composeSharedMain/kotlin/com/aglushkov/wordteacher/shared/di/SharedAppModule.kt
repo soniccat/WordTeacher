@@ -34,8 +34,6 @@ import io.ktor.client.*
 import io.ktor.client.plugins.cookies.*
 import okio.Path
 import okio.Path.Companion.toPath
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.StringResource
 
 @Module
 class SharedAppModule {
@@ -87,18 +85,6 @@ class SharedAppModule {
     ): DictFactory {
         return DictFactory(fileSystem)
     }
-
-//    @AppComp
-//    @Provides
-//    fun settings(
-//        context: Context
-//    ): FlowSettings {
-//        return DataStoreSettings(
-//            PreferenceDataStoreFactory.create {
-//                context.dataStoreFile("settings.preferences_pb")
-//            }
-//        )
-//    }
 
     @AppComp
     @Provides
@@ -249,24 +235,6 @@ class SharedAppModule {
         { spaceAuthRepository.get() },
         isDebug,
     ).build()
-
-//    @AppComp
-//    @Provides
-//    fun appInfo(@AppVersion appVersion: String): AppInfo = AppInfo(appVersion, "Android")
-
-//    // TODO: replace with bind
-//    @AppComp
-//    @Provides
-//    fun googleAuthRepositoryImpl(
-//        context: Context
-//    ): GoogleAuthRepositoryImpl =
-//        GoogleAuthRepositoryImpl(context.getString(R.string.default_web_client_id))
-
-//    @AppComp
-//    @Provides
-//    fun googleAuthRepository(
-//        impl: GoogleAuthRepositoryImpl
-//    ): GoogleAuthRepository = impl
 
     @AppComp
     @Provides
