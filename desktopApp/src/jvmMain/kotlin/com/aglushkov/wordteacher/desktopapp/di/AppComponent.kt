@@ -22,7 +22,7 @@ import dagger.Component
 
 @AppComp
 @Component(modules = [AppModule::class, GeneralModule::class] )
-public interface AppComponent:
+interface AppComponent:
     DefinitionsDependencies {
 
     fun configService(): ConfigService
@@ -34,7 +34,7 @@ public interface AppComponent:
     fun nlpCore(): NLPCore
 
     override fun dictRepository(): DictRepository
-    override fun routerResolver(): RouterResolver
+    fun routerResolver(): RouterResolver
 //    fun articlesRepository(): ArticlesRepository
     override fun cardSetsRepository(): CardSetsRepository
     override fun wordRepository(): WordDefinitionRepository

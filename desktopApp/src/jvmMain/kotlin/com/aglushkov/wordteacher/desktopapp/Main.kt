@@ -12,50 +12,58 @@ import androidx.compose.material.Button
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.aglushkov.wordteacher.cache.DBArticle
-import com.aglushkov.wordteacher.desktopapp.di.GeneralModule
-import com.aglushkov.wordteacher.desktopapp.features.definitions.DefinitionsUI
-import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
-import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatFile
-import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
-import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
-import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
-import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
-import com.aglushkov.wordteacher.shared.service.ConfigService
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
-import com.aglushkov.wordteacher.desktopapp.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
-import com.aglushkov.wordteacher.shared.di.SharedAppModule
-import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.desktopapp.features.definitions.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
+import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.arkivanov.essenty.parcelable.ParcelableContainer
+import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
+import java.io.File
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 
 fun main() = application {
+    val lifecycle = LifecycleRegistry()
+    val stateKeeper = StateKeeperDispatcher(tryRestoreStateFromFile())
+    val decomposeContext = DefaultComponentContext(
+        lifecycle = lifecycle,
+        stateKeeper = stateKeeper,
+    )
+
+//    val root =
+//        runOnUiThread {
+//            DefaultRootComponent(
+//                componentContext = ,
+//                featureInstaller = DefaultFeatureInstaller,
+//            )
+//        }
+
     val appComponent = DaggerAppComponent.builder()
 //        .generalModule(GeneralModule())
         .build()
 
+    val definitionsDecomposeComponent = DaggerDefinitionsComposeComponent.builder()
+        .setComponentContext(decomposeContext)
+        .setConfiguration(
+            DefinitionsComposeComponent.DefinitionConfiguration(
+                word = "fox"
+            )
+        )
+        .setDeps(appComponent)
+        .build()
+        .definitionsDecomposeComponent()
+
     Window(onCloseRequest = ::exitApplication) {
         Surface(color = MaterialTheme.colors.background) {
             Box(modifier = Modifier.fillMaxSize()) {
-                // TODO: use dagger when they fix this https://github.com/JetBrains/compose-jb/issues/1022
-//                val component = rememberRootComponent {
-//                    DaggerDefinitionsComposeComponent.builder()
-//                        .setComponentContext(it)
-//                        .setWord(null)
-//                        .setDeps(appComponent)
-//                        .build()
-//                        .rootDecomposeComponent()
-//                }
-
                 Column {
-                    Button(onClick = {
-                        //component.onNextChild()
-                    }) {
-                        Text("Open Next")
-                    }
+//                    Button(onClick = {
+//                        //component.onNextChild()
+//                    }) {
+//                        Text("Open Next")
+//                    }
 //                    Children(routerState = component.routerState, animation = slide()) { it ->
 //                        val instance = it.instance
 //                        when (instance) {
@@ -65,8 +73,28 @@ fun main() = application {
 //                            )
 //                        }
 //                    }
+                    DefinitionsUI(definitionsDecomposeComponent)
                 }
             }
         }
     }
 }
+
+private const val SAVED_STATE_FILE_NAME = "saved_state.dat"
+
+private fun saveStateToFile(state: ParcelableContainer) {
+    ObjectOutputStream(File(SAVED_STATE_FILE_NAME).outputStream()).use { output ->
+        output.writeObject(state)
+    }
+}
+
+private fun tryRestoreStateFromFile(): ParcelableContainer? =
+    File(SAVED_STATE_FILE_NAME).takeIf(File::exists)?.let { file ->
+        try {
+            ObjectInputStream(file.inputStream()).use(ObjectInputStream::readObject) as ParcelableContainer
+        } catch (e: Exception) {
+            null
+        } finally {
+            file.delete()
+        }
+    }

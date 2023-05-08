@@ -82,6 +82,7 @@ sqlDelightJvmDriver = { module = "com.squareup.sqldelight:sqlite-driver", versio
 coroutinesCommon = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutinesCommonTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+coroutinesSwing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 ktorCommonCore = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktorAuth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }

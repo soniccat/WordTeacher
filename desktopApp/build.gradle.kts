@@ -64,6 +64,7 @@ kotlin {
                 implementation(compose.preview)
                 implementation(compose.uiTooling)
                 implementation(compose.ui)
+                implementation(libs.coroutinesSwing)
 
                 implementation(libs.dagger)
             }
