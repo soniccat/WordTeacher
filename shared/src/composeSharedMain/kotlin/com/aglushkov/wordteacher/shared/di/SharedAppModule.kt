@@ -296,10 +296,6 @@ class SharedAppModule {
         return DatabaseWorker(database)
     }
 
-//    @AppComp
-//    @Provides
-//    fun databaseFactory(context: Context) = DatabaseDriverFactory(context)
-
     @AppComp
     @Provides
     fun idGenerator(): IdGenerator {
@@ -311,23 +307,4 @@ class SharedAppModule {
     fun timeSource(): TimeSource {
         return TimeSourceImpl()
     }
-
-//    @AppComp
-//    @Provides
-//    fun nlpCore(context: Context, fileSystem: FileSystem): NLPCore {
-//        val nlpIndexPath = context.filesDir.absolutePath.toPath().div("nlp")
-//        if (!fileSystem.exists(nlpIndexPath)) {
-//            fileSystem.createDirectory(nlpIndexPath)
-//        }
-//        return NLPCore(
-//            context.resources,
-//            R.raw.en_sent,
-//            R.raw.en_token,
-//            R.raw.en_pos_maxent,
-//            R.raw.en_lemmatizer_dict,
-//            R.raw.en_chunker,
-//            nlpIndexPath,
-//            fileSystem
-//        )
-//    }
 }

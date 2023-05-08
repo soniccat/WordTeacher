@@ -27,7 +27,6 @@ interface DefinitionsComposeComponent {
 }
 
 interface DefinitionsDependencies {
-//    fun routerResolver(): RouterResolver
     fun wordRepository(): WordDefinitionRepository
     fun connectivityManager(): ConnectivityManager
     fun idGenerator(): IdGenerator
