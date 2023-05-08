@@ -63,7 +63,7 @@ kotlin {
         val composeSharedMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation(libs.dagger)
+                api(libs.dagger)
             }
         }
         val androidMain by getting {

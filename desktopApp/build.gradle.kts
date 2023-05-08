@@ -39,6 +39,8 @@ kotlin {
 
         named("jvmMain") {
             dependencies {
+                implementation(project(":shared"))
+
                 implementation(compose.desktop.common)
                 implementation(compose.desktop.currentOs)
                 implementation(libs.decompose)
@@ -47,7 +49,6 @@ kotlin {
                 implementation(compose.preview)
                 implementation(compose.uiTooling)
                 implementation(compose.ui)
-                implementation(project(":shared"))
 
                 implementation(libs.dagger)
             }

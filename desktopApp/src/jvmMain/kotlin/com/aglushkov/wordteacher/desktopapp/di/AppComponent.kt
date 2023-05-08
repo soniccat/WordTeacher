@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.desktopapp.di
 
 import com.aglushkov.wordteacher.desktopapp.features.definitions.di.DefinitionsComposeDependencies
 import com.aglushkov.wordteacher.desktopapp.general.RouterResolver
+import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager

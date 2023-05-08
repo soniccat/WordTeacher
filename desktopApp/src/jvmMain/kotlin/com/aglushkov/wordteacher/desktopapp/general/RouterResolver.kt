@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.desktopapp.general
 
 import com.aglushkov.wordteacher.desktopapp.Router
-import com.aglushkov.wordteacher.desktopapp.di.AppComp
+import com.aglushkov.wordteacher.shared.di.AppComp
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
