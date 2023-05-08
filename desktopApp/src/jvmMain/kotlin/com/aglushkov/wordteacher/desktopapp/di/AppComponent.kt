@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.desktopapp.di
 
-import com.aglushkov.wordteacher.desktopapp.features.definitions.di.DefinitionsComposeDependencies
 import com.aglushkov.wordteacher.desktopapp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.di.AppComp
+import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -23,8 +23,7 @@ import dagger.Component
 @AppComp
 @Component(modules = [AppModule::class, GeneralModule::class] )
 public interface AppComponent:
-    //DefinitionsDependencies,
-    DefinitionsComposeDependencies {
+    DefinitionsDependencies {
 
     fun configService(): ConfigService
     fun configRepository(): ConfigRepository

@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.android_app.features.definitions.di
+package com.aglushkov.wordteacher.shared.features.definitions.di
 
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository

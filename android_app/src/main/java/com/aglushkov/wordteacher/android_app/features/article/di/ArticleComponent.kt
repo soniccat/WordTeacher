@@ -1,10 +1,10 @@
 package com.aglushkov.wordteacher.android_app.features.article.di
 
 import com.aglushkov.wordteacher.android_app.di.FragmentComp
-import com.aglushkov.wordteacher.android_app.features.definitions.di.DefinitionsModule
-import com.aglushkov.wordteacher.android_app.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
+import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsModule
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.arkivanov.decompose.ComponentContext

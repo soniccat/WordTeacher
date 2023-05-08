@@ -41,8 +41,9 @@ interface ArticleVM: Clearable {
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
     val eventFlow: Flow<Event>
     val dictPaths: StateFlow<Resource<List<String>>>
-
     val definitionsVM: DefinitionsVM
+
+    var router: ArticleRouter?
 
     fun onWordDefinitionHidden()
     fun onBackPressed()
@@ -163,10 +164,10 @@ open class ArticleVMImpl(
     private val cardsRepository: CardsRepository,
     private val dictRepository: DictRepository,
     articleId: Long,
-    private val router: ArticleRouter,
     private val idGenerator: IdGenerator,
     settings: FlowSettings
 ): ViewModel(), ArticleVM {
+    override var router: ArticleRouter? = null
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
@@ -409,7 +410,7 @@ open class ArticleVMImpl(
     }
 
     override fun onBackPressed() {
-        router.closeArticle()
+        router?.closeArticle()
     }
 
     override fun onCleared() {

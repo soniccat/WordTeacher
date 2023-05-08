@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.features
 
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
@@ -32,7 +33,7 @@ import kotlin.properties.Delegates
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-interface MainDecomposeComponent: DefinitionsRouter {
+interface MainDecomposeComponent: DefinitionsRouter, ArticleRouter {
     val routerState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
@@ -211,6 +212,10 @@ class MainDecomposeComponentImpl(
             holder.lifecycle.destroy()
         }
         dialogHolders = emptyList()
+    }
+
+    override fun closeArticle() {
+        back()
     }
 
 //    private fun findChildByInner(inner: Any): Child<*, *>? {

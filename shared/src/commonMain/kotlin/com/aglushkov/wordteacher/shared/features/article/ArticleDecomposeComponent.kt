@@ -22,7 +22,6 @@ class ArticleDecomposeComponent(
     cardsRepository: CardsRepository,
     dictRepository: DictRepository,
     idGenerator: IdGenerator,
-    router: ArticleRouter,
     settings: FlowSettings
 ) : ArticleVMImpl (
     definitionsVM,
@@ -30,7 +29,6 @@ class ArticleDecomposeComponent(
     cardsRepository,
     dictRepository,
     id,
-    router,
     idGenerator,
     settings
 ), ComponentContext by componentContext {

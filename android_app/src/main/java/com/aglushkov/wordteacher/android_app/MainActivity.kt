@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity(), Router {
     private fun setupComposeLayout() {
         val context = defaultComponentContext()
         val deps = appComponent()
-        deps.routerResolver().setRouter(this)
+//        deps.routerResolver().setRouter(this)
 
         mainDecomposeComponent = DaggerMainComposeComponent.builder()
             .setComponentContext(context)
@@ -160,6 +160,7 @@ class MainActivity : AppCompatActivity(), Router {
                     is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)
                     is MainDecomposeComponent.Child.Article -> ArticleUI(
                         vm = instance.vm.apply {
+                            router = mainDecomposeComponent
                             definitionsVM.router = mainDecomposeComponent
                         }
                     )

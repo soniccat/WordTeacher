@@ -59,7 +59,6 @@ class ArticleModule {
         cardsRepository: CardsRepository,
         dictRepository: DictRepository,
         idGenerator: IdGenerator,
-        router: RouterResolver,
         settings: FlowSettings
     ) = ArticleDecomposeComponent(
         componentContext,
@@ -69,7 +68,6 @@ class ArticleModule {
         cardsRepository,
         dictRepository,
         idGenerator,
-        router.router!!.get()!!,
         settings
     )
 }
