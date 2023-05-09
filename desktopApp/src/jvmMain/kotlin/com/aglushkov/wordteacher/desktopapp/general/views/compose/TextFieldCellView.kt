@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.desktopapp.compose.AppTypography
+import com.aglushkov.wordteacher.shared.res.MR
 
 
 @Composable
@@ -53,7 +54,7 @@ fun TextFieldCellView(
                 if (!focusState.isFocused) {
                     Row {
                         Icon(
-                            painter = painterResource(R.drawable.ic_create_note),
+                            painter = painterResource(MR.images.create_note.filePath),
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp),
                             tint = AppTypography.notePlaceholder.color
@@ -167,7 +168,6 @@ class TextFieldCellStateImpl(
         }
     }
 
-    @SuppressLint("ComposableNaming")
     @Composable
     override fun requestFocusIfNeeded() {
         LaunchedEffect("new note focus") {

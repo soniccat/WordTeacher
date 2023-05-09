@@ -4,10 +4,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.ColorResource
 
 // Set of Material typography styles to start with
 val typography = Typography(
@@ -23,7 +26,7 @@ class AppTypography {
         val wordDefinitionTitle = typography.h5
         val wordDefinitionProvidedBy: TextStyle
             @Composable get() {
-                val color = colorResource(id = R.color.word_provided_by)
+                val color = MR.colors.word_provided_by.resolveColor()
                 return remember(color) { typography.body2.copy(
                     color = color
                 )}
@@ -31,7 +34,7 @@ class AppTypography {
         val wordDefinitionTranscripton = typography.body2
         val wordDefinitionPartOfSpeech: TextStyle
             @Composable get() {
-                val color = colorResource(id = R.color.word_partOfSpeech)
+                val color = MR.colors.word_partOfSpeech.resolveColor()
                 return remember(color) { typography.subtitle2.copy(
                     color = color
                 )}
@@ -75,3 +78,7 @@ class AppTypography {
         val learningSessionProgress = wordDefinitionTitle
     }
 }
+
+fun ColorResource.resolveColor() = lightColor.toComposeColor()
+
+fun dev.icerock.moko.graphics.Color.toComposeColor() = Color(red, green, blue, alpha)

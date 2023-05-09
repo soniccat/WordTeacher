@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.android_app.R
+import com.aglushkov.wordteacher.shared.res.MR
 
 @Composable
 fun SearchView(
@@ -53,7 +53,7 @@ fun SearchView(
         ),
         leadingIcon = {
             Icon(
-                painter = painterResource(R.drawable.ic_field_search_24),
+                painter = painterResource(MR.images.field_search_24.filePath),
                 contentDescription = null,
                 tint = LocalContentColor.current
             )
@@ -61,7 +61,7 @@ fun SearchView(
     trailingIcon = {
         if (text.isNotEmpty()) {
             Icon(
-                painter = painterResource(R.drawable.ic_field_close_24),
+                painter = painterResource(MR.images.field_close_24.filePath),
                 contentDescription = null,
                 modifier = Modifier
                     .clip(CircleShape)

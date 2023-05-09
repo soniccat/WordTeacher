@@ -12,8 +12,9 @@ import androidx.compose.material.Button
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
-import com.aglushkov.wordteacher.desktopapp.features.definitions.DefinitionsUI
+import com.aglushkov.wordteacher.desktopapp.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
 import com.arkivanov.decompose.DefaultComponentContext
@@ -56,9 +57,10 @@ fun main() = application {
         .definitionsDecomposeComponent()
 
     Window(onCloseRequest = ::exitApplication) {
-        Surface(color = MaterialTheme.colors.background) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column {
+        ComposeAppTheme {
+            Surface(color = MaterialTheme.colors.background) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Column {
 //                    Button(onClick = {
 //                        //component.onNextChild()
 //                    }) {
@@ -73,7 +75,8 @@ fun main() = application {
 //                            )
 //                        }
 //                    }
-                    DefinitionsUI(definitionsDecomposeComponent)
+                        DefinitionsUI(definitionsDecomposeComponent)
+                    }
                 }
             }
         }

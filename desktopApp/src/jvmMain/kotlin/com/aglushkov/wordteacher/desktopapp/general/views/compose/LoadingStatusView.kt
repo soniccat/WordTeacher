@@ -11,12 +11,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.res.MR
 
 @Composable
 fun <T> LoadingStatusView(
@@ -72,7 +71,7 @@ fun <T> LoadingStatusView(
                 resource is Resource.Error -> {
                     LoadingStatusViewState.Error(
                         text = errorText,
-                        tryAgainText = LocalContext.current.getString(R.string.error_try_again)
+                        tryAgainText = MR.strings.error_try_again.localized()
                     )
                 }
                 else -> {

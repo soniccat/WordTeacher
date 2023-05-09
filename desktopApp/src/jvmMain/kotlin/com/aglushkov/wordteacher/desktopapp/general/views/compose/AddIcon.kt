@@ -10,14 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.android_app.R
+import com.aglushkov.wordteacher.shared.res.MR
 
 @Composable
 fun AddIcon(
     onClicked: () -> Unit
 ) {
     Icon(
-        painter = painterResource(id = R.drawable.ic_plus_small),
+        painter = painterResource(MR.images.plus_small.filePath),
         contentDescription = null,
         modifier = Modifier
             .clip(CircleShape)

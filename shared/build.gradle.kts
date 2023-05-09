@@ -61,6 +61,10 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 api(libs.dagger)
+                implementation(compose.runtime)
+                implementation(compose.ui)
+                implementation(compose.foundation)
+                implementation(compose.material)
             }
         }
         val androidMain by getting {
