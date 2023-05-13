@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.desktopapp.general.views.compose
+package com.aglushkov.wordteacher.shared.general.views
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
@@ -8,8 +8,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.shared.general.painterFromImageResource
 import com.aglushkov.wordteacher.shared.res.MR
 
 @Composable
@@ -17,7 +17,7 @@ fun AddIcon(
     onClicked: () -> Unit
 ) {
     Icon(
-        painter = painterResource(MR.images.plus_small.filePath),
+        painter = painterFromImageResource(MR.images.plus_small),
         contentDescription = null,
         modifier = Modifier
             .clip(CircleShape)

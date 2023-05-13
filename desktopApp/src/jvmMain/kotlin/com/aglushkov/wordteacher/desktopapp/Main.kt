@@ -57,6 +57,11 @@ fun main() = application {
         .definitionsDecomposeComponent()
 
     Window(onCloseRequest = ::exitApplication) {
+//        window.rootPane.apply {
+//            putClientProperty("apple.awt.fullWindowContent", true)
+//            putClientProperty("apple.awt.transparentTitleBar", true)
+//            putClientProperty("apple.awt.windowTitleVisible", false)
+//        }
         ComposeAppTheme {
             Surface(color = MaterialTheme.colors.background) {
                 Box(modifier = Modifier.fillMaxSize()) {

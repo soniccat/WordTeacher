@@ -22,7 +22,6 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.desktopapp.general.views.chooser_dialog.ChooserViewItem
-import com.aglushkov.wordteacher.desktopapp.general.views.compose.AddIcon
 import com.aglushkov.wordteacher.desktopapp.general.views.compose.CustomTopAppBar
 import com.aglushkov.wordteacher.desktopapp.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.desktopapp.general.views.compose.SearchView
@@ -34,6 +33,7 @@ import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
