@@ -62,9 +62,11 @@ kotlin {
             dependencies {
                 api(libs.dagger)
                 implementation(compose.runtime)
-                implementation(compose.ui)
                 implementation(compose.foundation)
                 implementation(compose.material)
+                implementation(compose.preview)
+                implementation(compose.ui)
+                implementation(compose.uiTooling)
             }
         }
         val androidMain by getting {
@@ -74,11 +76,6 @@ kotlin {
                 implementation(libs.sqlDelightAndroidDriver)
                 implementation("org.apache.opennlp:opennlp-tools:1.9.4")
                 implementation("org.jsoup:jsoup:1.14.3")
-
-                // for compose-jb - uncomment - start
-                implementation(compose.foundation)
-                implementation(compose.material)
-                // for compose-jb - uncomment - end
             }
         }
         val androidTest by getting {
@@ -110,11 +107,6 @@ kotlin {
             dependencies {
                 implementation(libs.ktorDesktop)
                 implementation("org.jsoup:jsoup:1.14.3")
-                // for compose-jb - uncomment - start
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                // for compose-jb - uncomment - end
 
 //                implementation(compose.uiTooling)
 //                implementation(compose.preview)
