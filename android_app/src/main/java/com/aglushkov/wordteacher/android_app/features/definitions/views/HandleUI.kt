@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.android_app.compose.shapes
+import com.aglushkov.wordteacher.shared.general.shapes
 
 @Composable
 fun HandleUI() {

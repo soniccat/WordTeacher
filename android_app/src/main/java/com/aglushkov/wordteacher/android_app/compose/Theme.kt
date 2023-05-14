@@ -7,9 +7,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
-import com.aglushkov.wordteacher.shared.general.AppTypography
-import com.aglushkov.wordteacher.shared.general.LocalAppTypography
-import com.aglushkov.wordteacher.shared.general.materialTypography
+import com.aglushkov.wordteacher.shared.general.*
 
 private val DarkColorPalette = darkColors(
     primary = primaryDark,

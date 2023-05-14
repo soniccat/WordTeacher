@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.android_app.compose
+package com.aglushkov.wordteacher.shared.general
 
 import androidx.compose.ui.graphics.Color
 
