@@ -67,6 +67,8 @@ kotlin {
                 implementation(compose.preview)
                 implementation(compose.ui)
                 implementation(compose.uiTooling)
+                implementation(libs.decomposeJetbrains)
+                implementation(libs.mokoCompose)
             }
         }
         val androidMain by getting {

@@ -1,8 +1,7 @@
-package com.aglushkov.wordteacher.desktopapp.general.views.compose
+package com.aglushkov.wordteacher.shared.general.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -14,12 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.getImageByFileName
+import dev.icerock.moko.resources.compose.painterResource
 
 // TODO: replace with material one
 @Composable
@@ -50,7 +48,7 @@ fun Chip(
     ) {
         if (isChecked) {
             Icon(
-                painter = painterResource(MR.images.check.filePath),
+                painter = painterResource(MR.images.check),
                 contentDescription = null,
                 tint = Color.Unspecified
             )
@@ -69,7 +67,7 @@ fun Chip(
         )
         if (isCloseIconVisible && closeBlock != null) {
             Icon(
-                painter = painterResource(MR.images.close_18.filePath),
+                painter = painterResource(MR.images.close_18),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(end = 2.dp)
@@ -88,55 +86,4 @@ data class ChipColors(
     val checkedBgColor: Color? = bgColor,
     val closeIconTint: Color? = contentColor
 )
-//
-//@Preview
-//@Composable
-//fun ChipPreview() {
-//    ComposeAppTheme {
-//        Column(
-//        ) {
-//            Chip(
-//                modifier = Modifier.padding(4.dp),
-//                text = "By Source",
-//                isChecked = true,
-//                colors = null,
-//                isCloseIconVisible = true,
-//                closeBlock = {},
-//                clickBlock = {}
-//            )
-//            Chip(
-//                modifier = Modifier.padding(4.dp),
-//                text = "By Source",
-//                isChecked = false,
-//                colors = null,
-//                isCloseIconVisible = true,
-//                closeBlock = {},
-//                clickBlock = {}
-//            )
-//            Chip(
-//                modifier = Modifier.padding(4.dp),
-//                text = "Add Filter",
-//                isChecked = false,
-//                colors = ChipColors(
-//                    contentColor = MaterialTheme.colors.onSecondary,
-//                    bgColor = MaterialTheme.colors.secondary
-//                ),
-//                isCloseIconVisible = false,
-//                closeBlock = {},
-//                clickBlock = {}
-//            )
-//            Chip(
-//                modifier = Modifier.padding(4.dp),
-//                text = "Add Filter",
-//                isChecked = false,
-//                colors = ChipColors(
-//                    contentColor = MaterialTheme.colors.onSecondary,
-//                    bgColor = MaterialTheme.colors.secondary
-//                ),
-//                isCloseIconVisible = true,
-//                closeBlock = {},
-//                clickBlock = {}
-//            )
-//        }
-//    }
-//}
+

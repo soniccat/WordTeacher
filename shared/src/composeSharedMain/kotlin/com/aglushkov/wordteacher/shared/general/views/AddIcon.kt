@@ -9,15 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.shared.general.painterFromImageResource
 import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.compose.painterResource
 
 @Composable
 fun AddIcon(
     onClicked: () -> Unit
 ) {
     Icon(
-        painter = painterFromImageResource(MR.images.plus_small),
+        painter = painterResource(MR.images.plus_small),
         contentDescription = null,
         modifier = Modifier
             .clip(CircleShape)
