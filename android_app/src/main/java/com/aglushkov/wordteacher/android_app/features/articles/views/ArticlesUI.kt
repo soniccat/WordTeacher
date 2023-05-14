@@ -16,14 +16,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
-import com.aglushkov.wordteacher.android_app.general.views.compose.CustomTopAppBar
-import com.aglushkov.wordteacher.android_app.general.views.compose.DeletableCell
-import com.aglushkov.wordteacher.android_app.general.views.compose.LoadingStatusView
-import com.aglushkov.wordteacher.android_app.general.views.compose.SearchView
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
+import com.aglushkov.wordteacher.shared.general.views.DeletableCell
+import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.SearchView
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi

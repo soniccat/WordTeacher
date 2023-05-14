@@ -28,6 +28,7 @@ import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.views.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

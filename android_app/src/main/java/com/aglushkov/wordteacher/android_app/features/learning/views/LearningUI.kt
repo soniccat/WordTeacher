@@ -37,7 +37,6 @@ import com.aglushkov.wordteacher.android_app.features.definitions.views.WordSubH
 import com.aglushkov.wordteacher.android_app.features.definitions.views.WordSynonymView
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.android_app.general.views.compose.CustomDialogUI
-import com.aglushkov.wordteacher.android_app.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
@@ -45,6 +44,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderVie
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import java.util.*
 
 @ExperimentalUnitApi

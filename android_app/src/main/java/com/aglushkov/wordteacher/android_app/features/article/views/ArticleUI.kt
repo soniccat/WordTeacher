@@ -37,7 +37,6 @@ import com.aglushkov.wordteacher.android_app.features.definitions.views.BottomSh
 import com.aglushkov.wordteacher.android_app.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.android_app.features.definitions.views.HandleUI
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
-import com.aglushkov.wordteacher.android_app.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.android_app.general.views.compose.ModalSideSheet
 import com.aglushkov.wordteacher.android_app.general.views.compose.SideSheetValue
 import com.aglushkov.wordteacher.android_app.general.views.compose.rememberSideSheetState
@@ -46,6 +45,7 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence

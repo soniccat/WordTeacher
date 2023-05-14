@@ -23,10 +23,10 @@ import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.AppTypography
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.android_app.general.views.compose.CustomDialogUI
-import com.aglushkov.wordteacher.android_app.general.views.compose.LoadingStatusView
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionTermResultViewItem
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import java.util.*
 
 @ExperimentalUnitApi

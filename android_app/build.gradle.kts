@@ -84,7 +84,7 @@ dependencies {
     implementation(libs.androidViewModelKtx)
     implementation(libs.androidLifecycleKtx)
     implementation(libs.decompose)
-    implementation(libs.decomposeJetpack)
+    implementation(libs.decomposeJetbrains)
     implementation(libs.essentyParcelable)
     implementation(libs.androidComposeActivity)
     implementation(libs.androidComposeUITooling)

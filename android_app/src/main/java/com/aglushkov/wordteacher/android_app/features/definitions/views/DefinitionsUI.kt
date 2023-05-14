@@ -38,13 +38,15 @@ import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.android_app.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.android_app.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.android_app.general.views.compose.*
-import com.aglushkov.wordteacher.android_app.general.views.compose.ChipColors
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
+import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
+import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.SearchView
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import kotlinx.coroutines.launch
@@ -351,13 +353,13 @@ private fun DefinitionsDisplayModeView(
             )
             .horizontalScroll(rememberScrollState())
     ) {
-        Chip(
+        com.aglushkov.wordteacher.shared.general.views.Chip(
             modifier = Modifier.padding(
                 top = 4.dp,
                 bottom = 4.dp
             ),
             text = item.partsOfSpeechFilterText.resolveString(),
-            colors = ChipColors(
+            colors = com.aglushkov.wordteacher.shared.general.views.ChipColors(
                 contentColor = MaterialTheme.colors.onSecondary,
                 bgColor = MaterialTheme.colors.secondary
             ),
@@ -376,7 +378,7 @@ private fun DefinitionsDisplayModeView(
         val selectedMode = item.items[item.selectedIndex]
         val firstMode = item.items.firstOrNull()
         for (mode in item.items) {
-            Chip(
+            com.aglushkov.wordteacher.shared.general.views.Chip(
                 modifier = Modifier.padding(
                     top = 4.dp,
                     bottom = 4.dp,

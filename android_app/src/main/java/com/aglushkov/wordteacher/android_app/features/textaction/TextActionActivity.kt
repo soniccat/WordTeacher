@@ -35,13 +35,13 @@ import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponent
 import com.arkivanov.decompose.defaultComponentContext
-import com.arkivanov.decompose.extensions.compose.jetpack.Children
-import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.childAnimation
-import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
 import java.net.URL
 import kotlinx.coroutines.launch
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.android_app.R
+import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 

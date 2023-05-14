@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogWindowProvider
 import com.aglushkov.wordteacher.android_app.LocalWindowInset
+import com.aglushkov.wordteacher.shared.general.views.pxToDp
 
 @ExperimentalComposeUiApi
 @Composable

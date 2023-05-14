@@ -22,9 +22,6 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.desktopapp.general.views.chooser_dialog.ChooserViewItem
-import com.aglushkov.wordteacher.desktopapp.general.views.compose.CustomTopAppBar
-import com.aglushkov.wordteacher.desktopapp.general.views.compose.LoadingStatusView
-import com.aglushkov.wordteacher.desktopapp.general.views.compose.SearchView
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.DimensWord
@@ -34,6 +31,9 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
+import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
+import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.SearchView
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
@@ -341,13 +341,13 @@ private fun DefinitionsDisplayModeView(
             )
             .horizontalScroll(rememberScrollState())
     ) {
-        com.aglushkov.wordteacher.desktopapp.general.views.compose.Chip(
+        com.aglushkov.wordteacher.shared.general.views.Chip(
             modifier = Modifier.padding(
                 top = 4.dp,
                 bottom = 4.dp
             ),
             text = item.partsOfSpeechFilterText.localized(),
-            colors = com.aglushkov.wordteacher.desktopapp.general.views.compose.ChipColors(
+            colors = com.aglushkov.wordteacher.shared.general.views.ChipColors(
                 contentColor = MaterialTheme.colors.onSecondary,
                 bgColor = MaterialTheme.colors.secondary
             ),
@@ -366,7 +366,7 @@ private fun DefinitionsDisplayModeView(
         val selectedMode = item.items[item.selectedIndex]
         val firstMode = item.items.firstOrNull()
         for (mode in item.items) {
-            com.aglushkov.wordteacher.desktopapp.general.views.compose.Chip(
+            com.aglushkov.wordteacher.shared.general.views.Chip(
                 modifier = Modifier.padding(
                     top = 4.dp,
                     bottom = 4.dp,

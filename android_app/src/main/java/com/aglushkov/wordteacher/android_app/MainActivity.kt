@@ -39,7 +39,6 @@ import com.aglushkov.wordteacher.android_app.features.learning_session_result.vi
 import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
 import com.aglushkov.wordteacher.android_app.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.android_app.general.views.compose.WindowInsets
-import com.aglushkov.wordteacher.android_app.general.views.compose.slideFromRight
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
@@ -49,11 +48,12 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
+import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.decompose.defaultComponentContext
-import com.arkivanov.decompose.extensions.compose.jetpack.Children
-import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.childAnimation
-import com.arkivanov.decompose.extensions.compose.jetpack.animation.child.slide
+import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
