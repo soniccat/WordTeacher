@@ -5,7 +5,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
+import com.aglushkov.wordteacher.shared.general.AppTypography
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
+import com.aglushkov.wordteacher.shared.general.materialTypography
 
 private val DarkColorPalette = darkColors(
     primary = primaryDark,
@@ -38,10 +42,14 @@ fun ComposeAppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compos
         LightColorPalette
     }
 
-    MaterialTheme(
-        colors = colors,
-        typography = typography,
-        shapes = shapes,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalAppTypography provides AppTypography().initStylesFromResources()
+    ) {
+        MaterialTheme(
+            colors = colors,
+            typography = materialTypography,
+            shapes = shapes,
+            content = content
+        )
+    }
 }

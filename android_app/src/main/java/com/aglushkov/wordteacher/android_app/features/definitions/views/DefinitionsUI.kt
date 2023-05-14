@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.compose.AppTypography
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.android_app.general.views.chooser_dialog.ChooserUI
@@ -40,6 +39,7 @@ import com.aglushkov.wordteacher.android_app.general.views.chooser_dialog.Choose
 import com.aglushkov.wordteacher.android_app.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -412,7 +412,7 @@ fun WordDividerView(
 fun WordTitleView(
     viewItem: WordTitleViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordDefinitionTitle,
+    textStyle: TextStyle = LocalAppTypography.current.wordDefinitionTitle,
     textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,
@@ -440,7 +440,7 @@ fun WordTitleView(
                 modifier = Modifier
                     .widthIn(max = dimensionResource(id = R.dimen.word_providedBy_maxWidth)),
                 textAlign = TextAlign.End,
-                style = AppTypography.wordDefinitionProvidedBy
+                style = LocalAppTypography.current.wordDefinitionProvidedBy
             )
         }
     }
@@ -450,7 +450,7 @@ fun WordTitleView(
 fun WordTranscriptionView(
     viewItem: WordTranscriptionViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordDefinitionTranscripton,
+    textStyle: TextStyle = LocalAppTypography.current.wordDefinitionTranscripton,
     textContent: @Composable BoxScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,
@@ -485,7 +485,7 @@ fun WordPartOfSpeechView(
                 end = dimensionResource(id = R.dimen.word_horizontalPadding),
                 top = topPadding
             ),
-        style = AppTypography.wordDefinitionPartOfSpeech
+        style = LocalAppTypography.current.wordDefinitionPartOfSpeech
     )
 }
 
@@ -493,7 +493,7 @@ fun WordPartOfSpeechView(
 fun WordDefinitionView(
     viewItem: WordDefinitionViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordDefinition,
+    textStyle: TextStyle = LocalAppTypography.current.wordDefinition,
     textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,
@@ -535,7 +535,7 @@ fun WordSubHeaderView(
                 top = dimensionResource(id = R.dimen.word_subHeader_topMargin)
             ),
     ) {
-        textContent(viewItem.firstItem().resolveString(), AppTypography.wordDefinitionSubHeader)
+        textContent(viewItem.firstItem().resolveString(), LocalAppTypography.current.wordDefinitionSubHeader)
     }
 }
 
@@ -543,7 +543,7 @@ fun WordSubHeaderView(
 fun WordSynonymView(
     viewItem: WordSynonymViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordSynonym,
+    textStyle: TextStyle = LocalAppTypography.current.wordSynonym,
     textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,
@@ -567,7 +567,7 @@ fun WordSynonymView(
 fun WordExampleView(
     viewItem: WordExampleViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordExample,
+    textStyle: TextStyle = LocalAppTypography.current.wordExample,
     textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,

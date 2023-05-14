@@ -20,12 +20,12 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.compose.AppTypography
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.android_app.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.notes.vm.CreateNoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.views.*
@@ -201,11 +201,11 @@ private fun NoteView(
             ) {
                 Text(
                     text = noteViewItem.text,
-                    style = AppTypography.noteText
+                    style = LocalAppTypography.current.noteText
                 )
                 Text(
                     text = noteViewItem.date,
-                    style = AppTypography.noteDate
+                    style = LocalAppTypography.current.noteDate
                 )
             }
         }

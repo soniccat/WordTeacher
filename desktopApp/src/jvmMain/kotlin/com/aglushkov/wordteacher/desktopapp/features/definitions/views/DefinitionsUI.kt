@@ -16,7 +16,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.desktopapp.compose.AppTypography
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
@@ -25,6 +24,7 @@ import com.aglushkov.wordteacher.desktopapp.general.views.chooser_dialog.Chooser
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.DimensWord
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -400,7 +400,7 @@ fun WordDividerView(
 fun WordTitleView(
     viewItem: WordTitleViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordDefinitionTitle,
+    textStyle: TextStyle = LocalAppTypography.current.wordDefinitionTitle,
     textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,
@@ -425,7 +425,7 @@ fun WordTitleView(
                 modifier = Modifier
                     .widthIn(max = LocalDimensWord.current.wordProvidedByMaxWidth),
                 textAlign = TextAlign.End,
-                style = AppTypography.wordDefinitionProvidedBy
+                style = LocalAppTypography.current.wordDefinitionProvidedBy
             )
         }
     }
@@ -435,7 +435,7 @@ fun WordTitleView(
 fun WordTranscriptionView(
     viewItem: WordTranscriptionViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordDefinitionTranscripton,
+    textStyle: TextStyle = LocalAppTypography.current.wordDefinitionTranscripton,
     textContent: @Composable BoxScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,
@@ -470,7 +470,7 @@ fun WordPartOfSpeechView(
                 end = LocalDimensWord.current.wordHorizontalPadding,
                 top = topPadding
             ),
-        style = AppTypography.wordDefinitionPartOfSpeech
+        style = LocalAppTypography.current.wordDefinitionPartOfSpeech
     )
 }
 
@@ -478,7 +478,7 @@ fun WordPartOfSpeechView(
 fun WordDefinitionView(
     viewItem: WordDefinitionViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordDefinition,
+    textStyle: TextStyle = LocalAppTypography.current.wordDefinition,
     textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,
@@ -520,7 +520,7 @@ fun WordSubHeaderView(
                 top = LocalDimensWord.current.wordSubHeaderTopMargin
             ),
     ) {
-        textContent(viewItem.firstItem().localized(), AppTypography.wordDefinitionSubHeader)
+        textContent(viewItem.firstItem().localized(), LocalAppTypography.current.wordDefinitionSubHeader)
     }
 }
 
@@ -528,7 +528,7 @@ fun WordSubHeaderView(
 fun WordSynonymView(
     viewItem: WordSynonymViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordSynonym,
+    textStyle: TextStyle = LocalAppTypography.current.wordSynonym,
     textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,
@@ -552,7 +552,7 @@ fun WordSynonymView(
 fun WordExampleView(
     viewItem: WordExampleViewItem,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = AppTypography.wordExample,
+    textStyle: TextStyle = LocalAppTypography.current.wordExample,
     textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
         Text(
             text = text,

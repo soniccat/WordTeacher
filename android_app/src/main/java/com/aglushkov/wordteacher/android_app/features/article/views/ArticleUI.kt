@@ -31,7 +31,6 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.compose.AppTypography
 import com.aglushkov.wordteacher.android_app.features.definitions.views.BottomSheet
 import com.aglushkov.wordteacher.android_app.features.definitions.views.BottomSheetStates
 import com.aglushkov.wordteacher.android_app.features.definitions.views.DefinitionsUI
@@ -43,6 +42,7 @@ import com.aglushkov.wordteacher.android_app.general.views.compose.rememberSideS
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
@@ -169,7 +169,7 @@ private fun ArticleSideSheetContent(
     Text(
         modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
         text = stringResource(id = R.string.article_side_sheet_selection_dicts),
-        style = AppTypography.articleSideSheetSection
+        style = LocalAppTypography.current.articleSideSheetSection
     )
     if (dictPaths.isLoaded()) {
         dictPaths.data()?.onEach {
@@ -186,7 +186,7 @@ private fun ArticleSideSheetContent(
     Text(
         modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
         text = stringResource(id = R.string.article_side_sheet_selection_phrases),
-        style = AppTypography.articleSideSheetSection
+        style = LocalAppTypography.current.articleSideSheetSection
     )
     ChunkType.values().onEach { chunkType ->
         CheckableListItem(
@@ -199,7 +199,7 @@ private fun ArticleSideSheetContent(
     Text(
         modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
         text = stringResource(id = R.string.article_side_sheet_part_of_speech_title),
-        style = AppTypography.articleSideSheetSection
+        style = LocalAppTypography.current.articleSideSheetSection
     )
     WordTeacherWord.PartOfSpeech.values().onEach { partOfSpeech ->
         CheckableListItem(
@@ -374,7 +374,7 @@ private fun ArticleParagraphView(
                     }
                 },
             fontSize = TextUnit(16f, TextUnitType.Sp),
-            style = AppTypography.wordDefinition,
+            style = LocalAppTypography.current.wordDefinition,
             onTextLayout = {
                 textLayoutResult = it
             }
