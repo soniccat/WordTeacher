@@ -28,12 +28,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.features.definitions.views.*
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.android_app.general.views.compose.*
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.views.*
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.AddIcon

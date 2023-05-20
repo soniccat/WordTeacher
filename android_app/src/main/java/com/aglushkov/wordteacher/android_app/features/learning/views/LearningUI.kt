@@ -30,13 +30,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.features.definitions.views.WordDefinitionView
-import com.aglushkov.wordteacher.android_app.features.definitions.views.WordExampleView
-import com.aglushkov.wordteacher.android_app.features.definitions.views.WordPartOfSpeechView
-import com.aglushkov.wordteacher.android_app.features.definitions.views.WordSubHeaderView
-import com.aglushkov.wordteacher.android_app.features.definitions.views.WordSynonymView
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.android_app.general.views.compose.CustomDialogUI
+import com.aglushkov.wordteacher.shared.features.definitions.views.*
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem

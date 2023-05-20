@@ -27,7 +27,6 @@ import com.aglushkov.wordteacher.android_app.EXTRA_ARTICLE_ID
 import com.aglushkov.wordteacher.android_app.MainActivity
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.features.add_article.views.AddArticleUI
-import com.aglushkov.wordteacher.android_app.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
 import com.aglushkov.wordteacher.android_app.features.textaction.di.DaggerTextActionComponent
 import com.aglushkov.wordteacher.android_app.features.textaction.di.TextActionComponent
@@ -39,6 +38,7 @@ import java.net.URL
 import kotlinx.coroutines.launch
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.android_app.R
+import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide

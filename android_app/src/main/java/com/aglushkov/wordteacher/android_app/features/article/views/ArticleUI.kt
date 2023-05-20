@@ -31,10 +31,6 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.features.definitions.views.BottomSheet
-import com.aglushkov.wordteacher.android_app.features.definitions.views.BottomSheetStates
-import com.aglushkov.wordteacher.android_app.features.definitions.views.DefinitionsUI
-import com.aglushkov.wordteacher.android_app.features.definitions.views.HandleUI
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.android_app.general.views.compose.ModalSideSheet
 import com.aglushkov.wordteacher.android_app.general.views.compose.SideSheetValue
@@ -42,6 +38,9 @@ import com.aglushkov.wordteacher.android_app.general.views.compose.rememberSideS
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.views.BottomSheetStates
+import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.definitions.views.HandleUI
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
@@ -217,7 +216,7 @@ private fun ArticleDefinitionBottomSheet(
     swipeableState: SwipeableState<BottomSheetStates>,
     screenHeight: Int
 ) {
-    BottomSheet(
+    com.aglushkov.wordteacher.shared.features.definitions.views.BottomSheet(
         swipeableState = swipeableState,
         anchors = mapOf(
             screenHeight / 2.0f to BottomSheetStates.Expanded,

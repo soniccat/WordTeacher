@@ -31,7 +31,6 @@ import com.aglushkov.wordteacher.android_app.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.android_app.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.android_app.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.android_app.features.definitions.di.DaggerMainComposeComponent
-import com.aglushkov.wordteacher.android_app.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUI
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUIDialog
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUI
@@ -43,6 +42,7 @@ import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
