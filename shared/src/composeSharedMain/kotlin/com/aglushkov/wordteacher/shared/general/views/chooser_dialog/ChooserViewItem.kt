@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.desktopapp.general.views.chooser_dialog
+package com.aglushkov.wordteacher.shared.general.views.chooser_dialog
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 

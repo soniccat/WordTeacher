@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.desktopapp.features.definitions.views
+package com.aglushkov.wordteacher.desktopapp.general.views.compose
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -18,9 +18,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
-import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
-import com.aglushkov.wordteacher.desktopapp.general.views.chooser_dialog.ChooserUI
-import com.aglushkov.wordteacher.desktopapp.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.DimensWord
@@ -34,9 +31,13 @@ import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.SearchView
+import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserUI
+import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.format
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -204,7 +205,7 @@ private fun DefinitionsWordUI(
                     resource = defsValue,
                     loadingText = null,
                     errorText = vm.getErrorText(defsValue)?.localized(),
-                    emptyText = MR.strings.error_no_definitions.localized()
+                    emptyText = stringResource(MR.strings.error_no_definitions)
                 ) {
                     vm.onTryAgainClicked()
                 }

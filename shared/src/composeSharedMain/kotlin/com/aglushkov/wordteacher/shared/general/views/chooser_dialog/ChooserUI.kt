@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.desktopapp.general.views.chooser_dialog
+package com.aglushkov.wordteacher.shared.general.views.chooser_dialog
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

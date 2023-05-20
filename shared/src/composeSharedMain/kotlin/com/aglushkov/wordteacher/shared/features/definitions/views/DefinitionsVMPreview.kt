@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.desktopapp.features.definitions.views
+package com.aglushkov.wordteacher.shared.features.definitions.views
 
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc

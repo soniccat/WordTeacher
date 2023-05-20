@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.desktopapp.features.definitions.views
+package com.aglushkov.wordteacher.shared.features.definitions.views
 
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box

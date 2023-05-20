@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.desktopapp.features.definitions.views
+package com.aglushkov.wordteacher.shared.features.definitions.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
