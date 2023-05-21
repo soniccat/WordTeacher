@@ -7,12 +7,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -21,6 +23,7 @@ import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextFieldCellView(
     placeholder: String,
@@ -46,8 +49,17 @@ fun TextFieldCellView(
             onValueChange = onTextChanged,
             modifier = Modifier
                 .fillMaxWidth()
+                .focusRequester(focusRequester)
                 .onFocusChanged {
                     focusState = it
+                }
+                .onPreviewKeyEvent {
+                    if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
+                        onCreated(textFieldValue.text)
+                        true
+                    } else {
+                        false
+                    }
                 },
             placeholder = {
                 if (!focusState.isFocused) {

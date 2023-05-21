@@ -47,7 +47,7 @@ fun ComposeAppTheme(
 
     CompositionLocalProvider(
         LocalIsDebug provides isDebug,
-        LocalAppTypography provides AppTypography().initStylesFromResources()
+        LocalAppTypography provides AppTypography().initStylesFromResources(colors)
     ) {
         MaterialTheme(
             colors = colors,

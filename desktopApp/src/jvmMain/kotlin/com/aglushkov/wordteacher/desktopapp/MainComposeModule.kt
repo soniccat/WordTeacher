@@ -3,6 +3,8 @@ package com.aglushkov.wordteacher.desktopapp
 import com.aglushkov.wordteacher.desktopapp.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -30,13 +32,13 @@ class MainComposeModule {
 //                        .setState(CardSetVM.State(configuration.id))
 //                        .build()
 //                        .cardSetDecomposeComponent()
-//                is MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
-//                    DaggerCardSetsComponent.builder()
-//                        .setComponentContext(context)
-//                        .setState(CardSetsVM.State())
-//                        .setDeps(appComponent)
-//                        .build()
-//                        .cardSetsDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
+                    DaggerCardSetsComponent.builder()
+                        .setComponentContext(context)
+                        .setState(CardSetsVM.State())
+                        .setDeps(appComponent)
+                        .build()
+                        .cardSetsDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.TabsConfiguration ->
                     DaggerTabComposeComponent.builder()
                         .setComponentContext(context)

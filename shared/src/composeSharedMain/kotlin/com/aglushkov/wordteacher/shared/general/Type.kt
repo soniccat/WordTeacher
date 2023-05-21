@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.general
 
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
@@ -45,12 +46,12 @@ data class AppTypography(
     var learningSessionProgress: TextStyle = wordDefinitionTitle,
 ) {
     @Composable
-    fun initStylesFromResources(): AppTypography {
+    fun initStylesFromResources(colors: Colors): AppTypography {
         wordDefinitionProvidedBy = materialTypography.body2.copy(color = colorResource(MR.colors.word_provided_by))
         wordDefinitionPartOfSpeech = materialTypography.subtitle2.copy(color = colorResource(MR.colors.word_partOfSpeech))
         articleDate = wordDefinitionProvidedBy
         noteDate = wordDefinitionProvidedBy
-        notePlaceholder = noteText.copy(color = MaterialTheme.colors.secondary)
+        notePlaceholder = noteText.copy(color = colors.secondary)
         return this
     }
 }

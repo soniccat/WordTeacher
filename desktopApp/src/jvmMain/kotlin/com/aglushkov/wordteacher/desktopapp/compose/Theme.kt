@@ -42,7 +42,7 @@ fun ComposeAppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compos
     }
 
     CompositionLocalProvider(
-        LocalAppTypography provides AppTypography().initStylesFromResources()
+        LocalAppTypography provides AppTypography().initStylesFromResources(colors)
     ) {
         MaterialTheme(
             colors = colors,

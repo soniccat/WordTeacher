@@ -24,9 +24,7 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.res.MR
@@ -54,7 +52,7 @@ fun SearchView(
             .focusRequester(focusRequester)
             .onFocusChanged(onFocusChanged)
             .onPreviewKeyEvent {
-                if (it.key == Key.Enter) {
+                if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
                     onImeAction()
                     true
                 } else {
