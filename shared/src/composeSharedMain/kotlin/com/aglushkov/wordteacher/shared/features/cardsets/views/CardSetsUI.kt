@@ -29,9 +29,6 @@ import dev.icerock.moko.resources.compose.painterResource
 import okio.FileSystem
 import okio.Path.Companion.toPath
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
-@ExperimentalComposeUiApi
 @Composable
 fun CardSetsUI(
     vm: CardSetsVM,
@@ -137,8 +134,6 @@ fun CardSetsUI(
     }
 }
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
 @Composable
 private fun ShowSearchCardSets(
     item: BaseViewItem<*>,
@@ -160,8 +155,6 @@ private fun ShowSearchCardSets(
     }
 }
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
 @Composable
 private fun CardSetsViewItem(
     item: BaseViewItem<*>,
@@ -192,9 +185,7 @@ private fun CardSetsViewItem(
     }
 }
 
-
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CardSetItemView(
     item: CardSetViewItem,
@@ -236,8 +227,7 @@ private fun CardSetItemView(
     }
 }
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CardSetSearchItemView(
     item: RemoteCardSetViewItem,

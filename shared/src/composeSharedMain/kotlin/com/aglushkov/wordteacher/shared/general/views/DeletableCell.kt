@@ -25,8 +25,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.*
 import kotlin.math.roundToInt
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
+
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DeletableCell(
     stateKey: Any,

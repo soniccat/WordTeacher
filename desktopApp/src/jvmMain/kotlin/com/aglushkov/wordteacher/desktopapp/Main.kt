@@ -1,30 +1,46 @@
 package com.aglushkov.wordteacher.desktopapp
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.Button
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
-import com.aglushkov.wordteacher.desktopapp.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.general.views.slideFromRight
+import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.parcelable.ParcelableContainer
 import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
+import dev.icerock.moko.resources.ImageResource
+import dev.icerock.moko.resources.StringResource
+import dev.icerock.moko.resources.compose.painterResource
 import java.io.File
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+
+private val bottomBarTabs = listOf(
+    ScreenTab.Definitions,
+    ScreenTab.CardSets,
+//    ScreenTab.Articles,
+//    ScreenTab.Settings
+)
+
+lateinit var mainDecomposeComponent: MainDecomposeComponent
 
 fun main() = application {
     val lifecycle = LifecycleRegistry()
@@ -46,6 +62,12 @@ fun main() = application {
 //        .generalModule(GeneralModule())
         .build()
 
+    mainDecomposeComponent = DaggerMainComposeComponent.builder()
+        .setComponentContext(decomposeContext)
+        .setAppComponent(appComponent)
+        .build()
+        .mainDecomposeComponent()
+
     val definitionsDecomposeComponent = DaggerDefinitionsComposeComponent.builder()
         .setComponentContext(decomposeContext)
         .setConfiguration(
@@ -66,27 +88,124 @@ fun main() = application {
         ComposeAppTheme {
             Surface(color = MaterialTheme.colors.background) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    Column {
-//                    Button(onClick = {
-//                        //component.onNextChild()
-//                    }) {
-//                        Text("Open Next")
-//                    }
-//                    Children(routerState = component.routerState, animation = slide()) { it ->
-//                        val instance = it.instance
-//                        when (instance) {
-//                            is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
-//                                vm = instance.inner//,
-//                                //modalModifier = Modifier.padding(innerPadding)
-//                            )
-//                        }
-//                    }
-                        DefinitionsUI(definitionsDecomposeComponent)
-                    }
+                    mainUI()
                 }
             }
         }
     }
+}
+
+
+@Composable
+private fun mainUI() {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Children(
+            routerState = mainDecomposeComponent.routerState,
+            animation = childAnimation(slideFromRight())
+        ) {
+            when (val instance = it.instance) {
+                is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)
+//                is MainDecomposeComponent.Child.Article -> ArticleUI(
+//                    vm = instance.vm.apply {
+//                        router = mainDecomposeComponent
+//                        definitionsVM.router = mainDecomposeComponent
+//                    }
+//                )
+//                is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.vm)
+                is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.vm.apply {
+                    router = mainDecomposeComponent
+                })
+//                is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.vm)
+//                is MainDecomposeComponent.Child.LearningSessionResult -> LearningSessionResultUI(vm = instance.vm)
+                else -> throw RuntimeException("mainUI: Not implemented ${instance}")
+            }
+        }
+    }
+}
+
+@Composable
+private fun TabsUI(component: TabDecomposeComponent) {
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBarUI(component)
+        }
+    ) { innerPadding ->
+        Children(
+            routerState = component.routerState,
+            animation = childAnimation(slide())
+        ) {
+            when (val instance = it.instance) {
+                is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
+                    vm = instance.vm.apply {
+                        router = mainDecomposeComponent
+                    },
+                    modalModifier = Modifier.padding(innerPadding)
+                )
+                is TabDecomposeComponent.Child.CardSets -> CardSetsUI(
+                    vm = instance.vm,
+                    modifier = Modifier.padding(innerPadding)
+                )
+                else -> {
+                    Text("Unknown screen: $instance")
+                }
+//                is TabDecomposeComponent.Child.Articles -> ArticlesUI(
+//                    vm = instance.vm,
+//                    modifier = Modifier.padding(innerPadding)
+//                )
+//                is TabDecomposeComponent.Child.Settings -> SettingsUI(
+//                    vm = instance.vm,
+//                    modifier = Modifier.padding(innerPadding)
+//                )
+//                is TabDecomposeComponent.Child.Notes -> NotesUI(
+//                    vm = instance.vm,
+//                    modifier = Modifier.padding(innerPadding)
+//                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BottomNavigationBarUI(component: TabDecomposeComponent) {
+    BottomNavigation(
+        modifier = Modifier
+            .requiredHeight(56.dp)
+    ) {
+        bottomBarTabs.forEachIndexed { index, tab ->
+            BottomNavigationItem(
+                selected = tab.decomposeChildConfigClass == component.routerState.value.activeChild.configuration::class.java,
+                onClick = {
+                    when (tab) {
+                        is ScreenTab.Definitions -> component.openDefinitions()
+                        is ScreenTab.CardSets -> component.openCardSets()
+//                        is ScreenTab.Articles -> component.openArticles()
+//                        is ScreenTab.Settings -> component.openSettings()
+//                        is ScreenTab.Notes -> component.openNotes()
+                    }
+                },
+                icon = {
+                    Icon(
+                        painter = painterResource(tab.iconRes),
+                        contentDescription = null,
+                        tint = LocalContentColor.current
+                    )
+                },
+                label = {
+                    Text(tab.nameRes.localized())
+                }
+            )
+        }
+    }
+}
+
+sealed class ScreenTab(val nameRes: StringResource, val iconRes: ImageResource, val decomposeChildConfigClass: Class<*>) {
+    object Definitions : ScreenTab(MR.strings.tab_definitions, MR.images.field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+    object CardSets : ScreenTab(MR.strings.tab_learning, MR.images.learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
+//    object Articles : ScreenTab(R.string.tab_articles, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
+//    object Settings : ScreenTab(R.string.tab_settings, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
+//    object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }
 
 private const val SAVED_STATE_FILE_NAME = "saved_state.dat"

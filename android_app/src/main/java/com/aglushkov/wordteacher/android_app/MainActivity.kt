@@ -60,7 +60,6 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slid
 @ExperimentalUnitApi
 @ExperimentalComposeUiApi
 class MainActivity : AppCompatActivity(), Router {
-    lateinit var binding: ActivityMainBinding
     private val bottomBarTabs = listOf(
         ScreenTab.Definitions,
         ScreenTab.CardSets,
