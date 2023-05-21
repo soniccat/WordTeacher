@@ -13,7 +13,6 @@ class CardSetsDecomposeComponent (
     initialState: CardSetsVM.State,
     cardSetsRepository: CardSetsRepository,
     cardSetSearchRepository: CardSetSearchRepository,
-    router: CardSetsRouter,
     componentContext: ComponentContext,
     timeSource: TimeSource,
     idGenerator: IdGenerator,
@@ -21,7 +20,6 @@ class CardSetsDecomposeComponent (
     initialState,
     cardSetsRepository,
     cardSetSearchRepository,
-    router,
     timeSource,
     idGenerator
 ), ComponentContext by componentContext {

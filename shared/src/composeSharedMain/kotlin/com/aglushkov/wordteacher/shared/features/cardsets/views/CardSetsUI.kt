@@ -1,7 +1,5 @@
-package com.aglushkov.wordteacher.android_app.features.cardsets.views
+package com.aglushkov.wordteacher.shared.features.cardsets.views
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,23 +12,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.android_app.BuildConfig
-import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
-import com.aglushkov.wordteacher.android_app.general.views.compose.*
+import com.aglushkov.wordteacher.shared.di.LocalIsDebug
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
+import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
 import com.aglushkov.wordteacher.shared.general.views.*
+import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.painterResource
 import okio.FileSystem
 import okio.Path.Companion.toPath
 
@@ -88,8 +83,8 @@ fun CardSetsUI(
                     LoadingStatusView(
                         resource = searchCardSets,
                         loadingText = null,
-                        errorText = vm.getErrorText().resolveString(),
-                        emptyText = vm.getEmptySearchText().resolveString(),
+                        errorText = vm.getErrorText().localized(),
+                        emptyText = vm.getEmptySearchText().localized(),
                     ) {
                         vm.onTryAgainSearchClicked()
                     }
@@ -99,9 +94,9 @@ fun CardSetsUI(
                 // local cardsets
                 val data = cardSets.data()
                 if (cardSets.isLoaded() && data != null) {
-                    if (data.size == 1 && BuildConfig.DEBUG) {
-                        importDBButton()
-                    }
+//                    if (data.size == 1 && LocalIsDebug.current) {
+//                        importDBButton()
+//                    }
 
                     LazyColumn(
                         contentPadding = PaddingValues(bottom = 100.dp)
@@ -117,7 +112,7 @@ fun CardSetsUI(
                     LoadingStatusView(
                         resource = cardSets,
                         loadingText = null,
-                        errorText = vm.getErrorText().resolveString(),
+                        errorText = vm.getErrorText().localized(),
                     ) {
                         vm.onTryAgainClicked()
                     }
@@ -131,12 +126,10 @@ fun CardSetsUI(
         ) {
             FloatingActionButton(
                 onClick = { vm.onStartLearningClicked() },
-                modifier = Modifier.padding(
-                    dimensionResource(id = R.dimen.article_horizontalPadding)
-                )
+                modifier = Modifier.padding(LocalDimensWord.current.articleHorizontalPadding)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_start_learning_24),
+                    painter = painterResource(MR.images.start_learning_24),
                     contentDescription = null
                 )
             }
@@ -176,7 +169,7 @@ private fun CardSetsViewItem(
     newCardSetState: TextFieldCellState,
 ) = when (item) {
     is CreateCardSetViewItem -> TextFieldCellView(
-        placeholder = item.placeholder.toString(LocalContext.current),
+        placeholder = item.placeholder.localized(),
         textFieldValue = newCardSetState.rememberTextFieldValueState(),
         focusRequester = newCardSetState.focusRequester,
         onTextChanged = {
@@ -270,20 +263,20 @@ private fun CardSetSearchItemView(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
-@Preview
-@Composable
-fun CardSetTitleViewPreviews() {
-    CardSetItemView(
-        CardSetViewItem(
-            setId = 0L,
-            name = "My card set",
-            date = "Today",
-            readyToLearnProgress = 0.3f,
-            totalProgress = 0.1f,
-        )
-    )
-}
+//@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+//@Preview
+//@Composable
+//fun CardSetTitleViewPreviews() {
+//    CardSetItemView(
+//        CardSetViewItem(
+//            setId = 0L,
+//            name = "My card set",
+//            date = "Today",
+//            readyToLearnProgress = 0.3f,
+//            totalProgress = 0.1f,
+//        )
+//    )
+//}
 
 //@ExperimentalAnimationApi
 //@ExperimentalMaterialApi
@@ -304,32 +297,32 @@ fun CardSetTitleViewPreviews() {
 //    }
 //}
 
-@Composable
-fun importDBButton() {
-    val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { result ->
-        result?.let {
-            val byteArray = ByteArray(DEFAULT_BUFFER_SIZE)
-            val importPath = context.getDatabasePath("test2").absolutePath.toPath()
-            context.contentResolver.openInputStream(result)?.buffered()?.use { stream ->
-                FileSystem.SYSTEM.write(importPath, true) {
-                    while (stream.read(byteArray) != -1) {
-                        write(byteArray)
-                    }
-                }
-            }
-
-            val dbPath = context.getDatabasePath("test.db").absolutePath.toPath()
-            FileSystem.SYSTEM.delete(dbPath)
-            FileSystem.SYSTEM.atomicMove(importPath, dbPath)
-        }
-    }
-
-    return Column {
-        Button(onClick = {
-            launcher.launch("*/*")
-        }) {
-            Text("Import db file")
-        }
-    }
-}
+//@Composable
+//fun importDBButton() {
+//    val context = LocalContext.current
+//    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { result ->
+//        result?.let {
+//            val byteArray = ByteArray(DEFAULT_BUFFER_SIZE)
+//            val importPath = context.getDatabasePath("test2").absolutePath.toPath()
+//            context.contentResolver.openInputStream(result)?.buffered()?.use { stream ->
+//                FileSystem.SYSTEM.write(importPath, true) {
+//                    while (stream.read(byteArray) != -1) {
+//                        write(byteArray)
+//                    }
+//                }
+//            }
+//
+//            val dbPath = context.getDatabasePath("test.db").absolutePath.toPath()
+//            FileSystem.SYSTEM.delete(dbPath)
+//            FileSystem.SYSTEM.atomicMove(importPath, dbPath)
+//        }
+//    }
+//
+//    return Column {
+//        Button(onClick = {
+//            launcher.launch("*/*")
+//        }) {
+//            Text("Import db file")
+//        }
+//    }
+//}

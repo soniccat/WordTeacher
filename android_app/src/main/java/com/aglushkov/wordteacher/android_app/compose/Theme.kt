@@ -7,6 +7,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
+import com.aglushkov.wordteacher.shared.di.LocalIsDebug
 import com.aglushkov.wordteacher.shared.general.*
 
 private val DarkColorPalette = darkColors(
@@ -33,7 +34,11 @@ onSurface = Color.Black,
 )
 
 @Composable
-fun ComposeAppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun ComposeAppTheme(
+    isDebug: Boolean = false,
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit,
+) {
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {
@@ -41,6 +46,7 @@ fun ComposeAppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compos
     }
 
     CompositionLocalProvider(
+        LocalIsDebug provides isDebug,
         LocalAppTypography provides AppTypography().initStylesFromResources()
     ) {
         MaterialTheme(

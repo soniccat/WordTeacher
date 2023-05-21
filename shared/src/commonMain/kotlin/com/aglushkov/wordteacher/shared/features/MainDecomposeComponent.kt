@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
@@ -33,7 +34,7 @@ import kotlin.properties.Delegates
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-interface MainDecomposeComponent: DefinitionsRouter, ArticleRouter {
+interface MainDecomposeComponent: DefinitionsRouter, CardSetsRouter, ArticleRouter {
     val routerState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
@@ -41,9 +42,9 @@ interface MainDecomposeComponent: DefinitionsRouter, ArticleRouter {
 //    fun popDialog(inner: Any)
     fun popDialog(child: Child)
     fun openArticle(id: Long)
-    fun openCardSet(id: Long)
+    override fun openCardSet(id: Long)
     override fun openCardSets()
-    fun openLearning(ids: List<Long>)
+    override fun openLearning(ids: List<Long>)
     fun openLearningSessionResult(results: List<SessionCardResult>)
     fun back()
     fun popToRoot()

@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 interface CardSetsVM: Clearable {
+    var router: CardSetsRouter?
+
     val stateFlow: StateFlow<State>
     val eventFlow: Flow<Event>
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
@@ -53,10 +55,10 @@ open class CardSetsVMImpl(
     state: CardSetsVM.State = CardSetsVM.State(),
     private val cardSetsRepository: CardSetsRepository,
     private val cardSetSearchRepository: CardSetSearchRepository,
-    private val router: CardSetsRouter,
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator
 ): ViewModel(), CardSetsVM {
+    override var router: CardSetsRouter? = null
 
     final override val stateFlow = MutableStateFlow(state)
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
@@ -124,7 +126,7 @@ open class CardSetsVMImpl(
     }
 
     override fun onCardSetClicked(item: CardSetViewItem) {
-        router.openCardSet(item.id)
+        router?.openCardSet(item.id)
     }
 
     override fun onCardSetRemoved(item: CardSetViewItem) {
@@ -137,7 +139,7 @@ open class CardSetsVMImpl(
         viewModelScope.launch {
             try {
                 val allCardIds = cardSetsRepository.allReadyToLearnCardIds()
-                router.openLearning(allCardIds)
+                router?.openLearning(allCardIds)
             } catch (e: Throwable) {
                 // TODO: handle error
             }
