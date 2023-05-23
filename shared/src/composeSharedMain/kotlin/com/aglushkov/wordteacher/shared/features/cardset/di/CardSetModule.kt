@@ -1,12 +1,10 @@
-package com.aglushkov.wordteacher.android_app.features.cardset.di
+package com.aglushkov.wordteacher.shared.features.cardset.di
 
-import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
-import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
@@ -25,16 +23,14 @@ class CardSetModule {
     @Provides
     fun cardSetDecomposeComponent(
         state: CardSetVM.State,
-        routerResolver: RouterResolver,
-        notesRepository: CardSetRepository,
+        cardSetRepository: CardSetRepository,
         databaseCardWorker: DatabaseCardWorker,
         componentContext: ComponentContext,
         timeSource: TimeSource,
         idGenerator: IdGenerator
     ) = CardSetDecomposeComponent(
         state,
-        routerResolver.router!!.get()!!,
-        notesRepository,
+        cardSetRepository,
         databaseCardWorker,
         componentContext,
         timeSource,

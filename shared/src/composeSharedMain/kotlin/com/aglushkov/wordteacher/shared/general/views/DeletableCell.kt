@@ -8,6 +8,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -16,6 +17,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -29,6 +32,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DeletableCell(
+    modifier: Modifier = Modifier,
     stateKey: Any,
     onClick: () -> Unit,
     onDeleted: () -> Unit,
@@ -62,7 +66,7 @@ fun DeletableCell(
         val deleteButtonWidth = (DeleteButtonWidth.value * LocalDensity.current.density).toInt()
         DeleteSwipeable(
             state = dismissState,
-            contentModifier = Modifier.fillMaxWidth().clickable { onClick() },
+            contentModifier = modifier.fillMaxWidth().clickable { onClick() },
             deleteButtonWidth = deleteButtonWidth,
             background = {
                 Box(

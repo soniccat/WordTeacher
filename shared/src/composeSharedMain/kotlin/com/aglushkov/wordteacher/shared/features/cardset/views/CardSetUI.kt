@@ -1,6 +1,4 @@
-@file:OptIn(ExperimentalAnimationApi::class)
-
-package com.aglushkov.wordteacher.android_app.features.cardset.views
+package com.aglushkov.wordteacher.shared.features.cardset.views
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -15,26 +13,26 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
-import com.aglushkov.wordteacher.android_app.general.views.compose.*
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.views.*
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
+import com.aglushkov.wordteacher.shared.general.DropdownMenu
+import com.aglushkov.wordteacher.shared.general.DropdownMenuItem
+import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
@@ -42,6 +40,9 @@ import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
+import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.painterResource
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -72,7 +73,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                     onClick = { vm.onBackPressed() }
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_arrow_back_24),
+                        painter = painterResource(MR.images.arrow_back_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )
@@ -86,7 +87,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
             if (data != null) {
                 LazyColumn(
                     contentPadding = PaddingValues(
-                        top = dimensionResource(id = R.dimen.word_horizontalPadding),
+                        top = LocalDimensWord.current.wordHorizontalPadding,
                         bottom = 300.dp
                     )
                 ) {
@@ -108,7 +109,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 LoadingStatusView(
                     resource = viewItemsRes,
                     loadingText = null,
-                    errorText = vm.getErrorText(viewItemsRes)?.resolveString()
+                    errorText = vm.getErrorText(viewItemsRes)?.localized()
                 ) {
                     vm.onTryAgainClicked()
                 }
@@ -121,11 +122,11 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 FloatingActionButton(
                     onClick = { vm.onStartLearningClicked() },
                     modifier = Modifier.padding(
-                        dimensionResource(id = R.dimen.article_horizontalPadding)
+                        LocalDimensWord.current.articleHorizontalPadding
                     )
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_start_learning_24),
+                        painter = painterResource(MR.images.start_learning_24),
                         contentDescription = null
                     )
                 }
@@ -195,14 +196,14 @@ fun CardSetViewItems(
             )
         }
         is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
-            CardSetDefinitionView(item, item.cardId, vm, focusRequester)
+            CardSetDefinitionView(Modifier, item, item.cardId, vm, focusRequester)
         } else {
             DeletableCell(
                 stateKey = item.id,
                 onClick = { /*TODO*/ },
                 onDeleted = { vm.onDefinitionRemoved(item, item.cardId) }
             ) {
-                CardSetDefinitionView(item, item.cardId, vm, focusRequester)
+                CardSetDefinitionView(Modifier, item, item.cardId, vm, focusRequester)
             }
         }
         is WordSubHeaderViewItem -> {
@@ -326,6 +327,7 @@ fun CardSetViewItems(
 
 @Composable
 private fun CardSetDefinitionView(
+    modifier: Modifier = Modifier,
     item: WordDefinitionViewItem,
     cardId: Long,
     vm: CardSetVM,
@@ -335,7 +337,7 @@ private fun CardSetDefinitionView(
         item,
         textContent = { text, textStyle ->
             CardTextField(
-                modifier = Modifier
+                modifier = modifier
                     .weight(1.0f)
                     .focusRequester(focusRequester),
                 text,
@@ -354,6 +356,7 @@ private fun CardSetDefinitionView(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun CardTextField(
     modifier: Modifier = Modifier,
@@ -366,9 +369,16 @@ private fun CardTextField(
     val focusManager = LocalFocusManager.current
     var textState by remember { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
     InlineTextField(
-        modifier = modifier,
+        modifier = modifier.onPreviewKeyEvent {
+            if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
+                focusManager.moveFocus(FocusDirection.Down)
+                true
+            } else {
+                false
+            }
+        },
         value = textState,
-        placeholder = vm.getPlaceholder(item)?.toString(LocalContext.current).orEmpty(),
+        placeholder = vm.getPlaceholder(item)?.localized().orEmpty(),
         textStyle = textStyle.copy(
             color = LocalContentColor.current
         ),
@@ -399,7 +409,7 @@ private fun CreateCardView(
             onClick = onClicked
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_create_note),
+                painter = painterResource(MR.images.create_note),
                 contentDescription = null,
                 tint = MaterialTheme.colors.secondary
             )
@@ -430,7 +440,7 @@ private fun PartOfSpeechSelectPopup(
                             vm.onPartOfSpeechChanged(it, cardId)
                         }
                     ) {
-                        Text(it.toStringDesc().resolveString())
+                        Text(it.toStringDesc().localized())
                     }
                 }
         }

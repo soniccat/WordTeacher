@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
@@ -113,9 +114,13 @@ private fun mainUI() {
 //                        definitionsVM.router = mainDecomposeComponent
 //                    }
 //                )
-//                is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.vm)
+                is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.vm.apply {
+                    router = mainDecomposeComponent
+                })
                 is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.vm.apply {
                     router = mainDecomposeComponent
+                }, onBackHandler = {
+                    mainDecomposeComponent.back()
                 })
 //                is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.vm)
 //                is MainDecomposeComponent.Child.LearningSessionResult -> LearningSessionResultUI(vm = instance.vm)
@@ -144,7 +149,9 @@ private fun TabsUI(component: TabDecomposeComponent) {
                     modalModifier = Modifier.padding(innerPadding)
                 )
                 is TabDecomposeComponent.Child.CardSets -> CardSetsUI(
-                    vm = instance.vm,
+                    vm = instance.vm.apply {
+                        router = mainDecomposeComponent
+                    },
                     modifier = Modifier.padding(innerPadding)
                 )
                 else -> {

@@ -3,6 +3,8 @@ package com.aglushkov.wordteacher.desktopapp
 import com.aglushkov.wordteacher.desktopapp.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.cardset.di.DaggerCardSetComponent
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.arkivanov.decompose.ComponentContext
@@ -25,13 +27,13 @@ class MainComposeModule {
 //                        .setConfiguration(configuration)
 //                        .build()
 //                        .articleDecomposeComponent()
-//                is MainDecomposeComponent.ChildConfiguration.CardSetConfiguration ->
-//                    DaggerCardSetComponent.builder()
-//                        .setComponentContext(context)
-//                        .setDeps(appComponent)
-//                        .setState(CardSetVM.State(configuration.id))
-//                        .build()
-//                        .cardSetDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.CardSetConfiguration ->
+                    DaggerCardSetComponent.builder()
+                        .setComponentContext(context)
+                        .setDeps(appComponent)
+                        .setState(CardSetVM.State(configuration.id))
+                        .build()
+                        .cardSetDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
                     DaggerCardSetsComponent.builder()
                         .setComponentContext(context)

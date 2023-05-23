@@ -32,7 +32,8 @@ import okio.Path.Companion.toPath
 @Composable
 fun CardSetsUI(
     vm: CardSetsVM,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBackHandler: (() -> Unit)? = null,
 ) {
     val cardSets by vm.cardSets.collectAsState()
     val searchCardSets by vm.searchCardSets.collectAsState()
@@ -49,6 +50,17 @@ fun CardSetsUI(
     ) {
         Column{
             CustomTopAppBar {
+                onBackHandler?.let { onBackHandler ->
+                    IconButton(
+                        onClick = { onBackHandler() }
+                    ) {
+                        Icon(
+                            painter = painterResource(MR.images.arrow_back_24),
+                            contentDescription = null,
+                            tint = LocalContentColor.current
+                        )
+                    }
+                }
                 SearchView(
                     searchText,
                     onTextChanged = {
@@ -193,6 +205,7 @@ private fun CardSetItemView(
     onDeleted: () -> Unit = {}
 ) {
     DeletableCell(
+        Modifier,
         stateKey = item.id,
         onClick,
         onDeleted

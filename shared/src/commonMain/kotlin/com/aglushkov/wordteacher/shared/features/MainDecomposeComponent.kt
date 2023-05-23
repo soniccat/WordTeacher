@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeCompone
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
@@ -34,7 +35,7 @@ import kotlin.properties.Delegates
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-interface MainDecomposeComponent: DefinitionsRouter, CardSetsRouter, ArticleRouter {
+interface MainDecomposeComponent: DefinitionsRouter, CardSetsRouter, CardSetRouter, ArticleRouter {
     val routerState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
@@ -160,6 +161,10 @@ class MainDecomposeComponentImpl(
         addDialogConfigIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningConfiguration(ids)
         )
+    }
+
+    override fun closeCardSet() {
+        back()
     }
 
     override fun openLearningSessionResult(results: List<SessionCardResult>) {

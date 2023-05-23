@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 interface CardSetVM: Clearable {
+    var router: CardSetRouter?
+
     val state: State
     val cardSet: StateFlow<Resource<out CardSet>>
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
@@ -49,12 +51,13 @@ interface CardSetVM: Clearable {
 
 open class CardSetVMImpl(
     override var state: CardSetVM.State,
-    private val router: CardSetRouter,
     private val repository: CardSetRepository,
     private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator
 ): ViewModel(), CardSetVM {
+
+    override var router: CardSetRouter? = null
 
     private var pendingEvents = mutableListOf<PendingEvent>()
     private val notHandledPendingEvents: List<PendingEvent>
@@ -454,7 +457,7 @@ open class CardSetVMImpl(
     }
 
     override fun onBackPressed() {
-        router.closeCardSet()
+        router?.closeCardSet()
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
@@ -479,7 +482,7 @@ open class CardSetVMImpl(
                     val allCardIds = set.cards.filter {
                         it.progress.isReadyToLearn(timeSource)
                     }.map { it.id }
-                    router.openLearning(allCardIds)
+                    router?.openLearning(allCardIds)
                 }
             } catch (e: Throwable) {
                 // TODO: handle error

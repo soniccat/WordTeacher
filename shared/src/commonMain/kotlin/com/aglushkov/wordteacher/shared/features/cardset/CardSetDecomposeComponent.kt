@@ -14,7 +14,6 @@ import com.arkivanov.essenty.statekeeper.consume
 
 class CardSetDecomposeComponent (
     initialState: CardSetVM.State,
-    router: CardSetRouter,
     cardSetsRepository: CardSetRepository,
     databaseCardWorker: DatabaseCardWorker,
     componentContext: ComponentContext,
@@ -22,7 +21,6 @@ class CardSetDecomposeComponent (
     idGenerator: IdGenerator
 ) : CardSetVMImpl(
     initialState,
-    router,
     cardSetsRepository,
     databaseCardWorker,
     timeSource,

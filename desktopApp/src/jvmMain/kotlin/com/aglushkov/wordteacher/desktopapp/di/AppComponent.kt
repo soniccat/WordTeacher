@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.desktopapp.di
 
 import com.aglushkov.wordteacher.desktopapp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.di.AppComp
+import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -25,7 +26,8 @@ import dagger.Component
 @Component(modules = [AppModule::class, GeneralModule::class] )
 interface AppComponent:
     DefinitionsDependencies,
-    CardSetsDependencies
+    CardSetsDependencies,
+    CardSetDependencies
 {
 
     fun configService(): ConfigService
@@ -33,7 +35,7 @@ interface AppComponent:
     fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
-    fun database(): AppDatabase
+    override fun database(): AppDatabase
     fun nlpCore(): NLPCore
 
     override fun dictRepository(): DictRepository

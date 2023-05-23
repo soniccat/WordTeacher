@@ -82,9 +82,9 @@ class CardSetSyncWorker(
             lastSyncDate = Instant.fromEpochMilliseconds(settings.getLong(LAST_SYNC_DATE_KEY))
 
             if (spaceAuthRepository.isAuthorized()) {
-                toState(State.AuthRequired)
-            } else {
                 toState(State.PullRequired())
+            } else {
+                toState(State.AuthRequired)
             }
         }
 
@@ -92,7 +92,7 @@ class CardSetSyncWorker(
         scope.launch {
             spaceAuthRepository.authDataFlow.collect {
                 if (state.value != State.Initializing) {
-                    if (spaceAuthRepository.isAuthorized()) {
+                    if (state.value is State.AuthRequired && spaceAuthRepository.isAuthorized()) {
                         toState(State.PullRequired())
                     } else {
                         toState(State.AuthRequired)
