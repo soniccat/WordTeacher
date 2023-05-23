@@ -3,7 +3,6 @@ package com.aglushkov.wordteacher.android_app.di
 import com.aglushkov.wordteacher.android_app.GApp
 import com.aglushkov.wordteacher.android_app.features.add_article.di.AddArticleDependencies
 import com.aglushkov.wordteacher.android_app.features.article.di.ArticleDependencies
-import com.aglushkov.wordteacher.android_app.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.android_app.features.learning.di.LearningDependencies
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.di.LearningSessionResultDependencies
 import com.aglushkov.wordteacher.android_app.features.notes.di.NotesDependencies
@@ -13,6 +12,7 @@ import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
 import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.SpaceHttpClient
+import com.aglushkov.wordteacher.shared.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies

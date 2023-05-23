@@ -1,11 +1,11 @@
 package com.aglushkov.wordteacher.android_app
 
-import com.aglushkov.wordteacher.android_app.features.articles.di.DaggerArticlesComposeComponent
 import com.aglushkov.wordteacher.android_app.features.notes.di.DaggerNotesComponent
 import com.aglushkov.wordteacher.android_app.features.settings.di.DaggerSettingsComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.articles.di.DaggerArticlesComposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent

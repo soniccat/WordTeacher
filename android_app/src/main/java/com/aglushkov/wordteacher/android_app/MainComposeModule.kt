@@ -2,7 +2,6 @@ package com.aglushkov.wordteacher.android_app
 
 import com.aglushkov.wordteacher.android_app.features.add_article.di.DaggerAddArticleComposeComponent
 import com.aglushkov.wordteacher.android_app.features.article.di.DaggerArticleComposeComponent
-import com.aglushkov.wordteacher.android_app.features.definitions.di.DaggerTabComposeComponent
 import com.aglushkov.wordteacher.android_app.features.learning.di.DaggerLearningComponent
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.di.DaggerLearningSessionResultComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponent

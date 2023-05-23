@@ -26,8 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.android_app.features.article.views.ArticleUI
-import com.aglushkov.wordteacher.android_app.features.articles.views.ArticlesUI
-import com.aglushkov.wordteacher.android_app.features.definitions.di.DaggerMainComposeComponent
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUI
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUIDialog
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUI
@@ -39,6 +37,7 @@ import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
@@ -204,7 +203,9 @@ class MainActivity : AppCompatActivity(), Router {
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Articles -> ArticlesUI(
-                        vm = instance.vm,
+                        vm = instance.vm.apply {
+                            router = mainDecomposeComponent
+                        },
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Settings -> SettingsUI(
@@ -302,7 +303,7 @@ class MainActivity : AppCompatActivity(), Router {
     // Router
 
     override fun openAddArticle() {
-        mainDecomposeComponent.openAddArticleDialog()
+        mainDecomposeComponent.openAddArticle()
     }
 
     override fun openArticle(id: Long) {

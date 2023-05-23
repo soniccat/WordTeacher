@@ -9,11 +9,9 @@ import com.arkivanov.decompose.ComponentContext
 class ArticlesDecomposeComponent (
     componentContext: ComponentContext,
     articlesRepository: ArticlesRepository,
-    timeSource: TimeSource,
-    router: ArticlesRouter
+    timeSource: TimeSource
 ) : ArticlesVMImpl(
     articlesRepository,
-    timeSource,
-    router
+    timeSource
 ), ComponentContext by componentContext {
 }

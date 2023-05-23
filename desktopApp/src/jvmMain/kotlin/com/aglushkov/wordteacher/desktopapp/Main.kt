@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
@@ -37,7 +38,7 @@ import java.io.ObjectOutputStream
 private val bottomBarTabs = listOf(
     ScreenTab.Definitions,
     ScreenTab.CardSets,
-//    ScreenTab.Articles,
+    ScreenTab.Articles,
 //    ScreenTab.Settings
 )
 
@@ -154,13 +155,12 @@ private fun TabsUI(component: TabDecomposeComponent) {
                     },
                     modifier = Modifier.padding(innerPadding)
                 )
-                else -> {
-                    Text("Unknown screen: $instance")
-                }
-//                is TabDecomposeComponent.Child.Articles -> ArticlesUI(
-//                    vm = instance.vm,
-//                    modifier = Modifier.padding(innerPadding)
-//                )
+                is TabDecomposeComponent.Child.Articles -> ArticlesUI(
+                    vm = instance.vm.apply {
+                        router = mainDecomposeComponent
+                    },
+                    modifier = Modifier.padding(innerPadding)
+                )
 //                is TabDecomposeComponent.Child.Settings -> SettingsUI(
 //                    vm = instance.vm,
 //                    modifier = Modifier.padding(innerPadding)
@@ -169,6 +169,9 @@ private fun TabsUI(component: TabDecomposeComponent) {
 //                    vm = instance.vm,
 //                    modifier = Modifier.padding(innerPadding)
 //                )
+                else -> {
+                    Text("Unknown screen: $instance")
+                }
             }
         }
     }
@@ -187,7 +190,7 @@ private fun BottomNavigationBarUI(component: TabDecomposeComponent) {
                     when (tab) {
                         is ScreenTab.Definitions -> component.openDefinitions()
                         is ScreenTab.CardSets -> component.openCardSets()
-//                        is ScreenTab.Articles -> component.openArticles()
+                        is ScreenTab.Articles -> component.openArticles()
 //                        is ScreenTab.Settings -> component.openSettings()
 //                        is ScreenTab.Notes -> component.openNotes()
                     }
@@ -210,7 +213,7 @@ private fun BottomNavigationBarUI(component: TabDecomposeComponent) {
 sealed class ScreenTab(val nameRes: StringResource, val iconRes: ImageResource, val decomposeChildConfigClass: Class<*>) {
     object Definitions : ScreenTab(MR.strings.tab_definitions, MR.images.field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
     object CardSets : ScreenTab(MR.strings.tab_learning, MR.images.learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
-//    object Articles : ScreenTab(R.string.tab_articles, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
+    object Articles : ScreenTab(MR.strings.tab_articles, MR.images.tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
 //    object Settings : ScreenTab(R.string.tab_settings, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
 //    object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }

@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecompose
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
+import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
@@ -35,14 +36,14 @@ import kotlin.properties.Delegates
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-interface MainDecomposeComponent: DefinitionsRouter, CardSetsRouter, CardSetRouter, ArticleRouter {
+interface MainDecomposeComponent: DefinitionsRouter, CardSetsRouter, CardSetRouter, ArticlesRouter, ArticleRouter {
     val routerState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
-    fun openAddArticleDialog()
+    override fun openAddArticle()
 //    fun popDialog(inner: Any)
     fun popDialog(child: Child)
-    fun openArticle(id: Long)
+    override fun openArticle(id: Long)
     override fun openCardSet(id: Long)
     override fun openCardSets()
     override fun openLearning(ids: List<Long>)
@@ -182,7 +183,7 @@ class MainDecomposeComponentImpl(
 
     // Dialogs
 
-    override fun openAddArticleDialog() {
+    override fun openAddArticle() {
         addDialogConfigIfNotAtTop(MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
     }
 

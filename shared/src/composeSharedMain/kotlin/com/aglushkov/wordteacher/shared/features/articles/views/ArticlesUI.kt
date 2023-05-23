@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.android_app.features.articles.views
+package com.aglushkov.wordteacher.shared.features.articles.views
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
@@ -9,25 +9,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
-import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
+import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.SearchView
+import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.painterResource
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
-@ExperimentalComposeUiApi
 @Composable
 fun ArticlesUI(
     vm: ArticlesVM,
@@ -61,8 +56,8 @@ fun ArticlesUI(
                 LoadingStatusView(
                     resource = articles,
                     loadingText = null,
-                    errorText = vm.getErrorText(articles)?.resolveString(),
-                    emptyText = LocalContext.current.getString(R.string.articles_no_articles)
+                    errorText = vm.getErrorText(articles)?.localized(),
+                    emptyText = StringDesc.Resource(MR.strings.articles_no_articles).localized()
                 ) {
                     vm.onTryAgainClicked()
                 }
@@ -76,11 +71,11 @@ fun ArticlesUI(
             FloatingActionButton(
                 onClick = { vm.onCreateTextArticleClicked() },
                 modifier = Modifier.padding(
-                    dimensionResource(id = R.dimen.article_horizontalPadding)
+                    LocalDimensWord.current.articleHorizontalPadding
                 )
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_add_white_24dp),
+                    painter = painterResource(MR.images.add_white_24),
                     contentDescription = null
                 )
             }
@@ -88,8 +83,6 @@ fun ArticlesUI(
     }
 }
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
 @Composable
 private fun ArticlesViewItem(
     item: BaseViewItem<*>,
@@ -107,8 +100,7 @@ private fun ArticlesViewItem(
     }
 }
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ArticleTitleView(
     articleViewItem: ArticleViewItem,
@@ -124,25 +116,6 @@ private fun ArticleTitleView(
         ListItem(
             text = { Text(articleViewItem.name) },
             secondaryText = { Text(articleViewItem.date) }
-        )
-    }
-}
-
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
-@ExperimentalComposeUiApi
-@Preview
-@Composable
-fun ArticlesUIPreviewWithArticles() {
-    ComposeAppTheme {
-        ArticlesUI(
-            vm = ArticlesVMPreview(
-                articles = Resource.Loaded(
-                    data = listOf(
-                        ArticleViewItem(1, "Article Name", "Today")
-                    )
-                )
-            )
         )
     }
 }

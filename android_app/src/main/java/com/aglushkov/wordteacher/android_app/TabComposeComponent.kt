@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.android_app.features.definitions.di
+package com.aglushkov.wordteacher.android_app
 
 import com.aglushkov.wordteacher.android_app.TabComposeModule
 import com.aglushkov.wordteacher.android_app.di.AppComponent

@@ -1,6 +1,5 @@
-package com.aglushkov.wordteacher.android_app.features.articles.di
+package com.aglushkov.wordteacher.shared.features.articles.di
 
-import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -17,11 +16,9 @@ class ArticlesModule {
         configuration: TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration,
         articlesRepository: ArticlesRepository,
         timeSource: TimeSource,
-        router: RouterResolver
     ) = ArticlesDecomposeComponent(
         componentContext,
         articlesRepository,
         timeSource,
-        router.router!!.get()!!
     )
 }

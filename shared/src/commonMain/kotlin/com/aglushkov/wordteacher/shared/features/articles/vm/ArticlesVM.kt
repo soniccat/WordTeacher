@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 interface ArticlesVM {
+    var router: ArticlesRouter?
     val articles: StateFlow<Resource<List<BaseViewItem<*>>>>
 
     fun onCreateTextArticleClicked()
@@ -41,8 +42,8 @@ interface ArticlesVM {
 open class ArticlesVMImpl(
     val articlesRepository: ArticlesRepository,
     private val timeSource: TimeSource,
-    private val router: ArticlesRouter
 ): ViewModel(), ArticlesVM {
+    override var router: ArticlesRouter? = null
 
     override val articles = articlesRepository.shortArticles.map {
         //Logger.v("build view items")
@@ -50,11 +51,11 @@ open class ArticlesVMImpl(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override fun onCreateTextArticleClicked() {
-        router.openAddArticle()
+        router?.openAddArticle()
     }
 
     override fun onArticleClicked(item: ArticleViewItem) {
-        router.openArticle(item.id)
+        router?.openArticle(item.id)
     }
 
     override fun onArticleRemoved(item: ArticleViewItem) {
