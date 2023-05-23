@@ -44,13 +44,15 @@ private val bottomBarTabs = listOf(
 
 lateinit var mainDecomposeComponent: MainDecomposeComponent
 
-fun main() = application {
-    val lifecycle = LifecycleRegistry()
-    val stateKeeper = StateKeeperDispatcher(tryRestoreStateFromFile())
-    val decomposeContext = DefaultComponentContext(
-        lifecycle = lifecycle,
-        stateKeeper = stateKeeper,
-    )
+fun main() {
+    System.setProperty("apple.awt.application.appearance", "system")
+    application {
+        val lifecycle = LifecycleRegistry()
+        val stateKeeper = StateKeeperDispatcher(tryRestoreStateFromFile())
+        val decomposeContext = DefaultComponentContext(
+            lifecycle = lifecycle,
+            stateKeeper = stateKeeper,
+        )
 
 //    val root =
 //        runOnUiThread {
@@ -60,37 +62,38 @@ fun main() = application {
 //            )
 //        }
 
-    val appComponent = DaggerAppComponent.builder()
+        val appComponent = DaggerAppComponent.builder()
 //        .generalModule(GeneralModule())
-        .build()
+            .build()
 
-    mainDecomposeComponent = DaggerMainComposeComponent.builder()
-        .setComponentContext(decomposeContext)
-        .setAppComponent(appComponent)
-        .build()
-        .mainDecomposeComponent()
+        mainDecomposeComponent = DaggerMainComposeComponent.builder()
+            .setComponentContext(decomposeContext)
+            .setAppComponent(appComponent)
+            .build()
+            .mainDecomposeComponent()
 
-    val definitionsDecomposeComponent = DaggerDefinitionsComposeComponent.builder()
-        .setComponentContext(decomposeContext)
-        .setConfiguration(
-            DefinitionsComposeComponent.DefinitionConfiguration(
-                word = "fox"
+        val definitionsDecomposeComponent = DaggerDefinitionsComposeComponent.builder()
+            .setComponentContext(decomposeContext)
+            .setConfiguration(
+                DefinitionsComposeComponent.DefinitionConfiguration(
+                    word = "fox"
+                )
             )
-        )
-        .setDeps(appComponent)
-        .build()
-        .definitionsDecomposeComponent()
+            .setDeps(appComponent)
+            .build()
+            .definitionsDecomposeComponent()
 
-    Window(onCloseRequest = ::exitApplication) {
+        Window(onCloseRequest = ::exitApplication) {
 //        window.rootPane.apply {
 //            putClientProperty("apple.awt.fullWindowContent", true)
 //            putClientProperty("apple.awt.transparentTitleBar", true)
 //            putClientProperty("apple.awt.windowTitleVisible", false)
 //        }
-        ComposeAppTheme {
-            Surface(color = MaterialTheme.colors.background) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    mainUI()
+            ComposeAppTheme {
+                Surface(color = MaterialTheme.colors.background) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        mainUI()
+                    }
                 }
             }
         }

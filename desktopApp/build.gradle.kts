@@ -119,10 +119,6 @@ compose.desktop {
                 // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
                 upgradeUuid = "BF9CDA6A-1391-46D5-9ED5-383D6E68CCEB"
             }
-
-            jvmArgs(
-                "-Dapple.awt.application.appearance=system"
-            )
         }
     }
 }
