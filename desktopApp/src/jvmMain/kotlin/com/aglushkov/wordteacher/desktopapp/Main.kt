@@ -37,9 +37,16 @@ import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.painterResource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+
+lateinit var mainDecomposeComponent: MainDecomposeComponent
+val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
 private val bottomBarTabs = listOf(
     ScreenTab.Definitions,
@@ -47,8 +54,6 @@ private val bottomBarTabs = listOf(
     ScreenTab.Articles,
 //    ScreenTab.Settings
 )
-
-lateinit var mainDecomposeComponent: MainDecomposeComponent
 
 fun main() {
     System.setProperty("apple.awt.application.appearance", "system")
@@ -71,6 +76,10 @@ fun main() {
         val appComponent = DaggerAppComponent.builder()
 //        .generalModule(GeneralModule())
             .build()
+
+        mainScope.launch(Dispatchers.Default) {
+            appComponent.nlpCore().load()
+        }
 
         mainDecomposeComponent = DaggerMainComposeComponent.builder()
             .setComponentContext(decomposeContext)

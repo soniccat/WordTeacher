@@ -57,7 +57,7 @@ class AppModule {
     @BasePath
     @AppComp
     @Provides
-    fun basePath(): Path = ".".toPath()
+    fun basePath(): Path = "./wordTeacherDesktop".toPath()
 
     @ConfigBaseUrl
     @AppComp
@@ -88,30 +88,27 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun databaseFactory() = DatabaseDriverFactory()
+    fun databaseFactory(
+        @BasePath basePath: Path,
+    ) = DatabaseDriverFactory(basePath.toString())
 
     @AppComp
     @Provides
-    fun nlpCore(): NLPCore {
-        return NLPCore()
+    fun nlpCore(
+        @BasePath basePath: Path,
+        fileSystem: FileSystem
+    ): NLPCore {
+        val nlpPath = basePath.div("nlp")
+        if (!fileSystem.exists(nlpPath)) {
+            fileSystem.createDirectory(nlpPath)
+        }
+        return NLPCore(
+            nlpPath.div("en_sent.bin"),
+            nlpPath.div("en_token.bin"),
+            nlpPath.div("en_pos_maxent.bin"),
+            nlpPath.div("en_lemmatizer_dict.bin"),
+            nlpPath.div("en_chunker.bin"),
+            fileSystem
+        )
     }
-
-//    @AppComp
-//    @Provides
-//    fun nlpCore(context: Context, fileSystem: FileSystem): NLPCore {
-//        val nlpIndexPath = context.filesDir.absolutePath.toPath().div("nlp")
-//        if (!fileSystem.exists(nlpIndexPath)) {
-//            fileSystem.createDirectory(nlpIndexPath)
-//        }
-//        return NLPCore(
-//            context.resources,
-//            R.raw.en_sent,
-//            R.raw.en_token,
-//            R.raw.en_pos_maxent,
-//            R.raw.en_lemmatizer_dict,
-//            R.raw.en_chunker,
-//            nlpIndexPath,
-//            fileSystem
-//        )
-//    }
 }

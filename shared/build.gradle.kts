@@ -108,6 +108,7 @@ kotlin {
             dependsOn(composeSharedMain)
             dependencies {
                 implementation(libs.ktorDesktop)
+                implementation("org.apache.opennlp:opennlp-tools:1.9.4")
                 implementation("org.jsoup:jsoup:1.14.3")
 
 //                implementation(compose.uiTooling)
