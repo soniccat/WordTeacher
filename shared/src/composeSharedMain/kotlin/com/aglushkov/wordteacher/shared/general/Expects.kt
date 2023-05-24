@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.general
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -21,4 +22,10 @@ expect fun DropdownMenu(expanded: Boolean, onDismissRequest: ()->Unit, content: 
 expect fun DropdownMenuItem(
     onClick: () -> Unit,
     content: @Composable RowScope.() -> Unit
+)
+
+@Composable
+expect fun CustomDialogUI(
+    onDismissRequest: () -> Unit = {},
+    content: @Composable BoxScope.() -> Unit
 )

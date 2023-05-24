@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.shared.general.views.SearchView
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
+import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 
@@ -57,7 +58,7 @@ fun ArticlesUI(
                     resource = articles,
                     loadingText = null,
                     errorText = vm.getErrorText(articles)?.localized(),
-                    emptyText = StringDesc.Resource(MR.strings.articles_no_articles).localized()
+                    emptyText = stringResource(MR.strings.articles_no_articles)
                 ) {
                     vm.onTryAgainClicked()
                 }

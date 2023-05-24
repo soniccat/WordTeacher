@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.android_app.features.add_article.views
+package com.aglushkov.wordteacher.shared.features.add_article.views
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,26 +12,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.general.views.compose.CustomDialogUI
+import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.events.CompletionData
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
+import com.aglushkov.wordteacher.shared.general.CustomDialogUI
+import com.aglushkov.wordteacher.shared.general.LocalDimens
+import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.painterResource
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 
-@ExperimentalUnitApi
-@ExperimentalComposeUiApi
 @Composable
 fun AddArticleUIDialog(
     vm: AddArticleVM,
@@ -49,7 +50,7 @@ fun AddArticleUIDialog(
                     onClick = { vm.onCancelPressed() }
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_close_24),
+                        painter = painterResource(MR.images.close_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )
@@ -67,9 +68,9 @@ fun AddArticleUI(
     actions: @Composable RowScope.() -> Unit = {},
     onArticleCreated: SnackbarHostState.(articleId: Long?) -> Unit
 ) {
-    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val focusRequester = remember { FocusRequester() }
+    val snackbarStringDesc = remember { mutableStateOf<dev.icerock.moko.resources.desc.StringDesc?>(null) }
 
     Box(
         modifier = Modifier
@@ -78,7 +79,7 @@ fun AddArticleUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(stringResource(id = R.string.add_article_title)) },
+                title = { Text(text = stringResource(MR.strings.add_article_title)) },
                 actions = actions
             )
 
@@ -91,22 +92,23 @@ fun AddArticleUI(
         ExtendedFloatingActionButton(
             text = {
                 Text(
-                    text = stringResource(id = R.string.add_article_done),
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
+                    text = stringResource(MR.strings.add_article_done),
+                    modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
                 )
             },
             onClick = { vm.onCompletePressed() },
             modifier = Modifier.Companion
                 .align(Alignment.BottomEnd)
-                .padding(dimensionResource(id = R.dimen.content_padding))
+                .padding(LocalDimens.current.contentPadding)
         )
 
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.Companion.align(Alignment.BottomCenter)
         ) {
-            Snackbar(
-                snackbarData = it
+            CustomSnackbar(
+                message = snackbarStringDesc.value?.localized(),
+                snackbarData = it,
             )
         }
     }
@@ -122,7 +124,8 @@ fun AddArticleUI(
                 }
                 is ErrorEvent -> {
                     launch {
-                        snackbarHostState.showSnackbar(it.text.toString(context))
+                        snackbarStringDesc.value = it.text
+                        snackbarHostState.showSnackbar("")
                     }
                 }
             }
@@ -150,9 +153,9 @@ private fun AddArticlesFieldsUI(
             .fillMaxSize()
             .verticalScroll(scrollableState)
             .padding(
-                top = dimensionResource(id = R.dimen.content_padding),
-                start = dimensionResource(id = R.dimen.content_padding),
-                end = dimensionResource(id = R.dimen.content_padding),
+                top = LocalDimens.current.contentPadding,
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
                 bottom = 88.dp,
             )
     ) {
@@ -171,12 +174,12 @@ private fun AddArticlesFieldsUI(
                         vm.onTitleFocusChanged(it.isFocused)
                     }
                 },
-            label = { Text(stringResource(id = R.string.add_article_field_title_hint)) },
+            label = { Text(stringResource(MR.strings.add_article_field_title_hint)) },
             isError = hasTitleError,
             trailingIcon = {
                 if (hasTitleError) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_error_24),
+                        painter = painterResource(MR.images.error_24),
                         contentDescription = null
                     )
                 }
@@ -198,7 +201,7 @@ private fun AddArticlesFieldsUI(
             val titleErrorDesc = titleError
             if (titleErrorDesc != null) {
                 Text(
-                    titleErrorDesc.toString(LocalContext.current),
+                    titleErrorDesc.localized(),
                     color = MaterialTheme.colors.error,
                     style = MaterialTheme.typography.caption
                 )
@@ -212,7 +215,7 @@ private fun AddArticlesFieldsUI(
                 .padding(top = 16.dp, bottom = 16.dp)
         ) {
             Text(
-                text = stringResource(id = R.string.add_article_create_set_option),
+                text = stringResource(MR.strings.add_article_create_set_option),
                 modifier = Modifier
                     .padding(end = 16.dp)
                     .weight(1.0f)
@@ -231,7 +234,44 @@ private fun AddArticlesFieldsUI(
                 .sizeIn(minHeight = with(LocalDensity.current) {
                     (42 * 2).sp.toDp()
                 }),
-            label = { Text(stringResource(id = R.string.add_article_field_text_hint)) }
+            label = { Text(stringResource(MR.strings.add_article_field_text_hint)) }
         )
     }
+}
+
+// CustomSnackbar to be able to override text in snackbarData
+@Composable
+fun CustomSnackbar(
+    message: String?,
+    snackbarData: SnackbarData,
+    modifier: Modifier = Modifier,
+    actionOnNewLine: Boolean = false,
+    shape: Shape = MaterialTheme.shapes.small,
+    backgroundColor: Color = SnackbarDefaults.backgroundColor,
+    contentColor: Color = MaterialTheme.colors.surface,
+    actionColor: Color = SnackbarDefaults.primaryActionColor,
+    elevation: Dp = 6.dp
+) {
+    val actionLabel = snackbarData.actionLabel
+    val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
+        @Composable {
+            TextButton(
+                colors = ButtonDefaults.textButtonColors(contentColor = actionColor),
+                onClick = { snackbarData.performAction() },
+                content = { Text(actionLabel) }
+            )
+        }
+    } else {
+        null
+    }
+    Snackbar(
+        modifier = modifier.padding(12.dp),
+        content = { Text(message ?: snackbarData.message) },
+        action = actionComposable,
+        actionOnNewLine = actionOnNewLine,
+        shape = shape,
+        backgroundColor = backgroundColor,
+        contentColor = contentColor,
+        elevation = elevation
+    )
 }

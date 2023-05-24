@@ -1,6 +1,5 @@
-package com.aglushkov.wordteacher.android_app.features.add_article.di
+package com.aglushkov.wordteacher.shared.features.add_article.di
 
-import com.aglushkov.wordteacher.android_app.di.AddArticleComposeModule
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.general.TimeSource

@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.desktopapp.di
 
 import com.aglushkov.wordteacher.desktopapp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.di.AppComp
+import com.aglushkov.wordteacher.shared.features.add_article.di.AddArticleDependencies
 import com.aglushkov.wordteacher.shared.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
@@ -29,7 +30,8 @@ interface AppComponent:
     DefinitionsDependencies,
     CardSetsDependencies,
     CardSetDependencies,
-    ArticlesDependencies
+    ArticlesDependencies,
+    AddArticleDependencies
 {
 
     fun configService(): ConfigService

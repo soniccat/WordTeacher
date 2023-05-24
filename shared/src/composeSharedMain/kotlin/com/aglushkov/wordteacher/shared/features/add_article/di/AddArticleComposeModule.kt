@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.android_app.di
+package com.aglushkov.wordteacher.shared.features.add_article.di
 
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent

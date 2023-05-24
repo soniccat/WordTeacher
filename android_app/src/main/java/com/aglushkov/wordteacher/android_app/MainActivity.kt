@@ -24,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
-import com.aglushkov.wordteacher.android_app.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.android_app.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUI
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUIDialog
@@ -32,11 +31,12 @@ import com.aglushkov.wordteacher.android_app.features.learning_session_result.vi
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUIDialog
 import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
 import com.aglushkov.wordteacher.android_app.features.settings.views.SettingsUI
-import com.aglushkov.wordteacher.android_app.general.views.compose.WindowInsets
+import com.aglushkov.wordteacher.shared.general.WindowInsets
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
@@ -45,6 +45,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
+import com.aglushkov.wordteacher.shared.general.LocalWindowInset
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
@@ -334,7 +335,5 @@ sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: In
     object Settings : ScreenTab(R.string.tab_settings, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
     object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }
-
-val LocalWindowInset = staticCompositionLocalOf { WindowInsets() }
 
 const val EXTRA_ARTICLE_ID = "articleId"

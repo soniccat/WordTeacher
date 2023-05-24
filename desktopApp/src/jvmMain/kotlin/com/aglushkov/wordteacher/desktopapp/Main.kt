@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -13,12 +14,17 @@ import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
+import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
+import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
+import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.DefaultComponentContext
@@ -72,27 +78,12 @@ fun main() {
             .build()
             .mainDecomposeComponent()
 
-        val definitionsDecomposeComponent = DaggerDefinitionsComposeComponent.builder()
-            .setComponentContext(decomposeContext)
-            .setConfiguration(
-                DefinitionsComposeComponent.DefinitionConfiguration(
-                    word = "fox"
-                )
-            )
-            .setDeps(appComponent)
-            .build()
-            .definitionsDecomposeComponent()
-
         Window(onCloseRequest = ::exitApplication) {
-//        window.rootPane.apply {
-//            putClientProperty("apple.awt.fullWindowContent", true)
-//            putClientProperty("apple.awt.transparentTitleBar", true)
-//            putClientProperty("apple.awt.windowTitleVisible", false)
-//        }
             ComposeAppTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         mainUI()
+                        dialogUI()
                     }
                 }
             }
@@ -176,6 +167,53 @@ private fun TabsUI(component: TabDecomposeComponent) {
                     Text("Unknown screen: $instance")
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+private fun dialogUI() {
+    val dialogs = mainDecomposeComponent.dialogsStateFlow.collectAsState()
+
+    dialogs.value.onEach { instance ->
+        when (val instance = instance.instance) {
+            is MainDecomposeComponent.Child.AddArticle ->
+                AddArticleUIDialog(
+                    vm = instance.vm,
+                    onArticleCreated = {
+                        mainDecomposeComponent.popDialog(instance)
+                    }
+                )
+//            is MainDecomposeComponent.Child.Learning ->
+//                LearningUIDialog(
+//                    vm = instance.vm.apply {
+//                        router = object : LearningRouter {
+//                            override fun openSessionResult(results: List<SessionCardResult>) {
+//                                mainDecomposeComponent.openLearningSessionResult(results)
+//                            }
+//
+//                            override fun onScreenFinished(
+//                                inner: Any,
+//                                result: SimpleRouter.Result
+//                            ) {
+//                                mainDecomposeComponent.popDialog(instance)
+//                            }
+//                        }
+//                    }
+//                )
+//            is MainDecomposeComponent.Child.LearningSessionResult -> {
+//                LearningSessionResultUIDialog(
+//                    vm = instance.vm.apply {
+//                        router = object : LearningSessionResultRouter {
+//                            override fun onScreenFinished(inner: Any, result: SimpleRouter.Result) {
+//                                mainDecomposeComponent.popDialog(instance)
+//                            }
+//                        }
+//                    }
+//                )
+//            }
+            else -> {}
         }
     }
 }

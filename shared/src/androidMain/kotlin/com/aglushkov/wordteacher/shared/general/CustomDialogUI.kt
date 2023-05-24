@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.android_app.general.views.compose
+package com.aglushkov.wordteacher.shared.general
 
 import android.content.res.Resources
 import android.util.Log
@@ -19,13 +19,11 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogWindowProvider
-import com.aglushkov.wordteacher.android_app.LocalWindowInset
 import com.aglushkov.wordteacher.shared.general.views.pxToDp
 
-@ExperimentalComposeUiApi
 @Composable
-fun CustomDialogUI(
-    onDismissRequest: () -> Unit = {},
+actual fun CustomDialogUI(
+    onDismissRequest: () -> Unit,
     content: @Composable BoxScope.() -> Unit
 ) {
     Dialog(
@@ -106,3 +104,5 @@ fun Modifier.applyWindowInsetsAsPaddings(
         bottom = windowInsets.bottom.pxToDp()
     )
 }
+
+val LocalWindowInset = staticCompositionLocalOf { WindowInsets() }

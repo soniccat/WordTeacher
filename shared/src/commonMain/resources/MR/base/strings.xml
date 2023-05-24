@@ -4,7 +4,7 @@
     <string name="api_base_url">http://193.168.0.1</string>
     <string name="app_name">WordTeacher</string>
     <string name="tab_definitions">Words</string>
-    <string name="tab_add_article">@string/add_article_title</string>
+    <string name="tab_add_article">New Article</string>
     <string name="tab_articles">Articles</string>
     <string name="tab_learning">Learning</string>
     <string name="tab_cardsets">Card Sets</string>
@@ -48,7 +48,7 @@
     <string name="articles_action_add_text">New Article</string>
     <string name="articles_action_article_created">Added!</string>
     <string name="articles_action_open">Open</string>
-    <string name="add_article_title">@string/articles_action_add_text</string>
+    <string name="add_article_title">New Article</string>
     <string name="add_article_field_title_hint">Title</string>
     <string name="add_article_field_text_hint">Text</string>
     <string name="add_article_done">ADD</string>
@@ -56,14 +56,14 @@
     <string name="add_article_create_set_option">Create a new set</string>
 
     <string name="learning_title">%d out of %d</string>
-    <string name="learning_error">@string/error_default</string>
+    <string name="learning_error">Something went wrong :(</string>
     <string name="learning_wrong_input">Something is wrong</string>
     <string name="learning_term_title_hint">Term</string>
     <string name="learning_show_hint">Give me a clue</string>
     <string name="learning_give_up">Give up</string>
 
     <string name="learning_session_result_title">Learning</string>
-    <string name="learning_session_result_error">@string/error_default</string>
+    <string name="learning_session_result_error">Something went wrong :(</string>
 
     <string name="empty_search_result">Can\'t find anything :(</string>
     <string name="error_default">Something went wrong :(</string>
@@ -72,9 +72,9 @@
     <string name="error_no_connection">No internet connection.\nPlease check your device network settings and try again.</string>
     <string name="error_no_definitions">No definitions were found</string>
     <string name="articles_no_articles">To create a new article tap the button</string>
-    <string name="cardsets_error">@string/error_default</string>
-    <string name="articles_error">@string/error_default</string>
-    <string name="article_error">@string/error_default</string>
+    <string name="cardsets_error">Something went wrong :(</string>
+    <string name="articles_error">Something went wrong :(</string>
+    <string name="article_error">Something went wrong :(</string>
     <string name="article_empty">There\'s an empty article</string>
     <string name="article_side_sheet_selection_dicts">Dictionaries</string>
     <string name="article_side_sheet_selection_phrases">Phrases</string>
@@ -87,7 +87,7 @@
     <string name="settings_auth_signin">Sign In</string>
     <string name="settings_auth_signout">Sign Out</string>
 
-    <string name="notes_error">@string/error_default</string>
+    <string name="notes_error">Something went wrong :(</string>
     <string name="notes_create_note">Create a note</string>
     <string name="cardsets_create_cardset">Create a card set</string>
 

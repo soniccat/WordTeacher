@@ -3,6 +3,8 @@ package com.aglushkov.wordteacher.desktopapp
 import com.aglushkov.wordteacher.desktopapp.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponentImpl
+import com.aglushkov.wordteacher.shared.features.add_article.di.DaggerAddArticleComposeComponent
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.cardset.di.DaggerCardSetComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
@@ -48,13 +50,13 @@ class MainComposeModule {
                         .setWord("owl")
                         .build()
                         .tabDecomposeComponent()
-//                is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
-//                    DaggerAddArticleComposeComponent.builder()
-//                        .setComponentContext(context)
-//                        .setConfiguration(AddArticleVM.State())
-//                        .setDeps(appComponent)
-//                        .build()
-//                        .addArticleDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
+                    DaggerAddArticleComposeComponent.builder()
+                        .setComponentContext(context)
+                        .setConfiguration(AddArticleVM.State())
+                        .setDeps(appComponent)
+                        .build()
+                        .addArticleDecomposeComponent()
 //                is MainDecomposeComponent.ChildConfiguration.LearningConfiguration ->
 //                    DaggerLearningComponent.builder()
 //                        .setState(LearningVM.State(configuration.ids, teacherState = null))
