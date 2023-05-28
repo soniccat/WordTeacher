@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.desktopapp.di
 import com.aglushkov.wordteacher.desktopapp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.features.add_article.di.AddArticleDependencies
+import com.aglushkov.wordteacher.shared.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.shared.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
@@ -11,7 +12,6 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
-import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -31,7 +31,8 @@ interface AppComponent:
     CardSetsDependencies,
     CardSetDependencies,
     ArticlesDependencies,
-    AddArticleDependencies
+    AddArticleDependencies,
+    ArticleDependencies
 {
 
     fun configService(): ConfigService
@@ -40,7 +41,7 @@ interface AppComponent:
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
     override fun database(): AppDatabase
-    fun nlpCore(): NLPCore
+    override fun nlpCore(): NLPCore
 
     override fun dictRepository(): DictRepository
     fun routerResolver(): RouterResolver

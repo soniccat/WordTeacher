@@ -1,6 +1,5 @@
-package com.aglushkov.wordteacher.android_app.features.article.di
+package com.aglushkov.wordteacher.shared.features.article.di
 
-import com.aglushkov.wordteacher.android_app.di.FragmentComp
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
@@ -12,7 +11,6 @@ import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.BindsInstance
 import dagger.Component
 
-@FragmentComp
 @Component(
     dependencies = [ArticleDependencies::class, DefinitionsDependencies::class],
     modules = [ArticleModule::class, DefinitionsModule::class]

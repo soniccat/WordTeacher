@@ -23,6 +23,7 @@ import opennlp.tools.tokenize.TokenizerModel
 import opennlp.tools.util.Span
 import opennlp.tools.util.normalizer.EmojiCharSequenceNormalizer
 
+// TODO: share the same logic with android
 actual class NLPCore(
     private val sentenceModelPath: Path,
     private val tokenPath: Path,
@@ -46,12 +47,6 @@ actual class NLPCore(
     private var tagger: POSTaggerME? = null
     private var lemmatizer: Lemmatizer? = null
     private var chunker: ChunkerME? = null
-
-    init {
-        // HACK: that's required to load en_pos_maxent.bin
-        // https://stackoverflow.com/questions/21719266/the-profile-data-stream-has-an-invalid-format-when-using-opennlp-postagger
-        //System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
-    }
 
     actual suspend fun waitUntilInitialized(): Resource<NLPCore> = state.first { it.isLoaded() }
 

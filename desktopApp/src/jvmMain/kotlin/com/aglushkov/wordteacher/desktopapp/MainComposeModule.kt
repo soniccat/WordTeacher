@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponentImpl
 import com.aglushkov.wordteacher.shared.features.add_article.di.DaggerAddArticleComposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
+import com.aglushkov.wordteacher.shared.features.article.di.DaggerArticleComposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.di.DaggerCardSetComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
@@ -21,14 +22,14 @@ class MainComposeModule {
     ): (context: ComponentContext, configuration: MainDecomposeComponent.ChildConfiguration) -> Any =
         { context: ComponentContext, configuration: MainDecomposeComponent.ChildConfiguration ->
             when (configuration) {
-//                is MainDecomposeComponent.ChildConfiguration.ArticleConfiguration ->
-//                    DaggerArticleComposeComponent.builder()
-//                        .setComponentContext(context)
-//                        .setDeps(appComponent)
-//                        .setDefinitionsDeps(appComponent)
-//                        .setConfiguration(configuration)
-//                        .build()
-//                        .articleDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.ArticleConfiguration ->
+                    DaggerArticleComposeComponent.builder()
+                        .setComponentContext(context)
+                        .setDeps(appComponent)
+                        .setDefinitionsDeps(appComponent)
+                        .setConfiguration(configuration)
+                        .build()
+                        .articleDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.CardSetConfiguration ->
                     DaggerCardSetComponent.builder()
                         .setComponentContext(context)

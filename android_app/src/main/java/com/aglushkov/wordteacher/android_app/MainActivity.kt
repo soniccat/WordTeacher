@@ -24,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
-import com.aglushkov.wordteacher.android_app.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUI
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUIDialog
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUI
@@ -37,6 +36,7 @@ import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUIDialog
+import com.aglushkov.wordteacher.shared.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI

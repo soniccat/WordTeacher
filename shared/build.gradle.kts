@@ -76,6 +76,7 @@ kotlin {
             dependencies {
                 implementation(libs.androidMaterial)
                 implementation(libs.sqlDelightAndroidDriver)
+                api(libs.androidComposeActivity)
                 implementation("org.apache.opennlp:opennlp-tools:1.9.4")
                 implementation("org.jsoup:jsoup:1.14.3")
             }
@@ -114,6 +115,7 @@ kotlin {
 //                implementation(compose.uiTooling)
 //                implementation(compose.preview)
                 implementation(libs.sqlDelightJvmDriver)
+                implementation("org.xerial:sqlite-jdbc:3.42.0.0")
             }
         }
     }

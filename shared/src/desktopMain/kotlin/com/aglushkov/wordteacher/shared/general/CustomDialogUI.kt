@@ -33,3 +33,8 @@ actual fun CustomDialogUI(
         }
     }
 }
+
+@Composable
+actual fun BackHandler(enabled: Boolean, onBack: () -> Unit) {
+    // Not supported, consider handling Esc key pressing as back button
+}

@@ -95,4 +95,10 @@
     <string name="card_transcription_placeholder">Enter transcription</string>
 
     <string name="error_try_again">Try again</string>
+
+    <string name="sidesheet_navigation_menu">Navigation menu</string>
+    <string name="sidesheet_side_sheet">Close navigation menu</string>
+    <string name="sidesheet_close">Close sheet</string>
+    <string name="sidesheet_default_error_message">Invalid input</string>
+    <string name="sidesheet_exposed_dropdown">Dropdown menu</string>
 </resources>

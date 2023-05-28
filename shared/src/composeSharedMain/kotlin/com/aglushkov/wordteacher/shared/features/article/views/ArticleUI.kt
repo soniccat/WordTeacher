@@ -1,6 +1,5 @@
-package com.aglushkov.wordteacher.android_app.features.article.views
+package com.aglushkov.wordteacher.shared.features.article.views
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,28 +22,25 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
-import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
-import com.aglushkov.wordteacher.android_app.general.views.compose.ModalSideSheet
-import com.aglushkov.wordteacher.android_app.general.views.compose.SideSheetValue
-import com.aglushkov.wordteacher.android_app.general.views.compose.rememberSideSheetState
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.views.BottomSheetStates
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.HandleUI
+import com.aglushkov.wordteacher.shared.general.BackHandler
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
+import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.ModalSideSheet
+import com.aglushkov.wordteacher.shared.general.views.SideSheetValue
+import com.aglushkov.wordteacher.shared.general.views.rememberSideSheetState
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
@@ -52,11 +48,15 @@ import com.aglushkov.wordteacher.shared.model.nlp.chunkEnum
 import com.aglushkov.wordteacher.shared.model.nlp.toStringDesc
 import com.aglushkov.wordteacher.shared.model.partOfSpeechEnum
 import com.aglushkov.wordteacher.shared.model.toStringDesc
+import com.aglushkov.wordteacher.shared.res.MR
+import com.arkivanov.essenty.backpressed.BackPressedHandler
+import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.painterResource
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
-@ExperimentalUnitApi
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ArticleUI(
     vm: ArticleVM,
@@ -120,7 +120,7 @@ fun ArticleUI(
                     LazyColumn(
                         state = lazyColumnState,
                         contentPadding = PaddingValues(
-                            bottom = dimensionResource(id = R.dimen.article_horizontalPadding) + this@BoxWithConstraints.maxHeight / 2
+                            bottom = LocalDimensWord.current.articleHorizontalPadding + this@BoxWithConstraints.maxHeight / 2
                         )
                     ) {
                         items(data) { item ->
@@ -138,8 +138,8 @@ fun ArticleUI(
                     LoadingStatusView(
                         resource = paragraphs,
                         loadingText = null,
-                        errorText = vm.getErrorText(paragraphs)?.resolveString(),
-                        emptyText = LocalContext.current.getString(R.string.article_empty)
+                        errorText = vm.getErrorText(paragraphs)?.localized(),
+                        emptyText = stringResource(MR.strings.article_empty)
                     ) {
                         vm.onTryAgainClicked()
                     }
@@ -161,13 +161,13 @@ private fun ArticleSideSheetContent(
 
     CheckableListItem(
         isChecked = state.selectionState.cardSetWords,
-        textRes = R.string.article_side_sheet_selection_cardset_words,
+        text = stringResource(MR.strings.article_side_sheet_selection_cardset_words),
         onClicked = { vm.onCardSetWordSelectionChanged() }
     )
 
     Text(
-        modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
-        text = stringResource(id = R.string.article_side_sheet_selection_dicts),
+        modifier = Modifier.padding(all = LocalDimens.current.contentPadding),
+        text = stringResource(MR.strings.article_side_sheet_selection_dicts),
         style = LocalAppTypography.current.articleSideSheetSection
     )
     if (dictPaths.isLoaded()) {
@@ -183,27 +183,27 @@ private fun ArticleSideSheetContent(
     }
 
     Text(
-        modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
-        text = stringResource(id = R.string.article_side_sheet_selection_phrases),
+        modifier = Modifier.padding(all = LocalDimens.current.contentPadding),
+        text = stringResource(MR.strings.article_side_sheet_selection_phrases),
         style = LocalAppTypography.current.articleSideSheetSection
     )
     ChunkType.values().onEach { chunkType ->
         CheckableListItem(
             isChecked = state.selectionState.phrases.contains(chunkType),
-            text = chunkType.toStringDesc().resolveString(),
+            text = chunkType.toStringDesc().localized(),
             onClicked = { vm.onPhraseSelectionChanged(chunkType) }
         )
     }
 
     Text(
-        modifier = Modifier.padding(all = dimensionResource(id = R.dimen.content_padding)),
-        text = stringResource(id = R.string.article_side_sheet_part_of_speech_title),
+        modifier = Modifier.padding(all = LocalDimens.current.contentPadding),
+        text = stringResource(MR.strings.article_side_sheet_part_of_speech_title),
         style = LocalAppTypography.current.articleSideSheetSection
     )
     WordTeacherWord.PartOfSpeech.values().onEach { partOfSpeech ->
         CheckableListItem(
             isChecked = state.selectionState.partsOfSpeech.contains(partOfSpeech),
-            text = partOfSpeech.toStringDesc().resolveString(),
+            text = partOfSpeech.toStringDesc().localized(),
             onClicked = { vm.onPartOfSpeechSelectionChanged(partOfSpeech) }
         )
     }
@@ -255,7 +255,7 @@ private fun ArticleTopBar(
                 onClick = onBackPressed
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back_24),
+                    painter = painterResource(MR.images.arrow_back_24),
                     contentDescription = null,
                     tint = LocalContentColor.current
                 )
@@ -266,7 +266,7 @@ private fun ArticleTopBar(
                 onClick = onSideSheetPressed
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_article_filter_24),
+                    painter = painterResource(MR.images.article_filter_24),
                     contentDescription = null,
                     tint = LocalContentColor.current
                 )
@@ -275,7 +275,6 @@ private fun ArticleTopBar(
     )
 }
 
-@ExperimentalUnitApi
 @Composable
 fun ParagraphViewItem(
     item: BaseViewItem<*>,
@@ -289,7 +288,6 @@ fun ParagraphViewItem(
     }
 }
 
-@ExperimentalUnitApi
 @Composable
 private fun ArticleParagraphView(
     paragraphViewItem: ParagraphViewItem,
@@ -324,9 +322,9 @@ private fun ArticleParagraphView(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                top = dimensionResource(id = R.dimen.article_horizontalPadding),
-                start = dimensionResource(id = R.dimen.article_horizontalPadding),
-                end = dimensionResource(id = R.dimen.article_horizontalPadding)
+                top = LocalDimensWord.current.articleHorizontalPadding,
+                start = LocalDimensWord.current.articleHorizontalPadding,
+                end = LocalDimensWord.current.articleHorizontalPadding
             )
     ) {
         val colors = MaterialTheme.colors
@@ -599,17 +597,17 @@ private val PhraseTypeToColorMap = mapOf(
     ChunkType.X to AnnotationColors(Color(0xFF5E0A0A)),
 )
 
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun CheckableListItem(
-    isChecked: Boolean,
-    textRes: Int,
-    onClicked: () -> Unit,
-) = CheckableListItem(
-    isChecked,
-    stringResource(id = textRes),
-    onClicked
-)
+//@OptIn(ExperimentalMaterialApi::class)
+//@Composable
+//fun CheckableListItem(
+//    isChecked: Boolean,
+//    text: String,
+//    onClicked: () -> Unit,
+//) = CheckableListItem(
+//    isChecked,
+//    text,
+//    onClicked
+//)
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

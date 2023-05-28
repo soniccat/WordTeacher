@@ -86,7 +86,6 @@ dependencies {
     implementation(libs.decompose)
     implementation(libs.decomposeJetbrains)
     implementation(libs.essentyParcelable)
-    implementation(libs.androidComposeActivity)
     implementation(libs.androidComposeUITooling)
     implementation(libs.androidComposeUIToolingPreview)
 

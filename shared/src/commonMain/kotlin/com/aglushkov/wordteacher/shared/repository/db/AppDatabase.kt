@@ -106,10 +106,10 @@ class AppDatabase(
         fun selectAll() = db.dBNLPSentenceQueries.selectAll()
         fun selectForArticle(articleId: Long) = db.dBNLPSentenceQueries
             .selectForArticle(articleId)
-            .executeAsList()
-            .map {
-                it.toNLPSentence()
-            }
+            //.executeAsList()
+//            .map {
+//                it.toNLPSentence()
+//            }
 
         fun removeAll() = db.dBNLPSentenceQueries.removeAll()
     }
@@ -124,10 +124,23 @@ class AppDatabase(
         fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date ->
             ShortArticle(id, name, date)
         }
-        fun selectArticle(anId: Long) = db.dBArticleQueries.selectArticle(anId) { id, name, date, style ->
+//        fun selectArticle(anId: Long) = db.dBArticleQueries.selectArticle(anId) { id, name, date, style ->
+//            Article(id, name, date, emptyList(), decodeStyle(style))
+//        }
+        fun selectArticle(anId: Long) = combine(
+            db.dBArticleQueries.selectArticle(anId).asFlow(),
+            sentencesNLP.selectForArticle(anId).asFlow(),
+        ) { f1, f2 ->
+            val article = f1.executeAsOneOrNull()
+            val sentences = f2.executeAsList().map { it.toNLPSentence() }
+            article?.let {
+                Article(article.id, article.name, article.date, sentences, decodeStyle(article.style))
+            }
+        }
+            /*db.dBArticleQueries.selectArticle(anId) { id, name, date, style ->
             val sentences = sentencesNLP.selectForArticle(anId)
             Article(id, name, date, sentences, decodeStyle(style))
-        }
+        }*/
         fun removeArticle(anId: Long) {
             db.transaction {
                 db.dBNLPSentenceQueries.removeWithArticleId(anId)

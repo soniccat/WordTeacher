@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.android_app.general.views.compose
+package com.aglushkov.wordteacher.shared.general.views
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
@@ -34,8 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.contentDescription
@@ -47,10 +45,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.android_app.R
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import com.aglushkov.wordteacher.shared.res.MR
 
 // The code is based on Drawer.kt
 
@@ -408,14 +407,12 @@ private class Strings private constructor(@Suppress("unused") private val value:
 
 @Composable
 private fun getString(string: Strings): String {
-    LocalConfiguration.current
-    val resources = LocalContext.current.resources
     return when (string) {
-        Strings.NavigationMenu -> resources.getString(R.string.navigation_menu)
-        Strings.CloseSideSheet -> resources.getString(R.string.close_drawer)
-        Strings.CloseSheet -> resources.getString(R.string.close_sheet)
-        Strings.DefaultErrorMessage -> resources.getString(R.string.default_error_message)
-        Strings.ExposedDropdownMenu -> resources.getString(R.string.dropdown_menu)
+        Strings.NavigationMenu -> stringResource(MR.strings.sidesheet_navigation_menu)
+        Strings.CloseSideSheet -> stringResource(MR.strings.sidesheet_side_sheet)
+        Strings.CloseSheet -> stringResource(MR.strings.sidesheet_close)
+        Strings.DefaultErrorMessage -> stringResource(MR.strings.sidesheet_default_error_message)
+        Strings.ExposedDropdownMenu -> stringResource(MR.strings.sidesheet_exposed_dropdown)
         else -> ""
     }
 }

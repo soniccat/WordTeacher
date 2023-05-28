@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUIDialog
+import com.aglushkov.wordteacher.shared.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
@@ -112,12 +113,12 @@ private fun mainUI() {
         ) {
             when (val instance = it.instance) {
                 is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)
-//                is MainDecomposeComponent.Child.Article -> ArticleUI(
-//                    vm = instance.vm.apply {
-//                        router = mainDecomposeComponent
-//                        definitionsVM.router = mainDecomposeComponent
-//                    }
-//                )
+                is MainDecomposeComponent.Child.Article -> ArticleUI(
+                    vm = instance.vm.apply {
+                        router = mainDecomposeComponent
+                        definitionsVM.router = mainDecomposeComponent
+                    }
+                )
                 is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.vm.apply {
                     router = mainDecomposeComponent
                 })

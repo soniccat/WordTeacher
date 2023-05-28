@@ -10,9 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ArticleRepository(
@@ -27,10 +25,9 @@ class ArticleRepository(
     suspend fun loadArticle(id: Long) {
         loadJob?.cancel()
         loadJob = scope.launch(Dispatchers.Default) {
-            database.articles.selectArticle(id).asFlow().collect {
-                val result = it.executeAsOneOrNull()
-                stateFlow.value = if (result != null) {
-                    Resource.Loaded(result)
+            database.articles.selectArticle(id).collect { article ->
+                stateFlow.value = if (article != null) {
+                    Resource.Loaded(article)
                 } else {
                     Resource.Error(ArticleNotFound(), true)
                 }

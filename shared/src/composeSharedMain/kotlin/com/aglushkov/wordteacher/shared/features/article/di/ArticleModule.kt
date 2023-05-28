@@ -1,6 +1,5 @@
-package com.aglushkov.wordteacher.android_app.features.article.di
+package com.aglushkov.wordteacher.shared.features.article.di
 
-import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM

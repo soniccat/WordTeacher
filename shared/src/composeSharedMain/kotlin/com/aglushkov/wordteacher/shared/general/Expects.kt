@@ -29,3 +29,6 @@ expect fun CustomDialogUI(
     onDismissRequest: () -> Unit = {},
     content: @Composable BoxScope.() -> Unit
 )
+
+@Composable
+expect fun BackHandler(enabled: Boolean = true, onBack: () -> Unit)
