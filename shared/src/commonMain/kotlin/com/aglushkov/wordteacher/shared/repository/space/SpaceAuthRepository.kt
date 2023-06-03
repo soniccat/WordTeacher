@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.space
 
 import com.aglushkov.wordteacher.shared.general.ErrorResponseException
-import com.aglushkov.wordteacher.shared.general.GoogleAuthRepository
+import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.service.*
@@ -17,7 +17,7 @@ import okio.Path
 
 class SpaceAuthRepository(
     private val service: SpaceAuthService,
-    private val googleAuthRepository: GoogleAuthRepository,
+    private val googleAuthController: GoogleAuthController,
     private val cachePath: Path,
     private val fileSystem: FileSystem,
 ) {
@@ -25,7 +25,7 @@ class SpaceAuthRepository(
     private val spaceAuthStateFlow = MutableStateFlow<Resource<AuthData>>(Resource.Uninitialized())
 
     private val stateFlow: StateFlow<Resource<AuthData>> = combine(
-        googleAuthRepository.googleAuthDataFlow,
+        googleAuthController.googleAuthDataFlow,
         spaceAuthStateFlow
     ) { googleRes, spaceRes ->
         googleRes.merge(spaceRes) { gr, sr ->
@@ -79,13 +79,13 @@ class SpaceAuthRepository(
             throw RuntimeException("authInternal: unsupported network")
         }
 
-        val googleAuthDataRes = googleAuthRepository.googleAuthDataFlow.value
+        val googleAuthDataRes = googleAuthController.googleAuthDataFlow.value
         if (googleAuthDataRes.isLoading()) {
             return currentAuthData
         }
 
         val googleAuthData = if (!googleAuthDataRes.isLoaded()) {
-            googleAuthRepository.signIn()
+            googleAuthController.signIn()
         } else {
             googleAuthDataRes
         }
@@ -96,7 +96,7 @@ class SpaceAuthRepository(
                 (errorAuthData.throwable as? ErrorResponseException)?.let {
                     // id token is expired, need to resign-in
                     if (it.statusCode == HttpStatusCode.Unauthorized.value) {
-                        val googleAuthData2 = googleAuthRepository.signIn()
+                        val googleAuthData2 = googleAuthController.signIn()
                         // on error just keep error in googleAuthRepository
                         googleAuthData2.asLoaded()?.let { loadedGoogleAuthData2 ->
                             // try second time
@@ -135,7 +135,7 @@ class SpaceAuthRepository(
         }
 
         if (network == SpaceAuthService.NetworkType.Google) {
-            googleAuthRepository.launchSignOut()
+            googleAuthController.launchSignOut()
         }
     }
 

@@ -9,7 +9,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import com.aglushkov.wordteacher.shared.general.GoogleAuthData
-import com.aglushkov.wordteacher.shared.general.GoogleAuthRepository
+import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -25,9 +25,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 
-class GoogleAuthRepositoryImpl(
+class GoogleAuthControllerImpl(
     private val serverClientId: String
-): GoogleAuthRepository {
+): GoogleAuthController {
     private var oldClient: GoogleSignInClient? = null
     private var client: SignInClient? = null
     private var signInRequest: BeginSignInRequest? = null

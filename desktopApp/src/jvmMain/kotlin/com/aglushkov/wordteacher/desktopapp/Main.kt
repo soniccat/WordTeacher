@@ -12,6 +12,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
+import com.aglushkov.wordteacher.desktopapp.features.webauth.WebAuthUI
+import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUIDialog
@@ -26,6 +28,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
+import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthVM
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.res.MR
@@ -88,6 +91,10 @@ fun main() {
             .setAppComponent(appComponent)
             .build()
             .mainDecomposeComponent()
+
+        (appComponent.googleAuthController() as GoogleAuthControllerImpl).apply {
+            authOpener = mainDecomposeComponent
+        }
 
         Window(onCloseRequest = ::exitApplication) {
             ComposeAppTheme {
@@ -195,6 +202,13 @@ private fun dialogUI() {
                 AddArticleUIDialog(
                     vm = instance.vm,
                     onArticleCreated = {
+                        mainDecomposeComponent.popDialog(instance)
+                    }
+                )
+            is MainDecomposeComponent.Child.WebAuth ->
+                WebAuthUI(
+                    vm = instance.vm,
+                    onCompleted = {
                         mainDecomposeComponent.popDialog(instance)
                     }
                 )

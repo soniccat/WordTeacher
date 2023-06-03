@@ -5,7 +5,7 @@ import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.aglushkov.wordteacher.android_app.BuildConfig
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
+import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -68,14 +68,14 @@ class AppModule {
     @Provides
     fun googleAuthRepositoryImpl(
         context: Context
-    ): GoogleAuthRepositoryImpl =
-        GoogleAuthRepositoryImpl(context.getString(R.string.default_web_client_id))
+    ): GoogleAuthControllerImpl =
+        GoogleAuthControllerImpl(context.getString(R.string.default_web_client_id))
 
     @AppComp
     @Provides
     fun googleAuthRepository(
-        impl: GoogleAuthRepositoryImpl
-    ): GoogleAuthRepository = impl
+        impl: GoogleAuthControllerImpl
+    ): GoogleAuthController = impl
 
     @AppComp
     @Provides

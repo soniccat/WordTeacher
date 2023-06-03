@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.di.DaggerCardSetCompone
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.webauth.di.DaggerWebAuthComponent
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -62,7 +63,7 @@ class MainComposeModule {
 //                is MainDecomposeComponent.ChildConfiguration.LearningConfiguration ->
 //                    DaggerLearningComponent.builder()
 //                        .setState(LearningVM.State(configuration.ids, teacherState = null))
-//                        .setComponentContext(context)
+//                        .setComponentContext(context)h
 //                        .setDeps(appComponent)
 //                        .build()
 //                        .learningDecomposeComponent()
@@ -73,6 +74,13 @@ class MainComposeModule {
 //                        .setDeps(appComponent)
 //                        .build()
 //                        .learningSessionResultDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration ->
+                    DaggerWebAuthComponent.builder()
+                        .setComponentContext(context)
+                        .setConfiguration(configuration)
+                        .setDeps(appComponent)
+                        .build()
+                        .webAuthDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
                     Any()
                 else -> {

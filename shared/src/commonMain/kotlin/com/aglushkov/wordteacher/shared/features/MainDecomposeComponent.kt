@@ -18,7 +18,10 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.LearningSessionResultDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
+import com.aglushkov.wordteacher.shared.features.webauth.WebAuthDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthRouter
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
@@ -41,7 +44,8 @@ interface MainDecomposeComponent: DefinitionsRouter,
     CardSetRouter,
     ArticlesRouter,
     ArticleRouter,
-    SettingsRouter {
+    SettingsRouter,
+    AuthOpener {
     val routerState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
@@ -55,6 +59,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
     fun openLearningSessionResult(results: List<SessionCardResult>)
     fun back()
     fun popToRoot()
+    override fun openWebAuth(networkType: SpaceAuthService.NetworkType)
 
     sealed class Child(
         val inner: Clearable?
@@ -67,6 +72,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
         data class Tabs(val vm: TabDecomposeComponent): Child(vm)
 
         data class AddArticle(val vm: AddArticleDecomposeComponent): Child(vm)
+        data class WebAuth(val vm: WebAuthDecomposeComponent): Child(vm)
         object EmptyDialog: Child(null)
 
         override fun onCleared() {
@@ -79,6 +85,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
         @Parcelize data class CardSetConfiguration(val id: Long) : ChildConfiguration()
         @Parcelize data class LearningConfiguration(val ids: List<Long>) : ChildConfiguration()
         @Parcelize data class LearningSessionResultConfiguration(val results: List<SessionCardResult>) : ChildConfiguration()
+        @Parcelize data class WebAuthConfiguration(val networkType: SpaceAuthService.NetworkType) : ChildConfiguration()
         @Parcelize object CardSetsConfiguration : ChildConfiguration()
         @Parcelize object TabsConfiguration : ChildConfiguration()
 
@@ -142,6 +149,19 @@ class MainDecomposeComponentImpl(
         is MainDecomposeComponent.ChildConfiguration.LearningSessionResultConfiguration -> MainDecomposeComponent.Child.LearningSessionResult(
             vm = childComponentFactory(componentContext, configuration) as LearningSessionResultDecomposeComponent
         )
+        is MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration -> MainDecomposeComponent.Child.WebAuth(
+            vm = (childComponentFactory(componentContext, configuration) as WebAuthDecomposeComponent).apply {
+                router = object : WebAuthRouter {
+                    override fun onCompleted(result: AuthOpener.AuthResult) {
+                        authListeners.onEach { it.onCompleted(result) }
+                    }
+
+                    override fun onError(throwable: Throwable) {
+                        authListeners.onEach { it.onError(throwable) }
+                    }
+                }
+            }
+        )
         is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration -> MainDecomposeComponent.Child.EmptyDialog
 
     }
@@ -166,6 +186,12 @@ class MainDecomposeComponentImpl(
     override fun openLearning(ids: List<Long>) {
         addDialogConfigIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.LearningConfiguration(ids)
+        )
+    }
+
+    override fun openWebAuth(networkType: SpaceAuthService.NetworkType) {
+        addDialogConfigIfNotAtTop(
+            MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration(networkType)
         )
     }
 
@@ -233,6 +259,18 @@ class MainDecomposeComponentImpl(
 //    private fun findChildByInner(inner: Any): Child<*, *>? {
 //        return dialogHolders.lastOrNull { it.child.instance.inner == inner }?.child
 //    }
+
+    // AuthOpener
+
+    private val authListeners = mutableListOf<AuthOpener.Listener>()
+
+    override fun addAuthListener(listener: AuthOpener.Listener) {
+        authListeners.add(listener)
+    }
+
+    override fun removeAuthListener(listener: AuthOpener.Listener) {
+        authListeners.remove(listener)
+    }
 
     private fun dialogHolder(config: MainDecomposeComponent.ChildConfiguration): DialogHolder {
         val lifecycle = LifecycleRegistry() // An instance of LifecycleRegistry associated with the new child

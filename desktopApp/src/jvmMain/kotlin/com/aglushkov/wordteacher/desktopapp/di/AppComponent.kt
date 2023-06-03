@@ -11,6 +11,8 @@ import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.settings.di.SettingsDependencies
+import com.aglushkov.wordteacher.shared.features.webauth.di.WebAuthDependencies
+import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -37,7 +39,8 @@ interface AppComponent:
     AddArticleDependencies,
     ArticleDependencies,
     SettingsDependencies,
-    TabComposeComponentDependencies
+    TabComposeComponentDependencies,
+    WebAuthDependencies
 {
 
     fun configService(): ConfigService
@@ -56,6 +59,7 @@ interface AppComponent:
     override fun idGenerator(): IdGenerator
     override fun timeSource(): TimeSource
     override fun connectivityManager(): ConnectivityManager
+    fun googleAuthController(): GoogleAuthController
 
     @IsDebug
     override fun isDebug(): Boolean

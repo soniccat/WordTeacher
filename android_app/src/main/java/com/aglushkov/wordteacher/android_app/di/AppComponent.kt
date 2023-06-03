@@ -5,7 +5,7 @@ import com.aglushkov.wordteacher.android_app.features.learning.di.LearningDepend
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.di.LearningSessionResultDependencies
 import com.aglushkov.wordteacher.android_app.features.notes.di.NotesDependencies
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
-import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
+import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.SpaceHttpClient
@@ -79,7 +79,7 @@ interface AppComponent:
     override fun wordRepository(): WordDefinitionRepository
     override fun notesRepository(): NotesRepository
 
-    fun googleAuthRepository(): GoogleAuthRepositoryImpl
+    fun googleAuthRepository(): GoogleAuthControllerImpl
     fun cookieStorage(): CookiesStorage
     @SpaceHttpClient
     fun spaceHttpClient(): HttpClient

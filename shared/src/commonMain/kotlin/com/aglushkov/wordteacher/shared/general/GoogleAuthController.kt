@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 data class GoogleAuthData(val name: String?, val tokenId: String, val isSilent: Boolean)
 
-interface GoogleAuthRepository {
+interface GoogleAuthController {
     var googleAuthDataFlow: StateFlow<Resource<GoogleAuthData>>
 
     fun launchSignIn()
