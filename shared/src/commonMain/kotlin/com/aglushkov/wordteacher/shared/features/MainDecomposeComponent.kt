@@ -36,7 +36,12 @@ import kotlin.properties.Delegates
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-interface MainDecomposeComponent: DefinitionsRouter, CardSetsRouter, CardSetRouter, ArticlesRouter, ArticleRouter {
+interface MainDecomposeComponent: DefinitionsRouter,
+    CardSetsRouter,
+    CardSetRouter,
+    ArticlesRouter,
+    ArticleRouter,
+    SettingsRouter {
     val routerState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 

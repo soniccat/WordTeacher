@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.android_app.features.settings.views
+package com.aglushkov.wordteacher.shared.features.settings.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -9,20 +9,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.android_app.R
+import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.features.settings.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.stringResource
 
-@ExperimentalFoundationApi
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingsUI(
     vm: SettingsVM,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val itemsState = vm.items.collectAsState()
 
     Box(
@@ -31,7 +30,7 @@ fun SettingsUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(stringResource(id = R.string.settings_title)) },
+                title = { Text(stringResource(MR.strings.settings_title)) },
             )
 
             LazyColumn(
@@ -61,7 +60,7 @@ private fun showSettingsItem(
 ) = when (item) {
     is SettingsViewTitleItem -> {
         ListItem (
-            text = { Text(item.firstItem().toString(LocalContext.current)) }
+            text = { Text(item.firstItem().localized()) }
         )
     }
     is SettingsViewLoading -> {
@@ -76,12 +75,12 @@ private fun showSettingsItem(
     }
     is SettingsViewAuthButtonItem -> {
         Button(onClick = { vm.onAuthButtonClicked(item.buttonType) }) {
-            Text(text = item.firstItem().toString(LocalContext.current))
+            Text(text = item.firstItem().localized())
         }
     }
     is SettingsViewAuthRefreshButtonItem -> {
         Button(onClick = { vm.onAuthRefreshClicked() }) {
-            Text(text = item.firstItem().toString(LocalContext.current))
+            Text(text = item.firstItem().localized())
         }
     }
     else -> {

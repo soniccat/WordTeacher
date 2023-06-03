@@ -48,6 +48,7 @@ class MainComposeModule {
                     DaggerTabComposeComponent.builder()
                         .setComponentContext(context)
                         .setAppComponent(appComponent)
+                        .setDeps(appComponent)
                         .setWord("owl")
                         .build()
                         .tabDecomposeComponent()

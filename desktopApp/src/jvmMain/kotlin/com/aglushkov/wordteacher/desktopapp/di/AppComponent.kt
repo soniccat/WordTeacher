@@ -1,13 +1,16 @@
 package com.aglushkov.wordteacher.desktopapp.di
 
+import com.aglushkov.wordteacher.desktopapp.TabComposeComponentDependencies
 import com.aglushkov.wordteacher.desktopapp.general.RouterResolver
 import com.aglushkov.wordteacher.shared.di.AppComp
+import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.features.add_article.di.AddArticleDependencies
 import com.aglushkov.wordteacher.shared.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.shared.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
+import com.aglushkov.wordteacher.shared.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -32,7 +35,9 @@ interface AppComponent:
     CardSetDependencies,
     ArticlesDependencies,
     AddArticleDependencies,
-    ArticleDependencies
+    ArticleDependencies,
+    SettingsDependencies,
+    TabComposeComponentDependencies
 {
 
     fun configService(): ConfigService
@@ -51,6 +56,9 @@ interface AppComponent:
     override fun idGenerator(): IdGenerator
     override fun timeSource(): TimeSource
     override fun connectivityManager(): ConnectivityManager
+
+    @IsDebug
+    override fun isDebug(): Boolean
 
     @Component.Builder
     interface Builder {

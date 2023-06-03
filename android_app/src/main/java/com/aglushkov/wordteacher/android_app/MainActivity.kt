@@ -29,7 +29,6 @@ import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUID
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUI
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUIDialog
 import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
-import com.aglushkov.wordteacher.android_app.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.general.WindowInsets
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
@@ -44,6 +43,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
+import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 import com.aglushkov.wordteacher.shared.general.LocalWindowInset
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
@@ -210,7 +210,9 @@ class MainActivity : AppCompatActivity(), Router {
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Settings -> SettingsUI(
-                        vm = instance.vm,
+                        vm = instance.vm.apply {
+                            router = mainDecomposeComponent
+                        },
                         modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Notes -> NotesUI(

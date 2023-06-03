@@ -1,6 +1,6 @@
-package com.aglushkov.wordteacher.android_app.features.settings.di
+package com.aglushkov.wordteacher.shared.features.settings.di
 
-import com.aglushkov.wordteacher.android_app.general.RouterResolver
+import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.features.settings.SettingsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -12,7 +12,7 @@ import dagger.Component
 import javax.inject.Qualifier
 
 @Component(dependencies = [SettingsDependencies::class], modules = [SettingsModule::class])
-public interface SettingsComponent {
+interface SettingsComponent {
     fun settingsDecomposeComponent(): SettingsDecomposeComponent
 
     @Component.Builder
@@ -27,11 +27,7 @@ public interface SettingsComponent {
 }
 
 interface SettingsDependencies {
-    fun routerResolver(): RouterResolver
     fun spaceAuthRepository(): SpaceAuthRepository
     fun connectivityManager(): ConnectivityManager
     fun idGenerator(): IdGenerator
 }
-
-@Qualifier
-annotation class IsDebug

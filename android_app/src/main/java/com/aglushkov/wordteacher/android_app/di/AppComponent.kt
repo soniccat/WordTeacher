@@ -4,7 +4,6 @@ import com.aglushkov.wordteacher.android_app.GApp
 import com.aglushkov.wordteacher.android_app.features.learning.di.LearningDependencies
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.di.LearningSessionResultDependencies
 import com.aglushkov.wordteacher.android_app.features.notes.di.NotesDependencies
-import com.aglushkov.wordteacher.android_app.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthRepositoryImpl
 import com.aglushkov.wordteacher.shared.di.AppComp
@@ -16,6 +15,7 @@ import com.aglushkov.wordteacher.shared.features.articles.di.ArticlesDependencie
 import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
+import com.aglushkov.wordteacher.shared.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource

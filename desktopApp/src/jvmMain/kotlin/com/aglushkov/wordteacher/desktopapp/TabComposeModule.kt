@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.desktopapp
 
 import com.aglushkov.wordteacher.desktopapp.di.AppComponent
+import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
 import com.aglushkov.wordteacher.shared.features.articles.di.DaggerArticlesComposeComponent
@@ -8,6 +9,8 @@ import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsCompo
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
+import com.aglushkov.wordteacher.shared.features.settings.di.DaggerSettingsComponent
+import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -16,7 +19,8 @@ import dagger.Provides
 class TabComposeModule {
     @Provides
     fun tabDecomposeComponentFactory(
-        appComponent: AppComponent
+        appComponent: AppComponent,
+        @IsDebug isDebug: Boolean
     ): (context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration) -> Any =
         { context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration ->
             when (configuration) {
@@ -45,14 +49,14 @@ class TabComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .articlesDecomposeComponent()
-//                is TabDecomposeComponent.ChildConfiguration.SettingsConfiguration ->
-//                    DaggerSettingsComponent.builder()
-//                        .setComponentContext(context)
-//                        .setState(SettingsVM.State())
-//                        .setIsDebug(BuildConfig.DEBUG)
-//                        .setDeps(appComponent)
-//                        .build()
-//                        .settingsDecomposeComponent()
+                is TabDecomposeComponent.ChildConfiguration.SettingsConfiguration ->
+                    DaggerSettingsComponent.builder()
+                        .setComponentContext(context)
+                        .setState(SettingsVM.State())
+                        .setIsDebug(isDebug)
+                        .setDeps(appComponent)
+                        .build()
+                        .settingsDecomposeComponent()
 //                is TabDecomposeComponent.ChildConfiguration.NotesConfiguration ->
 //                    DaggerNotesComponent.builder()
 //                        .setComponentContext(context)
