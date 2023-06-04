@@ -14,11 +14,17 @@ plugins {
     kotlin("multiplatform")
     id("kotlin-kapt")
     id("org.jetbrains.compose")
+    id("org.openjfx.javafxplugin") version "0.0.13"
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+javafx {
+    version = "19"
+    modules("javafx.web", "javafx.swing")
 }
 
 //kotlinOptions {
@@ -66,6 +72,10 @@ kotlin {
                 implementation(libs.coroutinesSwing)
 
                 implementation(libs.dagger)
+
+//                implementation("org.openjfx:javafx-base:20")
+//                implementation("org.openjfx:javafx-web:20")
+//                implementation("org.openjfx:javafx-swing:20")
             }
         }
     }
