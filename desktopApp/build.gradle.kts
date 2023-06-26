@@ -2,6 +2,7 @@ import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.gradle.api.NamedDomainObjectContainer
+import java.util.Properties
 
 repositories {
     google()
@@ -27,10 +28,6 @@ javafx {
     modules("javafx.web", "javafx.swing")
 }
 
-//kotlinOptions {
-//    jvmTarget = JavaVersion.VERSION_1_8.toString()
-//}
-
 kotlin {
     jvm {
         withJava()
@@ -50,16 +47,10 @@ kotlin {
     }
 
     sourceSets {
-//        named("commonMain") {
-//            dependencies {
-//                implementation(compose.runtime)
-//                implementation(compose.foundation)
-//                implementation(compose.material)
-//            }
-//        }
-
         val jvmMain by getting {
             dependencies {
+                compileOnly("com.squareup:kotlinpoet:1.14.2")
+
                 implementation(project(":shared"))
 
                 implementation(compose.desktop.common)
@@ -72,10 +63,6 @@ kotlin {
                 implementation(libs.coroutinesSwing)
 
                 implementation(libs.dagger)
-
-//                implementation("org.openjfx:javafx-base:20")
-//                implementation("org.openjfx:javafx-web:20")
-//                implementation("org.openjfx:javafx-swing:20")
             }
         }
     }
@@ -84,34 +71,6 @@ kotlin {
 dependencies {
     add("kapt", libs.daggerCompiler)
 }
-
-//compose.desktop {
-//    application {
-//        mainClass = "com.aglushkov.wordteacher.desktopapp.MainKt"
-//
-//        nativeDistributions {
-//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-//            packageName = "WordTeacher"
-//            packageVersion = "1.0.0"
-//
-//            modules("jdk.crypto.ec")
-//
-//            val iconsRoot = project.file("../common/src/jvmMain/resources/images")
-//            macOS {
-//                iconFile.set(iconsRoot.resolve("icon-mac.icns"))
-//            }
-//            windows {
-//                iconFile.set(iconsRoot.resolve("icon-windows.ico"))
-//                menuGroup = "Compose Examples"
-//                // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
-//                upgradeUuid = "18159995-d967-4CD2-8885-77BFA97CFA9F"
-//            }
-//            linux {
-//                iconFile.set(iconsRoot.resolve("icon-linux.png"))
-//            }
-//        }
-//    }
-//}
 
 compose.desktop {
     application {
@@ -123,16 +82,55 @@ compose.desktop {
             packageVersion = "1.0.0"
 
             modules("java.sql")
-
-            windows {
-                menuGroup = "Compose Examples"
-                // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
-                upgradeUuid = "BF9CDA6A-1391-46D5-9ED5-383D6E68CCEB"
-            }
         }
     }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
+}
+
+tasks.create("generateAppConfig") {
+    val propFiles = listOf("Google")
+
+    doLast {
+        propFiles.onEach { fileName ->
+            val filePath = projectDir.path + "/" + fileName + ".properties"
+            println("Reading property file: $filePath")
+
+            val properties = File(filePath).inputStream().use { inputStream ->
+                Properties().apply {
+                    load(inputStream)
+                }
+            }
+
+            createConfigClass(fileName, properties)
+        }
+    }
+}
+
+// To generate AppConfig.kt
+fun createConfigClass(prefix: String, properties: Properties) {
+    val companion = com.squareup.kotlinpoet.TypeSpec.companionObjectBuilder()
+        .addProperty(
+            com.squareup.kotlinpoet.PropertySpec.Companion.builder("testProp", String::class)
+                .initializer("%S", "defaultValue")
+                .build()
+        )
+        .build()
+    val className = prefix + "Config"
+    val cl = com.squareup.kotlinpoet.TypeSpec.classBuilder(className)
+        .addType(companion)
+        .build()
+    val file = com.squareup.kotlinpoet.FileSpec.builder("com.aglushkov.wordteacher.desktopapp", className)
+        .addType(cl)
+        .build()
+
+    println("hello from test")
+    file.writeTo(System.out)
+}
+
+
+tasks.named("jvmProcessResources") {
+    dependsOn(":desktopApp:generateAppConfig")
 }

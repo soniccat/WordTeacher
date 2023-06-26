@@ -38,6 +38,10 @@ class YandexService(
         }
     }
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     suspend fun definitions(
         word: String,
         languages: String,
@@ -55,10 +59,7 @@ class YandexService(
         return withContext(Dispatchers.Default) {
             val responseString = res.readBytes().decodeToString()
             logger.logLoadingCompleted(word, res, responseString)
-
-            Json {
-                ignoreUnknownKeys = true
-            }.decodeFromString(responseString)
+            json.decodeFromString(responseString)
         }
     }
 }

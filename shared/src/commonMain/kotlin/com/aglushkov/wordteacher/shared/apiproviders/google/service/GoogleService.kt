@@ -27,6 +27,10 @@ class GoogleService(
     private val logger = WordServiceLogger(Config.Type.Google.name)
     private val httpClient = HttpClient()
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     suspend fun loadDefinitions(word: String, lang: String): List<GoogleWord> {
         logger.logLoadingStarted(word)
 
@@ -34,10 +38,7 @@ class GoogleService(
         return withContext(Dispatchers.Default) {
             val responseString = res.readBytes().decodeToString()
             logger.logLoadingCompleted(word, res, responseString)
-
-            Json {
-                ignoreUnknownKeys = true
-            }.decodeFromString(responseString)
+            json.decodeFromString(responseString)
         }
     }
 }

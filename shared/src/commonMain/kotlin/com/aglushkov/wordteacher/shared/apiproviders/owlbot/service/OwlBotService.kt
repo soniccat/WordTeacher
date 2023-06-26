@@ -35,6 +35,10 @@ class OwlBotService(
         }
     }
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     suspend fun loadDefinition(word: String): OwlBotWord {
         logger.logLoadingStarted(word)
 
@@ -42,10 +46,7 @@ class OwlBotService(
         return withContext(Dispatchers.Default) {
             val responseString = res.readBytes().decodeToString()
             logger.logLoadingCompleted(word, res, responseString)
-
-            Json {
-                ignoreUnknownKeys = true
-            }.decodeFromString(responseString)
+            json.decodeFromString(responseString)
         }
     }
 }

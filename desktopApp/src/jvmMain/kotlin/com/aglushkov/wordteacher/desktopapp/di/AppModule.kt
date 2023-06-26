@@ -3,6 +3,8 @@ package com.aglushkov.wordteacher.desktopapp.di
 import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.crypto.PkceGenerator
+import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import dagger.Module
@@ -11,6 +13,7 @@ import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.JvmPreferencesSettings
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.coroutines.toFlowSettings
+import io.ktor.http.*
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -80,4 +83,18 @@ class AppModule {
             fileSystem
         )
     }
+
+    @AppComp
+    @Provides
+    fun googeOAuth2Service(): OAuth2Service {
+        return OAuth2Service(
+            authUrl = Url("https://accounts.google.com/o/oauth2/v2/auth"),
+            tokenUrl = Url("https://oauth2.googleapis.com/token"),
+            clientId = "",
+            clientSecret = "",
+            redirectUrl =,
+            scope = "",
+        )
+    }
+
 }

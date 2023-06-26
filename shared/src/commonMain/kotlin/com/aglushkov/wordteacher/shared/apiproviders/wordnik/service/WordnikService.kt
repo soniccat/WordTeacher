@@ -82,6 +82,10 @@ class WordnikService(
         }
     }
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     suspend fun loadDefinitions(
         word: String,
         dictionaries: String,
@@ -104,10 +108,7 @@ class WordnikService(
         return withContext(Dispatchers.Default) {
             val responseString = res.readBytes().decodeToString()
             logger.logLoadingCompleted(word, res, responseString)
-
-            Json {
-                ignoreUnknownKeys = true
-            }.decodeFromString(responseString)
+            json.decodeFromString(responseString)
         }
     }
 }
