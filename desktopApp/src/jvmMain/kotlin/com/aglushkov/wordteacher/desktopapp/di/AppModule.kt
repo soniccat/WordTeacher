@@ -30,7 +30,7 @@ class AppModule {
     @BasePath
     @AppComp
     @Provides
-    fun basePath(): Path = "./wordTeacherDesktop".toPath()
+    fun basePath(): Path = "../wordTeacherDesktop".toPath()
 
     @ConfigBaseUrl
     @AppComp

@@ -95,7 +95,9 @@ class SharedAppModule {
         fileSystem: FileSystem
     ): DictRepository {
         val dictsPath = basePath.div("dicts")
-        fileSystem.createDirectory(dictsPath)
+        if (!fileSystem.exists(dictsPath)) {
+            fileSystem.createDirectory(dictsPath)
+        }
         return DictRepositoryImpl(dictsPath, dictFactory, fileSystem)
     }
 

@@ -16,6 +16,7 @@ plugins {
     id("kotlin-kapt")
     id("org.jetbrains.compose")
     id("org.openjfx.javafxplugin") version "0.0.13"
+    id("com.aglushkov.config-generator")
 }
 
 java {
@@ -65,6 +66,13 @@ kotlin {
     }
 }
 
+configGenerator {
+    configs = listOf(
+        com.aglushkov.gradle.ConfigGeneratorItem("Google", "GoogleConfig"),
+        com.aglushkov.gradle.ConfigGeneratorItem("GoogleNotPublic", "GoogleConfig")
+    )
+}
+
 dependencies {
     add("kapt", libs.daggerCompiler)
 }
@@ -85,61 +93,4 @@ compose.desktop {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
-}
-
-data class Config (
-    val fileName: String,
-    val className: String
-)
-
-tasks.create("generateAppConfig") {
-    val propFiles = listOf(
-        Config("Google", "GoogleConfig"),
-        Config("GoogleAuth", "GoogleConfig")
-    )
-    project.kotlin.sourceSets["jvmMain"].kotlin.srcDir(configsSourceSetPath())
-
-    doLast {
-        propFiles.onEach { config ->
-            val filePath = projectDir.path + "/" + config.fileName + ".properties"
-            val file = File(filePath)
-            if (file.exists()) {
-                val properties = file.inputStream().use { inputStream ->
-                    Properties().apply {
-                        load(inputStream)
-                    }
-                }
-
-                createConfigClass(config.className, properties)
-            }
-        }
-    }
-}
-
-fun createConfigClass(className: String, properties: Properties) {
-    val companion = com.squareup.kotlinpoet.TypeSpec.companionObjectBuilder().apply {
-        properties.onEach { propEntry ->
-            addProperty(
-                com.squareup.kotlinpoet.PropertySpec.Companion.builder(propEntry.key as String, String::class)
-                    .initializer("%S", propEntry.value as String)
-                    .build()
-            )
-        }
-    }.build()
-    val cl = com.squareup.kotlinpoet.TypeSpec.classBuilder(className)
-        .addType(companion)
-        .build()
-    val fileSpec = com.squareup.kotlinpoet.FileSpec.builder("com.aglushkov.wordteacher.desktopapp.configs", className)
-        .addType(cl)
-        .build()
-    //println("hello from test :" + project.buildDir.path + "/generated/source/configs/main/com/aglushkov/wordteacher/desktopapp/config/")
-    fileSpec.writeTo(file(configsSourceSetPath()))
-}
-
-fun configsSourceSetPath(): String {
-    return project.buildDir.path + "/generated/source/configs/main"
-}
-
-tasks.named("jvmProcessResources") {
-    dependsOn(":desktopApp:generateAppConfig")
 }

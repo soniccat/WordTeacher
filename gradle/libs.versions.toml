@@ -5,6 +5,8 @@ kotlinxDateTime = "0.4.0"
 sqlDelight = "1.5.5"
 androidGradlePlugin = "7.0.4"
 
+kotlinPoet = "1.14.2"
+
 composeJetpackCompiler = "1.4.7"
 composeJetpackUiTooling = "1.3.2"
 composeJetpack = "1.4.0"
@@ -41,6 +43,8 @@ kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.r
 kotlinxSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlinVersion" }
 kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
 kotlinxDateTime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
+
+kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 
 androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 androidFragments = { module = "androidx.fragment:fragment-ktx", version.ref = "androidFragments" }
