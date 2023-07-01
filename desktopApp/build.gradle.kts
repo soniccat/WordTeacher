@@ -32,7 +32,7 @@ kotlin {
     jvm {
         withJava()
         val javaPluginConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
-        javaPluginConvention.sourceSets.all { javaSourceSet ->
+        javaPluginConvention.sourceSets.onEach { javaSourceSet ->
             // HACK: adds Dagger generated classes
 //            println("java sourceSet:" + javaSourceSet.name + " " + javaSourceSet.java.srcDirs.size)
             javaSourceSet.java.srcDir(project.rootDir.absolutePath + "/shared/build/generated/source/kapt/main/")
@@ -42,17 +42,15 @@ kotlin {
 //            javaSourceSet.allJava.onEach { file ->
 //                println("java file:" + file.absolutePath)
 //            }
-            true
         }
     }
 
     sourceSets {
-        val jvmMain by getting {
+        getByName("jvmMain") {
             dependencies {
                 compileOnly("com.squareup:kotlinpoet:1.14.2")
 
                 implementation(project(":shared"))
-
                 implementation(compose.desktop.common)
                 implementation(compose.desktop.currentOs)
                 implementation(libs.decompose)
@@ -61,7 +59,6 @@ kotlin {
                 implementation(compose.uiTooling)
                 implementation(compose.ui)
                 implementation(libs.coroutinesSwing)
-
                 implementation(libs.dagger)
             }
         }
@@ -90,46 +87,58 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
 
+data class Config (
+    val fileName: String,
+    val className: String
+)
+
 tasks.create("generateAppConfig") {
-    val propFiles = listOf("Google")
+    val propFiles = listOf(
+        Config("Google", "GoogleConfig"),
+        Config("GoogleAuth", "GoogleConfig")
+    )
+    project.kotlin.sourceSets["jvmMain"].kotlin.srcDir(configsSourceSetPath())
 
     doLast {
-        propFiles.onEach { fileName ->
-            val filePath = projectDir.path + "/" + fileName + ".properties"
-            println("Reading property file: $filePath")
-
-            val properties = File(filePath).inputStream().use { inputStream ->
-                Properties().apply {
-                    load(inputStream)
+        propFiles.onEach { config ->
+            val filePath = projectDir.path + "/" + config.fileName + ".properties"
+            val file = File(filePath)
+            if (file.exists()) {
+                val properties = file.inputStream().use { inputStream ->
+                    Properties().apply {
+                        load(inputStream)
+                    }
                 }
-            }
 
-            createConfigClass(fileName, properties)
+                createConfigClass(config.className, properties)
+            }
         }
     }
 }
 
-// To generate AppConfig.kt
-fun createConfigClass(prefix: String, properties: Properties) {
-    val companion = com.squareup.kotlinpoet.TypeSpec.companionObjectBuilder()
-        .addProperty(
-            com.squareup.kotlinpoet.PropertySpec.Companion.builder("testProp", String::class)
-                .initializer("%S", "defaultValue")
-                .build()
-        )
-        .build()
-    val className = prefix + "Config"
+fun createConfigClass(className: String, properties: Properties) {
+    val companion = com.squareup.kotlinpoet.TypeSpec.companionObjectBuilder().apply {
+        properties.onEach { propEntry ->
+            addProperty(
+                com.squareup.kotlinpoet.PropertySpec.Companion.builder(propEntry.key as String, String::class)
+                    .initializer("%S", propEntry.value as String)
+                    .build()
+            )
+        }
+    }.build()
     val cl = com.squareup.kotlinpoet.TypeSpec.classBuilder(className)
         .addType(companion)
         .build()
-    val file = com.squareup.kotlinpoet.FileSpec.builder("com.aglushkov.wordteacher.desktopapp", className)
+    val fileSpec = com.squareup.kotlinpoet.FileSpec.builder("com.aglushkov.wordteacher.desktopapp.configs", className)
         .addType(cl)
         .build()
-
-    println("hello from test")
-    file.writeTo(System.out)
+    //println("hello from test :" + project.buildDir.path + "/generated/source/configs/main/com/aglushkov/wordteacher/desktopapp/config/")
+    fileSpec.writeTo(file(configsSourceSetPath()))
 }
 
+fun configsSourceSetPath(): String {
+    return project.buildDir.path + "/generated/source/configs/main"
+}
 
 tasks.named("jvmProcessResources") {
     dependsOn(":desktopApp:generateAppConfig")

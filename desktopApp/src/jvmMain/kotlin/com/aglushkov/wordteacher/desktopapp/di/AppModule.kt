@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.desktopapp.di
 
+import com.aglushkov.wordteacher.desktopapp.configs.GoogleConfig
 import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.general.*
@@ -86,15 +87,14 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun googeOAuth2Service(): OAuth2Service {
+    fun googleOAuth2Service(): OAuth2Service {
         return OAuth2Service(
             authUrl = Url("https://accounts.google.com/o/oauth2/v2/auth"),
             tokenUrl = Url("https://oauth2.googleapis.com/token"),
-            clientId = "",
-            clientSecret = "",
-            redirectUrl =,
-            scope = "",
+            clientId = GoogleConfig.clientId,
+            clientSecret = GoogleConfig.secret,
+            redirectUrl = Url(GoogleConfig.redirectUri),
+            scope = GoogleConfig.scope,
         )
     }
-
 }
