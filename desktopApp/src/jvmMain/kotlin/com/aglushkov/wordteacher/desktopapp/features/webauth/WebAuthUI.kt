@@ -27,36 +27,40 @@ fun WebAuthUI(vm: WebAuthVM, onCompleted: () -> Unit) {
             background = Color.Transparent,
             modifier = Modifier.fillMaxSize(),
             factory = {
-                JFXWebView()
+                JFXWebView {
+                    it.load(vm.initialUrl.toString())
+                    it.onLocationChanged = { newUrl ->
+                        vm.onUrlChanged(newUrl)
+                    }
+                }
             }
         )
         Text("webview")
     }
 }
 
-class JFXWebView : JFXPanel() {
+class JFXWebView(
+    val initializedCallback: (JFXWebView) -> Unit,
+) : JFXPanel() {
+    private var webView: WebView? = null
+    var onLocationChanged: (String) -> Unit = {}
+
     init {
         Platform.runLater(::initialiseJavaFXScene)
     }
 
     private fun initialiseJavaFXScene() {
-        val webView = WebView()
-        val webEngine = webView.engine
-        webEngine.locationProperty().addListener { observable, oldValue, newValue ->
-            Logger.v("web location: $newValue")
-
-            try {
-                val url = Url(newValue)
-                if (url.host == "example.com") {
-                    val code = url.parameters["code"].orEmpty()
-                    val error = url.parameters["error"].orEmpty()
-
-                }
-            } catch (t: Throwable) {
+        webView = WebView().apply {
+            engine.locationProperty().addListener { observable, oldValue, newValue ->
+                onLocationChanged(newValue)
             }
         }
-        webEngine.load("https://accounts.google.com/o/oauth2/v2/auth?client_id=166526384655-9ji25ddl02vg3d91g8vc2tbvbupl6o3k.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fexample.com&scope=profile&response_type=code")
         val scene = Scene(webView)
         setScene(scene)
+        initializedCallback(this)
+    }
+
+    fun load(url: String) {
+        webView?.engine?.load(url)
     }
 }
