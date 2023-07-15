@@ -44,22 +44,37 @@ open class WebAuthVMImpl(
                     try {
                         val token = googleOAuth2Service.accessToken(result.code, authContext)
                         Logger.v("token " + token.accessToken)
+                        onCompleted(
+                            AuthOpener.AuthResult.GoogleResult(
+                                data = GoogleAuthData(
+                                    name = "Google Account",
+                                    tokenId = token.idToken.orEmpty(),
+                                    isSilent = false,
+                                )
+                            )
+                        )
                     } catch (e: Exception) {
                         // TODO: handle error
-                        Logger.e("accessToken error: " + e.message)
+                        val txt = "accessToken error: " + e.message
+                        Logger.e(txt)
+                        onError(RuntimeException(txt))
                     }
                 }
             }
             is OAuth2Service.AuthResult.Error -> {
                 // TODO: handle error
-                Logger.e("error result: " + result.error)
+                val txt = "error result: " + result.error
+                Logger.e(txt)
+                onError(RuntimeException(txt))
             }
             is OAuth2Service.AuthResult.WrongUrl -> {
                 // skip
             }
             else -> {
                 // TODO: handle error
-                Logger.e("sth went wrong in parseAuthResponseUrl: " + result)
+                val txt = "sth went wrong in parseAuthResponseUrl: $result"
+                Logger.e(txt)
+                onError(RuntimeException(txt))
             }
         }
     }

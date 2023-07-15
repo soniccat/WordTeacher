@@ -1,6 +1,6 @@
 package com.aglushkov.wordteacher.shared.general
 
-import com.github.aakira.napier.Napier
+import io.github.aakira.napier.Napier
 import kotlinx.datetime.Clock
 
 expect class Logger {

@@ -29,6 +29,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthVM
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.res.MR
@@ -61,6 +62,7 @@ private val bottomBarTabs = listOf(
 )
 
 fun main() {
+    Logger().setupDebug()
     System.setProperty("apple.awt.application.appearance", "system")
     application {
         val lifecycle = LifecycleRegistry()
