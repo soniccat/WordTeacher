@@ -12,15 +12,15 @@ class PkceGenerator {
     fun codeChallenge(codeVerifier: String): String {
         val bytes: ByteArray = codeVerifier.toByteArray(Charsets.UTF_8)
         val digest: ByteArray = bytes.sha256()
-        return digest.encodeBase64()
+        return digest.encodeBase64Url()
     }
 
     fun codeVerifier(): String {
         val secureRandom = SecureRandom()
-        val randomBytes = ByteArray(100)
+        val randomBytes = ByteArray(128)
         secureRandom.nextBytes(randomBytes)
         val chars = randomBytes.map {
-            VERIFIER_ALPHABET[it % VERIFIER_ALPHABET.size]
+            VERIFIER_ALPHABET[(it.toUInt() % VERIFIER_ALPHABET.size.toUInt()).toInt()]
         }.toByteArray()
         return String(chars, 0, chars.size, Charsets.UTF_8)
     }

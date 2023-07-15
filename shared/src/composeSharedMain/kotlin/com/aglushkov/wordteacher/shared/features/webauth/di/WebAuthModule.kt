@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecompose
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.webauth.WebAuthDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -19,12 +20,14 @@ class WebAuthModule {
     fun viewModel(
         componentContext: ComponentContext,
         configuration: MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration,
-        timeSource: TimeSource
+        timeSource: TimeSource,
+        googleOAuth2Service: OAuth2Service,
     ): WebAuthDecomposeComponent {
         return WebAuthDecomposeComponent(
             componentContext,
             configuration,
             timeSource,
+            googleOAuth2Service,
         )
     }
 }

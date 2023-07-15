@@ -38,7 +38,7 @@ open class WebAuthVMImpl(
     override val initialUrl: Url = authContext.url
 
     override fun onUrlChanged(url: String) {
-        when(val result = googleOAuth2Service.parseAuthResponseUrl(url)) {
+        when(val result = googleOAuth2Service.parseAuthResponseUrl(url, authContext.state)) {
             is OAuth2Service.AuthResult.Success -> {
                 mainScope.launch {
                     try {

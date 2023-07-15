@@ -67,7 +67,7 @@ class OAuth2Service(
             extraParameters?.let {
                 parameters.appendMissing(it)
             }
-            parameters.append("code_challenge", codeVerifier)
+            parameters.append("code_challenge", pkceGenerator.codeChallenge(codeVerifier))
             parameters.append("code_challenge_method", PkceGenerator.CODE_CHALLENGE_METHOD)
             parameters.append("client_id", clientId)
             parameters.append("scope", scope)
@@ -79,7 +79,7 @@ class OAuth2Service(
         return AuthContext(resultUrl, codeVerifier, state)
     }
 
-    fun parseAuthResponseUrl(urlStr: String): AuthResult {
+    fun parseAuthResponseUrl(urlStr: String, state: String): AuthResult {
         val url = try {
             Url(urlStr)
         } catch (e: Exception) {
@@ -93,7 +93,7 @@ class OAuth2Service(
         url.parameters["error"]?.let {
             return AuthResult.Error(it)
         }
-        url.parameters["state"]?.let {
+        if (url.parameters["state"] != state) {
             return AuthResult.WrongState
         }
         url.parameters["code"]?.let {

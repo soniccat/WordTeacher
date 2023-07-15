@@ -4,14 +4,17 @@ import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthVMImpl
 import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.arkivanov.decompose.ComponentContext
 
 class WebAuthDecomposeComponent (
     componentContext: ComponentContext,
     configuration: MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration,
-    timeSource: TimeSource
+    timeSource: TimeSource,
+    googleOAuth2Service: OAuth2Service,
 ) : WebAuthVMImpl(
     configuration.networkType,
-    timeSource
+    timeSource,
+    googleOAuth2Service,
 ), ComponentContext by componentContext {
 }

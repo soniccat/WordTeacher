@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.webauth.di
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.webauth.WebAuthDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -23,4 +24,5 @@ interface WebAuthComponent {
 
 interface WebAuthDependencies {
     fun timeSource(): TimeSource
+    fun oAuth2Service(): OAuth2Service
 }

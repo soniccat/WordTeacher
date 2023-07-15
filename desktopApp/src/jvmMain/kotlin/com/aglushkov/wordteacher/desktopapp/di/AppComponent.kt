@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
@@ -48,17 +49,7 @@ interface AppComponent:
     fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
-    override fun database(): AppDatabase
-    override fun nlpCore(): NLPCore
-
-    override fun dictRepository(): DictRepository
     fun routerResolver(): RouterResolver
-//    fun articlesRepository(): ArticlesRepository
-    override fun cardSetsRepository(): CardSetsRepository
-    override fun wordRepository(): WordDefinitionRepository
-    override fun idGenerator(): IdGenerator
-    override fun timeSource(): TimeSource
-    override fun connectivityManager(): ConnectivityManager
     fun googleAuthController(): GoogleAuthController
 
     @IsDebug
