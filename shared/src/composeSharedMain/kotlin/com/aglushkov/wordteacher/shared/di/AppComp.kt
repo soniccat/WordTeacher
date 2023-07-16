@@ -18,6 +18,9 @@ annotation class SpaceHttpClient
 annotation class IsDebug
 
 @Qualifier
+annotation class Platform
+
+@Qualifier
 annotation class ConfigBaseUrl
 
 @Qualifier

@@ -14,6 +14,11 @@ const HeaderDeviceType = "X-Device-Type"
 const HeaderAccessToken = "X-Access-Token"
 
 const (
+	DeviceTypeAndroid = "android"
+	DeviceTypeDesktop = "desktop"
+)
+
+const (
 	ErrorWrongInput = 1000
 	ErrorInnerError = 1001
 )

@@ -4,15 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/gorilla/mux"
-	"google.golang.org/api/idtoken"
 	"models"
 	"net/http"
 	"tools"
+
+	"github.com/gorilla/mux"
+	"google.golang.org/api/idtoken"
 )
 
 // TODO: move in params
-const GoogleIdTokenAudience = "435809636010-8kf32mn6jdokebe03cd9g8p2giudiq1c.apps.googleusercontent.com"
+const GoogleIdTokenAndroidAudience = "435809636010-8kf32mn6jdokebe03cd9g8p2giudiq1c.apps.googleusercontent.com"
+const GoogleIdDesktopTokenAudience = "166526384655-9ji25ddl02vg3d91g8vc2tbvbupl6o3k.apps.googleusercontent.com"
 
 type AuthInput struct {
 	Token string `json:"token,omitempty"`
@@ -89,7 +91,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 	var userNetwork *models.UserNetwork
 
 	if networkType == "google" {
-		aUser, userNetwork, err = app.resolveGoogleUser(r.Context(), &credentials)
+		aUser, userNetwork, err = app.resolveGoogleUser(r.Context(), &credentials, deviceType)
 
 		if _, ok := err.(*AuthErrorInvalidToken); ok {
 			tools.SetError(w, err, http.StatusUnauthorized, app.logger)
@@ -152,6 +154,7 @@ func (app *application) auth(w http.ResponseWriter, r *http.Request) {
 func (app *application) resolveGoogleUser(
 	context context.Context,
 	credentials *AuthInput,
+	deviceType string,
 ) (*models.User, *models.UserNetwork, error) {
 
 	validator, err := idtoken.NewValidator(context)
@@ -159,8 +162,15 @@ func (app *application) resolveGoogleUser(
 		return nil, nil, err
 	}
 
+	var idToken string
+	if deviceType == tools.DeviceTypeAndroid {
+		idToken = GoogleIdTokenAndroidAudience
+	} else {
+		idToken = GoogleIdDesktopTokenAudience
+	}
+
 	// TODO: consider to make validation more strict
-	payload, err := validator.Validate(context, credentials.Token, GoogleIdTokenAudience)
+	payload, err := validator.Validate(context, credentials.Token, idToken)
 	if err != nil {
 		return nil, nil, NewAuthErrorInvalidToken(err.Error())
 	}

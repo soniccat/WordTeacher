@@ -230,12 +230,14 @@ class SharedAppModule {
         appInfo: AppInfo,
         cookieStorage: CookiesStorage,
         spaceAuthRepository: dagger.Lazy<SpaceAuthRepository>,
+        @Platform platform: String,
         @IsDebug isDebug: Boolean,
     ): HttpClient = SpaceHttpClientBuilder(
         deviceIdRepository,
         appInfo,
         cookieStorage,
         { spaceAuthRepository.get() },
+        platform,
         isDebug,
     ).build()
 

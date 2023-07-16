@@ -26,6 +26,11 @@ class AppModule {
     @Provides
     fun isDebug(): Boolean = BuildConfig.DEBUG
 
+    @Platform
+    @AppComp
+    @Provides
+    fun platform(): String = "android"
+
     @BasePath
     @AppComp
     @Provides

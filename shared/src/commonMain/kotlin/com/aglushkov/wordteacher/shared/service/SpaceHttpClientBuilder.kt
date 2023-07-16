@@ -21,7 +21,8 @@ class SpaceHttpClientBuilder(
     private val appInfo: AppInfo,
     private val cookieStorage: CookiesStorage,
     private val spaceAuthRepositoryProvider: () -> SpaceAuthRepository,
-    private val isDebug: Boolean
+    private val platform: String,
+    private val isDebug: Boolean,
 ) {
     fun build() = HttpClient {
         if (isDebug) {
@@ -81,7 +82,7 @@ class SpaceHttpClientBuilder(
             createClientPlugin("SpacePlugin") {
                 onRequest { request, _ ->
                     request.headers {
-                        set(HeaderDeviceType, "android")
+                        set(HeaderDeviceType, platform)
                         set(HeaderDeviceId, deviceIdRepository.deviceId())
                         spaceAuthRepositoryProvider().currentAuthData.asLoaded()?.data?.let { authData ->
                             request.setAuthData(authData)

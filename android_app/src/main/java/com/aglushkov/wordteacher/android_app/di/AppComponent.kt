@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.di.IsDebug
+import com.aglushkov.wordteacher.shared.di.Platform
 import com.aglushkov.wordteacher.shared.di.SpaceHttpClient
 import com.aglushkov.wordteacher.shared.features.add_article.di.AddArticleDependencies
 import com.aglushkov.wordteacher.shared.features.article.di.ArticleDependencies
@@ -95,6 +96,7 @@ interface AppComponent:
     fun injectApplication(app: GApp)
 
     @IsDebug fun isDebug(): Boolean
+    @Platform fun platform(): String
 
     @Component.Builder
     interface Builder {

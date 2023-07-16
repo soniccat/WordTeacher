@@ -27,6 +27,11 @@ class AppModule {
     @Provides
     fun isDebug(): Boolean = true // TODO: figure out how to get isDebug state
 
+    @Platform
+    @AppComp
+    @Provides
+    fun platform(): String = "desktop"
+
     @BasePath
     @AppComp
     @Provides

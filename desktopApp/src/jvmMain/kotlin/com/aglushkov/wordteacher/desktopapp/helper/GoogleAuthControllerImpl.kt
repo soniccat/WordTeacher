@@ -41,12 +41,14 @@ class GoogleAuthControllerImpl(): GoogleAuthController, AuthOpener.Listener {
 
     override fun launchSignOut() {
         val prevValue = googleAuthDataState.value
+        googleAuthDataState.value = Resource.Uninitialized()
     }
 
     // AuthOpener.Listener
 
     override fun onCompleted(result: AuthOpener.AuthResult) {
-        TODO("Not yet implemented")
+        result as AuthOpener.AuthResult.GoogleResult
+        googleAuthDataState.value = Resource.Loaded(result.data)
     }
 
     override fun onError(throwable: Throwable) {
