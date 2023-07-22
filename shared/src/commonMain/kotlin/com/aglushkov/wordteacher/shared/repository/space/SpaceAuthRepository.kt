@@ -24,14 +24,15 @@ class SpaceAuthRepository(
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val spaceAuthStateFlow = MutableStateFlow<Resource<AuthData>>(Resource.Uninitialized())
 
-    private val stateFlow: StateFlow<Resource<AuthData>> = combine(
+    private val stateFlow: StateFlow<Resource<AuthData>> = spaceAuthStateFlow
+    /*combine(
         googleAuthController.googleAuthDataFlow,
         spaceAuthStateFlow
     ) { googleRes, spaceRes ->
         googleRes.merge(spaceRes) { gr, sr ->
             sr
         }
-    }.stateIn(mainScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(mainScope, SharingStarted.Eagerly, Resource.Uninitialized())*/
 
     val authDataFlow: Flow<Resource<AuthData>> = stateFlow
     val currentAuthData: Resource<AuthData>

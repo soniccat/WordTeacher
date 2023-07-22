@@ -64,6 +64,7 @@ private val bottomBarTabs = listOf(
 fun main() {
     Logger().setupDebug()
     System.setProperty("apple.awt.application.appearance", "system")
+
     application {
         val lifecycle = LifecycleRegistry()
         val stateKeeper = StateKeeperDispatcher(tryRestoreStateFromFile())
@@ -83,6 +84,10 @@ fun main() {
         val appComponent = DaggerAppComponent.builder()
 //        .generalModule(GeneralModule())
             .build()
+
+        // declare here to force initialization on startup
+        var databaseCardWorker = appComponent.databaseCardSetWorker()
+        var cookieStorage = appComponent.cookieStorage()
 
         mainScope.launch(Dispatchers.Default) {
             appComponent.nlpCore().load()

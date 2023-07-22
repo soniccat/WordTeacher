@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.workers
 
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.merge
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -77,7 +78,6 @@ class CardSetSyncWorker(
     var lastSyncDate: Instant = Instant.fromEpochMilliseconds(0)
 
     init {
-        // handle initialising
         scope.launch {
             lastSyncDate = Instant.fromEpochMilliseconds(settings.getLong(LAST_SYNC_DATE_KEY))
 
@@ -86,69 +86,67 @@ class CardSetSyncWorker(
             } else {
                 toState(State.AuthRequired)
             }
-        }
 
-        // handle authorizing
-        scope.launch {
-            spaceAuthRepository.authDataFlow.collect {
-                if (state.value != State.Initializing) {
-                    if (state.value is State.AuthRequired && spaceAuthRepository.isAuthorized()) {
+            // handle authorizing
+            launch {
+                spaceAuthRepository.authDataFlow.collect {
+                    if (state.value.innerState() is State.AuthRequired && spaceAuthRepository.isAuthorized()) {
                         toState(State.PullRequired())
-                    } else {
+                    } else if (!it.isLoaded()) {
                         toState(State.AuthRequired)
                     }
                 }
             }
-        }
 
-        // handle PullRequired
-        scope.launch {
-            state.collect { st ->
-                if (st is State.PullRequired) {
-                    while (state.value is State.PullRequired) {
-                        val interval = timeSource.timeInstant() - lastPullDate
-                        if (interval.inWholeSeconds <= PULL_RETRY_INTERVAL) {
-                            delay(PULL_RETRY_INTERVAL - interval.inWholeSeconds)
-                        }
+            // handle PullRequired
+            launch {
+                state.collect { st ->
+                    if (st is State.PullRequired) {
+                        while (state.value is State.PullRequired) {
+                            val interval = timeSource.timeInstant() - lastPullDate
+                            if (interval.inWholeSeconds <= PULL_RETRY_INTERVAL) {
+                                delay(PULL_RETRY_INTERVAL - interval.inWholeSeconds)
+                            }
 
-                        if (state.value is State.PullRequired) {
-                            pullInternal()
-                        }
-                    }
-                }
-            }
-        }
-
-        // handle PushRequired
-        scope.launch {
-            state.collect { st ->
-                if (st is State.PushRequired) {
-                    while (state.value is State.PushRequired) {
-                        val interval = timeSource.timeInstant() - lastPushDate
-                        if (interval.inWholeMilliseconds <= PUSH_RETRY_INTERVAL) {
-                            delay(PUSH_RETRY_INTERVAL - interval.inWholeMilliseconds)
-                        }
-
-                        if (state.value is State.PushRequired) {
-                            pushInternal()
+                            if (state.value is State.PullRequired) {
+                                pullInternal()
+                            }
                         }
                     }
                 }
             }
-        }
 
-        // watch database changes
-        scope.launch {
-            withContext(Dispatchers.Default) {
-                var pushRequestJob: Job? = null
-                combine(database.cardSets.changeFlow(), database.cards.changeFlow()) { a, b ->
-                    a + b
-                }.collect {
-                    pushRequestJob?.cancel()
-                    pushRequestJob = launch(Dispatchers.Main) {
-                        delay(1000)
-                        if (state.value.isPausedOrPausedIdle()) {
-                            toState(State.PushRequired())
+            // handle PushRequired
+            launch {
+                state.collect { st ->
+                    if (st is State.PushRequired) {
+                        while (state.value is State.PushRequired) {
+                            val interval = timeSource.timeInstant() - lastPushDate
+                            if (interval.inWholeMilliseconds <= PUSH_RETRY_INTERVAL) {
+                                delay(PUSH_RETRY_INTERVAL - interval.inWholeMilliseconds)
+                            }
+
+                            if (state.value is State.PushRequired) {
+                                pushInternal()
+                            }
+                        }
+                    }
+                }
+            }
+
+            // watch database changes
+            launch {
+                withContext(Dispatchers.Default) {
+                    var pushRequestJob: Job? = null
+                    combine(database.cardSets.changeFlow(), database.cards.changeFlow()) { a, b ->
+                        a + b
+                    }.collect {
+                        pushRequestJob?.cancel()
+                        pushRequestJob = launch(Dispatchers.Main) {
+                            delay(1000)
+                            if (state.value.isPausedOrPausedIdle()) {
+                                toState(State.PushRequired())
+                            }
                         }
                     }
                 }

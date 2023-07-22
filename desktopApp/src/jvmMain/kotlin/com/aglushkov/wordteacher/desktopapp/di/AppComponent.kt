@@ -28,6 +28,7 @@ import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServic
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.service.ConfigService
 import dagger.Component
+import io.ktor.client.plugins.cookies.CookiesStorage
 
 
 @AppComp
@@ -43,7 +44,7 @@ interface AppComponent:
     TabComposeComponentDependencies,
     WebAuthDependencies
 {
-
+    fun cookieStorage(): CookiesStorage
     fun configService(): ConfigService
     fun configRepository(): ConfigRepository
     fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository
