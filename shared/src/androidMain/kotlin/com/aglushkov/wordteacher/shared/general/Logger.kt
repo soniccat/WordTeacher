@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.general
 
-import com.github.aakira.napier.DebugAntilog
-import com.github.aakira.napier.Napier
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 
 actual class Logger {
     actual companion object {}

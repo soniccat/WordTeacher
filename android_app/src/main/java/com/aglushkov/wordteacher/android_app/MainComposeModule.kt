@@ -78,6 +78,8 @@ class MainComposeModule {
                         .learningSessionResultDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
                     Any()
+                is MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration ->
+                    TODO("Not supported")
             }
 
         }
