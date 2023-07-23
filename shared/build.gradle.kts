@@ -23,6 +23,8 @@ dependencies {
 }
 
 kotlin {
+    jvmToolchain(8)
+
     sourceSets {
         val commonMain by getting {
             dependencies {
