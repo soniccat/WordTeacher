@@ -26,7 +26,7 @@ android {
         versionCode = appVersionCode
         versionName = appVersionName
     }
-    namespace = "com.aglushkov.wordteacher"
+    namespace = "com.aglushkov.wordteacher.android_app"
 
     buildFeatures {
         viewBinding = true
@@ -34,23 +34,26 @@ android {
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs = freeCompilerArgs + "-Xinline-classes" + "-P" + "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=/Users/aoglushkov/androidProjects/WordTeacher/composedebug"
-
+        jvmTarget = "11"
+        //freeCompilerArgs = freeCompilerArgs + "-Xinline-classes" + "-P" + "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=/Users/aoglushkov/androidProjects/WordTeacher/composedebug"
+        compileOptions {
+            sourceCompatibility = JavaVersion.VERSION_11
+            targetCompatibility = JavaVersion.VERSION_11
+        }
     }
 
     composeOptions {
-        kotlinCompilerVersion = libs.versions.kotlinVersion.get()
+        //kotlinCompilerVersion = libs.versions.kotlinVersion.get()
         // for compose-jb - comment - start
 //        kotlinCompilerExtensionVersion = libs.versions.composeJetpackCompiler.get()
         // for compose-jb - comment - end
@@ -115,4 +118,12 @@ dependencies {
     kapt(libs.daggerCompiler)
 
     implementation(libs.playServicesAuth)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions.jvmTarget = "11"
+}
+
+tasks.withType(type = org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask::class) {
+    kotlinOptions.jvmTarget = "11"
 }

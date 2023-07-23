@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
+import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
 import okio.FileSystem
@@ -43,14 +44,14 @@ class AppModule {
     @Provides
     fun configBaseUrl(
         context: Context
-    ): String = context.getString(R.string.config_base_url)
+    ): String = context.getString(MR.strings.config_base_url.resourceId)
 
     @ApiBaseUrl
     @AppComp
     @Provides
     fun apiBaseUrl(
         context: Context
-    ): String = context.getString(R.string.api_base_url)
+    ): String = context.getString(MR.strings.api_base_url.resourceId)
 
     @AppComp
     @Provides

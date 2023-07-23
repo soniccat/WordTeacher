@@ -23,7 +23,11 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(11)
+
+    java {
+        jvmToolchain(11)
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -125,6 +129,19 @@ kotlin {
 
 android {
     namespace = "com.aglushkov.wordteacher.shared"
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions.jvmTarget = "11"
+}
+
+tasks.withType(type = org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask::class) {
+    kotlinOptions.jvmTarget = "11"
 }
 
 // HACK:

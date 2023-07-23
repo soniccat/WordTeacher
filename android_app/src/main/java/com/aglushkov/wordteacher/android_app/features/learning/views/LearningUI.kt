@@ -41,6 +41,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.res.MR
 import java.util.*
 
 @ExperimentalUnitApi
@@ -103,7 +104,7 @@ fun LearningUI(
                 title = {
                     if (termState.term.isNotEmpty()) {
                         Text(
-                            text = stringResource(id = R.string.learning_title)
+                            text = stringResource(id = MR.strings.learning_title.resourceId)
                                 .format(termState.index + 1, termState.count)
                         )
                     }
@@ -178,9 +179,9 @@ fun LearningUI(
                         Text(
                             text = stringResource(
                                 id = if (canShowHint) {
-                                    R.string.learning_show_hint
+                                    MR.strings.learning_show_hint.resourceId
                                 } else {
-                                    R.string.learning_give_up
+                                    MR.strings.learning_give_up.resourceId
                                 }
                             ).uppercase(Locale.getDefault()),
                             modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
@@ -262,7 +263,7 @@ fun TermInput(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            label = { Text(stringResource(id = R.string.learning_term_title_hint)) },
+            label = { Text(stringResource(id = MR.strings.learning_term_title_hint.resourceId)) },
             isError = hasError,
             trailingIcon = {
                 if (hasError) {
