@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS DBCard (
 
   modificationDate INTEGER NOT NULL DEFAULT 0,
   creationId TEXT NOT NULL DEFAULT "",
-  remoteId TEXT NOT NULL DEFAULT "" -- consider to remove it
+  remoteId TEXT NOT NULL DEFAULT ""
 );
 
 selectAllCardIds:
@@ -45,11 +45,11 @@ FROM DBCard
 WHERE DBCard.needToUpdateDefinitionSpans OR DBCard.needToUpdateExampleDefinitionSpans;
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId)
 VALUES ?;
 
 updateCard:

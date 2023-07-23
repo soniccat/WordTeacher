@@ -61,6 +61,7 @@ class CardSetsRepository(
         synonyms: List<String>,
         examples: List<String>
     ): Card {
+        nlpCore.waitUntilInitialized()
         val nlpCoreCopy = nlpCore.clone()
         return scope.async(Dispatchers.Default) {
             val definitionSpans = definitions.map { sentence ->

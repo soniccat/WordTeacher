@@ -136,14 +136,6 @@ android {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "11"
-}
-
-tasks.withType(type = org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask::class) {
-    kotlinOptions.jvmTarget = "11"
-}
-
 // HACK:
 // See https://youtrack.jetbrains.com/issue/KT-55751
 val myAttribute = Attribute.of("myOwnAttribute", String::class.java)

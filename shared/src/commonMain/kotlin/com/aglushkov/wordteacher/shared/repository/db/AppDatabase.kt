@@ -457,7 +457,8 @@ class AppDatabase(
                 progress = card.progress,
                 needToUpdateDefinitionSpans = card.needToUpdateDefinitionSpans,
                 needToUpdateExampleSpans = card.needToUpdateExampleSpans,
-                creationId = card.creationId
+                creationId = card.creationId,
+                remoteId = card.remoteId,
             )
         }
 
@@ -477,6 +478,7 @@ class AppDatabase(
             needToUpdateDefinitionSpans: Boolean,
             needToUpdateExampleSpans: Boolean,
             creationId: String,
+            remoteId: String,
         ) {
             db.transaction {
                 db.dBCardSetQueries.updateCardSetModificationDate(modificationDate, setId)
@@ -497,7 +499,8 @@ class AppDatabase(
                     needToUpdateDefinitionSpans.toLong(),
                     needToUpdateExampleSpans.toLong(),
                     modificationDate,
-                    creationId
+                    creationId,
+                    remoteId
                 )
 
                 val cardId = db.dBCardQueries.lastInsertedRowId().firstLong()!!

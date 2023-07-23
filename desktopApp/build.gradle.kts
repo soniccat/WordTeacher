@@ -30,6 +30,8 @@ javafx {
 }
 
 kotlin {
+    jvmToolchain(11)
+
     jvm {
         withJava()
         val javaPluginConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
@@ -89,8 +91,4 @@ compose.desktop {
             modules("java.sql")
         }
     }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
 }
