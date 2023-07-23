@@ -81,7 +81,7 @@ kotlin {
                 implementation("org.jsoup:jsoup:1.14.3")
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation(libs.kotlinTestJUnit)
                 implementation(libs.junit)
@@ -118,5 +118,38 @@ kotlin {
                 implementation("org.xerial:sqlite-jdbc:3.42.0.0")
             }
         }
+    }
+}
+
+android {
+    namespace = "com.aglushkov.wordteacher.shared"
+}
+
+// HACK:
+// See https://youtrack.jetbrains.com/issue/KT-55751
+val myAttribute = Attribute.of("myOwnAttribute", String::class.java)
+
+configurations.named("podDebugFrameworkIosFat").configure {
+    attributes {
+        // put a unique attribute
+        attribute(myAttribute, "podDebugFrameworkIosFat")
+    }
+}
+
+configurations.named("podDebugFrameworkIos").configure {
+    attributes {
+        attribute(myAttribute, "podDebugFrameworkIos")
+    }
+}
+
+configurations.named("podReleaseFrameworkIosFat").configure {
+    attributes {
+        attribute(myAttribute, "podReleaseFrameworkIosFat")
+    }
+}
+
+configurations.named("podReleaseFrameworkIos").configure {
+    attributes {
+        attribute(myAttribute, "podReleaseFrameworkIos")
     }
 }

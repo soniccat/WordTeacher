@@ -26,6 +26,7 @@ android {
         versionCode = appVersionCode
         versionName = appVersionName
     }
+    namespace = "com.aglushkov.wordteacher"
 
     buildFeatures {
         viewBinding = true

@@ -59,7 +59,7 @@ kotlin {
         podfile = project.file("../iosApp/Podfile")
         pod("Reachability","3.2")
 
-        ios.deploymentTarget = "11.0"
+        ios.deploymentTarget = "17.0"
     }
 }
 
@@ -74,5 +74,5 @@ tasks.getByName("podspec").doLast {
 
 // HACK: fix "Cannot inline bytecode built with JVM target 1.8 into bytecode that is being built with JVM target 1.6"
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "17"
 }

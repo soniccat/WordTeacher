@@ -3,7 +3,7 @@ kotlinVersion = "1.8.20"
 kotlinxSerializationVersion = "1.4.1"
 kotlinxDateTime = "0.4.0"
 sqlDelight = "1.5.5"
-androidGradlePlugin = "7.0.4"
+androidGradlePlugin = "8.0.2"
 
 kotlinPoet = "1.14.2"
 
@@ -22,7 +22,7 @@ dagger = "2.46"
 playServicesPlugin = "4.3.13"
 playServicesAuth = "20.4.0"
 
-mokoResources = "0.22.0"
+mokoResources = "0.23.0"
 decomposeVersion = "0.7.0"
 essenty = "0.2.2"
 coroutines = "1.6.0-native-mt"

@@ -8,7 +8,7 @@ Pod::Spec.new do |spec|
     spec.summary                  = 'Nothing'
     spec.vendored_frameworks      = 'build/cocoapods/framework/shared.framework'
     spec.libraries                = "c++", "sqlite3"
-    spec.ios.deployment_target = '11.0'
+    spec.ios.deployment_target = '17.0'
     spec.dependency 'Reachability', '3.2'
                 
     spec.pod_target_xcconfig = {
