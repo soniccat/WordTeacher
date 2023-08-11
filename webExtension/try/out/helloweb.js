@@ -11,6 +11,13 @@ var n2 = findNodeContainingClass(n.node, n.childIndex, "tool__number");
 if (n2 == null) {
     console.log("not element");
 }
+var nNode = n.node;
+if (nNode instanceof Element) {
+    var chNode = nNode.childNodes[n2.childIndexInOriginalNode];
+    if (chNode instanceof Element) {
+        console.log("found text " + chNode.textContent);
+    }
+}
 function findNodeContainingClass(startNode, startIndex, className) {
     if (startIndex == -1 && startNode instanceof Element) {
         var v = startNode.attributes["class"];
@@ -28,6 +35,7 @@ function findNodeContainingClass(startNode, startIndex, className) {
                 if (fr.childIndex == -1) {
                     return new FindResult(startNode, index);
                 }
+                fr.childIndexInOriginalNode = index;
                 return fr;
             }
         }
@@ -44,6 +52,7 @@ function findNodeContainingText(startNode, startIndex, text) {
                 if (fr.childIndex == -1) {
                     return new FindResult(startNode, index);
                 }
+                fr.childIndexInOriginalNode = index;
                 return fr;
             }
         }

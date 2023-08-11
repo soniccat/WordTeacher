@@ -16,6 +16,14 @@ if (n2 == null) {
   console.log("not element")
 }
 
+let nNode = n.node
+if (nNode instanceof Element) {
+  let chNode = nNode.childNodes[n2.childIndexInOriginalNode]
+  if (chNode instanceof Element) {
+    console.log("found text " + chNode.textContent)
+  }
+}
+
 function findNodeContainingClass(startNode: ChildNode, startIndex: number, className: String): FindResult | null {
   if (startIndex == -1 && startNode instanceof Element) {
     var v = startNode.attributes["class"]
@@ -34,6 +42,8 @@ function findNodeContainingClass(startNode: ChildNode, startIndex: number, class
         if (fr.childIndex == -1) {
           return new FindResult(startNode, index)
         }
+
+        fr.childIndexInOriginalNode = index
         return fr
       }
     };
@@ -41,7 +51,6 @@ function findNodeContainingClass(startNode: ChildNode, startIndex: number, class
 
   return null
 }
-
 
 function findNodeContainingText(startNode: ChildNode, startIndex: number, text: string): FindResult | null {
   if (startNode instanceof Element) {
@@ -52,6 +61,8 @@ function findNodeContainingText(startNode: ChildNode, startIndex: number, text: 
         if (fr.childIndex == -1) {
           return new FindResult(startNode, index)
         }
+
+        fr.childIndexInOriginalNode = index
         return fr
       }
     };
@@ -65,3 +76,4 @@ function findNodeContainingText(startNode: ChildNode, startIndex: number, text: 
 
   return null
 }
+

@@ -1,9 +1,28 @@
 class FindResult {
   node: ChildNode
   childIndex: number
+  childIndexInOriginalNode: number
 
-  constructor(n: ChildNode, chIndex: number = -1) {
+  constructor(n: ChildNode, chIndex: number = -1, chIndexInOriginalNode: number = -1) {
     this.node = n
     this.childIndex = chIndex
+    this.childIndexInOriginalNode = chIndexInOriginalNode
+  }
+
+  textContent(): String | null {
+    if (this.node instanceof Element) {
+      return this.node.textContent
+    } else {
+      return null
+    }
+  }
+
+  nodes(): NodeListOf<Node> | null{
+    let n = this.node
+    if (n instanceof Node) {
+      return n.childNodes
+    } else {
+      return null
+    }
   }
 }
