@@ -1,9 +1,9 @@
 class FindResult {
-  node: ChildNode
+  node: Node
   childIndex: number
   childIndexInOriginalNode: number
 
-  constructor(n: ChildNode, chIndex: number = -1, chIndexInOriginalNode: number = -1) {
+  constructor(n: Node, chIndex: number = -1, chIndexInOriginalNode: number = -1) {
     this.node = n
     this.childIndex = chIndex
     this.childIndexInOriginalNode = chIndexInOriginalNode
@@ -17,7 +17,7 @@ class FindResult {
     }
   }
 
-  nodes(): NodeListOf<Node> | null{
+  childNodes(): NodeListOf<Node> | null{
     let n = this.node
     if (n instanceof Node) {
       return n.childNodes
