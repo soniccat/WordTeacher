@@ -21,38 +21,12 @@ dw = DOMWalker()
   .call { jb.endArray() }
 */
 
-// [startIndex..endIndex)
-// -1 for startIndex means we include the node itself
-// -1 for endIndex means infinity 
-class DOMWalkerRange {
-  start: number
-  end: number
-
-  constructor(start: number, end: number) {
-    this.start = start
-    this.end = end
-  }
-
-  isInRange(v: number): boolean {
-    return v >= this.start && (this.end == -1 || v < this.end)
-  }
-
-  rangeWithStart(start: number): DOMWalkerRange {
-    return new DOMWalkerRange(start, this.end)
-  }
-
-  rangeWithEnd(end: number): DOMWalkerRange {
-    return new DOMWalkerRange(this.start, end)
-  }
-}
-
-let NodeRange = new DOMWalkerRange(-1, -1)
-
 class DOMWalker {
   private cursorStack: Array<DOMWalkerCursor> = Array()
   private cursor: DOMWalkerCursor
   private lastFoundResult?: FoundResult = null
   private internalDOMWalker?: DOMWalker = null
+  private stateStack: Array<DOMWalkerState> = Array()
 
   constructor(cursor: DOMWalkerCursor) {
     this.cursor = cursor
@@ -65,10 +39,36 @@ class DOMWalker {
     this.internalDOMWalker = null
   }
 
+  pushState(): DOMWalker {
+    this.stateStack.push(new DOMWalkerState(this.cursorStack, this.cursor, this.lastFoundResult))
+
+    return this
+  }
+
+  popState(): DOMWalker {
+    let state = this.stateStack.pop()
+    this.cursorStack = state.cursorStack
+    this.cursor = state.cursor
+    this.lastFoundResult = state.lastFoundResult
+
+    return this
+  }
+
   goIn(): DOMWalker {
     let c = this.cursor
     this.cursorStack.push(this.cursor)
     this.cursor = c.inCursor()
+
+    return this
+  }
+
+  goToFoundResult(): DOMWalker {
+    if (this.lastFoundResult == null) {
+      throw new DOMWalkerError(`goIn() failed as lastFoundResult is null`)
+    }
+
+    this.cursorStack.push(this.cursor)
+    this.cursor = new DOMWalkerCursor(this.lastFoundResult.node, this.lastFoundResult.childIndex)
 
     return this
   }
@@ -79,7 +79,7 @@ class DOMWalker {
     }
 
     this.cursorStack.push(this.cursor)
-    this.cursor = new DOMWalkerCursor(this.lastFoundResult.node, this.lastFoundResult.childIndex)
+    this.cursor = new DOMWalkerCursor(this.lastFoundResult.childNode(), 0)
 
     return this
   }
@@ -225,9 +225,48 @@ class DOMWalkerCursor {
   }
 
   atEnd(): boolean {
-    return this.childIndex >= this.maxIndex || this.childIndex >= this.node.childNodes.length
+    return this.maxIndex != -1 && this.childIndex >= this.maxIndex || this.childIndex >= this.node.childNodes.length
   }
 }
+
+class DOMWalkerState {
+  cursorStack: Array<DOMWalkerCursor> = Array()
+  cursor: DOMWalkerCursor
+  lastFoundResult?: FoundResult = null
+
+  constructor(cursorStack: Array<DOMWalkerCursor>, cursor: DOMWalkerCursor, lastFoundResult?: FoundResult) {
+    this.cursorStack = Array(...cursorStack)
+    this.cursor = new DOMWalkerCursor(cursor.node, cursor.childIndex, cursor.maxIndex)
+    this.lastFoundResult = lastFoundResult
+  }
+}
+
+// [startIndex..endIndex)
+// -1 for startIndex means we include the node itself
+// -1 for endIndex means infinity 
+class DOMWalkerRange {
+  start: number
+  end: number
+
+  constructor(start: number, end: number) {
+    this.start = start
+    this.end = end
+  }
+
+  isInRange(v: number): boolean {
+    return v >= this.start && (this.end == -1 || v < this.end)
+  }
+
+  rangeWithStart(start: number): DOMWalkerRange {
+    return new DOMWalkerRange(start, this.end)
+  }
+
+  rangeWithEnd(end: number): DOMWalkerRange {
+    return new DOMWalkerRange(this.start, end)
+  }
+}
+
+let NodeRange = new DOMWalkerRange(-1, -1)
 
 class DOMWalkerError extends Error {
 }
@@ -259,7 +298,7 @@ function findNodeWithClass(startNode: Node, range: DOMWalkerRange, className: st
   if (range.start == -1 && startNode instanceof Element) {
     var v = startNode.attributes["class"]
     if (v instanceof Attr) {
-      if (v.value == className) {
+      if (v.value.trim() == className) {
         return new FoundResult(startNode)
       }
     }

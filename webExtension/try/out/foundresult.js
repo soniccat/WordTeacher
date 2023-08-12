@@ -23,6 +23,9 @@ var FoundResult = /** @class */ (function () {
             return null;
         }
     };
+    FoundResult.prototype.childNode = function () {
+        return this.node.childNodes[this.childIndex];
+    };
     return FoundResult;
 }());
 //# sourceMappingURL=foundresult.js.map

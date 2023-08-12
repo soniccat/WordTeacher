@@ -25,4 +25,8 @@ class FoundResult {
       return null
     }
   }
+
+  childNode(): Node {
+    return this.node.childNodes[this.childIndex]
+  }
 }

@@ -29,31 +29,12 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-// [startIndex..endIndex)
-// -1 for startIndex means we include the node itself
-// -1 for endIndex means infinity 
-var DOMWalkerRange = /** @class */ (function () {
-    function DOMWalkerRange(start, end) {
-        this.start = start;
-        this.end = end;
-    }
-    DOMWalkerRange.prototype.isInRange = function (v) {
-        return v >= this.start && (this.end == -1 || v < this.end);
-    };
-    DOMWalkerRange.prototype.rangeWithStart = function (start) {
-        return new DOMWalkerRange(start, this.end);
-    };
-    DOMWalkerRange.prototype.rangeWithEnd = function (end) {
-        return new DOMWalkerRange(this.start, end);
-    };
-    return DOMWalkerRange;
-}());
-var NodeRange = new DOMWalkerRange(-1, -1);
 var DOMWalker = /** @class */ (function () {
     function DOMWalker(cursor) {
         this.cursorStack = Array();
         this.lastFoundResult = null;
         this.internalDOMWalker = null;
+        this.stateStack = Array();
         this.cursor = cursor;
     }
     DOMWalker.prototype.reset = function (cursor) {
@@ -62,10 +43,29 @@ var DOMWalker = /** @class */ (function () {
         this.lastFoundResult = null;
         this.internalDOMWalker = null;
     };
+    DOMWalker.prototype.pushState = function () {
+        this.stateStack.push(new DOMWalkerState(this.cursorStack, this.cursor, this.lastFoundResult));
+        return this;
+    };
+    DOMWalker.prototype.popState = function () {
+        var state = this.stateStack.pop();
+        this.cursorStack = state.cursorStack;
+        this.cursor = state.cursor;
+        this.lastFoundResult = state.lastFoundResult;
+        return this;
+    };
     DOMWalker.prototype.goIn = function () {
         var c = this.cursor;
         this.cursorStack.push(this.cursor);
         this.cursor = c.inCursor();
+        return this;
+    };
+    DOMWalker.prototype.goToFoundResult = function () {
+        if (this.lastFoundResult == null) {
+            throw new DOMWalkerError("goIn() failed as lastFoundResult is null");
+        }
+        this.cursorStack.push(this.cursor);
+        this.cursor = new DOMWalkerCursor(this.lastFoundResult.node, this.lastFoundResult.childIndex);
         return this;
     };
     DOMWalker.prototype.goInFoundResult = function () {
@@ -73,7 +73,7 @@ var DOMWalker = /** @class */ (function () {
             throw new DOMWalkerError("goIn() failed as lastFoundResult is null");
         }
         this.cursorStack.push(this.cursor);
-        this.cursor = new DOMWalkerCursor(this.lastFoundResult.node, this.lastFoundResult.childIndex);
+        this.cursor = new DOMWalkerCursor(this.lastFoundResult.childNode(), 0);
         return this;
     };
     DOMWalker.prototype.goOut = function () {
@@ -194,10 +194,40 @@ var DOMWalkerCursor = /** @class */ (function () {
         return new DOMWalkerRange(this.childIndex, this.maxIndex);
     };
     DOMWalkerCursor.prototype.atEnd = function () {
-        return this.childIndex >= this.maxIndex || this.childIndex >= this.node.childNodes.length;
+        return this.maxIndex != -1 && this.childIndex >= this.maxIndex || this.childIndex >= this.node.childNodes.length;
     };
     return DOMWalkerCursor;
 }());
+var DOMWalkerState = /** @class */ (function () {
+    function DOMWalkerState(cursorStack, cursor, lastFoundResult) {
+        this.cursorStack = Array();
+        this.lastFoundResult = null;
+        this.cursorStack = Array.apply(void 0, cursorStack);
+        this.cursor = new DOMWalkerCursor(cursor.node, cursor.childIndex, cursor.maxIndex);
+        this.lastFoundResult = lastFoundResult;
+    }
+    return DOMWalkerState;
+}());
+// [startIndex..endIndex)
+// -1 for startIndex means we include the node itself
+// -1 for endIndex means infinity 
+var DOMWalkerRange = /** @class */ (function () {
+    function DOMWalkerRange(start, end) {
+        this.start = start;
+        this.end = end;
+    }
+    DOMWalkerRange.prototype.isInRange = function (v) {
+        return v >= this.start && (this.end == -1 || v < this.end);
+    };
+    DOMWalkerRange.prototype.rangeWithStart = function (start) {
+        return new DOMWalkerRange(start, this.end);
+    };
+    DOMWalkerRange.prototype.rangeWithEnd = function (end) {
+        return new DOMWalkerRange(this.start, end);
+    };
+    return DOMWalkerRange;
+}());
+var NodeRange = new DOMWalkerRange(-1, -1);
 var DOMWalkerError = /** @class */ (function (_super) {
     __extends(DOMWalkerError, _super);
     function DOMWalkerError() {
@@ -229,7 +259,7 @@ function findNodeWithClass(startNode, range, className) {
     if (range.start == -1 && startNode instanceof Element) {
         var v = startNode.attributes["class"];
         if (v instanceof Attr) {
-            if (v.value == className) {
+            if (v.value.trim() == className) {
                 return new FoundResult(startNode);
             }
         }

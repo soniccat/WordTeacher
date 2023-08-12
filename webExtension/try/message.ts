@@ -1096,3 +1096,4151 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     transition: visibility 0s 400ms, opacity 400ms linear;
                     opacity: 0;visibility: hidden;"><div role="alertdialog" aria-describedby="onetrust-policy-text" aria-label="Privacy"><div class="ot-sdk-container"><div class="ot-sdk-row"><div id="onetrust-group-container" class="ot-sdk-eight ot-sdk-columns"><div class="banner_logo"></div><div id="onetrust-policy"><p id="onetrust-policy-text">By clicking “Accept All Cookies”, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. </p></div></div><div id="onetrust-button-group-parent" class="ot-sdk-three ot-sdk-columns has-reject-all-button"><div id="onetrust-button-group"><button id="onetrust-pc-btn-handler" class="cookie-setting-link">Cookies Settings</button> <button id="onetrust-reject-all-handler">Reject All</button> <button id="onetrust-accept-btn-handler">Accept All Cookies</button></div></div></div></div><!-- Close Button --><div id="onetrust-close-btn-container"><button class="onetrust-close-btn-handler onetrust-close-btn-ui banner-close-button ot-close-icon" style="background-image: url(&quot;https://cdn.cookielaw.org/logos/static/ot_close.svg&quot;);" aria-label="Close"></button></div><!-- Close Button END--></div></div></div></body></html>
 `;
+
+let message2: string = `
+<div class="pr cc_pgwn">
+
+    <div class="x lpl-10 lpr-10 lpt-10 lpb-25 lmax lp-m_l-20 lp-m_r-20">
+
+        <div class="hdn hdb-m hfl-m">
+                        <div id="ad_leftslot" class="am-default_moreslots ltas">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_leftslot'); });</script>
+        </div>
+            </div>
+        <div class="hfr-m ltab lp-m_l-15">
+
+                <div class="tz0 topslot-container" data-iaw="container">
+                        <div id="ad_topslot" class="am-default_moreslots ">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_topslot'); });</script>
+        </div>
+            </div>
+
+            <article id="page-content" class="hfl-s lt2b lmt-10 lmb-25 lp-s_r-20 x han tc-bd lmt-20 english" role="main" lang="en" itemscope="" itemtype="http://schema.org/WebPage">
+                        <div itemprop="author" itemscope="" itemtype="http://schema.org/Organization">
+            <meta itemprop="name" content="Cambridge Dictionary">
+        </div>
+                <meta itemprop="headline" content="work definition: 1. an activity, such as a job, that a person uses physical or mental effort to do, usually for…. Learn more.">
+                <meta itemprop="copyrightHolder" content="© Cambridge University Press">
+                <meta itemprop="copyrightYear" content="2023">
+                <meta itemprop="inLanguage" content="en">
+                                                                            <meta itemprop="genre" content="Patterns and shapes">
+                                            <meta itemprop="genre" content="Effort and expending energy">
+                                            <meta itemprop="genre" content="Starting and beginning">
+                                            <meta itemprop="genre" content="Machines - Engines &amp; motors">
+                                            <meta itemprop="genre" content="Solving and solutions">
+                                            <meta itemprop="genre" content="Factories">
+                                            <meta itemprop="genre" content="Physics: energy, force &amp; power">
+                                            <meta itemprop="genre" content="Making things better">
+                                            <meta itemprop="genre" content="Complicated and difficult to do">
+                                            <meta itemprop="genre" content="Planning, expecting and arranging">
+                                            <meta itemprop="genre" content="Building: construction work &amp; workers">
+                                            <meta itemprop="genre" content="Work, working and the workplace">
+                                            <meta itemprop="genre" content="Something, anything, nothing, and everything">
+                                            <meta itemprop="genre" content="Performing a function">
+                                            <meta itemprop="genre" content="The visual arts in general">
+                                            <meta itemprop="genre" content="Affecting and influencing">
+                                            <meta itemprop="genre" content="Urging &amp; persuading">
+                                            <meta itemprop="genre" content="Products &amp; producers">
+                                            <meta itemprop="genre" content="Removing and getting rid of things">
+                                            <meta itemprop="genre" content="Occurring and happening">
+                                            <meta itemprop="genre" content="Calculations &amp; calculating">
+                                            <meta itemprop="genre" content="Making people sad, shocked and upset">
+                                            <meta itemprop="genre" content="Exercising &amp; training">
+                                            <meta itemprop="genre" content="Busy and active">
+                                            <meta itemprop="genre" content="Industrial processing">
+                                            <meta itemprop="genre" content="Creating and producing">
+                                            <meta itemprop="genre" content="Succeeding, achieving and fulfilling">
+                                            <meta itemprop="genre" content="Machines - Functioning">
+                                            <meta itemprop="genre" content="Preparing">
+                                            <meta itemprop="genre" content="Becoming better">
+                                            <meta itemprop="genre" content="Understanding and comprehending">
+                                            <meta itemprop="genre" content="Efficient and effective">
+                                            <meta itemprop="genre" content="Trying and making an effort">
+                                            <meta itemprop="genre" content="Correcting and mending">
+                                            <meta itemprop="genre" content="Types of employment">
+                                            <meta itemprop="genre" content="Medical treatment: surgery">
+                                    
+                    
+
+                                    <h1 class="ti fs fs12 lmb-0 hw superentry">Meaning of <b class="tb ttn">work</b> in English</h1>
+
+                    
+                
+                <div class="page"><div class="pr dictionary" data-type="sorted" data-id="cald4" data-tab="ds-cald4" role="tabpanel"><div class="cid" id="dataset_cald4"></div><div class="link"><div class="pr di superentry" itemprop="text"><div class="cid" id="dataset_cald4"></div>                                    
+<div class="pr x lbb lb-cm">
+    <div class="hfr lpb-2">
+                    <div class="pr hdib i i-facebook lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'facebook')" target="_blank" rel="noopener" href="https://www.facebook.com/sharer.php?u=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fwork&amp;t=" title="Share on Facebook"></a>
+        </div>
+        <div class="pr hdib i i-twitter lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'twitter')" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fwork&amp;text=" title="Share on Twitter"></a>
+        </div>
+        </div>
+</div>
+            <div class="di-body"><div class="entry"><div class="entry-body"> <div class="pr entry-body__el"><div class="cid" id="cald4-1"></div><div class="pos-header dpos-h"><div class="di-title"><span class="headword hdb tw-bw dhw dpos-h_hw "><span class="hw dhw">work</span></span></div><div class="posgram dpos-g hdib lmr-5"><span class="pos dpos" title="A word that refers to a person, place, idea, event or thing.">noun</span></div> <div></div><span class="uk dpron-i "><span class="region dreg">uk</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio1" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/uk_pron/u/ukw/ukwor/ukwordp005.mp3">
+    <source type="audio/ogg" src="/media/english/uk_pron_ogg/u/ukw/ukwor/ukwordp005.ogg">
+</audio>
+<div title="Listen to the British English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio1.load(); audio1.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1">wɜːk</span>/</span></span> <span class="us dpron-i "><span class="region dreg">us</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio2" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/us_pron/w/wor/work_/work.mp3">
+    <source type="audio/ogg" src="/media/english/us_pron_ogg/w/wor/work_/work.ogg">
+</audio>
+<div title="Listen to the American English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio2.load(); audio2.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1">wɝːk</span>/</span></span></div><div class="pos-body">
+
+                                <div class="pr dsense "><div class="cid" id="cald4-1-1"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>ACTIVITY</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_01">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_01' } }), sidebarWordList.open">
+            <span class="tb fs10 hvm">Add to word list</span>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <span class="tb fs10 hvm">Add to word list</span>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info"><span class="epp-xref dxref A1">A1</span> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">U</span> ]</a></span></span> <div class="def ddef_d db">an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/activity" title="activity" rel="">activity</a>, such as a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>, that a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/person" title="person" rel="">person</a> uses <a class="query" href="https://dictionary.cambridge.org/dictionary/english/physical" title="physical" rel="">physical</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/mental" title="mental" rel="">mental</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effort" title="effort" rel="">effort</a> to do, usually for <a class="query" href="https://dictionary.cambridge.org/dictionary/english/money" title="money" rel="">money</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">I've got so much work to <span class="b db">do</span>.</span></div><div class="examp dexamp"> <span class="eg deg">Carrying <a class="query" href="https://dictionary.cambridge.org/dictionary/english/heavy" title="heavy" rel="">heavy</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/load" title="loads" rel="">loads</a> around all <a class="query" href="https://dictionary.cambridge.org/dictionary/english/day" title="day" rel="">day</a> is <span class="b db">hard</span> work.</span></div><div class="examp dexamp"> <span class="eg deg">What <a class="query" href="https://dictionary.cambridge.org/dictionary/english/time" title="time" rel="">time</a> do you <span class="b db"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/start" title="start" rel="">start</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/finish" title="finish" rel="">finish</a></span> work?</span></div><div class="examp dexamp"> <span class="eg deg">Aileen <span class="b db">does</span> most of the work around the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/house" title="house" rel="">house</a>.</span></div><div class="examp dexamp"> <span class="eg deg">What <a class="query" href="https://dictionary.cambridge.org/dictionary/english/sort" title="sort" rel="">sort</a> of work are you <a class="query" href="https://dictionary.cambridge.org/dictionary/english/experienced" title="experienced" rel="">experienced</a> in?</span></div><div class="examp dexamp"> <span class="eg deg">She <a class="query" href="https://dictionary.cambridge.org/dictionary/english/tend" title="tends" rel="">tends</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/wear" title="wear" rel="">wear</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/quite" title="quite" rel="">quite</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/dressy" title="dressy" rel="">dressy</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/clothes" title="clothes" rel="">clothes</a> for work.</span></div><div class="examp dexamp"> <span class="eg deg">Roger's work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/involve" title="involves" rel="">involves</a> a lot of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/travelling" title="travelling" rel="">travelling</a>.</span></div> </div></div><div class="def-block ddef_block " data-wl-senseid="ID_00036481_02">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_02' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info"><span class="epp-xref dxref A2">A2</span> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">U</span> ]</a></span></span> <div class="def ddef_d db">the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/material" title="material" rel="">material</a> used by someone at work, or what they <a class="query" href="https://dictionary.cambridge.org/dictionary/english/produce" title="produce" rel="">produce</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">I'll have to take this work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/home" title="home" rel="">home</a> with me and <a class="query" href="https://dictionary.cambridge.org/dictionary/english/finish" title="finish" rel="">finish</a> it there.</span></div><div class="examp dexamp"> <span class="eg deg">All the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/furniture" title="furniture" rel="">furniture</a> is the work of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/resident" title="residents" rel="">residents</a> here.</span></div> </div></div>
+                    <div class="daccord"><amp-accordion class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                            <section expanded="">
+                          <header class="ca_h daccord_h i-amphtml-accordion-header" id="2_AMP_header_0" role="button" aria-controls="2_AMP_content_0" aria-expanded="true" tabindex="0">
+                                  <i class="i i-plus ca_hi"></i>
+                                <span class="showmore">More examples</span><span class="showless">Fewer examples</span></header><ul class="hul-u hul-u0 ca_b daccord_b i-amphtml-accordion-content" id="2_AMP_content_0" aria-labelledby="2_AMP_header_0" role="region"><li class="eg dexamp hax">In <a class="query" href="https://dictionary.cambridge.org/dictionary/english/common" title="common" rel="">common</a> with many <a class="query" href="https://dictionary.cambridge.org/dictionary/english/mother" title="mothers" rel="">mothers</a>, she <a class="query" href="https://dictionary.cambridge.org/dictionary/english/feel" title="feels" rel="">feels</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/torn" title="torn" rel="">torn</a> between her <a class="query" href="https://dictionary.cambridge.org/dictionary/english/family" title="family" rel="">family</a> and her work.</li><li class="eg dexamp hax">You need to have <a class="query" href="https://dictionary.cambridge.org/dictionary/english/agile" title="agile" rel="">agile</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/finger" title="fingers" rel="">fingers</a> to do this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/kind" title="kind" rel="">kind</a> of work.</li><li class="eg dexamp hax">We had a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/disagreement" title="disagreement" rel="">disagreement</a> over the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/fee" title="fee" rel="">fee</a> for the work.</li><li class="eg dexamp hax">We've <a class="query" href="https://dictionary.cambridge.org/dictionary/english/finished" title="finished" rel="">finished</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/decorate" title="decorating" rel="">decorating</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/upstairs" title="upstairs" rel="">upstairs</a> but the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/downstairs" title="downstairs" rel="">downstairs</a> still <a class="query" href="https://dictionary.cambridge.org/dictionary/english/needs" title="needs" rel="">needs</a> some work.</li><li class="eg dexamp hax">They <a class="query" href="https://dictionary.cambridge.org/dictionary/english/pay" title="pay" rel="">pay</a> me next to nothing but I really <a class="query" href="https://dictionary.cambridge.org/dictionary/english/enjoy" title="enjoy" rel="">enjoy</a> the work.</li></ul>
+                            </section>
+                    </amp-accordion></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="61_AMP_header_0" role="button" aria-controls="61_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="61_AMP_content_0" aria-labelledby="61_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/working/work-working-and-the-workplace/" title="Words and phrases related to work in the topic Work, working and the workplace">Work, working and the workplace</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="act as something" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/act-as?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">act as <span class="obj">something</span></span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="all work and no play (makes Jack a dull boy) idiom" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/all-work-and-no-play-makes-jack-a-dull-boy?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">all work and no play (makes Jack a dull boy)</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="assignment" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/assignment?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">assignment</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="bandh" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/bandh?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">bandh</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="be at work idiom" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/be-at-work?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">be at work</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="grind" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/grind?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">grind</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="hoop" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/hoop?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">hoop</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="hotelling" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/hotelling?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">hotelling</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="housekeeping" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/housekeeping?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">housekeeping</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="in the line of duty idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/in-the-line-of-duty?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">in the line of duty</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="induction" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/induction?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">induction</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="industry" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/industry?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">industry</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="job" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/job?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">job</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="labour" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/labour?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">labour</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slave" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/slave?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">slave</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slog" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/slog?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">slog</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slouch" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/slouch?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">slouch</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="spadework" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/spadework?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">spadework</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="subtask" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/subtask?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">subtask</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="sweat" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/sweat?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">sweat</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/working/work-working-and-the-workplace/" class="had tb" title="Words and phrases related to work in the topic Work, working and the workplace">See more results »</a>
+                                                    </div>
+
+                                                <div class="lmt-20">
+                            <p>You can also find related words, phrases, and synonyms in the topics:</p>
+                            <div>
+                                                                                                <div class="lmb-5">
+                                        <a href="https://dictionary.cambridge.org/topics/industry/products-and-producers/" class="tb" title="Words and phrases related to work in the topic Products &amp; producers">Products &amp; producers</a>
+                                    </div>
+                                                                                        </div>
+                        </div>
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+                                          <script type="text/javascript">
+    if(typeof iaw !== 'undefined') {
+        iaw.que.push(function() {
+            iaw.setExtraAdSlots(["ad_ringlinkslot"]);
+            iaw.addPageCriteria("cdo_elvl", "A1");
+        });
+    }
+</script>
+<div id="ad_ringlinkslot">
+    <script type="text/javascript">iaw.cmd.push(function () { iaw.display("ad_ringlinkslot"); });</script>
+</div>
+                   </div>
+
+                        <div class="pr dsense "><div class="cid" id="cald4-1-2"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>PLACE</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_03">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_03' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info"><span class="epp-xref dxref A1">A1</span> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">U</span> ]</a></span></span> <div class="def ddef_d db">a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/place" title="place" rel="">place</a> where a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/person" title="person" rel="">person</a> goes <a class="query" href="https://dictionary.cambridge.org/dictionary/english/specially" title="specially" rel="">specially</a> to do <a class="query" href="https://dictionary.cambridge.org/dictionary/english/their" title="their" rel="">their</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Do you have <a class="query" href="https://dictionary.cambridge.org/dictionary/english/far" title="far" rel="">far</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/travel" title="travel" rel="">travel</a> <span class="b db">to</span> work each <a class="query" href="https://dictionary.cambridge.org/dictionary/english/day" title="day" rel="">day</a>?</span></div><div class="examp dexamp"> <span class="eg deg">Thousands of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/people" title="people" rel="">people</a> are <a class="query" href="https://dictionary.cambridge.org/dictionary/english/seriously" title="seriously" rel="">seriously</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/injured" title="injured" rel="">injured</a> <span class="b db">at</span> work every <a class="query" href="https://dictionary.cambridge.org/dictionary/english/year" title="year" rel="">year</a>.</span></div><div class="examp dexamp"> <span class="eg deg">When does she <a class="query" href="https://dictionary.cambridge.org/dictionary/english/leave" title="leave" rel="">leave</a> <span class="b db">for</span> work?</span></div> </div></div>
+                    <div class="daccord"><amp-accordion class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                            <section>
+                          <header class="ca_h daccord_h i-amphtml-accordion-header" id="53_AMP_header_0" role="button" aria-controls="53_AMP_content_0" aria-expanded="false" tabindex="0">
+                                  <i class="i i-plus ca_hi"></i>
+                                <span class="showmore">More examples</span><span class="showless">Fewer examples</span></header><ul class="hul-u hul-u0 ca_b daccord_b i-amphtml-accordion-content" id="53_AMP_content_0" aria-labelledby="53_AMP_header_0" role="region"><li class="eg dexamp hax">It's at least an hour's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/commute" title="commute" rel="">commute</a> to work.</li><li class="eg dexamp hax">I like the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/convenience" title="convenience" rel="">convenience</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/living" title="living" rel="">living</a> so near work.</li><li class="eg dexamp hax">She had a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/crash" title="crash" rel="">crash</a> on the way to work.</li><li class="eg dexamp hax">I've been getting a lot of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/aggravate" title="aggravation" rel="">aggravation</a> at work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/recent" title="recently" rel="">recently</a>.</li><li class="eg dexamp hax">We back up <a class="query" href="https://dictionary.cambridge.org/dictionary/english/our" title="our" rel="">our</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/computer" title="computer" rel="">computer</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/file" title="files" rel="">files</a> at work on a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/daily" title="daily" rel="">daily</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/basis" title="basis" rel="">basis</a>.</li></ul>
+                            </section>
+                    </amp-accordion></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="39_AMP_header_0" role="button" aria-controls="39_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="39_AMP_content_0" aria-labelledby="39_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/working/work-working-and-the-workplace/" title="Words and phrases related to work in the topic Work, working and the workplace">Work, working and the workplace</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="act as something" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/act-as?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">act as <span class="obj">something</span></span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="all work and no play (makes Jack a dull boy) idiom" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/all-work-and-no-play-makes-jack-a-dull-boy?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">all work and no play (makes Jack a dull boy)</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="assignment" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/assignment?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">assignment</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="bandh" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/bandh?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">bandh</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="be at work idiom" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/be-at-work?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">be at work</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="grind" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/grind?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">grind</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="hoop" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/hoop?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">hoop</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="hotelling" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/hotelling?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">hotelling</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="housekeeping" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/housekeeping?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">housekeeping</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="in the line of duty idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/in-the-line-of-duty?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">in the line of duty</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="induction" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/induction?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">induction</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="industry" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/industry?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">industry</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="job" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/job?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">job</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="labour" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/labour?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">labour</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slave" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/slave?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">slave</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slog" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/slog?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">slog</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slouch" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/slouch?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">slouch</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="spadework" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/spadework?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">spadework</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="subtask" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/subtask?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">subtask</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="sweat" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/sweat?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">sweat</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/working/work-working-and-the-workplace/" class="had tb" title="Words and phrases related to work in the topic Work, working and the workplace">See more results »</a>
+                                                    </div>
+
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+           </div>
+
+                                <div class="pr dsense "><div class="cid" id="cald4-1-3"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>CREATION</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_04">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_04' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info"><span class="epp-xref dxref B2">B2</span> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">C</span> ]</a></span></span> <div class="def ddef_d db">something <a class="query" href="https://dictionary.cambridge.org/dictionary/english/create" title="created" rel="">created</a> as a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/result" title="result" rel="">result</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effort" title="effort" rel="">effort</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/especially" title="especially" rel="">especially</a> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/painting" title="painting" rel="">painting</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/book" title="book" rel="">book</a>, or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/piece" title="piece" rel="">piece</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/music" title="music" rel="">music</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/museum" title="museum" rel="">museum</a> has many works <span class="b db">by</span> Picasso as well as other <a class="query" href="https://dictionary.cambridge.org/dictionary/english/modern" title="modern" rel="">modern</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/painter" title="painters" rel="">painters</a>.</span></div><div class="examp dexamp"> <span class="eg deg">the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/poetic" title="poetic" rel="">poetic</a> works of Tagore</span></div> </div></div>
+                    <div class="daccord"><amp-accordion class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                            <section>
+                          <header class="ca_h daccord_h i-amphtml-accordion-header" id="49_AMP_header_0" role="button" aria-controls="49_AMP_content_0" aria-expanded="false" tabindex="0">
+                                  <i class="i i-plus ca_hi"></i>
+                                <span class="showmore">More examples</span><span class="showless">Fewer examples</span></header><ul class="hul-u hul-u0 ca_b daccord_b i-amphtml-accordion-content" id="49_AMP_content_0" aria-labelledby="49_AMP_header_0" role="region"><li class="eg dexamp hax">This <a class="query" href="https://dictionary.cambridge.org/dictionary/english/novel" title="novel" rel="">novel</a> is his <a class="query" href="https://dictionary.cambridge.org/dictionary/english/best" title="best" rel="">best</a> work to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/date" title="date" rel="">date</a>.</li><li class="eg dexamp hax">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/mature" title="mature" rel="">mature</a> works of Haydn, Mozart, Beethoven and Schubert <a class="query" href="https://dictionary.cambridge.org/dictionary/english/belong" title="belong" rel="">belong</a> to the Classical <a class="query" href="https://dictionary.cambridge.org/dictionary/english/period" title="period" rel="">period</a>.</li><li class="eg dexamp hax">The museum's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/collection" title="collection" rel="">collection</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/include" title="includes" rel="">includes</a> works of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/art" title="art" rel="">art</a> from all around the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/world" title="world" rel="">world</a>.</li><li class="eg dexamp hax">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/exhibition" title="exhibition" rel="">exhibition</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/juxtapose" title="juxtaposes" rel="">juxtaposes</a> Picasso's early <a class="query" href="https://dictionary.cambridge.org/dictionary/english/drawing" title="drawings" rel="">drawings</a> with some of his <a class="query" href="https://dictionary.cambridge.org/dictionary/english/later" title="later" rel="">later</a> works.</li><li class="eg dexamp hax">In a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/coda" title="coda" rel="">coda</a> to the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/main" title="main" rel="">main</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/exhibition" title="exhibition" rel="">exhibition</a> are <a class="query" href="https://dictionary.cambridge.org/dictionary/english/various" title="various" rel="">various</a> works which were <a class="query" href="https://dictionary.cambridge.org/dictionary/english/once" title="once" rel="">once</a> attributed to Rembrandt.</li></ul>
+                            </section>
+                    </amp-accordion></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="59_AMP_header_0" role="button" aria-controls="59_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="59_AMP_content_0" aria-labelledby="59_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/industry/products-and-producers/" title="Words and phrases related to work in the topic Products &amp; producers">Products &amp; producers</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="anti-dumping" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/anti-dumping?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">anti-dumping</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="badging" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/badging?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">badging</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="begetter" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/begetter?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">begetter</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="big pharma" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/big-pharma?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">big pharma</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="big tobacco" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/big-tobacco?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">big tobacco</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="deliverable" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/deliverable?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">deliverable</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="dry goods" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/dry-goods?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">dry goods</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="end product" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/end-product?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">end product</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="fabricator" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/fabricator?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">fabricator</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="general-purpose" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/general-purpose?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">general-purpose</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="generator" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/generator?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">generator</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="haul" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/haul?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">haul</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="maker" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/maker?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">maker</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="marque" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/marque?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">marque</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="notion" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/notion?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">notion</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="output" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/output?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">output</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="overstock" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/overstock?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">overstock</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="producer" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/producer?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">producer</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="proprietary" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/proprietary?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">proprietary</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="purchase" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/purchase?topic=products-and-producers ">
+                                            <span class="results"><span class="base"><span class="hw haf">purchase</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/industry/products-and-producers/" class="had tb" title="Words and phrases related to work in the topic Products &amp; producers">See more results »</a>
+                                                    </div>
+
+                                                <div class="lmt-20">
+                            <p>You can also find related words, phrases, and synonyms in the topics:</p>
+                            <div>
+                                                                                                <div class="lmb-5">
+                                        <a href="https://dictionary.cambridge.org/topics/art/the-visual-arts-in-general/" class="tb" title="Words and phrases related to work in the topic The visual arts in general">The visual arts in general</a>
+                                    </div>
+                                                                                        </div>
+                        </div>
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+                                                                        <div id="ad_contentslot_1" class="am-default_moreslots contentslot">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_contentslot_1'); });</script>
+        </div>
+                                           </div>
+
+                        <div class="pr dsense "><div class="cid" id="cald4-1-4"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>SURGERY</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_50">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_50' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">U</span> ]</a></span> <span class="lab dlab"><span class="usage dusage">informal</span></span></span> <div class="def ddef_d db"><span class="nondv-xref dnondv-xref"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/surgery" title="surgery" rel="">surgery</a></span> <span class="gloss dgloss">(= a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/medical" title="medical" rel="">medical</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/operation" title="operation" rel="">operation</a>)</span> that is done to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/improve" title="improve" rel="">improve</a> someone's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/appearance" title="appearance" rel="">appearance</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">She <a class="query" href="https://dictionary.cambridge.org/dictionary/english/deny" title="denies" rel="">denies</a> having had any <a class="query" href="https://dictionary.cambridge.org/dictionary/english/cosmetic" title="cosmetic" rel="">cosmetic</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/surgery" title="surgery" rel="">surgery</a>, but I <a class="query" href="https://dictionary.cambridge.org/dictionary/english/think" title="think" rel="">think</a> she's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/definitely" title="definitely" rel="">definitely</a> had some work done.</span></div> </div></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="47_AMP_header_0" role="button" aria-controls="47_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="47_AMP_content_0" aria-labelledby="47_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/medicine/surgery/" title="Words and phrases related to work in the topic Medical treatment: surgery">Medical treatment: surgery</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="ablate" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/ablate?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">ablate</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="adrenalectomy" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/adrenalectomy?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">adrenalectomy</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="amputation" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/amputation?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">amputation</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="amputee" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/amputee?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">amputee</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="anaesthesiology" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/anaesthesiology?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">anaesthesiology</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="anaesthetize" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/anaesthetize?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">anaesthetize</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="harvesting" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/harvesting?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">harvesting</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="have something out" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/have-out?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="phrase haf">have <span class="obj">something</span> out</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="hysterectomy" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/hysterectomy?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">hysterectomy</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="implantable" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/implantable?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">implantable</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="implantation" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/implantation?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">implantation</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="incision" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/incision?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">incision</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="interoperative" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/interoperative?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">interoperative</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="laughing gas" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/laughing-gas?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">laughing gas</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="liposuction" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/liposuction?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">liposuction</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="replacement" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/replacement?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">replacement</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="resected" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/resected?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">resected</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="resection" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/resection?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">resection</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="rhino" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/rhino?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">rhino</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="rhinoplasty" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/rhinoplasty?topic=surgery ">
+                                            <span class="results"><span class="base"><span class="hw haf">rhinoplasty</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/medicine/surgery/" class="had tb" title="Words and phrases related to work in the topic Medical treatment: surgery">See more results »</a>
+                                                    </div>
+
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+           </div>
+
+                        <div class="pr dsense "><div class="cid" id="cald4-1-5"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>EVERYTHING</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cald4-1-5-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>the works</b></span> <span class="phrase-info dphrase-info"><span class="lab dlab"><span class="usage dusage">informal</span></span></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_05">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_05' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">everything that you might <a class="query" href="https://dictionary.cambridge.org/dictionary/english/want" title="want" rel="">want</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/expect" title="expect" rel="">expect</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/find" title="find" rel="">find</a> in a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/particular" title="particular" rel="">particular</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/situation" title="situation" rel="">situation</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/bridegroom" title="bridegroom" rel="">bridegroom</a> was <a class="query" href="https://dictionary.cambridge.org/dictionary/english/wearing" title="wearing" rel="">wearing</a> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/morning" title="morning" rel="">morning</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/suit" title="suit" rel="">suit</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/glove" title="gloves" rel="">gloves</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/top" title="top" rel="">top</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/hat" title="hat" rel="">hat</a> - the works.</span></div><div class="examp dexamp"><span class="lab dlab">mainly <span class="region dregion">US</span></span> <span class="eg deg">And can I have two <a class="query" href="https://dictionary.cambridge.org/dictionary/english/large" title="large" rel="">large</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/pizza" title="pizzas" rel="">pizzas</a> <span class="b db">with</span> the works <span class="gloss dgloss">(= with all <a class="query" href="https://dictionary.cambridge.org/dictionary/english/available" title="available" rel="">available</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/type" title="types" rel="">types</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/food" title="food" rel="">food</a> on <a class="query" href="https://dictionary.cambridge.org/dictionary/english/top" title="top" rel="">top</a>)</span>.</span></div> </div></div></div></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="93_AMP_header_0" role="button" aria-controls="93_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="93_AMP_content_0" aria-labelledby="93_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/size-and-quantity/something-anything-nothing-and-everything/" title="Words and phrases related to work in the topic Something, anything, nothing, and everything">Something, anything, nothing, and everything</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="across-the-board" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/across-the-board?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">across-the-board</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="anything" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/anything?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">anything</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="aught" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/aught?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">aught</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="bazillion" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/bazillion?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">bazillion</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="bupkis" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/bupkis?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">bupkis</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="fat" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/fat?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">fat</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="fresh" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/fresh?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">fresh</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="lock" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/lock?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">lock</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="matter" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/matter?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">matter</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="net zero" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/net-zero?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">net zero</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="nil" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/nil?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">nil</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="none" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/none?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">none</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="not a dicky bird idiom" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/not-a-dicky-bird?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="phrase haf">not a dicky bird</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="not a sausage idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/not-a-sausage?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="phrase haf">not a sausage</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="squat" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/squat?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">squat</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="summat" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/summat?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">summat</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="sweet fanny adams idiom" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/sweet-fanny-adams?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="phrase haf">sweet fanny adams</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="what with one thing and another idiom" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/what-with-one-thing-and-another?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="phrase haf">what with one thing and another</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="whatevs" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/whatevs?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">whatevs</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="zero" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/zero?topic=something-anything-nothing-and-everything ">
+                                            <span class="results"><span class="base"><span class="hw haf">zero</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/size-and-quantity/something-anything-nothing-and-everything/" class="had tb" title="Words and phrases related to work in the topic Something, anything, nothing, and everything">See more results »</a>
+                                                    </div>
+
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+           </div>
+
+                        <div class="pr dsense "><div class="cid" id="cald4-1-6"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>FACTORY</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cald4-1-6-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>works</b></span> <span class="phrase-info dphrase-info"><span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">C</span> ]</a></span> <span class="irreg-infls dinfls "><span class="inf-group dinfg "><span class="lab dlab">plural</span> <b class="inf dinf">works</b></span></span></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_06">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_06' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/industrial" title="industrial" rel="">industrial</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/building" title="building" rel="">building</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/especially" title="especially" rel="">especially</a> one where a lot of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/people" title="people" rel="">people</a> are <a class="query" href="https://dictionary.cambridge.org/dictionary/english/employed" title="employed" rel="">employed</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/steel" title="steel" rel="">steel</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/iron" title="iron" rel="">iron</a> works</span></div> </div></div></div></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="1_AMP_header_0" role="button" aria-controls="1_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="1_AMP_content_0" aria-labelledby="1_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/industry/factories/" title="Words and phrases related to work in the topic Factories">Factories</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="assembly line" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/assembly-line?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">assembly line</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="brewery" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/brewery?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">brewery</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="cannery" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/cannery?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">cannery</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="chemical park" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/chemical-park?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">chemical park</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="conveyor belt" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/conveyor-belt?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">conveyor belt</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="industrial park" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/industrial-park?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">industrial park</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="mill" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/mill?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">mill</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="miller" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/miller?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">miller</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="multi-plant" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/multi-plant?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">multi-plant</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="on the factory floor idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/on-the-factory-floor?topic=factories ">
+                                            <span class="results"><span class="base"><span class="phrase haf">on the factory floor</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="packing house" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/packing-house?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">packing house</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="power station" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/power-station?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">power station</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="rolling mill" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/rolling-mill?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">rolling mill</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="shipyard" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/shipyard?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">shipyard</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slaughterhouse" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/slaughterhouse?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">slaughterhouse</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="smelter" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/smelter?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">smelter</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="smithy" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/smithy?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">smithy</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="solar plant" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/solar-plant?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">solar plant</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="steel mill" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/steel-mill?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">steel mill</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="sweatshop" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/sweatshop?topic=factories ">
+                                            <span class="results"><span class="base"><span class="hw haf">sweatshop</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/industry/factories/" class="had tb" title="Words and phrases related to work in the topic Factories">See more results »</a>
+                                                    </div>
+
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+                                                                        <div id="ad_contentslot_2" class="am-default_moreslots contentslot">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_contentslot_2'); });</script>
+        </div>
+                                           </div>
+
+                        <div class="pr dsense "><div class="cid" id="cald4-1-7"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>MACHINE</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cald4-1-7-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>works</b></span> <span class="phrase-info dphrase-info"><span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">plural</span> ]</a></span></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_07">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_07' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/part" title="parts" rel="">parts</a> of a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/machine" title="machine" rel="">machine</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/especially" title="especially" rel="">especially</a> those that <a class="query" href="https://dictionary.cambridge.org/dictionary/english/move" title="move" rel="">move</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">If you take the back off this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/clock" title="clock" rel="">clock</a>, you can <a class="query" href="https://dictionary.cambridge.org/dictionary/english/see" title="see" rel="">see</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/its" title="its" rel="">its</a>/the works.</span></div> </div></div></div></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="97_AMP_header_0" role="button" aria-controls="97_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="97_AMP_content_0" aria-labelledby="97_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/technology/engines-and-motors/" title="Words and phrases related to work in the topic Machines - Engines &amp; motors">Machines - Engines &amp; motors</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="clockwork" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/clockwork?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">clockwork</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="electromotive" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/electromotive?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">electromotive</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="engine" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/engine?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">engine</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="exhaust" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/exhaust?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">exhaust</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="motor" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/motor?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">motor</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="multi-engine" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/multi-engine?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">multi-engine</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="power-assisted" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/power-assisted?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">power-assisted</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="servomechanism" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/servomechanism?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">servomechanism</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="servomotor" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/servomotor?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">servomotor</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="sprocket" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/sprocket?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">sprocket</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="starter motor" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/starter-motor?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">starter motor</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="steam engine" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/steam-engine?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">steam engine</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="traction engine" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/traction-engine?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">traction engine</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="treadle" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/treadle?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">treadle</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="turbo" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/turbo?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">turbo</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="workings" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/workings?topic=engines-and-motors ">
+                                            <span class="results"><span class="base"><span class="hw haf">workings</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                    </div>
+
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+           </div>
+
+                        <div class="pr dsense "><div class="cid" id="cald4-1-8"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>PHYSICS</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_08">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_08' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">U</span> ]</a></span>
+            <span class="ddivide ">&nbsp;</span>         <span class="domain ddomain">physics</span>
+            <span class="ddivide ">&nbsp;</span>         <span class="lab dlab"><span class="usage dusage">specialized</span></span></span> <div class="def ddef_d db"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/force" title="force" rel="">force</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/multiply" title="multiplied" rel="">multiplied</a> by <a class="query" href="https://dictionary.cambridge.org/dictionary/english/distance" title="distance" rel="">distance</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/moved" title="moved" rel="">moved</a></div> </div><div class="def-body ddef_b"> </div></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="93_AMP_header_0" role="button" aria-controls="93_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="93_AMP_content_0" aria-labelledby="93_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/science/energy-force-and-power/" title="Words and phrases related to work in the topic Physics: energy, force &amp; power">Physics: energy, force &amp; power</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="animal magnetism" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/animal-magnetism?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">animal magnetism</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="anti-gravity" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/anti-gravity?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">anti-gravity</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="atmospheric pressure" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/atmospheric-pressure?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">atmospheric pressure</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="attract" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/attract?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">attract</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="attraction" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/attraction?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">attraction</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="bar magnet" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/bar-magnet?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">bar magnet</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="excited" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/excited?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">excited</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="frictional" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/frictional?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">frictional</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="frictionless" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/frictionless?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">frictionless</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="fundamental force" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/fundamental-force?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">fundamental force</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="G-force" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/g-force?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">G-force</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="geothermal" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/geothermal?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">geothermal</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="inertia" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/inertia?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">inertia</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="propulsion" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/propulsion?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">propulsion</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="self-propulsion" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/self-propulsion?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">self-propulsion</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="sine curve" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/sine-curve?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">sine curve</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="sinusoid" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/sinusoid?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">sinusoid</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="solarize" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/solarize?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">solarize</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="specific heat" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/specific-heat?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">specific heat</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="thermodynamics" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/thermodynamics?topic=energy-force-and-power ">
+                                            <span class="results"><span class="base"><span class="hw haf">thermodynamics</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/science/energy-force-and-power/" class="had tb" title="Words and phrases related to work in the topic Physics: energy, force &amp; power">See more results »</a>
+                                                    </div>
+
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+           </div><div class="xref grammar hax dxref-w lmt-25 lmb-25"><h3 class="bb fs16 lp-10 lmb-0"><strong class="xref-title dxref-t">Grammar</strong></h3><div class="hax lp-10 lb lb-cm lbt0">
+
+                <div class="item lbb lb-cm lpb-10" data-position="1"><a href="/grammar/british-grammar/work-noun" title="grammar for Work (noun)"><div class="x-h dx-h"><span class="obj dobj">Work</span> (noun)</div><span class="x-pos dx-pos">Work is an uncountable noun when it means something we do that takes an effort, often as part of a job or for study:</span> …
+                </a></div>
+
+                <div class="item lbb lb-cm lpt-10 lpb-10" data-position="2"><a href="/grammar/british-grammar/work-noun" title="grammar for Work as an uncountable noun"><div class="x-h dx-h"><span class="obj dobj">Work</span> as an uncountable noun</div><span class="x-pos dx-pos">Work is an uncountable noun when it means something we do that takes an effort, often as part of a job or for study:</span> …
+                </a></div>
+
+                <div class="item lpt-10 lpb-10" data-position="3"><a href="/grammar/british-grammar/work-noun" title="grammar for Work as a countable noun"><div class="x-h dx-h"><span class="obj dobj">Work</span> as a countable noun</div><span class="x-pos dx-pos">Work as a countable noun means something created, especially a book or painting or piece of music or sculpture:</span> …
+                </a></div></div></div><div class="xref idioms hax dxref-w lmt-25 lmb-25"><h3 class="bb fs16 lp-10 lmb-0"><strong class="xref-title dxref-t">Idioms</strong></h3><div class="hax lp-10 lb lb-cm lbt0"><div class="lcs">
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/all-work-and-no-play-makes-jack-a-dull-boy" title="meaning of all work and no play (makes Jack a dull boy)" rel=""><span class="x-h dx-h">all work and no play (makes Jack a dull boy)</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="2"><a href="/dictionary/english/be-at-work" title="meaning of be at work" rel=""><span class="x-h dx-h">be at work</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="3"><a href="/dictionary/english/be-in-work" title="meaning of be in work" rel=""><span class="x-h dx-h">be in work</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="4"><a href="/dictionary/english/be-out-of-work" title="meaning of be out of work" rel=""><span class="x-h dx-h">be out of work</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="5"><a href="/dictionary/english/get-set-to-work" title="meaning of get/set to work" rel=""><span class="x-h dx-h">get/set to work</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="6"><a href="/dictionary/english/have-work-cut-out-for" title="meaning of have your work cut out (for you)" rel=""><span class="x-h dx-h">have <span class="obj dobj">your</span> work cut out (for <span class="obj dobj">you</span>)</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="7"><a href="/dictionary/english/in-the-works" title="meaning of in the works" rel=""><span class="x-h dx-h">in the works</span></a></div></div></div></div></div></div>
+                
+<div class="pr x lbb lb-cm">
+    <div class="hfr lpb-2">
+                    <div class="pr hdib i i-facebook lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'facebook')" target="_blank" rel="noopener" href="https://www.facebook.com/sharer.php?u=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fwork&amp;t=" title="Share on Facebook"></a>
+        </div>
+        <div class="pr hdib i i-twitter lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'twitter')" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fwork&amp;text=" title="Share on Twitter"></a>
+        </div>
+        </div>
+</div>
+            <div class="pr entry-body__el"><div class="cid" id="cald4-2"></div><div class="pos-header dpos-h"><div class="di-title"><span class="headword hdb tw-bw dhw dpos-h_hw "><span class="hw dhw">work</span></span></div><div class="posgram dpos-g hdib lmr-5"><span class="pos dpos" title="A word that describes an action, condition or experience.">verb</span></div> <div></div><span class="uk dpron-i "><span class="region dreg">uk</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio3" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/uk_pron/u/ukw/ukwor/ukwordp005.mp3">
+    <source type="audio/ogg" src="/media/english/uk_pron_ogg/u/ukw/ukwor/ukwordp005.ogg">
+</audio>
+<div title="Listen to the British English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio3.load(); audio3.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1">wɜːk</span>/</span></span> <span class="us dpron-i "><span class="region dreg">us</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio4" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/us_pron/w/wor/work_/work.mp3">
+    <source type="audio/ogg" src="/media/english/us_pron_ogg/w/wor/work_/work.ogg">
+</audio>
+<div title="Listen to the American English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio4.load(); audio4.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1">wɝːk</span>/</span></span></div><div class="pos-body">
+
+                                <div class="pr dsense "><div class="cid" id="cald4-2-1"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>HAVE EFFECT</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_15">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_15' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info"><span class="epp-xref dxref B1">B1</span> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> <span class="gc dgc">usually</span> <span class="gc dgc">+ adv/prep</span> ]</a></span></span> <div class="def ddef_d db">to be <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effective" title="effective" rel="">effective</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/successful" title="successful" rel="">successful</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Her <a class="query" href="https://dictionary.cambridge.org/dictionary/english/idea" title="idea" rel="">idea</a> for <a class="query" href="https://dictionary.cambridge.org/dictionary/english/reorganize" title="reorganizing" rel="">reorganizing</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/department" title="department" rel="">department</a> will never work <span class="b db">in <a class="query" href="https://dictionary.cambridge.org/dictionary/english/practice" title="practice" rel="">practice</a></span>.</span></div><div class="examp dexamp"> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/tablet" title="tablets" rel="">tablets</a> will <a class="query" href="https://dictionary.cambridge.org/dictionary/english/start" title="start" rel="">start</a> to work <span class="b db">in</span> a few <a class="query" href="https://dictionary.cambridge.org/dictionary/english/minutes" title="minutes" rel="">minutes</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Some <a class="query" href="https://dictionary.cambridge.org/dictionary/english/people" title="people" rel="">people</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/think" title="think" rel="">think</a> I'm <a class="query" href="https://dictionary.cambridge.org/dictionary/english/weird" title="weird" rel="">weird</a> doing <a class="query" href="https://dictionary.cambridge.org/dictionary/english/meditate" title="meditation" rel="">meditation</a>, but it works <span class="b db">for</span> me and that's all that <a class="query" href="https://dictionary.cambridge.org/dictionary/english/matter" title="matters" rel="">matters</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Arguably, the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/monarchy" title="monarchy" rel="">monarchy</a> worked <span class="b db">well</span> for many <a class="query" href="https://dictionary.cambridge.org/dictionary/english/century" title="centuries" rel="">centuries</a>.</span></div> </div></div>
+                    <div class="daccord"><amp-accordion class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                            <section>
+                          <header class="ca_h daccord_h i-amphtml-accordion-header" id="82_AMP_header_0" role="button" aria-controls="82_AMP_content_0" aria-expanded="false" tabindex="0">
+                                  <i class="i i-plus ca_hi"></i>
+                                <span class="showmore">More examples</span><span class="showless">Fewer examples</span></header><ul class="hul-u hul-u0 ca_b daccord_b i-amphtml-accordion-content" id="82_AMP_content_0" aria-labelledby="82_AMP_header_0" role="region"><li class="eg dexamp hax">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/argument" title="argument" rel="">argument</a> that <a class="query" href="https://dictionary.cambridge.org/dictionary/english/sanction" title="sanctions" rel="">sanctions</a> should be given more <a class="query" href="https://dictionary.cambridge.org/dictionary/english/time" title="time" rel="">time</a> to work is <a class="query" href="https://dictionary.cambridge.org/dictionary/english/seductive" title="seductive" rel="">seductive</a> but <a class="query" href="https://dictionary.cambridge.org/dictionary/english/fatal" title="fatally" rel="">fatally</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/flawed" title="flawed" rel="">flawed</a>.</li><li class="eg dexamp hax">In <a class="query" href="https://dictionary.cambridge.org/dictionary/english/conclusion" title="conclusion" rel="">conclusion</a>, I <a class="query" href="https://dictionary.cambridge.org/dictionary/english/submit" title="submit" rel="">submit</a> that the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/proposal" title="proposal" rel="">proposal</a> will not work without some <a class="query" href="https://dictionary.cambridge.org/dictionary/english/major" title="major" rel="">major</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/change" title="changes" rel="">changes</a>.</li><li class="eg dexamp hax">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/opposition" title="opposition" rel="">opposition</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/claim" title="claimed" rel="">claimed</a> that the government's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/education" title="education" rel="">education</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/policy" title="policy" rel="">policy</a> was not working.</li><li class="eg dexamp hax">My new <a class="query" href="https://dictionary.cambridge.org/dictionary/english/diet" title="diet" rel="">diet</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/seem" title="seems" rel="">seems</a> to be working. I've <a class="query" href="https://dictionary.cambridge.org/dictionary/english/lost" title="lost" rel="">lost</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/weight" title="weight" rel="">weight</a> already.</li><li class="eg dexamp hax">These <a class="query" href="https://dictionary.cambridge.org/dictionary/english/tactic" title="tactics" rel="">tactics</a> worked well in the last <a class="query" href="https://dictionary.cambridge.org/dictionary/english/match" title="match" rel="">match</a>.</li></ul>
+                            </section>
+                    </amp-accordion></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="87_AMP_header_0" role="button" aria-controls="87_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="87_AMP_content_0" aria-labelledby="87_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/doing-and-achieving/performing-a-function/" title="Words and phrases related to work in the topic Performing a function">Performing a function</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="act" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/act?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">act</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="act as something" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/act-as?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="phrase haf">act as <span class="obj">something</span></span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="discharge" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/discharge?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">discharge</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="function" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/function?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">function</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="function as something/someone" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/function-as?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="phrase haf">function as <span class="obj">something/someone</span></span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="functionalist" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/functionalist?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">functionalist</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="high-performance" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/high-performance?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">high-performance</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="hyperfunction" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/hyperfunction?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">hyperfunction</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="janitorial" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/janitorial?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">janitorial</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="make" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/make?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">make</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="man" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/man?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">man</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="multifunction" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/multifunction?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">multifunction</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="multifunctional" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/multifunctional?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">multifunctional</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="on it idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/on-it?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="phrase haf">on it</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="operate" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/operate?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">operate</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="purpose" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/purpose?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">purpose</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="serve" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/serve?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">serve</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="take" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/take?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">take</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="undischarged" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/undischarged?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="hw haf">undischarged</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="work a treat idiom" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/work-a-treat?topic=performing-a-function ">
+                                            <span class="results"><span class="base"><span class="phrase haf">work a treat</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/doing-and-achieving/performing-a-function/" class="had tb" title="Words and phrases related to work in the topic Performing a function">See more results »</a>
+                                                    </div>
+
+                                                <div class="lmt-20">
+                            <p>You can also find related words, phrases, and synonyms in the topics:</p>
+                            <div>
+                                                                                                <div class="lmb-5">
+                                        <a href="https://dictionary.cambridge.org/topics/doing-and-achieving/succeeding-achieving-and-fulfilling/" class="tb" title="Words and phrases related to work in the topic Succeeding, achieving and fulfilling">Succeeding, achieving and fulfilling</a>
+                                    </div>
+                                                                                        </div>
+                        </div>
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+                                                                        <div id="ad_contentslot_3" class="am-default_moreslots contentslot">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_contentslot_3'); });</script>
+        </div>
+                                           </div>
+
+                            <div class="pr dsense "><div class="cid" id="cald4-2-2"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>DO JOB</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_16">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_16' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info"><span class="epp-xref dxref A1">A1</span> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> or <span class="gc dgc">T</span> ]</a></span></span> <div class="def ddef_d db">to do a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/especially" title="especially" rel="">especially</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a> you do to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/earn" title="earn" rel="">earn</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/money" title="money" rel="">money</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Where do you work?</span></div><div class="examp dexamp"> <span class="eg deg">He works <strong class="cl">at</strong> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/hospital" title="hospital" rel="">hospital</a>.</span></div><div class="examp dexamp"> <span class="eg deg">She worked <span class="b db">as</span> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/cleaner" title="cleaner" rel="">cleaner</a> at the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/hospital" title="hospital" rel="">hospital</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Mike works <span class="b db">for</span> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/computer" title="computer" rel="">computer</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/company" title="company" rel="">company</a>.</span></div><div class="examp dexamp"> <span class="eg deg">I work <strong class="cl">in</strong> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/management" title="management" rel="">management</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/training" title="training" rel="">training</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Have you any <a class="query" href="https://dictionary.cambridge.org/dictionary/english/experience" title="experience" rel="">experience</a> of working <span class="b db">with</span> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/children" title="children" rel="">children</a> who have <a class="query" href="https://dictionary.cambridge.org/dictionary/english/learning" title="learning" rel="">learning</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/difficulty" title="difficulties" rel="">difficulties</a>?</span></div><div class="examp dexamp"> <span class="eg deg">It's not <a class="query" href="https://dictionary.cambridge.org/dictionary/english/unusual" title="unusual" rel="">unusual</a> for a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/junior" title="junior" rel="">junior</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/doctor" title="doctor" rel="">doctor</a> to work a 70 or sometimes an 80-hour <a class="query" href="https://dictionary.cambridge.org/dictionary/english/week" title="week" rel="">week</a>.</span></div> <div class="xref see_also hax dxref-w lmt-25"><strong class="xref-title dxref-t">See also</strong><div class="lcs lmt-10 lmb-20">
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/work-to-rule" title="meaning of work to rule" rel=""><span class="x-p dx-p">work to rule</span> <span class="x-at dx-at">(work-to-rule)</span></a></div></div></div> </div></div><div class="def-block ddef_block " data-wl-senseid="ID_00036481_51">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_51' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span></span> <div class="def ddef_d db">to make a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/person" title="person" rel="">person</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/animal" title="animal" rel="">animal</a> do a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/instructor" title="instructors" rel="">instructors</a> worked us very <span class="b db">hard</span> on the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/survival" title="survival" rel="">survival</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/course" title="course" rel="">course</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Many of the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/animal" title="animals" rel="">animals</a> were worked to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/death" title="death" rel="">death</a>.</span></div> </div></div>
+                    <div class="daccord"><amp-accordion class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                            <section>
+                          <header class="ca_h daccord_h i-amphtml-accordion-header" id="2_AMP_header_0" role="button" aria-controls="2_AMP_content_0" aria-expanded="false" tabindex="0">
+                                  <i class="i i-plus ca_hi"></i>
+                                <span class="showmore">More examples</span><span class="showless">Fewer examples</span></header><ul class="hul-u hul-u0 ca_b daccord_b i-amphtml-accordion-content" id="2_AMP_content_0" aria-labelledby="2_AMP_header_0" role="region"><li class="eg dexamp hax">He works for a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/company" title="company" rel="">company</a> that makes <a class="query" href="https://dictionary.cambridge.org/dictionary/english/software" title="software" rel="">software</a>.</li><li class="eg dexamp hax">She works three <a class="query" href="https://dictionary.cambridge.org/dictionary/english/afternoons" title="afternoons" rel="">afternoons</a> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/week" title="week" rel="">week</a> at the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/library" title="library" rel="">library</a>.</li><li class="eg dexamp hax">She has worked as an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/estate" title="estate" rel="">estate</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/agent" title="agent" rel="">agent</a> among other things.</li><li class="eg dexamp hax">I worked as an artist's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/model" title="model" rel="">model</a> when I was a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/student" title="student" rel="">student</a>.</li><li class="eg dexamp hax">I'm working late this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/evening" title="evening" rel="">evening</a>.</li></ul>
+                            </section>
+                    </amp-accordion></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="20_AMP_header_0" role="button" aria-controls="20_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="20_AMP_content_0" aria-labelledby="20_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/working/work-working-and-the-workplace/" title="Words and phrases related to work in the topic Work, working and the workplace">Work, working and the workplace</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="act as something" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/act-as?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">act as <span class="obj">something</span></span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="all work and no play (makes Jack a dull boy) idiom" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/all-work-and-no-play-makes-jack-a-dull-boy?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">all work and no play (makes Jack a dull boy)</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="assignment" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/assignment?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">assignment</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="bandh" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/bandh?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">bandh</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="be at work idiom" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/be-at-work?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">be at work</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="grind" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/grind?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">grind</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="hoop" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/hoop?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">hoop</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="hotelling" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/hotelling?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">hotelling</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="housekeeping" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/housekeeping?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">housekeeping</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="in the line of duty idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/in-the-line-of-duty?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="phrase haf">in the line of duty</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="induction" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/induction?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">induction</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="industry" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/industry?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">industry</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="job" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/job?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">job</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="labour" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/labour?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">labour</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slave" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/slave?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">slave</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slog" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/slog?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">slog</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slouch" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/slouch?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">slouch</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="spadework" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/spadework?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">spadework</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="subtask" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/subtask?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">subtask</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="sweat" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/sweat?topic=work-working-and-the-workplace ">
+                                            <span class="results"><span class="base"><span class="hw haf">sweat</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/working/work-working-and-the-workplace/" class="had tb" title="Words and phrases related to work in the topic Work, working and the workplace">See more results »</a>
+                                                    </div>
+
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+                 </div>
+
+                                <div class="pr dsense "><div class="cid" id="cald4-2-3"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>OPERATE</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_17">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_17' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info"><span class="epp-xref dxref A2">A2</span> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> or <span class="gc dgc">T</span> ]</a></span></span> <div class="def ddef_d db">If a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/machine" title="machine" rel="">machine</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/device" title="device" rel="">device</a> works, it <a class="query" href="https://dictionary.cambridge.org/dictionary/english/operate" title="operates" rel="">operates</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/especially" title="especially" rel="">especially</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/correctly" title="correctly" rel="">correctly</a> and without <a class="query" href="https://dictionary.cambridge.org/dictionary/english/failure" title="failure" rel="">failure</a>, and if you work it, you make it <a class="query" href="https://dictionary.cambridge.org/dictionary/english/operate" title="operate" rel="">operate</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Our <a class="query" href="https://dictionary.cambridge.org/dictionary/english/phone" title="phone" rel="">phone</a> isn't working.</span></div><div class="examp dexamp"> <span class="eg deg">You need a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/team" title="team" rel="">team</a> of about twelve <a class="query" href="https://dictionary.cambridge.org/dictionary/english/people" title="people" rel="">people</a> to work a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/furnace" title="furnace" rel="">furnace</a> this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/size" title="size" rel="">size</a>.</span></div><div class="examp dexamp"> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/pump" title="pump" rel="">pump</a> works <strong class="cl">off/on</strong> <span class="gloss dgloss">(= uses)</span> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/wind" title="wind" rel="">wind</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/power" title="power" rel="">power</a>.</span></div><div class="examp dexamp"> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/pump" title="pump" rel="">pump</a> is worked <span class="b db">by</span> <span class="gloss dgloss">(= uses to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/operate" title="operate" rel="">operate</a>)</span> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/wind" title="wind" rel="">wind</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/power" title="power" rel="">power</a>.</span></div><div class="examp dexamp"> <span class="eg deg">I can't <span class="b db">get</span> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/radio" title="radio" rel="">radio</a><span class="b db"> to</span> work.</span></div> </div></div>
+                    <div class="daccord"><amp-accordion class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                            <section>
+                          <header class="ca_h daccord_h i-amphtml-accordion-header" id="89_AMP_header_0" role="button" aria-controls="89_AMP_content_0" aria-expanded="false" tabindex="0">
+                                  <i class="i i-plus ca_hi"></i>
+                                <span class="showmore">More examples</span><span class="showless">Fewer examples</span></header><ul class="hul-u hul-u0 ca_b daccord_b i-amphtml-accordion-content" id="89_AMP_content_0" aria-labelledby="89_AMP_header_0" role="region"><li class="eg dexamp hax">You're <a class="query" href="https://dictionary.cambridge.org/dictionary/english/welcome" title="welcome" rel="">welcome</a> to it - I can never get it to work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/properly" title="properly" rel="">properly</a>.</li><li class="eg dexamp hax">Dust <a class="query" href="https://dictionary.cambridge.org/dictionary/english/particle" title="particles" rel="">particles</a> must have got into the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/motor" title="motor" rel="">motor</a>, which is why it isn't working <a class="query" href="https://dictionary.cambridge.org/dictionary/english/properly" title="properly" rel="">properly</a>.</li><li class="eg dexamp hax">How do you work this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/machine" title="machine" rel="">machine</a>?</li><li class="eg dexamp hax">It's a common-or-garden <a class="query" href="https://dictionary.cambridge.org/dictionary/english/washing" title="washing" rel="">washing</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/machine" title="machine" rel="">machine</a> with just the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/basic" title="basic" rel="">basic</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/function" title="functions" rel="">functions</a>, but it works <a class="query" href="https://dictionary.cambridge.org/dictionary/english/perfectly" title="perfectly" rel="">perfectly</a> well.</li><li class="eg dexamp hax">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/machine" title="machine" rel="">machine</a> works <a class="query" href="https://dictionary.cambridge.org/dictionary/english/accord" title="according" rel="">according</a> to the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/principle" title="principle" rel="">principle</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/electromagnetic" title="electromagnetic" rel="">electromagnetic</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/conduction" title="conduction" rel="">conduction</a>.</li></ul>
+                            </section>
+                    </amp-accordion></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="87_AMP_header_0" role="button" aria-controls="87_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="87_AMP_content_0" aria-labelledby="87_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/technology/functioning/" title="Words and phrases related to work in the topic Machines - Functioning">Machines - Functioning</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="action" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/action?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">action</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="actuator" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/actuator?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">actuator</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="deactivation" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/deactivation?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">deactivation</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="engaged" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/engaged?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">engaged</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="faultily" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/faultily?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">faultily</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="faulty" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/faulty?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">faulty</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="fire someone up" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/fire-up?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="phrase haf">fire <span class="obj">someone</span> up</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="function as something/someone" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/function-as?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="phrase haf">function as <span class="obj">something/someone</span></span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="light" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/light?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">light</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="operative" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/operative?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">operative</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="pack up" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/pack-up?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="phrase haf">pack up</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="peg" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/peg?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">peg</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="peg out" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/peg-out?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="phrase haf">peg out</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="play something up" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/play-up?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="phrase haf">play <span class="obj">something</span> up</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="power (something) up" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/power-up?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="phrase haf">power <span class="obj">(something)</span> up</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="refire" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/refire?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">refire</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="road" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/road?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">road</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="run" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/run?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">run</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="tick" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/tick?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">tick</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="working" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/working?topic=functioning ">
+                                            <span class="results"><span class="base"><span class="hw haf">working</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/technology/functioning/" class="had tb" title="Words and phrases related to work in the topic Machines - Functioning">See more results »</a>
+                                                    </div>
+
+                                                <div class="lmt-20">
+                            <p>You can also find related words, phrases, and synonyms in the topics:</p>
+                            <div>
+                                                                                                <div class="lmb-5">
+                                        <a href="https://dictionary.cambridge.org/topics/doing-and-achieving/performing-a-function/" class="tb" title="Words and phrases related to work in the topic Performing a function">Performing a function</a>
+                                    </div>
+                                                                                        </div>
+                        </div>
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+           </div>
+
+                        <div class="pr dsense "><div class="cid" id="cald4-2-4"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>SUCCEED IN BECOMING</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_18">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_18' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> or <span class="gc dgc">T</span>,  <span class="gc dgc">+ adv/prep</span> ]</a></span></span> <div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/succeed" title="succeed" rel="">succeed</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/gradually" title="gradually" rel="">gradually</a> in <a class="query" href="https://dictionary.cambridge.org/dictionary/english/becoming" title="becoming" rel="">becoming</a> something or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/cause" title="cause" rel="">cause</a> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/person" title="person" rel="">person</a> or thing to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/become" title="become" rel="">become</a> something, either by making an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effort" title="effort" rel="">effort</a> or by making many <a class="query" href="https://dictionary.cambridge.org/dictionary/english/small" title="small" rel="">small</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/movement" title="movements" rel="">movements</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">He <a class="query" href="https://dictionary.cambridge.org/dictionary/english/start" title="started" rel="">started</a> as a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/technician" title="technician" rel="">technician</a> and worked his <span class="b db">way up</span> through the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/company" title="company" rel="">company</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/become" title="become" rel="">become</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/manage" title="managing" rel="">managing</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/director" title="director" rel="">director</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Eventually she worked her <span class="b db">way through</span> <span class="gloss dgloss">(= <a class="query" href="https://dictionary.cambridge.org/dictionary/english/read" title="read" rel="">read</a>)</span> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/huge" title="huge" rel="">huge</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/amount" title="amount" rel="">amount</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/technical" title="technical" rel="">technical</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/papers" title="papers" rel="">papers</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Vibration <a class="query" href="https://dictionary.cambridge.org/dictionary/english/tend" title="tends" rel="">tends</a> to make <a class="query" href="https://dictionary.cambridge.org/dictionary/english/nuts" title="nuts" rel="">nuts</a> and <a class="query" href="https://dictionary.cambridge.org/dictionary/english/screw" title="screws" rel="">screws</a> work them<span class="b db"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/selves" title="selves" rel="">selves</a></span> <span class="b db"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/loose" title="loose" rel="">loose</a></span>.</span></div><div class="examp dexamp"> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/screw" title="screws" rel="">screws</a> had worked <a class="query" href="https://dictionary.cambridge.org/dictionary/english/loose" title="loose" rel="">loose</a> over <a class="query" href="https://dictionary.cambridge.org/dictionary/english/time" title="time" rel="">time</a>.</span></div> </div></div>
+                    <div class="daccord"><amp-accordion class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                            <section>
+                          <header class="ca_h daccord_h i-amphtml-accordion-header" id="98_AMP_header_0" role="button" aria-controls="98_AMP_content_0" aria-expanded="false" tabindex="0">
+                                  <i class="i i-plus ca_hi"></i>
+                                <span class="showmore">More examples</span><span class="showless">Fewer examples</span></header><ul class="hul-u hul-u0 ca_b daccord_b i-amphtml-accordion-content" id="98_AMP_content_0" aria-labelledby="98_AMP_header_0" role="region"><li class="eg dexamp hax">Sidney <a class="query" href="https://dictionary.cambridge.org/dictionary/english/ruthlessly" title="ruthlessly" rel="">ruthlessly</a> worked his way up from the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/position" title="position" rel="">position</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/junior" title="junior" rel="">junior</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/clerk" title="clerk" rel="">clerk</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/chairman" title="chairman" rel="">chairman</a> of the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/company" title="company" rel="">company</a>.</li><li class="eg dexamp hax">She is now a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/senior" title="senior" rel="">senior</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/executive" title="executive" rel="">executive</a> having worked her way up through the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/company" title="company" rel="">company</a>.</li><li class="eg dexamp hax">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/splinter" title="splinter" rel="">splinter</a> had worked <a class="query" href="https://dictionary.cambridge.org/dictionary/english/its" title="its" rel="">its</a> way under his <a class="query" href="https://dictionary.cambridge.org/dictionary/english/skin" title="skin" rel="">skin</a>.</li><li class="eg dexamp hax">It will take all <a class="query" href="https://dictionary.cambridge.org/dictionary/english/weekend" title="weekend" rel="">weekend</a> to work through this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/pile" title="pile" rel="">pile</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/marking" title="marking" rel="">marking</a>.</li><li class="eg dexamp hax">She <a class="query" href="https://dictionary.cambridge.org/dictionary/english/plan" title="plans" rel="">plans</a> to work her way to the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/top" title="top" rel="">top</a>.</li></ul>
+                            </section>
+                    </amp-accordion></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="79_AMP_header_0" role="button" aria-controls="79_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="79_AMP_content_0" aria-labelledby="79_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/doing-and-achieving/succeeding-achieving-and-fulfilling/" title="Words and phrases related to work in the topic Succeeding, achieving and fulfilling">Succeeding, achieving and fulfilling</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="A game" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/a-game?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">A game</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="accomplish" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/accomplish?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">accomplish</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="achieve" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/achieve?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">achieve</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="acquit" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/acquit?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">acquit</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="actualize" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/actualize?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">actualize</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="bear" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/bear?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">bear</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="get to/reach first base idiom" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/get-to-reach-first-base?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">get to/reach first base</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="go (like/down) a bomb idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/go-like-down-a-bomb?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">go (like/down) a bomb</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="go far idiom" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/go-far?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">go far</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="go from strength to strength idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/go-from-strength-to-strength?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">go from strength to strength</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="go into orbit idiom" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/go-into-orbit?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">go into orbit</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="kill" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/kill?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">kill</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="pan" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/pan?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">pan</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="rise" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/rise?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">rise</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="scale the heights idiom" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/scale-the-heights?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">scale the heights</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="scrape through (something)" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/scrape-through?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">scrape through <span class="obj">(something)</span></span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="sew something up" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/sew-up?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">sew <span class="obj">something</span> up</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="slam dunk" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/slam-dunk?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="hw haf">slam dunk</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="smash it idiom" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/smash-it?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">smash it</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="stand out" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/stand-out?topic=succeeding-achieving-and-fulfilling ">
+                                            <span class="results"><span class="base"><span class="phrase haf">stand out</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/doing-and-achieving/succeeding-achieving-and-fulfilling/" class="had tb" title="Words and phrases related to work in the topic Succeeding, achieving and fulfilling">See more results »</a>
+                                                    </div>
+
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+                                                                        <div id="ad_contentslot_4" class="am-default_moreslots contentslot">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_contentslot_4'); });</script>
+        </div>
+                                           </div>
+
+                        <div class="pr dsense "><div class="cid" id="cald4-2-5"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>ARRANGE</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_19">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_19' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span> <span class="lab dlab"><span class="usage dusage">informal</span></span></span> <div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/arrange" title="arrange" rel="">arrange</a> for something to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/happen" title="happen" rel="">happen</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/especially" title="especially" rel="">especially</a> by not using <a class="query" href="https://dictionary.cambridge.org/dictionary/english/official" title="official" rel="">official</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/method" title="methods" rel="">methods</a> and/or by being <a class="query" href="https://dictionary.cambridge.org/dictionary/english/clever" title="clever" rel="">clever</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">I don't <a class="query" href="https://dictionary.cambridge.org/dictionary/english/know" title="know" rel="">know</a> how she worked <span class="b db">it</span>, but she <a class="query" href="https://dictionary.cambridge.org/dictionary/english/retire" title="retired" rel="">retired</a> at 50.</span></div><div class="examp dexamp"> <span class="eg deg">Can we work <span class="b db">things (out)</span> so that there's always someone here to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/answer" title="answer" rel="">answer</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/phone" title="phone" rel="">phone</a> during <a class="query" href="https://dictionary.cambridge.org/dictionary/english/office" title="office" rel="">office</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/hours" title="hours" rel="">hours</a>?</span></div> </div></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="2_AMP_header_0" role="button" aria-controls="2_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="2_AMP_content_0" aria-labelledby="2_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/thinking-about-the-future/planning-expecting-and-arranging/" title="Words and phrases related to work in the topic Planning, expecting and arranging">Planning, expecting and arranging</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="accidentally" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/accidentally?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">accidentally</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="accidentally on purpose idiom" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/accidentally-on-purpose?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="phrase haf">accidentally on purpose</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="advertent" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/advertent?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">advertent</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="advisedly" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/advisedly?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">advisedly</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="aim at something" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/aim-at?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="phrase haf">aim at <span class="obj">something</span></span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="bargain" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/bargain?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">bargain</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="conscious" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/conscious?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">conscious</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="hatch" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/hatch?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">hatch</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="have something in mind idiom" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/have-something-in-mind?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="phrase haf">have something in mind</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="have something up your sleeve idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/have-up-sleeve?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="phrase haf">have <span class="obj">something</span> up <span class="obj">your</span> sleeve</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="horizon scanning" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/horizon-scanning?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">horizon scanning</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="how are you fixed for something ? idiom" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/how-are-you-fixed-for?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="phrase haf">how are you fixed for <span class="obj">something</span>?</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="I'll/we'll cross that bridge when I/we come/get to it idiom" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/i-ll-we-ll-cross-that-bridge-when-i-we-come-get-to-it?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="phrase haf">I'll/we'll cross that bridge when I/we come/get to it</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="pencil" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/pencil?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">pencil</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="provident" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/provident?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">provident</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="providently" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/providently?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">providently</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="provision" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/provision?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">provision</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="purpose" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/purpose?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">purpose</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="purposefully" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/purposefully?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">purposefully</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="purposely" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/purposely?topic=planning-expecting-and-arranging ">
+                                            <span class="results"><span class="base"><span class="hw haf">purposely</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/thinking-about-the-future/planning-expecting-and-arranging/" class="had tb" title="Words and phrases related to work in the topic Planning, expecting and arranging">See more results »</a>
+                                                    </div>
+
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+           </div>
+
+                                        <div class="pr dsense "><div class="cid" id="cald4-2-6"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>SHAPE</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036481_20">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036481_20' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span></span> <div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/shape" title="shape" rel="">shape</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/change" title="change" rel="">change</a>, or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/process" title="process" rel="">process</a> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/substance" title="substance" rel="">substance</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Working <a class="query" href="https://dictionary.cambridge.org/dictionary/english/iron" title="iron" rel="">iron</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/require" title="requires" rel="">requires</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/higher" title="higher" rel="">higher</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/temperature" title="temperatures" rel="">temperatures</a> than <a class="query" href="https://dictionary.cambridge.org/dictionary/english/bronze" title="bronze" rel="">bronze</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Gently work the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/butter" title="butter" rel="">butter</a> <span class="b db">into</span> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/flour" title="flour" rel="">flour</a> until there are no <a class="query" href="https://dictionary.cambridge.org/dictionary/english/lump" title="lumps" rel="">lumps</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/left" title="left" rel="">left</a>.</span></div> </div></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="83_AMP_header_0" role="button" aria-controls="83_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="83_AMP_content_0" aria-labelledby="83_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/straight-and-regular/patterns-and-shapes/" title="Words and phrases related to work in the topic Patterns and shapes">Patterns and shapes</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="amorphous" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/amorphous?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">amorphous</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="arabesque" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/arabesque?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">arabesque</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="argyle" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/argyle?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">argyle</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="asymmetrically" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/asymmetrically?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">asymmetrically</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="asymmetry" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/asymmetry?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">asymmetry</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="fishbone" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/fishbone?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">fishbone</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="fishhook" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/fishhook?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">fishhook</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="flecked" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/flecked?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">flecked</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="formless" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/formless?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">formless</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="formlessly" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/formlessly?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">formlessly</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="palmate" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/palmate?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">palmate</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="rhomboid" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/rhomboid?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">rhomboid</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="shapeable" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/shapeable?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">shapeable</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="shaped" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/shaped?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">shaped</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="shapeless" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/shapeless?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">shapeless</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="shapelessly" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/shapelessly?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">shapelessly</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="shapelessness" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/shapelessness?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">shapelessness</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="silhouetted" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/silhouetted?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">silhouetted</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="swoosh" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/swoosh?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">swoosh</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="variegated" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/variegated?topic=patterns-and-shapes ">
+                                            <span class="results"><span class="base"><span class="hw haf">variegated</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/straight-and-regular/patterns-and-shapes/" class="had tb" title="Words and phrases related to work in the topic Patterns and shapes">See more results »</a>
+                                                    </div>
+
+                                                <div class="lmt-20">
+                            <p>You can also find related words, phrases, and synonyms in the topics:</p>
+                            <div>
+                                                                                                <div class="lmb-5">
+                                        <a href="https://dictionary.cambridge.org/topics/industry/industrial-processing/" class="tb" title="Words and phrases related to work in the topic Industrial processing">Industrial processing</a>
+                                    </div>
+                                                                                                                                <div class="lmb-5">
+                                        <a href="https://dictionary.cambridge.org/topics/creating-and-preparing/creating-and-producing/" class="tb" title="Words and phrases related to work in the topic Creating and producing">Creating and producing</a>
+                                    </div>
+                                                                                        </div>
+                        </div>
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+           </div><div class="xref idioms hax dxref-w lmt-25 lmb-25"><h3 class="bb fs16 lp-10 lmb-0"><strong class="xref-title dxref-t">Idioms</strong></h3><div class="hax lp-10 lb lb-cm lbt0"><div class="lcs">
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/work-a-treat" title="meaning of work a treat" rel=""><span class="x-h dx-h">work a treat</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="2"><a href="/dictionary/english/work-like-a-charm" title="meaning of work like a charm" rel=""><span class="x-h dx-h">work like a charm</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="3"><a href="/dictionary/english/work-wonders-miracles" title="meaning of work wonders/miracles" rel=""><span class="x-h dx-h">work wonders/miracles</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="4"><a href="/dictionary/english/work-fingers-to-the-bone" title="meaning of work your fingers to the bone" rel=""><span class="x-h dx-h">work <span class="obj dobj">your</span> fingers to the bone</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="5"><a href="/dictionary/english/work-like-a-dog" title="meaning of work like a dog" rel=""><span class="x-h dx-h">work like a dog</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="6"><a href="/dictionary/english/work-till-until-drop" title="meaning of work till/until you drop" rel=""><span class="x-h dx-h">work till/until <span class="obj dobj">you</span> drop</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="7"><a href="/dictionary/english/work-way-around-to" title="meaning of work your way around to something" rel=""><span class="x-h dx-h">work <span class="obj dobj">your</span> way around to <span class="obj dobj">something</span></span></a></div></div></div></div><div class="xref phrasal_verbs hax dxref-w lmt-25 lmb-25"><h3 class="bb fs16 lp-10 lmb-0"><strong class="xref-title dxref-t">Phrasal verbs</strong></h3><div class="hax lp-10 lb lb-cm lbt0"><div class="lcs">
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/work-against-for" title="meaning of work against/for someone" rel=""><span class="x-h dx-h">work against/for <span class="obj dobj">someone</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="2"><a href="/dictionary/english/work-at" title="meaning of work at something" rel=""><span class="x-h dx-h">work at <span class="obj dobj">something</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="3"><a href="/dictionary/english/work-off" title="meaning of work something off" rel=""><span class="x-h dx-h">work <span class="obj dobj">something</span> off</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="4"><a href="/dictionary/english/work-on" title="meaning of work on something" rel=""><span class="x-h dx-h">work on <span class="obj dobj">something</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="5"><a href="/dictionary/english/work-on" title="meaning of work on someone" rel=""><span class="x-h dx-h">work on <span class="obj dobj">someone</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="6"><a href="/dictionary/english/work-out" title="meaning of work something out" rel=""><span class="x-h dx-h">work <span class="obj dobj">something</span> out</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="7"><a href="/dictionary/english/work-out" title="meaning of work out" rel=""><span class="x-h dx-h">work out</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="8"><a href="/dictionary/english/work-out" title="meaning of work someone out" rel=""><span class="x-h dx-h">work <span class="obj dobj">someone</span> out</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="9"><a href="/dictionary/english/work-out" title="meaning of work (something) out" rel=""><span class="x-h dx-h">work <span class="obj dobj">(something)</span> out</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="10"><a href="/dictionary/english/work-over" title="meaning of work someone over" rel=""><span class="x-h dx-h">work <span class="obj dobj">someone</span> over</span></a></div></div><amp-accordion class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                                        <section>
+                                        <header class="q150 ca_h hfocp lpl-0 i-amphtml-accordion-header" id="33_AMP_header_0" role="button" aria-controls="33_AMP_content_0" aria-expanded="false" tabindex="0">
+                                                <i class="i i-plus ca_hi"></i>
+                                            More phrasal verbs                                        </header><div class="lpt-10 lcs i-amphtml-accordion-content" id="33_AMP_content_0" aria-labelledby="33_AMP_header_0" role="region">
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/work-through" title="meaning of work through something" rel=""><span class="x-h dx-h">work through <span class="obj dobj">something</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="2"><a href="/dictionary/english/work-up" title="meaning of work up something" rel=""><span class="x-h dx-h">work up <span class="obj dobj">something</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="3"><a href="/dictionary/english/work-up" title="meaning of work someone up" rel=""><span class="x-h dx-h">work <span class="obj dobj">someone</span> up</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="4"><a href="/dictionary/english/work-up-to" title="meaning of work (yourself) up to something" rel=""><span class="x-h dx-h">work <span class="obj dobj">(yourself)</span> up to <span class="obj dobj">something</span></span></a></div></div>
+                                        </section>
+                                </amp-accordion></div></div></div></div></div></div><div class="entry"><div class="entry-body"> <div class="pr entry-body__el"><div class="cid" id="cald4-3"></div><div class="pos-header dpos-h"><div class="di-title"><span class="headword hdb tw-bw dhw dpos-h_hw "><span class="hw dhw">-work</span></span></div><div class="posgram dpos-g hdib lmr-5"><span class="pos dpos" title="A letter or group of letters added to the end of a word to make a new word.">suffix</span></div> <div></div><span class="uk dpron-i "><span class="region dreg">uk</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio5" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/uk_pron/u/ukw/ukwor/ukwordp005.mp3">
+    <source type="audio/ogg" src="/media/english/uk_pron_ogg/u/ukw/ukwor/ukwordp005.ogg">
+</audio>
+<div title="Listen to the British English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio5.load(); audio5.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1"> -wɜːk</span>/</span></span> <span class="us dpron-i "><span class="region dreg">us</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio6" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/us_pron/w/wor/work_/work.mp3">
+    <source type="audio/ogg" src="/media/english/us_pron_ogg/w/wor/work_/work.ogg">
+</audio>
+<div title="Listen to the American English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio6.load(); audio6.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1"> -wɝːk</span>/</span></span></div><div class="pos-body">
+
+                                    <div class="pr dsense dsense-noh"><div class="cid" id="cald4-3-3"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="ID_00036482_01">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036482_01' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">used to refer to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/work" title="work" rel="">work</a> of a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/particular" title="particular" rel="">particular</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/type" title="type" rel="">type</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/homework" title="homework" rel="">homework</a></span></div><div class="examp dexamp"> <span class="eg deg"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/paperwork" title="paperwork" rel="">paperwork</a></span></div> </div></div><div class="def-block ddef_block " data-wl-senseid="ID_00036482_02">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036482_02' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">used to refer to a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/skill" title="skill" rel="">skill</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/activity" title="activity" rel="">activity</a> using a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/particular" title="particular" rel="">particular</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/type" title="type" rel="">type</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/material" title="material" rel="">material</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Girls and <a class="query" href="https://dictionary.cambridge.org/dictionary/english/boy" title="boys" rel="">boys</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/study" title="study" rel="">study</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/woodwork" title="woodwork" rel="">woodwork</a> and <a class="query" href="https://dictionary.cambridge.org/dictionary/english/metalwork" title="metalwork" rel="">metalwork</a> at this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/school" title="school" rel="">school</a>.</span></div> </div></div><div class="def-block ddef_block " data-wl-senseid="ID_00036482_03">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'ID_00036482_03' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">used to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/name" title="name" rel="">name</a> things made of a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/particular" title="particular" rel="">particular</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/material" title="material" rel="">material</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/stonework" title="stonework" rel="">stonework</a></span></div><div class="examp dexamp"> <span class="eg deg"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/ironwork" title="ironwork" rel="">ironwork</a></span></div> </div></div></div>         
+        <div class="smartt daccord">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                    <section>
+                    <header class="ca_h daccord_h i-amphtml-accordion-header" id="43_AMP_header_0" role="button" aria-controls="43_AMP_content_0" aria-expanded="false" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        SMART Vocabulary: related words and phrases                    </header>
+                    <div class="ca_b had daccord_b daccord_l i-amphtml-accordion-content" id="43_AMP_content_0" aria-labelledby="43_AMP_header_0" role="region">
+                        <div class="daccord_lt">
+                            <a href="https://dictionary.cambridge.org/topics/business/employment-types/" title="Words and phrases related to work in the topic Types of employment">Types of employment</a>
+                        </div>
+
+                        <div class="daccord_lb">
+                            
+                            <ul class="hul-u hul-u0 hax lmb-10 lcs">
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="admin" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/admin?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">admin</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="administrative" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/administrative?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">administrative</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="administrative assistant" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/administrative-assistant?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">administrative assistant</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="administratively" class="topic_0  even " href=" https://dictionary.cambridge.org/dictionary/english/administratively?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">administratively</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="at the coalface idiom" class="topic_0  odd " href=" https://dictionary.cambridge.org/dictionary/english/at-the-coalface?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="phrase haf">at the coalface</span></span> <span class="pos">idiom</span> </span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="job-sharing" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/job-sharing?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">job-sharing</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="jobbing" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/jobbing?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">jobbing</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="jobless" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/jobless?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">jobless</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="joblessness" class="topic_1  odd " href=" https://dictionary.cambridge.org/dictionary/english/joblessness?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">joblessness</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="jobseeker" class="topic_1  even " href=" https://dictionary.cambridge.org/dictionary/english/jobseeker?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">jobseeker</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="professionalism" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/professionalism?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">professionalism</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="professionality" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/professionality?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">professionality</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="qualified" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/qualified?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">qualified</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="recertify" class="topic_2  even " href=" https://dictionary.cambridge.org/dictionary/english/recertify?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">recertify</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="redundancy" class="topic_2  odd " href=" https://dictionary.cambridge.org/dictionary/english/redundancy?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">redundancy</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="VA" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/va?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">VA</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="virtual assistant" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/virtual-assistant?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">virtual assistant</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="well qualified" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/well-qualified?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">well qualified</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="WFH" class="topic_3  odd " href=" https://dictionary.cambridge.org/dictionary/english/wfh?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">WFH</span></span></span>
+                                        </a>
+                                    </li>
+                                                                    <li class="lc lc1 lc-xs6-12 lpb-5 lpr-10">
+                                        <a title="white-collar" class="topic_3  even " href=" https://dictionary.cambridge.org/dictionary/english/white-collar?topic=employment-types ">
+                                            <span class="results"><span class="base"><span class="hw haf">white-collar</span></span></span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+
+                                                            <a href="https://dictionary.cambridge.org/topics/business/employment-types/" class="had tb" title="Words and phrases related to work in the topic Types of employment">See more results »</a>
+                                                    </div>
+
+                                                <div class="lmt-20">
+                            <p>You can also find related words, phrases, and synonyms in the topics:</p>
+                            <div>
+                                                                                                <div class="lmb-5">
+                                        <a href="https://dictionary.cambridge.org/topics/building-and-engineering/construction-work-and-workers/" class="tb" title="Words and phrases related to work in the topic Building: construction work &amp; workers">Building: construction work &amp; workers</a>
+                                    </div>
+                                                                                        </div>
+                        </div>
+                                            </div>
+                    </section>
+            </amp-accordion>
+        </div>
+                                                                        <div id="ad_contentslot_5" class="am-default_moreslots contentslot">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_contentslot_5'); });</script>
+        </div>
+                                     </div></div></div></div></div></div><small class="lbt lb-cm lpb-10 lpt-10 lpb-25 lmb-10 ddef had hdb">
+                                     (Definition of <b>work</b> from the <a href="https://dictionary.cambridge.org/dictionary/english/" title="Cambridge Advanced Learner's Dictionary &amp; Thesaurus" class="a--rev"><b>Cambridge Advanced Learner's Dictionary &amp; Thesaurus</b></a> © Cambridge University Press)
+                          </small></div></div></div><div class="pr dictionary" data-type="sorted" data-id="cacd" data-tab="ds-cacd" role="tabpanel"><div class="cid" id="dataset_cacd"></div><div class="link"><div class="pr di superentry" itemprop="text"><div class="cid" id="dataset_cacd"></div>                <div class="di-head c_h di_h"><div class="di-title di_t"><h2 class="c_hh"><b class="tb ttn">work</b> | American Dictionary</h2></div></div>
+                            <div class="di-body"><div class="entry"><div class="entry-body"> <div class="pr entry-body__el"><div class="cid" id="cacd-1"></div><div class="pos-header dpos-h"><div class="di-title"><span class="headword hdb tw-bw dhw dpos-h_hw "><span class="hw dhw">work</span></span></div><div class="posgram dpos-g hdib lmr-5"><span class="pos dpos" title="A word that describes an action, condition or experience.">verb</span></div> <div></div><span class="us dpron-i "><span class="region dreg">us</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio7" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/us_pron/w/wor/work_/work.mp3">
+    <source type="audio/ogg" src="/media/english/us_pron_ogg/w/wor/work_/work.ogg">
+</audio>
+<div title="Listen to the American English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio7.load(); audio7.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1">wɜrk</span>/</span></span></div><div class="pos-body">
+
+                <div class="pr dsense "><div class="cid" id="cacd-1-1"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>DO A JOB</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CACD_00020270_01">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CACD_00020270_01' } }), sidebarWordList.open">
+            <span class="tb fs10 hvm">Add to word list</span>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <span class="tb fs10 hvm">Add to word list</span>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I/T</span> ]</a></span></span> <div class="def ddef_d db">to do a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/esp" title="esp" rel="">esp</a>. a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a> you do to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/earn" title="earn" rel="">earn</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/money" title="money" rel="">money</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span> <span class="eg deg">She works <a class="query" href="https://dictionary.cambridge.org/dictionary/english/long" title="long" rel="">long</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/hours" title="hours" rel="">hours</a>.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span> <span class="eg deg">Richie worked the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/night" title="night" rel="">night</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/shift" title="shift" rel="">shift</a>.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span> <span class="eg deg">Designers worked with the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/director" title="director" rel="">director</a>.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span> <span class="eg deg">Mike works for a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/computer" title="computer" rel="">computer</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/company" title="company" rel="">company</a>.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span> <span class="eg deg">Medics were working on him for an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/hour" title="hour" rel="">hour</a>.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span> <span class="eg deg">She worked on the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/project" title="project" rel="">project</a> with Luce.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span> <span class="eg deg">Anna works well with <a class="query" href="https://dictionary.cambridge.org/dictionary/english/others" title="others" rel="">others</a>.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span> <span class="eg deg">I have to work on <a class="query" href="https://dictionary.cambridge.org/dictionary/english/saturday" title="Saturday" rel="">Saturday</a>.</span></div> </div></div></div>                  </div>
+
+                <div class="pr dsense "><div class="cid" id="cacd-1-2"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>PERFORM AS INTENDED</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CACD_00020270_02">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CACD_00020270_02' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I/T</span> ]</a></span></span> <div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/perform" title="perform" rel="">perform</a> as <a class="query" href="https://dictionary.cambridge.org/dictionary/english/intended" title="intended" rel="">intended</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/desired" title="desired" rel="">desired</a>, or to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/cause" title="cause" rel="">cause</a> something to do what it was <a class="query" href="https://dictionary.cambridge.org/dictionary/english/intended" title="intended" rel="">intended</a> to do: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/medicine" title="medicine" rel="">medicine</a> ought to work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/right" title="right" rel="">right</a> away.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span> <span class="eg deg">Our <a class="query" href="https://dictionary.cambridge.org/dictionary/english/plan" title="plan" rel="">plan</a> worked <a class="query" href="https://dictionary.cambridge.org/dictionary/english/perfectly" title="perfectly" rel="">perfectly</a>.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span> <span class="eg deg">I don’t <a class="query" href="https://dictionary.cambridge.org/dictionary/english/know" title="know" rel="">know</a> how to work this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/computer" title="computer" rel="">computer</a>.</span></div><div class="examp dexamp"> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span> <span class="eg deg">He <a class="query" href="https://dictionary.cambridge.org/dictionary/english/know" title="knows" rel="">knows</a> how to work the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/system" title="system" rel="">system</a> <span class="gloss dgloss">(= get what he <a class="query" href="https://dictionary.cambridge.org/dictionary/english/wants" title="wants" rel="">wants</a> from it)</span>.</span></div> </div></div></div>            </div>
+
+                <div class="pr dsense "><div class="cid" id="cacd-1-3"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>HAVE EFFECT</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CACD_00020270_03">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CACD_00020270_03' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> <span class="gc dgc">always</span> <span class="gc dgc">+ adv/prep</span> ]</a></span></span> <div class="def ddef_d db">(of a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/condition" title="condition" rel="">condition</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/fact" title="fact" rel="">fact</a>) to have an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effect" title="effect" rel="">effect</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/esp" title="esp" rel="">esp</a>. one that either <a class="query" href="https://dictionary.cambridge.org/dictionary/english/help" title="helps" rel="">helps</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/cause" title="causes" rel="">causes</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/difficulty" title="difficulties" rel="">difficulties</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Time was working against us.</span></div><div class="examp dexamp"> <span class="eg deg">Jimmie has a lot working in his <a class="query" href="https://dictionary.cambridge.org/dictionary/english/favor" title="favor" rel="">favor</a>.</span></div> </div></div></div>                                                                         <div id="ad_contentslot_6" class="am-default_moreslots contentslot">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_contentslot_6'); });</script>
+        </div>
+                                     </div>
+
+                <div class="pr dsense "><div class="cid" id="cacd-1-4"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that describes an action, condition or experience.">verb</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>MAKE OBJECT</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CACD_00020270_04">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CACD_00020270_04' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span></span> <div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/shape" title="shape" rel="">shape</a> something with <a class="query" href="https://dictionary.cambridge.org/dictionary/english/your" title="your" rel="">your</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/hand" title="hands" rel="">hands</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">She <a class="query" href="https://dictionary.cambridge.org/dictionary/english/carefully" title="carefully" rel="">carefully</a> works the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/clay" title="clay" rel="">clay</a>.</span></div> </div></div></div>                  </div><div class="xref idioms hax dxref-w lmt-25 lmb-25"><h3 class="bb fs16 lp-10 lmb-0"><strong class="xref-title dxref-t">Idioms</strong></h3><div class="hax lp-10 lb lb-cm lbt0"><div class="lcs">
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/work-like-a-dog" title="meaning of work like a dog" rel=""><span class="x-h dx-h">work like a dog</span></a></div>
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="2"><a href="/dictionary/english/work-the-land" title="meaning of work the land" rel=""><span class="x-h dx-h">work the land</span></a></div>
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="3"><a href="/dictionary/english/work-way-up" title="meaning of work your way up" rel=""><span class="x-h dx-h">work <span class="obj dobj">your</span> way up</span></a></div>
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="4"><a href="/dictionary/english/work-wonders" title="meaning of work wonders" rel=""><span class="x-h dx-h">work wonders</span></a></div></div></div></div><div class="xref phrasal_verbs hax dxref-w lmt-25 lmb-25"><h3 class="bb fs16 lp-10 lmb-0"><strong class="xref-title dxref-t">Phrasal verbs</strong></h3><div class="hax lp-10 lb lb-cm lbt0"><div class="lcs">
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/work-up" title="meaning of work someone/yourself up" rel=""><span class="x-h dx-h">work <span class="obj dobj">someone/yourself</span> up</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="2"><a href="/dictionary/english/work-out" title="meaning of work out" rel=""><span class="x-h dx-h">work out</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="3"><a href="/dictionary/english/work-out" title="meaning of work out" rel=""><span class="x-h dx-h">work out</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="4"><a href="/dictionary/english/work-out" title="meaning of work out something" rel=""><span class="x-h dx-h">work out <span class="obj dobj">something</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="5"><a href="/dictionary/english/work-out" title="meaning of work out something" rel=""><span class="x-h dx-h">work out <span class="obj dobj">something</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="6"><a href="/dictionary/english/work-through" title="meaning of work through something" rel=""><span class="x-h dx-h">work through <span class="obj dobj">something</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="7"><a href="/dictionary/english/work-up" title="meaning of work up something" rel=""><span class="x-h dx-h">work up <span class="obj dobj">something</span></span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="8"><a href="/dictionary/english/work-up-to" title="meaning of work up to something" rel=""><span class="x-h dx-h">work up to <span class="obj dobj">something</span></span></a></div></div></div></div></div></div>
+                
+<div class="pr x lbb lb-cm">
+    <div class="hfr lpb-2">
+                    <div class="pr hdib i i-facebook lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'facebook')" target="_blank" rel="noopener" href="https://www.facebook.com/sharer.php?u=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fwork&amp;t=" title="Share on Facebook"></a>
+        </div>
+        <div class="pr hdib i i-twitter lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'twitter')" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fwork&amp;text=" title="Share on Twitter"></a>
+        </div>
+        </div>
+</div>
+            <div class="pr entry-body__el"><div class="cid" id="cacd-2"></div><div class="pos-header dpos-h"><div class="di-title"><span class="headword hdb tw-bw dhw dpos-h_hw "><span class="hw dhw">work</span></span></div><div class="posgram dpos-g hdib lmr-5"><span class="pos dpos" title="A word that refers to a person, place, idea, event or thing.">noun</span></div> <div></div><span class="us dpron-i "><span class="region dreg">us</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio8" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/us_pron/w/wor/work_/work.mp3">
+    <source type="audio/ogg" src="/media/english/us_pron_ogg/w/wor/work_/work.ogg">
+</audio>
+<div title="Listen to the American English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio8.load(); audio8.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1">wɜrk</span>/</span></span></div><div class="pos-body">
+
+                <div class="pr dsense "><div class="cid" id="cacd-2-1"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>FORCE</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CACD_00020270_19">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CACD_00020270_19' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">U</span> ]</a></span>
+            <span class="ddivide ">&nbsp;</span>         <span class="domain ddomain">physics</span> </span><div class="def ddef_d db"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/force" title="force" rel="">force</a> used on an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/object" title="object" rel="">object</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/multiply" title="multiplied" rel="">multiplied</a> by the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/distance" title="distance" rel="">distance</a> it <a class="query" href="https://dictionary.cambridge.org/dictionary/english/move" title="moves" rel="">moves</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/object" title="object" rel="">object</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/measured" title="measured" rel="">measured</a> in <a class="query" href="https://dictionary.cambridge.org/dictionary/english/joule" title="joules" rel="">joules</a></div> </div></div></div>            </div>
+
+                <div class="pr dsense "><div class="cid" id="cacd-2-2"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>PLACE</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CACD_00020270_20">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CACD_00020270_20' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">U</span> ]</a></span></span> <div class="def ddef_d db">the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/place" title="place" rel="">place</a> where a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/person" title="person" rel="">person</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/regularly" title="regularly" rel="">regularly</a> goes to do his or her <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">I had to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/leave" title="leave" rel="">leave</a> work early.</span></div><div class="examp dexamp"> <span class="eg deg">Does it take <a class="query" href="https://dictionary.cambridge.org/dictionary/english/long" title="long" rel="">long</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/commute" title="commute" rel="">commute</a> to work?</span></div> </div></div></div>                                                                         <div id="ad_contentslot_7" class="am-default_moreslots contentslot">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_contentslot_7'); });</script>
+        </div>
+                                     </div>
+
+                <div class="pr dsense "><div class="cid" id="cacd-2-3"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>OBJECT</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CACD_00020270_21">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CACD_00020270_21' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">C</span> ]</a></span></span> <div class="def ddef_d db">an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/object" title="object" rel="">object</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/produce" title="produced" rel="">produced</a> as a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/result" title="result" rel="">result</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effort" title="effort" rel="">effort</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/esp" title="esp" rel="">esp</a>. something <a class="query" href="https://dictionary.cambridge.org/dictionary/english/intended" title="intended" rel="">intended</a> to be <a class="query" href="https://dictionary.cambridge.org/dictionary/english/art" title="art" rel="">art</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/museum" title="museum" rel="">museum</a> is <a class="query" href="https://dictionary.cambridge.org/dictionary/english/showing" title="showing" rel="">showing</a> works by 20th-century <a class="query" href="https://dictionary.cambridge.org/dictionary/english/artist" title="artists" rel="">artists</a>.</span></div> </div></div></div>                  </div>
+
+                <div class="pr dsense "><div class="cid" id="cacd-2-4"></div> <h3 class="dsense_h"><span class="hw dsense_hw">work</span> <span class="pos dsense_pos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="guideword dsense_gw" title="Guide word: helps you find the right meaning when a word has more than one meaning">
+            (<span>DO A JOB</span>)
+      </span></h3> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CACD_00020270_22">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CACD_00020270_22' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">U</span> ]</a></span></span> <div class="def ddef_d db">the use of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effort" title="effort" rel="">effort</a> to do or make something that has <a class="query" href="https://dictionary.cambridge.org/dictionary/english/value" title="value" rel="">value</a>, and for which you are usually <a class="query" href="https://dictionary.cambridge.org/dictionary/english/paid" title="paid" rel="">paid</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/outdoor" title="outdoor" rel="">outdoor</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/office" title="office" rel="">office</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/manual" title="manual" rel="">manual</a> work</span></div><div class="examp dexamp"> <span class="eg deg">Steve’s out of work again <span class="gloss dgloss">(= not <a class="query" href="https://dictionary.cambridge.org/dictionary/english/employed" title="employed" rel="">employed</a>)</span>.</span></div> </div></div></div>            </div><div class="xref idioms hax dxref-w lmt-25 lmb-25"><h3 class="bb fs16 lp-10 lmb-0"><strong class="xref-title dxref-t">Idioms</strong></h3><div class="hax lp-10 lb lb-cm lbt0"><div class="lcs">
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/at-work" title="meaning of at work" rel=""><span class="x-h dx-h">at work</span></a></div>
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="2"><a href="/dictionary/english/in-the-works" title="meaning of in the works" rel=""><span class="x-h dx-h">in the works</span></a></div></div></div></div></div></div></div></div></div><small class="lbt lb-cm lpb-10 lpt-10 lpb-25 lmb-10 ddef had hdb">
+                                     (Definition of <b>work</b> from the <a href="https://dictionary.cambridge.org/dictionary/english/" title="Cambridge Academic Content Dictionary" class="a--rev"><b>Cambridge Academic Content Dictionary</b></a> © Cambridge University Press)
+                          </small></div></div></div><div class="pr dictionary" data-type="sorted" data-id="cbed" data-tab="ds-cbed" role="tabpanel"><div class="cid" id="dataset_cbed"></div><div class="link"><div class="pr di superentry" itemprop="text"><div class="cid" id="dataset_cbed"></div>                <div class="di-head c_h di_h"><div class="di-title di_t"><h2 class="c_hh"><b class="tb ttn">work</b> | Business English</h2></div></div>
+                            <div class="di-body"><div class="entry"><div class="entry-body"> <div class="pr entry-body__el"><div class="cid" id="cbed-1"></div><div class="pos-header dpos-h"><div class="di-title"><span class="headword hdb tw-bw dhw dpos-h_hw "><span class="hw dhw">work</span></span></div><div class="posgram dpos-g hdib lmr-5"><span class="pos dpos" title="A word that describes an action, condition or experience.">verb</span></div> <div></div><span class="uk dpron-i "><span class="region dreg">uk</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio9" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/uk_pron/u/ukw/ukwor/ukwordp005.mp3">
+    <source type="audio/ogg" src="/media/english/uk_pron_ogg/u/ukw/ukwor/ukwordp005.ogg">
+</audio>
+<div title="Listen to the British English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio9.load(); audio9.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1">wɜːk</span>/</span></span> <span class="us dpron-i "><span class="region dreg">us</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio10" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/us_pron/w/wor/work_/work.mp3">
+    <source type="audio/ogg" src="/media/english/us_pron_ogg/w/wor/work_/work.ogg">
+</audio>
+<div title="Listen to the American English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio10.load(); audio10.play();" role="button" tabindex="0">
+</div>
+</span></span></div><div class="pos-body">
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-1"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_01">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_01' } }), sidebarWordList.open">
+            <span class="tb fs10 hvm">Add to word list</span>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <span class="tb fs10 hvm">Add to word list</span>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> or <span class="gc dgc">T</span> ]</a></span>
+            <span class="ddivide ">&nbsp;</span>         <span class="domain ddomain">HR</span>, <span class="domain ddomain">WORKPLACE</span> </span><div class="def ddef_d db">to do a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/especially" title="especially" rel="">especially</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/earn" title="earn" rel="">earn</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/money" title="money" rel="">money</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Do you work?</span></div><div class="examp dexamp"> <span class="eg deg">He <strong class="cl">works as </strong>a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/computer" title="computer" rel="">computer</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/technician" title="technician" rel="">technician</a>.</span></div><div class="examp dexamp"> <span class="eg deg">My <a class="query" href="https://dictionary.cambridge.org/dictionary/english/brother" title="brother" rel="">brother</a> <strong class="cl">works for</strong> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/large" title="large" rel="">large</a> American <a class="query" href="https://dictionary.cambridge.org/dictionary/english/corporation" title="corporation" rel="">corporation</a>.</span></div><div class="examp dexamp"> <span class="eg deg">How many <a class="query" href="https://dictionary.cambridge.org/dictionary/english/people" title="people" rel="">people</a> work at <a class="query" href="https://dictionary.cambridge.org/dictionary/english/your" title="your" rel="">your</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/company" title="company" rel="">company</a>?</span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl">work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/full-time" title="full-time" rel="">full-time</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/part-time" title="part-time" rel="">part-time</a>/from <a class="query" href="https://dictionary.cambridge.org/dictionary/english/home" title="home" rel="">home</a></strong></span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl">work an eight-hour <a class="query" href="https://dictionary.cambridge.org/dictionary/english/day" title="day" rel="">day</a>/hard/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/long" title="long" rel="">long</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/hours" title="hours" rel="">hours</a> </strong></span></div><div class="examp dexamp"><span class="eg deg"><strong class="cl">work in a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/bank" title="bank" rel="">bank</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/factory" title="factory" rel="">factory</a>/an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/office" title="office" rel="">office</a></strong></span></div> </div></div></div>                  </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-2"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_02">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_02' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span></span> <div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/spend" title="spend" rel="">spend</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/time" title="time" rel="">time</a> and <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effort" title="effort" rel="">effort</a> doing something: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">We were <strong class="cl">working on</strong> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/presentation" title="presentation" rel="">presentation</a> all <a class="query" href="https://dictionary.cambridge.org/dictionary/english/night" title="night" rel="">night</a>.</span></div><div class="examp dexamp"> <span class="eg deg">The two <a class="query" href="https://dictionary.cambridge.org/dictionary/english/country" title="countries" rel="">countries</a> <strong class="cl">worked together</strong> on <a class="query" href="https://dictionary.cambridge.org/dictionary/english/developing" title="developing" rel="">developing</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/technology" title="technology" rel="">technology</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Multinationals will have to <strong class="cl">work with </strong><a class="query" href="https://dictionary.cambridge.org/dictionary/english/government" title="governments" rel="">governments</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/achieve" title="achieve" rel="">achieve</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/best" title="best" rel="">best</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/balance" title="balance" rel="">balance</a> between <a class="query" href="https://dictionary.cambridge.org/dictionary/english/open" title="openness" rel="">openness</a> and <a class="query" href="https://dictionary.cambridge.org/dictionary/english/security" title="security" rel="">security</a>.</span></div> </div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-3"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_03">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_03' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span></span> <div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/try" title="try" rel="">try</a> hard to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/achieve" title="achieve" rel="">achieve</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/improve" title="improve" rel="">improve</a> something: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="lu dlu">work at/on sth</span> <span class="eg deg">You need to work on <a class="query" href="https://dictionary.cambridge.org/dictionary/english/your" title="your" rel="">your</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/communication" title="communication" rel="">communication</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/skill" title="skills" rel="">skills</a>.</span></div><div class="examp dexamp"> <span class="eg deg">I'm not very <a class="query" href="https://dictionary.cambridge.org/dictionary/english/confident" title="confident" rel="">confident</a> on the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/phone" title="phone" rel="">phone</a>, but I'm <a class="query" href="https://dictionary.cambridge.org/dictionary/english/prepared" title="prepared" rel="">prepared</a> to <strong class="cl">work at it</strong>.</span></div><div class="examp dexamp"><span class="lu dlu">be working towards sth</span> <span class="eg deg">Our <a class="query" href="https://dictionary.cambridge.org/dictionary/english/firm" title="firm" rel="">firm</a> is working towards being a paperless <a class="query" href="https://dictionary.cambridge.org/dictionary/english/environment" title="environment" rel="">environment</a>.</span></div> </div></div></div>                              </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-4"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_04">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_04' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span></span> <div class="def ddef_d db">to be <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effective" title="effective" rel="">effective</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/successful" title="successful" rel="">successful</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/plan" title="plan" rel="">plan</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/seem" title="seemed" rel="">seemed</a> to work well.</span></div><div class="examp dexamp"> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/current" title="current" rel="">current</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/system" title="system" rel="">system</a> isn't working, so we'll need to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/look" title="look" rel="">look</a> at an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/alternative" title="alternative" rel="">alternative</a>.</span></div> </div></div></div>                  </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-5"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_05">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_05' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span>
+            <span class="ddivide ">&nbsp;</span>         <span class="domain ddomain">WORKPLACE</span>, <span class="domain ddomain">IT</span> </span><div class="def ddef_d db">if a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/machine" title="machine" rel="">machine</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/piece" title="piece" rel="">piece</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/equipment" title="equipment" rel="">equipment</a> works, it <a class="query" href="https://dictionary.cambridge.org/dictionary/english/operate" title="operates" rel="">operates</a> as <a class="query" href="https://dictionary.cambridge.org/dictionary/english/expected" title="expected" rel="">expected</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">My <a class="query" href="https://dictionary.cambridge.org/dictionary/english/computer" title="computer" rel="">computer</a> isn't working.</span></div><div class="examp dexamp"> <span class="eg deg">I can't get this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/printer" title="printer" rel="">printer</a> to work.</span></div> </div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-6"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_06">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_06' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span>
+            <span class="ddivide ">&nbsp;</span>         <span class="domain ddomain">WORKPLACE</span>, <span class="domain ddomain">IT</span>
+            <span class="ddivide ">&nbsp;</span>         <span class="lab dlab"><span class="usage dusage">informal</span></span></span> <div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/operate" title="operate" rel="">operate</a> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/machine" title="machine" rel="">machine</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/piece" title="piece" rel="">piece</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/equipment" title="equipment" rel="">equipment</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">He doesn't <a class="query" href="https://dictionary.cambridge.org/dictionary/english/even" title="even" rel="">even</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/know" title="know" rel="">know</a> how to work a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/photocopier" title="photocopier" rel="">photocopier</a>.</span></div> </div></div></div>                              </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-7"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_07">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_07' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span>
+            <span class="ddivide ">&nbsp;</span>         <span class="domain ddomain">COMMERCE</span> </span><div class="def ddef_d db">to go around a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/particular" title="particular" rel="">particular</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/area" title="area" rel="">area</a> that you are <a class="query" href="https://dictionary.cambridge.org/dictionary/english/responsible" title="responsible" rel="">responsible</a> for, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/especially" title="especially" rel="">especially</a> in a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/sales" title="sales" rel="">sales</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">His <a class="query" href="https://dictionary.cambridge.org/dictionary/english/sales" title="sales" rel="">sales</a> were <a class="query" href="https://dictionary.cambridge.org/dictionary/english/better" title="better" rel="">better</a> when he was working the London <a class="query" href="https://dictionary.cambridge.org/dictionary/english/area" title="area" rel="">area</a>.</span></div> </div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-8"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_08">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_08' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">I</span> ]</a></span></span> <div class="def ddef_d db">to have a good or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/bad" title="bad" rel="">bad</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effect" title="effect" rel="">effect</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/terms" title="terms" rel="">terms</a> they're <a class="query" href="https://dictionary.cambridge.org/dictionary/english/offering" title="offering" rel="">offering</a> don't work for us.</span></div><div class="examp dexamp"> <span class="eg deg">His <a class="query" href="https://dictionary.cambridge.org/dictionary/english/poor" title="poor" rel="">poor</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/command" title="command" rel="">command</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/english" title="English" rel="">English</a> <strong class="cl">worked against</strong> him in the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/interview" title="interview" rel="">interview</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Her <a class="query" href="https://dictionary.cambridge.org/dictionary/english/previous" title="previous" rel="">previous</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/sales" title="sales" rel="">sales</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/experience" title="experience" rel="">experience</a> <strong class="cl">worked in her <a class="query" href="https://dictionary.cambridge.org/dictionary/english/favour" title="favour" rel="">favour</a></strong>.</span></div> </div></div></div>                  </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-9"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_09">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_09' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">T</span> ]</a></span></span> <div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/change" title="change" rel="">change</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/shape" title="shape" rel="">shape</a> of a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/material" title="material" rel="">material</a> to make something <a class="query" href="https://dictionary.cambridge.org/dictionary/english/else" title="else" rel="">else</a> with it: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg"><strong class="cl">work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/leather" title="leather" rel="">leather</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/metal" title="metal" rel="">metal</a></strong></span></div> </div></div></div>                              </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-10"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-1-10-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>work a mine</b></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_10">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_10' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="domain ddomain">NATURAL RESOURCES</span> </span><div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/dig" title="dig" rel="">dig</a> for <a class="query" href="https://dictionary.cambridge.org/dictionary/english/coal" title="coal" rel="">coal</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/mineral" title="minerals" rel="">minerals</a>, etc.: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">These men have been working the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/mine" title="mines" rel="">mines</a> all <a class="query" href="https://dictionary.cambridge.org/dictionary/english/their" title="their" rel="">their</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/lives" title="lives" rel="">lives</a>.</span></div> </div></div></div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-11"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-1-11-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>work sb hard</b></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_11">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_11' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">to make someone use a lot of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effort" title="effort" rel="">effort</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">He works his <a class="query" href="https://dictionary.cambridge.org/dictionary/english/trainee" title="trainees" rel="">trainees</a> really hard.</span></div> </div></div></div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-12"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-1-12-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>work it so (that)</b></span> <span class="phrase-info dphrase-info"><span class="lab dlab"><span class="usage dusage">informal</span></span></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_12">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_12' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/arrange" title="arrange" rel="">arrange</a> for something to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/happen" title="happen" rel="">happen</a> in a way that is <a class="query" href="https://dictionary.cambridge.org/dictionary/english/useful" title="useful" rel="">useful</a> for you: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">I'm going to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/try" title="try" rel="">try</a> and work it so I can <a class="query" href="https://dictionary.cambridge.org/dictionary/english/spend" title="spend" rel="">spend</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/weekend" title="weekend" rel="">weekend</a> in New York after the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/conference" title="conference" rel="">conference</a>.</span></div> </div></div></div></div></div>                                    </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-13"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-1-13-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>work the land</b></span> <span class="phrase-info dphrase-info"><span class="lab dlab"><span class="usage dusage">formal</span></span></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_13">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_13' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/prepare" title="prepare" rel="">prepare</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/soil" title="soil" rel="">soil</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/grow" title="grow" rel="">grow</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/crop" title="crops" rel="">crops</a> on it: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">We're here to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/thank" title="thank" rel="">thank</a> those who work the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/land" title="land" rel="">land</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/feed" title="feed" rel="">feed</a> us.</span></div> </div></div></div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-14"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-1-14-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>work the system</b></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_14">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_14' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/know" title="know" rel="">know</a> how to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/deal" title="deal" rel="">deal</a> with a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/system" title="system" rel="">system</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/organization" title="organization" rel="">organization</a> to get the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/result" title="result" rel="">result</a> you <a class="query" href="https://dictionary.cambridge.org/dictionary/english/want" title="want" rel="">want</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">People who <a class="query" href="https://dictionary.cambridge.org/dictionary/english/know" title="know" rel="">know</a> how to work the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/system" title="system" rel="">system</a> can <a class="query" href="https://dictionary.cambridge.org/dictionary/english/significantly" title="significantly" rel="">significantly</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/reduce" title="reduce" rel="">reduce</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/their" title="their" rel="">their</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/tax" title="tax" rel="">tax</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/bill" title="bill" rel="">bill</a>.</span></div> </div></div></div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-15"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-1-15-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>work things out</b></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_15">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_15' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/deal" title="deal" rel="">deal</a> with a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/situation" title="situation" rel="">situation</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/successfully" title="successfully" rel="">successfully</a>, <a class="query" href="https://dictionary.cambridge.org/dictionary/english/especially" title="especially" rel="">especially</a> when there is a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/problem" title="problem" rel="">problem</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">I'll <a class="query" href="https://dictionary.cambridge.org/dictionary/english/try" title="try" rel="">try</a> to work things out with <a class="query" href="https://dictionary.cambridge.org/dictionary/english/our" title="our" rel="">our</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/supplier" title="suppliers" rel="">suppliers</a>.</span></div> </div></div></div></div></div>                              </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-1-16"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-1-16-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>work your way up sth</b></span> <span class="phrase-info dphrase-info"><span class="var dvar">(<span class="lab dlab">also</span> <span class="v dv lmr-0">work your way up to sth</span>)</span></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_16">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_16' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">to do a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/series" title="series" rel="">series</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="jobs" rel="">jobs</a> at different <a class="query" href="https://dictionary.cambridge.org/dictionary/english/level" title="levels" rel="">levels</a> in an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/organization" title="organization" rel="">organization</a> until you <a class="query" href="https://dictionary.cambridge.org/dictionary/english/reach" title="reach" rel="">reach</a> a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/position" title="position" rel="">position</a> at the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/top" title="top" rel="">top</a> of the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/organization" title="organization" rel="">organization</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">She <a class="query" href="https://dictionary.cambridge.org/dictionary/english/join" title="joined" rel="">joined</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/company" title="company" rel="">company</a> as a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/sales" title="sales" rel="">sales</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/rep" title="rep" rel="">rep</a> but worked her way up to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/manage" title="managing" rel="">managing</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/director" title="director" rel="">director</a>.</span></div><div class="examp dexamp"><span class="lu dlu">work your way up the ladder/hierarchy/ranks</span> <span class="eg deg">I'd like to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/stay" title="stay" rel="">stay</a> here and work my way up the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/audit" title="audit" rel="">audit</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/career" title="career" rel="">career</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/ladder" title="ladder" rel="">ladder</a>.</span></div> </div></div></div></div></div>                  </div><div class="xref phrasal_verbs hax dxref-w lmt-25 lmb-25"><h3 class="bb fs16 lp-10 lmb-0"><strong class="xref-title dxref-t">Phrasal verbs</strong></h3><div class="hax lp-10 lb lb-cm lbt0"><div class="lcs">
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/work-out" title="meaning of work out" rel=""><span class="x-h dx-h">work out</span></a></div>
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="2"><a href="/dictionary/english/work-out" title="meaning of work sth out" rel=""><span class="x-h dx-h">work sth out</span></a></div>
+
+                <div class="item lc lc1 lpb-10 lpr-10" data-position="3"><a href="/dictionary/english/work-up" title="meaning of work sth up" rel=""><span class="x-h dx-h">work sth up</span></a></div></div></div></div></div></div>
+                
+<div class="pr x lbb lb-cm">
+    <div class="hfr lpb-2">
+                    <div class="pr hdib i i-facebook lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'facebook')" target="_blank" rel="noopener" href="https://www.facebook.com/sharer.php?u=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fwork&amp;t=" title="Share on Facebook"></a>
+        </div>
+        <div class="pr hdib i i-twitter lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'twitter')" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fwork&amp;text=" title="Share on Twitter"></a>
+        </div>
+        </div>
+</div>
+            <div class="pr entry-body__el"><div class="cid" id="cbed-2"></div><div class="pos-header dpos-h"><div class="di-title"><span class="headword hdb tw-bw dhw dpos-h_hw "><span class="hw dhw">work</span></span></div><div class="posgram dpos-g hdib lmr-5"><span class="pos dpos" title="A word that refers to a person, place, idea, event or thing.">noun</span> <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">U</span> ]</a></span></div> <div></div><span class="uk dpron-i "><span class="region dreg">uk</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio11" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/uk_pron/u/ukw/ukwor/ukwordp005.mp3">
+    <source type="audio/ogg" src="/media/english/uk_pron_ogg/u/ukw/ukwor/ukwordp005.ogg">
+</audio>
+<div title="Listen to the British English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio11.load(); audio11.play();" role="button" tabindex="0">
+</div>
+</span><span class="pron dpron">/<span class="ipa dipa lpr-2 lpl-1">wɜːk</span>/</span></span> <span class="us dpron-i "><span class="region dreg">us</span><span class="daud">                
+<audio class="hdn" preload="none" id="audio12" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/us_pron/w/wor/work_/work.mp3">
+    <source type="audio/ogg" src="/media/english/us_pron_ogg/w/wor/work_/work.ogg">
+</audio>
+<div title="Listen to the American English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio12.load(); audio12.play();" role="button" tabindex="0">
+</div>
+</span></span></div><div class="pos-body">
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-2-1"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_22">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_22' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="domain ddomain">HR</span> </span><div class="def ddef_d db">the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a> that someone does, usually to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/earn" title="earn" rel="">earn</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/money" title="money" rel="">money</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="lu dlu">full-time/part-time work</span> <span class="eg deg">Many <a class="query" href="https://dictionary.cambridge.org/dictionary/english/pensioner" title="pensioners" rel="">pensioners</a> will have to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/consider" title="consider" rel="">consider</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/part-time" title="part-time" rel="">part-time</a> work to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/supplement" title="supplement" rel="">supplement</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/their" title="their" rel="">their</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/retirement" title="retirement" rel="">retirement</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/plan" title="plans" rel="">plans</a>.</span></div><div class="examp dexamp"><span class="lu dlu">find/get/look for work</span> <span class="eg deg">The government's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/initiative" title="initiative" rel="">initiative</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/help" title="helps" rel="">helps</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/unemployed" title="unemployed" rel="">unemployed</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/find" title="find" rel="">find</a> work.</span></div><div class="examp dexamp"> <span class="eg deg">He's been <strong class="cl">out of work</strong> for six <a class="query" href="https://dictionary.cambridge.org/dictionary/english/month" title="months" rel="">months</a> now.</span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/permanent" title="permanent" rel="">permanent</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/regular" title="regular" rel="">regular</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/temporary" title="temporary" rel="">temporary</a> work</strong></span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/paid" title="paid" rel="">paid</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/unpaid" title="unpaid" rel="">unpaid</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/voluntary" title="voluntary" rel="">voluntary</a> work</strong></span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/badly" title="badly" rel="">badly</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/paid" title="paid" rel="">paid</a>/well-paid work</strong></span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl">give up/go back to/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/return" title="return" rel="">return</a> to work</strong></span></div> </div></div></div>                  </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-2-2"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_23">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_23' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="domain ddomain">WORKPLACE</span> </span><div class="def ddef_d db">a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/place" title="place" rel="">place</a>, such as an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/office" title="office" rel="">office</a>, a <a class="query" href="https://dictionary.cambridge.org/dictionary/english/factory" title="factory" rel="">factory</a>, etc., where someone goes to do <a class="query" href="https://dictionary.cambridge.org/dictionary/english/their" title="their" rel="">their</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">The Managing Director always <a class="query" href="https://dictionary.cambridge.org/dictionary/english/arrive" title="arrived" rel="">arrived</a> at work early and <a class="query" href="https://dictionary.cambridge.org/dictionary/english/stay" title="stayed" rel="">stayed</a> late.</span></div><div class="examp dexamp"> <span class="eg deg">She <a class="query" href="https://dictionary.cambridge.org/dictionary/english/claim" title="claimed" rel="">claimed</a> her <a class="query" href="https://dictionary.cambridge.org/dictionary/english/stress" title="stress" rel="">stress</a> was the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/result" title="result" rel="">result</a> of the bank's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/hostile" title="hostile" rel="">hostile</a> <strong class="cl">work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/environment" title="environment" rel="">environment</a></strong>. </span></div><div class="examp dexamp"><span class="lu dlu">be at/go to/leave work</span> <span class="eg deg">What <a class="query" href="https://dictionary.cambridge.org/dictionary/english/time" title="time" rel="">time</a> do you go to work in the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/morning" title="morning" rel="">morning</a>?</span></div> </div></div></div>                              </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-2-3"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_24">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_24' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="domain ddomain">WORKPLACE</span> </span><div class="def ddef_d db">the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/responsibility" title="responsibilities" rel="">responsibilities</a> that are <a class="query" href="https://dictionary.cambridge.org/dictionary/english/part" title="part" rel="">part</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/your" title="your" rel="">your</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/job" title="job" rel="">job</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="lu dlu">start/finish/stop work</span> <span class="eg deg">I don't <a class="query" href="https://dictionary.cambridge.org/dictionary/english/finish" title="finish" rel="">finish</a> work until 6.30 pm.</span></div><div class="examp dexamp"> <span class="eg deg">I need to <strong class="cl">take</strong> some <strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/time" title="time" rel="">time</a> off work</strong> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/look" title="look" rel="">look</a> after my <a class="query" href="https://dictionary.cambridge.org/dictionary/english/son" title="son" rel="">son</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Analysts refer to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/various" title="various" rel="">various</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/source" title="sources" rel="">sources</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/information" title="information" rel="">information</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/help" title="help" rel="">help</a> them make <a class="query" href="https://dictionary.cambridge.org/dictionary/english/investment" title="investment" rel="">investment</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/decision" title="decisions" rel="">decisions</a> in <a class="query" href="https://dictionary.cambridge.org/dictionary/english/their" title="their" rel="">their</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/day-to-day" title="day-to-day" rel="">day-to-day</a> work.</span></div><div class="examp dexamp"> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/government" title="government" rel="">government</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/launch" title="launched" rel="">launched</a> an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/inquiry" title="inquiry" rel="">inquiry</a> into <strong class="cl">the work of</strong> the Monetary Policy Committee.</span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl">do/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/enjoy" title="enjoy" rel="">enjoy</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/hate" title="hate" rel="">hate</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/your" title="your" rel="">your</a> work</strong></span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/factory" title="factory" rel="">factory</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/manual" title="manual" rel="">manual</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/office" title="office" rel="">office</a> work</strong></span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/administration" title="administrative" rel="">administrative</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/clerical" title="clerical" rel="">clerical</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/secretarial" title="secretarial" rel="">secretarial</a> work</strong></span></div> </div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-2-4"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_25">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_25' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="domain ddomain">WORKPLACE</span> </span><div class="def ddef_d db">the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/task" title="tasks" rel="">tasks</a> that need to be <a class="query" href="https://dictionary.cambridge.org/dictionary/english/complete" title="completed" rel="">completed</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="lu dlu">do/produce/take on work</span> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/department" title="department" rel="">department</a> can't take on any more work until this <a class="query" href="https://dictionary.cambridge.org/dictionary/english/project" title="project" rel="">project</a> is <a class="query" href="https://dictionary.cambridge.org/dictionary/english/finished" title="finished" rel="">finished</a>.</span></div><div class="examp dexamp"> <span class="eg deg">I always end up <strong class="cl">taking work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/home" title="home" rel="">home</a></strong> at the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/weekend" title="weekend" rel="">weekend</a>.</span></div> </div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-2-5"></div> <div class="sense-body dsense_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_26">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_26' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/mental" title="mental" rel="">mental</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/physical" title="physical" rel="">physical</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/effort" title="effort" rel="">effort</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/involved" title="involved" rel="">involved</a> in doing or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/achieve" title="achieving" rel="">achieving</a> something: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/builder" title="builders" rel="">builders</a> <strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/start" title="started" rel="">started</a> work</strong> on the new <a class="query" href="https://dictionary.cambridge.org/dictionary/english/office" title="offices" rel="">offices</a> last <a class="query" href="https://dictionary.cambridge.org/dictionary/english/week" title="week" rel="">week</a>.</span></div><div class="examp dexamp"><span class="lu dlu">carry out/put in work</span> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/whole" title="whole" rel="">whole</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/team" title="team" rel="">team</a> put in a lot of hard work to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/win" title="win" rel="">win</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/contract" title="contract" rel="">contract</a>.</span></div><div class="examp dexamp"> <span class="eg deg">We need to <strong class="cl">set to work on</strong> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/review" title="reviewing" rel="">reviewing</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/our" title="our" rel="">our</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/claim" title="claims" rel="">claims</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/system" title="system" rel="">system</a>.</span></div><div class="examp dexamp"> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/finance" title="finance" rel="">finance</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/department" title="department" rel="">department</a> has been <strong class="cl">hard at work on</strong> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/its" title="its" rel="">its</a> year-end <a class="query" href="https://dictionary.cambridge.org/dictionary/english/report" title="report" rel="">report</a>.</span></div><div class="examp dexamp"> <span class="eg deg">Management still has a lot of <strong class="cl">work to do</strong> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/ensure" title="ensure" rel="">ensure</a> the company's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/future" title="future" rel="">future</a>.</span></div><div class="examp dexamp"> <span class="eg deg">The committee's <a class="query" href="https://dictionary.cambridge.org/dictionary/english/report" title="report" rel="">report</a> was a very good <strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/piece" title="piece" rel="">piece</a> of work</strong>.</span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl">good/hard work</strong></span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/innovative" title="innovative" rel="">innovative</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/major" title="major" rel="">major</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/outstanding" title="outstanding" rel="">outstanding</a> work</strong></span></div> </div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-2-6"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-2-6-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>works</b></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_27">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_27' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">plural</span> ]</a></span> <span class="lab dlab"><span class="region dregion">UK</span></span></span> <div class="def ddef_d db">the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/activity" title="activity" rel="">activity</a> of <a class="query" href="https://dictionary.cambridge.org/dictionary/english/building" title="building" rel="">building</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/repair" title="repairing" rel="">repairing</a> something: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="lu dlu">engineering/repair works</span> <span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/road" title="road" rel="">road</a> was <a class="query" href="https://dictionary.cambridge.org/dictionary/english/closed" title="closed" rel="">closed</a> for <a class="query" href="https://dictionary.cambridge.org/dictionary/english/essential" title="essential" rel="">essential</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/repair" title="repair" rel="">repair</a> works.</span></div> </div></div></div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-2-7"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-2-7-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>works</b></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_28">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_28' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  <span class="gram dgram"><a href="/help/codes.html">[ <span class="gc dgc">C</span> ]</a></span>
+            <span class="ddivide ">&nbsp;</span>         <span class="domain ddomain">PRODUCTION</span> </span><div class="def ddef_d db">an <a class="query" href="https://dictionary.cambridge.org/dictionary/english/industrial" title="industrial" rel="">industrial</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/building" title="building" rel="">building</a> where <a class="query" href="https://dictionary.cambridge.org/dictionary/english/material" title="materials" rel="">materials</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/goods" title="goods" rel="">goods</a> are <a class="query" href="https://dictionary.cambridge.org/dictionary/english/manufacture" title="manufactured" rel="">manufactured</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Residents <a class="query" href="https://dictionary.cambridge.org/dictionary/english/protest" title="protested" rel="">protested</a> about the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/waste" title="waste" rel="">waste</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/produce" title="produced" rel="">produced</a> by the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/nearby" title="nearby" rel="">nearby</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/industrial" title="industrial" rel="">industrial</a> works.</span></div><div class="examp dexamp"> <span class="eg deg">a <strong class="cl"><a class="query" href="https://dictionary.cambridge.org/dictionary/english/chemical" title="chemical" rel="">chemical</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/gas" title="gas" rel="">gas</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/steel" title="steel" rel="">steel</a> works</strong></span></div><div class="examp dexamp"> <span class="eg deg">the <strong class="cl">works <a class="query" href="https://dictionary.cambridge.org/dictionary/english/foreman" title="foreman" rel="">foreman</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/manager" title="manager" rel="">manager</a>/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/supervise" title="supervisor" rel="">supervisor</a></strong></span></div><div class="examp dexamp"> <span class="eg deg"><strong class="cl">the works <a class="query" href="https://dictionary.cambridge.org/dictionary/english/close" title="close" rel="">close</a> down/<a class="query" href="https://dictionary.cambridge.org/dictionary/english/open" title="open" rel="">open</a> </strong></span></div> </div></div></div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-2-8"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-2-8-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>have your work cut out for you</b></span> <span class="phrase-info dphrase-info"><span class="lab dlab"><span class="usage dusage">informal</span></span></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_29">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_29' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">to have something very <a class="query" href="https://dictionary.cambridge.org/dictionary/english/difficult" title="difficult" rel="">difficult</a> to do: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">The <a class="query" href="https://dictionary.cambridge.org/dictionary/english/government" title="government" rel="">government</a> has <a class="query" href="https://dictionary.cambridge.org/dictionary/english/its" title="its" rel="">its</a> work <a class="query" href="https://dictionary.cambridge.org/dictionary/english/cut" title="cut" rel="">cut</a> out for it <a class="query" href="https://dictionary.cambridge.org/dictionary/english/trying" title="trying" rel="">trying</a> to <a class="query" href="https://dictionary.cambridge.org/dictionary/english/reduce" title="reduce" rel="">reduce</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/national" title="national" rel="">national</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/deficit" title="deficit" rel="">deficit</a>.</span></div> </div></div></div></div></div>            </div>
+
+                <div class="pr dsense dsense-noh"><div class="cid" id="cbed-2-9"></div> <div class="sense-body dsense_b"><div class="pr phrase-block dphrase-block "><div class="cid" id="cbed-2-9-1"></div><div class="phrase-head dphrase_h"><i class="i i-caret-right dtrans fs18 lpb-4">&nbsp;</i><span class="phrase-title dphrase-title"><b>in the works</b></span></div><div class="phrase-body dphrase_b"><div class="def-block ddef_block " data-wl-senseid="CBED_00018684_30">
+                        <div class="dwl hax">
+                            
+        <a amp-access="loggedIn" amp-access-hide="" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:AMP.setState({ stateGlobal: { wlSenseId: 'CBED_00018684_30' } }), sidebarWordList.open">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        <a amp-access="NOT loggedIn" class="dwla wordlist-add-button" title="Add this meaning to a word list" on="tap:amp-access.login-sign-in">
+            <i class="i i-plus" aria-hidden="true"></i>
+            <i class="i i-list-ul"></i>
+        </a>
+        </div>
+                <div class="ddef_h"><span class="def-info ddef-info">  </span><div class="def ddef_d db">in the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/process" title="process" rel="">process</a> of being <a class="query" href="https://dictionary.cambridge.org/dictionary/english/planned" title="planned" rel="">planned</a> or <a class="query" href="https://dictionary.cambridge.org/dictionary/english/discuss" title="discussed" rel="">discussed</a>: </div> </div><div class="def-body ddef_b"><div class="examp dexamp"><span class="eg deg">Protesters <a class="query" href="https://dictionary.cambridge.org/dictionary/english/claim" title="claim" rel="">claim</a> the <a class="query" href="https://dictionary.cambridge.org/dictionary/english/proposed" title="proposed" rel="">proposed</a> <a class="query" href="https://dictionary.cambridge.org/dictionary/english/cut" title="cuts" rel="">cuts</a> had been in the works for <a class="query" href="https://dictionary.cambridge.org/dictionary/english/month" title="months" rel="">months</a>.</span></div> </div></div></div></div></div>            </div><div class="xref see_also hax dxref-w lmt-25 lmb-25"><h3 class="bb fs16 lp-10 lmb-0"><strong class="xref-title dxref-t">See also</strong></h3><div class="hax lp-10 lb lb-cm lbt0"><div class="lcs">
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="1"><a href="/dictionary/english/casual" title="meaning of casual" rel=""><span class="x-h dx-h">casual</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="2"><a href="/dictionary/english/contingent-worker" title="meaning of contingent work" rel=""><span class="x-h dx-h">contingent work</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="3"><a href="/dictionary/english/make-work" title="meaning of make-work" rel=""><span class="x-h dx-h">make-work</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="4"><a href="/dictionary/english/out-of-work" title="meaning of out of work" rel=""><span class="x-h dx-h">out of work</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="5"><a href="/dictionary/english/piecework" title="meaning of piecework" rel=""><span class="x-h dx-h">piecework</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="6"><a href="/dictionary/english/public-works" title="meaning of public works" rel=""><span class="x-h dx-h">public works</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="7"><a href="/dictionary/english/welfare-to-work" title="meaning of welfare to work" rel=""><span class="x-h dx-h">welfare to work</span></a></div>
+
+                <div class="item lc lc1 lc-xs6-12 lpb-10 lpr-10" data-position="8"><a href="/dictionary/english/work-in-progress" title="meaning of work in progress" rel=""><span class="x-h dx-h">work in progress</span></a></div></div></div></div></div></div></div></div></div><small class="lbt lb-cm lpb-10 lpt-10 lpb-25 lmb-10 ddef had hdb">
+                                     (Definition of <b>work</b> from the <a href="https://dictionary.cambridge.org/dictionary/english/" title="Cambridge Business English Dictionary" class="a--rev"><b>Cambridge Business English Dictionary</b></a> © Cambridge University Press)
+                          </small></div></div></div>          
+        <div class="dataset dd pr lmb-20" data-type="sorted" data-id="examples" data-tab="ds-examples" role="tabpanel"><div class="cid" id="dataset_examples"></div>                         <div id="dataset-example" data-tab="ds-example" role="tabpanel">
+                <div class="c_h">
+              <h2 class="c_hh">Examples <span class="tcl">of </span><span class="tb tci">work</span></h2></div>
+
+<div class="lp-10">
+    <div class="h2 dhw dpos-h_hw  lpt-5 lpb-10">
+        work
+    </div>
+
+    
+    
+    <div class="degs had lbt lb-cm">
+        
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            Space permits only a cursory overview of these slighter works.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142004" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142004', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            In order for the equilibrium notion to do any <em>work</em> for the players, moreover, they should know each other's strategies.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142006" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142006', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            At 25 minutes' duration and requiring 25 players, it is one of the most substantial works ever to come out of the project.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142007" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142007', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            One can argue that if a numerical scheme works well, then its numerical dissipation must have the same qualitative properties as the physical dissipation.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142008" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142008', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            They worked toward quick and uniform program implementation and national program standards.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142009" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142009', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            However, it does not show that the idea of purely functional space does not <em>work</em>.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142010" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142010', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            Affective responses seem to occur when pupils have almost finished their <em>work</em>.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142011" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142011', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            There is also the question of marking pupils' or students' <em>work</em>.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142012" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142012', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            The teachers, as working women who were active in civic affairs, served as role models to the pupils.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142013" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142013', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            Moreover, by working with the entire population of existing design solutions, it makes the indexation and selection of relevant cases redundant.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142014" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142014', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            How far can the number of working languages be reduced?
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142015" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142015', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            This was reinforced by the low priority given to public health <em>work</em> at all levels within the organization and by primary care team colleagues.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142016" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142016', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            The <em>work</em> reported in this paper represents the first part of a two part research project.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142018" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142018', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            The <em>work</em> represents the product of two workshops, held in 2004 and 2005.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142019" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142019', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+                            <div class="lbb lb-cm lpt-10">
+
+                                            <span class="deg">
+                            The text is unique, as it represents the <em>work</em> of a single author, who cogently articulates a systematic approach to psychiatry.
+                        </span>
+                                        <div class="dsource lpr-20 pr">
+                                    From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                            <a class="report-example-inappropriate pa pt0 pr0" data-example-id="10142020" data-dataset-id="10133295" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '10142020', dataset_id: '10133295' } }),sidebarEntryTellUs.open">
+                            <i class="i i-comment fs14" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                    
+        
+        <div class="tc-bi fs12 lpt-10 lpb-10 break">
+            These examples are from corpora and from sources on the web. Any opinions in the examples do not represent the opinion of the Cambridge Dictionary editors or of Cambridge University Press or its licensors.        </div>
+
+    </div>
+</div>
+
+            </div></div>
+            <div class="dataset dd pr lmb-20" data-type="sorted" data-id="combinations" data-tab="ds-combinations" role="tabpanel"><div class="cid" id="dataset_combinations"></div><div class="cpexamps">
+                        <div class="cpexamps-head c_h"><h2 class="c_hh">Collocations <span class="tcl">with</span> <span class="tb tcl">work</span></h2></div><div class="lp-10"><h2 class="tw-bw dhw dpos-h_hw     ">
+                    work
+                </h2>
+
+                
+                <p class="tb">These are words often used in combination with <span class="ti">work</span>.</p><p>Click on a collocation to see more examples of it.</p><div class="cpexamps-body"><div class="cpegs degs had lbt lb-cm"><div class="lbb lb-cm lpt-10">
+                        <a href="https://dictionary.cambridge.org/example/english/arduous-work" class="hdib tb lmb-10">arduous work</a><div class="dexamp"><span class="text dtext">Even feeling and sight - faculties which we might think of as spontaneous, natural, unmediated - are the fruits of long and arduous work.</span></div><div class="dsource lpr-20 pr">
+                                                            From the <a href="https://www.cambridge.org/gb/cambridgeenglish/better-learning-insights/corpus" class="italic" target="_blank" rel="noopener">Cambridge English Corpus</a>                    <a class="report-example-inappropriate pa pt0 pr0" data-dummy-attr="" data-example-id="23841757" data-dataset-id="23622615" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '23841757', dataset_id: '23622615' } }),sidebarEntryTellUs.open" data-dummy-attr2=""><i class="i i-comment fs14">&nbsp;</i></a></div></div><div class="lbb lb-cm lpt-10">
+                        <a href="https://dictionary.cambridge.org/example/english/assigned-work" class="hdib tb lmb-10">assigned work</a><div class="dexamp"><span class="text dtext">This is because those authorities which have assigned work to their own work forces cannot simply revise a specification to meet higher standards.</span></div><div class="dsource lpr-20 pr">
+                                                            From the <div class="hansard-source dsource_e haf hp" on="tap:AMP.setState({ stateGlobal: { flyout: '0.661569827890312' } })" role="button" aria-label="" tabindex="0">Hansard archive</div>                
+    <div class="hdn" [class]="stateGlobal.flyout == '0.661569827890312' ? 'pa pt0 pba pl-5 bw hbsf fs12 tw-bw lp-20 lpt-25 lc0 lmin-300 lmt-25 lml-10 z5' : 'hdn'">
+        <span class="pa pl0 pt-10 c_ict lml-15 $extraClassArrow"></span>
+        <button on="tap:AMP.setState({ stateGlobal: { flyout: '' } })" class="pa pr0 bt pt0 lpt-5 lb0"><i class="i i-close" aria-hidden="true"></i></button>
+        <div class="hoh">
+            Example from the Hansard archive. Contains Parliamentary information licensed under the <a href="http://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/" target="_blank" rel="noopener">Open Parliament Licence v3.0</a>
+        </div>
+    </div>
+                    <a class="report-example-inappropriate pa pt0 pr0" data-dummy-attr="" data-example-id="23844711" data-dataset-id="23622615" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '23844711', dataset_id: '23622615' } }),sidebarEntryTellUs.open" data-dummy-attr2=""><i class="i i-comment fs14">&nbsp;</i></a></div></div>      <div class="lbb lb-cm lpt-10">
+                        <a href="https://dictionary.cambridge.org/example/english/best-known-work" class="hdib tb lmb-10">best-known work</a><div class="dexamp"><span class="text dtext">His best-known work is his piano concerto which premiered in 1941.</span></div><div class="dsource lpr-20 pr">
+                                                            From <div class="wikipedia-source dsource_e haf hp" on="tap:AMP.setState({ stateGlobal: { flyout: '0.16399820015354794' } })" role="button" aria-label="" tabindex="0">Wikipedia</div>                
+    <div class="hdn" [class]="stateGlobal.flyout == '0.16399820015354794' ? 'pa pt0 pba pl-5 bw hbsf fs12 tw-bw lp-20 lpt-25 lc0 lmin-300 lmt-25 lml-10 z5' : 'hdn'">
+        <span class="pa pl0 pt-10 c_ict lml-15 $extraClassArrow"></span>
+        <button on="tap:AMP.setState({ stateGlobal: { flyout: '' } })" class="pa pr0 bt pt0 lpt-5 lb0"><i class="i i-close" aria-hidden="true"></i></button>
+        <div class="hoh">
+             <amp-img src="/external/images/creative-commons-icon.png?version=5.0.332" width="24" height="24" class="hfl lmr-10 i-amphtml-element i-amphtml-layout-fixed i-amphtml-layout-size-defined i-amphtml-built" alt="Creatives commons icon" i-amphtml-layout="fixed" style="width: 24px; height: 24px;"></amp-img>  This example is from Wikipedia and may be reused under a CC BY-SA license.
+        </div>
+    </div>
+                    <a class="report-example-inappropriate pa pt0 pr0" data-dummy-attr="" data-example-id="23857605" data-dataset-id="23622615" role="button" aria-label="Tell us what you think" title="Tell us what you think" tabindex="0" on="tap: formTellUs.clear,formTellUsDefinition.clear,AMP.setState({ stateSidebarEntryTellUs: { success: false, example_id: '23857605', dataset_id: '23622615' } }),sidebarEntryTellUs.open" data-dummy-attr2=""><i class="i i-comment fs14">&nbsp;</i></a></div></div><div class="ex-opinion tc-bi fs12 lpt-10 lpb-10">
+                            These examples are from corpora and from sources on the web. Any opinions in the examples do not represent the opinion of the Cambridge Dictionary editors or of Cambridge University Press or its licensors.                        </div><div class="tc-w hax">
+                        <a href="https://dictionary.cambridge.org/collocation/english/work" class="hao hbtn hbtn-tab bh tc-w tb lmt-5">See all collocations with <span class="bold">work</span></a></div></div></div></div></div></div>        <div class="lmt-10 hax">
+        <a href="/pronunciation/english/work" title="work, -work pronunciation in English" class="hao hbtn hbtn-tab hbtn-b hbtn-tl bh tc-w tb pr">
+            <span class="hdib w95">What is the pronunciation of <em>work, -work</em>?</span>
+            <i class="i i-angle-right iw tb pa pr0 pt0 lmt-5 lmr-20" aria-hidden="true"></i>
+        </a>
+    </div>
+    <div class="lmb-25 lch0">&nbsp;</div>
+</div>
+
+                
+                                            <div class="pr lcs bh">
+        <!-- translation -->
+        <div class="cid" id="dataset_translations"></div>
+        <div class="lc lc1 lc-m7-12 lp-20 lbb lbb0-m lbr-m lb-cn cdo-translations" id="translations">
+          <h2 class="h3 fs19 tn tc-w">Translations of <span class="tb">work</span></h2>
+          <!-- market data set + localized data set -->
+          <div class="lmb-10">
+                                         <div class="pr bw lp-10 lmt-5">
+                <div class="tc-bd fs14 lmb-10" tabindex="0">
+                    in Chinese (Traditional)
+                </div>
+                <div class="tc-bb tb lpb-25 break-cj" lang="zh-Hant">
+                    行動, 工作, 勞動…
+                </div>
+                <div class="pa pr0 pb0 lp-5 fs13">
+                    <a href="/dictionary/english-chinese-traditional/work" class="hbtn hbtn-tab bh tc-w" title="work: Chinese (Traditional) translation">
+                        See more                    </a>
+                </div>
+              </div>
+                                         <div class="pr bw lp-10 lmt-5">
+                <div class="tc-bd fs14 lmb-10" tabindex="0">
+                    in Chinese (Simplified)
+                </div>
+                <div class="tc-bb tb lpb-25 break-cj" lang="zh-Hans">
+                    行动, 工作，活儿, 劳动…
+                </div>
+                <div class="pa pr0 pb0 lp-5 fs13">
+                    <a href="/dictionary/english-chinese-simplified/work" class="hbtn hbtn-tab bh tc-w" title="work: Chinese (Simplified) translation">
+                        See more                    </a>
+                </div>
+              </div>
+                                         <div class="pr bw lp-10 lmt-5">
+                <div class="tc-bd fs14 lmb-10" tabindex="0">
+                    in Spanish
+                </div>
+                <div class="tc-bb tb lpb-25" lang="es">
+                    trabajo, obra, cirugía estética…
+                </div>
+                <div class="pa pr0 pb0 lp-5 fs13">
+                    <a href="/dictionary/english-spanish/work" class="hbtn hbtn-tab bh tc-w" title="work Spanish translation">
+                        See more                    </a>
+                </div>
+              </div>
+                                         <div class="pr bw lp-10 lmt-5">
+                <div class="tc-bd fs14 lmb-10" tabindex="0">
+                    in Portuguese
+                </div>
+                <div class="tc-bb tb lpb-25" lang="pt">
+                    trabalho, obra, cirurgia estética…
+                </div>
+                <div class="pa pr0 pb0 lp-5 fs13">
+                    <a href="/dictionary/english-portuguese/work" class="hbtn hbtn-tab bh tc-w" title="work: Portuguese translation">
+                        See more                    </a>
+                </div>
+              </div>
+                      </div>
+
+                     <!-- other data set-->
+           <div amp-access="1=1">
+             <div class="lmb-5 pr">
+                 <div class="cid" id="dataset_translations_down"></div>                 <amp-state id="stateDictTrans" i-amphtml-key="6" amp-access-template="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container" hidden="" aria-hidden="true">
+                         <script type="application/json">
+                           {
+                             "dataset": "",
+                             "dataset_text": "in more languages"
+                           }
+                         </script>
+                     </amp-state>
+                 <amp-accordion id="accordEntryTrans" disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built" i-amphtml-layout="container">
+                     <section>
+                         <header class="pr bt ca_h lpt-0 lpb-0 lpl-0 lpr-0 i-amphtml-accordion-header" id="accordEntryTrans_AMP_header_0" role="button" aria-controls="accordEntryTrans_AMP_content_0" aria-expanded="false" tabindex="0">
+                             <span class="hbtn hbtn-tab hbtn-b hbtn-tl bw tc-bd tn fs14">
+                                 <span [text]="stateDictTrans.dataset_text">in more languages</span>
+                                 <i class="i i-chevron-down il tn pa pr0 pt0 lpt-5 lpr-15" aria-hidden="true"></i>
+                             </span>
+                         </header>
+                         <div class="bw lp-10 lpl-10 lmt-5 i-amphtml-accordion-content" id="accordEntryTrans_AMP_content_0" aria-labelledby="accordEntryTrans_AMP_header_0" role="region">
+                             <div class="lpl-2">
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-japanese', dataset_text: 'in Japanese' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Japanese
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-turkish', dataset_text: 'in Turkish' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Turkish
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-french', dataset_text: 'in French' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in French
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-catalan', dataset_text: 'in Catalan' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Catalan
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-dutch', dataset_text: 'in Dutch' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Dutch
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-arabic', dataset_text: 'in Arabic' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Arabic
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-czech', dataset_text: 'in Czech' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Czech
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-danish', dataset_text: 'in Danish' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Danish
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-indonesian', dataset_text: 'in Indonesian' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Indonesian
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-thai', dataset_text: 'in Thai' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Thai
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-vietnamese', dataset_text: 'in Vietnamese' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Vietnamese
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-polish', dataset_text: 'in Polish' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Polish
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-malaysian', dataset_text: 'in Malay' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Malay
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-german', dataset_text: 'in German' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in German
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-norwegian', dataset_text: 'in Norwegian' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Norwegian
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-korean', dataset_text: 'in Korean' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Korean
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-ukrainian', dataset_text: 'in Ukrainian' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Ukrainian
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-italian', dataset_text: 'in Italian' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Italian
+                                 </div>
+                                                              <div class="hp tc-bd fs14 lp-5 lpl-10 lpr-10 lmb-5" role="button" tabindex="0" on="tap:AMP.setState({ stateDictTrans: { dataset: 'english-russian', dataset_text: 'in Russian' } }),accordEntryTrans.collapse,dataset_translations_down.scrollTo">
+                                     in Russian
+                                 </div>
+                                                          </div>
+                         </div>
+                     </section>
+                 </amp-accordion>
+ 
+                 <div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-japanese' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="ja">
+                             （人）が働く, 勤めている, （機械など）が動く…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-japanese/work" class="hbtn hbtn-tab bh tc-w" title="work: Japanese translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-turkish' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="tr">
+                             çalışmak, işlemek, işe yaramak…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-turkish/work" class="hbtn hbtn-tab bh tc-w" title="work Turkish translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-french' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="fr">
+                             travailler, fonctionner, marcher…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-french/work" class="hbtn hbtn-tab bh tc-w" title="work: French translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-catalan' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="ca">
+                             treballar, funcionar, feina…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-catalan/work" class="hbtn hbtn-tab bh tc-w" title="work: Catalan translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-dutch' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="nl">
+                             werk, werken, (doen) werken…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-dutch/work" class="hbtn hbtn-tab bh tc-w" title="">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-arabic' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="ar">
+                             يَعْمَل, يَشْتَغَل, يَنْجَح…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-arabic/work" class="hbtn hbtn-tab bh tc-w" title="work: Arabic translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-czech' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="cs">
+                             práce, dílo, pracovat…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-czech/work" class="hbtn hbtn-tab bh tc-w" title="work: Czech translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-danish' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="da">
+                             arbejde, værk, arbejdsplads…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-danish/work" class="hbtn hbtn-tab bh tc-w" title="work: Danish translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-indonesian' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="id">
+                             pekerjaan, tugas, hasil karya…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-indonesian/work" class="hbtn hbtn-tab bh tc-w" title="work: Indonesian translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-thai' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="th">
+                             ความพยายามในการทำงาน, การจ้างงาน, หน้าที่การทำงาน…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-thai/work" class="hbtn hbtn-tab bh tc-w" title="work: Thai translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-vietnamese' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="vi">
+                             nỗ lực, công việc, nhiệm vụ…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-vietnamese/work" class="hbtn hbtn-tab bh tc-w" title="work: Vietnamese translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-polish' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="pl">
+                             pracować, działać, udać się…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-polish/work" class="hbtn hbtn-tab bh tc-w" title="work: Polish translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-malaysian' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="ms">
+                             kerja, pekerjaan, tugasan…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-malaysian/work" class="hbtn hbtn-tab bh tc-w" title="work: Malay translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-german' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="de">
+                             die Arbeit, das Werk, arbeiten…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-german/work" class="hbtn hbtn-tab bh tc-w" title="work: German translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-norwegian' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="no">
+                             jobbe, arbeide, virke…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-norwegian/work" class="hbtn hbtn-tab bh tc-w" title="work: Norwegian translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-korean' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="ko">
+                             일하다, 작동하다, 효과가 있다…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-korean/work" class="hbtn hbtn-tab bh tc-w" title="work: Korean translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-ukrainian' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="uk">
+                             робота, труд, діло…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-ukrainian/work" class="hbtn hbtn-tab bh tc-w" title="work: Ukrainian translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-italian' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="it">
+                             lavorare, funzionare, avere successo…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-italian/work" class="hbtn hbtn-tab bh tc-w" title="work: Italian translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                                            <div class="pr lmt-10 nojs" [class]="stateDictTrans.dataset == 'english-russian' ? 'pr lmt-10' : 'pr lmt-10 nojs'">
+                       <div class="pr bw lp-10 lmt-5">
+                         <span class="pa cs-tw"></span>
+                         <div class="tc-bb tb lpb-25" lang="ru">
+                             работать, функционировать, срабатывать…
+                         </div>
+                         <div class="pa pr0 pb0 lp-5 fs13">
+                             <a href="/dictionary/english-russian/work" class="hbtn hbtn-tab bh tc-w" title="work: Russian translation">
+                                 See more                             </a>
+                         </div>
+                       </div>
+                     </div>
+                                  </div>
+ 
+             </div>
+           </div>
+                  </div>
+
+        <!-- need a translator -->
+        <div class="hax lc lc1 lc-m5-12">
+            <div class="lp-20">
+                <div class="h3 fs19 tn tc-w lmb-10">Need a translator?</div>
+
+                <p>Get a quick, free translation!</p>
+
+                <div class="lp-s_t-25">
+                    <a href="https://dictionary.cambridge.org/translate/" class="hao hbtn hbtn-tab hbtn-b bo lpl-25">
+                        <div class="tc-bd pr lpl-10">
+                            <i class="i i-language pa pl-15" aria-hidden="true"></i>
+                            <span class="tb">Translator tool</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+                
+                <div class="lmb-25 lch0">&nbsp;</div>
+
+
+                    <div class="lmb-20">
+        <h2 class="bb fs16 lp-10 lmb-0">
+            <strong class="tb">Browse</strong>
+        </h2>
+
+        <div class="hax lp-10 lb lb-cm lbt0 dbrowse">
+                            <div class="lmb-12">
+                                    <a href="/dictionary/english/words-fail" title="words fail me idiom">
+                        <span class="entry_title"><span class="results"><span class="base"><span class="phrase haf">words fail <span class="obj">me</span></span></span> <span class="pos">idiom</span> </span></span>
+                    </a>
+                                                </div>
+                            <div class="lmb-12">
+                                    <a href="/dictionary/english/wordsmith" title="wordsmith">
+                        <span class="entry_title"><span class="results"><span class="base"><span class="hw haf">wordsmith</span></span></span></span>
+                    </a>
+                                                </div>
+                            <div class="lmb-12">
+                                    <a href="/dictionary/english/wordy" title="wordy">
+                        <span class="entry_title"><span class="results"><span class="base"><span class="hw haf">wordy</span></span></span></span>
+                    </a>
+                                                </div>
+                            <div class="lmb-12">
+                                    <a href="/dictionary/english/wore" title="wore">
+                        <span class="entry_title"><span class="results"><span class="base"><span class="hw haf">wore</span></span></span></span>
+                    </a>
+                                                </div>
+                            <div class="lmb-12">
+                                    <span class="entry_title"><span class="results"><span class="base"><span class="hw haf">work</span></span></span></span>
+                                                </div>
+                            <div class="lmb-12">
+                                    <a href="/dictionary/english/work-up-to" title="work (yourself) up to something">
+                        <span class="entry_title"><span class="results"><span class="base"><span class="phrase haf">work <span class="obj">(yourself)</span> up to <span class="obj">something</span></span></span></span></span>
+                    </a>
+                                                </div>
+                            <div class="lmb-12">
+                                    <a href="/dictionary/english/work-a-treat" title="work a treat idiom">
+                        <span class="entry_title"><span class="results"><span class="base"><span class="phrase haf">work a treat</span></span> <span class="pos">idiom</span> </span></span>
+                    </a>
+                                                </div>
+                            <div class="lmb-12">
+                                    <a href="/dictionary/english/work-against-for" title="work against/for someone">
+                        <span class="entry_title"><span class="results"><span class="base"><span class="phrase haf">work against/for <span class="obj">someone</span></span></span></span></span>
+                    </a>
+                                                </div>
+                            <div class="lmb-12">
+                                    <a href="/dictionary/english/work-around" title="work around">
+                        <span class="entry_title"><span class="results"><span class="base"><span class="hw haf">work around</span></span></span></span>
+                    </a>
+                                                </div>
+                    </div>
+    </div>
+
+                
+                                        <div id="ad_btmslot" class="am-default_moreslots ">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_btmslot'); });</script>
+        </div>
+            
+                                        <div id="ad_houseslot_b" class="am-default_moreslots ">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_houseslot_b'); });</script>
+        </div>
+            
+            </article>
+
+            <div class="hfr-s lt2s lmt-10">
+                <div id="rightcol-above-sticky">
+
+    
+<div amp-access="1=1">
+  <div class="bw hbss lp-10 lmb-25 pr" amp-access-template="">
+        <div class="fs18 fs20-m hlh1_3 lmb-5 break">Test your vocabulary with our fun image quizzes</div>
+
+        <div class="pr wl-fc-c">
+            <div class="pa pr-5 pb-5 lc1 lch1 bo"></div>
+            <a target="_top" title="Test your vocabulary with our fun image quizzes" class="pr bw hdb lcs lp-5 lb" href="https://dictionary.cambridge.org/plus/quiz/image/in-town-and-shopping2_1">
+                <div class="pr wl-fc-2">
+                    <amp-img alt="in-town-and-shopping2_1" layout="fill" src="https://dictionary.cambridge.org/external/images/quiz/hook/in-town-and-shopping_2.jpg?version=5.0.332" i-amphtml-ignore="" class="i-amphtml-element i-amphtml-layout-fill i-amphtml-layout-size-defined i-amphtml-built i-amphtml-layout" i-amphtml-layout="fill" style="--loader-delay-offset: 51ms !important;">
+                        
+                    <img decoding="async" alt="in-town-and-shopping2_1" src="https://dictionary.cambridge.org/external/images/quiz/hook/in-town-and-shopping_2.jpg?version=5.0.332" class="i-amphtml-fill-content i-amphtml-replaced-content"></amp-img>
+                </div>
+            </a>
+        </div>
+
+                <div class="pr">
+            <div data-amp-bind-class="stateGlobal.imageCredits == '0.71270502409436' ? 'pa pb0 pl-5 bw hbsf fs12 tw-bw lc1 lp-20 lpt-25 lmb-5' : 'hdn'" i-amphtml-binding="" class="hdn" i-amphtml-key="7">
+                <span class="pa pr0 pb-10 c_icb lmr-15"></span>
+                <button class="pa pr0 bt pt0 lpt-5 lb0" on="tap:AMP.setState({ stateGlobal: { imageCredits: '' } })">
+                    <i aria-hidden="true" class="i i-close"></i>
+                </button>
+                <div class="hoh">
+                    <ul class="hul-u0 lmb-0">
+                        <li>ugurhan/iStock/Getty Images Plus/GettyImages</li>
+                        <li>Julia Antonio/EyeEm/GettyImages</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="lmt-10 lmb-5 lmr-25 htr">
+            <a class="fs12 ti tc-bl" tabindex="0" aria-label="View image credits" role="button" on="tap:AMP.setState({ stateGlobal: { imageCredits: '0.71270502409436' } })">Image credits</a>        </div>
+
+        <a target="_top" class="bh hao hbtn hbtn-tab tb mw260" href="https://dictionary.cambridge.org/plus/quiz/image/in-town-and-shopping2_1">Try a quiz now</a>
+
+        <span class="lpt-40 lpb-10 lpr-10 lpl-15 pa pr0 pb0">
+            <span class="bod lpt-20 lpb-10 lpr-10 lpl-15 pa pr0 pb20"></span>
+            <span class="bsb lpt-15 lpb-10 lpr-10 lpl-15 pa pr0 pb0"></span>
+        </span>
+    </div>
+</div>
+
+
+                        <div id="ad_rightslot" class="am-default_moreslots ">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_rightslot'); });</script>
+        </div>
+            
+    
+    
+    <aside class="lmb-20 lmt-10 cdo-more-results">
+        <h2 class="bb fs16 tb lp-10 lmb-5">
+                                    More meanings of <em>work</em>
+        </h2>
+
+        <div class="lpl-10">
+            <amp-accordion disable-session-states="" class="i-amphtml-element i-amphtml-layout-container i-amphtml-built i-amphtml-layout" i-amphtml-layout="container">
+                <section expanded="">
+                    <header class="ca_h lpl-0 i-amphtml-accordion-header" title="All “work” meanings in English" id="8_AMP_header_0" role="button" aria-controls="8_AMP_content_0" aria-expanded="true" tabindex="0">
+                        <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                        All
+                    </header>
+                    <div class="ca_b lpl-20 lpr-10 lpb-20 i-amphtml-accordion-content" id="8_AMP_content_0" aria-labelledby="8_AMP_header_0" role="region">
+                        <ul class="hax hul-u hul-u0 lmb-10">
+                                                                                                    <li>
+                                <a href="/dictionary/english/workweek" title="workweek" class="moreResult" onclick="sendGAEvent('more-result', 'more-result-link')">
+                                    <span class="arl2"><span class="base"><span class="hw haf">workweek</span></span></span>
+                                </a>
+                            </li>
+                                                    <li>
+                                <a href="/dictionary/english/dirty-work" title="dirty work" class="moreResult" onclick="sendGAEvent('more-result', 'more-result-link')">
+                                    <span class="arl3"><span class="base"><span class="hw haf">dirty work</span></span></span>
+                                </a>
+                            </li>
+                                                    <li>
+                                <a href="/dictionary/english/work-ethic" title="work ethic" class="moreResult" onclick="sendGAEvent('more-result', 'more-result-link')">
+                                    <span class="arl3"><span class="base"><span class="hw haf">work ethic</span></span></span>
+                                </a>
+                            </li>
+                                                    <li>
+                                <a href="/dictionary/english/work-force" title="work force" class="moreResult" onclick="sendGAEvent('more-result', 'more-result-link')">
+                                    <span class="arl3"><span class="base"><span class="hw haf">work force</span></span></span>
+                                </a>
+                            </li>
+                                                    <li>
+                                <a href="/dictionary/english/work-of-art" title="work of art" class="moreResult" onclick="sendGAEvent('more-result', 'more-result-link')">
+                                    <span class="arl3"><span class="base"><span class="hw haf">work of art</span></span></span>
+                                </a>
+                            </li>
+                                                    <li>
+                                <a href="/dictionary/english/day-work" title="day work" class="moreResult" onclick="sendGAEvent('more-result', 'more-result-link')">
+                                    <span class="arl3"><span class="base"><span class="hw haf">day work</span></span></span>
+                                </a>
+                            </li>
+                                                    <li>
+                                <a href="/dictionary/english/non-work" title="non-work" class="moreResult" onclick="sendGAEvent('more-result', 'more-result-link')">
+                                    <span class="arl3"><span class="base"><span class="hw haf">non-work</span></span></span>
+                                </a>
+                            </li>
+                                                </ul>
+
+                        <a href="https://dictionary.cambridge.org/search/english/?q=work" class="tb" onclick="sendGAEvent('more-result', 'see-all-meaning')" title="All meanings for work in English" rel="nofollow">
+                            See all meanings                        </a>
+                    </div>
+                </section>
+
+                                    <section>
+                        <header class="ca_h lpl-0 i-amphtml-accordion-header" title="Meanings for “work” in phrasal verbs in English" id="8_AMP_header_1" role="button" aria-controls="8_AMP_content_1" aria-expanded="false" tabindex="0">
+                            <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                            Phrasal Verbs
+                        </header>
+                        <div class="ca_b lpl-20 lpr-10 lpb-20 i-amphtml-accordion-content" id="8_AMP_content_1" aria-labelledby="8_AMP_header_1" role="region">
+                            <ul class="hax hul-u hul-u0 lmb-10">
+                                                                                                <li><a href="/dictionary/english/work-out" title="work out"><span class="arl5"><span class="base"><span class="phrase haf">work out</span></span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-out" title="work out something"><span class="arl5"><span class="base"><span class="phrase haf">work out <span class="obj">something</span></span></span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-through" title="work through something"><span class="arl5"><span class="base"><span class="phrase haf">work through <span class="obj">something</span></span></span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-up-to" title="work up to something"><span class="arl5"><span class="base"><span class="phrase haf">work up to <span class="obj">something</span></span></span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-up" title="work someone/yourself up"><span class="arl5"><span class="base"><span class="phrase haf">work <span class="obj">someone/yourself</span> up</span></span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-up" title="work up something"><span class="arl5"><span class="base"><span class="phrase haf">work up <span class="obj">something</span></span></span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-out" title="work (something) out"><span class="arl5"><span class="base"><span class="phrase haf">work <span class="obj">(something)</span> out</span></span></span></a></li>
+                                                                                        </ul>
+                            <a href="https://dictionary.cambridge.org/search/english/?q=work&amp;type=pv" class="tb" title="All phrasal verb meanings for work in English" rel="nofollow">
+                                See all phrasal verb meanings                            </a>
+                        </div>
+                    </section>
+                
+                                    <section>
+                        <header class="ca_h lpl-0 i-amphtml-accordion-header" title="Meanings for “work” in idioms in English" id="8_AMP_header_2" role="button" aria-controls="8_AMP_content_2" aria-expanded="false" tabindex="0">
+                            <i class="i i-plus ca_hi" aria-hidden="true"></i>
+                            Idioms and phrases
+                        </header>
+                        <div class="ca_b lpl-20 lpr-10 lpb-20 i-amphtml-accordion-content" id="8_AMP_content_2" aria-labelledby="8_AMP_header_2" role="region">
+                            <ul class="hax hul-u hul-u0 lmb-10">
+                                                                                                                            <li><a href="/dictionary/english/at-work" title="at work idiom"><span class="arl6"><span class="base"><span class="phrase haf">at work</span></span> <span class="pos">idiom</span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/in-the-works" title="in the works idiom"><span class="arl6"><span class="base"><span class="phrase haf">in the works</span></span> <span class="pos">idiom</span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-like-a-dog" title="work like a dog idiom"><span class="arl6"><span class="base"><span class="phrase haf">work like a dog</span></span> <span class="pos">idiom</span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-the-land" title="work the land idiom"><span class="arl6"><span class="base"><span class="phrase haf">work the land</span></span> <span class="pos">idiom</span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-way-up" title="work your way up idiom"><span class="arl6"><span class="base"><span class="phrase haf">work <span class="obj">your</span> way up</span></span> <span class="pos">idiom</span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/work-wonders" title="work wonders idiom"><span class="arl6"><span class="base"><span class="phrase haf">work wonders</span></span> <span class="pos">idiom</span></span></a></li>
+                                                                                                                                <li><a href="/dictionary/english/count-go-work-against" title="count/go/work against someone phrase"><span class="arl6"><span class="base"><span class="phrase haf">count/go/work against <span class="obj">someone</span></span></span> <span class="pos">phrase</span></span></a></li>
+                                                                                        </ul>
+                                                            <a href="https://dictionary.cambridge.org/search/english/?q=work&amp;type=idiom" class="tb" title="All idiom meanings of work in English" rel="nofollow">
+                                    See all idioms and phrases                                </a>
+                                                    </div>
+                    </section>
+                            </amp-accordion>
+
+        </div>
+    </aside>
+
+                        <div id="ad_houseslot_a" class="am-default_moreslots ">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_houseslot_a'); });</script>
+        </div>
+            
+    
+        <div class="pr bw hbss x lmb-25">
+    
+    <div class="pr boa lp-5 lpl-10 lpr-10 lc1">
+                    <div class="pr hdib i i-facebook lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'facebook')" target="_blank" rel="noopener" href="https://www.facebook.com/sharer.php?u=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fshirker%23cald4-1&amp;t=" title="Share on Facebook"></a>
+        </div>
+        <div class="pr hdib i i-twitter lp-5 lmr-10">
+            <a class="pa p0" onclick="sendGAEvent('share_this_entry', 'twitter')" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fdictionary.cambridge.org%2Fdictionary%2Fenglish%2Fshirker%23cald4-1&amp;text=" title="Share on Twitter"></a>
+        </div>
+    
+        <div class="htc hax lmt-20 lmb-25">
+            <p class="fs12 tcu lmb-0">Word of the Day</p>
+            <p class="fs36 lmt-5 feature-w-big wotd-hw">
+                <a href="/dictionary/english/shirker#cald4-1">shirker</a>
+            </p>
+                        <div class="hdib">
+                <span class="region dreg">UK</span>
+                                    <span class="daud">
+                                        
+<audio class="hdn" preload="none" id="audio13" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/uk_pron/u/uks/ukshi/ukshine027.mp3">
+    <source type="audio/ogg" src="/media/english/uk_pron_ogg/u/uks/ukshi/ukshine027.ogg">
+</audio>
+<div title="Listen to the British English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio13.load(); audio13.play();" role="button" tabindex="0">
+</div>
+                    </span>
+                                                    <span class="ipa dipa lpr-2 lpl-1">/ˈʃɜː.kər/</span>
+                            </div>
+                                    <div class="hdib">
+                <span class="region dreg">US</span>
+                                    <span class="daud">
+                                        
+<audio class="hdn" preload="none" id="audio14" controlslist="nodownload">
+    <div class="hdib" fallback="">
+        <p>Your browser doesn't support HTML5 audio</p>
+    </div>
+    <source type="audio/mpeg" src="/media/english/us_pron/u/uss/usshi/usshint012.mp3">
+    <source type="audio/ogg" src="/media/english/us_pron_ogg/u/uss/usshi/usshint012.ogg">
+</audio>
+<div title="Listen to the American English pronunciation" class="i i-volume-up c_aud htc hdib hp hv-1 fon tcu tc-bd lmr-10 lpt-3 fs20 hv-3" onclick="audio14.load(); audio14.play();" role="button" tabindex="0">
+</div>
+                    </span>
+                                                    <span class="ipa dipa lpr-2 lpl-1">/ˈʃɝː.kɚ/</span>
+                            </div>
+                    </div>
+    </div>
+
+    <div class="hoh lp-20">
+        <p class="lmt-0 lmb-20">someone who avoids something, especially work</p>
+
+        <a href="/dictionary/english/shirker#cald4-1" class="bh hao hbtn hbtn-tab tb">About this</a>
+    </div>
+</div>
+
+
+        
+        <div class="bw hbss x lmb-25">
+            <a href="https://dictionaryblog.cambridge.org/2023/08/09/talking-about-sleep-part-2/" target="_blank" rel="noopener noreferrer" class="hdb hao lc1">
+            <amp-img src="/rss/images/nap.jpg" height="180" width="300" alt="Dropping off and snoozing (Talking about sleep, Part 2)" layout="responsive" class="i-amphtml-element i-amphtml-layout-responsive i-amphtml-layout-size-defined i-amphtml-built i-amphtml-layout" i-amphtml-layout="responsive"><i-amphtml-sizer slot="i-amphtml-svc" style="padding-top: 60%;"></i-amphtml-sizer>
+                <noscript>
+                    <img src="/rss/images/nap.jpg" height="180" width="300" alt="Dropping off and snoozing (Talking about sleep, Part 2)" class="lc1" />
+                </noscript>
+            <img decoding="async" alt="Dropping off and snoozing (Talking about sleep, Part 2)" src="/rss/images/nap.jpg" class="i-amphtml-fill-content i-amphtml-replaced-content"></amp-img>
+        </a>
+    
+    <div class="hoh lp-20">
+        <p class="h6 lm-0 lmb-15">Blog</p>
+        <p class="fs19 hlh1_5 lmb-15">
+            <a href="https://dictionaryblog.cambridge.org/2023/08/09/talking-about-sleep-part-2/" class="ha" target="_blank" rel="noopener noreferrer">Dropping off and snoozing (Talking about sleep, Part 2)</a>
+        </p>
+        <div class="fs14 tc-bl lmb-20">
+                        <time datetime="2023-08-09">August 09, 2023</time>
+        </div>
+        <div>
+            <a href="https://dictionaryblog.cambridge.org/2023/08/09/talking-about-sleep-part-2/" target="_blank" rel="noopener noreferrer" class="bh hao hbtn hbtn-tab tb">
+                Read More            </a>
+        </div>
+    </div>
+</div>
+
+    
+<div class="bw hbss x lmb-25">
+                    
+                
+                <a href="https://dictionaryblog.cambridge.org/2023/08/07/new-words-7-august-2023/" target="_blank" rel="noopener noreferrer" class="hdb hao lc1">
+            <amp-img src="/rss/images/agrivoltaics.jpg" height="180" width="300" alt="<p>agrivoltaics" layout="responsive" class="i-amphtml-element i-amphtml-layout-responsive i-amphtml-layout-size-defined i-amphtml-built i-amphtml-layout" i-amphtml-layout="responsive"><i-amphtml-sizer slot="i-amphtml-svc" style="padding-top: 60%;"></i-amphtml-sizer>
+                <noscript>
+                    <img src="/rss/images/agrivoltaics.jpg" height="180" width="300" alt="<p>agrivoltaics" class="lc1" />
+                </noscript>
+            <img decoding="async" alt="<p>agrivoltaics" src="/rss/images/agrivoltaics.jpg" class="i-amphtml-fill-content i-amphtml-replaced-content"></amp-img>
+        </a>
+                <div class="hoh lp-20">
+        <p class="h6 lm-0 lmb-5">New Words</p>
+
+        <div class="lmb-15  fs36 ">
+            <a href="https://dictionaryblog.cambridge.org/2023/08/07/new-words-7-august-2023/" class="ha" target="_blank" rel="noopener noreferrer"></a><p><a href="https://dictionaryblog.cambridge.org/2023/08/07/new-words-7-august-2023/" class="ha" target="_blank" rel="noopener noreferrer">agrivoltaics</a>
+        </p></div>
+
+        <div class="fs14 tc-bl lmb-20">
+                        <time datetime="2023-08-07">August 07, 2023</time>
+        </div>
+
+        <a href="https://dictionaryblog.cambridge.org/2023/08/07/new-words-7-august-2023/" target="_blank" rel="noopener noreferrer" class="bh hao hbtn hbtn-tab tb">
+            More new words        </a>
+    </div>
+</div>
+</div>
+<div id="rightcol-sticky">
+                <div class="am-default_moreslots rightslot2-container" data-iaw="container">        <div id="ad_rightslot2" class="am-default_moreslots ">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_rightslot2'); });</script>
+        </div>
+        </div>    </div>
+<div id="rightcol-sticky2">
+                <div class="am-default_moreslots rightslot3-container" data-iaw="container">        <div id="ad_rightslot3" class="am-default_moreslots ">
+            <script type="text/javascript">iaw.cmd.push(function() { iaw.display('ad_rightslot3'); });</script>
+        </div>
+        </div>    </div>
+            </div>
+
+        </div>
+
+    </div>
+
+            
+
+
+<div class="pf py pb0 pl0 pr0">
+            <div id="stickyslot_placeholder"></div>
+    
+    <div amp-access="loggedIn" amp-access-hide="">
+    <div class="q250 pa pl0 pt100 lmt-25 lml-20 lmr-20 lmax100 z5" [class]="stateSidebarWordList.word != '' &amp;&amp; stateSidebarWordList.word != null ? 'q250 pa pl0 pb0 lmb-25 lml-20 lmr-20 lmax100 z5' : 'q250 pa pl0 pt100 lmt-25 lml-20 lmr-20 lmax100 z5'">
+        <div class="hdn" [class]="stateSidebarWordList.word != '' &amp;&amp; stateSidebarWordList.word != null ? 'bpb tc-bd hbs-br lmb-25' : 'hdn'">
+            <span on="tap:AMP.setState({ stateSidebarWordList: { wordlist_id: '', word: '', wordlist: '', url: '' } })" class="pa pt-10 pr-10 cx hbr50 bh hp">
+                <i class="i i-close iw" aria-hidden="true"></i>
+            </span>
+            <div class="fs14 lpt-15 lpl-20 lpr-25 lpb-20">
+                              <strong class="tb" [text]="stateSidebarWordList.word"></strong> has been added to <span [class]="stateSidebarWordList.url == '' || stateSidebarWordList.wordlist == ''  ? '' : 'hdn'">list</span><a class="hdn" [class]="stateSidebarWordList.url == '' || stateSidebarWordList.wordlist == '' ? 'hdn' : 'dipa'" [href]="stateSidebarWordList.url" [text]="stateSidebarWordList.wordlist"></a>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="ccn bh hax lp-5 lpl-10 lpr-10 lp-m_l-15 lp-m_r-15">
+        <div class="x fs15 lpt-1 lpb-1">
+
+            <div class="hfr lmt--2">
+                <span class="hao hdib lpt-5 lpb-5 lpl-15 lpr-15 hp" on="tap:top.scrollTo">
+                    <span class="hdi">To top</span>
+                    <span class="lml-10 hv2"><i class="i arrow-circle-o-up iw" aria-hidden="true"></i></span>
+                </span>
+            </div>
+
+    <div class="hoh">
+        <div class="hfl">
+            <span class="hao hdib lpt-5 lpb-5 lpl-15 lpr-15 fon hp" on="tap:sidebarContentNav.open">
+                <span class="cb hv-2 lmr-10"><i></i></span>
+                <span class="hv2">Contents</span>
+            </span>
+        </div>
+
+        
+                                                
+                
+        <div class="ccnl hoh fs10 tb tcu tcu hdn hdb-l hls1 lpt-3">
+            <a href="#dataset_cald4" class="hao hdib lpt-5 lpb-5 lpl-15 lpr-15 lbl lb-cn">English</a><a href="#dataset_cacd" class="hao hdib lpt-5 lpb-5 lpl-15 lpr-15 lbl lb-cn">American</a><a href="#dataset_cbed" class="hao hdib lpt-5 lpb-5 lpl-15 lpr-15 lbl lb-cn">Business</a><a href="#dataset_examples" class="hao hdib lpt-5 lpb-5 lpl-15 lpr-15 lbl lb-cn">Examples</a><a href="#dataset_combinations" class="hao hdib lpt-5 lpb-5 lpl-15 lpr-15 lbl lb-cn">Collocations</a><a href="#dataset_translations" class="hao hdib lpt-5 lpb-5 lpl-15 lpr-15 lbl lb-cn">Translations</a>        </div>
+    </div>
+
+
+        </div>
+    </div>
+</div>
+    </div>
+`
