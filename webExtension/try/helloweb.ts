@@ -7,7 +7,21 @@ dw
 .goInFoundResult()
 .findNodeContainingText("80 common phrasal verbs")
 .findNodeWithClass("tool__number")
-.textContent((t: string) => { console.log(t) })
+//.textContent((t: string) => { console.log(t) })
+.splitByFunctionWithDOMWalker(
+  findNodeWithClassSplitter("tool__number"),
+  (dw: DOMWalker) => {
+    dw.textContent((t: string) => { console.log(cutFirstWord(t)) })
+    dw.whileNotEnd(() => {
+      dw.nextSibling()
+        .findNodeWithNotEmptyText()
+        .textContent((t: string) => { console.log("\t def " + t) })
+        .findNodeWithClass("tool__example-content")
+        .textContent((t: string) => { console.log("\t ex " + t.trim()) })
+      }
+    )
+  }
+)
 
 // let n1 = findNodeWithClass(document.body, -1, -1, "tool__example tool__correct")
 // if (n1 == null) {

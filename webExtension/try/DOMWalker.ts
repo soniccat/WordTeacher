@@ -21,13 +21,48 @@ dw = DOMWalker()
   .call { jb.endArray() }
 */
 
+// [startIndex..endIndex)
+// -1 for startIndex means we include the node itself
+// -1 for endIndex means infinity 
+class DOMWalkerRange {
+  start: number
+  end: number
+
+  constructor(start: number, end: number) {
+    this.start = start
+    this.end = end
+  }
+
+  isInRange(v: number): boolean {
+    return v >= this.start && (this.end == -1 || v < this.end)
+  }
+
+  rangeWithStart(start: number): DOMWalkerRange {
+    return new DOMWalkerRange(start, this.end)
+  }
+
+  rangeWithEnd(end: number): DOMWalkerRange {
+    return new DOMWalkerRange(this.start, end)
+  }
+}
+
+let NodeRange = new DOMWalkerRange(-1, -1)
+
 class DOMWalker {
   private cursorStack: Array<DOMWalkerCursor> = Array()
   private cursor: DOMWalkerCursor
   private lastFoundResult?: FoundResult = null
+  private internalDOMWalker?: DOMWalker = null
 
   constructor(cursor: DOMWalkerCursor) {
     this.cursor = cursor
+  }
+
+  reset(cursor: DOMWalkerCursor) {
+    this.cursorStack = Array()
+    this.cursor = cursor
+    this.lastFoundResult = null
+    this.internalDOMWalker = null
   }
 
   goIn(): DOMWalker {
@@ -55,8 +90,17 @@ class DOMWalker {
     return this
   }
 
+  nextSibling(): DOMWalker {
+    if (this.cursor.childIndex + 1 == this.cursor.node.childNodes.length) {
+      throw new DOMWalkerError("nextSibling is called at the last node")
+    }
+    this.cursor.childIndex += 1
+
+    return this
+  }
+
   findNodeWithClass(name: string): DOMWalker {
-    let fr = findNodeWithClass(this.cursor.node, this.cursor.childIndex, this.cursor.maxIndex, name)
+    let fr = findNodeWithClass(this.cursor.node, this.cursor.range(), name)
     if (fr != null) {
       this.lastFoundResult = fr
       this.cursor.childIndex = fr.childIndexInOriginalNode
@@ -68,7 +112,7 @@ class DOMWalker {
   }
 
   findNodeContainingText(text: string): DOMWalker {
-    let fr = findNodeContainingText(this.cursor.node, this.cursor.childIndex, this.cursor.maxIndex, text)
+    let fr = findNodeContainingText(this.cursor.node, this.cursor.range(), text)
     if (fr != null) {
       this.lastFoundResult = fr
       this.cursor.childIndex = fr.childIndexInOriginalNode
@@ -77,6 +121,35 @@ class DOMWalker {
     }
     
     return this
+  }
+
+  findNodeWithNotEmptyText(): DOMWalker {
+    let fr = findNodeWithNotEmptyText(this.cursor.node, this.cursor.range())
+    if (fr != null) {
+      this.lastFoundResult = fr
+      this.cursor.childIndex = fr.childIndexInOriginalNode
+    } else {
+      throw new DOMWalkerError(`findNodeWithNotEmptyText() failed at ${this.cursor.toString()}`)
+    }
+    
+    return this
+  }
+
+  splitByFunctionWithDOMWalker(f: (node: Node, range: DOMWalkerRange) => FoundResult | null, itemCallback: (dw: DOMWalker) => void) {
+    let internalDOMWalker = this.requireInternalDOMWalker(this.cursor)
+    let foundResults = splitByFunction(this.cursor.node, this.cursor.range(), f)
+
+    for (let index = 0; index < foundResults.length; index++) {
+      let fr = foundResults[index]
+
+      if (index == foundResults.length - 1) {
+        internalDOMWalker.reset(new DOMWalkerCursor(this.cursor.node, fr.childIndexInOriginalNode, -1))
+      } else {
+        let nextFr = foundResults[index+1]
+        internalDOMWalker.reset(new DOMWalkerCursor(this.cursor.node, fr.childIndexInOriginalNode, nextFr.childIndexInOriginalNode))
+      }
+      itemCallback(internalDOMWalker)
+    }
   }
 
   textContent(f: (text: string) => void ): DOMWalker {
@@ -88,6 +161,27 @@ class DOMWalker {
     f()
     return this
   }
+
+  whileNotEnd(f: () => void) {
+    var p = this.cursor.childIndex
+    try {
+      while (!this.cursor.atEnd()) {
+        f()
+        if (p == this.cursor.childIndex) {
+          break
+        }
+      }
+    } catch (e) {
+    }
+  }
+
+  requireInternalDOMWalker(cursor: DOMWalkerCursor): DOMWalker {
+    if (this.internalDOMWalker == null) {
+      this.internalDOMWalker = new DOMWalker(cursor)
+    }
+
+    return this.internalDOMWalker
+  }
 }
 
 class DOMWalkerCursor {
@@ -97,6 +191,7 @@ class DOMWalkerCursor {
 
   constructor(node: Node);
   constructor(node: Node, childIndex: number);
+  constructor(node: Node, childIndex?: number, maxIndex?: number);
   constructor(node: Node, childIndex?: number, maxIndex?: number) {
     this.node = node
 
@@ -124,18 +219,25 @@ class DOMWalkerCursor {
   toString(): String {
     return `node: ${this.node.textContent}\nchildIndex: ${this.childIndex}\nmaxIndex: ${this.maxIndex}`
   }
+
+  range(): DOMWalkerRange {
+    return new DOMWalkerRange(this.childIndex, this.maxIndex)
+  }
+
+  atEnd(): boolean {
+    return this.childIndex >= this.maxIndex || this.childIndex >= this.node.childNodes.length
+  }
 }
 
 class DOMWalkerError extends Error {
-
 }
 
 //// functions
 
-function splitByFunction(node: Node, startIndex: number, f: (aStartNode: Node, index: number) => FoundResult | null): Array<FoundResult> {
+function splitByFunction(node: Node, range: DOMWalkerRange, f: (aNode: Node, aRange: DOMWalkerRange) => FoundResult | null): Array<FoundResult> {
   let result = Array<FoundResult>()
-  for (let index = startIndex; index < node.childNodes.length;) {
-    let fr = f(node, index)
+  for (let index = range.start; index < node.childNodes.length && range.isInRange(index);) {
+    let fr = f(node, new DOMWalkerRange(index, range.end))
     if (fr != null) {
       result.push(fr)
       index = fr.childIndexInOriginalNode + 1 
@@ -147,8 +249,14 @@ function splitByFunction(node: Node, startIndex: number, f: (aStartNode: Node, i
   return result
 }
 
-function findNodeWithClass(startNode: Node, startIndex: number, endIndex: number, className: String): FoundResult | null {
-  if (startIndex == -1 && startNode instanceof Element) {
+function findNodeWithClassSplitter(className: string): (aStartNode: Node, range: DOMWalkerRange) => FoundResult | null {
+  return (aStartNode: Node, range: DOMWalkerRange) => {
+    return findNodeWithClass(aStartNode, range, className)
+  }
+}
+
+function findNodeWithClass(startNode: Node, range: DOMWalkerRange, className: string): FoundResult | null {
+  if (range.start == -1 && startNode instanceof Element) {
     var v = startNode.attributes["class"]
     if (v instanceof Attr) {
       if (v.value == className) {
@@ -158,12 +266,12 @@ function findNodeWithClass(startNode: Node, startIndex: number, endIndex: number
   }
 
   if (startNode instanceof Node) {
-    for (let index = startIndex; index < startNode.childNodes.length && (endIndex == -1 || index < endIndex); index++) {
+    for (let index = range.start; index < startNode.childNodes.length && range.isInRange(index); index++) {
       const element = startNode.childNodes[index];
-      var fr = findNodeWithClass(element, -1, -1, className)
+      var fr = findNodeWithClass(element, NodeRange, className)
       if (fr != null) {
         if (fr.childIndex == -1) {
-          return new FoundResult(startNode, index)
+          return new FoundResult(startNode, index, index)
         }
 
         fr.childIndexInOriginalNode = index
@@ -175,14 +283,22 @@ function findNodeWithClass(startNode: Node, startIndex: number, endIndex: number
   return null
 }
 
-function findNodeContainingText(startNode: Node, startIndex: number, endIndex: number, text: string): FoundResult | null {
+function findNodeContainingText(startNode: Node, range: DOMWalkerRange, text: string): FoundResult | null {
+  return findNodeContainingWithTextChecker(startNode, range, (t: string) => { return t.indexOf(text) != -1 } )
+}
+
+function findNodeWithNotEmptyText(startNode: Node, range: DOMWalkerRange): FoundResult | null {
+  return findNodeContainingWithTextChecker(startNode, range, (t: string) => { return t.trim().length > 0 } )
+}
+
+function findNodeContainingWithTextChecker(startNode: Node, range: DOMWalkerRange, textChecker: (t: string) => boolean): FoundResult | null {
   if (startNode instanceof Node) {
-    for (let index = startIndex; index < startNode.childNodes.length && (endIndex == -1 || index < endIndex); index++) {
+    for (let index = range.start; index < startNode.childNodes.length && range.isInRange(index); index++) {
       const element = startNode.childNodes[index];
-      var fr = findNodeContainingText(element, -1, -1, text)
+      var fr = findNodeContainingWithTextChecker(element, NodeRange, textChecker)
       if (fr != null) {
         if (fr.childIndex == -1) {
-          return new FoundResult(startNode, index)
+          return new FoundResult(startNode, index, index)
         }
 
         fr.childIndexInOriginalNode = index
@@ -191,11 +307,20 @@ function findNodeContainingText(startNode: Node, startIndex: number, endIndex: n
     };
   }
 
-  if (startIndex == -1 && startNode instanceof Node) {
-    if (startNode.textContent.indexOf(text) != -1) {
+  if (range.start == -1 && startNode instanceof Node) {
+    if (textChecker(startNode.textContent)) {
       return new FoundResult(startNode)
     }
   }
 
   return null
+}
+
+function cutFirstWord(str: string): string {
+  let i = str.indexOf(' ')
+  if (i != -1) {
+    return str.substring(i+1)
+  }
+
+  return str
 }

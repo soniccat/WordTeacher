@@ -29,12 +29,39 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+// [startIndex..endIndex)
+// -1 for startIndex means we include the node itself
+// -1 for endIndex means infinity 
+var DOMWalkerRange = /** @class */ (function () {
+    function DOMWalkerRange(start, end) {
+        this.start = start;
+        this.end = end;
+    }
+    DOMWalkerRange.prototype.isInRange = function (v) {
+        return v >= this.start && (this.end == -1 || v < this.end);
+    };
+    DOMWalkerRange.prototype.rangeWithStart = function (start) {
+        return new DOMWalkerRange(start, this.end);
+    };
+    DOMWalkerRange.prototype.rangeWithEnd = function (end) {
+        return new DOMWalkerRange(this.start, end);
+    };
+    return DOMWalkerRange;
+}());
+var NodeRange = new DOMWalkerRange(-1, -1);
 var DOMWalker = /** @class */ (function () {
     function DOMWalker(cursor) {
         this.cursorStack = Array();
         this.lastFoundResult = null;
+        this.internalDOMWalker = null;
         this.cursor = cursor;
     }
+    DOMWalker.prototype.reset = function (cursor) {
+        this.cursorStack = Array();
+        this.cursor = cursor;
+        this.lastFoundResult = null;
+        this.internalDOMWalker = null;
+    };
     DOMWalker.prototype.goIn = function () {
         var c = this.cursor;
         this.cursorStack.push(this.cursor);
@@ -53,8 +80,15 @@ var DOMWalker = /** @class */ (function () {
         this.cursor = this.cursorStack.pop();
         return this;
     };
+    DOMWalker.prototype.nextSibling = function () {
+        if (this.cursor.childIndex + 1 == this.cursor.node.childNodes.length) {
+            throw new DOMWalkerError("nextSibling is called at the last node");
+        }
+        this.cursor.childIndex += 1;
+        return this;
+    };
     DOMWalker.prototype.findNodeWithClass = function (name) {
-        var fr = findNodeWithClass(this.cursor.node, this.cursor.childIndex, this.cursor.maxIndex, name);
+        var fr = findNodeWithClass(this.cursor.node, this.cursor.range(), name);
         if (fr != null) {
             this.lastFoundResult = fr;
             this.cursor.childIndex = fr.childIndexInOriginalNode;
@@ -65,7 +99,7 @@ var DOMWalker = /** @class */ (function () {
         return this;
     };
     DOMWalker.prototype.findNodeContainingText = function (text) {
-        var fr = findNodeContainingText(this.cursor.node, this.cursor.childIndex, this.cursor.maxIndex, text);
+        var fr = findNodeContainingText(this.cursor.node, this.cursor.range(), text);
         if (fr != null) {
             this.lastFoundResult = fr;
             this.cursor.childIndex = fr.childIndexInOriginalNode;
@@ -75,6 +109,32 @@ var DOMWalker = /** @class */ (function () {
         }
         return this;
     };
+    DOMWalker.prototype.findNodeWithNotEmptyText = function () {
+        var fr = findNodeWithNotEmptyText(this.cursor.node, this.cursor.range());
+        if (fr != null) {
+            this.lastFoundResult = fr;
+            this.cursor.childIndex = fr.childIndexInOriginalNode;
+        }
+        else {
+            throw new DOMWalkerError("findNodeWithNotEmptyText() failed at " + this.cursor.toString());
+        }
+        return this;
+    };
+    DOMWalker.prototype.splitByFunctionWithDOMWalker = function (f, itemCallback) {
+        var internalDOMWalker = this.requireInternalDOMWalker(this.cursor);
+        var foundResults = splitByFunction(this.cursor.node, this.cursor.range(), f);
+        for (var index = 0; index < foundResults.length; index++) {
+            var fr = foundResults[index];
+            if (index == foundResults.length - 1) {
+                internalDOMWalker.reset(new DOMWalkerCursor(this.cursor.node, fr.childIndexInOriginalNode, -1));
+            }
+            else {
+                var nextFr = foundResults[index + 1];
+                internalDOMWalker.reset(new DOMWalkerCursor(this.cursor.node, fr.childIndexInOriginalNode, nextFr.childIndexInOriginalNode));
+            }
+            itemCallback(internalDOMWalker);
+        }
+    };
     DOMWalker.prototype.textContent = function (f) {
         f(this.cursor.childNode().textContent);
         return this;
@@ -82,6 +142,25 @@ var DOMWalker = /** @class */ (function () {
     DOMWalker.prototype.call = function (f) {
         f();
         return this;
+    };
+    DOMWalker.prototype.whileNotEnd = function (f) {
+        var p = this.cursor.childIndex;
+        try {
+            while (!this.cursor.atEnd()) {
+                f();
+                if (p == this.cursor.childIndex) {
+                    break;
+                }
+            }
+        }
+        catch (e) {
+        }
+    };
+    DOMWalker.prototype.requireInternalDOMWalker = function (cursor) {
+        if (this.internalDOMWalker == null) {
+            this.internalDOMWalker = new DOMWalker(cursor);
+        }
+        return this.internalDOMWalker;
     };
     return DOMWalker;
 }());
@@ -111,6 +190,12 @@ var DOMWalkerCursor = /** @class */ (function () {
     DOMWalkerCursor.prototype.toString = function () {
         return "node: " + this.node.textContent + "\nchildIndex: " + this.childIndex + "\nmaxIndex: " + this.maxIndex;
     };
+    DOMWalkerCursor.prototype.range = function () {
+        return new DOMWalkerRange(this.childIndex, this.maxIndex);
+    };
+    DOMWalkerCursor.prototype.atEnd = function () {
+        return this.childIndex >= this.maxIndex || this.childIndex >= this.node.childNodes.length;
+    };
     return DOMWalkerCursor;
 }());
 var DOMWalkerError = /** @class */ (function (_super) {
@@ -121,10 +206,10 @@ var DOMWalkerError = /** @class */ (function (_super) {
     return DOMWalkerError;
 }(Error));
 //// functions
-function splitByFunction(node, startIndex, f) {
+function splitByFunction(node, range, f) {
     var result = Array();
-    for (var index = startIndex; index < node.childNodes.length;) {
-        var fr = f(node, index);
+    for (var index = range.start; index < node.childNodes.length && range.isInRange(index);) {
+        var fr = f(node, new DOMWalkerRange(index, range.end));
         if (fr != null) {
             result.push(fr);
             index = fr.childIndexInOriginalNode + 1;
@@ -135,8 +220,13 @@ function splitByFunction(node, startIndex, f) {
     }
     return result;
 }
-function findNodeWithClass(startNode, startIndex, endIndex, className) {
-    if (startIndex == -1 && startNode instanceof Element) {
+function findNodeWithClassSplitter(className) {
+    return function (aStartNode, range) {
+        return findNodeWithClass(aStartNode, range, className);
+    };
+}
+function findNodeWithClass(startNode, range, className) {
+    if (range.start == -1 && startNode instanceof Element) {
         var v = startNode.attributes["class"];
         if (v instanceof Attr) {
             if (v.value == className) {
@@ -145,12 +235,12 @@ function findNodeWithClass(startNode, startIndex, endIndex, className) {
         }
     }
     if (startNode instanceof Node) {
-        for (var index = startIndex; index < startNode.childNodes.length && (endIndex == -1 || index < endIndex); index++) {
+        for (var index = range.start; index < startNode.childNodes.length && range.isInRange(index); index++) {
             var element = startNode.childNodes[index];
-            var fr = findNodeWithClass(element, -1, -1, className);
+            var fr = findNodeWithClass(element, NodeRange, className);
             if (fr != null) {
                 if (fr.childIndex == -1) {
-                    return new FoundResult(startNode, index);
+                    return new FoundResult(startNode, index, index);
                 }
                 fr.childIndexInOriginalNode = index;
                 return fr;
@@ -160,14 +250,20 @@ function findNodeWithClass(startNode, startIndex, endIndex, className) {
     }
     return null;
 }
-function findNodeContainingText(startNode, startIndex, endIndex, text) {
+function findNodeContainingText(startNode, range, text) {
+    return findNodeContainingWithTextChecker(startNode, range, function (t) { return t.indexOf(text) != -1; });
+}
+function findNodeWithNotEmptyText(startNode, range) {
+    return findNodeContainingWithTextChecker(startNode, range, function (t) { return t.trim().length > 0; });
+}
+function findNodeContainingWithTextChecker(startNode, range, textChecker) {
     if (startNode instanceof Node) {
-        for (var index = startIndex; index < startNode.childNodes.length && (endIndex == -1 || index < endIndex); index++) {
+        for (var index = range.start; index < startNode.childNodes.length && range.isInRange(index); index++) {
             var element = startNode.childNodes[index];
-            var fr = findNodeContainingText(element, -1, -1, text);
+            var fr = findNodeContainingWithTextChecker(element, NodeRange, textChecker);
             if (fr != null) {
                 if (fr.childIndex == -1) {
-                    return new FoundResult(startNode, index);
+                    return new FoundResult(startNode, index, index);
                 }
                 fr.childIndexInOriginalNode = index;
                 return fr;
@@ -175,11 +271,18 @@ function findNodeContainingText(startNode, startIndex, endIndex, text) {
         }
         ;
     }
-    if (startIndex == -1 && startNode instanceof Node) {
-        if (startNode.textContent.indexOf(text) != -1) {
+    if (range.start == -1 && startNode instanceof Node) {
+        if (textChecker(startNode.textContent)) {
             return new FoundResult(startNode);
         }
     }
     return null;
+}
+function cutFirstWord(str) {
+    var i = str.indexOf(' ');
+    if (i != -1) {
+        return str.substring(i + 1);
+    }
+    return str;
 }
 //# sourceMappingURL=DOMWalker.js.map
