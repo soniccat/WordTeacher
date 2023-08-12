@@ -1,4 +1,4 @@
-class FindResult {
+class FoundResult {
   node: Node
   childIndex: number
   childIndexInOriginalNode: number
