@@ -1,7 +1,8 @@
 
 /*
-// cursor - a child position of a parent node, we move cursor down the siblings
-// we keep a stack of cursor positions, so a cursor position is restored after going deeper and coming back
+// DOM parser with a cursor
+// cursor - a child position of the current parent node, we move cursor down the siblings when calling find.. methods
+// to change the parent we call go.. methods, in this case we keep a stack of cursor positions, so a cursor position is restored after goOut
 dw = DOMWalker()
   .findNodeWithClass("tool__correct") // moves cursor to the node with a class
   .goIn() // go deeper, starts searching through cursor's childs (goOut to go back)
@@ -20,7 +21,6 @@ dw = DOMWalker()
   )
   .call { jb.endArray() }
 */
-
 class DOMWalker {
   private cursorStack: Array<DOMWalkerCursor> = Array()
   private cursor: DOMWalkerCursor
@@ -99,6 +99,13 @@ class DOMWalker {
     return this
   }
 
+  goToNodeWithClass(name: string): DOMWalker {
+    this.findNodeWithClass(name)
+    this.goToFoundResult()
+
+    return this
+  }
+
   findNodeWithClass(name: string): DOMWalker {
     let fr = findNodeWithClass(this.cursor.node, this.cursor.range(), name)
     if (fr != null) {
@@ -135,7 +142,7 @@ class DOMWalker {
     return this
   }
 
-  splitByFunctionWithDOMWalker(f: (node: Node, range: DOMWalkerRange) => FoundResult | null, itemCallback: (dw: DOMWalker) => void) {
+  splitByFunctionWithDOMWalker(f: (node: Node, range: DOMWalkerRange) => FoundResult | null, itemCallback: (dw: DOMWalker) => void): DOMWalker {
     let internalDOMWalker = this.requireInternalDOMWalker(this.cursor)
     let foundResults = splitByFunction(this.cursor.node, this.cursor.range(), f)
 
@@ -150,6 +157,8 @@ class DOMWalker {
       }
       itemCallback(internalDOMWalker)
     }
+
+    return this
   }
 
   textContent(f: (text: string) => void ): DOMWalker {
@@ -162,7 +171,17 @@ class DOMWalker {
     return this
   }
 
-  whileNotEnd(f: () => void) {
+  try(f: (dw: DOMWalker) => void): DOMWalker {
+    try {
+      f(this)
+    } catch (e) {
+      console.log(e)
+    }
+
+    return this
+  }
+
+  whileNotEnd(f: () => void): DOMWalker {
     var p = this.cursor.childIndex
     try {
       while (!this.cursor.atEnd()) {
@@ -172,7 +191,12 @@ class DOMWalker {
         }
       }
     } catch (e) {
+      if (!(e instanceof DOMWalkerError)) {
+        console.log(e)
+      }
     }
+
+    return this
   }
 
   requireInternalDOMWalker(cursor: DOMWalkerCursor): DOMWalker {
@@ -269,6 +293,10 @@ class DOMWalkerRange {
 let NodeRange = new DOMWalkerRange(-1, -1)
 
 class DOMWalkerError extends Error {
+  constructor(s: string) {
+    super(s)
+    Object.setPrototypeOf(this, DOMWalkerError.prototype);
+  }
 }
 
 //// functions

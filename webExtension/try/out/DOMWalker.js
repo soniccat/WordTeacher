@@ -1,6 +1,17 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /*
-// cursor - a child position of a parent node, we move cursor down the siblings
-// we keep a stack of cursor positions, so a cursor position is restored after going deeper and coming back
+// DOM parser with a cursor
+// cursor - a child position of the current parent node, we move cursor down the siblings when calling find.. methods
+// to change the parent we call go.. methods, in this case we keep a stack of cursor positions, so a cursor position is restored after goOut
 dw = DOMWalker()
   .findNodeWithClass("tool__correct") // moves cursor to the node with a class
   .goIn() // go deeper, starts searching through cursor's childs (goOut to go back)
@@ -19,16 +30,6 @@ dw = DOMWalker()
   )
   .call { jb.endArray() }
 */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var DOMWalker = /** @class */ (function () {
     function DOMWalker(cursor) {
         this.cursorStack = Array();
@@ -87,6 +88,11 @@ var DOMWalker = /** @class */ (function () {
         this.cursor.childIndex += 1;
         return this;
     };
+    DOMWalker.prototype.goToNodeWithClass = function (name) {
+        this.findNodeWithClass(name);
+        this.goToFoundResult();
+        return this;
+    };
     DOMWalker.prototype.findNodeWithClass = function (name) {
         var fr = findNodeWithClass(this.cursor.node, this.cursor.range(), name);
         if (fr != null) {
@@ -134,6 +140,7 @@ var DOMWalker = /** @class */ (function () {
             }
             itemCallback(internalDOMWalker);
         }
+        return this;
     };
     DOMWalker.prototype.textContent = function (f) {
         f(this.cursor.childNode().textContent);
@@ -141,6 +148,15 @@ var DOMWalker = /** @class */ (function () {
     };
     DOMWalker.prototype.call = function (f) {
         f();
+        return this;
+    };
+    DOMWalker.prototype.try = function (f) {
+        try {
+            f(this);
+        }
+        catch (e) {
+            console.log(e);
+        }
         return this;
     };
     DOMWalker.prototype.whileNotEnd = function (f) {
@@ -154,7 +170,11 @@ var DOMWalker = /** @class */ (function () {
             }
         }
         catch (e) {
+            if (!(e instanceof DOMWalkerError)) {
+                console.log(e);
+            }
         }
+        return this;
     };
     DOMWalker.prototype.requireInternalDOMWalker = function (cursor) {
         if (this.internalDOMWalker == null) {
@@ -230,8 +250,10 @@ var DOMWalkerRange = /** @class */ (function () {
 var NodeRange = new DOMWalkerRange(-1, -1);
 var DOMWalkerError = /** @class */ (function (_super) {
     __extends(DOMWalkerError, _super);
-    function DOMWalkerError() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function DOMWalkerError(s) {
+        var _this = _super.call(this, s) || this;
+        Object.setPrototypeOf(_this, DOMWalkerError.prototype);
+        return _this;
     }
     return DOMWalkerError;
 }(Error));
