@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.android_app.BuildConfig
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
@@ -103,6 +104,16 @@ class AppModule {
             R.raw.en_chunker,
             nlpIndexPath,
             fileSystem
+        )
+    }
+
+    // Features
+
+    @AppComp
+    @Provides
+    fun cardSetsFeatures(): CardSetsVM.Features {
+        return CardSetsVM.Features(
+            canImportCardSetFromJson = false,
         )
     }
 }

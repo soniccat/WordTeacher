@@ -1,5 +1,7 @@
-package com.aglushkov.wordteacher.shared.features.cardsets.di
+package com.aglushkov.wordteacher.shared.features.cardset_json_import.di
 
+import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.CardSetJsonImportDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -10,24 +12,23 @@ import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
 
-@Component(dependencies = [CardSetsDependencies::class], modules = [CardSetsModule::class])
-interface CardSetsComponent {
-    fun cardSetsDecomposeComponent(): CardSetsDecomposeComponent
+@Component(dependencies = [CardSetJsonImportDependencies::class], modules = [CardSetJsonImportModule::class])
+interface CardSetJsonImportComponent {
+    fun cardSetsDecomposeComponent(): CardSetJsonImportDecomposeComponent
 
     @Component.Builder
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
-        @BindsInstance fun setState(configuration: CardSetsVM.State): Builder
+        @BindsInstance fun setState(configuration: MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration): Builder
 
-        fun setDeps(deps: CardSetsDependencies): Builder
-        fun build(): CardSetsComponent
+        fun setDeps(deps: CardSetJsonImportDependencies): Builder
+        fun build(): CardSetJsonImportComponent
     }
 }
 
-interface CardSetsDependencies {
+interface CardSetJsonImportDependencies {
     fun cardSetsRepository(): CardSetsRepository
     fun cardSetSearchRepository(): CardSetSearchRepository
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
-    fun cardSetsFeatures(): CardSetsVM.Features
 }

@@ -62,6 +62,7 @@ fun CardSetsUI(
                     }
                 }
                 SearchView(
+                    modifier = Modifier.weight(1.0f),
                     searchText,
                     onTextChanged = {
                         searchText = it
@@ -71,6 +72,11 @@ fun CardSetsUI(
                     }
                 ) {
                     vm.onSearch(searchText)
+                }
+                if (vm.availableFeatures.canImportCardSetFromJson) {
+                    AddIcon {
+                        vm.onJsonImportClicked()
+                    }
                 }
             }
 

@@ -33,6 +33,7 @@ import dev.icerock.moko.resources.compose.painterResource
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchView(
+    modifier: Modifier = Modifier,
     text: String,
     focusRequester: FocusRequester = remember { FocusRequester() },
     onTextChanged: (String) -> Unit,
@@ -42,7 +43,7 @@ fun SearchView(
     TextField(
         value = text,
         onValueChange = onTextChanged,
-        modifier = Modifier
+        modifier = modifier
             .padding(8.dp)
             .fillMaxWidth()
             .background(

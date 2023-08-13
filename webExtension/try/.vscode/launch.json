@@ -11,7 +11,7 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "url": "file://${workspaceFolder}/helloweb.html",
+      "url": "file://${workspaceFolder}/src/helloweb.html",
       "preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": [
         "${workspaceFolder}/out/**/*.js"

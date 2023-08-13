@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.article.di.DaggerArticleComposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.di.DaggerCardSetComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.di.DaggerCardSetJsonImportComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.webauth.di.DaggerWebAuthComponent
@@ -81,6 +82,13 @@ class MainComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .webAuthDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration ->
+                    DaggerCardSetJsonImportComponent.builder()
+                        .setComponentContext(context)
+                        .setState(configuration)
+                        .setDeps(appComponent)
+                        .build()
+                        .cardSetsDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
                     Any()
                 else -> {

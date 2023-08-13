@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-interface WebAuthVM {
+interface WebAuthVM: Clearable {
     var router: WebAuthRouter?
     val initialUrl: Url
 

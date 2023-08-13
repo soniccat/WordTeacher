@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUID
 import com.aglushkov.wordteacher.shared.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.views.CardSetJsonImportUIDialog
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
@@ -216,6 +217,13 @@ private fun dialogUI() {
                 WebAuthUI(
                     vm = instance.vm,
                     onCompleted = {
+                        mainDecomposeComponent.popDialog(instance)
+                    }
+                )
+            is MainDecomposeComponent.Child.CardSetJsonImport ->
+                CardSetJsonImportUIDialog(
+                    vm = instance.vm,
+                    onCardSetCreated = {
                         mainDecomposeComponent.popDialog(instance)
                     }
                 )

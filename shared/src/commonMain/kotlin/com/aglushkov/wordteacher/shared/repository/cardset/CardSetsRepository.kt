@@ -38,6 +38,14 @@ class CardSetsRepository(
         }.await()
     }
 
+    suspend fun insertCardSet(cardSet: CardSet) = supervisorScope {
+        scope.async(Dispatchers.Default) {
+            databaseWorker.run {
+                it.cardSets.insert(cardSet)
+            }
+        }.await()
+    }
+
     suspend fun removeCardSet(cardSetId: Long) = supervisorScope {
         scope.async(Dispatchers.Default) {
             removeCardSetInternal(cardSetId)

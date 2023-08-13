@@ -16,11 +16,13 @@ class CardSetsDecomposeComponent (
     componentContext: ComponentContext,
     timeSource: TimeSource,
     idGenerator: IdGenerator,
+    features: CardSetsVM.Features
 ) : CardSetsVMImpl(
     initialState,
     cardSetsRepository,
     cardSetSearchRepository,
     timeSource,
-    idGenerator
+    idGenerator,
+    features
 ), ComponentContext by componentContext {
 }

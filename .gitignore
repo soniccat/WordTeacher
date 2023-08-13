@@ -19,3 +19,4 @@ iosApp/iosApp.xcworkspace/xcuserdata/alexeyglushkov.xcuserdatad/
 iosApp/Pods/
 
 webExtension/try/out
+webExtension/try/node_modules

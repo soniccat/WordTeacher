@@ -28,6 +28,7 @@ interface CardSetsVM: Clearable {
     val eventFlow: Flow<Event>
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
     val searchCardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
+    val availableFeatures: Features
 
     fun restore(newState: State)
     fun onCardSetAdded(text: String)
@@ -43,12 +44,17 @@ interface CardSetsVM: Clearable {
     fun onTryAgainSearchClicked()
     fun onSearchCardSetClicked(item: RemoteCardSetViewItem)
     fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem)
+    fun onJsonImportClicked()
 
     @Parcelize
     data class State (
         val searchQuery: String? = null,
         val newCardSetText: String? = null
     ): Parcelable
+
+    data class Features (
+        val canImportCardSetFromJson: Boolean = false
+    )
 }
 
 open class CardSetsVMImpl(
@@ -56,7 +62,8 @@ open class CardSetsVMImpl(
     private val cardSetsRepository: CardSetsRepository,
     private val cardSetSearchRepository: CardSetSearchRepository,
     private val timeSource: TimeSource,
-    private val idGenerator: IdGenerator
+    private val idGenerator: IdGenerator,
+    override val availableFeatures: CardSetsVM.Features,
 ): ViewModel(), CardSetsVM {
     override var router: CardSetsRouter? = null
 
@@ -213,6 +220,10 @@ open class CardSetsVMImpl(
 
     override fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem) {
         cardSetsRepository.addRemoteCardSet(item.remoteCardSetId)
+    }
+
+    override fun onJsonImportClicked() {
+        router?.openJsonImport()
     }
 }
 

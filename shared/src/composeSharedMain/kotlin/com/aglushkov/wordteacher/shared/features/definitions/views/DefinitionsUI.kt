@@ -134,6 +134,7 @@ private fun DefinitionsWordUI(
         if (withSearchBar) {
             CustomTopAppBar {
                 SearchView(
+                    Modifier,
                     searchText,
                     focusRequester = focusRequester,
                     onTextChanged = {

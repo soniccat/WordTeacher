@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.desktopapp.di
 import com.aglushkov.wordteacher.desktopapp.configs.GoogleConfig
 import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.crypto.PkceGenerator
 import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
@@ -100,6 +101,14 @@ class AppModule {
             clientSecret = GoogleConfig.secret,
             redirectUrl = Url(GoogleConfig.redirectUri),
             scope = GoogleConfig.scope,
+        )
+    }
+
+    @AppComp
+    @Provides
+    fun cardSetsFeatures(): CardSetsVM.Features {
+        return CardSetsVM.Features(
+            canImportCardSetFromJson = true,
         )
     }
 }

@@ -1,9 +1,10 @@
+import {v4 as uuidv4} from 'uuid';
 
 document.body.innerHTML = message;
 
 let jsonBuilder = new JSONBuilder()
-jsonBuilder.startArray("updatedCardSets")
-jsonBuilder.startArrayObject()
+// jsonBuilder.startArray("updatedCardSets")
+// jsonBuilder.startArrayObject()
 jsonBuilder.set("name", "80 Most Common Phrasal Verbs")
 jsonBuilder.set("source", "https://www.grammarly.com/blog/common-phrasal-verbs/")
 jsonBuilder.startArray("cards")
@@ -22,7 +23,19 @@ dw
   (dw: DOMWalker) => {
     dw.textContent((t: string) => { 
       jsonBuilder.startArrayObject() 
-      jsonBuilder.set("term", cutFirstWord(t).trim())
+      jsonBuilder.set("id", "")
+      jsonBuilder.set("creationDate", "2023-08-10T16:21:59.452Z")
+      jsonBuilder.set("modificationDate", "2023-08-10T16:21:59.452Z")
+      jsonBuilder.set("term", cutFirstWord(t).trim().replace("[x]", "sth"))
+      jsonBuilder.set("partOfSpeech", 12)
+      jsonBuilder.set("definitionTermSpans", [])
+      jsonBuilder.set("synonyms", [])
+      jsonBuilder.set("examples", [])
+      jsonBuilder.set("exampleTermSpans", [])
+      jsonBuilder.set("progress", {})
+      jsonBuilder.set("creationId", uuidv4())
+      jsonBuilder.set("needToUpdateDefinitionSpans", true)
+      jsonBuilder.set("needToUpdateExampleSpans", true)
       console.log(cutFirstWord(t).trim()) 
       jsonBuilder.startArray("definitions")
       defs = jsonBuilder.cursor as Array<string>
@@ -102,13 +115,3 @@ console.log(JSON.stringify(jsonBuilder.json, null, 4))
 //     )
 //   }
 // )
-
-/*
-
-// select(path like "obj.obj")
-// goIn/goOut
-// startObject/endObject/set
-// startArray/endArray/add,
-jb = JSONBuilder()
-
-*/

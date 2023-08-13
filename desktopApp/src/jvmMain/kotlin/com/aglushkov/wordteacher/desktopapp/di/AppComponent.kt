@@ -8,7 +8,9 @@ import com.aglushkov.wordteacher.shared.features.add_article.di.AddArticleDepend
 import com.aglushkov.wordteacher.shared.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.shared.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.di.CardSetJsonImportDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.shared.features.webauth.di.WebAuthDependencies
@@ -42,7 +44,8 @@ interface AppComponent:
     ArticleDependencies,
     SettingsDependencies,
     TabComposeComponentDependencies,
-    WebAuthDependencies
+    WebAuthDependencies,
+    CardSetJsonImportDependencies
 {
     fun cookieStorage(): CookiesStorage
     fun configService(): ConfigService

@@ -1,5 +1,7 @@
-package com.aglushkov.wordteacher.shared.features.cardsets.di
+package com.aglushkov.wordteacher.shared.features.cardset_json_import.di
 
+import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.CardSetJsonImportDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -11,26 +13,20 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class CardSetsModule {
+class CardSetJsonImportModule {
 
     @Provides
     fun viewModel(
-        state: CardSetsVM.State,
-        cardSetsRepository: CardSetsRepository,
-        cardSetSearchRepository: CardSetSearchRepository,
         componentContext: ComponentContext,
+        configuration: MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration,
+        cardSetsRepository: CardSetsRepository,
         timeSource: TimeSource,
-        idGenerator: IdGenerator,
-        features: CardSetsVM.Features,
-    ): CardSetsDecomposeComponent {
-        return CardSetsDecomposeComponent(
-            state,
-            cardSetsRepository,
-            cardSetSearchRepository,
+    ): CardSetJsonImportDecomposeComponent {
+        return CardSetJsonImportDecomposeComponent(
             componentContext,
+            configuration,
+            cardSetsRepository,
             timeSource,
-            idGenerator,
-            features
         )
     }
 }
