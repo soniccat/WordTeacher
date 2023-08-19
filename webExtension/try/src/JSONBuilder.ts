@@ -3,9 +3,9 @@
 // select(path like "obj.obj")
 // startObject/endObject/set
 // startArray/endArray/add,
-class JSONBuilder {
-  json: object = {}
-  cursor: object = this.json
+export class JSONBuilder {
+  json: any = {}
+  cursor: any = this.json
   private cursorStack: Array<object> = Array()
 
   constructor();
@@ -90,5 +90,5 @@ class JSONBuilder {
   }
 }
 
-class JSONBuilderError extends Error {
+export class JSONBuilderError extends Error {
 }

@@ -324,7 +324,7 @@ function findNodeWithClassSplitter(className: string): (aStartNode: Node, range:
 
 function findNodeWithClass(startNode: Node, range: DOMWalkerRange, className: string): FoundResult | null {
   if (range.start == -1 && startNode instanceof Element) {
-    var v = startNode.attributes["class"]
+    var v = startNode.attributes.getNamedItem("class")
     if (v instanceof Attr) {
       if (v.value.trim() == className) {
         return new FoundResult(startNode)

@@ -1,4 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
+import { JSONBuilder } from "./JSONBuilder";
 
 document.body.innerHTML = message;
 
