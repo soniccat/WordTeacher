@@ -5,18 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "chrome",
+      "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "url": "file://${workspaceFolder}/helloweb.html",
-      "preLaunchTask": "tsc: build - tsconfig.json",
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
-      "webRoot": "${workspaceFolder}"
+      "name": "Open helloweb.html",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "develop"]
+      // "file": "/Users/alexeyglushkov/androidProjects/WordTeacher/webExtension/try/dst/helloweb.html",
     }
   ]
 }

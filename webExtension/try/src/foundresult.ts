@@ -1,4 +1,4 @@
-class FoundResult {
+export class FoundResult {
   node: Node
   childIndex: number
   childIndexInOriginalNode: number

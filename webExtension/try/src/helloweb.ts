@@ -1,33 +1,40 @@
 import {v4 as uuidv4} from 'uuid';
 import { JSONBuilder } from "./JSONBuilder";
+import * as dwlib from "./DOMWalker";
+import { message } from "./message"
 
 document.body.innerHTML = message;
 
+let date = "2023-08-10T16:21:59.452Z"
 let jsonBuilder = new JSONBuilder()
 // jsonBuilder.startArray("updatedCardSets")
 // jsonBuilder.startArrayObject()
 jsonBuilder.set("name", "80 Most Common Phrasal Verbs")
 jsonBuilder.set("source", "https://www.grammarly.com/blog/common-phrasal-verbs/")
+jsonBuilder.set("id", "")
+jsonBuilder.set("creationId", uuidv4())
+jsonBuilder.set("creationDate", date)
+jsonBuilder.set("modificationDate", date)
 jsonBuilder.startArray("cards")
 
 
 var defs = Array()
 var examples = Array()
-let dw = new DOMWalker(new DOMWalkerCursor(document.body))
+let dw = new dwlib.DOMWalker(new dwlib.DOMWalkerCursor(document.body))
 dw
 .findNodeWithClass("tool__example tool__correct")
 .goToFoundResult()
 .findNodeContainingText("80 common phrasal verbs")
 .findNodeWithClass("tool__number")
 .splitByFunctionWithDOMWalker(
-  findNodeWithClassSplitter("tool__number"),
-  (dw: DOMWalker) => {
+  dwlib.findNodeWithClassSplitter("tool__number"),
+  (dw: dwlib.DOMWalker) => {
     dw.textContent((t: string) => { 
       jsonBuilder.startArrayObject() 
       jsonBuilder.set("id", "")
-      jsonBuilder.set("creationDate", "2023-08-10T16:21:59.452Z")
-      jsonBuilder.set("modificationDate", "2023-08-10T16:21:59.452Z")
-      jsonBuilder.set("term", cutFirstWord(t).trim().replace("[x]", "sth"))
+      jsonBuilder.set("creationDate", date)
+      jsonBuilder.set("modificationDate", date)
+      jsonBuilder.set("term", dwlib.cutFirstWord(t).trim().replace("[x]", "sth"))
       jsonBuilder.set("partOfSpeech", 12)
       jsonBuilder.set("definitionTermSpans", [])
       jsonBuilder.set("synonyms", [])
@@ -37,7 +44,7 @@ dw
       jsonBuilder.set("creationId", uuidv4())
       jsonBuilder.set("needToUpdateDefinitionSpans", true)
       jsonBuilder.set("needToUpdateExampleSpans", true)
-      console.log(cutFirstWord(t).trim()) 
+      console.log(dwlib.cutFirstWord(t).trim()) 
       jsonBuilder.startArray("definitions")
       defs = jsonBuilder.cursor as Array<string>
       jsonBuilder.endArray()

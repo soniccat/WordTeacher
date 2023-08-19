@@ -1,4 +1,5 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/helloweb.ts',
@@ -18,9 +19,15 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: 'our project', 
+      template: './src/helloweb.html' }) 
+  ],
+  devtool: 'source-map',
   devServer: {
     static: path.join(__dirname, "dist"),
     compress: true,
-    port: 4000,
+    port: 6001,
   },
 };

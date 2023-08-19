@@ -1,4 +1,4 @@
-let message: string = `
+export let message: string = `
 <html lang="en" data-react-helmet="lang"><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style lang="en" type="text/css" id="dark-mode-custom-style"></style><style lang="en" type="text/css" id="dark-mode-native-style"></style><style lang="en" type="text/css" id="dark-mode-native-sheet"></style><head>
         <meta data-react-helmet="true" charset="utf-8"><meta data-react-helmet="true" name="viewport" content="width=device-width, initial-scale=1.0"><meta data-react-helmet="true" name="theme-color" content="#15C39A"><meta data-react-helmet="true" name="msapplication-TileImage" content="https://contenthub-static.grammarly.com/assets/img/6a2864564457e4414f37f69cb45902f2/mstile-150x150.png"><meta data-react-helmet="true" name="msapplication-TileColor" content="#15C39A"><meta data-react-helmet="true" name="google-site-verification" content="HZCIqSzJFf3guNYh6dzIjKHHtSoEtYgXalyay8fU0SE"><meta data-react-helmet="true" property="fb:app_id" content="203198053709806">
         <title>Phrasal Verbs Defined &amp; Most Common Phrasal Verbs | Grammarly Blog</title>
@@ -1097,7 +1097,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     opacity: 0;visibility: hidden;"><div role="alertdialog" aria-describedby="onetrust-policy-text" aria-label="Privacy"><div class="ot-sdk-container"><div class="ot-sdk-row"><div id="onetrust-group-container" class="ot-sdk-eight ot-sdk-columns"><div class="banner_logo"></div><div id="onetrust-policy"><p id="onetrust-policy-text">By clicking “Accept All Cookies”, you agree to the storing of cookies on your device to enhance site navigation, analyze site usage, and assist in our marketing efforts. </p></div></div><div id="onetrust-button-group-parent" class="ot-sdk-three ot-sdk-columns has-reject-all-button"><div id="onetrust-button-group"><button id="onetrust-pc-btn-handler" class="cookie-setting-link">Cookies Settings</button> <button id="onetrust-reject-all-handler">Reject All</button> <button id="onetrust-accept-btn-handler">Accept All Cookies</button></div></div></div></div><!-- Close Button --><div id="onetrust-close-btn-container"><button class="onetrust-close-btn-handler onetrust-close-btn-ui banner-close-button ot-close-icon" style="background-image: url(&quot;https://cdn.cookielaw.org/logos/static/ot_close.svg&quot;);" aria-label="Close"></button></div><!-- Close Button END--></div></div></div></body></html>
 `;
 
-let message2: string = `
+export let message2: string = `
 <div class="pr cc_pgwn">
 
     <div class="x lpl-10 lpr-10 lpt-10 lpb-25 lmax lp-m_l-20 lp-m_r-20">

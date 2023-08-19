@@ -51,6 +51,8 @@ open class CardSetJsonImportVMImpl(
 
     private val json = Json {
         ignoreUnknownKeys = true
+        coerceInputValues = true
+        explicitNulls = false
     }
 
     override fun onJsonTextChanged(text: String) {

@@ -1,4 +1,4 @@
-
+import { FoundResult } from "./foundresult"
 /*
 // DOM parser with a cursor
 // cursor - a child position of the current parent node, we move cursor down the siblings when calling find.. methods
@@ -21,7 +21,7 @@ dw = DOMWalker()
   )
   .call { jb.endArray() }
 */
-class DOMWalker {
+export class DOMWalker {
   private cursorStack: Array<DOMWalkerCursor> = Array()
   private cursor: DOMWalkerCursor
   private lastFoundResult?: FoundResult = null
@@ -208,7 +208,7 @@ class DOMWalker {
   }
 }
 
-class DOMWalkerCursor {
+export class DOMWalkerCursor {
   node: Node
   childIndex: number = -1
   maxIndex: number = -1
@@ -268,7 +268,7 @@ class DOMWalkerState {
 // [startIndex..endIndex)
 // -1 for startIndex means we include the node itself
 // -1 for endIndex means infinity 
-class DOMWalkerRange {
+export class DOMWalkerRange {
   start: number
   end: number
 
@@ -292,7 +292,7 @@ class DOMWalkerRange {
 
 let NodeRange = new DOMWalkerRange(-1, -1)
 
-class DOMWalkerError extends Error {
+export class DOMWalkerError extends Error {
   constructor(s: string) {
     super(s)
     Object.setPrototypeOf(this, DOMWalkerError.prototype);
@@ -316,7 +316,7 @@ function splitByFunction(node: Node, range: DOMWalkerRange, f: (aNode: Node, aRa
   return result
 }
 
-function findNodeWithClassSplitter(className: string): (aStartNode: Node, range: DOMWalkerRange) => FoundResult | null {
+export function findNodeWithClassSplitter(className: string): (aStartNode: Node, range: DOMWalkerRange) => FoundResult | null {
   return (aStartNode: Node, range: DOMWalkerRange) => {
     return findNodeWithClass(aStartNode, range, className)
   }
@@ -383,7 +383,7 @@ function findNodeContainingWithTextChecker(startNode: Node, range: DOMWalkerRang
   return null
 }
 
-function cutFirstWord(str: string): string {
+export function cutFirstWord(str: string): string {
   let i = str.indexOf(' ')
   if (i != -1) {
     return str.substring(i+1)
