@@ -1,0 +1,66 @@
+{
+  "commands":[
+    {
+      "name": "goTo",
+      "params": [
+        {
+          "name": "className",
+          "value": "entry learnable"
+        }
+      ]
+    },
+    {
+      "name": "split",
+      "params": [
+        {
+          "name": "className",
+          "value": "entry learnable"
+        },
+        {
+          "name": "commands",
+          "value": [
+            {
+              "name": "goIn"
+            },
+            {
+              "name": "find",
+              "params": [
+                {
+                  "name": "className",
+                  "value": "word"
+                }
+              ]
+            },
+            {
+              "name": "call",
+              "params": [
+                {
+                  "name": "menthod",
+                  "value": "cardset.startCard"
+                }
+              ]
+            },
+            {
+              "name": "call",
+              "params": [
+                {
+                  "name": "menthod",
+                  "value": "cardset.setCardTerm"
+                },
+                {
+                  "name": "arguments",
+                  "arguments": [
+                    {
+                      "name": "text",
+                      "value": "$text"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

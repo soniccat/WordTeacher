@@ -4,5 +4,6 @@ use (
 	./service_auth
 	./service_cardsets
 	./service_cardsetsearch
+	./service_webadapter
 	./tools
 )

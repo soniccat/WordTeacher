@@ -1,4 +1,4 @@
-import {v4 as uuidv4} from 'uuid';
+import { randomUUID } from 'crypto';
 import { JSONBuilder } from "./JSONBuilder"
 
 export enum PartOfSpeech {
@@ -32,7 +32,7 @@ export class CardSetBuilder {
     this.jsonBuilder.set("name", name)
     this.jsonBuilder.set("source", source)
     this.jsonBuilder.set("id", "")
-    this.jsonBuilder.set("creationId", uuidv4())
+    this.jsonBuilder.set("creationId", randomUUID())
     this.jsonBuilder.set("creationDate", this.creationDate)
     this.jsonBuilder.set("modificationDate", this.creationDate)
     this.jsonBuilder.startArray("cards")
@@ -51,7 +51,7 @@ export class CardSetBuilder {
     this.currentCard = this.jsonBuilder.cursor
 
     this.jsonBuilder.set("id", "")
-    this.jsonBuilder.set("creationId", uuidv4())
+    this.jsonBuilder.set("creationId", randomUUID())
     this.jsonBuilder.set("creationDate", this.creationDate)
     this.jsonBuilder.set("modificationDate", this.creationDate)
     this.jsonBuilder.set("progress", {})

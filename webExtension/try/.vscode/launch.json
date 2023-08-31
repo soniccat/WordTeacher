@@ -7,9 +7,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Open helloweb.html",
+      "name": "backend config",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "develop"]
+      "runtimeArgs": ["run-script", "backend"]
       // "file": "/Users/alexeyglushkov/androidProjects/WordTeacher/webExtension/try/dst/helloweb.html",
     }
   ]

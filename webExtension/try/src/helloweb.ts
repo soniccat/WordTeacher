@@ -1,10 +1,10 @@
 import * as dwlib from "./DOMWalker";
 import * as messages from "./message"
 import { CardSetBuilder } from './CardSetBuilder';
+const jsdom = require("jsdom");
 
 let cardSetBuilder = new CardSetBuilder("100 Words Every Middle Schooler Should Know", "https://www.vocabulary.com/lists/558097")
-
-document.body.innerHTML = messages.message3;
+let dom = new JSDOM(messages.message3)
 
 let dw = new dwlib.DOMWalker(new dwlib.DOMWalkerCursor(document.body))
 dw

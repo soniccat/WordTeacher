@@ -1,0 +1,7 @@
+{
+  "vocabulary.com": {
+    "dir": "vocabulary.com",
+    "lists/*": "lists.json",
+    "dictionary/*": "dictionary.json"
+  }
+}

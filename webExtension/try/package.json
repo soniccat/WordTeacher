@@ -4,16 +4,15 @@
   "description": "",
   "main": "src/helloweb.ts",
   "scripts": {
+    "backend": "node ./dist/bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "develop": "webpack-dev-server --mode development",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production && node ./dist/bundle.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Alexey Glushkov",
+  "license": "MIT",
   "devDependencies": {
-    "css-loader": "^6.7.1",
-    "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.6.1",
     "ts-loader": "^9.4.1",
     "webpack": "^5.74.0",
@@ -21,7 +20,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
-    "@types/uuid": "^9.0.2",
-    "uuid": "^9.0.0"
+    "@types/jsdom": "^21.1.1",
+    "jsdom": "^22.1.0"
   }
 }
