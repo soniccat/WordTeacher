@@ -23,6 +23,7 @@ import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
+import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.launch
 
 @Composable

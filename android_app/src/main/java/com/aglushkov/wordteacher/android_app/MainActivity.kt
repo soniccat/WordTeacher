@@ -330,6 +330,10 @@ class MainActivity : AppCompatActivity(), Router {
     override fun closeCardSet() {
         mainDecomposeComponent.back()
     }
+
+    override fun openJsonImport() {
+        TODO("Not yet implemented")
+    }
 }
 
 sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
