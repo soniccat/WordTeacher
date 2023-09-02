@@ -1,6 +1,6 @@
-import * as dwlib from "../../../domwalker"
-import { CardSetBuilder } from '../../../cardset_builder';
-import { ParserResult } from "../../../parser_result";
+import * as dwlib from "../../../dom/domwalker"
+import { CardSetBuilder } from '../../../builder/cardset_builder';
+import { ParserResult } from "../../parser_result";
 
 export function vocabularyListParser(document: Document): ParserResult {
   const cardSetBuilder = new CardSetBuilder("", document.URL)

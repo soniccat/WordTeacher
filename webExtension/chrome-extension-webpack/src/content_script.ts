@@ -1,5 +1,5 @@
 import { config } from "./config"
-import { ParserResult } from "./parser_result";
+import { ParserResult } from "./parsers/parser_result";
 
 const url = new URL(document.URL)
 const site = config.get(url.hostname)

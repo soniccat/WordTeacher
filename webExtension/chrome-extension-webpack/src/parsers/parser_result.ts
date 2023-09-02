@@ -1,4 +1,4 @@
-import { CardSetBuilder } from "./cardset_builder"
+import { CardSetBuilder } from "../builder/cardset_builder"
 
 export class ParserResult {
   titleNode: Node
