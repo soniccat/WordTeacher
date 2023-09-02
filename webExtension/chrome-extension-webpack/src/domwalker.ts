@@ -99,52 +99,40 @@ export class DOMWalker {
     return this
   }
 
-  goToNodeWithClass(name: string): DOMWalker {
-    this.findNodeWithClass(name)
+  goToTopNodeWithMatcher(matcher: NodeMatcher): DOMWalker {
+    this.findTopNodeWithMatcher(matcher)
     this.goToFoundResult()
 
     return this
   }
 
-  findNodeWithClass(name: string): DOMWalker {
-    const fr = findNodeWithClass(this.cursor.node, this.cursor.range(), name)
+  findTopNodeWithMatcher(matcher: NodeMatcher): DOMWalker {
+    const fr = findTopNode(this.cursor.node, this.cursor.range(), matcher)
     if (fr != null) {
       this.lastFoundResult = fr
       this.cursor.childIndex = fr.childIndexInOriginalNode
     } else {
-      throw new DOMWalkerError(`findNodeWithClass(${name}) failed at ${this.cursor.toString()}`)
+      throw new DOMWalkerError(`findTopNodeWithMatcher(${matcher}) failed at ${this.cursor.toString()}`)
     }
 
     return this
   }
 
-  findNodeContainingText(text: string): DOMWalker {
-    const fr = findNodeContainingText(this.cursor.node, this.cursor.range(), text)
+  findDeepestNodeWithMatcher(matcher: NodeMatcher): DOMWalker {
+    const fr = findDeepestNode(this.cursor.node, this.cursor.range(), matcher)
     if (fr != null) {
       this.lastFoundResult = fr
       this.cursor.childIndex = fr.childIndexInOriginalNode
     } else {
-      throw new DOMWalkerError(`findNodeContainingText(${text}) failed at ${this.cursor.toString()}`)
-    }
-    
-    return this
-  }
-
-  findNodeWithNotEmptyText(): DOMWalker {
-    const fr = findNodeWithNotEmptyText(this.cursor.node, this.cursor.range())
-    if (fr != null) {
-      this.lastFoundResult = fr
-      this.cursor.childIndex = fr.childIndexInOriginalNode
-    } else {
-      throw new DOMWalkerError(`findNodeWithNotEmptyText() failed at ${this.cursor.toString()}`)
+      throw new DOMWalkerError(`findDeepestNodeWithMatcher(${matcher}) failed at ${this.cursor.toString()}`)
     }
     
     return this
   }
 
-  splitByFunctionWithDOMWalker(f: (node: Node, range: DOMWalkerRange) => FoundResult | null, itemCallback: (dw: DOMWalker) => void): DOMWalker {
+  splitByMatcherWithDOMWalker(matcher: NodeMatcher, itemCallback: (dw: DOMWalker) => void): DOMWalker {
     const internalDOMWalker = this.requireInternalDOMWalker(this.cursor)
-    const foundResults = splitByFunction(this.cursor.node, this.cursor.range(), f)
+    const foundResults = splitByMatcher(this.cursor.node, this.cursor.range(), matcher)
 
     for (let index = 0; index < foundResults.length; index++) {
       const fr = foundResults[index]
@@ -160,6 +148,25 @@ export class DOMWalker {
 
     return this
   }
+
+  // splitByFunctionWithDOMWalker(f: (node: Node, range: DOMWalkerRange) => FoundResult | null, itemCallback: (dw: DOMWalker) => void): DOMWalker {
+  //   const internalDOMWalker = this.requireInternalDOMWalker(this.cursor)
+  //   const foundResults = splitByFunction(this.cursor.node, this.cursor.range(), f)
+
+  //   for (let index = 0; index < foundResults.length; index++) {
+  //     const fr = foundResults[index]
+
+  //     if (index == foundResults.length - 1) {
+  //       internalDOMWalker.reset(new DOMWalkerCursor(this.cursor.node, fr.childIndexInOriginalNode, -1))
+  //     } else {
+  //       const nextFr = foundResults[index+1]
+  //       internalDOMWalker.reset(new DOMWalkerCursor(this.cursor.node, fr.childIndexInOriginalNode, nextFr.childIndexInOriginalNode))
+  //     }
+  //     itemCallback(internalDOMWalker)
+  //   }
+
+  //   return this
+  // }
 
   textContent(f: (text: string) => void ): DOMWalker {
     f(this.cursor.childNode().textContent)
@@ -306,6 +313,12 @@ export class DOMWalkerError extends Error {
 
 //// functions
 
+function splitByMatcher(node: Node, range: DOMWalkerRange, matcher: NodeMatcher): Array<FoundResult> {
+  return splitByFunction(node, range, (aStartNode: Node, range: DOMWalkerRange) => {
+    return findTopNode(aStartNode, range, matcher)
+  })
+}
+
 function splitByFunction(node: Node, range: DOMWalkerRange, f: (aNode: Node, aRange: DOMWalkerRange) => FoundResult | null): Array<FoundResult> {
   const result = Array<FoundResult>()
   for (let index = range.start; index < node.childNodes.length && range.isInRange(index);) {
@@ -321,26 +334,266 @@ function splitByFunction(node: Node, range: DOMWalkerRange, f: (aNode: Node, aRa
   return result
 }
 
-export function findNodeWithClassSplitter(className: string): (aStartNode: Node, range: DOMWalkerRange) => FoundResult | null {
+export function findNodeWithMatcher(matcher: NodeMatcher): (aStartNode: Node, range: DOMWalkerRange) => FoundResult | null {
   return (aStartNode: Node, range: DOMWalkerRange) => {
-    return findNodeWithClass(aStartNode, range, className)
+    return findTopNode(aStartNode, range, matcher)
   }
 }
 
-function findNodeWithClass(startNode: Node, range: DOMWalkerRange, className: string): FoundResult | null {
-  if (range.start == -1 && startNode instanceof Element) {
-    const v = startNode.attributes.getNamedItem("class")
-    if (v instanceof Attr) {
-      if (v.value.trim() == className) {
-        return new FoundResult(startNode)
+// function findNodeWithClass(startNode: Node, range: DOMWalkerRange, className: string): FoundResult | null {
+//   if (range.start == -1 && startNode instanceof Element) {
+//     const v = startNode.attributes.getNamedItem("class")
+//     if (v instanceof Attr) {
+//       if (v.value.trim() == className) {
+//         return new FoundResult(startNode)
+//       }
+//     }
+//   }
+
+//   if (startNode instanceof Node) {
+//     for (let index = range.start; index < startNode.childNodes.length && range.isInRange(index); index++) {
+//       const element = startNode.childNodes[index];
+//       const fr = findNodeWithClass(element, NodeRange, className)
+//       if (fr != null) {
+//         if (fr.childIndex == -1) {
+//           return new FoundResult(startNode, index, index)
+//         }
+
+//         fr.childIndexInOriginalNode = index
+//         return fr
+//       }
+//     };
+//   }
+
+//   return null
+// }
+
+// function findNodeContainingText(startNode: Node, range: DOMWalkerRange, text: string): FoundResult | null {
+//   return findNodeContainingWithTextChecker(startNode, range, (t: string) => { return t.indexOf(text) != -1 } )
+// }
+
+// function findNodeWithNotEmptyText(startNode: Node, range: DOMWalkerRange): FoundResult | null {
+//   return findNodeContainingWithTextChecker(startNode, range, (t: string) => { return t.trim().length > 0 } )
+// }
+
+// function findNodeContainingWithTextChecker(startNode: Node, range: DOMWalkerRange, textChecker: (t: string) => boolean): FoundResult | null {
+//   if (startNode instanceof Node) {
+//     for (let index = range.start; index < startNode.childNodes.length && range.isInRange(index); index++) {
+//       const element = startNode.childNodes[index];
+//       const fr = findNodeContainingWithTextChecker(element, NodeRange, textChecker)
+//       if (fr != null) {
+//         if (fr.childIndex == -1) {
+//           return new FoundResult(startNode, index, index)
+//         }
+
+//         fr.childIndexInOriginalNode = index
+//         return fr
+//       }
+//     };
+//   }
+
+//   if (range.start == -1 && startNode instanceof Node) {
+//     if (textChecker(startNode.textContent)) {
+//       return new FoundResult(startNode)
+//     }
+//   }
+
+//   return null
+// }
+
+export class NodeMatcherBuilder {
+  private currentMatcher: NodeMatcher
+
+  constructor(m: NodeMatcher) {
+    this.currentMatcher = m
+  }
+
+  not(): NodeMatcherBuilder {
+    this.currentMatcher = new NotNodeMatcher(this.currentMatcher)
+    return this
+  }
+
+  and(m: NodeMatcher): NodeMatcherBuilder {
+    this.currentMatcher = new AndNodeMatcher(this.currentMatcher, m)
+    return this
+  }
+
+  or(m: NodeMatcher): NodeMatcherBuilder {
+    this.currentMatcher = new OrNodeMatcher(this.currentMatcher, m)
+    return this
+  }
+
+  build(): NodeMatcher {
+    return this.currentMatcher
+  }
+}
+
+abstract class NodeMatcher {
+  abstract match(n: Node): boolean
+
+  asBuilder(): NodeMatcherBuilder {
+    return new NodeMatcherBuilder(this)
+  }
+}
+
+export class NoNodeMatcher extends NodeMatcher {
+  match(n: Node): boolean {
+    return false
+  }
+}
+
+export class NotNodeMatcher extends NodeMatcher {
+  private matcher: NodeMatcher
+
+  constructor(matcher: NodeMatcher) {
+    super()
+    this.matcher = matcher
+  }
+
+  match(n: Node): boolean {
+    return !this.matcher.match(n)
+  }
+}
+
+export class LambdaNodeMatcher extends NodeMatcher {
+  private l: (n:Node) => boolean
+
+  constructor(l: (n:Node) => boolean) {
+    super()
+    this.l = l
+  }
+
+  match(n: Node): boolean {
+    return this.l(n)
+  }
+}
+
+export enum ClassNodeMatcherType {
+  Equal,
+  StartsWith
+}
+
+export class ClassNodeMatcher extends NodeMatcher {
+  private className: string
+  private type: ClassNodeMatcherType
+
+  constructor(className: string, type: ClassNodeMatcherType = ClassNodeMatcherType.Equal) {
+    super()
+    this.className = className
+    this.type = type
+  }
+
+  match(n: Node): boolean {
+    if (n instanceof Element) {
+      const v = n.attributes.getNamedItem("class")
+      if (v instanceof Attr) {
+        const trimmed = v.value.trim()
+        if (this.type == ClassNodeMatcherType.Equal && trimmed == this.className) {
+          return true
+        } else if (this.type == ClassNodeMatcherType.StartsWith && trimmed.startsWith(this.className)) {
+          return true
+        }
       }
+    }
+    return false
+  }
+}
+
+export enum TextNodeMatcherType {
+  Equal,
+  StartsWith,
+  EndsWith,
+  Contains
+}
+
+export class TextNodeMatcher extends NodeMatcher {
+  private text: string
+  private type: TextNodeMatcherType
+
+  constructor(text: string, type: TextNodeMatcherType = TextNodeMatcherType.Equal) {
+    super()
+    this.text = text
+    this.type = type
+  }
+
+  match(n: Node): boolean {
+    const trimmed = n.textContent.trim()
+    if (this.type == TextNodeMatcherType.Equal && trimmed == this.text) {
+      return true
+    } else if (this.type == TextNodeMatcherType.StartsWith && trimmed.startsWith(this.text)) {
+      return true
+    } else if (this.type == TextNodeMatcherType.EndsWith && trimmed.endsWith(this.text)) {
+      return true
+    } else if (this.type == TextNodeMatcherType.Contains && trimmed.indexOf(this.text) != -1) {
+      return true
+    }
+    return false
+  }
+}
+
+export class ParentNodeMatcher extends NodeMatcher {
+  private parentMatcher: NodeMatcher
+
+  constructor(parentMatcher: NodeMatcher) {
+    super()
+    this.parentMatcher = parentMatcher
+  }
+
+  match(n: Node): boolean {
+    let localNode = n
+    while (localNode.parentElement != null) {
+      if (this.parentMatcher.match(localNode.parentElement)) {
+        return true
+      }
+
+      localNode = localNode.parentElement
+    }
+
+    return false
+  }
+}
+
+export class AndNodeMatcher extends NodeMatcher {
+  private l: NodeMatcher
+  private r: NodeMatcher
+
+constructor(l: NodeMatcher, r: NoNodeMatcher) {
+    super()
+    this.l = l
+    this.r = r
+  }
+
+  match(n: Node): boolean {
+    return this.l.match(n) && this.r.match(n)
+  }
+}
+
+export class OrNodeMatcher extends NodeMatcher {
+  private l: NodeMatcher
+  private r: NodeMatcher
+
+  constructor(l: NodeMatcher, r: NoNodeMatcher) {
+    super()
+    this.l = l
+    this.r = r
+  }
+
+  match(n: Node): boolean {
+    return this.l.match(n) || this.r.match(n)
+  }
+}
+
+function findTopNode(startNode: Node, range: DOMWalkerRange, matcher: NodeMatcher): FoundResult | null {
+  if (range.start == -1 && startNode instanceof Element) {
+    if (matcher.match(startNode)) {
+      return new FoundResult(startNode)
     }
   }
 
   if (startNode instanceof Node) {
     for (let index = range.start; index < startNode.childNodes.length && range.isInRange(index); index++) {
       const element = startNode.childNodes[index];
-      const fr = findNodeWithClass(element, NodeRange, className)
+      const fr = findTopNode(element, NodeRange, matcher)
       if (fr != null) {
         if (fr.childIndex == -1) {
           return new FoundResult(startNode, index, index)
@@ -355,19 +608,11 @@ function findNodeWithClass(startNode: Node, range: DOMWalkerRange, className: st
   return null
 }
 
-function findNodeContainingText(startNode: Node, range: DOMWalkerRange, text: string): FoundResult | null {
-  return findNodeContainingWithTextChecker(startNode, range, (t: string) => { return t.indexOf(text) != -1 } )
-}
-
-function findNodeWithNotEmptyText(startNode: Node, range: DOMWalkerRange): FoundResult | null {
-  return findNodeContainingWithTextChecker(startNode, range, (t: string) => { return t.trim().length > 0 } )
-}
-
-function findNodeContainingWithTextChecker(startNode: Node, range: DOMWalkerRange, textChecker: (t: string) => boolean): FoundResult | null {
+function findDeepestNode(startNode: Node, range: DOMWalkerRange, matcher: NodeMatcher): FoundResult | null {
   if (startNode instanceof Node) {
     for (let index = range.start; index < startNode.childNodes.length && range.isInRange(index); index++) {
       const element = startNode.childNodes[index];
-      const fr = findNodeContainingWithTextChecker(element, NodeRange, textChecker)
+      const fr = findDeepestNode(element, NodeRange, matcher)
       if (fr != null) {
         if (fr.childIndex == -1) {
           return new FoundResult(startNode, index, index)
@@ -380,7 +625,7 @@ function findNodeContainingWithTextChecker(startNode: Node, range: DOMWalkerRang
   }
 
   if (range.start == -1 && startNode instanceof Node) {
-    if (textChecker(startNode.textContent)) {
+    if (matcher.match(startNode)) {
       return new FoundResult(startNode)
     }
   }

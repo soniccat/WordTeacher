@@ -9,8 +9,8 @@ export function vocabularyListParser(document: Document): ParserResult {
   const dw = new dwlib.DOMWalker(new dwlib.DOMWalkerCursor(document.body))
   dw
   .pushState()
-  .goToNodeWithClass("title-actions-stats")
-  .goToNodeWithClass("title")
+  .goToTopNodeWithMatcher(new dwlib.ClassNodeMatcher("title-actions-stats"))
+  .goToTopNodeWithMatcher(new dwlib.ClassNodeMatcher("title"))
   .childNode((node) => {
     titleNode = node
   })
@@ -19,31 +19,31 @@ export function vocabularyListParser(document: Document): ParserResult {
     cardSetBuilder.setName(t.trim().replace("\n", " ").replace("  ", " "))
   })
   .popState()
-  .goToNodeWithClass("entry learnable")
-  .splitByFunctionWithDOMWalker(
-    dwlib.findNodeWithClassSplitter("entry learnable"),
+  .goToTopNodeWithMatcher(new dwlib.ClassNodeMatcher("entry", dwlib.ClassNodeMatcherType.StartsWith))
+  .splitByMatcherWithDOMWalker(
+    new dwlib.ClassNodeMatcher("entry", dwlib.ClassNodeMatcherType.StartsWith),
     (dw) => {
       dw
       .goIn()
-      .findNodeWithClass("word")
+      .findTopNodeWithMatcher(new dwlib.ClassNodeMatcher("word"))
       .textContent((t) => { 
         console.log(t.trim()) 
         cardSetBuilder.startCard()
         cardSetBuilder.setCardTerm(t.trim().replace("\n", " ").replace("  ", " "))
       })
-      .findNodeWithClass("definition")
+      .findTopNodeWithMatcher(new dwlib.ClassNodeMatcher("definition"))
       .textContent((t) => { 
         console.log(t.trim()) 
         cardSetBuilder.addCardDefinition(t.trim().replace("\n", " ").replace("  ", " "))
       })
-      // .try((dw) => {
-      //   dw
-      //   .findNodeWithClass("example")
-      //   .textContent((t) => { 
-      //     console.log(t.trim()) 
-      //     cardSetBuilder.addCardExample(t.trim().replace("\n", " ").replace("  ", " "))
-      //   })
-      // })
+      .try((dw) => {
+        dw
+        .findTopNodeWithMatcher(new dwlib.ClassNodeMatcher("example"))
+        .textContent((t) => { 
+          console.log(t.trim()) 
+          cardSetBuilder.addCardExample(t.trim().replace("\n", " ").replace("  ", " "))
+        })
+      })
     }
   )
 
