@@ -23,9 +23,18 @@ import (
 
 type CardSetServer struct {
 	cardsets.UnimplementedCardSetsServer
+
+	logger *logger.Logger
+}
+
+func NewCardSetServer(logger *logger.Logger) *CardSetServer {
+	return &CardSetServer{
+		logger: logger,
+	}
 }
 
 func (s *CardSetServer) GetCardSets(in *cardsets.GetCardSetsIn, server cardsets.CardSets_GetCardSetsServer) error {
+	s.logger.Info.Print("GetCardSets called")
 	return nil
 }
 
@@ -72,8 +81,8 @@ func main() {
 
 	// rpc
 	grpcServer := grpc.NewServer()
-	rpcCardSetService := CardSetServer{}
-	cardsets.RegisterCardSetsServer(grpcServer, &rpcCardSetService)
+	rpcCardSetService := NewCardSetServer(app.logger)
+	cardsets.RegisterCardSetsServer(grpcServer, rpcCardSetService)
 
 	grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%d", *grpcPort))
 	if err != nil {

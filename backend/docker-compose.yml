@@ -93,6 +93,8 @@ services:
     ports:
       - target: "${CARDSETSEARCH_PORT}"
         published: "${CARDSETSEARCH_PORT}"
+    depends_on:
+      - cardsets
 
   redis:
     container_name: "redis${TEST_SUFFIX}"
