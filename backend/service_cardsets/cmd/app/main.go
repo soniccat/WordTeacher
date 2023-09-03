@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"models/session_validator"
+	"net"
 	"net/http"
 	"runtime/debug"
 	"service_cardsets/internal/cardset"
@@ -12,8 +14,24 @@ import (
 	"tools/logger"
 	"tools/mongowrapper"
 
+	cardsets "service_cardsets/grpc"
+
+	"google.golang.org/grpc"
+
 	"github.com/alexedwards/scs/v2"
 )
+
+type CardSetServer struct {
+	cardsets.UnimplementedCardSetsServer
+}
+
+func (s *CardSetServer) GetCardSets(in *cardsets.GetCardSetsIn, server cardsets.CardSets_GetCardSetsServer) error {
+	return nil
+}
+
+func (s *CardSetServer) GetCardSetById(ctx context.Context, in *cardsets.GetCardSetIn) (*cardsets.GetCardSetOut, error) {
+	return nil, nil
+}
 
 func main() {
 	// Define command-line flags
@@ -23,6 +41,7 @@ func main() {
 
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
+	grpcPort := flag.Int("grpcPort", 5001, "gRPC port")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
 	flag.Parse()
@@ -48,6 +67,22 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
+		}
+	}()
+
+	// rpc
+	grpcServer := grpc.NewServer()
+	rpcCardSetService := CardSetServer{}
+	cardsets.RegisterCardSetsServer(grpcServer, &rpcCardSetService)
+
+	grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%d", *grpcPort))
+	if err != nil {
+		app.logger.Error.Printf("grpc: failed to listen: %v", err)
+	}
+
+	go func() {
+		if err := grpcServer.Serve(grpcListener); err != nil {
+			app.logger.Error.Printf("grpc: failed to serve: %v", err)
 		}
 	}()
 

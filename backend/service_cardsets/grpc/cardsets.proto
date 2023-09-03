@@ -1,0 +1,74 @@
+/*
+$ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+$ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+
+protoc --go_out=. --go_opt=paths=source_relative \
+--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+service_cardsets/grpc/cardsets.proto
+*/
+
+syntax = "proto3";
+
+option go_package = "google.golang.org/grpc/cardsets/cardsets";
+option java_multiple_files = true;
+option java_package = "io.grpc.cardsets";
+option java_outer_classname = "CardSetsProto";
+
+package cardsets;
+
+service CardSets {
+  rpc GetCardSets (GetCardSetsIn) returns (stream CardSet) {}
+  rpc GetCardSetById (GetCardSetIn) returns (GetCardSetOut) {}
+}
+
+message GetCardSetsIn {
+  optional string sinceDate = 1;
+}
+
+message GetCardSetIn {
+  string id = 1;
+}
+
+message GetCardSetOut {
+  CardSet cardSet = 1;
+}
+
+message CardSet {
+	string id = 1;
+	string name = 2;
+	string description = 3;
+	repeated string tags = 4;
+	repeated Card cards = 5;
+	string userId = 6;
+	string creationDate = 7;
+	string modificationDate = 8;
+}
+
+message Card {
+	string id = 1;
+	string term = 2;
+	optional string transcription = 3;
+	PartOfSpeech partOfSpeech = 4;
+	repeated string definitions = 5;
+	repeated string synonyms = 6;
+	repeated string examples = 7;
+	string userId = 8;
+	string creationDate = 9;
+	string modificationDate = 10;
+}
+
+enum PartOfSpeech {
+	UNDEFINED = 0;
+	NOUN = 1;
+	VERB = 2;
+	ADJECTIVE = 3;
+	ADVERB = 4;
+	PRONOUN = 5;
+	PREPOSITION = 6;
+	CONJUNCTION = 7;
+	INTERJECTION = 8;
+	ABBREVIATION = 9;
+	EXCLAMATION = 10;
+	DETERMINER = 11;
+	PHRASALVERB = 12;
+}

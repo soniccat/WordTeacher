@@ -4,9 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
 	"models/session_validator"
 	"net/http"
 	"runtime/debug"
+	cardsets "service_cardsets/grpc"
 	"service_cardsetsearch/internal/cardsetsearch"
 	"time"
 	"tools"
@@ -14,6 +16,8 @@ import (
 	"tools/mongowrapper"
 
 	"github.com/alexedwards/scs/v2"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -24,6 +28,7 @@ func main() {
 
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
+	cardSetsGRPCAddress := flag.String("cardSetsGPRCAddress", "localhost:5001", "get new cardsets")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
 	flag.Parse()
@@ -52,6 +57,32 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
+		}
+	}()
+
+	// grpc
+	gprcConnection, err := grpc.Dial(*cardSetsGRPCAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer gprcConnection.Close()
+	cardSetGRPCClient := cardsets.NewCardSetsClient(gprcConnection)
+
+	grpcContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	go func() {
+		stream, err := cardSetGRPCClient.GetCardSets(grpcContext, &cardsets.GetCardSetsIn{})
+		if err != nil {
+			return
+		}
+
+		for {
+			_, err := stream.Recv()
+			if err != nil {
+				break
+			}
+
 		}
 	}()
 

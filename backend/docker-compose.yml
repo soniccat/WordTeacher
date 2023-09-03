@@ -60,6 +60,8 @@ services:
       - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
       - "redis:${REDIS_PORT}"
+      - "-grpcPort"
+      - "${CARDSETS_GPRC_PORT}"
     networks:
       mongo_net:
         ipv4_address: 172.16.0.11
@@ -83,6 +85,8 @@ services:
       - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
       - "redis:${REDIS_PORT}"
+      - "-cardSetsGPRCAddress"
+      - "cardsets:${CARDSETS_GPRC_PORT}"
     networks:
       mongo_net:
         ipv4_address: 172.16.0.13
