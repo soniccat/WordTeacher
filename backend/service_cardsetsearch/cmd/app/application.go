@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/alexedwards/scs/v2"
 	"models/session_validator"
 	"net/http"
 	"service_cardsetsearch/internal/cardsetsearch"
 	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
-	"tools/rabbitmq"
+
+	"github.com/alexedwards/scs/v2"
 )
 
 type application struct {
@@ -16,8 +16,6 @@ type application struct {
 	logger                  *logger.Logger
 	sessionManager          *scs.SessionManager
 	mongoWrapper            *mongowrapper.MongoWrapper
-	rabbitMQ                *rabbitmq.RabbitMQ
-	cardSetQueue            *rabbitmq.Queue
 	cardSetSearchRepository *cardsetsearch.Repository
 	sessionValidator        session_validator.SessionValidator
 }
@@ -54,16 +52,6 @@ func (app *application) WriteResponse(w http.ResponseWriter, response interface{
 	tools.WriteResponse(w, response, app.GetLogger())
 }
 
-// RabbitMQ
-
-func (app *application) SetRabbitMQWrapper(wrapper *rabbitmq.RabbitMQ) {
-	app.rabbitMQ = wrapper
-}
-
-func (app *application) GetRabbitMQWrapper() *rabbitmq.RabbitMQ {
-	return app.rabbitMQ
-}
-
 type service struct {
 	serverAddr string
 	serverPort int
@@ -74,13 +62,6 @@ func (app *application) stop() {
 		err := app.mongoWrapper.Stop()
 		if err != nil {
 			app.logger.Error.Print("application mongoWrapper.Stop():" + err.Error())
-		}
-	}
-
-	if app.rabbitMQ != nil {
-		err := app.rabbitMQ.Stop()
-		if err != nil {
-			app.logger.Error.Print("application rabbitMQ.Stop():" + err.Error())
 		}
 	}
 }

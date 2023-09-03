@@ -2,50 +2,11 @@ package cardsetsearch
 
 import (
 	"api"
-	cardSetsRabbitmq "service_cardsets/pkg/rabbitmq"
 	"time"
 	"tools"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-func MessageCardSetToDb(cs *cardSetsRabbitmq.CardSet) (*DbCardSet, error) {
-	id, err := tools.ParseObjectID(cs.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	userId, err := tools.ParseObjectID(cs.UserId)
-	if err != nil {
-		return nil, err
-	}
-
-	creationDate, err := tools.ApiDateToDbDate(cs.CreationDate)
-	if err != nil {
-		return nil, err
-	}
-
-	modificationDateTime, err := tools.ApiDateToDbDate(cs.ModificationDate)
-	if err != nil {
-		return nil, err
-	}
-
-	terms := tools.Map(cs.Cards, func(c *cardSetsRabbitmq.Card) string {
-		return c.Term
-	})
-
-	cardSetDb := &DbCardSet{
-		CardSetId:        id,
-		Name:             cs.Name,
-		Description:      cs.Description,
-		Tags:             cs.Tags,
-		UserId:           userId,
-		CreationDate:     creationDate,
-		ModificationDate: modificationDateTime,
-		Terms:            terms,
-	}
-	return cardSetDb, nil
-}
 
 type DbCardSet struct {
 	Id               *primitive.ObjectID `bson:"_id,omitempty"`

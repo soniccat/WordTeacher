@@ -3,14 +3,14 @@ package cardsetsearch
 import (
 	"api"
 	"context"
+	"log"
+	"tools/logger"
+	"tools/mongowrapper"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	cardSetsRabbitmq "service_cardsets/pkg/rabbitmq"
-	"tools/logger"
-	"tools/mongowrapper"
 )
 
 type Repository struct {
@@ -78,24 +78,6 @@ func (m *Repository) DeleteSearchCardSetByCardSetId(
 	cardSetId *primitive.ObjectID,
 ) error {
 	_, err := m.CardSetCollection.DeleteOne(ctx, bson.M{"cardSetId": cardSetId})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Repository) UpsertCardSet(
-	ctx context.Context,
-	cardSet *cardSetsRabbitmq.CardSet,
-) error {
-
-	newCardSetDb, err := MessageCardSetToDb(cardSet)
-	if err != nil {
-		return err
-	}
-
-	err = m.upsertCardSet(ctx, newCardSetDb)
 	if err != nil {
 		return err
 	}

@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/alexedwards/scs/v2"
 	"models/session_validator"
 	"net/http"
 	"runtime/debug"
@@ -12,7 +11,8 @@ import (
 	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
-	"tools/rabbitmq"
+
+	"github.com/alexedwards/scs/v2"
 )
 
 func main() {
@@ -23,7 +23,6 @@ func main() {
 
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
-	rabbitMQUrl := flag.String("rabbitMQ", "amqp://guest:guest@localhost:5672/", "RabbitMQ url")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
 	flag.Parse()
@@ -34,7 +33,6 @@ func main() {
 		sessionManager,
 		*mongoURI,
 		*enableCredentials,
-		*rabbitMQUrl,
 		session_validator.NewSessionManagerValidator(sessionManager),
 	)
 
@@ -52,8 +50,6 @@ func main() {
 			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
 		}
 	}()
-
-	go app.handleCardSetChannel()
 
 	// Initialize a new http.Server struct.
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)
@@ -76,7 +72,6 @@ func createApplication(
 	sessionManager *scs.SessionManager,
 	mongoURI string,
 	enableCredentials bool,
-	rabbitMQUrl string,
 	sessionValidator session_validator.SessionValidator,
 ) (_ *application, err error) {
 	app := &application{
@@ -93,11 +88,6 @@ func createApplication(
 	}()
 
 	err = mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
-	if err != nil {
-		return nil, err
-	}
-
-	err = rabbitmq.SetupApp(app, rabbitMQUrl)
 	if err != nil {
 		return nil, err
 	}

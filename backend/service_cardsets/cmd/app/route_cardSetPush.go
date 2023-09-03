@@ -6,15 +6,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"sync"
+	"time"
+	"tools"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
-	"net/http"
-	"service_cardsets/pkg/rabbitmq"
-	"sync"
-	"time"
-	"tools"
 )
 
 const (
@@ -174,42 +174,7 @@ func (app *application) cardSetPush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go app.sendMessageInCardSetChannel(input, deletedIds)
-
 	app.WriteResponse(w, response)
-}
-
-func (app *application) sendMessageInCardSetChannel(input CardSetPushInput, deletedIds []primitive.ObjectID) {
-	for i, _ := range input.UpdatedCardSets {
-		updateMessage, err := rabbitmq.NewWithUpdate(
-			rabbitmq.CardSetFromApiCardSet(input.UpdatedCardSets[i]),
-		)
-
-		if err == nil {
-			bytes, err := json.Marshal(updateMessage)
-			if err == nil {
-				app.cardSetMessageChannel <- bytes
-			}
-		}
-
-		if err != nil {
-			app.logger.Error.Printf("public cardSet NewWithUpdate message: " + err.Error())
-		}
-	}
-
-	for i, _ := range deletedIds {
-		deleteMessage, err := rabbitmq.NewWithDelete(deletedIds[i].Hex())
-		if err == nil {
-			bytes, err := json.Marshal(deleteMessage)
-			if err == nil {
-				app.cardSetMessageChannel <- bytes
-			}
-		}
-
-		if err != nil {
-			app.logger.Error.Printf("public cardSet NewWithDelete message: " + err.Error())
-		}
-	}
 }
 
 func (app *application) handleUpdatedCardSets(

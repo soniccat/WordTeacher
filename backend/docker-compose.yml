@@ -60,10 +60,6 @@ services:
       - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
       - "redis:${REDIS_PORT}"
-      - "-rabbitMQ"
-      - "amqp://guest:guest@rabbitmq:${RABBITMQ_PORT}/"
-    depends_on:
-      - rabbitmq
     networks:
       mongo_net:
         ipv4_address: 172.16.0.11
@@ -87,10 +83,6 @@ services:
       - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
       - "redis:${REDIS_PORT}"
-      - "-rabbitMQ"
-      - "amqp://guest:guest@rabbitmq:${RABBITMQ_PORT}/"
-    depends_on:
-      - rabbitmq
     networks:
       mongo_net:
         ipv4_address: 172.16.0.13
@@ -142,20 +134,6 @@ services:
       - /tmp/mongodatadb:/data/db
       - /tmp/mongodataconfigdb:/data/configdb
 
-  rabbitmq:
-    container_name: 'rabbitmq'
-    hostname: 'rabbitmq'
-    image: rabbitmq:3-management-alpine
-    networks:
-      mongo_net:
-        ipv4_address: 172.16.0.4
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    volumes:
-      - ${VOLUME_RABBITMQDATA_PATH}:/var/lib/rabbitmq/
-      - ${VOLUME_RABBITMQLOG_PATH}:/var/log/rabbitmq
-
 networks:
   mongo_net:
     driver: bridge
@@ -184,18 +162,6 @@ volumes:
       o: bind
       type: none
       device: "${VOLUME_MONGOCONFIG_PATH}"
-  rabbitmq:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: "${VOLUME_RABBITMQDATA_PATH}"
-  rabbitmqlog:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: "${VOLUME_RABBITMQLOG_PATH}"
   redis_test:
 #    driver: local
 #    driver_opts:
