@@ -50,6 +50,7 @@ class JFXWebView(
     }
 
     private fun initialiseJavaFXScene() {
+        Platform.setImplicitExit(false)
         webView = WebView().apply {
             engine.locationProperty().addListener { observable, oldValue, newValue ->
                 onLocationChanged(newValue)

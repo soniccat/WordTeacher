@@ -44,6 +44,7 @@ import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.painterResource
+import javafx.application.Platform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -64,7 +65,7 @@ private val bottomBarTabs = listOf(
 
 fun main() {
     Logger().setupDebug()
-    System.setProperty("apple.awt.application.appearance", "system")
+    System.setProperty("apple.awt.application.appearance", "system") // for system light/dark mode
 
     application {
         val lifecycle = LifecycleRegistry()
@@ -73,20 +74,10 @@ fun main() {
             lifecycle = lifecycle,
             stateKeeper = stateKeeper,
         )
-
-//    val root =
-//        runOnUiThread {
-//            DefaultRootComponent(
-//                componentContext = ,
-//                featureInstaller = DefaultFeatureInstaller,
-//            )
-//        }
-
         val appComponent = DaggerAppComponent.builder()
-//        .generalModule(GeneralModule())
             .build()
 
-        // declare here to force initialization on startup
+        // declared here to force initialization on startup
         var databaseCardWorker = appComponent.databaseCardSetWorker()
         var cookieStorage = appComponent.cookieStorage()
 
@@ -104,7 +95,10 @@ fun main() {
             authOpener = mainDecomposeComponent
         }
 
-        Window(onCloseRequest = ::exitApplication) {
+        Window(onCloseRequest = {
+            Platform.exit() // JavaFX exit
+            exitApplication()
+        }) {
             ComposeAppTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     Box(modifier = Modifier.fillMaxSize()) {
