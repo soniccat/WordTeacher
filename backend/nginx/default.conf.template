@@ -28,13 +28,7 @@ server {
     }
 
     location /cardsets.CardSets {
-        #set $cardsets2 grpc://cardsets:${CARDSETS_GPRC_PORT};
-        #grpc_pass $cardsets2;
-        #proxy_pass http://172.16.0.11:5001;
-        grpc_pass grpc://172.16.0.11:5001;
+        set $cardsets2 grpc://cardsets:${CARDSETS_GPRC_PORT};
+        grpc_pass $cardsets2;
     }
-
-    #location /grpc {
-    #    grpc_pass grpc://172.16.0.11:5001;
-    #}
 }

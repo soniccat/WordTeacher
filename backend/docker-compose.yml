@@ -69,8 +69,6 @@ services:
     ports:
       - target: "${CARDSETS_PORT}"
         published: "${CARDSETS_PORT}"
-      - target: "${CARDSETS_GPRC_PORT}"
-        published: "${CARDSETS_GPRC_PORT}"
 
   cardsetsearch:
     container_name: "cardsetsearch${TEST_SUFFIX}"
