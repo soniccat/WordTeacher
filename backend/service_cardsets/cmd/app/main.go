@@ -17,6 +17,7 @@ import (
 	cardsets "service_cardsets/grpc"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/alexedwards/scs/v2"
 )
@@ -83,6 +84,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	rpcCardSetService := NewCardSetServer(app.logger)
 	cardsets.RegisterCardSetsServer(grpcServer, rpcCardSetService)
+	reflection.Register(grpcServer)
 
 	grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%d", *grpcPort))
 	if err != nil {
