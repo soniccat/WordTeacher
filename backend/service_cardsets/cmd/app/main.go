@@ -1,46 +1,20 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
-	"models/session_validator"
 	"net"
 	"net/http"
 	"runtime/debug"
-	"service_cardsets/internal/cardset"
 	"time"
 	"tools"
 	"tools/logger"
-	"tools/mongowrapper"
-
-	cardsets "service_cardsets/grpc"
 
 	"google.golang.org/grpc"
 
-	"github.com/alexedwards/scs/v2"
+	"models/session_validator"
+	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
 )
-
-type CardSetServer struct {
-	cardsets.UnimplementedCardSetsServer
-
-	logger *logger.Logger
-}
-
-func NewCardSetServer(logger *logger.Logger) *CardSetServer {
-	return &CardSetServer{
-		logger: logger,
-	}
-}
-
-func (s *CardSetServer) GetCardSets(in *cardsets.GetCardSetsIn, server cardsets.CardSets_GetCardSetsServer) error {
-	s.logger.Info.Print("GetCardSets called")
-	return nil
-}
-
-func (s *CardSetServer) GetCardSetById(ctx context.Context, in *cardsets.GetCardSetIn) (*cardsets.GetCardSetOut, error) {
-	return nil, nil
-}
 
 func main() {
 	// Define command-line flags
@@ -55,9 +29,10 @@ func main() {
 
 	flag.Parse()
 
+	logger := logger.New(*isDebug)
 	sessionManager := tools.CreateSessionManager(*redisAddress)
 	app, err := createApplication(
-		*isDebug,
+		logger,
 		sessionManager,
 		*mongoURI,
 		*enableCredentials,
@@ -79,64 +54,34 @@ func main() {
 		}
 	}()
 
-	// rpc
+	// grpc
 	grpcServer := grpc.NewServer()
-	rpcCardSetService := NewCardSetServer(app.logger)
-	cardsets.RegisterCardSetsServer(grpcServer, rpcCardSetService)
+	rpcCardSetService := NewCardSetServer(app)
+	cardsetsgrpc.RegisterCardSetsServer(grpcServer, rpcCardSetService)
 
 	grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%d", *grpcPort))
 	if err != nil {
-		app.logger.Error.Printf("grpc: failed to listen: %v", err)
+		logger.Error.Printf("grpc: failed to listen: %v", err)
 	}
 
 	go func() {
 		if err := grpcServer.Serve(grpcListener); err != nil {
-			app.logger.Error.Printf("grpc: failed to serve: %v", err)
+			logger.Error.Printf("grpc: failed to serve: %v", err)
 		}
 	}()
 
-	// Initialize a new http.Server struct.
+	// server
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)
 	srv := &http.Server{
 		Addr:         serverURI,
-		ErrorLog:     app.logger.Error,
+		ErrorLog:     logger.Error,
 		Handler:      app.routes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 
-	app.logger.Info.Printf("Starting server on %s", serverURI)
+	logger.Info.Printf("Starting server on %s", serverURI)
 	err = srv.ListenAndServe()
-	app.logger.Error.Fatal(err)
-}
-
-func createApplication(
-	isDebug bool,
-	sessionManager *scs.SessionManager,
-	mongoURI string,
-	enableCredentials bool,
-	sessionValidator session_validator.SessionValidator,
-) (_ *application, err error) {
-	app := &application{
-		logger:                logger.New(isDebug),
-		sessionManager:        sessionManager,
-		sessionValidator:      sessionValidator,
-		cardSetMessageChannel: make(chan []byte),
-	}
-
-	defer func() {
-		if err != nil {
-			app.stop()
-		}
-	}()
-
-	err = mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
-	if err != nil {
-		return nil, err
-	}
-
-	app.cardSetRepository = cardset.New(app.logger, app.mongoWrapper.Client)
-
-	return app, nil
+	logger.Error.Fatal(err)
 }

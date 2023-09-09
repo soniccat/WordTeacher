@@ -8,8 +8,6 @@ import (
 	"models/session_validator"
 	"net/http"
 	"runtime/debug"
-	cardsets "service_cardsets/grpc"
-	"service_cardsetsearch/internal/cardsetsearch"
 	"time"
 	"tools"
 	"tools/logger"
@@ -18,6 +16,9 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	cardsetsrpc "service_cardsets/pkg/grpc/service_cardsets/api"
+	"service_cardsetsearch/internal/cardsetsearch"
 )
 
 func main() {
@@ -66,13 +67,13 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer gprcConnection.Close()
-	cardSetGRPCClient := cardsets.NewCardSetsClient(gprcConnection)
+	cardSetGRPCClient := cardsetsrpc.NewCardSetsClient(gprcConnection)
 
 	grpcContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	go func() {
-		stream, err := cardSetGRPCClient.GetCardSets(grpcContext, &cardsets.GetCardSetsIn{})
+		stream, err := cardSetGRPCClient.GetCardSets(grpcContext, &cardsetsrpc.GetCardSetsIn{})
 		if err != nil {
 			return
 		}

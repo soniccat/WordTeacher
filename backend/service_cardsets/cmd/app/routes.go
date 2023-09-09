@@ -1,24 +1,43 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
+
+	"github.com/gorilla/mux"
+
+	"service_cardsets/internal/routing"
 )
 
 func (app *application) routes() *mux.Router {
+
+	cardSetPushHandler := routing.NewCardSetPushHandler(
+		app.sessionValidator,
+		app.cardSetRepository,
+	)
+
+	cardSetPullHandler := routing.NewCardSetPullHandler(
+		app.sessionValidator,
+		app.cardSetRepository,
+	)
+
+	cardSetByIdHandler := routing.NewCardSetByIdHandler(
+		app.sessionValidator,
+		app.cardSetRepository,
+	)
+
 	// Register handler functions.
 	r := mux.NewRouter()
 	r.Handle(
 		"/api/cardsets/push",
-		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetPush)),
+		app.sessionManager.LoadAndSave(http.HandlerFunc(cardSetPushHandler.CardSetPush)),
 	).Methods("POST")
 	r.Handle(
 		"/api/cardsets/pull",
-		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetPull)),
+		app.sessionManager.LoadAndSave(http.HandlerFunc(cardSetPullHandler.CardSetPull)),
 	).Methods("POST")
 	r.Handle(
 		"/api/cardsets/{id}",
-		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetById)),
+		app.sessionManager.LoadAndSave(http.HandlerFunc(cardSetByIdHandler.CardSetById)),
 	).Methods("GET")
 
 	return r

@@ -2,11 +2,12 @@ package mongowrapper
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"time"
 	"tools/logger"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const EnvMongoUsername = "MONGODB_USERNAME"
@@ -76,24 +77,22 @@ func (mw *MongoWrapper) Stop() error {
 	return nil
 }
 
-type MongoApp interface {
-	GetLogger() *logger.Logger
-	SetMongoWrapper(*MongoWrapper)
-	GetMongoWrapper() *MongoWrapper
+type MongoApp struct {
+	MongoWrapper *MongoWrapper
 }
 
-func SetupMongo(app MongoApp, mongoURI string, enableCredentials bool) error {
+func (m *MongoApp) SetupMongo(mongoURI string, enableCredentials bool, logger *logger.Logger) error {
 	mongoWrapper, err := New(mongoURI, enableCredentials)
 	if err != nil {
-		app.GetLogger().Error.Printf("createMongoWrapper failed: %s\n", err.Error())
+		logger.Error.Printf("createMongoWrapper failed: %s\n", err.Error())
 		return err
 	}
 
 	if err = mongoWrapper.Connect(); err != nil {
-		app.GetLogger().Error.Printf("mongoWrapper.connect() failed: %s\n", err.Error())
+		logger.Error.Printf("mongoWrapper.connect() failed: %s\n", err.Error())
 		return err
 	}
 
-	app.SetMongoWrapper(mongoWrapper)
+	m.MongoWrapper = mongoWrapper
 	return nil
 }

@@ -1,12 +1,17 @@
 package tools
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func Ptr[T any](x T) *T {
 	return &x
+}
+
+func ParseApiDate(date string) (time.Time, error) {
+	return time.Parse(time.RFC3339, date)
 }
 
 func ApiDateToDbDate(date string) (primitive.DateTime, error) {
