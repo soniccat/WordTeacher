@@ -9,17 +9,14 @@ import (
 )
 
 func (app *application) routes() *mux.Router {
-
 	cardSetPushHandler := routing.NewCardSetPushHandler(
 		app.sessionValidator,
 		app.cardSetRepository,
 	)
-
 	cardSetPullHandler := routing.NewCardSetPullHandler(
 		app.sessionValidator,
 		app.cardSetRepository,
 	)
-
 	cardSetByIdHandler := routing.NewCardSetByIdHandler(
 		app.sessionValidator,
 		app.cardSetRepository,

@@ -1,12 +1,11 @@
 package userauthtoken
 
 import (
-	"context"
-	"github.com/alexedwards/scs/v2"
-	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"models"
 	"time"
+
+	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func GenerateUserAuthToken(
@@ -36,14 +35,4 @@ func GenerateUserAuthToken(
 		UserDeviceType: deviceType,
 		UserDeviceId:   deviceId,
 	}, nil
-}
-
-func SaveUserAuthTokenAsSession(sd *models.UserAuthToken, context context.Context, manager *scs.SessionManager) {
-	manager.Put(context, models.SessionAccessTokenKey, sd.AccessToken.Value)
-	manager.Put(context, models.SessionAccessTokenExpirationDateKey, int64(sd.AccessToken.ExpirationDate))
-	manager.Put(context, models.SessionRefreshTokenKey, sd.RefreshToken)
-	manager.Put(context, models.SessionNetworkTypeKey, int8(sd.NetworkType))
-	manager.Put(context, models.SessionUserMongoIdKey, sd.UserMongoId.Hex())
-	manager.Put(context, models.SessionUserDeviceType, sd.UserDeviceType)
-	manager.Put(context, models.SessionUserDeviceId, sd.UserDeviceId)
 }

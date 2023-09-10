@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
-	"service_auth/internal"
 	"time"
-	"tools"
 	"tools/logger"
-	"tools/mongowrapper"
 )
 
 func main() {
@@ -24,7 +21,8 @@ func main() {
 
 	flag.Parse()
 
-	app, err := createApplication(*isDebug, *redisAddress, *mongoURI, *enableCredentials)
+	logger := logger.New(*isDebug)
+	app, err := createApplication(logger, *redisAddress, *mongoURI, *enableCredentials)
 
 	if err != nil {
 		fmt.Println("app creation error: " + err.Error())
@@ -52,34 +50,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	app.logger.Info.Printf("Starting server on %s", serverURI)
+	logger.Info.Printf("Starting server on %s", serverURI)
 	err = srv.ListenAndServe()
-	app.logger.Error.Fatal(err)
-}
-
-func createApplication(
-	isDebug bool,
-	redisAddress string,
-	mongoURI string,
-	enableCredentials bool,
-) (_ *application, err error) {
-	app := &application{
-		logger:         logger.New(isDebug),
-		sessionManager: tools.CreateSessionManager(redisAddress),
-	}
-
-	defer func() {
-		if err != nil {
-			app.stop()
-		}
-	}()
-
-	err = mongowrapper.SetupMongo(app, mongoURI, enableCredentials)
-	if err != nil {
-		return nil, err
-	}
-
-	app.userModel = internal.New(app.logger, app.mongoWrapper.Client)
-
-	return app, nil
+	logger.Error.Fatal(err)
 }

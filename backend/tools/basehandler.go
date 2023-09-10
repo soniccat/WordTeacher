@@ -9,26 +9,26 @@ type BaseHandler struct {
 	Logger *logger.Logger
 }
 
-func (app *BaseHandler) AllowStackTraces() bool {
-	return app.Logger.AllowStackTraces
+func (h *BaseHandler) AllowStackTraces() bool {
+	return h.Logger.AllowStackTraces
 }
 
-func (app *BaseHandler) NewHandlerError(code int, err error) *HandlerError {
-	return NewHandlerError(err, code, app.AllowStackTraces())
+func (h *BaseHandler) NewHandlerError(code int, err error) *HandlerError {
+	return NewHandlerError(err, code, h.AllowStackTraces())
 }
 
-func (app *BaseHandler) SetHandlerError(w http.ResponseWriter, err *HandlerError) {
-	SetHandlerError(w, err, app.Logger)
+func (h *BaseHandler) SetHandlerError(w http.ResponseWriter, err *HandlerError) {
+	SetHandlerError(w, err, h.Logger)
 }
 
-func (app *BaseHandler) SetError(w http.ResponseWriter, outErr error, code int) {
+func (h *BaseHandler) SetError(w http.ResponseWriter, outErr error, code int) {
 	if handlerError, ok := outErr.(*HandlerError); ok {
-		app.SetHandlerError(w, handlerError)
+		h.SetHandlerError(w, handlerError)
 	} else {
-		SetError(w, outErr, code, app.Logger)
+		SetError(w, outErr, code, h.Logger)
 	}
 }
 
-func (app *BaseHandler) WriteResponse(w http.ResponseWriter, response interface{}) {
-	WriteResponse(w, response, app.Logger)
+func (h *BaseHandler) WriteResponse(w http.ResponseWriter, response interface{}) {
+	WriteResponse(w, response, h.Logger)
 }

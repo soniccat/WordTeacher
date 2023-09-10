@@ -38,7 +38,7 @@ func createApplication(
 		}
 	}()
 
-	err = app.SetupMongo(mongoURI, enableCredentials, app.logger)
+	err = app.SetupMongo(mongoURI, enableCredentials)
 	if err != nil {
 		return nil, err
 	}
@@ -49,10 +49,5 @@ func createApplication(
 }
 
 func (app *application) stop() {
-	if app.MongoWrapper != nil {
-		err := app.MongoWrapper.Stop()
-		if err != nil {
-			app.logger.Error.Print("application mongoWrapper.Stop():" + err.Error())
-		}
-	}
+	app.StopMongo()
 }

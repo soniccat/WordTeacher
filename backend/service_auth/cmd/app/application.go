@@ -1,66 +1,56 @@
 package main
 
 import (
-	"context"
-	"github.com/alexedwards/scs/v2"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"models"
-	"service_auth/internal"
-	appUsearAuthToken "service_auth/internal/userauthtoken"
+	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
+
+	"github.com/alexedwards/scs/v2"
+
+	"service_auth/internal/storage"
+	"service_auth/internal/userauthtoken_generator"
 )
 
 type application struct {
-	service        service
-	logger         *logger.Logger
-	sessionManager *scs.SessionManager
-	mongoWrapper   *mongowrapper.MongoWrapper
-	userModel      *internal.UserRepository
+	mongowrapper.MongoApp
+	logger                 *logger.Logger
+	sessionManager         *scs.SessionManager
+	userRepository         *storage.UserRepository
+	userAuthTokenGenerator userauthtoken_generator.UserAuthTokenGenerator
 }
 
-func (a *application) GetLogger() *logger.Logger {
-	return a.logger
-}
-
-func (a *application) SetMongoWrapper(mw *mongowrapper.MongoWrapper) {
-	a.mongoWrapper = mw
-}
-
-func (a *application) GetMongoWrapper() *mongowrapper.MongoWrapper {
-	return a.mongoWrapper
-}
-
-type service struct {
-	serverAddr string
-	serverPort int
-}
-
-func (app *application) stop() {
-	if app.mongoWrapper != nil {
-		err := app.mongoWrapper.Stop()
-		app.GetLogger().Error.Printf("mongoWrapper.Stop() failed: %s\n", err.Error())
+func createApplication(
+	logger *logger.Logger,
+	redisAddress string,
+	mongoURI string,
+	enableCredentials bool,
+) (_ *application, err error) {
+	app := &application{
+		MongoApp:       mongowrapper.NewMongoApp(logger),
+		logger:         logger,
+		sessionManager: tools.CreateSessionManager(redisAddress),
 	}
-}
 
-func (app *application) GenerateUserAuthToken(
-	context context.Context,
-	userMongoId *primitive.ObjectID,
-	networkType models.UserNetworkType,
-	deviceType string,
-	deviceId string,
-) (*models.UserAuthToken, error) {
-	token, err := app.userModel.GenerateUserAuthToken(
-		context,
-		userMongoId,
-		networkType,
-		deviceType,
-		deviceId,
-	)
+	defer func() {
+		if err != nil {
+			app.stop()
+		}
+	}()
+
+	err = app.SetupMongo(mongoURI, enableCredentials)
 	if err != nil {
 		return nil, err
 	}
 
-	appUsearAuthToken.SaveUserAuthTokenAsSession(token, context, app.sessionManager)
-	return token, nil
+	app.userRepository = storage.NewUserRepository(app.logger, app.MongoWrapper.Client)
+	app.userAuthTokenGenerator = userauthtoken_generator.NewUserAuthTokenGenerator(
+		app.userRepository,
+		app.sessionManager,
+	)
+
+	return app, nil
+}
+
+func (app *application) stop() {
+	app.StopMongo()
 }

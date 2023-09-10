@@ -9,14 +9,14 @@ import (
 
 type CardSetsServer struct {
 	grpcapi.UnimplementedCardSetsServer
-	*grpc.CardSetByIdGRPCHandler
-	*grpc.CardSetsGRPCHandler
+	grpc.CardSetByIdGRPCHandler
+	grpc.CardSetsGRPCHandler
 }
 
 func NewCardSetServer(app *application) *CardSetsServer {
 	s := &CardSetsServer{
-		CardSetByIdGRPCHandler: grpc.NewCardSetByIdGRPCHandler(app.sessionValidator, app.cardSetRepository),
-		CardSetsGRPCHandler:    grpc.NewCardSetsGRPCHandler(app.sessionValidator, app.cardSetRepository),
+		CardSetByIdGRPCHandler: *grpc.NewCardSetByIdGRPCHandler(app.sessionValidator, app.cardSetRepository),
+		CardSetsGRPCHandler:    *grpc.NewCardSetsGRPCHandler(app.sessionValidator, app.cardSetRepository),
 	}
 	return s
 }

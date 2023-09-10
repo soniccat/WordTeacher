@@ -1,21 +1,32 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
+
+	"github.com/gorilla/mux"
+
+	"service_auth/internal/routing"
 )
 
 func (app *application) routes() *mux.Router {
-	// Register handler functions.
+	authHandler := routing.NewAuthHandler(
+		app.userRepository,
+		app.userAuthTokenGenerator,
+	)
+	refreshHandler := routing.NewRefreshHandler(
+		app.sessionManager,
+		app.userRepository,
+		app.userAuthTokenGenerator,
+	)
+
 	r := mux.NewRouter()
 	r.Handle(
 		"/api/auth/social/{networkType}", // TODO: adds versioning
-		app.sessionManager.LoadAndSave(http.HandlerFunc(app.auth)),
+		app.sessionManager.LoadAndSave(http.HandlerFunc(authHandler.Auth)),
 	).Methods("POST")
-
 	r.Handle(
 		"/api/auth/refresh",
-		app.sessionManager.LoadAndSave(http.HandlerFunc(app.refresh)),
+		app.sessionManager.LoadAndSave(http.HandlerFunc(refreshHandler.Refresh)),
 	).Methods("POST")
 
 	return r
