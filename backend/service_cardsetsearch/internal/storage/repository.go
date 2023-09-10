@@ -1,16 +1,20 @@
-package cardsetsearch
+package storage
 
 import (
 	"api"
 	"context"
 	"log"
-	"tools/logger"
-	"tools/mongowrapper"
+	"time"
+	"tools"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"service_cardsetsearch/internal/model"
+	"tools/logger"
+	"tools/mongowrapper"
 )
 
 type Repository struct {
@@ -52,16 +56,16 @@ func (m *Repository) CreateTextIndexIfNeeded(ctx context.Context) error {
 
 	indexModel := mongo.IndexModel{
 		Keys: bson.D{
-			{"name", "text"},
-			{"description", "text"},
-			{"terms", "text"},
+			{Key: "name", Value: "text"},
+			{Key: "description", Value: "text"},
+			{Key: "terms", Value: "text"},
 		},
 		Options: &options.IndexOptions{
 			Name: &textIndexName,
 			Weights: bson.D{
-				{"name", 3},
-				{"description", 3},
-				{"terms", 1},
+				{Key: "name", Value: 3},
+				{Key: "description", Value: 3},
+				{Key: "terms", Value: 1},
 			},
 		},
 	}
@@ -88,7 +92,7 @@ func (m *Repository) DeleteSearchCardSetByCardSetId(
 func (m *Repository) LoadCardSetDbById(
 	context context.Context,
 	id string,
-) (*DbCardSet, error) {
+) (*model.DbCardSet, error) {
 	cardSetDbId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -99,8 +103,8 @@ func (m *Repository) LoadCardSetDbById(
 func (m *Repository) loadCardSetDb(
 	context context.Context,
 	filter interface{},
-) (*DbCardSet, error) {
-	var cardSetDb DbCardSet
+) (*model.DbCardSet, error) {
+	var cardSetDb model.DbCardSet
 	err := m.CardSetCollection.FindOne(context, filter).Decode(&cardSetDb)
 	if err != nil {
 		return nil, err
@@ -109,9 +113,9 @@ func (m *Repository) loadCardSetDb(
 	return &cardSetDb, nil
 }
 
-func (m *Repository) upsertCardSet(
+func (m *Repository) UpsertCardSet(
 	ctx context.Context,
-	cardSetDb *DbCardSet,
+	cardSetDb *model.DbCardSet,
 ) error {
 	_, err := m.CardSetCollection.ReplaceOne(
 		ctx,
@@ -155,11 +159,31 @@ func (m *Repository) SearchCardSets(
 
 	defer func() { cursor.Close(ctx) }()
 
-	var dbCardSets []*DbCardSet
+	var dbCardSets []*model.DbCardSet
 	err = cursor.All(ctx, &dbCardSets)
 	if err != nil {
 		return nil, err
 	}
 
-	return DbCardSetsToApi(dbCardSets), nil
+	return model.DbCardSetsToApi(dbCardSets), nil
+}
+
+type modificationDateResult struct {
+	ModificationDate primitive.DateTime `bson:"modificationDate"`
+}
+
+func (m *Repository) LastCardSetModificationDate(
+	ctx context.Context,
+) (*time.Time, error) {
+	var r modificationDateResult
+	err := m.CardSetCollection.FindOne(
+		ctx,
+		bson.M{},
+		options.FindOne().SetProjection(bson.M{"modificationDate": 1}).SetSort(bson.M{"modificationDate": -1}),
+	).Decode(&r)
+	if err != nil {
+		return nil, err
+	}
+
+	return tools.Ptr(r.ModificationDate.Time()), nil
 }

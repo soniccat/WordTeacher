@@ -1,16 +1,20 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
+
+	"github.com/gorilla/mux"
+
+	"service_cardsetsearch/internal/routing"
 )
 
 func (app *application) routes() *mux.Router {
-	// Register handler functions.
+	cardSetSearchHandler := routing.NewCardSetSearchHandler(app.sessionValidator, app.cardSetSearchRepository)
+
 	r := mux.NewRouter()
 	r.Handle(
 		"/api/cardsets/search",
-		app.sessionManager.LoadAndSave(http.HandlerFunc(app.cardSetSearch)),
+		app.sessionManager.LoadAndSave(http.HandlerFunc(cardSetSearchHandler.CardSetSearch)),
 	).Methods("GET")
 
 	return r

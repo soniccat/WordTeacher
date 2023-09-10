@@ -1,0 +1,58 @@
+package cardsets_client
+
+import (
+	"context"
+	"time"
+	"tools"
+	"tools/logger"
+
+	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
+)
+
+type CardSetResult struct {
+	CardSet *cardsetsgrpc.CardSet
+	Error   error
+}
+
+type Contract interface {
+	GetCardSets(ctx context.Context, since time.Time) (chan CardSetResult, error)
+}
+
+type client struct {
+	logger     *logger.Logger
+	grpcClient cardsetsgrpc.CardSetsClient
+}
+
+func NewClient(logger *logger.Logger, grpcClient cardsetsgrpc.CardSetsClient) Contract {
+	return &client{
+		logger:     logger,
+		grpcClient: grpcClient,
+	}
+}
+
+func (c *client) GetCardSets(ctx context.Context, since time.Time) (chan CardSetResult, error) {
+	grpcCardSetStream, err := c.grpcClient.GetCardSets(
+		ctx,
+		&cardsetsgrpc.GetCardSetsIn{SinceDate: tools.Ptr(tools.TimeToApiDate(since))},
+		nil,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	cardSetChan := make(chan CardSetResult)
+	go func() {
+		for {
+			cs, err := grpcCardSetStream.Recv()
+			if err != nil {
+				cardSetChan <- CardSetResult{Error: err}
+				break
+			} else {
+				cardSetChan <- CardSetResult{CardSet: cs}
+			}
+		}
+	}()
+
+	return cardSetChan, nil
+}

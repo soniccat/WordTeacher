@@ -1,4 +1,4 @@
-package cardsetsearch
+package model
 
 import (
 	"api"
