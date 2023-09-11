@@ -27,7 +27,7 @@ server {
         proxy_pass $cardsets;
     }
 
-    location /cardsets.CardSets {
+    location /cardsetsgrpc.CardSets {
         set $cardsets2 grpc://cardsets:${CARDSETS_GPRC_PORT};
         grpc_pass $cardsets2;
     }

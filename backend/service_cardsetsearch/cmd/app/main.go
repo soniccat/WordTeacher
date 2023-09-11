@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	// Define command-line flags
+	// flags
 	isDebug := flag.Bool("debugMode", false, "Shows stack traces in logs")
 	serverAddr := flag.String("serverAddr", "", "HTTP server network address")
 	serverPort := flag.Int("serverPort", 4002, "HTTP server network port")
@@ -69,6 +69,13 @@ func main() {
 			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
 		}
 	}()
+
+	logger.Info.Printf("Starting cardSetPullWorker")
+	err = app.startCardSetPullWorker()
+	if err != nil {
+		logger.Error.Fatal(err)
+		return
+	}
 
 	// Initialize a new http.Server struct.
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)

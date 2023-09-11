@@ -6,6 +6,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 
 	"models/session_validator"
+	"service_cardsetsearch/internal/cardsetpull_worker"
 	"service_cardsetsearch/internal/cardsets_client"
 	"service_cardsetsearch/internal/storage"
 	"tools/logger"
@@ -14,6 +15,7 @@ import (
 
 type application struct {
 	mongowrapper.MongoApp
+	ctx                     context.Context
 	logger                  *logger.Logger
 	sessionManager          *scs.SessionManager
 	cardSetSearchRepository *storage.Repository
@@ -32,6 +34,7 @@ func createApplication(
 ) (_ *application, err error) {
 	app := &application{
 		MongoApp:         mongowrapper.NewMongoApp(logger),
+		ctx:              ctx,
 		logger:           logger,
 		sessionManager:   sessionManager,
 		sessionValidator: sessionValidator,
@@ -56,6 +59,12 @@ func createApplication(
 	}
 
 	return app, nil
+}
+
+func (app *application) startCardSetPullWorker() error {
+	// worker
+	worker := cardsetpull_worker.NewCardSetPullWorker(app.logger, app.cardSetsClient, app.cardSetSearchRepository)
+	return worker.Start(app.ctx)
 }
 
 func (app *application) stop() {

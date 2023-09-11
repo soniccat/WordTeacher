@@ -9,7 +9,7 @@ protoc --go_out=service_cardsets/pkg/grpc --go_opt=paths=source_relative \
 service_cardsets/api/cardsets.proto
 
 // direct call for testing
-grpcurl -import-path ./service_cardsets/pkg/grpc -proto cardsets.proto -plaintext -format text -d 'sinceDate: "gRPCurl"' localhost:9090 cardsets.CardSets.GetCardSets
+grpcurl -import-path ./service_cardsets/api -proto cardsets.proto -plaintext -format text -d 'sinceDate: "2006-01-02T15:04:05Z"' localhost:9090 cardsetsgrpc.CardSets.GetCardSets
 */
 
 syntax = "proto3";

@@ -7,6 +7,8 @@ import (
 	"tools/logger"
 
 	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
+
+	"google.golang.org/grpc"
 )
 
 type CardSetResult struct {
@@ -34,7 +36,7 @@ func (c *client) GetCardSets(ctx context.Context, since time.Time) (chan CardSet
 	grpcCardSetStream, err := c.grpcClient.GetCardSets(
 		ctx,
 		&cardsetsgrpc.GetCardSetsIn{SinceDate: tools.Ptr(tools.TimeToApiDate(since))},
-		nil,
+		grpc.EmptyCallOption{},
 	)
 
 	if err != nil {
