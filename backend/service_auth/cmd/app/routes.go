@@ -10,10 +10,12 @@ import (
 
 func (app *application) routes() *mux.Router {
 	authHandler := routing.NewAuthHandler(
+		app.logger,
 		app.userRepository,
 		app.userAuthTokenGenerator,
 	)
 	refreshHandler := routing.NewRefreshHandler(
+		app.logger,
 		app.sessionManager,
 		app.userRepository,
 		app.userAuthTokenGenerator,

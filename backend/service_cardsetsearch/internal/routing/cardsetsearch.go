@@ -6,6 +6,7 @@ import (
 	"models/session_validator"
 	"net/http"
 	"service_cardsetsearch/internal/storage"
+	"tools/logger"
 
 	"tools"
 )
@@ -25,10 +26,12 @@ type CardSetSearchHandler struct {
 }
 
 func NewCardSetSearchHandler(
+	logger *logger.Logger,
 	sessionValidator session_validator.SessionValidator,
 	cardSetSearchRepository *storage.Repository,
 ) *CardSetSearchHandler {
 	return &CardSetSearchHandler{
+		BaseHandler:             *tools.NewBaseHandler(logger),
 		sessionValidator:        sessionValidator,
 		cardSetSearchRepository: cardSetSearchRepository,
 	}

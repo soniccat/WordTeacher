@@ -6,6 +6,7 @@ import (
 	"models"
 	"net/http"
 	"tools"
+	"tools/logger"
 
 	"github.com/alexedwards/scs/v2"
 
@@ -31,11 +32,13 @@ type RefreshHandler struct {
 }
 
 func NewRefreshHandler(
+	logger *logger.Logger,
 	sessionManager *scs.SessionManager,
 	userRepository *storage.UserRepository,
 	userAuthTokenGenerator userauthtokengenerator.UserAuthTokenGenerator,
 ) *RefreshHandler {
 	return &RefreshHandler{
+		BaseHandler:            *tools.NewBaseHandler(logger),
 		sessionManager:         sessionManager,
 		userRepository:         userRepository,
 		userAuthTokenGenerator: userAuthTokenGenerator,

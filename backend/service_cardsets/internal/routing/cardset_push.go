@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 	"tools"
+	"tools/logger"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -50,10 +51,12 @@ type CardSetPushHandler struct {
 }
 
 func NewCardSetPushHandler(
+	logger *logger.Logger,
 	sessionValidator session_validator.SessionValidator,
 	cardSetRepository *storage.Repository,
 ) *CardSetPushHandler {
 	return &CardSetPushHandler{
+		BaseHandler:       *tools.NewBaseHandler(logger),
 		sessionValidator:  sessionValidator,
 		cardSetRepository: cardSetRepository,
 	}

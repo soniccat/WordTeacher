@@ -9,7 +9,11 @@ import (
 )
 
 func (app *application) routes() *mux.Router {
-	cardSetSearchHandler := routing.NewCardSetSearchHandler(app.sessionValidator, app.cardSetSearchRepository)
+	cardSetSearchHandler := routing.NewCardSetSearchHandler(
+		app.logger,
+		app.sessionValidator,
+		app.cardSetSearchRepository,
+	)
 
 	r := mux.NewRouter()
 	r.Handle(

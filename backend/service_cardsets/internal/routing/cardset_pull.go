@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 	"tools"
+	"tools/logger"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -33,10 +34,12 @@ type CardSetPullHandler struct {
 }
 
 func NewCardSetPullHandler(
+	logger *logger.Logger,
 	sessionValidator session_validator.SessionValidator,
 	cardSetRepository *storage.Repository,
 ) *CardSetPullHandler {
 	return &CardSetPullHandler{
+		BaseHandler:       *tools.NewBaseHandler(logger),
 		sessionValidator:  sessionValidator,
 		cardSetRepository: cardSetRepository,
 	}

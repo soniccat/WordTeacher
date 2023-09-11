@@ -26,6 +26,7 @@ func createApplication(
 	sessionValidator session_validator.SessionValidator,
 ) (_ *application, err error) {
 	app := &application{
+		MongoApp:              mongowrapper.NewMongoApp(logger),
 		logger:                logger,
 		sessionManager:        sessionManager,
 		sessionValidator:      sessionValidator,

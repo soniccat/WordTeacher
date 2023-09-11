@@ -4,6 +4,7 @@ import (
 	"api"
 	"net/http"
 	"tools"
+	"tools/logger"
 
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
@@ -25,10 +26,12 @@ type CardSetByIdHandler struct {
 }
 
 func NewCardSetByIdHandler(
+	logger *logger.Logger,
 	sessionValidator session_validator.SessionValidator,
 	cardSetRepository *storage.Repository,
 ) *CardSetByIdHandler {
 	return &CardSetByIdHandler{
+		BaseHandler:       *tools.NewBaseHandler(logger),
 		sessionValidator:  sessionValidator,
 		cardSetRepository: cardSetRepository,
 	}

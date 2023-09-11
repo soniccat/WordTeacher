@@ -9,6 +9,12 @@ type BaseHandler struct {
 	Logger *logger.Logger
 }
 
+func NewBaseHandler(logger *logger.Logger) *BaseHandler {
+	return &BaseHandler{
+		Logger: logger,
+	}
+}
+
 func (h *BaseHandler) AllowStackTraces() bool {
 	return h.Logger.AllowStackTraces
 }

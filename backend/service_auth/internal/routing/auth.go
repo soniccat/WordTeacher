@@ -8,6 +8,7 @@ import (
 	"models"
 	"net/http"
 	"tools"
+	"tools/logger"
 
 	"github.com/gorilla/mux"
 	"google.golang.org/api/idtoken"
@@ -40,10 +41,12 @@ type AuthHandler struct {
 }
 
 func NewAuthHandler(
+	logger *logger.Logger,
 	userRepository *storage.UserRepository,
 	userAuthTokenGenerator userauthtokengenerator.UserAuthTokenGenerator,
 ) *AuthHandler {
 	return &AuthHandler{
+		BaseHandler:            *tools.NewBaseHandler(logger),
 		userRepository:         userRepository,
 		userAuthTokenGenerator: userAuthTokenGenerator,
 	}
