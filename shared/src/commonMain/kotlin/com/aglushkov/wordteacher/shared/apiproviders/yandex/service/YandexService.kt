@@ -13,6 +13,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
+import io.ktor.http.encodeURLQueryComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -79,7 +80,7 @@ fun YandexService.Companion.createWordTeacherWordService(
             val ui = lookup?.get(LookupUi) ?: "en"
             val flags = lookup?.get(LookupFlags)?.toIntOrNull() ?: 4
 
-            return service.definitions(word, lang, ui, flags).words.mapNotNull { it.asWordTeacherWord() }
+            return service.definitions(word.encodeURLQueryComponent(), lang, ui, flags).words.mapNotNull { it.asWordTeacherWord() }
         }
     }
 }

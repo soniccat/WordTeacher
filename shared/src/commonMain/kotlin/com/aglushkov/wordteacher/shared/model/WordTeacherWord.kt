@@ -7,14 +7,17 @@ import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Parcelize
+@Serializable
 data class WordTeacherWord(
-    val word: String,
-    val transcriptions: List<String>,
-    val definitions: Map<PartOfSpeech, List<WordTeacherDefinition>>,
-    val types: List<Config.Type>
+    @SerialName("term") val word: String,
+    @SerialName("transcriptions") val transcriptions: List<String>?,
+    @SerialName("definitions") val definitions: Map<PartOfSpeech, List<WordTeacherDefinition>>,
+    @Transient val types: List<Config.Type> = emptyList()
 ) : Parcelable {
 
     private class PartOfSpeechSerializer: EnumAsIntSerializer<PartOfSpeech>(

@@ -48,9 +48,15 @@ func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
 	}
 
 	apiWords := tools.Map(words, func(w wiktionary.Word) api.Word {
+		transcriptions := make([]string, 0, len(w.Transcriptions))
+		transcriptionCount := len(w.Transcriptions)
+		if transcriptionCount > 1 || transcriptionCount == 1 && w.Transcriptions[0] != "" {
+			transcriptions = w.Transcriptions
+		}
+
 		apiW := api.Word{
 			Term:           w.Term,
-			Transcriptions: w.Transcriptions,
+			Transcriptions: transcriptions,
 			Definitions:    make(map[api.PartOfSpeech][]api.Definitions),
 		}
 

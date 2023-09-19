@@ -6,8 +6,8 @@ import com.aglushkov.wordteacher.apiproviders.wordnik.service.WordnikService
 import com.aglushkov.wordteacher.apiproviders.wordnik.service.createWordTeacherWordService
 import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService
 import com.aglushkov.wordteacher.apiproviders.yandex.service.createWordTeacherWordService
-import com.aglushkov.wordteacher.shared.apiproviders.owlbot.service.OwlBotService
-import com.aglushkov.wordteacher.shared.apiproviders.owlbot.service.createWordTeacherWordService
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.createWordTeacherWordService
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
@@ -25,10 +25,10 @@ class WordTeacherWordServiceFactory {
         val key = connectParams.key
 
         return when (type) {
-            Config.Type.OwlBot -> OwlBotService.createWordTeacherWordService(baseUrl, key)
             Config.Type.Yandex -> YandexService.createWordTeacherWordService(baseUrl, key, methodParams)
             Config.Type.Wordnik -> WordnikService.createWordTeacherWordService(baseUrl, key, methodParams)
             Config.Type.Google -> GoogleService.createWordTeacherWordService(baseUrl, methodParams)
+            Config.Type.WordTeacher -> WordTeacherDictService.createWordTeacherWordService(baseUrl)
             else -> null
         }
     }

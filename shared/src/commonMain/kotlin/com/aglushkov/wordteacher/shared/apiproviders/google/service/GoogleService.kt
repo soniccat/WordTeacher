@@ -11,6 +11,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
+import io.ktor.http.encodeURLQueryComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -53,7 +54,7 @@ fun GoogleService.Companion.createWordTeacherWordService(
 
         override suspend fun define(word: String): List<WordTeacherWord> {
             val lang: String = params.value[Entries]?.get(EntriesLang) ?: "en"
-            return service.loadDefinitions(word, lang).mapNotNull { it.asWordTeacherWord() }
+            return service.loadDefinitions(word.encodeURLQueryComponent(), lang).mapNotNull { it.asWordTeacherWord() }
         }
     }
 }

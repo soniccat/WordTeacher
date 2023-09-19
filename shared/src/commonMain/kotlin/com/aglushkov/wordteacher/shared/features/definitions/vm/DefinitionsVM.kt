@@ -318,17 +318,17 @@ open class DefinitionsVMImpl(
                     )
                 }
 
-                if (def.examples.isNotEmpty()) {
+                if (def.examples?.isNotEmpty() == true) {
                     items.add(WordSubHeaderViewItem(
                         StringDesc.Resource(MR.strings.word_section_examples),
                         Indent.SMALL
                     ))
-                    for (ex in def.examples) {
+                    for (ex in def.examples.orEmpty()) {
                         items.add(WordExampleViewItem(ex, Indent.SMALL))
                     }
                 }
 
-                if (def.synonyms.isNotEmpty()) {
+                if (def.synonyms?.isNotEmpty() == true) {
                     items.add(WordSubHeaderViewItem(
                         StringDesc.Resource(MR.strings.word_section_synonyms),
                         Indent.SMALL
@@ -343,7 +343,7 @@ open class DefinitionsVMImpl(
         val hasNewItems = items.size - topIndex > 0
         if (hasNewItems) {
             items.add(topIndex, WordTitleViewItem(word.word, word.types))
-            if (word.transcriptions.isNotEmpty()) {
+            if (word.transcriptions?.isNotEmpty() == true) {
                 items.add(topIndex + 1, WordTranscriptionViewItem(word.transcriptions.joinToString(", ")))
             }
         }
@@ -367,7 +367,7 @@ open class DefinitionsVMImpl(
                 allWords.add(it.word)
             }
 
-            it.transcriptions.onEach {
+            it.transcriptions?.onEach {
                 if (!allTranscriptions.contains(it)) {
                     allTranscriptions.add(it)
                 }
@@ -448,9 +448,9 @@ open class DefinitionsVMImpl(
                 term = viewData.word.word,
                 definitions = viewData.def.definitions,
                 partOfSpeech = viewData.partOfSpeech,
-                transcription = viewData.word.transcriptions.firstOrNull(), // TODO: support several transcriptions
-                synonyms = viewData.def.synonyms,
-                examples = viewData.def.examples + contextExamples
+                transcription = viewData.word.transcriptions?.firstOrNull(), // TODO: support several transcriptions
+                synonyms = viewData.def.synonyms.orEmpty(),
+                examples = viewData.def.examples.orEmpty() + contextExamples
             )
         }
     }

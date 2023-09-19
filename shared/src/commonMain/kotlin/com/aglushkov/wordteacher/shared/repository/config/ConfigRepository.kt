@@ -58,7 +58,7 @@ class ConfigRepository(
 
     private fun loadConfigFlow() = flow {
         try {
-            val configs = service.config()
+            val configs = service.config() + Config(Config.Type.WordTeacher, listOf(ConfigConnectParams("http://193.168.0.1/", "")), emptyMap())
             emit(Resource.Loaded(configs))
         } catch (e: CancellationException) {
             throw e

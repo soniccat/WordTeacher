@@ -13,6 +13,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
+import io.ktor.http.encodeURLQueryComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -131,7 +132,7 @@ fun WordnikService.Companion.createWordTeacherWordService(
             val useCanonical = definitions?.get(DefinitionsUseCanonical)?.toBoolean() ?: false
             val includeTags = definitions?.get(DefinitionsIncludeTags)?.toBoolean() ?: false
 
-            return service.loadDefinitions(word,
+            return service.loadDefinitions(word.encodeURLQueryComponent(),
                     dictionaries,
                     limit,
                     partOfSpeech,
