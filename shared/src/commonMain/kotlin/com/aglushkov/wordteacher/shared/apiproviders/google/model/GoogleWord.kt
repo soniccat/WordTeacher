@@ -36,8 +36,9 @@ fun GoogleWord.asWordTeacherWord(): WordTeacherWord? {
     return if (isEmpty) {
         null
     } else {
-        WordTeacherWord(word,
-            phonetic,
+        WordTeacherWord(
+            word,
+            phonetic?.let { listOf(it) } ?: emptyList(),
             definitionsMap,
             listOf(Config.Type.Google))
     }

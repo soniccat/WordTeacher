@@ -16,8 +16,11 @@ data class GoogleDefinition(
 ) : Parcelable
 
 fun GoogleDefinition.asWordTeacherDefinition(): WordTeacherDefinition? {
-    return WordTeacherDefinition(listOf(definition),
-            if (example != null) listOf(example) else emptyList(),
-            synonyms.orEmpty(),
-            null)
+    return WordTeacherDefinition(
+        listOf(definition),
+        if (example != null) listOf(example) else emptyList(),
+        synonyms.orEmpty(),
+        emptyList(), // TODO: check for antonyms
+        null
+    )
 }

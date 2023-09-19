@@ -9,5 +9,6 @@ data class WordTeacherDefinition(
     val definitions: List<String>,
     val examples: List<String>,
     val synonyms: List<String>,
+    val antonyms: List<String>,
     val imageUrl: String?
 ) : Parcelable

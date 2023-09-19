@@ -26,8 +26,11 @@ fun YandexDefinition.asWordTeacherDefinition(): WordTeacherDefinition? {
     val resultSynonyms = synonyms.orEmpty().map { it.text }
     // TODO: support meanings for non english definitions
 
-    return WordTeacherDefinition(listOf(text),
-            resultExamples,
-            resultSynonyms,
-            null)
+    return WordTeacherDefinition(
+        listOf(text),
+        resultExamples,
+        resultSynonyms,
+        emptyList(), // TODO: check if they are available
+        null
+    )
 }

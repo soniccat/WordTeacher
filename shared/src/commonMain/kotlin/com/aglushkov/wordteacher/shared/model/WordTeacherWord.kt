@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 data class WordTeacherWord(
     val word: String,
-    val transcription: String?, // TODO: a transcription should be per definition (in WordTeacherDefinition)
+    val transcriptions: List<String>,
     val definitions: Map<PartOfSpeech, List<WordTeacherDefinition>>,
     val types: List<Config.Type>
 ) : Parcelable {
@@ -47,7 +47,7 @@ data class WordTeacherWord(
 
 class WordTeacherWordBuilder {
     private var word: String = ""
-    private var transcription: String? = null
+    private var transcriptions = mutableListOf<String>()
     private var wordDefinitions = mutableMapOf<WordTeacherWord.PartOfSpeech, MutableList<WordTeacherDefinition>>()
     private var types = mutableListOf<Config.Type>()
 
@@ -56,6 +56,7 @@ class WordTeacherWordBuilder {
     private var definitions = mutableListOf<String>()
     private var examples = mutableListOf<String>()
     private var synonyms = mutableListOf<String>()
+    private var antonyms = mutableListOf<String>()
     private var imageUrl: String? = null
 
     fun setWord(v: String): WordTeacherWordBuilder {
@@ -64,7 +65,12 @@ class WordTeacherWordBuilder {
     }
 
     fun setTranscription(v: String): WordTeacherWordBuilder {
-        transcription = v
+        transcriptions = mutableListOf(v)
+        return this
+    }
+
+    fun setTranscriptions(v: List<String>): WordTeacherWordBuilder {
+        transcriptions = v.toMutableList()
         return this
     }
 
@@ -103,6 +109,7 @@ class WordTeacherWordBuilder {
         definitions.isNotEmpty() ||
             examples.isNotEmpty() ||
             synonyms.isNotEmpty() ||
+            antonyms.isNotEmpty() ||
             imageUrl != null
 
     private fun addWordDefinition() {
@@ -112,6 +119,7 @@ class WordTeacherWordBuilder {
                 definitions.toList(),
                 examples.toList(),
                 synonyms.toList(),
+                antonyms.toList(),
                 imageUrl
             )
         )
@@ -124,12 +132,13 @@ class WordTeacherWordBuilder {
         definitions.clear()
         examples.clear()
         synonyms.clear()
+        antonyms.clear()
         imageUrl = null
     }
 
     fun clear() {
         word = ""
-        transcription = null
+        transcriptions.clear()
         wordDefinitions.clear()
         types.clear()
         partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined
@@ -144,7 +153,7 @@ class WordTeacherWordBuilder {
         return if (wordDefinitions.isNotEmpty()) {
             WordTeacherWord(
                 word,
-                transcription,
+                transcriptions,
                 wordDefinitions.toMap(),
                 types.toList()
             )

@@ -29,7 +29,7 @@ fun OwlBotWord.asWordTeacherWord(): WordTeacherWord? {
     }
 
     return WordTeacherWord(word,
-        pronunciation,
+        pronunciation?.let { listOf(it) } ?: emptyList(),
         map,
         listOf(Config.Type.OwlBot))
 }

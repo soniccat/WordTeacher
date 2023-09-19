@@ -343,8 +343,8 @@ open class DefinitionsVMImpl(
         val hasNewItems = items.size - topIndex > 0
         if (hasNewItems) {
             items.add(topIndex, WordTitleViewItem(word.word, word.types))
-            word.transcription?.let {
-                items.add(topIndex + 1, WordTranscriptionViewItem(it))
+            if (word.transcriptions.isNotEmpty()) {
+                items.add(topIndex + 1, WordTranscriptionViewItem(word.transcriptions.joinToString(", ")))
             }
         }
 
@@ -367,7 +367,7 @@ open class DefinitionsVMImpl(
                 allWords.add(it.word)
             }
 
-            it.transcription?.let {
+            it.transcriptions.onEach {
                 if (!allTranscriptions.contains(it)) {
                     allTranscriptions.add(it)
                 }
@@ -395,9 +395,9 @@ open class DefinitionsVMImpl(
 
         val resultWord = allWords.joinToString()
         val resultTranscription = if (allTranscriptions.isEmpty())
-                null
+                emptyList<String>()
             else
-                allTranscriptions.joinToString()
+                allTranscriptions
 
         return WordTeacherWord(resultWord, resultTranscription, allDefinitions, allTypes)
     }
@@ -448,7 +448,7 @@ open class DefinitionsVMImpl(
                 term = viewData.word.word,
                 definitions = viewData.def.definitions,
                 partOfSpeech = viewData.partOfSpeech,
-                transcription = viewData.word.transcription,
+                transcription = viewData.word.transcriptions.firstOrNull(), // TODO: support several transcriptions
                 synonyms = viewData.def.synonyms,
                 examples = viewData.def.examples + contextExamples
             )

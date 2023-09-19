@@ -20,6 +20,7 @@ data class Config(
         @SerialName("owlbot") OwlBot,
         @SerialName("wordnik") Wordnik,
         @SerialName("yandex") Yandex,
+        @SerialName("wordteacher") WordTeacher,
         @SerialName("local") Local
     }
 }

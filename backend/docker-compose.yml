@@ -97,6 +97,27 @@ services:
     depends_on:
       - cardsets
 
+  dict:
+    container_name: "dict${TEST_SUFFIX}"
+    hostname: "dict"
+    build:
+      context: ./
+      args:
+        PORT: "${DICT_PORT}"
+      dockerfile: ./Dict.Dockerfile
+    image: dict
+    command:
+      - "-serverPort"
+      - "${DICT_PORT}"
+      - "-mongoURI"
+      - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.14
+    ports:
+      - target: "${DICT_PORT}"
+        published: "${DICT_PORT}"
+
   redis:
     container_name: "redis${TEST_SUFFIX}"
     hostname: "redis"
