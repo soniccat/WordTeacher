@@ -17,6 +17,7 @@ services:
       - CARDSETS_PORT=${CARDSETS_PORT}
       - CARDSETSEARCH_PORT=${CARDSETSEARCH_PORT}
       - CARDSETS_GPRC_PORT=${CARDSETS_GPRC_PORT}
+      - DICT_PORT=${DICT_PORT}
     logging:
       driver: "json-file"
       options:
@@ -41,9 +42,9 @@ services:
     networks:
       mongo_net:
         ipv4_address: 172.16.0.10
-    ports:
-      - target: "${AUTH_PORT}"
-        published: "${AUTH_PORT}"
+    # ports:
+    #   - target: "${AUTH_PORT}"
+    #     published: "${AUTH_PORT}"
 
   cardsets:
     container_name: "cardsets${TEST_SUFFIX}"
@@ -66,9 +67,9 @@ services:
     networks:
       mongo_net:
         ipv4_address: 172.16.0.11
-    ports:
-      - target: "${CARDSETS_PORT}"
-        published: "${CARDSETS_PORT}"
+    # ports:
+    #   - target: "${CARDSETS_PORT}"
+    #     published: "${CARDSETS_PORT}"
 
   cardsetsearch:
     container_name: "cardsetsearch${TEST_SUFFIX}"
@@ -91,9 +92,9 @@ services:
     networks:
       mongo_net:
         ipv4_address: 172.16.0.13
-    ports:
-      - target: "${CARDSETSEARCH_PORT}"
-        published: "${CARDSETSEARCH_PORT}"
+    # ports:
+    #   - target: "${CARDSETSEARCH_PORT}"
+    #     published: "${CARDSETSEARCH_PORT}"
     depends_on:
       - cardsets
 
@@ -114,9 +115,9 @@ services:
     networks:
       mongo_net:
         ipv4_address: 172.16.0.14
-    ports:
-      - target: "${DICT_PORT}"
-        published: "${DICT_PORT}"
+    # ports:
+    #   - target: "${DICT_PORT}"
+    #     published: "${DICT_PORT}"
 
   redis:
     container_name: "redis${TEST_SUFFIX}"

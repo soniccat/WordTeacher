@@ -117,6 +117,28 @@ cardsetsearchbuild:
 cardsetsearchrun:
 	docker start cardsetsearch
 
+# service_dict
+
+dictup:
+	docker stop dict || true
+	docker rm dict || true
+	docker rmi dict || true
+	make up
+
+dictstop:
+	docker container stop dict
+
+dictrm: dictstop
+	docker container rm dict
+	docker image rm dict
+
+dictbuild:
+	docker build -t dict -f ./Dict.Dockerfile .
+	docker container create -p 4001:4001 --name dict dict
+
+dictrun:
+	docker start dict
+
 #
 #cardsetsstop:
 #	docker container stop service_cardsets

@@ -4,6 +4,7 @@ import (
 	"api"
 	"errors"
 	"net/http"
+	"strings"
 	"tools"
 	"tools/logger"
 
@@ -41,7 +42,7 @@ func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	words, err := h.wiktionary.Definitions(r.Context(), term)
+	words, err := h.wiktionary.Definitions(r.Context(), strings.ToLower(term))
 	if err != nil {
 		h.SetError(w, err, http.StatusInternalServerError)
 	}
@@ -64,9 +65,9 @@ func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
 			for _, wiktionaryDef := range v {
 				apiW.Definitions[p] = append(apiW.Definitions[p], api.Definitions{
 					Definitions: []string{wiktionaryDef.Def},
-					Examples:    wiktionaryDef.Examples,
-					Synonyms:    wiktionaryDef.Synonyms,
-					Antonyms:    wiktionaryDef.Antonyms,
+					Examples:    removeTermSurroundings(wiktionaryDef.Examples),
+					Synonyms:    removeTermSurroundings(wiktionaryDef.Synonyms),
+					Antonyms:    removeTermSurroundings(wiktionaryDef.Antonyms),
 				})
 			}
 		}
@@ -78,4 +79,10 @@ func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.WriteResponse(w, response)
+}
+
+func removeTermSurroundings(slice []string) []string {
+	return tools.Map(slice, func(ex string) string {
+		return strings.ReplaceAll(ex, "'''", "")
+	})
 }

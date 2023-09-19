@@ -28,7 +28,15 @@ server {
     }
 
     location /cardsetsgrpc.CardSets {
-        set $cardsets2 grpc://cardsets:${CARDSETS_GPRC_PORT};
-        grpc_pass $cardsets2;
+        set $cardsetsPRPC grpc://cardsets:${CARDSETS_GPRC_PORT};
+        grpc_pass $cardsetsPRPC;
+    }
+
+    #
+    # Dict
+    #
+    location /api/dict {
+        set $dict http://dict:${DICT_PORT};
+        proxy_pass $dict;
     }
 }
