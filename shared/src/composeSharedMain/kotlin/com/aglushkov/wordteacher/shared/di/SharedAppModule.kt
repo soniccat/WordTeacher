@@ -3,14 +3,12 @@ package com.aglushkov.wordteacher.shared.di
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.service.SpaceHttpClientBuilder
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
-import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
@@ -40,37 +38,17 @@ import okio.Path.Companion.toPath
 class SharedAppModule {
     @AppComp
     @Provides
-    fun configService(
-        @ConfigBaseUrl configBaseUrl: String
-    ): ConfigService {
-        return ConfigService(configBaseUrl)
-    }
-
-    @AppComp
-    @Provides
-    fun configRepository(configService: ConfigService, connectivityManager: ConnectivityManager): ConfigRepository {
-        return ConfigRepository(configService, connectivityManager)
-    }
-
-    @AppComp
-    @Provides
-    fun configConnectParamsStatRepository(
-        fileSystem: FileSystem
-    ): ConfigConnectParamsStatRepository {
-        return ConfigConnectParamsStatRepository(
-            fileSystem,
-            ".".toPath().div("config_connect_params_stats")
-        )
+    fun configRepository(connectivityManager: ConnectivityManager): ConfigRepository {
+        return ConfigRepository(connectivityManager)
     }
 
     @AppComp
     @Provides
     fun serviceRepository(
         configRepository: ConfigRepository,
-        configConnectParamsStatRepository: ConfigConnectParamsStatRepository,
         factory: WordTeacherWordServiceFactory
     ): ServiceRepository {
-        return ServiceRepository(configRepository, configConnectParamsStatRepository, factory)
+        return ServiceRepository(configRepository, factory)
     }
 
     @AppComp

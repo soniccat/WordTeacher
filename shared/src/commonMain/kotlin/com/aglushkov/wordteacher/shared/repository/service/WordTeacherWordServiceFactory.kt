@@ -1,9 +1,5 @@
 package com.aglushkov.wordteacher.shared.repository.service
 
-import com.aglushkov.wordteacher.apiproviders.google.service.GoogleService
-import com.aglushkov.wordteacher.apiproviders.google.service.createWordTeacherWordService
-import com.aglushkov.wordteacher.apiproviders.wordnik.service.WordnikService
-import com.aglushkov.wordteacher.apiproviders.wordnik.service.createWordTeacherWordService
 import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService
 import com.aglushkov.wordteacher.apiproviders.yandex.service.createWordTeacherWordService
 import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
@@ -26,8 +22,6 @@ class WordTeacherWordServiceFactory {
 
         return when (type) {
             Config.Type.Yandex -> YandexService.createWordTeacherWordService(baseUrl, key, methodParams)
-            Config.Type.Wordnik -> WordnikService.createWordTeacherWordService(baseUrl, key, methodParams)
-            Config.Type.Google -> GoogleService.createWordTeacherWordService(baseUrl, methodParams)
             Config.Type.WordTeacher -> WordTeacherDictService.createWordTeacherWordService(baseUrl)
             else -> null
         }

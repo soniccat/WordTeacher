@@ -30,12 +30,10 @@ import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
-import com.aglushkov.wordteacher.shared.repository.service.ConfigConnectParamsStatRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
-import com.aglushkov.wordteacher.shared.service.ConfigService
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
@@ -61,9 +59,7 @@ interface AppComponent:
     SettingsDependencies {
 
     override fun settings(): FlowSettings
-    fun configService(): ConfigService
     fun configRepository(): ConfigRepository
-    fun configConnectParamsStatRepository(): ConfigConnectParamsStatRepository
     fun serviceRepository(): ServiceRepository
     override fun dictRepository(): DictRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory

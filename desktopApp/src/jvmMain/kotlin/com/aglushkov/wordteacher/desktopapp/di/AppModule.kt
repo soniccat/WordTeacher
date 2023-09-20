@@ -38,11 +38,6 @@ class AppModule {
     @Provides
     fun basePath(): Path = "../wordTeacherDesktop".toPath()
 
-    @ConfigBaseUrl
-    @AppComp
-    @Provides
-    fun configBaseUrl(): String = MR.strings.config_base_url.localized()
-
     @ApiBaseUrl
     @AppComp
     @Provides

@@ -1,21 +1,15 @@
 package com.aglushkov.wordteacher.shared.apiproviders.wordteacher
 
-import com.aglushkov.wordteacher.apiproviders.google.model.GoogleWord
-import com.aglushkov.wordteacher.apiproviders.google.model.asWordTeacherWord
 import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.toOkResponse
-import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
-import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
-import com.aglushkov.wordteacher.shared.service.AuthData
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
-import io.ktor.http.encodeURLPath
 import io.ktor.http.encodeURLQueryComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

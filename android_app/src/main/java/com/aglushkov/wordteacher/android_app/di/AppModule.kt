@@ -40,13 +40,6 @@ class AppModule {
         context: Context
     ): Path = context.filesDir.absolutePath.toPath()
 
-    @ConfigBaseUrl
-    @AppComp
-    @Provides
-    fun configBaseUrl(
-        context: Context
-    ): String = context.getString(MR.strings.config_base_url.resourceId)
-
     @ApiBaseUrl
     @AppComp
     @Provides

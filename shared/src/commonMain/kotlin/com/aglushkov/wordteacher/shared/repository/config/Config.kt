@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 
 // Translation service config
-// Provides method description with paras for every service
+// Provides method description with params for every service
 @Serializable
 data class Config(
     @SerialName("type") val type: Type,
@@ -16,9 +16,6 @@ data class Config(
 
     @Serializable
     enum class Type {
-        @SerialName("google") Google,
-        @SerialName("owlbot") OwlBot,
-        @SerialName("wordnik") Wordnik,
         @SerialName("yandex") Yandex,
         @SerialName("wordteacher") WordTeacher,
         @SerialName("local") Local
