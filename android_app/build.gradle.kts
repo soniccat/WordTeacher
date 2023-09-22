@@ -108,10 +108,7 @@ dependencies {
     implementation(libs.coroutinesAndroid)
     implementation(libs.ktorAndroidClient)
 //    implementation(libs.okio)
-    implementation(libs.settingsDataStore) {
-        // as we use mt coroutines
-        exclude(group = "com.russhwolf", module = "multiplatform-settings-coroutines-android-debug")
-    }
+    implementation(libs.settingsDataStore)
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation(libs.dagger)

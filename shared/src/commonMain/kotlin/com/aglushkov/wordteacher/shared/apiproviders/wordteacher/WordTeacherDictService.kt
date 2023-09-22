@@ -52,7 +52,7 @@ class WordTeacherDictService (
     suspend fun loadWords(word: String): Response<WordTeacherDictResponse> {
         logger.logLoadingStarted(word)
 
-        val res: HttpResponse = httpClient.get("${baseUrl}api/dict/words/${word}")
+        val res: HttpResponse = httpClient.get("${baseUrl}/api/dict/words/${word}")
         return withContext(Dispatchers.Default) {
             val responseString = res.readBytes().decodeToString()
             logger.logLoadingCompleted(word, res, responseString)

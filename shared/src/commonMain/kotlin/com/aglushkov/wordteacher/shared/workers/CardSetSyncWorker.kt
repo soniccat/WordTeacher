@@ -79,7 +79,7 @@ class CardSetSyncWorker(
 
     init {
         scope.launch {
-            lastSyncDate = Instant.fromEpochMilliseconds(settings.getLong(LAST_SYNC_DATE_KEY))
+            lastSyncDate = Instant.fromEpochMilliseconds(settings.getLong(LAST_SYNC_DATE_KEY, 0))
 
             if (spaceAuthRepository.isAuthorized()) {
                 toState(State.PullRequired())

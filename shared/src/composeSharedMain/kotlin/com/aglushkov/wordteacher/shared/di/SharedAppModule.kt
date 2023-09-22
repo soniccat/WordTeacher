@@ -2,13 +2,14 @@ package com.aglushkov.wordteacher.shared.di
 
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
-import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.service.SpaceHttpClientBuilder
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
+import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
@@ -32,14 +33,23 @@ import dagger.Provides
 import io.ktor.client.*
 import io.ktor.client.plugins.cookies.*
 import okio.Path
-import okio.Path.Companion.toPath
 
 @Module
 class SharedAppModule {
     @AppComp
     @Provides
-    fun configRepository(connectivityManager: ConnectivityManager): ConfigRepository {
-        return ConfigRepository(connectivityManager)
+    fun configRepository(
+        @BasePath basePath: Path,
+        @ApiBaseUrl apiBaseUrl: String,
+        fileSystem: FileSystem
+    ): ConfigRepository {
+        val configPath = basePath.div("services")
+        val wordTeacherDictServiceConfig = Config(Config.Type.WordTeacher, listOf(ConfigConnectParams(apiBaseUrl, "")), emptyMap())
+        return ConfigRepository(
+            configPath,
+            fileSystem,
+            wordTeacherDictServiceConfig,
+        )
     }
 
     @AppComp

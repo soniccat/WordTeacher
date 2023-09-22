@@ -36,7 +36,7 @@ private fun DefinitionsUIPreviewWithResponse() {
                         ),
                         WordTitleViewItem(
                             title = "Word 2",
-                            providers = listOf(Config.Type.Yandex, Config.Type.Google, Config.Type.OwlBot)
+                            providers = listOf(Config.Type.Yandex, Config.Type.WordTeacher, Config.Type.Local)
                         ),
                         WordTranscriptionViewItem("[omg]"),
                         WordPartOfSpeechViewItem(StringDesc.Raw("Noun"), WordTeacherWord.PartOfSpeech.Noun),

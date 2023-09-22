@@ -51,7 +51,7 @@ kotlin {
                 implementation(libs.statelyConcurrency)
                 implementation(compose.runtime)
                 api(libs.settings)
-                api(libs.settingsCoroutinesMt)
+                api(libs.settingsCoroutines)
                 api(libs.mokoResourcesLib)
             }
         }
