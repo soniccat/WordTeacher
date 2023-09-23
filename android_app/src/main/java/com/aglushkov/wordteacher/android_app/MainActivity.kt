@@ -174,6 +174,7 @@ class MainActivity : AppCompatActivity(), Router {
                     })
                     is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.vm)
                     is MainDecomposeComponent.Child.LearningSessionResult -> LearningSessionResultUI(vm = instance.vm)
+                    is MainDecomposeComponent.Child.DictConfigs ->
                     else -> throw RuntimeException("mainUI: Not implemented ${instance}")
                 }
             }

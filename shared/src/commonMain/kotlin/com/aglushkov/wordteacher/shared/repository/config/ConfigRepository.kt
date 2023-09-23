@@ -85,10 +85,10 @@ class ConfigRepository(
         save(configs.data().orEmpty())
     }
 
-    fun removeConfig(type: Config.Type) {
+    fun removeConfig(config: Config) {
         val configs = stateFlow.updateAndGet { configListRes ->
             configListRes.transform { configs ->
-                configs.filter { it.type != type }
+                configs.filter { it != config }
             }
         }
         save(configs.data().orEmpty())

@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.AuthData
 import com.arkivanov.essenty.parcelable.Parcelable

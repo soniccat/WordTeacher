@@ -20,7 +20,7 @@ import dev.icerock.moko.resources.compose.stringResource
 @Composable
 fun SettingsUI(
     vm: SettingsVM,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val itemsState = vm.items.collectAsState()
 

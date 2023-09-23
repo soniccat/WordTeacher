@@ -14,6 +14,8 @@ import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeCompo
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
+import com.aglushkov.wordteacher.shared.features.dict_configs.DictConfigsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
@@ -78,6 +80,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
         data class AddArticle(val vm: AddArticleDecomposeComponent): Child(vm)
         data class WebAuth(val vm: WebAuthVM): Child(vm)
         data class CardSetJsonImport(val vm: CardSetJsonImportVM): Child(vm)
+        data class DictConfigs(val vm: DictConfigsVM): Child(vm)
         object EmptyDialog: Child(null)
 
         override fun onCleared() {
@@ -91,6 +94,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
         @Parcelize data class LearningConfiguration(val ids: List<Long>) : ChildConfiguration()
         @Parcelize data class LearningSessionResultConfiguration(val results: List<SessionCardResult>) : ChildConfiguration()
         @Parcelize data class WebAuthConfiguration(val networkType: SpaceAuthService.NetworkType) : ChildConfiguration()
+        @Parcelize object DictConfigs : ChildConfiguration()
         @Parcelize object CardSetJsonImportConfiguration : ChildConfiguration()
         @Parcelize object CardSetsConfiguration : ChildConfiguration()
         @Parcelize object TabsConfiguration : ChildConfiguration()
@@ -171,6 +175,9 @@ class MainDecomposeComponentImpl(
         is MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration -> MainDecomposeComponent.Child.CardSetJsonImport(
             vm = childComponentFactory(componentContext, configuration) as CardSetJsonImportDecomposeComponent
         )
+        is MainDecomposeComponent.ChildConfiguration.DictConfigs -> MainDecomposeComponent.Child.DictConfigs(
+            vm = childComponentFactory(componentContext, configuration) as DictConfigsDecomposeComponent
+        )
         is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration -> MainDecomposeComponent.Child.EmptyDialog
 
     }
@@ -201,6 +208,12 @@ class MainDecomposeComponentImpl(
     override fun openWebAuth(networkType: SpaceAuthService.NetworkType) {
         addDialogConfigIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration(networkType)
+        )
+    }
+
+    override fun openDictConfigs() {
+        router.pushChildConfigurationIfNotAtTop(
+            MainDecomposeComponent.ChildConfiguration.DictConfigs
         )
     }
 

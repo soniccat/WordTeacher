@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Config(
     @SerialName("type") val type: Type,
-    @SerialName("connectParams") val connectParams: List<ConfigConnectParams>,
+    @SerialName("connectParams") val connectParams: ConfigConnectParams,
     @SerialName("methods") val methods: Map<String, Map<String, String>>
     //@SerialName("methods") val methods: ServiceMethodParams = ServiceMethodParams(emptyMap())
 ) {

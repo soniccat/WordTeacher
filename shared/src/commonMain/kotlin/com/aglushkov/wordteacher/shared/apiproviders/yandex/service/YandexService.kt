@@ -26,6 +26,7 @@ class YandexService(
     companion object {
         val Lookup = "yandex_lookup"
         val LookupLang = "yandex_lookup_lang"
+        val LookupLangDefault = "en-en"
         val LookupUi = "yandex_lookup_ui"
         val LookupFlags = "yandex_lookup_flags"
     }
@@ -76,7 +77,7 @@ fun YandexService.Companion.createWordTeacherWordService(
 
         override suspend fun define(word: String): List<WordTeacherWord> {
             val lookup = params.value[Lookup]
-            val lang = lookup?.get(LookupLang) ?: "en-en"
+            val lang = lookup?.get(LookupLang) ?: LookupLangDefault
             val ui = lookup?.get(LookupUi) ?: "en"
             val flags = lookup?.get(LookupFlags)?.toIntOrNull() ?: 4
 

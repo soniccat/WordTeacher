@@ -22,7 +22,11 @@ class ServiceRepository(
             configs.copyWith(
                 if (configs is Resource.Loaded) {
                     configs.data.mapNotNull { safeConfig ->
-                        createWordTeacherWordService(safeConfig)
+                        if (safeConfig.type == Config.Type.WordTeacher || safeConfig.connectParams.key.isNotEmpty()) {
+                            createWordTeacherWordService(safeConfig)
+                        } else {
+                            null
+                        }
                     }
                 } else {
                     emptyList()
@@ -31,7 +35,6 @@ class ServiceRepository(
         }.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     private fun createWordTeacherWordService(it: Config): WordTeacherWordService? {
-        val connectParams = it.connectParams.first()
-        return serviceFactory.createService(it.type, connectParams, ServiceMethodParams(it.methods))
+        return serviceFactory.createService(it.type, it.connectParams, ServiceMethodParams(it.methods))
     }
 }
