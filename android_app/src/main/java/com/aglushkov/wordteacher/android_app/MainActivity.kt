@@ -41,6 +41,7 @@ import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
@@ -174,7 +175,12 @@ class MainActivity : AppCompatActivity(), Router {
                     })
                     is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.vm)
                     is MainDecomposeComponent.Child.LearningSessionResult -> LearningSessionResultUI(vm = instance.vm)
-                    is MainDecomposeComponent.Child.DictConfigs ->
+                    is MainDecomposeComponent.Child.DictConfigs -> DictConfigsUI(
+                        vm = instance.vm,
+                        onBackPressed = {
+                            mainDecomposeComponent.back()
+                        }
+                    )
                     else -> throw RuntimeException("mainUI: Not implemented ${instance}")
                 }
             }

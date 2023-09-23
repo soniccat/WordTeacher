@@ -89,6 +89,12 @@ class MainComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .cardSetsDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.DictConfigs ->
+                    DaggerDictConfigsComponent.builder()
+                        .setComponentContext(context)
+                        .setDeps(appComponent)
+                        .build()
+                        .dictConfigsDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
                     Any()
                 else -> {

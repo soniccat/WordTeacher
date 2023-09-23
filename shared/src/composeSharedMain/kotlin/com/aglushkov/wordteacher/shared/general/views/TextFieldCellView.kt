@@ -6,15 +6,17 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -114,12 +116,14 @@ fun TextFieldCellView(
 //    }
 //}
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun InlineTextField(
     modifier: Modifier,
     value: TextFieldValue,
     placeholder: String,
     textStyle: TextStyle,
+    focusManager: FocusManager?,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     onValueChange: (TextFieldValue) -> Unit,
@@ -127,16 +131,35 @@ fun InlineTextField(
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier,
+        modifier = modifier.apply {
+          if (focusManager != null) {
+              onPreviewKeyEvent {
+                  if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
+                      focusManager.moveFocus(FocusDirection.Down)
+                      true
+                  } else {
+                      false
+                  }
+              }
+          }
+        },
         textStyle = textStyle,
         keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
+        keyboardActions = keyboardActions.apply {
+          if (focusManager != null) {
+              KeyboardActions(
+                  onNext = {
+                      focusManager.moveFocus(FocusDirection.Down)
+                  }
+              )
+          }
+        },
         decorationBox = @Composable { coreTextField ->
             Box(
                 contentAlignment = Alignment.CenterStart
             ) {
                 coreTextField()
-                if (value.text.isEmpty()) {
+                if (value.text.isEmpty() && placeholder.isNotEmpty()) {
                     Text(
                         text = placeholder,
                         color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)

@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.shared.features.articles.di.ArticlesDependencie
 import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
+import com.aglushkov.wordteacher.shared.features.dict_configs.di.DictConfigsDependencies
 import com.aglushkov.wordteacher.shared.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -53,13 +54,13 @@ interface AppComponent:
     ArticleDependencies,
     CardSetsDependencies,
     CardSetDependencies,
+    DictConfigsDependencies,
     NotesDependencies,
     LearningDependencies,
     LearningSessionResultDependencies,
     SettingsDependencies {
 
     override fun settings(): FlowSettings
-    fun configRepository(): ConfigRepository
     fun serviceRepository(): ServiceRepository
     override fun dictRepository(): DictRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory

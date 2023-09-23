@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.dict_configs.vm
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 
 class YandexConfigViewItem(
+    val hasToken: Boolean,
     val lang: String,
     val settings: YandexSettings
 ): BaseViewItem<String>(lang, Type) {

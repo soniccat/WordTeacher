@@ -76,7 +76,7 @@ open class SettingsVMImpl (
         }
 
         generateIds(resultItems)
-        return resultItems
+        return resultItems + SettingsOpenDictConfigsItem()
     }
 
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {

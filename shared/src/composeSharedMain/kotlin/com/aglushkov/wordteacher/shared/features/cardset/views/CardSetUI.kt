@@ -369,25 +369,14 @@ private fun CardTextField(
     val focusManager = LocalFocusManager.current
     var textState by remember { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
     InlineTextField(
-        modifier = modifier.onPreviewKeyEvent {
-            if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
-                focusManager.moveFocus(FocusDirection.Down)
-                true
-            } else {
-                false
-            }
-        },
+        modifier = modifier,
         value = textState,
         placeholder = vm.getPlaceholder(item)?.localized().orEmpty(),
         textStyle = textStyle.copy(
             color = LocalContentColor.current
         ),
+        focusManager = focusManager,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        keyboardActions = KeyboardActions(
-            onNext = {
-                focusManager.moveFocus(FocusDirection.Down)
-            }
-        ),
         onValueChange = {
             textState = it
             vm.onItemTextChanged(it.text, item, cardId)

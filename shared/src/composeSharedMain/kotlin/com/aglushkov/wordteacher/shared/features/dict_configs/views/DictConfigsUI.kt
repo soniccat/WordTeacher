@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.dict_configs.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -66,6 +67,7 @@ fun DictConfigsUI(
     Box(
         modifier = modifier
             .fillMaxSize()
+            .background(color = MaterialTheme.colors.background)
     ) {
         Column {
             TopAppBar(
@@ -101,7 +103,6 @@ fun DictConfigsUI(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun showDictConfigsItem(
     modifier: Modifier,
@@ -116,6 +117,18 @@ private fun showDictConfigsItem(
             ),
             style = LocalAppTypography.current.wordDefinitionTitle
         )
+        ConfigTextField(
+            modifier = modifier.padding(
+                horizontal = LocalDimensWord.current.wordHorizontalPadding
+            ),
+            text = if (item.hasToken) {
+                "*".repeat(10)
+            } else {
+                ""
+            },
+        ) {
+            vm.onYandexConfigChanged(item, it, null, null)
+        }
     }
     is CreateConfigViewItem -> {
         CreateYandexConfigView(
@@ -153,41 +166,26 @@ private fun CreateYandexConfigView(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ConfigTextField(
     modifier: Modifier = Modifier,
     text: String,
-    textStyle: androidx.compose.ui.text.TextStyle,
-    item: BaseViewItem<*>,
-    cardId: Long,
-    vm: CardSetVM
+    onItemChanged: (text: String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     var textState by remember { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
     InlineTextField(
-        modifier = modifier.onPreviewKeyEvent {
-            if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
-                focusManager.moveFocus(FocusDirection.Down)
-                true
-            } else {
-                false
-            }
-        },
+        modifier = modifier,
         value = textState,
-        placeholder = vm.getPlaceholder(item)?.localized().orEmpty(),
-        textStyle = textStyle.copy(
+        placeholder = "",
+        textStyle = LocalAppTypography.current.wordDefinitionTranscripton.copy(
             color = LocalContentColor.current
         ),
+        focusManager = focusManager,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        keyboardActions = KeyboardActions(
-            onNext = {
-                focusManager.moveFocus(FocusDirection.Down)
-            }
-        ),
         onValueChange = {
             textState = it
-            vm.onItemTextChanged(it.text, item, cardId)
+            onItemChanged(it.text)
         }
     )
 }

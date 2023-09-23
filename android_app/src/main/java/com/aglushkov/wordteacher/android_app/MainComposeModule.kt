@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.di.DaggerCardSetCompone
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.dict_configs.di.DaggerDictConfigsComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.arkivanov.decompose.ComponentContext
@@ -76,6 +77,12 @@ class MainComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .learningSessionResultDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.DictConfigs ->
+                    DaggerDictConfigsComponent.builder()
+                        .setComponentContext(context)
+                        .setDeps(appComponent)
+                        .build()
+                        .dictConfigsDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
                     Any()
                 is MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration,

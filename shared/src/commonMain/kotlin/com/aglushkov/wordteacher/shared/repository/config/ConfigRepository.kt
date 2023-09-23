@@ -52,7 +52,7 @@ class ConfigRepository(
             fileSystem.read(configPath) {
                 val byteArray = readByteArray()
                 // TODO: decifer
-                listOf(wordTeacherDictServiceConfig) + configJson.decodeFromString<List<Config>>(byteArray.decodeToString())
+                configJson.decodeFromString<List<Config>>(byteArray.decodeToString())
             }
         }.forward(stateFlow)
     }
@@ -67,19 +67,9 @@ class ConfigRepository(
         stateFlow.update { Resource.Loaded(configs) }
     }
 
-    fun putConfig(config: Config) {
+    fun addConfig(config: Config) {
         val configs = stateFlow.updateAndGet { configListRes ->
-            val configs = configListRes.data().orEmpty().let { configs ->
-                configs.indexOfFirst { it.type == config.type }.let { configIndex ->
-                    if (configIndex == -1) {
-                        configs + config
-                    } else {
-                        configs.toMutableList().apply {
-                            this[configIndex] = config
-                        }
-                    }
-                }
-            }
+            val configs = configListRes.data().orEmpty() + config
             configListRes.toLoaded(configs)
         }
         save(configs.data().orEmpty())

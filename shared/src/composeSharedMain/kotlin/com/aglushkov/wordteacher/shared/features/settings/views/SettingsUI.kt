@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.settings.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.features.settings.vm.*
+import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.stringResource
@@ -82,6 +84,20 @@ private fun showSettingsItem(
         Button(onClick = { vm.onAuthRefreshClicked() }) {
             Text(text = item.firstItem().localized())
         }
+    }
+    is SettingsOpenDictConfigsItem -> {
+        ListItem(
+            modifier = Modifier
+                .clickable {
+                    vm.router?.openDictConfigs()
+                }.padding(
+                    horizontal = LocalDimens.current.contentPadding,
+                    vertical = 8.dp
+                ),
+            text = {
+                Text("Dict Configs")
+            },
+        )
     }
     else -> {
         Text(

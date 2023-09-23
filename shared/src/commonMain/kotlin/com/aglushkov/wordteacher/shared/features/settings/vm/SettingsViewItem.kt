@@ -42,3 +42,8 @@ class SettingsViewAuthRefreshButtonItem(text: StringDesc): BaseViewItem<StringDe
     }
 }
 
+class SettingsOpenDictConfigsItem: BaseViewItem<Unit>(Unit, Type) {
+    companion object {
+        const val Type = 1004
+    }
+}

@@ -70,6 +70,7 @@ open class DictConfigsVMImpl(
         }.map { config ->
             val flag = config.methods[Lookup]?.get(LookupFlags)?.toIntOrNull() ?: 0
             YandexConfigViewItem(
+                hasToken = config.connectParams.key.isNotEmpty(),
                 lang = config.methods[Lookup]?.get(LookupLang) ?: LookupLangDefault,
                 settings = YandexSettings.fromInt(flag)
             ) as BaseViewItem<*>
@@ -123,9 +124,9 @@ open class DictConfigsVMImpl(
                 baseUrl = "https://dictionary.yandex.net/",
                 key = "",
             ),
-            methods = mapOf(Lookup to emptyMap())
+            methods = mapOf(Lookup to mapOf(LookupLang to LookupLangDefault))
         )
-        configRepository.putConfig(yandexConfig)
+        configRepository.addConfig(yandexConfig)
     }
 
     override fun onCleared() {
