@@ -44,7 +44,7 @@ class SharedAppModule {
         fileSystem: FileSystem
     ): ConfigRepository {
         val configPath = basePath.div("services")
-        val wordTeacherDictServiceConfig = Config(Config.Type.WordTeacher, ConfigConnectParams(apiBaseUrl, ""), emptyMap())
+        val wordTeacherDictServiceConfig = Config(0, Config.Type.WordTeacher, ConfigConnectParams(apiBaseUrl, ""), emptyMap())
         return ConfigRepository(
             configPath,
             fileSystem,

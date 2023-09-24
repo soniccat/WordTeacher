@@ -65,44 +65,39 @@ open class DictConfigsVMImpl(
 ): ViewModel(), DictConfigsVM {
 
     override val viewItems = configRepository.flow.map { res ->
-        val items = res.data().orEmpty().filter {
+        res.data().orEmpty().filter {
             it.type == Config.Type.Yandex
         }.map { config ->
             val flag = config.methods[Lookup]?.get(LookupFlags)?.toIntOrNull() ?: 0
             YandexConfigViewItem(
+                id = config.id.toLong(),
                 hasToken = config.connectParams.key.isNotEmpty(),
                 lang = config.methods[Lookup]?.get(LookupLang) ?: LookupLangDefault,
                 settings = YandexSettings.fromInt(flag)
             ) as BaseViewItem<*>
-        } + CreateConfigViewItem()
-        items.also {
-            generateIds(it)
-        }
+        } + CreateConfigViewItem(Long.MAX_VALUE)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    private fun generateIds(items: List<BaseViewItem<*>>) {
-        generateViewItemIds(items, viewItems.value, idGenerator)
-    }
 
     override fun onConfigDeleteClicked(item: YandexConfigViewItem) {
         yandexConfig(item)?.let {
-                configRepository.removeConfig(it)
-            }
+            configRepository.removeConfig(it.id)
+        }
     }
 
     private fun yandexConfig(item: YandexConfigViewItem) =
         configRepository.value.data()
-            ?.firstOrNull { it.type == Config.Type.Yandex && it.methods[Lookup]?.get(LookupLang) == item.lang }
+            ?.firstOrNull { it.id == item.id.toInt() }
 
     override fun onYandexConfigChanged(item: YandexConfigViewItem, key: String?, lang: String?, settings: YandexSettings?) {
         yandexConfig(item)?.let { config ->
             config.copy(
-                connectParams = config.connectParams.apply {
+                id = config.id,
+                connectParams = config.connectParams.run {
                     key?.let {
                         this.copy(key = it)
                     } ?: this
                 },
-                methods = config.methods.apply {
+                methods = config.methods.run {
                     val m = this[Lookup]?.toMutableMap() ?: mutableMapOf()
                     lang?.let { lang ->
                         m[LookupLang] = lang
@@ -114,17 +109,20 @@ open class DictConfigsVMImpl(
                     this + (Lookup to m)
                 }
             )
+        }?.let {
+            configRepository.updateConfig(it)
         }
     }
 
     override fun onYandexConfigAddClicked() {
         val yandexConfig = Config(
+            id = configRepository.value.data()?.maxOfOrNull { it.id + 1 } ?: 1,
             type = Config.Type.Yandex,
             connectParams = ConfigConnectParams(
                 baseUrl = "https://dictionary.yandex.net/",
                 key = "",
             ),
-            methods = mapOf(Lookup to mapOf(LookupLang to LookupLangDefault))
+            methods = mapOf(Lookup to mapOf(LookupLang to LookupLangDefault)),
         )
         configRepository.addConfig(yandexConfig)
     }

@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 // Provides method description with params for every service
 @Serializable
 data class Config(
+    @SerialName("id") val id: Int,
     @SerialName("type") val type: Type,
     @SerialName("connectParams") val connectParams: ConfigConnectParams,
     @SerialName("methods") val methods: Map<String, Map<String, String>>

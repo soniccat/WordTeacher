@@ -2,13 +2,14 @@ package com.aglushkov.wordteacher.shared.repository.config
 
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
+import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
@@ -24,7 +25,7 @@ class ConfigRepository(
     private val wordTeacherDictServiceConfig: Config,
 ) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val stateFlow = MutableStateFlow<Resource<List<Config>>>(Resource.Loaded(listOf(wordTeacherDictServiceConfig)))
+    private val stateFlow = MutableStateFlow<Resource<List<Config>>>(Resource.Uninitialized())
     val flow = stateFlow
     val value: Resource<List<Config>>
         get() {
@@ -43,6 +44,8 @@ class ConfigRepository(
         mainScope.launch {
             if (fileSystem.exists(configPath)) {
                 load()
+            } else {
+                save(listOf(wordTeacherDictServiceConfig))
             }
         }
     }
@@ -53,6 +56,12 @@ class ConfigRepository(
                 val byteArray = readByteArray()
                 // TODO: decifer
                 configJson.decodeFromString<List<Config>>(byteArray.decodeToString())
+            }
+        }.map {
+            if (it.isError()) {
+                Resource.Loaded(listOf(wordTeacherDictServiceConfig))
+            } else {
+                it
             }
         }.forward(stateFlow)
     }
@@ -75,10 +84,25 @@ class ConfigRepository(
         save(configs.data().orEmpty())
     }
 
-    fun removeConfig(config: Config) {
+    fun removeConfig(id: Int) {
         val configs = stateFlow.updateAndGet { configListRes ->
             configListRes.transform { configs ->
-                configs.filter { it != config }
+                configs.filter { it.id != id }
+            }
+        }
+        save(configs.data().orEmpty())
+    }
+
+    fun updateConfig(config: Config) {
+        val configs = stateFlow.updateAndGet { configListRes ->
+            configListRes.transform { configs ->
+                configs.map {
+                    if (it.id == config.id) {
+                        config
+                    } else {
+                        it
+                    }
+                }
             }
         }
         save(configs.data().orEmpty())

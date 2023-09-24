@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.features.dict_configs.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Checkbox
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -103,6 +105,7 @@ fun DictConfigsUI(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun showDictConfigsItem(
     modifier: Modifier,
@@ -121,14 +124,70 @@ private fun showDictConfigsItem(
             modifier = modifier.padding(
                 horizontal = LocalDimensWord.current.wordHorizontalPadding
             ),
-            text = if (item.hasToken) {
-                "*".repeat(10)
+            initialText = "",
+            placeholder = if (item.hasToken) {
+                "type to change api token"
             } else {
-                ""
-            },
+                "api token"
+            }
         ) {
             vm.onYandexConfigChanged(item, it, null, null)
         }
+        ConfigTextField(
+            modifier = modifier.padding(
+                horizontal = LocalDimensWord.current.wordHorizontalPadding
+            ),
+            initialText = item.lang,
+            placeholder = if (item.lang.isEmpty()) {
+                "language: en-en, en-ru ..."
+            } else {
+                ""
+            }
+        ) {
+            vm.onYandexConfigChanged(item, null, it, null)
+        }
+        ListItem(
+            modifier = Modifier.clickable {
+                vm.onYandexConfigChanged(item, null, null, item.settings.copy(
+                    applyFamilySearchFilter = !item.settings.applyFamilySearchFilter
+                ))
+            },
+            trailing = {
+                Checkbox(
+                    checked = item.settings.applyFamilySearchFilter,
+                    onCheckedChange = null
+                )
+            },
+            text = { Text("Apply the family search filter") },
+        )
+        ListItem(
+            modifier = Modifier.clickable {
+                vm.onYandexConfigChanged(item, null, null, item.settings.copy(
+                    enableSearchingByWordForm = !item.settings.enableSearchingByWordForm
+                ))
+            },
+            trailing = {
+                Checkbox(
+                    checked = item.settings.enableSearchingByWordForm,
+                    onCheckedChange = null
+                )
+            },
+            text = { Text("Enable searching by word form") },
+        )
+        ListItem(
+            modifier = Modifier.clickable {
+                vm.onYandexConfigChanged(item, null, null, item.settings.copy(
+                    enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation = !item.settings.enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation
+                ))
+            },
+            trailing = {
+                Checkbox(
+                    checked = item.settings.enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation,
+                    onCheckedChange = null
+                )
+            },
+            text = { Text("Enable a filter that requires matching parts of speech for the search word and translation") },
+        )
     }
     is CreateConfigViewItem -> {
         CreateYandexConfigView(
@@ -169,15 +228,16 @@ private fun CreateYandexConfigView(
 @Composable
 private fun ConfigTextField(
     modifier: Modifier = Modifier,
-    text: String,
+    initialText: String,
+    placeholder: String = "",
     onItemChanged: (text: String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    var textState by remember { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
+    var textState by remember { mutableStateOf(TextFieldValue(initialText, TextRange(initialText.length))) }
     InlineTextField(
         modifier = modifier,
         value = textState,
-        placeholder = "",
+        placeholder = placeholder,
         textStyle = LocalAppTypography.current.wordDefinitionTranscripton.copy(
             color = LocalContentColor.current
         ),
