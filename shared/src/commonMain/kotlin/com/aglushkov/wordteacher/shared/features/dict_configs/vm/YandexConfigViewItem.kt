@@ -11,6 +11,13 @@ class YandexConfigViewItem(
     companion object {
         const val Type = 1100
     }
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other) && run {
+            other as YandexConfigViewItem
+            hasToken == other.hasToken && lang == other.lang && settings == other.settings
+        }
+    }
 }
 
 class CreateConfigViewItem(

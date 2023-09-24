@@ -95,7 +95,7 @@ fun generateViewItemIds(
         } else {
             val itemsHashCode = it.itemsHashCode()
             val mapListOfViewItems = map[itemsHashCode]
-            val item = mapListOfViewItems?.firstOrNull { listItem -> listItem.items == it.items }
+            val item = mapListOfViewItems?.firstOrNull { listItem -> listItem.equalsByContent(it) }
 
             if (item != null) {
                 it.id = item.id
