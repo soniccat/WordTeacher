@@ -25,6 +25,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
@@ -137,6 +138,12 @@ private fun mainUI() {
                 }, onBackHandler = {
                     mainDecomposeComponent.back()
                 })
+                is MainDecomposeComponent.Child.DictConfigs -> DictConfigsUI(
+                    vm = instance.vm,
+                    onBackPressed = {
+                        mainDecomposeComponent.back()
+                    }
+                )
 //                is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.vm)
 //                is MainDecomposeComponent.Child.LearningSessionResult -> LearningSessionResultUI(vm = instance.vm)
                 else -> throw RuntimeException("mainUI: Not implemented ${instance}")

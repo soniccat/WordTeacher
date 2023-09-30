@@ -13,9 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.features.settings.vm.*
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -62,7 +64,7 @@ private fun showSettingsItem(
 ) = when (item) {
     is SettingsViewTitleItem -> {
         ListItem (
-            text = { Text(item.firstItem().localized()) }
+            text = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsTitle) }
         )
     }
     is SettingsViewLoading -> {
@@ -76,12 +78,18 @@ private fun showSettingsItem(
         }
     }
     is SettingsViewAuthButtonItem -> {
-        Button(onClick = { vm.onAuthButtonClicked(item.buttonType) }) {
+        Button(
+            onClick = { vm.onAuthButtonClicked(item.buttonType) },
+            modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
+        ) {
             Text(text = item.firstItem().localized())
         }
     }
     is SettingsViewAuthRefreshButtonItem -> {
-        Button(onClick = { vm.onAuthRefreshClicked() }) {
+        Button(
+            onClick = { vm.onAuthRefreshClicked() },
+            modifier = Modifier.padding(start = LocalDimens.current.contentPadding, bottom = LocalDimens.current.contentPadding)
+        ) {
             Text(text = item.firstItem().localized())
         }
     }
@@ -90,12 +98,16 @@ private fun showSettingsItem(
             modifier = Modifier
                 .clickable {
                     vm.router?.openDictConfigs()
-                }.padding(
-                    horizontal = LocalDimens.current.contentPadding,
-                    vertical = 8.dp
-                ),
+                },
+            trailing = {
+                Icon(
+                    painter = painterResource(MR.images.arrow_right_24),
+                    contentDescription = null,
+                    tint = LocalContentColor.current
+                )
+            },
             text = {
-                Text("Dict Configs")
+                Text(stringResource(MR.strings.settings_dictconfigs))
             },
         )
     }

@@ -85,6 +85,15 @@
     <string name="settings_auth_title">Space</string>
     <string name="settings_auth_signin">Sign In</string>
     <string name="settings_auth_signout">Sign Out</string>
+    <string name="settings_dictconfigs">Dict Configs</string>
+
+    <string name="dictconfigs_yandex_title">Yandex</string>
+    <string name="dictconfigs_yandex_api_token_exists_placeholder">type to change api token</string>
+    <string name="dictconfigs_yandex_api_token_doesnt_exist_placeholder">type your api token</string>
+    <string name="dictconfigs_yandex_language_placeholder">type language: en-en, en-ru ...</string>
+    <string name="dictconfigs_yandex_param_family_search_filter">Apply the family search filter</string>
+    <string name="dictconfigs_yandex_param_search_by_word_form">Enable searching by word form</string>
+    <string name="dictconfigs_yandex_param_require_matching_parts">Enable a filter that requires matching parts of speech for the search word and translation</string>
 
     <string name="notes_error">Something went wrong :(</string>
     <string name="notes_create_note">Create a note</string>

@@ -12,7 +12,7 @@ import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import dagger.Module
 import dagger.Provides
 import com.aglushkov.wordteacher.shared.res.MR
-import com.russhwolf.settings.JvmPreferencesSettings
+import com.russhwolf.settings.PreferencesSettings
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.coroutines.toFlowSettings
 import io.ktor.http.*
@@ -46,7 +46,7 @@ class AppModule {
     @AppComp
     @Provides
     fun settings(): FlowSettings {
-        val s = JvmPreferencesSettings.Factory().create("settings.preferences_pb") as JvmPreferencesSettings
+        val s = PreferencesSettings.Factory().create("settings.preferences_pb")
         return s.toFlowSettings()
     }
 

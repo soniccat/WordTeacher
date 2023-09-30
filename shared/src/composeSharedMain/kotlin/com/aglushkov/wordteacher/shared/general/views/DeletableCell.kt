@@ -34,7 +34,7 @@ import kotlin.math.roundToInt
 fun DeletableCell(
     modifier: Modifier = Modifier,
     stateKey: Any,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     onDeleted: () -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -66,7 +66,11 @@ fun DeletableCell(
         val deleteButtonWidth = (DeleteButtonWidth.value * LocalDensity.current.density).toInt()
         DeleteSwipeable(
             state = dismissState,
-            contentModifier = modifier.fillMaxWidth().clickable { onClick() },
+            contentModifier = modifier.fillMaxWidth().let { m ->
+                onClick?.let {
+                    m.clickable { it() }
+                } ?: m
+            },
             deleteButtonWidth = deleteButtonWidth,
             background = {
                 Box(

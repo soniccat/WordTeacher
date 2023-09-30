@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.di.DaggerCardSetJsonImportComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.dict_configs.di.DaggerDictConfigsComponent
 import com.aglushkov.wordteacher.shared.features.webauth.di.DaggerWebAuthComponent
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module

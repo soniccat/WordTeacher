@@ -4,8 +4,10 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -50,8 +52,11 @@ import com.aglushkov.wordteacher.shared.features.dict_configs.vm.YandexConfigVie
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
+import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.views.CustomListItem
+import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
@@ -105,7 +110,6 @@ fun DictConfigsUI(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun showDictConfigsItem(
     modifier: Modifier,
@@ -113,81 +117,7 @@ private fun showDictConfigsItem(
     vm: DictConfigsVM,
 ) = when (item) {
     is YandexConfigViewItem -> {
-        Text(
-            "Yandex",
-            modifier = modifier.padding(
-                horizontal = LocalDimensWord.current.wordHorizontalPadding
-            ),
-            style = LocalAppTypography.current.wordDefinitionTitle
-        )
-        ConfigTextField(
-            modifier = modifier.padding(
-                horizontal = LocalDimensWord.current.wordHorizontalPadding
-            ),
-            initialText = "",
-            placeholder = if (item.hasToken) {
-                "type to change api token"
-            } else {
-                "api token"
-            }
-        ) {
-            vm.onYandexConfigChanged(item, it, null, null)
-        }
-        ConfigTextField(
-            modifier = modifier.padding(
-                horizontal = LocalDimensWord.current.wordHorizontalPadding
-            ),
-            initialText = item.lang,
-            placeholder = if (item.lang.isEmpty()) {
-                "language: en-en, en-ru ..."
-            } else {
-                ""
-            }
-        ) {
-            vm.onYandexConfigChanged(item, null, it, null)
-        }
-        ListItem(
-            modifier = Modifier.clickable {
-                vm.onYandexConfigChanged(item, null, null, item.settings.copy(
-                    applyFamilySearchFilter = !item.settings.applyFamilySearchFilter
-                ))
-            },
-            trailing = {
-                Checkbox(
-                    checked = item.settings.applyFamilySearchFilter,
-                    onCheckedChange = null
-                )
-            },
-            text = { Text("Apply the family search filter") },
-        )
-        ListItem(
-            modifier = Modifier.clickable {
-                vm.onYandexConfigChanged(item, null, null, item.settings.copy(
-                    enableSearchingByWordForm = !item.settings.enableSearchingByWordForm
-                ))
-            },
-            trailing = {
-                Checkbox(
-                    checked = item.settings.enableSearchingByWordForm,
-                    onCheckedChange = null
-                )
-            },
-            text = { Text("Enable searching by word form") },
-        )
-        ListItem(
-            modifier = Modifier.clickable {
-                vm.onYandexConfigChanged(item, null, null, item.settings.copy(
-                    enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation = !item.settings.enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation
-                ))
-            },
-            trailing = {
-                Checkbox(
-                    checked = item.settings.enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation,
-                    onCheckedChange = null
-                )
-            },
-            text = { Text("Enable a filter that requires matching parts of speech for the search word and translation") },
-        )
+        YandexConfigViewItemUI(item, vm, modifier)
     }
     is CreateConfigViewItem -> {
         CreateYandexConfigView(
@@ -201,6 +131,106 @@ private fun showDictConfigsItem(
             text = "unknown item $item",
             modifier = modifier
         )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun YandexConfigViewItemUI(
+    item: YandexConfigViewItem,
+    vm: DictConfigsVM,
+    modifier: Modifier
+) {
+    DeletableCell(
+        Modifier.padding(horizontal = LocalDimens.current.contentPadding),
+        stateKey = item.id,
+        onDeleted = {
+            vm.onConfigDeleteClicked(item)
+        }
+    ) {
+        Column(
+            modifier = modifier.fillMaxWidth(),
+        ) {
+            Text(
+                stringResource(MR.strings.dictconfigs_yandex_title),
+                modifier = Modifier.padding(vertical = LocalDimens.current.contentPadding),
+                style = LocalAppTypography.current.dictConfigTitle
+            )
+            ConfigTextField(
+                modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding),
+                initialText = "",
+                placeholder = if (item.hasToken) {
+                    stringResource(MR.strings.dictconfigs_yandex_api_token_exists_placeholder)
+                } else {
+                    stringResource(MR.strings.dictconfigs_yandex_api_token_doesnt_exist_placeholder)
+                }
+            ) {
+                vm.onYandexConfigChanged(item, it, null, null)
+            }
+            // TODO: get list of available dictionaries from yandex api
+            ConfigTextField(
+                modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding),
+                initialText = item.lang,
+                placeholder = if (item.lang.isEmpty()) {
+                    stringResource(MR.strings.dictconfigs_yandex_language_placeholder)
+                } else {
+                    ""
+                }
+            ) {
+                vm.onYandexConfigChanged(item, null, it, null)
+            }
+            CustomListItem(
+                modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding)
+                    .clickable {
+                        vm.onYandexConfigChanged(
+                            item, null, null, item.settings.copy(
+                                applyFamilySearchFilter = !item.settings.applyFamilySearchFilter
+                            )
+                        )
+                    },
+                trailing = {
+                    Checkbox(
+                        checked = item.settings.applyFamilySearchFilter,
+                        onCheckedChange = null
+                    )
+                },
+                content = { Text(stringResource(MR.strings.dictconfigs_yandex_param_family_search_filter)) },
+            )
+            CustomListItem(
+                modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding)
+                    .clickable {
+                        vm.onYandexConfigChanged(
+                            item, null, null, item.settings.copy(
+                                enableSearchingByWordForm = !item.settings.enableSearchingByWordForm
+                            )
+                        )
+                    },
+                trailing = {
+                    Checkbox(
+                        checked = item.settings.enableSearchingByWordForm,
+                        onCheckedChange = null
+                    )
+                },
+                content = { Text(stringResource(MR.strings.dictconfigs_yandex_param_search_by_word_form)) },
+            )
+            CustomListItem(
+                modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding)
+                    .clickable {
+                        vm.onYandexConfigChanged(
+                            item, null, null, item.settings.copy(
+                                enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation = !item.settings.enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation
+                            )
+                        )
+                    },
+                trailing = {
+                    Checkbox(
+                        checked = item.settings.enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation,
+                        onCheckedChange = null
+                    )
+                },
+                content = { Text(stringResource(MR.strings.dictconfigs_yandex_param_require_matching_parts)) },
+            )
+        }
     }
 }
 
@@ -238,7 +268,7 @@ private fun ConfigTextField(
         modifier = modifier,
         value = textState,
         placeholder = placeholder,
-        textStyle = LocalAppTypography.current.wordDefinitionTranscripton.copy(
+        textStyle = LocalAppTypography.current.dictParamText.copy(
             color = LocalContentColor.current
         ),
         focusManager = focusManager,

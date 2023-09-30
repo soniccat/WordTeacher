@@ -75,8 +75,9 @@ open class SettingsVMImpl (
             resultItems += SettingsViewAuthRefreshButtonItem(StringDesc.Raw("Refresh"))
         }
 
+        resultItems += SettingsOpenDictConfigsItem()
         generateIds(resultItems)
-        return resultItems + SettingsOpenDictConfigsItem()
+        return resultItems
     }
 
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {

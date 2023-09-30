@@ -44,6 +44,11 @@ data class AppTypography(
 
     var learningSessionTerm: TextStyle = wordDefinitionTitle,
     var learningSessionProgress: TextStyle = wordDefinitionTitle,
+
+    var dictConfigTitle: TextStyle = materialTypography.h5,
+    var dictParamText: TextStyle = materialTypography.body2,
+
+    var settingsTitle: TextStyle = materialTypography.h5,
 ) {
     @Composable
     fun initStylesFromResources(colors: Colors): AppTypography {
