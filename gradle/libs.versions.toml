@@ -7,11 +7,11 @@ androidGradlePlugin = "8.0.2"
 
 kotlinPoet = "1.14.2"
 
-composeJetpackCompiler = "1.4.7"
+#composeJetpackCompiler = "1.4.7"
 composeJetpackUiTooling = "1.3.2"
-composeJetpack = "1.4.0"
-androidComposeActivity = "1.4.0"
-androidComposeDesktop = "1.4.0"
+#composeJetpack = "1.4.0"
+androidComposeActivity = "1.7.2"
+androidComposeDesktop = "1.5.2"
 androidFragments = "1.4.1"
 androidMaterial = "1.6.1"
 androidAppCompat = "1.4.2"
@@ -54,9 +54,9 @@ androidConstraintLayout = { module = "androidx.constraintlayout:constraintlayout
 androidCoreKts = { module = "androidx.core:core-ktx", version.ref = "androidCoreKts" }
 androidViewModelKtx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidLifecycle" }
 androidLifecycleKtx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidLifecycle" }
-androidComposeCompiler = { module = "androidx.compose.compiler:compiler", version.ref = "composeJetpackCompiler" }
-androidComposeFoundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeJetpack" }
-androidComposeMaterial = { module = "androidx.compose.material:material", version.ref = "composeJetpack" }
+#androidComposeCompiler = { module = "androidx.compose.compiler:compiler", version.ref = "composeJetpackCompiler" }
+#androidComposeFoundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeJetpack" }
+#androidComposeMaterial = { module = "androidx.compose.material:material", version.ref = "composeJetpack" }
 androidComposeActivity = {  module = "androidx.activity:activity-compose", version.ref = "androidComposeActivity" }
 androidComposeUITooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "composeJetpackUiTooling" }
 androidComposeUIToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "composeJetpackUiTooling" }

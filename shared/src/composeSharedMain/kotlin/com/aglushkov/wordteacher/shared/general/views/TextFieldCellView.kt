@@ -17,6 +17,7 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -154,6 +155,7 @@ fun InlineTextField(
               )
           }
         },
+        cursorBrush = SolidColor(MaterialTheme.colors.secondary),
         decorationBox = @Composable { coreTextField ->
             Box(
                 contentAlignment = Alignment.CenterStart
