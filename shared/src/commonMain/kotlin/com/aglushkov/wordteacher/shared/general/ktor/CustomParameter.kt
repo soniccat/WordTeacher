@@ -8,7 +8,11 @@ import io.ktor.util.AttributeKey
 
 class CustomParameter(val config: Config) {
 
-    class Config(var parameterName: String = "", var parameterValue: String = "")
+    class Config(
+        var parameterName: String = "",
+        var parameterValue: String? = null,
+        var parameterProvider: (() -> String?)? = null
+    )
 
     companion object Plugin : HttpClientPlugin<Config, CustomParameter> {
         override val key: AttributeKey<CustomParameter> = AttributeKey("CustomParameter")
@@ -17,7 +21,10 @@ class CustomParameter(val config: Config) {
 
         override fun install(plugin: CustomParameter, scope: HttpClient) {
             scope.requestPipeline.intercept(HttpRequestPipeline.State) {
-                context.parameter(plugin.config.parameterName, plugin.config.parameterValue)
+                val value = plugin.config.parameterValue ?: plugin.config.parameterProvider?.invoke()
+                value?.let { v ->
+                    context.parameter(plugin.config.parameterName, v)
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.repository.config
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 
 // Translation service config
@@ -26,7 +27,8 @@ data class Config(
 @Serializable
 data class ConfigConnectParams(
     @SerialName("baseUrl") val baseUrl: String,
-    @SerialName("key") val key: String
+    @Transient val key: String = "",
+    @SerialName("securedKey") val securedKey: String,
 )
 
 @Serializable

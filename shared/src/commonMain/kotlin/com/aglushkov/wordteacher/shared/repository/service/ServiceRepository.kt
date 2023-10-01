@@ -22,7 +22,7 @@ class ServiceRepository(
             configs.copyWith(
                 if (configs is Resource.Loaded) {
                     configs.data.mapNotNull { safeConfig ->
-                        if (safeConfig.type == Config.Type.WordTeacher || safeConfig.connectParams.key.isNotEmpty()) {
+                        if (safeConfig.type == Config.Type.WordTeacher || safeConfig.connectParams.securedKey.isNotEmpty()) {
                             createWordTeacherWordService(safeConfig)
                         } else {
                             null

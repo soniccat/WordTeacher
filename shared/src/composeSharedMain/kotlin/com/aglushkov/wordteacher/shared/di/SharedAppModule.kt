@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.di
 
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.service.SpaceHttpClientBuilder
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -33,6 +34,7 @@ import dagger.Provides
 import io.ktor.client.*
 import io.ktor.client.plugins.cookies.*
 import okio.Path
+import opennlp.tools.namefind.BilouCodec
 
 @Module
 class SharedAppModule {
@@ -41,14 +43,16 @@ class SharedAppModule {
     fun configRepository(
         @BasePath basePath: Path,
         @ApiBaseUrl apiBaseUrl: String,
-        fileSystem: FileSystem
+        fileSystem: FileSystem,
+        secureCodec: SecureCodec,
     ): ConfigRepository {
         val configPath = basePath.div("services")
-        val wordTeacherDictServiceConfig = Config(0, Config.Type.WordTeacher, ConfigConnectParams(apiBaseUrl, ""), emptyMap())
+        val wordTeacherDictServiceConfig = Config(0, Config.Type.WordTeacher, ConfigConnectParams(apiBaseUrl, "", ""), emptyMap())
         return ConfigRepository(
             configPath,
             fileSystem,
             wordTeacherDictServiceConfig,
+            secureCodec,
         )
     }
 
@@ -101,8 +105,10 @@ class SharedAppModule {
 
     @AppComp
     @Provides
-    fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory {
-        return WordTeacherWordServiceFactory()
+    fun wordTeacherWordServiceFactory(
+        secureCodec: SecureCodec,
+    ): WordTeacherWordServiceFactory {
+        return WordTeacherWordServiceFactory(secureCodec)
     }
 
     @AppComp

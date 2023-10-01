@@ -1,9 +1,11 @@
 package com.aglushkov.wordteacher.shared.repository.config
 
+import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import io.ktor.util.encodeBase64
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +25,7 @@ class ConfigRepository(
     private val configPath: Path,
     private val fileSystem: FileSystem,
     private val wordTeacherDictServiceConfig: Config,
+    private val secureCodec: SecureCodec,
 ) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlow = MutableStateFlow<Resource<List<Config>>>(Resource.Uninitialized())
@@ -54,7 +57,6 @@ class ConfigRepository(
         loadResource {
             fileSystem.read(configPath) {
                 val byteArray = readByteArray()
-                // TODO: decifer
                 configJson.decodeFromString<List<Config>>(byteArray.decodeToString())
             }
         }.map {
@@ -67,13 +69,24 @@ class ConfigRepository(
     }
 
     fun save(configs: List<Config>) {
+        val encryptedConfigs = configs.map {
+            it.copy(
+                connectParams = if (it.connectParams.key.isNotEmpty()) {
+                    it.connectParams.copy(
+                        key = "",
+                        securedKey = secureCodec.encript(it.connectParams.key.toByteArray()).encodeBase64()
+                    )
+                } else {
+                    it.connectParams
+                }
+            )
+        }
         fileSystem.write(configPath) {
-            val str = configJson.encodeToString(configs)
+            val str = configJson.encodeToString(encryptedConfigs)
             val byteArray = str.toByteArray()
-            // TODO: cifer
             write(byteArray)
         }
-        stateFlow.update { Resource.Loaded(configs) }
+        stateFlow.update { Resource.Loaded(encryptedConfigs) }
     }
 
     fun addConfig(config: Config) {

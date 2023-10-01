@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.apiproviders.yandex.service
 import com.aglushkov.wordteacher.apiproviders.yandex.model.YandexWords
 import com.aglushkov.wordteacher.apiproviders.yandex.model.asWordTeacherWord
 import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
+import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.ktor.CustomParameter
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
@@ -14,6 +15,8 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
 import io.ktor.http.encodeURLQueryComponent
+import io.ktor.util.decodeBase64Bytes
+import io.ktor.util.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -21,7 +24,8 @@ import kotlinx.serialization.json.Json
 
 class YandexService(
     private val baseUrl: String,
-    private val apiKey: String
+    private val apiKey: String,
+    private val secureCodec: SecureCodec,
 ) {
     companion object {
         val Lookup = "yandex_lookup"
@@ -33,10 +37,11 @@ class YandexService(
 
     private val logger = WordServiceLogger(Config.Type.Yandex.name)
     private val httpClient = HttpClient {
-        val anApiKey = apiKey
         install(CustomParameter) {
             parameterName = "key"
-            parameterValue = anApiKey
+            parameterProvider = {
+                secureCodec.decript(apiKey.decodeBase64Bytes())!!.decodeToString()
+            }
         }
     }
 
@@ -69,11 +74,12 @@ class YandexService(
 fun YandexService.Companion.createWordTeacherWordService(
     aBaseUrl: String,
     aKey: String,
-    params: ServiceMethodParams
+    params: ServiceMethodParams,
+    secureCodec: SecureCodec,
 ): WordTeacherWordService {
     return object : WordTeacherWordService {
         override var type: Config.Type = Config.Type.Yandex
-        private val service = YandexService(aBaseUrl, aKey)
+        private val service = YandexService(aBaseUrl, aKey, secureCodec)
 
         override suspend fun define(word: String): List<WordTeacherWord> {
             val lookup = params.value[Lookup]
