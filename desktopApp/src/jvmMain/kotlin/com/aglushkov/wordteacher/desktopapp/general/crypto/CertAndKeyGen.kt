@@ -1,19 +1,13 @@
-@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
+//@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 package com.aglushkov.wordteacher.desktopapp.general.crypto
 
-import sun.security.pkcs10.PKCS10
-import sun.security.x509.AlgorithmId
-import sun.security.x509.CertificateAlgorithmId
-import sun.security.x509.CertificateExtensions
-import sun.security.x509.CertificateSerialNumber
-import sun.security.x509.CertificateValidity
-import sun.security.x509.CertificateVersion
-import sun.security.x509.CertificateX509Key
-import sun.security.x509.X500Name
-import sun.security.x509.X509CertImpl
-import sun.security.x509.X509CertInfo
-import sun.security.x509.X509Key
+import org.bouncycastle.asn1.x500.X500Name
+import org.bouncycastle.cert.X509v1CertificateBuilder
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
+import org.bouncycastle.cert.jcajce.JcaX509v1CertificateBuilder
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import java.io.IOException
+import java.math.BigInteger
 import java.security.InvalidKeyException
 import java.security.KeyPair
 import java.security.KeyPairGenerator
@@ -24,11 +18,9 @@ import java.security.PublicKey
 import java.security.SecureRandom
 import java.security.Signature
 import java.security.SignatureException
-import java.security.cert.CertificateEncodingException
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import java.util.Date
-import java.util.Random
 
 
 // source: https://alvinalexander.com/java/jwarehouse/openjdk-8/jdk/src/share/classes/sun/security/tools/keytool/CertAndKeyGen.java.shtml
@@ -160,11 +152,11 @@ class CertAndKeyGen {
      * `X509Key. Accordingly, the return type of this method
      * should be `PublicKey.
     ``` */
-    fun getPublicKey(): X509Key? {
-        return if (!(publicKeyAnyway is X509Key)) {
-            null
-        } else publicKeyAnyway as X509Key?
-    }
+//    fun getPublicKey(): X509Key? {
+//        return if (!(publicKeyAnyway is X509Key)) {
+//            null
+//        } else publicKeyAnyway as X509Key?
+//    }
 
     /**
      * Returns a self-signed X.509v3 certificate for the public key.
@@ -195,52 +187,92 @@ class CertAndKeyGen {
     fun getSelfCertificate(
         myname: X500Name?, firstDate: Date, validity: Long
     ): X509Certificate {
-        return getSelfCertificate(myname, firstDate, validity, null)
+        return createAcIssuerCert(publicKeyAnyway, privateKey)!! //getSelfCertificate(myname, firstDate, validity, null)
+    }
+
+    /**
+     * we generate the AC issuer's certificate
+     */
+    @Throws(java.lang.Exception::class)
+    fun createAcIssuerCert(
+        pubKey: PublicKey?,
+        privKey: PrivateKey?
+    ): X509Certificate? {
+        //
+        // signers name
+        //
+        val issuer = "C=AU, O=The Legion of the Bouncy Castle, OU=Bouncy Primary Certificate"
+
+        //
+        // subjects name - the same as we are self signed.
+        //
+        val subject = "C=AU, O=The Legion of the Bouncy Castle, OU=Bouncy Primary Certificate"
+
+        //
+        // create the certificate - version 1
+        //
+        val v1Bldr: X509v1CertificateBuilder = JcaX509v1CertificateBuilder(
+            X500Name(issuer), BigInteger.valueOf(1),
+            Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 30), Date(
+                System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 30
+            ),
+            X500Name(subject), pubKey
+        )
+        val certHldr =
+            v1Bldr.build(JcaContentSignerBuilder("SHA1WithRSA").setProvider("BC").build(privKey))
+        val cert = JcaX509CertificateConverter().setProvider("BC").getCertificate(certHldr)
+        cert.checkValidity(Date())
+        cert.verify(pubKey)
+        return cert
     }
 
     // Like above, plus a CertificateExtensions argument, which can be null.
-    @Throws(
-        CertificateException::class,
-        InvalidKeyException::class,
-        SignatureException::class,
-        NoSuchAlgorithmException::class,
-        NoSuchProviderException::class
-    )
-    fun getSelfCertificate(
-        myname: X500Name?, firstDate: Date,
-        validity: Long, ext: CertificateExtensions?
-    ): X509Certificate {
-        val cert: X509CertImpl
-        val lastDate: Date
-        try {
-            lastDate = Date()
-            lastDate.setTime(firstDate.getTime() + validity * 1000)
-            val interval = CertificateValidity(firstDate, lastDate)
-            val info = X509CertInfo()
-            // Add all mandatory attributes
-            info[X509CertInfo.VERSION] = CertificateVersion(CertificateVersion.V3)
-            info[X509CertInfo.SERIAL_NUMBER] = CertificateSerialNumber(
-                Random().nextInt() and 0x7fffffff
-            )
-            val algID = AlgorithmId.get(sigAlg)
-            info[X509CertInfo.ALGORITHM_ID] = CertificateAlgorithmId(algID)
-            info[X509CertInfo.SUBJECT] = myname
-            info[X509CertInfo.KEY] = CertificateX509Key(
-                publicKeyAnyway
-            )
-            info[X509CertInfo.VALIDITY] = interval
-            info[X509CertInfo.ISSUER] = myname
-            if (ext != null) info[X509CertInfo.EXTENSIONS] = ext
-            cert = X509CertImpl(info)
-            cert.sign(privateKey, sigAlg)
-            return cert as X509Certificate
-        } catch (e: IOException) {
-            throw CertificateEncodingException(
-                "getSelfCert: " +
-                        e.message
-            )
-        }
-    }
+//    @Throws(
+//        CertificateException::class,
+//        InvalidKeyException::class,
+//        SignatureException::class,
+//        NoSuchAlgorithmException::class,
+//        NoSuchProviderException::class
+//    )
+//    fun getSelfCertificate(
+//        myname: X500Name?,
+//        firstDate: Date,
+//        validity: Long,
+//        ext: CertificateExtensions?
+//    ): X509Certificate {
+//        val b = BcX509v3CertificateBuilder()
+//
+//        val cert: X509CertImpl
+//        val lastDate: Date
+//        try {
+//            lastDate = Date()
+//            lastDate.setTime(firstDate.getTime() + validity * 1000)
+//            val interval = CertificateValidity(firstDate, lastDate)
+//            val info = X509CertInfo()
+//            // Add all mandatory attributes
+//            info[X509CertInfo.VERSION] = CertificateVersion(CertificateVersion.V3)
+//            info[X509CertInfo.SERIAL_NUMBER] = CertificateSerialNumber(
+//                Random().nextInt() and 0x7fffffff
+//            )
+//            val algID = AlgorithmId.get(sigAlg)
+//            info[X509CertInfo.ALGORITHM_ID] = CertificateAlgorithmId(algID)
+//            info[X509CertInfo.SUBJECT] = myname
+//            info[X509CertInfo.KEY] = CertificateX509Key(
+//                publicKeyAnyway
+//            )
+//            info[X509CertInfo.VALIDITY] = interval
+//            info[X509CertInfo.ISSUER] = myname
+//            if (ext != null) info[X509CertInfo.EXTENSIONS] = ext
+//            cert = X509CertImpl(info)
+//            cert.sign(privateKey, sigAlg)
+//            return cert as X509Certificate
+//        } catch (e: IOException) {
+//            throw CertificateEncodingException(
+//                "getSelfCert: " +
+//                        e.message
+//            )
+//        }
+//    }
 
     // Keep the old method
     @Throws(
@@ -268,23 +300,23 @@ class CertAndKeyGen {
      * @exception InvalidKeyException on key handling errors.
      * @exception SignatureException on signature handling errors.
     </P>` */
-    @Throws(InvalidKeyException::class, SignatureException::class)
-    fun getCertRequest(myname: X500Name?): PKCS10 {
-        val req = PKCS10(publicKeyAnyway)
-        try {
-            val signature: Signature = Signature.getInstance(sigAlg)
-            signature.initSign(privateKey)
-            req.encodeAndSign(myname, signature)
-        } catch (e: CertificateException) {
-            throw SignatureException("$sigAlg CertificateException")
-        } catch (e: IOException) {
-            throw SignatureException("$sigAlg IOException")
-        } catch (e: NoSuchAlgorithmException) {
-            // "can't happen"
-            throw SignatureException("$sigAlg unavailable?")
-        }
-        return req
-    }
+//    @Throws(InvalidKeyException::class, SignatureException::class)
+//    fun getCertRequest(myname: X500Name?): PKCS10 {
+//        val req = PKCS10(publicKeyAnyway)
+//        try {
+//            val signature: Signature = Signature.getInstance(sigAlg)
+//            signature.initSign(privateKey)
+//            req.encodeAndSign(myname, signature)
+//        } catch (e: CertificateException) {
+//            throw SignatureException("$sigAlg CertificateException")
+//        } catch (e: IOException) {
+//            throw SignatureException("$sigAlg IOException")
+//        } catch (e: NoSuchAlgorithmException) {
+//            // "can't happen"
+//            throw SignatureException("$sigAlg unavailable?")
+//        }
+//        return req
+//    }
 
     private var prng: SecureRandom? = null
     private var sigAlg: String

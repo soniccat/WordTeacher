@@ -142,7 +142,7 @@ class AppModule {
             spec.generateKeyPair()
         }
 
-        return SecureCodec(ks, alias)
+        return SecureCodec(ks, alias, null)
     }
 
     // Features

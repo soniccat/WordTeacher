@@ -63,6 +63,10 @@ kotlin {
                 implementation(compose.ui)
                 implementation(libs.coroutinesSwing)
                 implementation(libs.dagger)
+
+                implementation("org.bouncycastle:bcpkix-jdk15on:1.67")
+                //implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+
             }
         }
     }

@@ -12,6 +12,7 @@ import javax.crypto.CipherOutputStream
 actual class SecureCodec(
     private val ks: KeyStore, // an already loaded one
     private val keyAlias: String,
+    private val protectionParameter: KeyStore.ProtectionParameter?
 ) {
     actual fun encript(value: ByteArray): ByteArray {
         val key = getPublicKey()
@@ -48,12 +49,12 @@ actual class SecureCodec(
     }
 
     private fun getPublicKey(): PublicKey {
-        val key = ks.getEntry(keyAlias, null) as KeyStore.PrivateKeyEntry
+        val key = ks.getEntry(keyAlias, protectionParameter) as KeyStore.PrivateKeyEntry
         return key.certificate.publicKey
     }
 
     private fun getPrivateKey(): PrivateKey {
-        val key = ks.getEntry(keyAlias, null) as KeyStore.PrivateKeyEntry
+        val key = ks.getEntry(keyAlias, protectionParameter) as KeyStore.PrivateKeyEntry
         return key.privateKey
     }
 }
