@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.desktopapp.general.crypto
 
 import com.aglushkov.wordteacher.desktopapp.configs.KeyStoreConfig
-import com.aglushkov.wordteacher.shared.di.BasePath
+import com.aglushkov.wordteacher.shared.general.crypto.SECURE_CODEC_ALIAS_NAME
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import okio.FileSystem
 import okio.Path
@@ -20,9 +20,8 @@ class SecureCodecBuilder(
         val keystoreType = "PKCS12"
         val keystoreFilename = "keystore.p12"
         val keystorePassword = KeyStoreConfig.password.map { Char(it.toInt()) }.toCharArray()
-        val alias = "word_teacher_key"
-
         val keyStorePath = basePath.div(keystoreFilename)
+
         if (!fileSystem.exists(keyStorePath)) {
             try {
                 val keyStore = KeyStore.getInstance(keystoreType)
@@ -43,8 +42,8 @@ class SecureCodecBuilder(
         if (keyStore.aliases().toList().isEmpty()) {
             try {
                 val certGenerator = CertCreator()
-                val cert: X509Certificate = CertCreator().createSelfSignedCert()
-                keyStore.setKeyEntry(alias, certGenerator.privateKey, keystorePassword, arrayOf(cert))
+                val cert: X509Certificate = certGenerator.createSelfSignedCert()
+                keyStore.setKeyEntry(SECURE_CODEC_ALIAS_NAME, certGenerator.privateKey, keystorePassword, arrayOf(cert))
                 keyStore.store(
                     FileOutputStream(keyStorePath.toString()),
                     keystorePassword
@@ -55,6 +54,6 @@ class SecureCodecBuilder(
             }
         }
 
-        return SecureCodec(keyStore, alias, KeyStore.PasswordProtection(keystorePassword))
+        return SecureCodec(keyStore, SECURE_CODEC_ALIAS_NAME, KeyStore.PasswordProtection(keystorePassword))
     }
 }

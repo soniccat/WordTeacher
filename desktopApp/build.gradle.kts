@@ -51,8 +51,6 @@ kotlin {
     sourceSets {
         getByName("jvmMain") {
             dependencies {
-                compileOnly("com.squareup:kotlinpoet:1.14.2")
-
                 implementation(project(":shared"))
                 implementation(compose.desktop.common)
                 implementation(compose.desktop.currentOs)
@@ -63,8 +61,7 @@ kotlin {
                 implementation(compose.ui)
                 implementation(libs.coroutinesSwing)
                 implementation(libs.dagger)
-
-                implementation("org.bouncycastle:bcpkix-jdk15on:1.67")
+                implementation(libs.bouncyCastle)
             }
         }
     }

@@ -35,6 +35,9 @@ stately = "1.2.0"
 mockitoKotlin = "4.0.0"
 settings = "1.0.0"
 
+#JVM
+bouncyCastle = "1.67"
+
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
 kotlinTest = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlinVersion" }
@@ -113,3 +116,6 @@ junit = { module = "junit:junit", version.ref = "junit" }
 mokoResourcesLib = { module = "dev.icerock.moko:resources", version.ref = "mokoResources"}
 mokoResourcesGenerator = { module = "dev.icerock.moko:resources-generator", version.ref = "mokoResources"}
 mokoCompose = { module = "dev.icerock.moko:resources-compose", version.ref = "mokoResources"}
+
+#JVM
+bouncyCastle = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bouncyCastle" }

@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.android_app.general.crypto
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import com.aglushkov.wordteacher.shared.general.crypto.SECURE_CODEC_ALIAS_NAME
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import java.math.BigInteger
 import java.security.KeyPairGenerator
@@ -10,16 +11,15 @@ import javax.security.auth.x500.X500Principal
 
 class SecureCodecBuilder {
     fun build(): SecureCodec {
-        val alias = "secureKeyPair"
         val provider = "AndroidKeyStore"
         val ks = KeyStore.getInstance(provider)
         ks.load(null)
 
-        if (!ks.aliases().toList().contains(alias)) {
+        if (!ks.aliases().toList().contains(SECURE_CODEC_ALIAS_NAME)) {
             val spec = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, provider)
             spec.initialize(
                 KeyGenParameterSpec.Builder(
-                    alias,
+                    SECURE_CODEC_ALIAS_NAME,
                     KeyProperties.PURPOSE_DECRYPT or KeyProperties.PURPOSE_ENCRYPT
                 )
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
@@ -37,6 +37,6 @@ class SecureCodecBuilder {
             spec.generateKeyPair()
         }
 
-        return SecureCodec(ks, alias, null)
+        return SecureCodec(ks, SECURE_CODEC_ALIAS_NAME, null)
     }
 }
