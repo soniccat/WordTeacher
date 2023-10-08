@@ -65,8 +65,6 @@ kotlin {
                 implementation(libs.dagger)
 
                 implementation("org.bouncycastle:bcpkix-jdk15on:1.67")
-                //implementation("org.bouncycastle:bcprov-jdk15on:1.70")
-
             }
         }
     }
@@ -75,7 +73,9 @@ kotlin {
 configGenerator {
     configs = listOf(
         com.aglushkov.gradle.ConfigGeneratorItem("Google", "GoogleConfig"),
-        com.aglushkov.gradle.ConfigGeneratorItem("GoogleNotPublic", "GoogleConfig")
+        com.aglushkov.gradle.ConfigGeneratorItem("GoogleNotPublic", "GoogleConfig"),
+        com.aglushkov.gradle.ConfigGeneratorItem("KeyStore", "KeyStoreConfig"),
+        com.aglushkov.gradle.ConfigGeneratorItem("KeyStoreNotPublic", "KeyStoreConfig")
     )
 }
 

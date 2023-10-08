@@ -2,7 +2,9 @@
 package com.aglushkov.wordteacher.desktopapp.di
 
 import com.aglushkov.wordteacher.desktopapp.configs.GoogleConfig
-import com.aglushkov.wordteacher.desktopapp.general.crypto.CertAndKeyGen
+import com.aglushkov.wordteacher.desktopapp.configs.KeyStoreConfig
+import com.aglushkov.wordteacher.desktopapp.general.crypto.CertCreator
+import com.aglushkov.wordteacher.desktopapp.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.ApiBaseUrl
 import com.aglushkov.wordteacher.shared.di.AppComp
@@ -27,7 +29,6 @@ import io.ktor.http.Url
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
-import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -35,6 +36,7 @@ import java.security.KeyStore
 import java.security.KeyStore.PasswordProtection
 import java.security.Security
 import java.security.cert.X509Certificate
+import java.util.Date
 
 
 @Module(includes = [SharedAppModule::class])
@@ -130,62 +132,6 @@ class AppModule {
         @BasePath basePath: Path,
         fileSystem: FileSystem,
     ): SecureCodec {
-        val keystoreType = "PKCS12"
-        val keystoreFilename = "sender_keystore.p12"
-        val keystorePassword = "abc"
-        val alias = "senderKeyPair"
-        val cnString = "CN=Baeldung"
-        val rsaKeylength = 2048
-        val certificateSignatureAlgorithm = "SHA1WithRSA"
-        val certificateValidityDays = 365
-
-        val keyStorePath = basePath.div(keystoreFilename)
-        val needInit = !fileSystem.exists(keyStorePath)
-        if (needInit) {
-            try {
-                val keyStore = KeyStore.getInstance(keystoreType)
-                keyStore.load(null, null)
-                keyStore.store(
-                    FileOutputStream(keyStorePath.toString()),
-                    keystorePassword.toCharArray()
-                )
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
-
-        Security.addProvider(BouncyCastleProvider())
-
-        val keyStore = KeyStore.getInstance(keystoreType)
-        keyStore.load(FileInputStream(keyStorePath.toString()), keystorePassword.toCharArray())
-        if (needInit || keyStore.aliases().toList().isEmpty()) {
-            try {
-                val gen = CertAndKeyGen("RSA", certificateSignatureAlgorithm)
-                gen.generate(rsaKeylength)
-                val key = gen.privateKey
-                val cert: X509Certificate = gen.getSelfCertificate(
-                    X500Name(cnString),
-                    certificateValidityDays.toLong() * 1
-                )
-                val chain: Array<X509Certificate?> = arrayOfNulls<X509Certificate>(1)
-                chain[0] = cert
-                keyStore.setKeyEntry(alias, key, keystorePassword.toCharArray(), chain)
-                keyStore.store(
-                    FileOutputStream(keyStorePath.toString()),
-                    keystorePassword.toCharArray()
-                )
-            } catch (ex: java.lang.Exception) {
-                ex.printStackTrace()
-            }
-        } else {
-            try {
-                val e = keyStore.getEntry(alias, PasswordProtection(keystorePassword.toCharArray()))
-                println(e.toString())
-            } catch (ex: java.lang.Exception) {
-                ex.printStackTrace()
-            }
-        }
-
-        return SecureCodec(keyStore!!, alias, PasswordProtection(keystorePassword.toCharArray()))
+        return SecureCodecBuilder(basePath, fileSystem).build()
     }
 }

@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.konan.properties.suffix
 import java.io.File
 import java.util.*
 
@@ -47,16 +48,34 @@ class ConfigGeneratorPlugin : Plugin<Project> {
     private fun createConfigClass(target: Project, className: String, properties: Properties) {
         val companion = com.squareup.kotlinpoet.TypeSpec.companionObjectBuilder().apply {
             properties.onEach { propEntry ->
-                addProperty(
-                    com.squareup.kotlinpoet.PropertySpec.Companion.builder(propEntry.key as String, String::class)
-                        .initializer("%S", propEntry.value as String)
-                        .build()
-                )
+                if ((propEntry.key as String).endsWith(BYTES_PREFIX)) {
+                    addProperty(
+                        com.squareup.kotlinpoet.PropertySpec.Companion.builder(
+                            (propEntry.key as String).let { key ->
+                                key.take(key.length - BYTES_PREFIX.length)
+                            },
+                            ByteArray::class
+                        )
+                            .initializer("byteArrayOf(" + (propEntry.value as String).toByteArray()
+                                .joinToString { it.toString() } + ")", null)
+                            .build()
+                    )
+                } else {
+                    addProperty(
+                        com.squareup.kotlinpoet.PropertySpec.Companion.builder(
+                            propEntry.key as String,
+                            String::class
+                        )
+                            .initializer("%S", propEntry.value as String)
+                            .build()
+                    )
+                }
             }
         }.build()
         val cl = com.squareup.kotlinpoet.TypeSpec.classBuilder(className)
             .addType(companion)
             .build()
+        // TODO: get rid of this hardcode and get the value somehow
         val fileSpec = com.squareup.kotlinpoet.FileSpec.builder("com.aglushkov.wordteacher.desktopapp.configs", className)
             .addType(cl)
             .build()
@@ -67,3 +86,5 @@ class ConfigGeneratorPlugin : Plugin<Project> {
         return target.buildDir.path + "/generated/configs/code/main"
     }
 }
+
+private const val BYTES_PREFIX = "_bytes"
