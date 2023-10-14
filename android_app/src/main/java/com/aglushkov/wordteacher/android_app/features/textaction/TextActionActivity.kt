@@ -1,6 +1,9 @@
 package com.aglushkov.wordteacher.android_app.features.textaction
 
+import android.content.ContentProvider
+import android.content.ContentResolver
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Patterns
 import androidx.activity.compose.setContent
@@ -64,13 +67,21 @@ class TextActionActivity: AppCompatActivity() {
         val deps = (applicationContext as AppComponentOwner).appComponent
         val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT) // from action.PROCESS_TEXT
             ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT) // from action.ACTION_SEND
-        ?: ""
+        ?: intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)?.toString() ?: ""
 
         var urlString: String? = null
         val matcher = Patterns.WEB_URL.matcher(text)
         if (matcher.find()) {
             try {
                 urlString = URL(text.subSequence(matcher.start(), matcher.end()).toString()).toString()
+            } catch (e: Throwable) {
+            }
+        } else {
+            try {
+                val uri = Uri.parse(text.toString())
+                if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+                    urlString = uri.toString()
+                }
             } catch (e: Throwable) {
             }
         }

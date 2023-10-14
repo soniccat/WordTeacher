@@ -24,6 +24,6 @@ interface TextActionComponent {
     @Parcelize
     data class Config(
         val text: CharSequence,
-        val url: String?
+        val url: String?,
     ): Parcelable
 }
