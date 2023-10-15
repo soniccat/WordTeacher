@@ -12,12 +12,15 @@ import com.aglushkov.wordteacher.shared.di.BasePath
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.Platform
 import com.aglushkov.wordteacher.shared.di.SharedAppModule
+import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
+import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.PreferencesSettings
@@ -133,5 +136,13 @@ class AppModule {
         fileSystem: FileSystem,
     ): SecureCodec {
         return SecureCodecBuilder(basePath, fileSystem).build()
+    }
+
+    @AppComp
+    @Provides
+    fun contentExtractors(): Array<ArticleContentExtractor> {
+        return arrayOf(
+            ArticleParserRepository().toArticleContentExtractor(),
+        )
     }
 }
