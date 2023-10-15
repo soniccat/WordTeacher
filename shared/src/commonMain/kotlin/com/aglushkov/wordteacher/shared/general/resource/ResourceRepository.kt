@@ -9,30 +9,40 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-interface ResourceRepository<T> {
+interface ResourceRepository<T, A> {
     val stateFlow: StateFlow<Resource<T>>
 
-    fun load(initialValue: Resource<T> = stateFlow.value): StateFlow<Resource<T>>
+    fun load(arg: A, initialValue: Resource<T> = stateFlow.value): StateFlow<Resource<T>>
 }
 
-class SimpleResourceRepository<T>(
+abstract class SimpleResourceRepository<T, A>(
     initialValue: Resource<T> = Resource.Uninitialized(),
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob()),
     private val canTryAgain: Boolean = true,
-    private val loader: suspend () -> T
-): ResourceRepository<T> {
+): ResourceRepository<T, A> {
     override val stateFlow = MutableStateFlow(initialValue)
     private var loadJob: Job? = null
 
-    override fun load(initialValue: Resource<T>): StateFlow<Resource<T>> {
+    override fun load(arg: A, initialValue: Resource<T>): StateFlow<Resource<T>> {
         loadJob?.cancel()
+
+        // Keep version for Uninitialized to support flow collecting in advance when services aren't loaded
+        val bumpedValue = if (initialValue.isLoadedOrError()) {
+            initialValue.bumpVersion()
+        } else {
+            initialValue
+        }
+
         loadJob = scope.launch {
             loadResource(
-                initialValue = initialValue,
+                initialValue = bumpedValue,
                 canTryAgain = canTryAgain,
-                loader = loader,
+                loader = { load(arg) },
             ).collect(stateFlow)
         }
+
         return stateFlow
     }
+
+    abstract suspend fun load(arg: A): T
 }

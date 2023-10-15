@@ -123,6 +123,10 @@ suspend fun <T> Flow<Resource<T>>.waitUntilLoadedOrError(): Resource<T> {
     return res
 }
 
+fun <T> MutableStateFlow<Resource<T>>.updateData(dataTransform: (T) -> T) {
+    this.update { it.transform( loadedDataTransformer= dataTransform) }
+}
+
 class AbortFlowException constructor(
     val owner: FlowCollector<*>
 ) : CancellationException("Flow was aborted, no more elements needed")

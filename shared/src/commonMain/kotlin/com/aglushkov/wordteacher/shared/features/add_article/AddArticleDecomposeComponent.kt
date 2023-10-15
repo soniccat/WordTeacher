@@ -2,8 +2,8 @@ package com.aglushkov.wordteacher.shared.features.add_article
 
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVMImpl
+import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.general.TimeSource
-import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.arkivanov.decompose.ComponentContext
@@ -14,16 +14,15 @@ import com.arkivanov.essenty.statekeeper.consume
 class AddArticleDecomposeComponent(
     componentContext: ComponentContext,
     articlesRepository: ArticlesRepository,
-    articleParserRepository: ArticleParserRepository,
+    contentExtractors: Array<ArticleContentExtractor>,
     cardSetsRepository: CardSetsRepository,
     timeSource: TimeSource,
-    val initialState: AddArticleVM.State = AddArticleVM.State()
+    private val initialState: AddArticleVM.State = AddArticleVM.State()
 ): AddArticleVMImpl(
     articlesRepository,
-    articleParserRepository,
+    contentExtractors,
     cardSetsRepository,
     timeSource,
-    initialState
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
@@ -32,7 +31,7 @@ class AddArticleDecomposeComponent(
 
     init {
         stateKeeper.register(KEY_STATE) {
-            state
+            createState()
         }
 
         restore(instanceState.state)

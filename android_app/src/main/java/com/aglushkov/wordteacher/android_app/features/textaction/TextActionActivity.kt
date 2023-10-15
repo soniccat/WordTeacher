@@ -65,31 +65,31 @@ class TextActionActivity: AppCompatActivity() {
 
         val context = defaultComponentContext()
         val deps = (applicationContext as AppComponentOwner).appComponent
-        val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT) // from action.PROCESS_TEXT
+        val intentString = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT) // from action.PROCESS_TEXT
             ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT) // from action.ACTION_SEND
         ?: intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)?.toString() ?: ""
 
+        var text: CharSequence? = null
         var urlString: String? = null
-        val matcher = Patterns.WEB_URL.matcher(text)
+
+        val matcher = Patterns.WEB_URL.matcher(intentString)
         if (matcher.find()) {
             try {
-                urlString = URL(text.subSequence(matcher.start(), matcher.end()).toString()).toString()
+                urlString = URL(intentString.subSequence(matcher.start(), matcher.end()).toString()).toString()
             } catch (e: Throwable) {
             }
         } else {
             try {
-                val uri = Uri.parse(text.toString())
-                if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
-                    urlString = uri.toString()
-                }
+                urlString = URL(intentString.toString()).toString()
             } catch (e: Throwable) {
+                text = intentString
             }
         }
 
         textActionDecomposeComponent = DaggerTextActionComponent.builder()
             .setAppComponent(deps)
             .setComponentContext(context)
-            .setConfig(TextActionComponent.Config(text, urlString))
+            .setConfig(TextActionComponent.Config(text ?: "", urlString))
             .build()
             .textActionDecomposeComponent()
 

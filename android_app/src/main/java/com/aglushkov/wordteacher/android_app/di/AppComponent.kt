@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.Platform
 import com.aglushkov.wordteacher.shared.di.SpaceHttpClient
 import com.aglushkov.wordteacher.shared.features.add_article.di.AddArticleDependencies
+import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.shared.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
@@ -90,6 +91,8 @@ interface AppComponent:
     override fun idGenerator(): IdGenerator
     override fun timeSource(): TimeSource
     override fun connectivityManager(): ConnectivityManager
+    override fun contentExtractors(): Array<ArticleContentExtractor>
+
     fun injectApplication(app: GApp)
 
     @IsDebug fun isDebug(): Boolean

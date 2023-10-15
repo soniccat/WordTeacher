@@ -5,6 +5,7 @@ import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.extensions.updateData
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.data
@@ -20,6 +21,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
@@ -27,8 +29,9 @@ import kotlinx.coroutines.launch
 
 interface AddArticleVM: Clearable {
     val eventFlow: Flow<Event>
-    val uiStateFlow: Flow<Resource<UIState>>
+    val uiStateFlow: StateFlow<Resource<UIState>>
 
+    fun createState(): State
     fun onTitleChanged(title: String)
     fun onTextChanged(text: String)
     fun onCancelPressed(): Job
@@ -38,10 +41,10 @@ interface AddArticleVM: Clearable {
 
     @Parcelize
     data class State(
-        var title: String? = null,
-        var text: String? = null,
-        var uri: String? = null,
-        var needToCreateSet: Boolean = false
+        val title: String? = null,
+        val text: String? = null,
+        val uri: String? = null,
+        val needToCreateSet: Boolean = false
     ): Parcelable
 
     data class UIState(
@@ -54,8 +57,7 @@ interface AddArticleVM: Clearable {
 
 open class AddArticleVMImpl(
     private val articlesRepository: ArticlesRepository,
-    //private val articleParseRepository: ArticleParserRepository,
-    private val contentExtractors: List<ArticleContentExtractor>,
+    private val contentExtractors: Array<ArticleContentExtractor>,
     private val cardSetsRepository: CardSetsRepository,
     private val timeSource: TimeSource,
 ): ViewModel(), AddArticleVM {
@@ -63,18 +65,19 @@ open class AddArticleVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED) // TODO: replace with a list of strings
     override val eventFlow = eventChannel.receiveAsFlow()
 
-    // TODO: consider creating a dingle UIState object
-//    private val mutableTitle = MutableStateFlow("")
-//    override val title: StateFlow<String> = mutableTitle
-//    private val mutableTitleErrorFlow = MutableStateFlow<StringDesc?>(null)
-//    override val titleErrorFlow: Flow<StringDesc?> = mutableTitleErrorFlow
-//    override val needToCreateSet = MutableStateFlow<Boolean>(false)
-//    private val mutableText = MutableStateFlow("")
-//    override val text: StateFlow<String> = mutableText
-
+    private var state = AddArticleVM.State()
     override val uiStateFlow = MutableStateFlow<Resource<AddArticleVM.UIState>>(Resource.Uninitialized())
 
+    override fun createState(): AddArticleVM.State {
+        val data = uiStateFlow.value.data()
+        return state.copy(
+            title = data?.title
+        )
+    }
+
     fun restore(state: AddArticleVM.State) {
+        this.state = state
+
         val dataFromState = AddArticleVM.UIState(
             title = state.title.orEmpty(),
             titleError = null,
@@ -128,14 +131,12 @@ open class AddArticleVMImpl(
     }
 
     override fun onTitleChanged(title: String) {
-        state.title = title
-        mutableTitle.value = title
+        uiStateFlow.updateData { it.copy(title = title) }
         updateTitleErrorFlow()
     }
 
     override fun onTextChanged(text: String) {
-        state.text = text
-        mutableText.value = text
+        uiStateFlow.updateData { it.copy(text = text) }
     }
 
     override fun onCancelPressed() = viewModelScope.launch {
@@ -150,34 +151,44 @@ open class AddArticleVMImpl(
 
     override fun onCompletePressed() {
         updateTitleErrorFlow()
-        if (mutableTitleErrorFlow.value == null) {
-            if (needToCreateSet.value) {
-                createCardSet()
-            }
+        uiStateFlow.value.data()?.let { data ->
+            if (data.titleError == null) {
+                if (data.needToCreateSet) {
+                    createCardSet()
+                }
 
-            createArticle()
+                createArticle()
+            }
         }
     }
 
     override fun onNeedToCreateSetPressed() {
-        needToCreateSet.value = !needToCreateSet.value
-        state.needToCreateSet = needToCreateSet.value
+        uiStateFlow.updateData { it.copy(needToCreateSet = !it.needToCreateSet) }
     }
 
     private fun createCardSet() = viewModelScope.launch {
         runSafely {
-            cardSetsRepository.createCardSet(
-                title.value,
-                timeSource.timeInMilliseconds()
-            )
+            uiStateFlow.value.data()?.let { data ->
+                cardSetsRepository.createCardSet(
+                    data.title,
+                    timeSource.timeInMilliseconds()
+                )
+            }
         }
     }
 
     private fun createArticle() = viewModelScope.launch {
         runSafely {
-            // TODO: show loading, adding might take for a while
-            val article = articlesRepository.createArticle(title.value, text.value)
-            eventChannel.trySend(CompletionEvent(CompletionResult.COMPLETED, CompletionData.Article(article.id)))
+            uiStateFlow.value.data()?.let { data ->
+                // TODO: show loading, adding might take for a while
+                val article = articlesRepository.createArticle(data.title, data.text)
+                eventChannel.trySend(
+                    CompletionEvent(
+                        CompletionResult.COMPLETED,
+                        CompletionData.Article(article.id)
+                    )
+                )
+            }
         }
     }
 
@@ -197,10 +208,11 @@ open class AddArticleVMImpl(
     }
 
     private fun updateTitleErrorFlow() {
-        if (title.value.isBlank()) {
-            mutableTitleErrorFlow.value = StringDesc.Resource(MR.strings.add_article_error_empty_title)
+        val data = uiStateFlow.value.data()
+        if (data != null && data.title.isBlank()) {
+            uiStateFlow.updateData { it.copy(titleError = StringDesc.Resource(MR.strings.add_article_error_empty_title)) }
         } else {
-            mutableTitleErrorFlow.value = null
+            uiStateFlow.updateData { it.copy(titleError = null) }
         }
     }
 

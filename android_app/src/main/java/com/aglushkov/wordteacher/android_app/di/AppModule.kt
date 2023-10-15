@@ -8,10 +8,13 @@ import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
+import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
+import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -106,6 +109,14 @@ class AppModule {
     @Provides
     fun secureCodec(): SecureCodec {
         return SecureCodecBuilder().build()
+    }
+
+    @AppComp
+    @Provides
+    fun contentExtractors(): Array<ArticleContentExtractor> {
+        return arrayOf(
+            ArticleParserRepository().toArticleContentExtractor()
+        )
     }
 
     // Features

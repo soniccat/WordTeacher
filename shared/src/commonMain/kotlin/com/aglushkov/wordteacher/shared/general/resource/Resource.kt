@@ -202,7 +202,7 @@ fun <T> loadResource(
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        Logger.e(e.message.orEmpty(), "resourceLoadingFlow")
+        Logger.e(e.message.orEmpty(), "loadResource")
         e.printStackTrace()
         emit(initialValue.toError(e, canTryAgain))
     }

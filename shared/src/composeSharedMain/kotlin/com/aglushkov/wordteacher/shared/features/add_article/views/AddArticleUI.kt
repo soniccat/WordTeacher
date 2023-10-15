@@ -138,12 +138,8 @@ private fun AddArticlesFieldsUI(
     vm: AddArticleVM,
     focusRequester: FocusRequester
 ) {
-    val title by vm.title.collectAsState()
-    val titleError by vm.titleErrorFlow.collectAsState(initial = null)
-    val text by vm.text.collectAsState()
-    val needToCreateSet by vm.needToCreateSet.collectAsState()
-
-    val hasTitleError = remember(titleError) { titleError != null }
+    val uiState by vm.uiStateFlow.collectAsState()
+    val hasTitleError = remember(uiState.data()?.titleError) { uiState.data()?.titleError != null }
     val scrollableState = rememberScrollState()
     var wasTitleFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -160,7 +156,7 @@ private fun AddArticlesFieldsUI(
             )
     ) {
         OutlinedTextField(
-            value = title,
+            value = uiState.data()?.title.orEmpty(),
             onValueChange = { vm.onTitleChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -198,7 +194,7 @@ private fun AddArticlesFieldsUI(
                 .defaultMinSize(minHeight = 16.dp)
                 .padding(horizontal = 16.dp)
         ) {
-            val titleErrorDesc = titleError
+            val titleErrorDesc = uiState.data()?.titleError
             if (titleErrorDesc != null) {
                 Text(
                     titleErrorDesc.localized(),
@@ -221,13 +217,13 @@ private fun AddArticlesFieldsUI(
                     .weight(1.0f)
             )
             Checkbox(
-                checked = needToCreateSet,
+                checked = uiState.data()?.needToCreateSet ?: false,
                 onCheckedChange = null
             )
         }
 
         OutlinedTextField(
-            value = text,
+            value = uiState.data()?.text.orEmpty(),
             onValueChange = { vm.onTextChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
