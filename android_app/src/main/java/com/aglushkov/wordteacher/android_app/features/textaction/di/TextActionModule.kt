@@ -38,7 +38,7 @@ class TextActionModule {
                     DaggerAddArticleComposeComponent.builder()
                         .setComponentContext(context)
                         .setConfiguration(
-                            AddArticleVM.State(text = config.text.toString(), url = config.url)
+                            AddArticleVM.State(text = config.text.toString(), uri = config.url)
                         )
                         .setDeps(appComponent)
                         .build()

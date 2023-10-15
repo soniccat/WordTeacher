@@ -5,7 +5,11 @@ import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.*
-import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
+import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.data
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -16,18 +20,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
 interface AddArticleVM: Clearable {
     val eventFlow: Flow<Event>
-    // TODO: consider to move it into one StateFlow<State>
-    val title: StateFlow<String>
-    val titleErrorFlow: Flow<StringDesc?>
-    val text: StateFlow<String>
-    val needToCreateSet: StateFlow<Boolean>
-    var state: State
+    val uiStateFlow: Flow<Resource<UIState>>
 
     fun onTitleChanged(title: String)
     fun onTextChanged(text: String)
@@ -37,51 +37,91 @@ interface AddArticleVM: Clearable {
     fun onNeedToCreateSetPressed()
 
     @Parcelize
-    class State(
+    data class State(
         var title: String? = null,
         var text: String? = null,
-        var url: String? = null,
+        var uri: String? = null,
         var needToCreateSet: Boolean = false
     ): Parcelable
+
+    data class UIState(
+        val title: String,
+        val titleError: StringDesc?,
+        val text: String,
+        val needToCreateSet: Boolean,
+    )
 }
 
 open class AddArticleVMImpl(
     private val articlesRepository: ArticlesRepository,
-    private val articleParseRepository: ArticleParserRepository,
+    //private val articleParseRepository: ArticleParserRepository,
+    private val contentExtractors: List<ArticleContentExtractor>,
     private val cardSetsRepository: CardSetsRepository,
     private val timeSource: TimeSource,
-    override var state: AddArticleVM.State
 ): ViewModel(), AddArticleVM {
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED) // TODO: replace with a list of strings
     override val eventFlow = eventChannel.receiveAsFlow()
 
     // TODO: consider creating a dingle UIState object
-    private val mutableTitle = MutableStateFlow("")
-    override val title: StateFlow<String> = mutableTitle
-    private val mutableTitleErrorFlow = MutableStateFlow<StringDesc?>(null)
-    override val titleErrorFlow: Flow<StringDesc?> = mutableTitleErrorFlow
-    override val needToCreateSet = MutableStateFlow<Boolean>(false)
+//    private val mutableTitle = MutableStateFlow("")
+//    override val title: StateFlow<String> = mutableTitle
+//    private val mutableTitleErrorFlow = MutableStateFlow<StringDesc?>(null)
+//    override val titleErrorFlow: Flow<StringDesc?> = mutableTitleErrorFlow
+//    override val needToCreateSet = MutableStateFlow<Boolean>(false)
+//    private val mutableText = MutableStateFlow("")
+//    override val text: StateFlow<String> = mutableText
 
-    private val mutableText = MutableStateFlow("")
-    override val text: StateFlow<String> = mutableText
+    override val uiStateFlow = MutableStateFlow<Resource<AddArticleVM.UIState>>(Resource.Uninitialized())
 
     fun restore(state: AddArticleVM.State) {
-        mutableTitle.value = state.title.orEmpty()
-        mutableText.value = state.text.orEmpty()
-        needToCreateSet.value = state.needToCreateSet
+        val dataFromState = AddArticleVM.UIState(
+            title = state.title.orEmpty(),
+            titleError = null,
+            text = state.text.orEmpty(),
+            needToCreateSet = state.needToCreateSet,
+        )
+        val uiState = uiStateFlow.updateAndGet { uiState ->
+            uiState.toLoading().copy(
+                data = dataFromState
+            ).run {
+                if (dataFromState.text.isNotEmpty()) {
+                    this.toLoaded(dataFromState)
+                } else {
+                    this
+                }
+            }
+        }
 
-        state.url?.let {
-            viewModelScope.launch {
-                val parsedArticleRes = articleParseRepository.parse(it)
-                parsedArticleRes.data()?.let {
-                    it.title?.let {
-                        mutableTitle.value = it
-                    }
+        if (!uiState.isLoaded()) {
+            state.uri?.let { uri ->
+                extractContent(uri, dataFromState)
+            } ?: run {
+                uiStateFlow.update { it.toLoaded(dataFromState) }
+            }
+        }
+    }
 
-                    it.text?.let {
-                        mutableText.value = it
-                    }
+    private fun extractContent(uri: String, dataFromState: AddArticleVM.UIState) {
+        viewModelScope.launch {
+            uiStateFlow.update { it.toLoading() }
+            var res: Resource<ArticleContent> = Resource.Uninitialized()
+            for (extractor in contentExtractors) {
+                if (extractor.canExtract(uri)) {
+                    res = extractor.extract(uri).waitUntilLoadedOrError()
+                }
+
+                if (res.isLoadedOrError()) {
+                    break
+                }
+            }
+
+            uiStateFlow.update {
+                res.transform {
+                    dataFromState.copy(
+                        title = it.title.orEmpty(),
+                        text = it.text.orEmpty(),
+                    )
                 }
             }
         }

@@ -111,10 +111,17 @@ suspend fun <T> Flow<Resource<T>>.waitUntilLoaded() {
     takeWhile { !it.isLoaded() }.collect()
 }
 
-suspend fun <T> Flow<Resource<T>>.waitUntilLoadedOrError() {
-    takeWhile { !it.isLoadedOrError() }.collect()
+suspend fun <T> Flow<Resource<T>>.waitUntilLoadedOrError(): Resource<T> {
+    var res: Resource<T> = Resource.Uninitialized()
+    takeWhile {
+        val needTake = !it.isLoadedOrError()
+        if (!needTake) {
+            res = it
+        }
+        needTake
+    }.collect()
+    return res
 }
-
 
 class AbortFlowException constructor(
     val owner: FlowCollector<*>
