@@ -1,7 +1,5 @@
 package com.aglushkov.wordteacher.android_app.features.textaction
 
-import android.content.ContentProvider
-import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -72,18 +70,26 @@ class TextActionActivity: AppCompatActivity() {
         var text: CharSequence? = null
         var urlString: String? = null
 
+        // TODO: move this login into VM layer
         val matcher = Patterns.WEB_URL.matcher(intentString)
         if (matcher.find()) {
             try {
                 urlString = URL(intentString.subSequence(matcher.start(), matcher.end()).toString()).toString()
             } catch (e: Throwable) {
             }
-        } else {
+        }
+
+        if (urlString == null) {
             try {
-                urlString = URL(intentString.toString()).toString()
+                if (Uri.parse(intentString.toString()).scheme != null) {
+                    urlString = intentString.toString()
+                }
             } catch (e: Throwable) {
-                text = intentString
             }
+        }
+
+        if (urlString == null) {
+            text = intentString
         }
 
         textActionDecomposeComponent = DaggerTextActionComponent.builder()

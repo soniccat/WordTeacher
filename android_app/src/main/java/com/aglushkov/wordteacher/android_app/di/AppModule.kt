@@ -5,6 +5,8 @@ import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.aglushkov.wordteacher.android_app.BuildConfig
 import com.aglushkov.wordteacher.android_app.R
+import com.aglushkov.wordteacher.android_app.features.add_article.ContentProviderRepository
+import com.aglushkov.wordteacher.android_app.features.add_article.toArticleContentExtractor
 import com.aglushkov.wordteacher.android_app.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
@@ -113,9 +115,12 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun contentExtractors(): Array<ArticleContentExtractor> {
+    fun contentExtractors(
+        context: Context,
+    ): Array<ArticleContentExtractor> {
         return arrayOf(
-            ArticleParserRepository().toArticleContentExtractor()
+            ArticleParserRepository().toArticleContentExtractor(),
+            ContentProviderRepository(context).toArticleContentExtractor(),
         )
     }
 
