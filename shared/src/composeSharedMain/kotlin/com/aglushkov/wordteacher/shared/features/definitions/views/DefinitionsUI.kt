@@ -461,7 +461,7 @@ fun WordPartOfSpeechView(
     topPadding: Dp = LocalDimensWord.current.wordPartOfSpeechTopMargin
 ) {
     Text(
-        text = viewItem.firstItem().localized().toUpperCase(Locale.getDefault()),
+        text = viewItem.firstItem().localized().uppercase(Locale.getDefault()),
         modifier = Modifier
             .then(modifier)
             .padding(

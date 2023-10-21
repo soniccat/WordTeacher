@@ -371,6 +371,7 @@ private fun ArticleParagraphView(
                     }
                 },
             fontSize = TextUnit(16f, TextUnitType.Sp),
+            lineHeight = 28.sp,
             style = LocalAppTypography.current.wordDefinition,
             onTextLayout = {
                 textLayoutResult = it

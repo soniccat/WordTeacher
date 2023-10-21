@@ -177,7 +177,7 @@ fun partOfSpeechEnum(it: String?) = if (it == null) {
 }
 
 fun WordTeacherWord.PartOfSpeech.Companion.fromString(string: String?): WordTeacherWord.PartOfSpeech {
-    val resultString = string?.toLowerCase() ?: "null"
+    val resultString = string?.lowercase() ?: "null"
     return when {
         resultString.contains("noun") -> WordTeacherWord.PartOfSpeech.Noun
         resultString.contains("verb") -> WordTeacherWord.PartOfSpeech.Verb

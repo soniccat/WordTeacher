@@ -80,12 +80,13 @@ class WordDefinitionRepository(
         word: String,
         reload: Boolean = false
     ): Flow<Resource<List<WordTeacherWord>>> {
+        val lowercasedWord = word.lowercase()
         val tag = "WordDefinitionRepository.define"
         val services = serviceRepository.services.value.data().orEmpty() +
                 dictRepository.dicts.value.data().orEmpty()
 
         // Decide if we need to load or reuse what we've already loaded or what we're loading now
-        val stateFlow = obtainMutableStateFlow(word)
+        val stateFlow = obtainMutableStateFlow(lowercasedWord)
         val currentValue = stateFlow.value
         val needLoad = reload || currentValue.isNotLoadedAndNotLoading()
 
@@ -100,9 +101,9 @@ class WordDefinitionRepository(
             // Update the version of a resource as soon as possible to filter changes from the current flow if it exists
             stateFlow.value = Resource.Loading(version = nextVersion)
 
-            jobs[word]?.cancel()
-            jobs[word] = scope.launch { // use our scope here to avoid cancellation by Structured Concurrency
-                loadDefinitionsFlow(word, nextVersion, services).onEach {
+            jobs[lowercasedWord]?.cancel()
+            jobs[lowercasedWord] = scope.launch { // use our scope here to avoid cancellation by Structured Concurrency
+                loadDefinitionsFlow(lowercasedWord, nextVersion, services).onEach {
                     if (it.version == nextVersion) {
                         stateFlow.value = it
                     }

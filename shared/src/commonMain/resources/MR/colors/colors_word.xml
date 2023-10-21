@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="word_provided_by">#aaa</color>
+    <color name="word_provided_by">#aaaaaa</color>
     <color name="partOfSpeechChipBg">@color/secondaryColor</color>
     <color name="partOfSpeechChipText">@color/secondaryTextColor</color>
 
