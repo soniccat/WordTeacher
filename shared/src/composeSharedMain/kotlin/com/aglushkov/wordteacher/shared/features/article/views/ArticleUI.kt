@@ -22,7 +22,9 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
@@ -49,8 +51,6 @@ import com.aglushkov.wordteacher.shared.model.nlp.toStringDesc
 import com.aglushkov.wordteacher.shared.model.partOfSpeechEnum
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.res.MR
-import com.arkivanov.essenty.backpressed.BackPressedHandler
-import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.flow.filter
@@ -293,6 +293,7 @@ private fun ArticleParagraphView(
     paragraphViewItem: ParagraphViewItem,
     onSentenceClick: (sentence: NLPSentence, offset: Int) -> Unit
 ) {
+    val density = LocalDensity.current
     val text = buildAnnotatedString {
         withStyle(
             style = ParagraphStyle()
@@ -354,25 +355,18 @@ private fun ArticleParagraphView(
                                 it.end < text.length
                             }
                             .onEach {
-                                drawAnnotation(it, v, colors)
+                                drawAnnotation(it, v, colors, density)
                             }
-
-//                    data.getLineForOffset()
-//
-//                    val lt = data.getLineTop(0)
-//                    val lb = data.getLineBottom(0)
-//                    val ll = data.getLineLeft(0)
-//                    val lr = data.getLineRight(0)
-//                    drawRect(
-//                        color = Color.Red,
-//                        topLeft = Offset(ll, lt),
-//                        size = Size(lr - ll, lb - lt)
-//                    )
                     }
                 },
-            fontSize = TextUnit(16f, TextUnitType.Sp),
-            lineHeight = 28.sp,
-            style = LocalAppTypography.current.wordDefinition,
+            fontSize = ArticleFontSize,
+            lineHeight = 2.em,
+            style = LocalAppTypography.current.wordDefinition.copy(
+                lineHeightStyle = LineHeightStyle(
+                    alignment = LineHeightStyle.Alignment.Bottom, // align bottom to simplify annotation frame calculation
+                    trim = LineHeightStyle.Trim.None
+                )
+            ),
             onTextLayout = {
                 textLayoutResult = it
             }
@@ -448,30 +442,33 @@ private fun AnnotatedString.Builder.addAnnotations(
 private fun DrawScope.drawAnnotation(
     it: AnnotatedString.Range<String>,
     layoutResult: TextLayoutResult,
-    colors: Colors
+    colors: Colors,
+    density: Density
 ) {
     val annotationColors = it.resolveColor(colors)
+    val fontHeight = articleFontHeight(density)
     val lineStart = layoutResult.getLineForOffset(it.start)
     val lineEnd = layoutResult.getLineForOffset(it.end)
 
-    val lt = layoutResult.getLineTop(lineStart)
     val lb = layoutResult.getLineBottom(lineStart)
+    val lt = lb - fontHeight // as we use LineHeightStyle.Alignment.Bottom we can calculate the top this way
     val bgOffset = 2.dp.toPx()
+    val topBgOffset = bgOffset + 2.dp.toPx() // add extra top offset to make text looking vertically aligned inside of an annotation
     val cornerRadius = 4.dp.toPx()
 
     if (lineStart != lineEnd) {
         // left part
         val leftPartLl = layoutResult.getHorizontalPosition(it.start, true)
         val leftPartLr = layoutResult.getLineRight(lineStart)
-        val leftRect = Rect(leftPartLl - bgOffset, lt - bgOffset, leftPartLr + bgOffset, lb + bgOffset)
+        val leftRect = Rect(leftPartLl - bgOffset, lt - topBgOffset, leftPartLr + bgOffset, lb + bgOffset)
         drawAnnotationPart(leftRect, cornerRadius, isLeftPart = true, annotationColors)
 
         // right part
-        val rightPartLt = layoutResult.getLineTop(lineEnd)
         val rightPartLb = layoutResult.getLineBottom(lineEnd)
+        val rightPartLt = rightPartLb - fontHeight
         val rightPartLl = layoutResult.getLineLeft(lineEnd)
         val rightPartLr = layoutResult.getHorizontalPosition(it.end, true)
-        val rightRect = Rect(rightPartLl - bgOffset, rightPartLt - bgOffset, rightPartLr + bgOffset, rightPartLb + bgOffset)
+        val rightRect = Rect(rightPartLl - bgOffset, rightPartLt - topBgOffset, rightPartLr + bgOffset, rightPartLb + bgOffset)
         drawAnnotationPart(rightRect, cornerRadius, isLeftPart = false, annotationColors)
 
     } else {
@@ -481,8 +478,8 @@ private fun DrawScope.drawAnnotation(
         annotationColors.bgColor?.let {
             drawRoundRect(
                 color = it,
-                topLeft = Offset(ll, lt).minus(Offset(bgOffset, bgOffset)),
-                size = Size(lr - ll + 2 * bgOffset, lb - lt + 2 * bgOffset),
+                topLeft = Offset(ll, lt).minus(Offset(bgOffset, topBgOffset)),
+                size = Size(lr - ll + 2 * bgOffset, lb - lt  + topBgOffset + bgOffset),
                 cornerRadius = CornerRadius(cornerRadius, cornerRadius),
                 style = Fill
             )
@@ -491,8 +488,8 @@ private fun DrawScope.drawAnnotation(
         annotationColors.strokeColor?.let {
             drawRoundRect(
                 color = it,
-                topLeft = Offset(ll, lt).minus(Offset(bgOffset, bgOffset)),
-                size = Size(lr - ll + 2 * bgOffset, lb - lt + 2 * bgOffset),
+                topLeft = Offset(ll, lt).minus(Offset(bgOffset, topBgOffset)),
+                size = Size(lr - ll + 2 * bgOffset, lb - lt + topBgOffset + bgOffset),
                 cornerRadius = CornerRadius(cornerRadius, cornerRadius),
                 style = Stroke(
                     width = 1.dp.toPx()
@@ -598,18 +595,6 @@ private val PhraseTypeToColorMap = mapOf(
     ChunkType.X to AnnotationColors(Color(0xFF5E0A0A)),
 )
 
-//@OptIn(ExperimentalMaterialApi::class)
-//@Composable
-//fun CheckableListItem(
-//    isChecked: Boolean,
-//    text: String,
-//    onClicked: () -> Unit,
-//) = CheckableListItem(
-//    isChecked,
-//    text,
-//    onClicked
-//)
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CheckableListItem(
@@ -635,8 +620,14 @@ private class AnnotationColors(
     val strokeColor: Color? = inputColor
 }
 
+private fun articleFontHeight(density: Density): Float {
+    return with(density) {ArticleFontSize.value.sp.toPx()}
+}
+
 private const val SENTENCE_CONNECTOR = " "
 private const val ROUNDED_ANNOTATION_PROGRESS_VALUE = "progress_value"
 private const val ROUNDED_ANNOTATION_PART_OF_SPEECH_VALUE = "part_of_speech_value"
 private const val ROUNDED_ANNOTATION_PHRASE_VALUE = "phrase_value"
 private const val ROUNDED_ANNOTATION_DICT_VALUE = "dict_value"
+
+private val ArticleFontSize = TextUnit(16f, TextUnitType.Sp)
