@@ -7,6 +7,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.extensions.updateData
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
+import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.data
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
@@ -19,6 +20,7 @@ import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,6 +40,8 @@ interface AddArticleVM: Clearable {
     fun onTitleFocusChanged(hasFocus: Boolean)
     fun onCompletePressed()
     fun onNeedToCreateSetPressed()
+    fun onTryAgainPressed()
+    fun getErrorText(): StringDesc?
 
     @Parcelize
     data class State(
@@ -84,24 +88,11 @@ open class AddArticleVMImpl(
             text = state.text.orEmpty(),
             needToCreateSet = state.needToCreateSet,
         )
-        val uiState = uiStateFlow.updateAndGet { uiState ->
-            uiState.toLoading().copy(
-                data = dataFromState
-            ).run {
-                if (dataFromState.text.isNotEmpty()) {
-                    this.toLoaded(dataFromState)
-                } else {
-                    this
-                }
-            }
-        }
 
-        if (!uiState.isLoaded()) {
-            state.uri?.let { uri ->
-                extractContent(uri, dataFromState)
-            } ?: run {
-                uiStateFlow.update { it.toLoaded(dataFromState) }
-            }
+        state.uri?.let { uri ->
+            extractContent(uri, dataFromState)
+        } ?: run {
+            uiStateFlow.update { it.toLoaded(dataFromState) }
         }
     }
 
@@ -128,6 +119,13 @@ open class AddArticleVMImpl(
                 }
             }
         }
+    }
+
+    override fun onTryAgainPressed() {
+        val uiStateData = uiStateFlow.value.data() ?: return
+        val uri = this.state.uri ?: return
+
+        extractContent(uri, uiStateData)
     }
 
     override fun onTitleChanged(title: String) {
@@ -219,6 +217,10 @@ open class AddArticleVMImpl(
     override fun onCleared() {
         super.onCleared()
         eventChannel.cancel()
+    }
+
+    override fun getErrorText(): StringDesc? {
+        return StringDesc.Resource(MR.strings.article_error)
     }
 }
 

@@ -28,6 +28,9 @@ import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
+import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -69,8 +72,9 @@ fun AddArticleUI(
     onArticleCreated: SnackbarHostState.(articleId: Long?) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val focusRequester = remember { FocusRequester() }
     val snackbarStringDesc = remember { mutableStateOf<dev.icerock.moko.resources.desc.StringDesc?>(null) }
+    val uiState by vm.uiStateFlow.collectAsState()
+    val needShowFloatingActionButton by remember(uiState) { derivedStateOf { uiState.isLoaded() } }
 
     Box(
         modifier = Modifier
@@ -85,22 +89,23 @@ fun AddArticleUI(
 
             AddArticlesFieldsUI(
                 vm = vm,
-                focusRequester = focusRequester
             )
         }
 
-        ExtendedFloatingActionButton(
-            text = {
-                Text(
-                    text = stringResource(MR.strings.add_article_done),
-                    modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
-                )
-            },
-            onClick = { vm.onCompletePressed() },
-            modifier = Modifier.Companion
-                .align(Alignment.BottomEnd)
-                .padding(LocalDimens.current.contentPadding)
-        )
+        if (needShowFloatingActionButton) {
+            ExtendedFloatingActionButton(
+                text = {
+                    Text(
+                        text = stringResource(MR.strings.add_article_done),
+                        modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
+                    )
+                },
+                onClick = { vm.onCompletePressed() },
+                modifier = Modifier.Companion
+                    .align(Alignment.BottomEnd)
+                    .padding(LocalDimens.current.contentPadding)
+            )
+        }
 
         SnackbarHost(
             hostState = snackbarHostState,
@@ -113,9 +118,7 @@ fun AddArticleUI(
         }
     }
 
-    LaunchedEffect("focus") {
-        focusRequester.requestFocus()
-
+    LaunchedEffect("eventHandler") {
         vm.eventFlow.collect {
             when (it) {
                 is CompletionEvent -> with(snackbarHostState) {
@@ -136,102 +139,117 @@ fun AddArticleUI(
 @Composable
 private fun AddArticlesFieldsUI(
     vm: AddArticleVM,
-    focusRequester: FocusRequester
 ) {
     val uiState by vm.uiStateFlow.collectAsState()
-    val hasTitleError = remember(uiState.data()?.titleError) { uiState.data()?.titleError != null }
-    val scrollableState = rememberScrollState()
-    var wasTitleFocused by remember { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
+    val data = uiState.data()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollableState)
-            .padding(
-                top = LocalDimens.current.contentPadding,
-                start = LocalDimens.current.contentPadding,
-                end = LocalDimens.current.contentPadding,
-                bottom = 88.dp,
-            )
-    ) {
-        OutlinedTextField(
-            value = uiState.data()?.title.orEmpty(),
-            onValueChange = { vm.onTitleChanged(it) },
+    if (!uiState.isLoaded() || data == null) {
+        LoadingStatusView(
+            resource = uiState,
+            loadingText = null,
+            errorText = vm.getErrorText()?.localized(),
+        ) {
+            vm.onTryAgainPressed()
+        }
+    } else {
+        val focusRequester = remember { FocusRequester() }
+        val hasTitleError = remember(uiState.data()?.titleError) { uiState.data()?.titleError != null }
+        val scrollableState = rememberScrollState()
+        var wasTitleFocused by remember { mutableStateOf(false) }
+        val focusManager = LocalFocusManager.current
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester)
-                .onFocusChanged {
-                    if (it.isFocused) {
-                        wasTitleFocused = true
-                    }
+                .fillMaxSize()
+                .verticalScroll(scrollableState)
+                .padding(
+                    top = LocalDimens.current.contentPadding,
+                    start = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding,
+                    bottom = 88.dp,
+                )
+        ) {
+            OutlinedTextField(
+                value = data.title,
+                onValueChange = { vm.onTitleChanged(it) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            wasTitleFocused = true
+                        }
 
-                    if (wasTitleFocused) {
-                        vm.onTitleFocusChanged(it.isFocused)
+                        if (wasTitleFocused) {
+                            vm.onTitleFocusChanged(it.isFocused)
+                        }
+                    },
+                label = { Text(stringResource(MR.strings.add_article_field_title_hint)) },
+                isError = hasTitleError,
+                trailingIcon = {
+                    if (hasTitleError) {
+                        Icon(
+                            painter = painterResource(MR.images.error_24),
+                            contentDescription = null
+                        )
                     }
                 },
-            label = { Text(stringResource(MR.strings.add_article_field_title_hint)) },
-            isError = hasTitleError,
-            trailingIcon = {
-                if (hasTitleError) {
-                    Icon(
-                        painter = painterResource(MR.images.error_24),
-                        contentDescription = null
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                ),
+                singleLine = true
+            )
+
+            Box(
+                modifier = Modifier
+                    .defaultMinSize(minHeight = 16.dp)
+                    .padding(horizontal = 16.dp)
+            ) {
+                val titleErrorDesc = data.titleError
+                if (titleErrorDesc != null) {
+                    Text(
+                        titleErrorDesc.localized(),
+                        color = MaterialTheme.colors.error,
+                        style = MaterialTheme.typography.caption
                     )
                 }
-            },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(FocusDirection.Down)
-                }
-            ),
-            singleLine = true
-        )
+            }
 
-        Box(
-            modifier = Modifier
-                .defaultMinSize(minHeight = 16.dp)
-                .padding(horizontal = 16.dp)
-        ) {
-            val titleErrorDesc = uiState.data()?.titleError
-            if (titleErrorDesc != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = { vm.onNeedToCreateSetPressed() })
+                    .padding(top = 16.dp, bottom = 16.dp)
+            ) {
                 Text(
-                    titleErrorDesc.localized(),
-                    color = MaterialTheme.colors.error,
-                    style = MaterialTheme.typography.caption
+                    text = stringResource(MR.strings.add_article_create_set_option),
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .weight(1.0f)
+                )
+                Checkbox(
+                    checked = data.needToCreateSet,
+                    onCheckedChange = null
                 )
             }
-        }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = { vm.onNeedToCreateSetPressed() })
-                .padding(top = 16.dp, bottom = 16.dp)
-        ) {
-            Text(
-                text = stringResource(MR.strings.add_article_create_set_option),
+            OutlinedTextField(
+                value = data.text,
+                onValueChange = { vm.onTextChanged(it) },
                 modifier = Modifier
-                    .padding(end = 16.dp)
-                    .weight(1.0f)
-            )
-            Checkbox(
-                checked = uiState.data()?.needToCreateSet ?: false,
-                onCheckedChange = null
+                    .fillMaxWidth()
+                    .sizeIn(minHeight = with(LocalDensity.current) {
+                        (42 * 2).sp.toDp()
+                    }),
+                label = { Text(stringResource(MR.strings.add_article_field_text_hint)) }
             )
         }
 
-        OutlinedTextField(
-            value = uiState.data()?.text.orEmpty(),
-            onValueChange = { vm.onTextChanged(it) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .sizeIn(minHeight = with(LocalDensity.current) {
-                    (42 * 2).sp.toDp()
-                }),
-            label = { Text(stringResource(MR.strings.add_article_field_text_hint)) }
-        )
+        LaunchedEffect("focus") {
+            focusRequester.requestFocus()
+        }
     }
 }
 

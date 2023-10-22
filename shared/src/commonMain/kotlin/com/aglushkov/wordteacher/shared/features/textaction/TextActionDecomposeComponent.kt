@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.general.RouterStateChangeHandler
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.popToRoot
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
+import com.aglushkov.wordteacher.shared.general.pushChildConfigurationOrPopIfExists
 import com.aglushkov.wordteacher.shared.general.toClearables
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.Router
@@ -95,12 +96,12 @@ class TextActionDecomposeComponentImpl(
     override fun openDefinitions() = router.popToRoot()
 
     override fun openAddArticle(url: String?) =
-        router.pushChildConfigurationIfNotAtTop(
+        router.pushChildConfigurationOrPopIfExists(
             TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration(url = url)
         )
 
     override fun openAddNote() =
-        router.pushChildConfigurationIfNotAtTop(
+        router.pushChildConfigurationOrPopIfExists(
             TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration
         )
 

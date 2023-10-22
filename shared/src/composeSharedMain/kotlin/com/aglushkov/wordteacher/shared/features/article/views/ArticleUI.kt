@@ -53,6 +53,7 @@ import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
+import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
