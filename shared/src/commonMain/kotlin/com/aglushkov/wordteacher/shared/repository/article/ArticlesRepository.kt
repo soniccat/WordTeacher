@@ -61,7 +61,7 @@ class ArticlesRepository(
     private suspend fun createArticleInternal(title: String, text: String): Article {
         nlpCore.waitUntilInitialized()
 
-        val resultText = text//clearString(text)
+        val resultText = clearText(text)//clearString(text)
         val nlpCoreCopy = nlpCore.clone()
         val sentenceSpans = nlpCoreCopy.sentenceSpans(resultText)
         val paragraphs = mutableListOf<Paragraph>()
@@ -74,6 +74,9 @@ class ArticlesRepository(
                 if (sentenceGap.contains('\n')) {
                     paragraphs += Paragraph(startParagraphIndex, i + 1)
                     startParagraphIndex = i + 1
+
+                    val ds = text.subSequence(sentenceSpans[paragraphs.last().start].start, sentenceSpans[paragraphs.last().end-1].end).toString()
+                    Logger.v(ds)
                 }
             }
         }
@@ -95,7 +98,7 @@ class ArticlesRepository(
 
             val sentences = mutableListOf<NLPSentence>()
             resultText.split(sentenceSpans).forEachIndexed { index, s ->
-                val nlpSentence = NLPSentence(articleId, index.toLong(), s.toString())
+                val nlpSentence = NLPSentence(articleId, index.toLong(), clearString(s.toString()))
                 nlpSentenceProcessor.process(nlpSentence, nlpCoreCopy)
                 database.sentencesNLP.insert(nlpSentence)
                 sentences += nlpSentence
@@ -126,9 +129,14 @@ class ArticlesRepository(
         .replace(11.toChar(), ' ')
         .replace(13.toChar(), ' ')
         .replace(3.toChar(), ' ')
-        .replace("``", "\"")
-        .replace("''", "\"")
         .trim()
+
+    private fun clearText(s: String) = s.replace("``", "\"")
+        .replace("''", "\"")
+        .replace(147.toChar(), '"')
+        .replace(148.toChar(), '"')
+        .replace(8220.toChar(), '"')
+        .replace(8221.toChar(), '"')
 }
 
 class ArticleInsertException(message: String): RuntimeException(message)

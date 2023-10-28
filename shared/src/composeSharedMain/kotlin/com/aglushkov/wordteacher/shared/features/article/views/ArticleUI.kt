@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
@@ -373,6 +374,7 @@ private fun ArticleParagraphView(
             }
         )
     }
+//    Box(modifier = Modifier.fillMaxWidth().height(10.dp).background(color = Color.Black))
 }
 
 private fun findSentence(viewItem: ParagraphViewItem, index: Int): Pair<NLPSentence, Int>? {
