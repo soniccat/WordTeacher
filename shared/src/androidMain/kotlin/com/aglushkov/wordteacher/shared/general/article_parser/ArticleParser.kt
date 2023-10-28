@@ -1,8 +1,13 @@
 package com.aglushkov.wordteacher.shared.general.article_parser
 
 import org.jsoup.Jsoup
+import org.jsoup.internal.StringUtil
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
+import org.jsoup.nodes.TextNode
+import org.jsoup.select.NodeTraversor
+import org.jsoup.select.NodeVisitor
 
 actual class ArticleParser actual constructor() {
     private var title: String? = null
@@ -80,8 +85,22 @@ actual class ArticleParser actual constructor() {
         articleElement: ArticleElement
     ) = ParsedArticle(
         title,
-        articleElement.element.children().joinToString("\n") { it.wholeText() }
+        wholeText(articleElement.element)
     )
+
+    fun wholeText(element: Element): String? {
+        val accum = StringUtil.borrowBuilder()
+        NodeTraversor.traverse(object : NodeVisitor {
+            override fun head(node: Node, depth: Int) {
+                if (node is TextNode) {
+                    accum.append(node.wholeText + "\n")
+                }
+            }
+
+            override fun tail(node: Node, depth: Int) {}
+        }, element)
+        return StringUtil.releaseBuilder(accum)
+    }
 
     private fun buildNodeTree(rootElement: ArticleElement) {
         val articleElements = rootElement.childElements.map {

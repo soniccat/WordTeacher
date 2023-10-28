@@ -327,7 +327,8 @@ private fun ArticleParagraphView(
             .padding(
                 top = LocalDimensWord.current.articleHorizontalPadding,
                 start = LocalDimensWord.current.articleHorizontalPadding,
-                end = LocalDimensWord.current.articleHorizontalPadding
+                end = LocalDimensWord.current.articleHorizontalPadding,
+                bottom = 10.dp
             )
     ) {
         val colors = MaterialTheme.colors
@@ -374,7 +375,7 @@ private fun ArticleParagraphView(
             }
         )
     }
-//    Box(modifier = Modifier.fillMaxWidth().height(10.dp).background(color = Color.Black))
+    //Box(modifier = Modifier.fillMaxWidth().height(10.dp).background(color = Color.Black))
 }
 
 private fun findSentence(viewItem: ParagraphViewItem, index: Int): Pair<NLPSentence, Int>? {
