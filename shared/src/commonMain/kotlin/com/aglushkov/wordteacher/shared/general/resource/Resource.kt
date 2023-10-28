@@ -207,3 +207,9 @@ fun <T> loadResource(
         emit(initialValue.toError(e, canTryAgain))
     }
 }
+
+fun Resource<*>?.onError(block: (Throwable) -> Unit) {
+    if (this is Resource.Error) {
+        block(this.throwable)
+    }
+}

@@ -28,8 +28,10 @@ import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
@@ -75,6 +77,8 @@ fun AddArticleUI(
     val snackbarStringDesc = remember { mutableStateOf<dev.icerock.moko.resources.desc.StringDesc?>(null) }
     val uiState by vm.uiStateFlow.collectAsState()
     val needShowFloatingActionButton by remember(uiState) { derivedStateOf { uiState.isLoaded() } }
+    val addingState by vm.addingStateFlow.collectAsState()
+    val isAdding by remember(addingState){ derivedStateOf { addingState.isLoading() } }
 
     Box(
         modifier = Modifier
@@ -89,16 +93,24 @@ fun AddArticleUI(
 
             AddArticlesFieldsUI(
                 vm = vm,
+                uiState = uiState
             )
         }
 
         if (needShowFloatingActionButton) {
             ExtendedFloatingActionButton(
                 text = {
-                    Text(
-                        text = stringResource(MR.strings.add_article_done),
-                        modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
-                    )
+                    if (isAdding) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.then(Modifier.size(32.dp)),
+                            color = contentColorFor(MaterialTheme.colors.secondary)
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(MR.strings.add_article_done),
+                            modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
+                        )
+                    }
                 },
                 onClick = { vm.onCompletePressed() },
                 modifier = Modifier.Companion
@@ -139,8 +151,8 @@ fun AddArticleUI(
 @Composable
 private fun AddArticlesFieldsUI(
     vm: AddArticleVM,
+    uiState: Resource<AddArticleVM.UIState>
 ) {
-    val uiState by vm.uiStateFlow.collectAsState()
     val data = uiState.data()
 
     if (!uiState.isLoaded() || data == null) {

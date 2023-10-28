@@ -10,8 +10,11 @@ import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrErro
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.data
+import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -32,6 +35,7 @@ import kotlinx.coroutines.launch
 interface AddArticleVM: Clearable {
     val eventFlow: Flow<Event>
     val uiStateFlow: StateFlow<Resource<UIState>>
+    val addingStateFlow: StateFlow<Resource<Unit>>
 
     fun createState(): State
     fun onTitleChanged(title: String)
@@ -71,6 +75,7 @@ open class AddArticleVMImpl(
 
     private var state = AddArticleVM.State()
     override val uiStateFlow = MutableStateFlow<Resource<AddArticleVM.UIState>>(Resource.Uninitialized())
+    override val addingStateFlow = MutableStateFlow<Resource<Unit>>(Resource.Uninitialized())
 
     override fun createState(): AddArticleVM.State {
         val data = uiStateFlow.value.data()
@@ -150,12 +155,26 @@ open class AddArticleVMImpl(
     override fun onCompletePressed() {
         updateTitleErrorFlow()
         uiStateFlow.value.data()?.let { data ->
-            if (data.titleError == null) {
-                if (data.needToCreateSet) {
-                    createCardSet()
-                }
+            viewModelScope.launch {
+                if (data.titleError == null) {
+                    loadResource {
+                        if (data.needToCreateSet) {
+                            createCardSet()
+                        }
 
-                createArticle()
+                        createArticle()
+                        Unit
+                    }.collect(addingStateFlow)
+
+                    addingStateFlow.value.onError { e ->
+                        Logger.exception(e, TAG)
+                        val errorText = e.message?.let {
+                            StringDesc.Raw(it)
+                        } ?: StringDesc.Resource(MR.strings.error_default)
+
+                        eventChannel.trySend(ErrorEvent(errorText))
+                    }
+                }
             }
         }
     }
@@ -164,44 +183,24 @@ open class AddArticleVMImpl(
         uiStateFlow.updateData { it.copy(needToCreateSet = !it.needToCreateSet) }
     }
 
-    private fun createCardSet() = viewModelScope.launch {
-        runSafely {
-            uiStateFlow.value.data()?.let { data ->
-                cardSetsRepository.createCardSet(
-                    data.title,
-                    timeSource.timeInMilliseconds()
-                )
-            }
+    private suspend fun createCardSet() {
+        uiStateFlow.value.data()?.let { data ->
+            cardSetsRepository.createCardSet(
+                data.title,
+                timeSource.timeInMilliseconds()
+            )
         }
     }
 
-    private fun createArticle() = viewModelScope.launch {
-        runSafely {
-            uiStateFlow.value.data()?.let { data ->
-                // TODO: show loading, adding might take for a while
-                val article = articlesRepository.createArticle(data.title, data.text)
-                eventChannel.trySend(
-                    CompletionEvent(
-                        CompletionResult.COMPLETED,
-                        CompletionData.Article(article.id)
-                    )
+    private suspend fun createArticle() {
+        uiStateFlow.value.data()?.let { data ->
+            val article = articlesRepository.createArticle(data.title, data.text)
+            eventChannel.trySend(
+                CompletionEvent(
+                    CompletionResult.COMPLETED,
+                    CompletionData.Article(article.id)
                 )
-            }
-        }
-    }
-
-    private suspend fun runSafely(block: suspend () -> Unit) {
-        try {
-            block()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Logger.exception(e, TAG)
-            val errorText = e.message?.let {
-                StringDesc.Raw(it)
-            } ?: StringDesc.Resource(MR.strings.error_default)
-
-            eventChannel.trySend(ErrorEvent(errorText))
+            )
         }
     }
 
