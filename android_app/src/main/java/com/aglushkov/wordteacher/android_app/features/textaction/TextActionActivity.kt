@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.android_app.features.textaction
 
+import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -74,14 +75,25 @@ class TextActionActivity: AppCompatActivity() {
         val matcher = Patterns.WEB_URL.matcher(intentString)
         if (matcher.find()) {
             try {
-                urlString = URL(intentString.subSequence(matcher.start(), matcher.end()).toString()).toString()
+                if (matcher.start() == 0) {
+                    urlString = URL(
+                        intentString.subSequence(matcher.start(), matcher.end()).toString()
+                    ).toString()
+                }
             } catch (e: Throwable) {
             }
         }
 
         if (urlString == null) {
             try {
-                if (Uri.parse(intentString.toString()).scheme != null) {
+                val scheme = Uri.parse(intentString.toString()).scheme
+                if (
+                    listOf(
+                        ContentResolver.SCHEME_CONTENT,
+                        ContentResolver.SCHEME_FILE,
+                        ContentResolver.SCHEME_ANDROID_RESOURCE
+                    ).contains(scheme)
+                ) {
                     urlString = intentString.toString()
                 }
             } catch (e: Throwable) {
@@ -99,7 +111,7 @@ class TextActionActivity: AppCompatActivity() {
             .build()
             .textActionDecomposeComponent()
 
-        if (urlString != null) {
+        if (urlString != null || text?.length?.let { it >= 100 } == true) {
             textActionDecomposeComponent.openAddArticle()
         }
 

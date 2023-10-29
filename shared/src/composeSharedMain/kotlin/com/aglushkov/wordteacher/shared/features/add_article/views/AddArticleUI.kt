@@ -102,7 +102,7 @@ fun AddArticleUI(
                 text = {
                     if (isAdding) {
                         CircularProgressIndicator(
-                            modifier = Modifier.then(Modifier.size(32.dp)),
+                            modifier = Modifier.then(Modifier.size(30.dp)),
                             color = contentColorFor(MaterialTheme.colors.secondary)
                         )
                     } else {

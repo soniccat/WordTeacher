@@ -130,10 +130,11 @@ class WordDefinitionRepository(
     }
 
     private fun obtainMutableStateFlow(word: String): MutableStateFlow<Resource<List<WordTeacherWord>>> {
-        var stateFlow = stateFlows[word]
+        val lowercasedWord = word.lowercase()
+        var stateFlow = stateFlows[lowercasedWord]
         if (stateFlow == null) {
             stateFlow = MutableStateFlow(Resource.Uninitialized())
-            stateFlows[word] = stateFlow
+            stateFlows[lowercasedWord] = stateFlow
         }
 
         return stateFlow
