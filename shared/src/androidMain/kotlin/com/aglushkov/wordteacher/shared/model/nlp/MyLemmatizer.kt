@@ -19,7 +19,6 @@ class MyLemmatizer(
     // and its skip operation is very expensive
     private val unzippedLemmatizerPath = nlpPath.div("unzipped_lemmatizer")
     private val indexPath = nlpPath.div("unizppedlemmatizer_index")
-    private var randomAccessFile: RandomAccessFile? = null
 
     private val elemRegexp = "\t".toRegex()
     private lateinit var index: MyLemmatizerIndex
@@ -38,7 +37,6 @@ class MyLemmatizer(
         }
 
         index = anIndex
-        randomAccessFile = RandomAccessFile(unzippedLemmatizerPath.toFile(), "r")
     }
 
     private fun createUnzippedLemmatizerIfNeeded() {
@@ -104,25 +102,25 @@ class MyLemmatizer(
      * @return the lemma
      */
     private fun lemmatize(word: String, postag: String): String {
-        var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
-        val safeRandomAccessFile = randomAccessFile ?: return resultLemma
+        return RandomAccessFile(unzippedLemmatizerPath.toFile(), "r").use { file ->
+            var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
+            index.offset(word)?.let { offset ->
+                file.channel.position(offset)
 
-        index.offset(word)?.let { offset ->
-            safeRandomAccessFile.channel.position(offset)
-
-            while (true) {
-                val line = safeRandomAccessFile.readLine() ?: break
-                val elems = line.split(elemRegexp).toTypedArray()
-                if (elems[0] != word) {
-                    break
-                }
-                if (elems[1] == postag) {
-                    resultLemma = elems[2]
-                    break
+                while (true) {
+                    val line = file.readLine() ?: break
+                    val elems = line.split(elemRegexp).toTypedArray()
+                    if (elems[0] != word) {
+                        break
+                    }
+                    if (elems[1] == postag) {
+                        resultLemma = elems[2]
+                        break
+                    }
                 }
             }
-        }
 
-        return resultLemma
+            resultLemma
+        }
     }
 }
