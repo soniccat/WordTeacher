@@ -8,9 +8,11 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.FileSystem
@@ -94,7 +96,7 @@ actual class NLPCore(
         mainScope.launch {
             try {
                 withContext(dispatcher) {
-                    loadModels()
+                    loadModels(this)
                     createMEObjects()
                 }
                 state.value = Resource.Loaded(this@NLPCore)
@@ -104,45 +106,69 @@ actual class NLPCore(
         }
     }
 
-    private fun loadModels() {
+    private suspend fun loadModels(scope: CoroutineScope) {
         val buffer = 100 * 1024
-        Logger.measure("SentenceModel loaded: ") {
-            resources.openRawResource(sentenceModelRes).buffered(buffer).use { modelIn ->
-                sentenceModel = SentenceModel(modelIn)
-            }
-        }
+        val jobs: MutableList<Job> = mutableListOf()
 
-        Logger.measure("TokenizerModel loaded: ") {
-            resources.openRawResource(tokenRes).buffered(buffer).use { stream ->
-                tokenModel = TokenizerModel(stream)
-            }
-        }
-
-        Logger.measure("POSModel loaded: ") {
-            resources.openRawResource(posModelRes).buffered(buffer).use { stream ->
-                posModel = POSModel(stream)
-            }
-        }
-
-        Logger.measure("DictionaryLemmatizer loaded: ") {
-            lemmatizer = MyLemmatizer(
-                { block ->
-                    resources.openRawResource(lemmatizerRes).buffered(buffer).use { stream ->
-                        block(stream)
+        jobs.add(
+            scope.launch {
+                Logger.measure("SentenceModel loaded: ") {
+                    resources.openRawResource(sentenceModelRes).buffered(buffer).use { modelIn ->
+                        sentenceModel = SentenceModel(modelIn)
                     }
-                },
-                nlpPath,
-                fileSystem
-            ).apply {
-                load()
+                }
             }
-        }
+        )
 
-        Logger.measure("ChunkerModel loaded: ") {
-            resources.openRawResource(chunkerRes).buffered(buffer).use { stream ->
-                chunkerModel = ChunkerModel(stream)
+        jobs.add(
+            scope.launch {
+                Logger.measure("TokenizerModel loaded: ") {
+                    resources.openRawResource(tokenRes).buffered(buffer).use { stream ->
+                        tokenModel = TokenizerModel(stream)
+                    }
+                }
             }
-        }
+        )
+
+        jobs.add(
+            scope.launch {
+                Logger.measure("POSModel loaded: ") {
+                    resources.openRawResource(posModelRes).buffered(buffer).use { stream ->
+                        posModel = POSModel(stream)
+                    }
+                }
+            }
+        )
+
+        jobs.add(
+            scope.launch {
+                Logger.measure("DictionaryLemmatizer loaded: ") {
+                    lemmatizer = MyLemmatizer(
+                        { block ->
+                            resources.openRawResource(lemmatizerRes).buffered(buffer).use { stream ->
+                                block(stream)
+                            }
+                        },
+                        nlpPath,
+                        fileSystem
+                    ).apply {
+                        load()
+                    }
+                }
+            }
+        )
+
+        jobs.add(
+            scope.launch {
+                Logger.measure("ChunkerModel loaded: ") {
+                    resources.openRawResource(chunkerRes).buffered(buffer).use { stream ->
+                        chunkerModel = ChunkerModel(stream)
+                    }
+                }
+            }
+        )
+
+        jobs.joinAll()
     }
 
     private fun createMEObjects() {
