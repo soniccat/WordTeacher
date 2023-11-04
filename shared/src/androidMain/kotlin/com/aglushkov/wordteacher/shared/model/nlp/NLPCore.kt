@@ -62,6 +62,10 @@ actual class NLPCore(
 
     actual suspend fun waitUntilInitialized(): Resource<NLPCore> = state.first { it.isLoaded() }
 
+    actual fun normalizeText(text: String): String {
+        return EmojiCharSequenceNormalizer.getInstance().normalize(text).toString()
+    }
+
     actual fun sentenceSpans(text: String): List<SentenceSpan> = sentenceDetector?.sentPosDetect(text).orEmpty().flatMap {
         val subSequence = text.subSequence(it.start, it.end)
         // fixing span detecting for direct speech when a sentence ends with "\n
@@ -77,7 +81,7 @@ actual class NLPCore(
         }
     }
     actual fun tokenSpans(sentence: String) = tokenizer?.tokenizePos(
-        EmojiCharSequenceNormalizer.getInstance().normalize(sentence).toString()
+        sentence
     ).orEmpty().asList().map {
         createTokenSpan(it)
     }

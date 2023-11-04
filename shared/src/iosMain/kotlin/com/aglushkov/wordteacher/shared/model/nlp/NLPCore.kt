@@ -3,6 +3,9 @@ package com.aglushkov.wordteacher.shared.model.nlp
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 
 actual class NLPCore {
+    actual fun normalizeText(text: String): String {
+        TODO("not implemented")
+    }
 
     actual fun sentenceSpans(text: String): List<SentenceSpan> {
         TODO("not implemented")
