@@ -5,6 +5,7 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningLoadingViewItem
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.extensions.forward
@@ -13,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -105,7 +107,7 @@ open class DefinitionsVMImpl(
     .map { (wordDefinitions, displayMode, partOfSpeechFilter) ->
         //Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
         wordDefinitions.copyWith(
-            buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter)
+            buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter, wordDefinitions.isLoading())
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
@@ -232,7 +234,8 @@ open class DefinitionsVMImpl(
     private fun buildViewItems(
         words: List<WordTeacherWord>,
         displayMode: DefinitionsDisplayMode,
-        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>
+        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+        isLoading: Boolean
     ): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         if (words.isNotEmpty()) {
@@ -248,6 +251,10 @@ open class DefinitionsVMImpl(
         when (displayMode) {
             DefinitionsDisplayMode.Merged -> addMergedWords(words, partsOfSpeechFilter, items)
             else -> addWordsGroupedBySource(words, partsOfSpeechFilter, items)
+        }
+
+        if (isLoading) {
+            items += WordLoadingViewItem()
         }
 
         generateIds(items)

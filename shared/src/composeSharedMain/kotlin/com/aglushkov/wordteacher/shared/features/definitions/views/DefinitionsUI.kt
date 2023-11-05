@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
@@ -271,6 +272,11 @@ private fun showViewItem(
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
     is WordSynonymViewItem -> WordSynonymView(item, modifier)
     is WordExampleViewItem -> WordExampleView(item, modifier)
+    is WordLoadingViewItem -> {
+        Box(Modifier.fillMaxWidth().padding(LocalDimens.current.contentPadding), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    }
     else -> {
         Text(
             text = "unknown item $item",

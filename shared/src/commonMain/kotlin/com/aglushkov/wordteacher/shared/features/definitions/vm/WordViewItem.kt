@@ -96,6 +96,12 @@ class WordDividerViewItem(): BaseViewItem<Any>(Obj, Type) {
     }
 }
 
+class WordLoadingViewItem: BaseViewItem<String>("", Type) {
+    companion object {
+        const val Type = 110
+    }
+}
+
 enum class Indent {
     NONE,
     SMALL
