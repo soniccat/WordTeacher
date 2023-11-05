@@ -27,7 +27,11 @@ actual class NLPCore {
         TODO("not implemented")
     }
 
-    actual suspend fun waitUntilInitialized(): Resource<NLPCore> {
+    actual suspend fun waitUntilInitialized(): NLPCore {
+        TODO("not implemented")
+    }
+
+    actual suspend fun waitUntilLemmatizerInitialized(): NLPLemmatizer {
         TODO("not implemented")
     }
 

@@ -5,16 +5,17 @@ import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.okio.newLineSize
 import okio.FileSystem
 import okio.Path
+import okio.Source
+import okio.buffer
 import okio.utf8Size
-import opennlp.tools.lemmatizer.Lemmatizer
 import java.io.*
 import java.util.*
 
 class MyLemmatizer(
-    private val lemmatizerResourceReader: ( (InputStream) -> Unit ) -> Unit,
+    private val source: Source,
     private val nlpPath: Path,
     private val fileSystem: FileSystem
-) : Lemmatizer {
+) : NLPLemmatizer {
     // first we need to decompress bundled raw lemmatizer as a raw resource requires StreamingZipInflater
     // and its skip operation is very expensive
     private val unzippedLemmatizerPath = nlpPath.div("unzipped_lemmatizer")
@@ -49,12 +50,16 @@ class MyLemmatizer(
             fileSystem.delete(inProgressPath)
         }
 
-        lemmatizerResourceReader { stream ->
-            val byteArray = ByteArray(DEFAULT_BUFFER_SIZE)
-            fileSystem.write(inProgressPath) {
-                while (stream.read(byteArray) != -1) {
-                    write(byteArray)
+        val bufferedSource = source.buffer()
+        fileSystem.write(inProgressPath) {
+            val readByteArray = ByteArray(100 * 1024)
+            var readByteCount = 0
+            while (true) {
+                readByteCount = bufferedSource.read(readByteArray, 0, readByteArray.size)
+                if (readByteCount == -1) {
+                    break
                 }
+                write(readByteArray, 0, readByteCount)
             }
         }
 
@@ -80,16 +85,12 @@ class MyLemmatizer(
         }
     }
 
-    override fun lemmatize(tokens: Array<String>, postags: Array<String>): Array<String> {
+    override fun lemmatize(tokens: List<String>, postags: List<String>): Array<String> {
         val lemmas: MutableList<String> = ArrayList()
         for (i in tokens.indices) {
             lemmas.add(this.lemmatize(tokens[i], postags[i]))
         }
         return lemmas.toTypedArray()
-    }
-
-    override fun lemmatize(tokens: List<String>, posTags: List<String>): List<List<String>> {
-        throw RuntimeException("Not implemented")
     }
 
     /**
@@ -102,13 +103,13 @@ class MyLemmatizer(
      * @return the lemma
      */
     private fun lemmatize(word: String, postag: String): String {
-        return RandomAccessFile(unzippedLemmatizerPath.toFile(), "r").use { file ->
+        return fileSystem.read(unzippedLemmatizerPath) {
             var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
             index.offset(word)?.let { offset ->
-                file.channel.position(offset)
+                skip(offset)
 
                 while (true) {
-                    val line = file.readLine() ?: break
+                    val line = readUtf8Line() ?: break
                     val elems = line.split(elemRegexp).toTypedArray()
                     if (elems[0] != word) {
                         break

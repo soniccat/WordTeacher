@@ -22,8 +22,9 @@ fun Logger.Companion.exception(e: Throwable, tag: String? = null) {
     Logger.e("${e}: ${e.message.orEmpty()}: ${e.stackTraceToString()}", tag)
 }
 
-fun Logger.Companion.measure(message: String, block: () -> Unit) {
+fun <T> Logger.Companion.measure(message: String, block: () -> T): T {
     val time = Clock.System.now()
-    block()
+    val res = block()
     Logger.v("$message${Clock.System.now().toEpochMilliseconds() - time.toEpochMilliseconds()}")
+    return res
 }

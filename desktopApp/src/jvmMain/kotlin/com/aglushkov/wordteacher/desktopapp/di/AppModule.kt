@@ -104,6 +104,7 @@ class AppModule {
             nlpPath.div("en_pos_maxent.bin"),
             nlpPath.div("en_lemmatizer_dict.bin"),
             nlpPath.div("en_chunker.bin"),
+            nlpPath,
             fileSystem
         )
     }

@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
-import com.aglushkov.wordteacher.shared.general.resource.Resource
+interface NLPLemmatizer {
+    fun lemmatize(tokens: List<String>, postags: List<String>): Array<String>
+}
 
 expect class NLPCore {
     fun normalizeText(text: String): String
@@ -10,7 +12,8 @@ expect class NLPCore {
     fun lemmatize(tokens: List<String>, tags: List<String>): List<String>
     fun chunk(tokens: List<String>, tags: List<String>): List<String>
 
-    suspend fun waitUntilInitialized(): Resource<NLPCore>
+    suspend fun waitUntilInitialized(): NLPCore
+    suspend fun waitUntilLemmatizerInitialized(): NLPLemmatizer
     fun clone(): NLPCore
 }
 

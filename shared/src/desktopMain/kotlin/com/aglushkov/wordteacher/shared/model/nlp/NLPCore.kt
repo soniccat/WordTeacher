@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.measure
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -30,12 +31,14 @@ actual class NLPCore(
     private val posModelPath: Path,
     private val lemmatizerPath: Path,
     private val chunkerPath: Path,
+    private val nlpPath: Path,
     private val fileSystem: FileSystem,
     dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) {
     private val mainScope = CoroutineScope(dispatcher + SupervisorJob())
 
-    val state = MutableStateFlow<Resource<NLPCore>>(Resource.Uninitialized())
+    private val lemmatizerState = MutableStateFlow<Resource<MyLemmatizer>>(Resource.Uninitialized())
+    private val state = MutableStateFlow<Resource<NLPCore>>(Resource.Uninitialized())
 
     private var sentenceModel: SentenceModel? = null
     private var tokenModel: TokenizerModel? = null
@@ -45,10 +48,16 @@ actual class NLPCore(
     private var sentenceDetector: SentenceDetectorME? = null
     private var tokenizer: TokenizerME? = null
     private var tagger: POSTaggerME? = null
-    private var lemmatizer: Lemmatizer? = null
+    private var lemmatizer: MyLemmatizer? = null
     private var chunker: ChunkerME? = null
 
-    actual suspend fun waitUntilInitialized(): Resource<NLPCore> = state.first { it.isLoaded() }
+    actual suspend fun waitUntilInitialized(): NLPCore {
+        return state.first { it.isLoaded() }.data()!!
+    }
+
+    actual suspend fun waitUntilLemmatizerInitialized(): NLPLemmatizer {
+        return lemmatizerState.first{ it.isLoaded() }.data()!!
+    }
 
     actual fun normalizeText(text: String): String {
         return EmojiCharSequenceNormalizer.getInstance().normalize(text).toString()
@@ -74,7 +83,7 @@ actual class NLPCore(
         createTokenSpan(it)
     }
     actual fun tag(tokens: List<String>) = tagger?.tag(tokens.toTypedArray()).orEmpty().asList()
-    actual fun lemmatize(tokens: List<String>, tags: List<String>) = lemmatizer?.lemmatize(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
+    actual fun lemmatize(tokens: List<String>, tags: List<String>) = lemmatizer?.lemmatize(tokens, tags).orEmpty().asList()
     actual fun chunk(tokens: List<String>, tags: List<String>) = chunker?.chunk(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
 
     fun load(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
@@ -94,6 +103,26 @@ actual class NLPCore(
 
     private suspend fun loadModels(context: CoroutineScope) {
         val jobs: MutableList<Job> = mutableListOf()
+
+        jobs.add(
+            context.launch {
+                loadResource {
+                    Logger.measure("DictionaryLemmatizer loaded: ") {
+                        fileSystem.read(lemmatizerPath) {
+                            MyLemmatizer(
+                                this,
+                                nlpPath,
+                                fileSystem
+                            ).apply {
+                                load()
+                            }.also {
+                                lemmatizer = it
+                            }
+                        }
+                    }
+                }.collect(lemmatizerState)
+            }
+        )
 
         jobs.add(
             context.launch {
@@ -120,16 +149,6 @@ actual class NLPCore(
                 Logger.measure("POSModel loaded: ") {
                     posModel = fileSystem.read(posModelPath) {
                         POSModel(inputStream())
-                    }
-                }
-            }
-        )
-
-        jobs.add(
-            context.launch {
-                Logger.measure("DictionaryLemmatizer loaded: ") {
-                    lemmatizer = fileSystem.read(lemmatizerPath) {
-                        DictionaryLemmatizer(inputStream())
                     }
                 }
             }
@@ -165,6 +184,7 @@ actual class NLPCore(
             posModelPath,
             lemmatizerPath,
             chunkerPath,
+            nlpPath,
             fileSystem
         ).apply {
             sentenceDetector = SentenceDetectorME(this@NLPCore.sentenceModel)

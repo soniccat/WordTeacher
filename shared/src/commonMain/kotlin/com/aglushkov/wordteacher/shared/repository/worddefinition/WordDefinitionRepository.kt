@@ -156,9 +156,8 @@ class WordDefinitionRepository(
             Logger.v("send Loading", tag)
 
             for (service in services) {
-                val dictNlpCore = if (service.type == Config.Type.Local) {
-                    nlpCore.waitUntilInitialized()
-                    nlpCore.clone()
+                val lemmatizer = if (service.type == Config.Type.Local) {
+                    nlpCore.waitUntilLemmatizerInitialized()
                 } else {
                     null
                 }
@@ -169,9 +168,9 @@ class WordDefinitionRepository(
                 }) {
                     words.addAll(service.define(word))
 
-                    if (dictNlpCore != null) {
+                    if (lemmatizer != null) {
                         val lemmas = withContext(Dispatchers.Default) {
-                            dictNlpCore.allLemmas(word)
+                            lemmatizer.allLemmas(word)
                         }
 
                         lemmas.onEach { lemma ->

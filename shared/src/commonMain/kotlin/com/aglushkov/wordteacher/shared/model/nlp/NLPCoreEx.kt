@@ -1,6 +1,6 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
-fun NLPCore.allLemmas(word: String): List<String> {
+fun NLPLemmatizer.allLemmas(word: String): List<String> {
     val tags = Tag.values()
     return lemmatize(
         tags.map { word },

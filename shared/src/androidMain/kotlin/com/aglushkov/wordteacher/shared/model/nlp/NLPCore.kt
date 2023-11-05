@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.measure
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
+import okio.source
 import opennlp.tools.chunker.ChunkSample
 import opennlp.tools.chunker.ChunkerME
 import opennlp.tools.chunker.ChunkerModel
@@ -43,7 +45,8 @@ actual class NLPCore(
 ) {
     private val mainScope = CoroutineScope(dispatcher + SupervisorJob())
 
-    val state = MutableStateFlow<Resource<NLPCore>>(Resource.Uninitialized())
+    private val lemmatizerState = MutableStateFlow<Resource<MyLemmatizer>>(Resource.Uninitialized())
+    private val state = MutableStateFlow<Resource<NLPCore>>(Resource.Uninitialized())
 
     private var sentenceModel: SentenceModel? = null
     private var tokenModel: TokenizerModel? = null
@@ -53,7 +56,7 @@ actual class NLPCore(
     private var sentenceDetector: SentenceDetectorME? = null
     private var tokenizer: TokenizerME? = null
     private var tagger: POSTaggerME? = null
-    private var lemmatizer: Lemmatizer? = null
+    private var lemmatizer: MyLemmatizer? = null
     private var chunker: ChunkerME? = null
 
     init {
@@ -62,7 +65,13 @@ actual class NLPCore(
         System.setProperty("org.xml.sax.driver", "org.xmlpull.v1.sax2.Driver");
     }
 
-    actual suspend fun waitUntilInitialized(): Resource<NLPCore> = state.first { it.isLoaded() }
+    actual suspend fun waitUntilInitialized(): NLPCore {
+        return state.first { it.isLoaded() }.data()!!
+    }
+
+    actual suspend fun waitUntilLemmatizerInitialized(): NLPLemmatizer {
+        return lemmatizerState.first{ it.isLoaded() }.data()!!
+    }
 
     actual fun normalizeText(text: String): String {
         return EmojiCharSequenceNormalizer.getInstance().normalize(text).toString()
@@ -88,27 +97,42 @@ actual class NLPCore(
         createTokenSpan(it)
     }
     actual fun tag(tokens: List<String>) = tagger?.tag(tokens.toTypedArray()).orEmpty().asList()
-    actual fun lemmatize(tokens: List<String>, tags: List<String>) = lemmatizer?.lemmatize(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
+    actual fun lemmatize(tokens: List<String>, tags: List<String>) = lemmatizer?.lemmatize(tokens, tags).orEmpty().asList()
     actual fun chunk(tokens: List<String>, tags: List<String>) = chunker?.chunk(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
 
-    fun load(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
-        state.value = Resource.Loading(this@NLPCore)
-        mainScope.launch {
-            try {
-                withContext(dispatcher) {
-                    loadModels(this)
-                    createMEObjects()
-                }
-                state.value = Resource.Loaded(this@NLPCore)
-            } catch (e: Exception) {
-                state.value = Resource.Error(e, true)
+    suspend fun load(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+        loadResource {
+            withContext(dispatcher) {
+                loadModels(this)
+                createMEObjects()
             }
-        }
+            this@NLPCore
+        }.collect(state)
     }
 
     private suspend fun loadModels(scope: CoroutineScope) {
         val buffer = 100 * 1024
         val jobs: MutableList<Job> = mutableListOf()
+
+        jobs.add(
+            scope.launch {
+                loadResource {
+                    Logger.measure("DictionaryLemmatizer loaded: ") {
+                        resources.openRawResource(lemmatizerRes).buffered(buffer).use { inputStream ->
+                            MyLemmatizer(
+                                inputStream.source(),
+                                nlpPath,
+                                fileSystem
+                            ).apply {
+                                load()
+                            }.also {
+                                lemmatizer = it
+                            }
+                        }
+                    }
+                }.collect(lemmatizerState)
+            }
+        )
 
         jobs.add(
             scope.launch {
@@ -135,24 +159,6 @@ actual class NLPCore(
                 Logger.measure("POSModel loaded: ") {
                     resources.openRawResource(posModelRes).buffered(buffer).use { stream ->
                         posModel = POSModel(stream)
-                    }
-                }
-            }
-        )
-
-        jobs.add(
-            scope.launch {
-                Logger.measure("DictionaryLemmatizer loaded: ") {
-                    lemmatizer = MyLemmatizer(
-                        { block ->
-                            resources.openRawResource(lemmatizerRes).buffered(buffer).use { stream ->
-                                block(stream)
-                            }
-                        },
-                        nlpPath,
-                        fileSystem
-                    ).apply {
-                        load()
                     }
                 }
             }
