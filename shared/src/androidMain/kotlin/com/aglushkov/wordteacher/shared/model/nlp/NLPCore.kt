@@ -112,69 +112,46 @@ actual class NLPCore(
 
     private suspend fun loadModels(scope: CoroutineScope) {
         val buffer = 100 * 1024
-        val jobs: MutableList<Job> = mutableListOf()
 
-        jobs.add(
-            scope.launch {
-                loadResource {
-                    Logger.measure("DictionaryLemmatizer loaded: ") {
-                        resources.openRawResource(lemmatizerRes).buffered(buffer).use { inputStream ->
-                            MyLemmatizer(
-                                inputStream.source(),
-                                nlpPath,
-                                fileSystem
-                            ).apply {
-                                load()
-                            }.also {
-                                lemmatizer = it
-                            }
-                        }
-                    }
-                }.collect(lemmatizerState)
-            }
-        )
-
-        jobs.add(
-            scope.launch {
-                Logger.measure("SentenceModel loaded: ") {
-                    resources.openRawResource(sentenceModelRes).buffered(buffer).use { modelIn ->
-                        sentenceModel = SentenceModel(modelIn)
+        loadResource {
+            Logger.measure("DictionaryLemmatizer loaded: ") {
+                resources.openRawResource(lemmatizerRes).buffered(buffer).use { inputStream ->
+                    MyLemmatizer(
+                        inputStream.source(),
+                        nlpPath,
+                        fileSystem
+                    ).apply {
+                        load()
+                    }.also {
+                        lemmatizer = it
                     }
                 }
             }
-        )
+        }.collect(lemmatizerState)
 
-        jobs.add(
-            scope.launch {
-                Logger.measure("TokenizerModel loaded: ") {
-                    resources.openRawResource(tokenRes).buffered(buffer).use { stream ->
-                        tokenModel = TokenizerModel(stream)
-                    }
-                }
+        Logger.measure("SentenceModel loaded: ") {
+            resources.openRawResource(sentenceModelRes).buffered(buffer).use { modelIn ->
+                sentenceModel = SentenceModel(modelIn)
             }
-        )
+        }
 
-        jobs.add(
-            scope.launch {
-                Logger.measure("POSModel loaded: ") {
-                    resources.openRawResource(posModelRes).buffered(buffer).use { stream ->
-                        posModel = POSModel(stream)
-                    }
-                }
+        Logger.measure("TokenizerModel loaded: ") {
+            resources.openRawResource(tokenRes).buffered(buffer).use { stream ->
+                tokenModel = TokenizerModel(stream)
             }
-        )
+        }
 
-        jobs.add(
-            scope.launch {
-                Logger.measure("ChunkerModel loaded: ") {
-                    resources.openRawResource(chunkerRes).buffered(buffer).use { stream ->
-                        chunkerModel = ChunkerModel(stream)
-                    }
-                }
+        Logger.measure("POSModel loaded: ") {
+            resources.openRawResource(posModelRes).buffered(buffer).use { stream ->
+                posModel = POSModel(stream)
             }
-        )
+        }
 
-        jobs.joinAll()
+        Logger.measure("ChunkerModel loaded: ") {
+            resources.openRawResource(chunkerRes).buffered(buffer).use { stream ->
+                chunkerModel = ChunkerModel(stream)
+            }
+        }
     }
 
     private fun createMEObjects() {

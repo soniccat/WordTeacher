@@ -102,69 +102,45 @@ actual class NLPCore(
     }
 
     private suspend fun loadModels(context: CoroutineScope) {
-        val jobs: MutableList<Job> = mutableListOf()
-
-        jobs.add(
-            context.launch {
-                loadResource {
-                    Logger.measure("DictionaryLemmatizer loaded: ") {
-                        fileSystem.read(lemmatizerPath) {
-                            MyLemmatizer(
-                                this,
-                                nlpPath,
-                                fileSystem
-                            ).apply {
-                                load()
-                            }.also {
-                                lemmatizer = it
-                            }
-                        }
-                    }
-                }.collect(lemmatizerState)
-            }
-        )
-
-        jobs.add(
-            context.launch {
-                Logger.measure("SentenceModel loaded: ") {
-                    sentenceModel = fileSystem.read(sentenceModelPath) {
-                        SentenceModel(inputStream())
+        loadResource {
+            Logger.measure("DictionaryLemmatizer loaded: ") {
+                fileSystem.read(lemmatizerPath) {
+                    MyLemmatizer(
+                        this,
+                        nlpPath,
+                        fileSystem
+                    ).apply {
+                        load()
+                    }.also {
+                        lemmatizer = it
                     }
                 }
             }
-        )
+        }.collect(lemmatizerState)
 
-        jobs.add(
-            context.launch {
-                Logger.measure("TokenizerModel loaded: ") {
-                    tokenModel = fileSystem.read(tokenPath) {
-                        TokenizerModel(inputStream())
-                    }
-                }
+        Logger.measure("SentenceModel loaded: ") {
+            sentenceModel = fileSystem.read(sentenceModelPath) {
+                SentenceModel(inputStream())
             }
-        )
+        }
 
-        jobs.add(
-            context.launch {
-                Logger.measure("POSModel loaded: ") {
-                    posModel = fileSystem.read(posModelPath) {
-                        POSModel(inputStream())
-                    }
-                }
+        Logger.measure("TokenizerModel loaded: ") {
+            tokenModel = fileSystem.read(tokenPath) {
+                TokenizerModel(inputStream())
             }
-        )
+        }
 
-        jobs.add(
-            context.launch {
-                Logger.measure("ChunkerModel loaded: ") {
-                    chunkerModel = fileSystem.read(chunkerPath) {
-                        ChunkerModel(inputStream())
-                    }
-                }
+        Logger.measure("POSModel loaded: ") {
+            posModel = fileSystem.read(posModelPath) {
+                POSModel(inputStream())
             }
-        )
+        }
 
-        jobs.joinAll()
+        Logger.measure("ChunkerModel loaded: ") {
+            chunkerModel = fileSystem.read(chunkerPath) {
+                ChunkerModel(inputStream())
+            }
+        }
     }
 
     private fun createMEObjects() {
