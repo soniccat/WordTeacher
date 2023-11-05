@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.writeIntValue
-import com.aglushkov.wordteacher.shared.general.extensions.writeLongValue
-import com.aglushkov.wordteacher.shared.general.extensions.writeStringValue
 import com.aglushkov.wordteacher.shared.general.okio.skipNewLine
 import com.aglushkov.wordteacher.shared.general.okio.skipSpace
 import okio.BufferedSink
@@ -14,7 +14,7 @@ class MyLemmatizerIndex(
     private val indexPath: Path,
     private val fileSystem: FileSystem,
 ) {
-    private val index = HashMap<String, Long>()
+    private val index = HashMap<String, Int>()
 
     init {
         if (fileSystem.exists(indexPath)) {
@@ -40,13 +40,13 @@ class MyLemmatizerIndex(
 
             while (!this.exhausted()) {
                 readEntry()?.let {
-                    add(it.word,it.offset)
+                    add(it.word, it.offset)
                 }
             }
         }
     }
 
-    fun add(word: String, offset: Long) {
+    fun add(word: String, offset: Int) {
         index[word] = offset
     }
 
@@ -62,58 +62,40 @@ class MyLemmatizerIndex(
 
     private fun BufferedSource.readEntry(): ReadEntry? {
         var word: String? = null
-        var offset = 0L
+        var offset = 0
 
-        var v: Int
-        while(!exhausted()) {
-            v = readInt()
-            if (v == INDEX_WORD_END) {
-                if (!exhausted()) {
-                    skipNewLine()
-                }
-                break
-            }
-            skipSpace()
-
-            when (v) {
-                INDEX_WORD -> word = readUtf8Line()
-                INDEX_OFFSET -> {
-                    offset = readLong()
-                    skipNewLine()
-                }
-            }
+        try {
+            offset = readInt()
+            word = readUtf8Line()
+        } catch (e: Exception) {
+            Logger.e(e.message.orEmpty())
         }
 
-        return if (word != null && offset != 0L) {
+        return if (word != null && offset != 0) {
             ReadEntry(word, offset)
         } else {
             null
         }
     }
 
-    private fun BufferedSink.writeEntry(it: Map.Entry<String, Long>) {
-        writeStringValue(INDEX_WORD, it.key)
-        writeLongValue(INDEX_OFFSET, it.value)
-
-        writeInt(INDEX_WORD_END)
+    private fun BufferedSink.writeEntry(it: Map.Entry<String, Int>) {
+        writeInt(it.value)
+        writeUtf8(it.key)
         writeUtf8("\n")
     }
 
-    fun offset(term: String): Long? = index[term]
+    fun offset(term: String): Int? = index[term]
 
     fun isEmpty() = index.isEmpty()
 
     private data class ReadEntry(
         val word: String,
-        val offset: Long
+        val offset: Int
     )
 }
 
 class WrongVersionException: RuntimeException("")
 
-private const val CURRENT_VERSION = 1
-
+private const val CURRENT_VERSION = 2
 private const val INDEX_VERSION = 0
-private const val INDEX_WORD = 1
-private const val INDEX_OFFSET = 2
-private const val INDEX_WORD_END = 3
+

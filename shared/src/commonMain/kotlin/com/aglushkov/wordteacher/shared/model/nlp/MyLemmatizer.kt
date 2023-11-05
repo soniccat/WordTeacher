@@ -71,14 +71,14 @@ class MyLemmatizer(
 
         try {
             var lastWord = ""
-            var offset = 0L
+            var offset = 0
             while (readUtf8Line()?.also { line = it } != null) {
                 val elems = line.split(elemRegexp).toTypedArray()
                 if (lastWord != elems[0]) {
                     lastWord = elems[0]
                     anIndex.add(elems[0], offset)
                 }
-                offset += line.utf8Size() + newLineSize
+                offset += line.utf8Size().toInt() + newLineSize.toInt()
             }
         } catch (t: Throwable) {
             Logger.e(t.message.orEmpty())
@@ -106,7 +106,7 @@ class MyLemmatizer(
         return fileSystem.read(unzippedLemmatizerPath) {
             var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
             index.offset(word)?.let { offset ->
-                skip(offset)
+                skip(offset.toLong())
 
                 while (true) {
                     val line = readUtf8Line() ?: break
