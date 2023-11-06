@@ -7,6 +7,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
+import com.aglushkov.wordteacher.shared.di.LocalIsDarkTheme
 import com.aglushkov.wordteacher.shared.di.LocalIsDebug
 import com.aglushkov.wordteacher.shared.general.*
 
@@ -47,6 +48,7 @@ fun ComposeAppTheme(
 
     CompositionLocalProvider(
         LocalIsDebug provides isDebug,
+        LocalIsDarkTheme provides darkTheme,
         LocalAppTypography provides AppTypography().initStylesFromResources(colors)
     ) {
         MaterialTheme(

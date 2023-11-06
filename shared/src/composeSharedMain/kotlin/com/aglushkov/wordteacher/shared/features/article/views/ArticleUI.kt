@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
+import com.aglushkov.wordteacher.shared.di.LocalIsDarkTheme
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
@@ -296,6 +297,7 @@ private fun ArticleParagraphView(
     onSentenceClick: (sentence: NLPSentence, offset: Int) -> Unit
 ) {
     val density = LocalDensity.current
+    val isDarkTheme = LocalIsDarkTheme.current
     val text = buildAnnotatedString {
         withStyle(
             style = ParagraphStyle()
@@ -358,7 +360,7 @@ private fun ArticleParagraphView(
                                 it.end < text.length
                             }
                             .onEach {
-                                drawAnnotation(it, v, colors, density)
+                                drawAnnotation(it, v, colors, isDarkTheme, density)
                             }
                     }
                 },
@@ -447,9 +449,10 @@ private fun DrawScope.drawAnnotation(
     it: AnnotatedString.Range<String>,
     layoutResult: TextLayoutResult,
     colors: Colors,
+    isDarkTheme: Boolean,
     density: Density
 ) {
-    val annotationColors = it.resolveColor(colors)
+    val annotationColors = it.resolveColor(colors, isDarkTheme)
     val fontHeight = articleFontHeight(density)
     val lineStart = layoutResult.getLineForOffset(it.start)
     val lineEnd = layoutResult.getLineForOffset(it.end)
@@ -557,7 +560,8 @@ private fun buildRoundRectPath(
 }
 
 private fun AnnotatedString.Range<String>.resolveColor(
-    colors: Colors
+    colors: Colors,
+    isDarkTheme: Boolean
 ): AnnotationColors {
     return when(tag) {
         ROUNDED_ANNOTATION_PROGRESS_VALUE -> {
@@ -570,7 +574,11 @@ private fun AnnotatedString.Range<String>.resolveColor(
         ROUNDED_ANNOTATION_PHRASE_VALUE ->
             PhraseTypeToColorMap[chunkEnum(item)] ?: AnnotationColors(null)
         ROUNDED_ANNOTATION_DICT_VALUE ->
-            AnnotationColors(Color(0xB44C0A57))
+            if (isDarkTheme) {
+                AnnotationColors(Color(0xB4AE61BB))
+            } else {
+                AnnotationColors(Color(0xB44C0A57))
+            }
         else -> AnnotationColors(null)
     }
 }

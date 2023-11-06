@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import kotlin.math.abs
 
 data class NLPSentence(
     var articleId: Long = 0,
@@ -15,8 +16,11 @@ data class NLPSentence(
         return tokenSpans.spanIndexWithIndex(textIndex)
     }
 
-    fun sliceFromTextIndex(textIndex: Int): NLPSentenceSlice? {
-        val nlpIndex = textIndexToNlpIndex(textIndex)
+    fun sliceFromTextIndex(textIndex: Int, chooseLeftIfNotFound: Boolean = false): NLPSentenceSlice? {
+        var nlpIndex = textIndexToNlpIndex(textIndex)
+        if (chooseLeftIfNotFound && nlpIndex < 0 && abs(nlpIndex) > 1) {
+            nlpIndex = abs(nlpIndex) - 2 // convert insertion point to the span on the left
+        }
         return sliceFromNlpIndex(nlpIndex)
     }
 

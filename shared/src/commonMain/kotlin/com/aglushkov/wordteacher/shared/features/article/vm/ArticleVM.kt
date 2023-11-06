@@ -317,8 +317,8 @@ open class ArticleVMImpl(
     }
 
     override fun onTextClicked(sentence: NLPSentence, offset: Int): Boolean {
-        val slice = sentence.sliceFromTextIndex(offset)
-        if (slice != null) {
+        val slice = sentence.sliceFromTextIndex(offset, true)
+        if (slice != null && slice.tokenSpan.length > 1) {
             val sentenceIndex = article.value.data()?.sentences?.indexOf(sentence) ?: return false
             val sentenceAnnotations = annotations.value[sentenceIndex].filterIsInstance<ArticleAnnotation.DictWord>()
             val annotations = sentenceAnnotations.filter {

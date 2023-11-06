@@ -23,3 +23,5 @@ annotation class Platform
 annotation class ApiBaseUrl
 
 val LocalIsDebug = staticCompositionLocalOf { false }
+
+val LocalIsDarkTheme = staticCompositionLocalOf { false }
