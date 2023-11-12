@@ -92,6 +92,7 @@ dependencies {
     implementation(libs.essentyParcelable)
     implementation(libs.androidComposeUITooling)
     implementation(libs.androidComposeUIToolingPreview)
+    runtimeOnly("androidx.compose.ui:ui:1.5.2")
 
     implementation("com.google.accompanist:accompanist-insets:0.17.0")
 

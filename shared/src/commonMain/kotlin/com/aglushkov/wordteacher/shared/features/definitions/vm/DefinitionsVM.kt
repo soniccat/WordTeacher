@@ -253,7 +253,7 @@ open class DefinitionsVMImpl(
             else -> addWordsGroupedBySource(words, partsOfSpeechFilter, items)
         }
 
-        if (isLoading) {
+        if (items.isNotEmpty() && isLoading) {
             items += WordLoadingViewItem()
         }
 
