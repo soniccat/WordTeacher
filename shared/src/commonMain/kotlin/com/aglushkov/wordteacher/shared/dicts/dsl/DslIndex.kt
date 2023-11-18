@@ -2,8 +2,6 @@ package com.aglushkov.wordteacher.shared.dicts.dsl
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.general.extensions.writeIntValue
-import com.aglushkov.wordteacher.shared.general.extensions.writeLongValue
-import com.aglushkov.wordteacher.shared.general.extensions.writeStringValue
 import com.aglushkov.wordteacher.shared.general.okio.skipNewLine
 import com.aglushkov.wordteacher.shared.general.okio.skipSpace
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -70,7 +68,7 @@ class DslIndex(
         }
     }
 
-    fun add(term: String, partOfSpeech: WordTeacherWord.PartOfSpeech?, offset: Long) {
+    fun add(term: String, partOfSpeech: WordTeacherWord.PartOfSpeech?, offset: Int) {
         add(
             term,
             partOfSpeech ?: WordTeacherWord.PartOfSpeech.Undefined,
@@ -98,35 +96,11 @@ class DslIndex(
     }
 
     private fun BufferedSource.readEntry(): ReadEntry? {
-        var word: String? = null
-        var partOfSpeech: WordTeacherWord.PartOfSpeech? = null
-        var offset = 0L
+        val offset = readInt()
+        val partOfSpeech = WordTeacherWord.PartOfSpeech.values()[readInt()]
+        val word = readUtf8Line()
 
-        var v: Int
-        while(!exhausted()) {
-            v = readInt()
-            if (v == INDEX_WORD_END) {
-                if (!exhausted()) {
-                    skipNewLine()
-                }
-                break
-            }
-            skipSpace()
-
-            when (v) {
-                INDEX_WORD -> word = readUtf8Line()
-                INDEX_PART_OF_SPEECH -> {
-                    partOfSpeech = WordTeacherWord.PartOfSpeech.values()[readInt()]
-                    skipNewLine()
-                }
-                INDEX_OFFSET -> {
-                    offset = readLong()
-                    skipNewLine()
-                }
-            }
-        }
-
-        return if (word != null && partOfSpeech != null && offset != 0L) {
+        return if (word != null && offset != 0) {
             ReadEntry(word, partOfSpeech, offset, dict)
         } else {
             null
@@ -134,17 +108,15 @@ class DslIndex(
     }
 
     private fun BufferedSink.writeEntry(it: Dict.Index.Entry) {
-        writeStringValue(INDEX_WORD, it.word)
-        writeIntValue(INDEX_PART_OF_SPEECH, it.partOfSpeech.ordinal)
-        writeLongValue(INDEX_OFFSET, it.indexValue as Long)
-
-        writeInt(INDEX_WORD_END)
+        writeInt(it.indexValue as Int)
+        writeInt(it.partOfSpeech.ordinal)
+        writeUtf8(it.word)
         writeUtf8("\n")
     }
 
     fun partOfSpeech(term: String) = index.word(term).firstOrNull()?.partOfSpeech
 
-    fun offset(term: String): Long? = index.word(term).firstOrNull()?.indexValue as? Long
+    fun offset(term: String): Int? = index.word(term).firstOrNull()?.indexValue as? Int
 
     fun isEmpty() = index.isEmpty()
 
@@ -158,10 +130,6 @@ class DslIndex(
 
 class WrongVersionException: RuntimeException("")
 
-private const val CURRENT_VERSION = 1
+private const val CURRENT_VERSION = 2
 
 private const val INDEX_VERSION = 0
-private const val INDEX_WORD = 1
-private const val INDEX_PART_OF_SPEECH = 2
-private const val INDEX_OFFSET = 3
-private const val INDEX_WORD_END = 4

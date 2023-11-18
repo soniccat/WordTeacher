@@ -64,7 +64,7 @@ class DslDict(
 
     private fun fillIndex(index: DslIndex) {
         fileSystem.read(path) {
-            var offset = 0L
+            var offset = 0
             var line = readUtf8Line()
             var readLine: String? = null
 
@@ -96,13 +96,13 @@ class DslDict(
                             }
 
                             readLine = nl
-                            offset += readBytes + resultLine.utf8Size() + newLineSize
+                            offset += (readBytes + resultLine.utf8Size() + newLineSize).toInt()
                         }
                     }
                 }
 
                 if (readLine == null) {
-                    offset += resultLine.utf8Size() + newLineSize
+                    offset += (resultLine.utf8Size() + newLineSize).toInt()
                     line = readUtf8Line()
                 }
             }
@@ -120,7 +120,7 @@ class DslDict(
             val builder = WordTeacherWordBuilder()
             builder.setWord(word)
 
-            val pos = indexEntry.indexValue as Long
+            val pos = indexEntry.indexValue as Int
             fileSystem.read(path) {
                 skip(pos + word.length + newLineSize)
                 readWord(builder)
@@ -135,14 +135,14 @@ class DslDict(
         }
     }
 
-    private fun BufferedSource.readWord(wordTeacherWordBuilder: WordTeacherWordBuilder): Pair<Long, String?> {
-        var readBytes = 0L
+    private fun BufferedSource.readWord(wordTeacherWordBuilder: WordTeacherWordBuilder): Pair<Int, String?> {
+        var readBytes = 0
         var line = readUtf8Line()
         var isFirstLine = true
         while (line != null && line.isNotEmpty() && line.first() == '\t') {
             readWordLine(line, isFirstLine, wordTeacherWordBuilder)
 
-            readBytes += line.utf8Size() + newLineSize
+            readBytes += (line.utf8Size() + newLineSize).toInt()
             line = readUtf8Line()
             isFirstLine = false
         }

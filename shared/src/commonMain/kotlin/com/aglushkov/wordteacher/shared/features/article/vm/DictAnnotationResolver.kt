@@ -90,7 +90,7 @@ class DictAnnotationResolver {
                             dict = dict
                         )
                     )
-                    i = it.first
+                    //i = it.first // as phrases may overlap
                 }
 
                 ++i
