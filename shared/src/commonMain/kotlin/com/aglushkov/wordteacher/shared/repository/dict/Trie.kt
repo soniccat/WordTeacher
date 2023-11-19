@@ -162,6 +162,8 @@ abstract class Trie<T, D>: Iterable<T> {
             return
         }
 
+        // set to false when we ask for the next word in the sentence
+        // set to true when we ask for another similar word at the current position i.e. a token instead of a lemma
         var needAnotherOne = false
         var nw = nextWord(needAnotherOne)
         while (nw != null) {
@@ -178,7 +180,10 @@ abstract class Trie<T, D>: Iterable<T> {
                 val spaceNode2 = nextNode.findChild(' ')
                 if (spaceNode2 != null) {
                     node = spaceNode2
-                } else if (nextNode.isEnd && nextNode.dictIndexEntries.isEmpty()) {
+                } else if (
+                    nextNode.isEnd && nextNode.dictIndexEntries.isEmpty() ||
+                    !nextNode.isEnd && nextNode.dictIndexEntries.isNotEmpty() // added for cases like "out of sorts" as lemma "sort" doesn't fit and we're in the middle of a metanode
+                ) {
                     needAnotherOne = true
                 } else {
                     node = nextNode
