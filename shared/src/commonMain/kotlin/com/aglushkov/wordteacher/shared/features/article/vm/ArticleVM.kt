@@ -337,12 +337,12 @@ open class ArticleVMImpl(
 
     override fun onTextClicked(sentence: NLPSentence, offset: Int) {
         val slice = sentence.sliceFromTextIndex(offset, true)
-        if (slice != null && slice.tokenSpan.length > 1) {
+        if (slice != null && slice.tokenSpan.length > 1 && annotations.value.isNotEmpty()) {
             val sentenceIndex = article.value.data()?.sentences?.indexOf(sentence) ?: return
             val sentenceAnnotations = annotations.value[sentenceIndex].filterIsInstance<ArticleAnnotation.DictWord>()
             val annotations = sentenceAnnotations.filter {
                 slice.tokenSpan.start >= it.start && slice.tokenSpan.end <= it.end
-            }
+            }.distinctBy { it.entry.word }
 
             if (annotations.size > 1) {
                 stateController.updateAnnotationChooserState {
@@ -387,10 +387,12 @@ open class ArticleVMImpl(
 
     override fun onAnnotationChooserClicked(index: Int?) {
         val chooserState = state.value.annotationChooserState ?: return
-        val annotation = chooserState.annotations.getOrNull(index ?: -1) ?: return
+        val annotation = chooserState.annotations.getOrNull(index ?: -1)
         stateController.updateAnnotationChooserState { null }
 
-        showAnnotationClicked(annotation, chooserState.sentence, chooserState.sentenceSlice)
+        annotation?.let { a ->
+            showAnnotationClicked(a, chooserState.sentence, chooserState.sentenceSlice)
+        }
     }
 
     override fun onCardSetWordSelectionChanged() =

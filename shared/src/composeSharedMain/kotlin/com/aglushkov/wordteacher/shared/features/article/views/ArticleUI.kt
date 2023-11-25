@@ -47,6 +47,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.ModalSideSheet
 import com.aglushkov.wordteacher.shared.general.views.SideSheetValue
+import com.aglushkov.wordteacher.shared.general.views.pxToDp
 import com.aglushkov.wordteacher.shared.general.views.rememberSideSheetState
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
@@ -60,6 +61,7 @@ import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.compose.localized
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.util.logging.Logger
@@ -88,7 +90,20 @@ fun ArticleUI(
             }
     }
 
-    BoxWithConstraints {
+    var lastDownPoint: Offset by remember { mutableStateOf(Offset.Zero) }
+    BoxWithConstraints(
+        modifier = Modifier.pointerInput(Unit) {
+            awaitEachGesture {
+                val down = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial)
+                down.changes.lastOrNull()?.let {
+                    coroutineScope.launch {
+                        delay(100) // HACK: without it detectTapGestures won't catch taps, somehow connected with recomposition on lastDownPoint changes
+                        lastDownPoint = it.position
+                    }
+                }
+            }
+        },
+    ) {
         val swipeableState = rememberSwipeableState(BottomSheetStates.Collapsed)
         val screenHeight = constraints.maxHeight
 
@@ -125,18 +140,7 @@ fun ArticleUI(
                 )
 
                 if (data != null) {
-                    var lastDownPoint: Offset by remember { mutableStateOf(Offset.Zero) }
                     LazyColumn(
-                        modifier = Modifier.pointerInput(Unit) {
-                            awaitEachGesture {
-                                val down = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Main)
-                                down.changes.lastOrNull()?.let {
-                                    if (it.isConsumed) {
-                                        lastDownPoint = it.position
-                                    }
-                                }
-                            }
-                        },
                         state = lazyColumnState,
                         contentPadding = PaddingValues(
                             bottom = LocalDimensWord.current.articleHorizontalPadding + this@BoxWithConstraints.maxHeight / 2
@@ -145,29 +149,6 @@ fun ArticleUI(
                         items(data) { item ->
                             ParagraphViewItem(item) { sentence, offset ->
                                 vm.onTextClicked(sentence, offset)
-//                                if (isHandled) {
-//                                    coroutineScope.launch {
-//
-//                                    }
-//                                }
-                            }
-                        }
-                    }
-
-                    DropdownMenu(
-                        expanded = state.annotationChooserState != null,
-                        offset = DpOffset(lastDownPoint.x.dp, lastDownPoint.y.dp),
-                        onDismissRequest = {
-                            vm.onAnnotationChooserClicked(null)
-                        }
-                    ) {
-                        state.annotationChooserState?.annotations?.onEachIndexed { i, word ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    vm.onAnnotationChooserClicked(i)
-                                }
-                            ) {
-                                Text(word.entry.word)
                             }
                         }
                     }
@@ -184,6 +165,24 @@ fun ArticleUI(
             }
 
             ArticleDefinitionBottomSheet(vm, swipeableState, screenHeight)
+
+            DropdownMenu(
+                expanded = state.annotationChooserState != null,
+                offset = DpOffset(lastDownPoint.x.pxToDp(), lastDownPoint.y.pxToDp() - maxHeight),
+                onDismissRequest = {
+                    vm.onAnnotationChooserClicked(null)
+                }
+            ) {
+                state.annotationChooserState?.annotations?.onEachIndexed { i, word ->
+                    DropdownMenuItem(
+                        onClick = {
+                            vm.onAnnotationChooserClicked(i)
+                        }
+                    ) {
+                        Text(word.entry.word)
+                    }
+                }
+            }
         }
     }
 }
