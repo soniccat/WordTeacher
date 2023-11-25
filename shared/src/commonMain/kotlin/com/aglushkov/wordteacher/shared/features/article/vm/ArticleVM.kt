@@ -39,7 +39,6 @@ interface ArticleVM: Clearable {
     val state: StateFlow<State>
     val article: StateFlow<Resource<Article>>
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
-    val eventFlow: Flow<Event>
     val dictPaths: StateFlow<Resource<List<String>>>
     val definitionsVM: DefinitionsVM
 
@@ -48,6 +47,7 @@ interface ArticleVM: Clearable {
     fun onWordDefinitionHidden()
     fun onBackPressed()
     fun onTextClicked(sentence: NLPSentence, offset: Int): Boolean
+    fun onAnnotationChooserClicked(index: Int?)
     fun onTryAgainClicked()
     fun onCardSetWordSelectionChanged()
     fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech)
@@ -57,6 +57,7 @@ interface ArticleVM: Clearable {
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
+    // TODO: simplify
     class StateController(
         id: Long,
         private val settings: FlowSettings,
@@ -122,14 +123,20 @@ interface ArticleVM: Clearable {
             }
 
         fun updateSelectionState(block: (SelectionState) -> SelectionState) {
-            this.selectionState = block.invoke(this.selectionState)
+            this.selectionState = block(this.selectionState)
+        }
+
+        fun updateAnnotationChooserState(block: (AnnotationChooserState?) -> AnnotationChooserState?) {
+            inMemoryState = inMemoryState.copy(annotationChooserState = block(inMemoryState.annotationChooserState))
+            mutableFlow.update { inMemoryState }
         }
     }
 
     private data class InMemoryState(
         val id: Long,
         val selectionState: SelectionState = SelectionState(),
-        val lastFirstVisibleItemMap: Map<Long, Int> = emptyMap() // keep the whole map not to reload it repeatedly
+        val lastFirstVisibleItemMap: Map<Long, Int> = emptyMap(), // keep the whole map not to reload it repeatedly
+        val annotationChooserState: AnnotationChooserState? = null,
     ) {
         val lastFirstVisibleItem: Int
             get() = lastFirstVisibleItemMap[id] ?: 0
@@ -145,7 +152,7 @@ interface ArticleVM: Clearable {
     data class State(
         val id: Long,
         val selectionState: SelectionState = SelectionState(),
-        val lastFirstVisibleItem: Int = 0
+        val lastFirstVisibleItem: Int = 0,
     ) : Parcelable
 
     @Parcelize
@@ -156,6 +163,12 @@ interface ArticleVM: Clearable {
         val cardSetWords: Boolean = true,
         val dicts: List<String> = emptyList()
     ) : Parcelable
+
+    data class AnnotationChooserState(
+        val sentenceIndex: Int,
+        val sentenceOffset: Int,
+        val annotations: List<ArticleAnnotation.DictWord>
+    )
 }
 
 open class ArticleVMImpl(
@@ -168,9 +181,6 @@ open class ArticleVMImpl(
     settings: FlowSettings
 ): ViewModel(), ArticleVM {
     override var router: ArticleRouter? = null
-
-    private val eventChannel = Channel<Event>(Channel.BUFFERED)
-    override val eventFlow = eventChannel.receiveAsFlow()
     override val article: StateFlow<Resource<Article>> = articleRepository.article
 
     private val stateController = ArticleVM.StateController(
@@ -324,6 +334,12 @@ open class ArticleVMImpl(
             val annotations = sentenceAnnotations.filter {
                 slice.tokenSpan.start >= it.start && slice.tokenSpan.end <= it.end
             }
+
+            if (annotations.isNotEmpty()) {
+                stateController.updateAnnotationChooserState { ArticleVM.AnnotationChooserState(sentenceIndex, offset, annotations) }
+                return false
+            }
+
             val firstAnnotation = annotations.firstOrNull()
             val resultWord = firstAnnotation?.entry?.word ?: slice.tokenString
             val resultPartOfSpeech = firstAnnotation?.entry?.partOfSpeech ?: slice.partOfSpeech()
@@ -347,6 +363,10 @@ open class ArticleVMImpl(
         }
 
         return slice != null
+    }
+
+    override fun onAnnotationChooserClicked(index: Int?) {
+        stateController.updateAnnotationChooserState { null }
     }
 
     override fun onCardSetWordSelectionChanged() =
@@ -417,7 +437,6 @@ open class ArticleVMImpl(
         super.onCleared()
         articleRepository.cancel()
         cardsRepository.cancel()
-        eventChannel.cancel()
     }
 }
 
