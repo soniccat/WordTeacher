@@ -3,6 +3,8 @@ package com.aglushkov.wordteacher.shared.features.article.views
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +23,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
@@ -56,8 +59,10 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.compose.localized
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import java.util.logging.Logger
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -120,7 +125,18 @@ fun ArticleUI(
                 )
 
                 if (data != null) {
+                    var lastDownPoint: Offset by remember { mutableStateOf(Offset.Zero) }
                     LazyColumn(
+                        modifier = Modifier.pointerInput(Unit) {
+                            awaitEachGesture {
+                                val down = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Main)
+                                down.changes.lastOrNull()?.let {
+                                    if (it.isConsumed) {
+                                        lastDownPoint = it.position
+                                    }
+                                }
+                            }
+                        },
                         state = lazyColumnState,
                         contentPadding = PaddingValues(
                             bottom = LocalDimensWord.current.articleHorizontalPadding + this@BoxWithConstraints.maxHeight / 2
@@ -128,12 +144,30 @@ fun ArticleUI(
                     ) {
                         items(data) { item ->
                             ParagraphViewItem(item) { sentence, offset ->
-                                val isHandled = vm.onTextClicked(sentence, offset)
-                                if (isHandled) {
-                                    coroutineScope.launch {
-                                        swipeableState.animateTo(BottomSheetStates.Expanded)
-                                    }
+                                vm.onTextClicked(sentence, offset)
+//                                if (isHandled) {
+//                                    coroutineScope.launch {
+//
+//                                    }
+//                                }
+                            }
+                        }
+                    }
+
+                    DropdownMenu(
+                        expanded = state.annotationChooserState != null,
+                        offset = DpOffset(lastDownPoint.x.dp, lastDownPoint.y.dp),
+                        onDismissRequest = {
+                            vm.onAnnotationChooserClicked(null)
+                        }
+                    ) {
+                        state.annotationChooserState?.annotations?.onEachIndexed { i, word ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    vm.onAnnotationChooserClicked(i)
                                 }
+                            ) {
+                                Text(word.entry.word)
                             }
                         }
                     }
@@ -158,7 +192,7 @@ fun ArticleUI(
 @Composable
 private fun ArticleSideSheetContent(
     vm: ArticleVM,
-    state: ArticleVM.State
+    state: ArticleVM.InMemoryState
 ) {
     val dictPaths by vm.dictPaths.collectAsState()
 
@@ -219,6 +253,17 @@ private fun ArticleDefinitionBottomSheet(
     swipeableState: SwipeableState<BottomSheetStates>,
     screenHeight: Int
 ) {
+    LaunchedEffect("needShowWordDefinition handler") {
+        vm.state.collect {
+            if (it.needShowWordDefinition) {
+                if (swipeableState.currentValue == BottomSheetStates.Collapsed) {
+                    swipeableState.animateTo(BottomSheetStates.Expanded)
+                }
+                vm.onWordDefinitionShown()
+            }
+        }
+    }
+
     com.aglushkov.wordteacher.shared.features.definitions.views.BottomSheet(
         swipeableState = swipeableState,
         anchors = mapOf(
@@ -340,6 +385,7 @@ private fun ArticleParagraphView(
                 .fillMaxWidth()
                 .pointerInput(onSentenceClick) {
                     detectTapGestures { pos ->
+                        Napier.v("gesture text clicked " + pos)
                         val v = textLayoutResult
                         if (v is TextLayoutResult) {
                             textLayoutResult.let { layoutResult ->

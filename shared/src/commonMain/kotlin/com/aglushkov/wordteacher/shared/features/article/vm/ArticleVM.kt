@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
+import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceSlice
 import com.aglushkov.wordteacher.shared.model.nlp.split
 import com.aglushkov.wordteacher.shared.model.nlp.toPartOfSpeech
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
@@ -36,7 +37,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 interface ArticleVM: Clearable {
-    val state: StateFlow<State>
+    val state: StateFlow<InMemoryState>
     val article: StateFlow<Resource<Article>>
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
     val dictPaths: StateFlow<Resource<List<String>>>
@@ -46,7 +47,7 @@ interface ArticleVM: Clearable {
 
     fun onWordDefinitionHidden()
     fun onBackPressed()
-    fun onTextClicked(sentence: NLPSentence, offset: Int): Boolean
+    fun onTextClicked(sentence: NLPSentence, offset: Int)
     fun onAnnotationChooserClicked(index: Int?)
     fun onTryAgainClicked()
     fun onCardSetWordSelectionChanged()
@@ -54,6 +55,7 @@ interface ArticleVM: Clearable {
     fun onPhraseSelectionChanged(phraseType: ChunkType)
     fun onDictSelectionChanged(dictPath: String)
     fun onFirstItemIndexChanged(index: Int)
+    fun onWordDefinitionShown()
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
@@ -93,8 +95,7 @@ interface ArticleVM: Clearable {
         }
 
         private val mutableFlow = MutableStateFlow(inMemoryState)
-        val stateFlow: StateFlow<State> = mutableFlow.map { it.toState() }
-            .stateIn(mainScope, SharingStarted.Eagerly, inMemoryState.toState())
+        val stateFlow: StateFlow<InMemoryState> = mutableFlow
 
         var selectionState: SelectionState
             get() = inMemoryState.selectionState
@@ -130,11 +131,17 @@ interface ArticleVM: Clearable {
             inMemoryState = inMemoryState.copy(annotationChooserState = block(inMemoryState.annotationChooserState))
             mutableFlow.update { inMemoryState }
         }
+
+        fun updateNeedShowWordDefinition(needShowWordDefinition: Boolean) {
+            inMemoryState = inMemoryState.copy(needShowWordDefinition = needShowWordDefinition)
+            mutableFlow.update { inMemoryState }
+        }
     }
 
-    private data class InMemoryState(
+    data class InMemoryState(
         val id: Long,
         val selectionState: SelectionState = SelectionState(),
+        val needShowWordDefinition: Boolean = false,
         val lastFirstVisibleItemMap: Map<Long, Int> = emptyMap(), // keep the whole map not to reload it repeatedly
         val annotationChooserState: AnnotationChooserState? = null,
     ) {
@@ -167,7 +174,9 @@ interface ArticleVM: Clearable {
     data class AnnotationChooserState(
         val sentenceIndex: Int,
         val sentenceOffset: Int,
-        val annotations: List<ArticleAnnotation.DictWord>
+        val annotations: List<ArticleAnnotation.DictWord>,
+        val sentence: NLPSentence,
+        val sentenceSlice: NLPSentenceSlice,
     )
 }
 
@@ -326,47 +335,62 @@ open class ArticleVMImpl(
         return paragraphList
     }
 
-    override fun onTextClicked(sentence: NLPSentence, offset: Int): Boolean {
+    override fun onTextClicked(sentence: NLPSentence, offset: Int) {
         val slice = sentence.sliceFromTextIndex(offset, true)
         if (slice != null && slice.tokenSpan.length > 1) {
-            val sentenceIndex = article.value.data()?.sentences?.indexOf(sentence) ?: return false
+            val sentenceIndex = article.value.data()?.sentences?.indexOf(sentence) ?: return
             val sentenceAnnotations = annotations.value[sentenceIndex].filterIsInstance<ArticleAnnotation.DictWord>()
             val annotations = sentenceAnnotations.filter {
                 slice.tokenSpan.start >= it.start && slice.tokenSpan.end <= it.end
             }
 
-            if (annotations.isNotEmpty()) {
-                stateController.updateAnnotationChooserState { ArticleVM.AnnotationChooserState(sentenceIndex, offset, annotations) }
-                return false
+            if (annotations.size > 1) {
+                stateController.updateAnnotationChooserState {
+                    ArticleVM.AnnotationChooserState(sentenceIndex, offset, annotations, sentence, slice)
+                }
+                return
             }
 
             val firstAnnotation = annotations.firstOrNull()
-            val resultWord = firstAnnotation?.entry?.word ?: slice.tokenString
-            val resultPartOfSpeech = firstAnnotation?.entry?.partOfSpeech ?: slice.partOfSpeech()
-            val resultPartOfSpeechList = if (resultPartOfSpeech == WordTeacherWord.PartOfSpeech.PhrasalVerb) {
+            showAnnotationClicked(firstAnnotation, sentence, slice)
+        }
+    }
+
+    private fun showAnnotationClicked(
+        firstAnnotation: ArticleAnnotation.DictWord?,
+        sentence: NLPSentence,
+        slice: NLPSentenceSlice,
+    ) {
+        val resultWord = firstAnnotation?.entry?.word ?: slice.tokenString
+        val resultPartOfSpeech = firstAnnotation?.entry?.partOfSpeech ?: slice.partOfSpeech()
+        val resultPartOfSpeechList =
+            if (resultPartOfSpeech == WordTeacherWord.PartOfSpeech.PhrasalVerb) {
                 listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.Verb)
             } else {
                 listOf(resultPartOfSpeech)
             }
 
-            definitionsVM.onWordSubmitted(
-                resultWord,
-                resultPartOfSpeechList + WordTeacherWord.PartOfSpeech.Undefined, // undefined to show dict result,
-                DefinitionsContext(
-                    wordContexts = mapOf(
-                        resultPartOfSpeech to DefinitionsWordContext(
-                            examples = listOf(sentence.text)
-                        )
+        definitionsVM.onWordSubmitted(
+            resultWord,
+            resultPartOfSpeechList + WordTeacherWord.PartOfSpeech.Undefined, // undefined to show dict result,
+            DefinitionsContext(
+                wordContexts = mapOf(
+                    resultPartOfSpeech to DefinitionsWordContext(
+                        examples = listOf(sentence.text)
                     )
                 )
             )
-        }
+        )
 
-        return slice != null
+        stateController.updateNeedShowWordDefinition(true)
     }
 
     override fun onAnnotationChooserClicked(index: Int?) {
+        val chooserState = state.value.annotationChooserState ?: return
+        val annotation = chooserState.annotations.getOrNull(index ?: -1) ?: return
         stateController.updateAnnotationChooserState { null }
+
+        showAnnotationClicked(annotation, chooserState.sentence, chooserState.sentenceSlice)
     }
 
     override fun onCardSetWordSelectionChanged() =
@@ -415,6 +439,10 @@ open class ArticleVMImpl(
 
     override fun onFirstItemIndexChanged(index: Int) {
         stateController.lastFirstVisibleItem = index
+    }
+
+    override fun onWordDefinitionShown() {
+        stateController.updateNeedShowWordDefinition(false)
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
