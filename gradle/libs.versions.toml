@@ -3,7 +3,7 @@ kotlinVersion = "1.8.20"
 kotlinxSerializationVersion = "1.4.1"
 kotlinxDateTime = "0.4.0"
 sqlDelight = "1.5.5"
-androidGradlePlugin = "8.0.2"
+androidGradlePlugin = "8.1.4"
 
 kotlinPoet = "1.14.2"
 
