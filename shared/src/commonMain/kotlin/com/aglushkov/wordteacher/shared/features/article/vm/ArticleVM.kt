@@ -100,7 +100,7 @@ interface ArticleVM: Clearable {
         var selectionState: SelectionState
             get() = inMemoryState.selectionState
             set(value) {
-                inMemoryState = inMemoryState.copy(selectionState = value)
+                inMemoryState = inMemoryState.update { copy(selectionState = value) }
                 mutableFlow.update { inMemoryState }
                 scope.launch {
                     val stringValue = jsonCoder.encodeToString(value)
@@ -128,17 +128,18 @@ interface ArticleVM: Clearable {
         }
 
         fun updateAnnotationChooserState(block: (AnnotationChooserState?) -> AnnotationChooserState?) {
-            inMemoryState = inMemoryState.copy(annotationChooserState = block(inMemoryState.annotationChooserState))
+            inMemoryState = inMemoryState.update { copy(annotationChooserState = block(inMemoryState.annotationChooserState)) }
             mutableFlow.update { inMemoryState }
         }
 
         fun updateNeedShowWordDefinition(needShowWordDefinition: Boolean) {
-            inMemoryState = inMemoryState.copy(needShowWordDefinition = needShowWordDefinition)
+            inMemoryState = inMemoryState.update { copy(needShowWordDefinition = needShowWordDefinition) }
             mutableFlow.update { inMemoryState }
         }
     }
 
     data class InMemoryState(
+        val version: Int = 0,
         val id: Long,
         val selectionState: SelectionState = SelectionState(),
         val needShowWordDefinition: Boolean = false,
@@ -148,11 +149,10 @@ interface ArticleVM: Clearable {
         val lastFirstVisibleItem: Int
             get() = lastFirstVisibleItemMap[id] ?: 0
 
+        fun update(block: InMemoryState.()->InMemoryState) = run { block(this).copy(version = version + 1) }
         fun toState() = State(id = id, selectionState = selectionState, lastFirstVisibleItem = lastFirstVisibleItem)
         fun updateWithLastFirstVisibleItem(index: Int) =
-            copy(
-                lastFirstVisibleItemMap = lastFirstVisibleItemMap + (id to index)
-            )
+            update { copy(lastFirstVisibleItemMap = lastFirstVisibleItemMap + (id to index)) }
     }
 
     @Parcelize

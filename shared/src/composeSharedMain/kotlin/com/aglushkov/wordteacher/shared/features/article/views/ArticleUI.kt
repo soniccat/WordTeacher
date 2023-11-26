@@ -64,7 +64,9 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import java.util.logging.Logger
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.v
+import kotlinx.coroutines.Job
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -98,6 +100,7 @@ fun ArticleUI(
                 down.changes.lastOrNull()?.let {
                     coroutineScope.launch {
                         delay(100) // HACK: without it detectTapGestures won't catch taps, somehow connected with recomposition on lastDownPoint changes
+                        Logger.v("gesture lastPoint " + it.position)
                         lastDownPoint = it.position
                     }
                 }
@@ -166,6 +169,7 @@ fun ArticleUI(
 
             ArticleDefinitionBottomSheet(vm, swipeableState, screenHeight)
 
+            Logger.v("gesture dropdownmenu " + DpOffset(lastDownPoint.x.pxToDp(), lastDownPoint.y.pxToDp() - maxHeight))
             DropdownMenu(
                 expanded = state.annotationChooserState != null,
                 offset = DpOffset(lastDownPoint.x.pxToDp(), lastDownPoint.y.pxToDp() - maxHeight),
@@ -253,10 +257,14 @@ private fun ArticleDefinitionBottomSheet(
     screenHeight: Int
 ) {
     LaunchedEffect("needShowWordDefinition handler") {
+        var job: Job? = null
         vm.state.collect {
             if (it.needShowWordDefinition) {
+                job?.cancel()
                 if (swipeableState.currentValue == BottomSheetStates.Collapsed) {
-                    swipeableState.animateTo(BottomSheetStates.Expanded)
+                    job = launch {
+                        swipeableState.animateTo(BottomSheetStates.Expanded)
+                    }
                 }
                 vm.onWordDefinitionShown()
             }
@@ -384,7 +392,7 @@ private fun ArticleParagraphView(
                 .fillMaxWidth()
                 .pointerInput(onSentenceClick) {
                     detectTapGestures { pos ->
-                        Napier.v("gesture text clicked " + pos)
+                        Logger.v("gesture text clicked " + pos)
                         val v = textLayoutResult
                         if (v is TextLayoutResult) {
                             textLayoutResult.let { layoutResult ->
