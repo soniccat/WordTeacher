@@ -120,17 +120,22 @@ fun LearningUI(
                             .padding(dimensionResource(id = R.dimen.learning_testOption_margin))
                     ) {
                         Column {
-                            Row(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                OptionButton(vm, termState.testOptions[0])
-                                OptionButton(vm, termState.testOptions[1])
+                            val itemPerRow = 2
+                            var rowCount = termState.testOptions.size / itemPerRow
+                            if (termState.testOptions.size % itemPerRow != 0) {
+                                rowCount += 1
                             }
-                            Row(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                OptionButton(vm, termState.testOptions[2])
-                                OptionButton(vm, termState.testOptions[3])
+
+                            for (i in 0 until rowCount) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    OptionButton(vm, termState.testOptions[i * itemPerRow])
+
+                                    if (i * itemPerRow + 1 < termState.testOptions.size) {
+                                        OptionButton(vm, termState.testOptions[i * itemPerRow + 1])
+                                    }
+                                }
                             }
                         }
                     }
