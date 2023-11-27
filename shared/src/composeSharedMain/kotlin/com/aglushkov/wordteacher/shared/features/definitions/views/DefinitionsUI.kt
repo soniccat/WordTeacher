@@ -266,7 +266,9 @@ private fun showViewItem(
                 text = text,
                 style = ts
             )
-            AddToSet(vm, item)
+            if (item.withAddButton) {
+                AddToSet(vm, item)
+            }
         }
     )
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)

@@ -312,10 +312,12 @@ open class DefinitionsVMImpl(
             items.add(WordPartOfSpeechViewItem(partOfSpeech.toStringDesc(), partOfSpeech))
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
+                var isFirstDef = true
                 for (d in def.definitions) {
                     items.add(
                         WordDefinitionViewItem(
                             definition = d,
+                            withAddButton = isFirstDef,
                             data = WordDefinitionViewData(
                                 word = word,
                                 partOfSpeech = partOfSpeech,
@@ -323,6 +325,7 @@ open class DefinitionsVMImpl(
                             )
                         )
                     )
+                    isFirstDef = false
                 }
 
                 if (def.examples?.isNotEmpty() == true) {
