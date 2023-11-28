@@ -104,7 +104,9 @@ class CardTeacher(
 
         val isRight = currentCard!!.term == answer
         if (isRight) {
-            countRightAnswer()
+            if (!isWrongAnswerCounted) {
+                countRightAnswer()
+            }
             switchToNextCard()
 
         } else if (checkCount > 1) { // TODO: move to settings
