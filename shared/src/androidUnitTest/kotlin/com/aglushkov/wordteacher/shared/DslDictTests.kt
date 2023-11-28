@@ -77,13 +77,14 @@ class DslDictTests {
         assertEquals(
             WordTeacherWord(
                 word = "term1",
-                transcription = null,
+                transcriptions = emptyList(),
                 definitions = mapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1", "def2", "def3 (comment3)", "def4"),
                             examples = listOf("ex1 — ex1_1"),
                             synonyms = listOf(),
+                            antonyms = listOf(),
                             imageUrl = null
                         )
                     )
@@ -126,19 +127,21 @@ class DslDictTests {
         assertEquals(
             WordTeacherWord(
                 word = "another term",
-                transcription = "transcription",
+                transcriptions = listOf("transcription"),
                 definitions = mapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1"),
                             examples = listOf("ex1 — ex1_1"),
                             synonyms = listOf(),
+                            antonyms = listOf(),
                             imageUrl = null
                         ),
                         WordTeacherDefinition(
                             definitions = listOf("def2 (def2_1)"),
                             examples = listOf("ex2 — ex2_1"),
                             synonyms = listOf(),
+                            antonyms = listOf(),
                             imageUrl = null
                         )
                     )
@@ -187,13 +190,14 @@ class DslDictTests {
         assertEquals(
             WordTeacherWord(
                 word = "term1",
-                transcription = "transcription",
+                transcriptions = listOf("transcription"),
                 definitions = mapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1"),
                             examples = listOf("ex1 — ex1_1"),
                             synonyms = listOf(),
+                            antonyms = listOf(),
                             imageUrl = null
                         )
                     )
@@ -205,13 +209,14 @@ class DslDictTests {
         assertEquals(
             WordTeacherWord(
                 word = "term2",
-                transcription = "transcription2",
+                transcriptions = listOf("transcription2"),
                 definitions = mapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def2"),
                             examples = listOf("ex2 — ex2_2"),
                             synonyms = listOf(),
+                            antonyms = listOf(),
                             imageUrl = null
                         )
                     )
@@ -254,7 +259,7 @@ class DslDictTests {
         assertEquals(
             DictWordData(
                 WordTeacherWord.PartOfSpeech.PhrasalVerb,
-                73L,
+                73,
                 dslDict
             ),
             dslDict.index.allEntries().first().toWordData()
@@ -266,19 +271,21 @@ class DslDictTests {
         assertEquals(
             WordTeacherWord(
                 word = "term1",
-                transcription = null,
+                transcriptions = emptyList(),
                 definitions = mapOf(
                     WordTeacherWord.PartOfSpeech.PhrasalVerb to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1"),
                             examples = listOf("ex1"),
                             synonyms = listOf(),
+                            antonyms = listOf(),
                             imageUrl = null
                         ),
                         WordTeacherDefinition(
                             definitions = listOf("def2"),
                             examples = listOf(),
                             synonyms = listOf(),
+                            antonyms = listOf(),
                             imageUrl = null
                         )
                     )

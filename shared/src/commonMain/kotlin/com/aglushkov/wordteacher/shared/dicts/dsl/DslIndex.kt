@@ -1,9 +1,11 @@
 package com.aglushkov.wordteacher.shared.dicts.dsl
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.extensions.writeIntValue
 import com.aglushkov.wordteacher.shared.general.okio.skipNewLine
 import com.aglushkov.wordteacher.shared.general.okio.skipSpace
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.dict.DictTrie
 import com.aglushkov.wordteacher.shared.repository.dict.DictWordData
@@ -110,6 +112,11 @@ class DslIndex(
     private fun BufferedSink.writeEntry(it: Dict.Index.Entry) {
         writeInt(it.indexValue as Int)
         writeInt(it.partOfSpeech.ordinal)
+        if (it.word.equals("from ")) {
+            var i = 0
+            ++i
+            Logger.v("aaa " + i)
+        }
         writeUtf8(it.word)
         writeUtf8("\n")
     }

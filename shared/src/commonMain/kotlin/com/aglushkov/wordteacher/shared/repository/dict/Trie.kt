@@ -33,7 +33,7 @@ abstract class Trie<T, D>: Iterable<T> {
                 node.prefix = node.prefix + ch
                 innerNodeIndex += 1
 
-            // reached the end of prefix and there children or entries -> try to find a child with the same prefix or add a new child
+            // reached the end of prefix and there're children or entries -> try to find a child with the same prefix or add a new child
             } else if (node.prefix.length == innerNodeIndex && (node.children.isNotEmpty() || node.dictIndexEntries.isNotEmpty() || node == root)) {
                 val childNode = node.children.firstOrNull {
                     it.prefix.first() == ch

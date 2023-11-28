@@ -23,10 +23,10 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 
     java {
-        jvmToolchain(11)
+        jvmToolchain(17)
     }
 
     sourceSets {
@@ -92,7 +92,7 @@ kotlin {
                 implementation(libs.kotlinTestJUnit)
                 implementation(libs.junit)
                 implementation(libs.mockitoKotlin)
-                implementation("org.robolectric:robolectric:4.7.3")
+                implementation("org.robolectric:robolectric:4.11-beta-2")
                 implementation(libs.coroutinesCommonTest)
                 implementation(libs.okioFakeFileSystem)
             }

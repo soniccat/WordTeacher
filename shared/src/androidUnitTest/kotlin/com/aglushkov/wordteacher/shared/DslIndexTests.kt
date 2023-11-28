@@ -28,9 +28,9 @@ class DslIndexTests {
         dslIndex.save()
 
         val dslIndex2 = DslIndex(dict, indexPath, fakeFileSystem)
-        assertEquals(100L, dslIndex2.offset("term1"))
-        assertEquals(101L, dslIndex2.offset("term2"))
-        assertEquals(102L, dslIndex2.offset("term3"))
+        assertEquals(100, dslIndex2.offset("term1"))
+        assertEquals(101, dslIndex2.offset("term2"))
+        assertEquals(102, dslIndex2.offset("term3"))
         assertEquals(WordTeacherWord.PartOfSpeech.Adjective, dslIndex2.partOfSpeech("term1"))
         assertEquals(WordTeacherWord.PartOfSpeech.Noun, dslIndex2.partOfSpeech("term2"))
         assertEquals(WordTeacherWord.PartOfSpeech.Adverb, dslIndex2.partOfSpeech("term3"))

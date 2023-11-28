@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.general.StringReader
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
 import com.aglushkov.wordteacher.shared.general.okio.newLineSize
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.WordTeacherWordBuilder
 import com.aglushkov.wordteacher.shared.model.fromString
@@ -37,12 +38,12 @@ class DslDict(
 
     override suspend fun load() {
         val dslIndex = DslIndex(this, (path.toString() + DSL_INDEX_SUFFIX).toPath(), fileSystem)
-        if (dslIndex.isEmpty()) {
+        //if (dslIndex.isEmpty()) {
             fillIndex(dslIndex)
             dslIndex.save()
-        } else {
-            readHeader()
-        }
+//        } else {
+//            readHeader()
+//        }
 
         this.dslIndex = dslIndex
     }
@@ -82,15 +83,31 @@ class DslDict(
                         else -> {
                             wordTeacherWordBuilder.clear()
                             wordTeacherWordBuilder.setWord(resultLine)
+                            if (resultLine.equals("from ")) {
+                                var i = 0
+                                ++i
+                                Logger.v("aaa " + i)
+                            }
 
                             val (readBytes, nl) = readWord(wordTeacherWordBuilder)
                             val word = wordTeacherWordBuilder.build()
+                            if (resultLine.equals("from ")) {
+                                var i = 0
+                                ++i
+                                Logger.v("aaa " + i)
+                            }
+
                             if (word?.definitions?.isNotEmpty() == true) {
                                 val partOfSpeeches = word.definitions.keys
                                 if (partOfSpeeches.size > 1) {
                                     Logger.e("DslDict fillIndex found several partOfSpeeches for $word")
                                 } else if (partOfSpeeches.size == 1) {
                                     val partOfSpeech = partOfSpeeches.first()
+                                    if (word.word.equals("from")) {
+                                        var i = 0
+                                        ++i
+                                        Logger.v("aaa " + i)
+                                    }
                                     index.add(word.word, partOfSpeech, offset)
                                 }
                             }

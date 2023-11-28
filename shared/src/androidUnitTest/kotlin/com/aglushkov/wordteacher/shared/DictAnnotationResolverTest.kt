@@ -1,11 +1,12 @@
 package com.aglushkov.wordteacher.shared
 
-import com.aglushkov.wordteacher.android.R
+import com.aglushkov.wordteacher.shared.R
 import com.aglushkov.wordteacher.shared.features.article.vm.DictAnnotationResolver
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import kotlin.test.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import okio.Path
 import okio.Path.Companion.toPath
@@ -14,6 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
@@ -32,13 +34,13 @@ class DictAnnotationResolverTest {
         FakeFileSystem(),
         testDispatcher
     )
-    val nlpSentenceProcessor = NLPSentenceProcessor(
-        nlpCore
-    )
+    val nlpSentenceProcessor = NLPSentenceProcessor()
     val dictAnnotationResolver = DictAnnotationResolver()
 
     init {
-        nlpCore.load(testDispatcher)
+        runBlocking {
+            nlpCore.load(testDispatcher)
+        }
         testDispatcher.scheduler.runCurrent()
     }
 
@@ -50,7 +52,7 @@ class DictAnnotationResolverTest {
             }
         )
 
-        val nlpSentence = nlpSentenceProcessor.processString("I've made up this idea")
+        val nlpSentence = nlpSentenceProcessor.processString("I've made up this idea", nlpCore)
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,
@@ -69,7 +71,7 @@ class DictAnnotationResolverTest {
             }
         )
 
-        val nlpSentence = nlpSentenceProcessor.processString("He have talked my best friend into it")
+        val nlpSentence = nlpSentenceProcessor.processString("He have talked my best friend into it", nlpCore)
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,
@@ -88,7 +90,7 @@ class DictAnnotationResolverTest {
             }
         )
 
-        val nlpSentence = nlpSentenceProcessor.processString("In fact, many phrasal verbs are distinct variations on the same base verb, which can add to the confusion")
+        val nlpSentence = nlpSentenceProcessor.processString("In fact, many phrasal verbs are distinct variations on the same base verb, which can add to the confusion", nlpCore)
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,
@@ -107,7 +109,7 @@ class DictAnnotationResolverTest {
             }
         )
 
-        val nlpSentence = nlpSentenceProcessor.processString("Let’s look at the phrasal verb get over as an example")
+        val nlpSentence = nlpSentenceProcessor.processString("Let’s look at the phrasal verb get over as an example", nlpCore)
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,
@@ -126,7 +128,7 @@ class DictAnnotationResolverTest {
             }
         )
 
-        val nlpSentence = nlpSentenceProcessor.processString("Pick it up and carry it to the kitchen.")
+        val nlpSentence = nlpSentenceProcessor.processString("Pick it up and carry it to the kitchen.", nlpCore)
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,
@@ -145,7 +147,7 @@ class DictAnnotationResolverTest {
             }
         )
 
-        val nlpSentence = nlpSentenceProcessor.processString("Phrasal verbs are two or more words that together act as a completely new word, with a meaning separate from the original words")
+        val nlpSentence = nlpSentenceProcessor.processString("Phrasal verbs are two or more words that together act as a completely new word, with a meaning separate from the original words", nlpCore)
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,
@@ -163,7 +165,7 @@ class DictAnnotationResolverTest {
             }
         )
 
-        val nlpSentence = nlpSentenceProcessor.processString("Phrasal verbs are two or more words")
+        val nlpSentence = nlpSentenceProcessor.processString("Phrasal verbs are two or more words", nlpCore)
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,
