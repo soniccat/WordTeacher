@@ -49,6 +49,48 @@ class DictTrieTests {
         assertEquals(word2, foundEntry2.toWordData())
     }
 
+
+    @Test
+    fun testPut3() {
+        val dict = mock<Dict>()
+        val trie = DictTrie()
+        val word1 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 100, dict)
+        val word2 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 101, dict)
+        trie.put("from ab", word1)
+        trie.put("from", word2)
+
+        val foundEntry1 = trie.word("from ab").firstOrNull()
+        val foundEntry2 = trie.word("from").firstOrNull()
+
+        assertEquals("from ab", foundEntry1!!.word)
+        assertEquals("from", foundEntry2!!.word)
+        assertEquals(word1, foundEntry1.toWordData())
+        assertEquals(word2, foundEntry2.toWordData())
+    }
+
+    @Test
+    fun testPut4() {
+        val dict = mock<Dict>()
+        val trie = DictTrie()
+        val word1 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 100, dict)
+        val word2 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 101, dict)
+        val word3 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 102, dict)
+        trie.put("from ab", word1)
+        trie.put("from cd", word2)
+        trie.put("from", word3)
+
+        val foundEntry1 = trie.word("from ab").firstOrNull()
+        val foundEntry2 = trie.word("from cd").firstOrNull()
+        val foundEntry3 = trie.word("from").firstOrNull()
+
+        assertEquals("from ab", foundEntry1!!.word)
+        assertEquals("from cd", foundEntry2!!.word)
+        assertEquals("from", foundEntry3!!.word)
+        assertEquals(word1, foundEntry1.toWordData())
+        assertEquals(word2, foundEntry2.toWordData())
+        assertEquals(word3, foundEntry3.toWordData())
+    }
+
     @Test
     fun testAsSequence() {
         val dict = mock<Dict>()

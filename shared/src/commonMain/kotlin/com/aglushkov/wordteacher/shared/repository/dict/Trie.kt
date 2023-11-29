@@ -7,18 +7,11 @@ abstract class Trie<T, D>: Iterable<T> {
 
     abstract fun createEntry(node: TrieNode<T>, data: D): T
 
-    abstract fun setNodeForEntry(entry: T, node: TrieNode<T>)
+    abstract fun setNodeForEntry(entry: T, node: TrieNode<T>) // TODO: try to move node in Entry type
+
+    abstract fun getNodeFromEntry(entry: T): T
 
     fun put(word: String, data: D): T {
-        val node = putWord(word)
-        val entry = createEntry(node, data)
-        node.dictIndexEntries.add(
-            entry
-        )
-        return entry
-    }
-
-    private fun putWord(word: String): TrieNode<T> {
         var node = root
         var innerNodeIndex = 0
 
@@ -58,7 +51,6 @@ abstract class Trie<T, D>: Iterable<T> {
                     node.children.toMutableList()
                 )
                 newNode1.dictIndexEntries.map {
-                    //it.node = newNode1
                     setNodeForEntry(it, newNode1)
                 }
                 newNode1.children.onEach {
@@ -82,7 +74,37 @@ abstract class Trie<T, D>: Iterable<T> {
             }
         }
 
-        return node
+        // found a node but it for a longer word with the same beginning, split the node
+        if (!node.isEnd && node.prefix.length > 1) {
+            // a node with the right part of text
+            val rightNode = TrieNode<T>(
+                node.prefix.substring(innerNodeIndex + 1, node.prefix.length),
+                node,
+                node.dictIndexEntries.toMutableList(),
+                node.children.toMutableList()
+            )
+            rightNode.dictIndexEntries.map {
+                setNodeForEntry(it, rightNode)
+            }
+            rightNode.children.onEach {
+                it.parent = rightNode
+            }
+
+            // transform the node to the node with the left part of text
+            node.prefix = node.prefix.substring(0, innerNodeIndex + 1)
+            node.dictIndexEntries.clear()
+            node.children.clear()
+            node.children.addElements(rightNode)
+
+            //innerNodeIndex = 1
+        }
+
+        val entry = createEntry(node, data)
+        node.dictIndexEntries.add(
+            entry
+        )
+
+        return entry
     }
 
     fun wordsStartWith(prefix: String, limit: Int): List<T> {

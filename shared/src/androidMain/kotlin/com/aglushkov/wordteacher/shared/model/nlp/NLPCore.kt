@@ -69,6 +69,10 @@ actual class NLPCore(
         return state.first { it.isLoaded() }.data()!!
     }
 
+    fun isInitialized(): Boolean {
+        return state.value.isLoaded()
+    }
+
     actual suspend fun waitUntilLemmatizerInitialized(): NLPLemmatizer {
         return lemmatizerState.first{ it.isLoaded() }.data()!!
     }

@@ -4,8 +4,12 @@ import com.aglushkov.wordteacher.shared.R
 import com.aglushkov.wordteacher.shared.features.article.vm.DictAnnotationResolver
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlin.test.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import okio.Path
@@ -21,6 +25,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 class DictAnnotationResolverTest {
 
+    val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     val testDispatcher = StandardTestDispatcher()
     val res = RuntimeEnvironment.getApplication().resources
     val nlpCore = NLPCore(
@@ -31,17 +36,24 @@ class DictAnnotationResolverTest {
         R.raw.en_lemmatizer_dict,
         R.raw.en_chunker,
         "lemmatizer_test".toPath(),
-        FakeFileSystem(),
+        FakeFileSystem().apply {
+            createDirectories("/lemmatizer_test/".toPath())
+        },
         testDispatcher
     )
     val nlpSentenceProcessor = NLPSentenceProcessor()
     val dictAnnotationResolver = DictAnnotationResolver()
 
     init {
-        runBlocking {
+        scope.launch(testDispatcher) {
             nlpCore.load(testDispatcher)
         }
-        testDispatcher.scheduler.runCurrent()
+
+        runBlocking {
+            while (!nlpCore.isInitialized()) {
+                testDispatcher.scheduler.runCurrent()
+            }
+        }
     }
 
     @Test
