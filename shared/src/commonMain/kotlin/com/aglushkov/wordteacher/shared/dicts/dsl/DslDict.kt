@@ -83,19 +83,9 @@ class DslDict(
                         else -> {
                             wordTeacherWordBuilder.clear()
                             wordTeacherWordBuilder.setWord(resultLine)
-                            if (resultLine.equals("from ")) {
-                                var i = 0
-                                ++i
-                                Logger.v("aaa " + i)
-                            }
 
                             val (readBytes, nl) = readWord(wordTeacherWordBuilder)
                             val word = wordTeacherWordBuilder.build()
-                            if (resultLine.equals("from ")) {
-                                var i = 0
-                                ++i
-                                Logger.v("aaa " + i)
-                            }
 
                             if (word?.definitions?.isNotEmpty() == true) {
                                 val partOfSpeeches = word.definitions.keys
@@ -103,11 +93,6 @@ class DslDict(
                                     Logger.e("DslDict fillIndex found several partOfSpeeches for $word")
                                 } else if (partOfSpeeches.size == 1) {
                                     val partOfSpeech = partOfSpeeches.first()
-                                    if (word.word.equals("from")) {
-                                        var i = 0
-                                        ++i
-                                        Logger.v("aaa " + i)
-                                    }
                                     index.add(word.word, partOfSpeech, offset)
                                 }
                             }
@@ -218,7 +203,7 @@ class DslDict(
                 builder.addExample(value.toString())
             } else if (isFirstLine) {
                 val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(firstLineValue.toString().trimNonLetterNonDigit())
-                wordTeacherWordBuilder.startPartOfSpeech(partOfSpeech)
+                builder.startPartOfSpeech(partOfSpeech)
             }
         }
     }

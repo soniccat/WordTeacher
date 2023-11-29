@@ -16,10 +16,6 @@ class DictTrie: Trie<Dict.Index.Entry, DictWordData>(), Iterable<Dict.Index.Entr
     override fun setNodeForEntry(entry: Dict.Index.Entry, node: TrieNode<Dict.Index.Entry>) {
         (entry as DictEntry).node = node
     }
-
-    override fun getNodeFromEntry(entry: Dict.Index.Entry): TrieNode<Dict.Index.Entry> {
-        return (entry as DictEntry).node
-    }
 }
 
 data class DictWordData(

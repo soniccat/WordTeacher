@@ -9,9 +9,16 @@ abstract class Trie<T, D>: Iterable<T> {
 
     abstract fun setNodeForEntry(entry: T, node: TrieNode<T>) // TODO: try to move node in Entry type
 
-    abstract fun getNodeFromEntry(entry: T): T
-
     fun put(word: String, data: D): T {
+        val node = putWord(word, data)
+        val entry = createEntry(node, data)
+        node.dictIndexEntries.add(
+            entry
+        )
+        return entry
+    }
+
+    private fun putWord(word: String, data: D): TrieNode<T> {
         var node = root
         var innerNodeIndex = 0
 
@@ -75,10 +82,10 @@ abstract class Trie<T, D>: Iterable<T> {
         }
 
         // found a node but it for a longer word with the same beginning, split the node
-        if (!node.isEnd && node.prefix.length > 1) {
+        if (innerNodeIndex != node.prefix.length) { // here innerNodeIndex is already incremented
             // a node with the right part of text
             val rightNode = TrieNode<T>(
-                node.prefix.substring(innerNodeIndex + 1, node.prefix.length),
+                node.prefix.substring(innerNodeIndex, node.prefix.length),
                 node,
                 node.dictIndexEntries.toMutableList(),
                 node.children.toMutableList()
@@ -91,7 +98,7 @@ abstract class Trie<T, D>: Iterable<T> {
             }
 
             // transform the node to the node with the left part of text
-            node.prefix = node.prefix.substring(0, innerNodeIndex + 1)
+            node.prefix = node.prefix.substring(0, innerNodeIndex)
             node.dictIndexEntries.clear()
             node.children.clear()
             node.children.addElements(rightNode)
@@ -99,12 +106,7 @@ abstract class Trie<T, D>: Iterable<T> {
             //innerNodeIndex = 1
         }
 
-        val entry = createEntry(node, data)
-        node.dictIndexEntries.add(
-            entry
-        )
-
-        return entry
+        return node
     }
 
     fun wordsStartWith(prefix: String, limit: Int): List<T> {
