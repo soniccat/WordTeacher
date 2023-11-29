@@ -38,12 +38,12 @@ class DslDict(
 
     override suspend fun load() {
         val dslIndex = DslIndex(this, (path.toString() + DSL_INDEX_SUFFIX).toPath(), fileSystem)
-        //if (dslIndex.isEmpty()) {
+        if (dslIndex.isEmpty()) {
             fillIndex(dslIndex)
             dslIndex.save()
-//        } else {
-//            readHeader()
-//        }
+        } else {
+            readHeader()
+        }
 
         this.dslIndex = dslIndex
     }

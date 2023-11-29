@@ -102,8 +102,6 @@ abstract class Trie<T, D>: Iterable<T> {
             node.dictIndexEntries.clear()
             node.children.clear()
             node.children.addElements(rightNode)
-
-            //innerNodeIndex = 1
         }
 
         return node

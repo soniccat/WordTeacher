@@ -474,15 +474,13 @@ open class DefinitionsVMImpl(
 
     override fun requestSuggests(word: String) {
         var i = 0L
-        val entries = dictRepository.wordsStartWith(word, 20).map {
+        val entries = dictRepository.wordsStartWith(word, 40).map {
             WordSuggestViewItem(
                 word = it.word,
                 definition = "", // TODO: support first definition
                 source = it.dict.name
-            ).apply {
-                id = i++
-            }
-        }
+            ).apply { id = i++ }
+        }.distinctBy { it.firstItem() } // here we loose source to avoid duplications
         suggests.value = Resource.Loaded(entries)
     }
 }
