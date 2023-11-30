@@ -209,6 +209,14 @@ private fun ArticleSideSheetContent(
         style = LocalAppTypography.current.articleSideSheetSection
     )
     if (dictPaths.isLoaded()) {
+        if (dictPaths.data()?.isNotEmpty() == true) {
+            CheckableListItem(
+                isChecked = state.selectionState.filterDictSingleWordEntries,
+                text = stringResource(MR.strings.article_side_sheet_selection_filter_dict_single_word_entries),
+                onClicked = { vm.onFilterDictSingleWordEntriesChanged() }
+            )
+        }
+
         dictPaths.data()?.onEach {
             CheckableListItem(
                 isChecked = state.selectionState.dicts.contains(it),

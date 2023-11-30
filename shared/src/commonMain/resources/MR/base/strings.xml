@@ -76,6 +76,7 @@
     <string name="article_error">Something went wrong :(</string>
     <string name="article_empty">There\'s an empty article</string>
     <string name="article_side_sheet_selection_dicts">Dictionaries</string>
+    <string name="article_side_sheet_selection_filter_dict_single_word_entries">Filter single word entries</string>
     <string name="article_side_sheet_selection_phrases">Phrases</string>
     <string name="article_side_sheet_selection_phrasal_verbs">Phrasal verbs</string>
     <string name="article_side_sheet_selection_cardset_words">Learning progress</string>

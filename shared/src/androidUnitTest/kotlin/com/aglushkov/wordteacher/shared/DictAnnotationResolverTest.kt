@@ -170,7 +170,7 @@ class DictAnnotationResolverTest {
     }
 
     @Test
-    fun testNountHighlight() {
+    fun testNounHighlight() {
         val dict = createFakeDict(
             buildDictContent {
                 addTerm("verb", listOf("def1"))

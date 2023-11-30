@@ -160,6 +160,8 @@ abstract class Trie<T, D>: Iterable<T> {
         return true
     }
 
+    // TODO: refactor, simplify logic
+    // we can request all the word forms at once (lemma, term) and remove that misleading "needAnotherOne: Boolean"
     fun entry(
         word: String,
         nextWord: (needAnotherOne: Boolean) -> String?,

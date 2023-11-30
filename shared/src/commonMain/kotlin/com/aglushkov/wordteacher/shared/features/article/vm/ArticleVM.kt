@@ -54,6 +54,7 @@ interface ArticleVM: Clearable {
     fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech)
     fun onPhraseSelectionChanged(phraseType: ChunkType)
     fun onDictSelectionChanged(dictPath: String)
+    fun onFilterDictSingleWordEntriesChanged()
     fun onFirstItemIndexChanged(index: Int)
     fun onWordDefinitionShown()
 
@@ -168,7 +169,8 @@ interface ArticleVM: Clearable {
         val partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
         val phrases: Set<ChunkType> = emptySet(),
         val cardSetWords: Boolean = true,
-        val dicts: List<String> = emptyList()
+        val dicts: List<String> = emptyList(),
+        val filterDictSingleWordEntries: Boolean = false,
     ) : Parcelable
 
     data class AnnotationChooserState(
@@ -289,7 +291,15 @@ open class ArticleVMImpl(
 
         val actualDicts = selectionState.dicts.mapNotNull { s -> dicts.firstOrNull { it.path.name == s } }
         val dictAnnotationResolver = DictAnnotationResolver()
-        val dictAnnotations = dictAnnotationResolver.resolve(actualDicts, sentence, phrases)
+        val dictAnnotations = dictAnnotationResolver.resolve(actualDicts, sentence, phrases).run {
+            if (selectionState.filterDictSingleWordEntries) {
+                filter {
+                    it.entry.word.contains(' ') // contains word delimiter
+                }
+            } else {
+                this
+            }
+        }
 
         return progressAndPartOfSpeechAnnotations + phraseAnnotations + dictAnnotations
     }
@@ -436,6 +446,12 @@ open class ArticleVMImpl(
                     it.dicts.plus(dictPath)
                 }
             )
+        }
+    }
+
+    override fun onFilterDictSingleWordEntriesChanged() {
+        stateController.updateSelectionState {
+            it.copy(filterDictSingleWordEntries = !it.filterDictSingleWordEntries)
         }
     }
 

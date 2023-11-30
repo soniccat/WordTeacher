@@ -10,7 +10,7 @@ class DictAnnotationResolver {
     fun resolve(
         actualDicts: List<Dict>,
         sentence: NLPSentence,
-        phrases: List<PhraseSpan>
+        phrases: List<PhraseSpan>,
     ): List<ArticleAnnotation.DictWord> {
         val dictAnnotations = actualDicts.map { dict ->
             val annotations = mutableListOf<ArticleAnnotation.DictWord>()
@@ -90,7 +90,6 @@ class DictAnnotationResolver {
                             dict = dict
                         )
                     )
-                    //i = it.first // as phrases may overlap
                 }
 
                 ++i
