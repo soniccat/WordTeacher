@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,7 +24,13 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
@@ -67,6 +74,7 @@ import kotlinx.coroutines.launch
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.v
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -94,15 +102,9 @@ fun ArticleUI(
 
     var lastDownPoint: Offset by remember { mutableStateOf(Offset.Zero) }
     BoxWithConstraints(
-        modifier = Modifier.pointerInput(Unit) {
-            awaitEachGesture {
-                val down = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial)
-                down.changes.lastOrNull()?.let {
-                    coroutineScope.launch {
-                        delay(100) // HACK: without it detectTapGestures won't catch taps, somehow connected with recomposition on lastDownPoint changes
-                        lastDownPoint = it.position
-                    }
-                }
+        modifier = Modifier.pointerInput(Unit){
+            interceptTap {
+                lastDownPoint = it
             }
         },
     ) {
@@ -149,9 +151,15 @@ fun ArticleUI(
                         )
                     ) {
                         items(data) { item ->
-                            ParagraphViewItem(item) { sentence, offset ->
-                                vm.onTextClicked(sentence, offset)
-                            }
+                            ParagraphViewItem(
+                                item,
+                                { sentence, offset ->
+                                    vm.onTextClicked(sentence, offset)
+                                },
+                                { sentence, offset ->
+                                    vm.onTextLongPressed(sentence, offset)
+                                },
+                            )
                         }
                     }
                 } else {
@@ -186,6 +194,42 @@ fun ArticleUI(
                 }
             }
         }
+    }
+}
+
+suspend fun PointerInputScope.interceptTap(
+    pass: PointerEventPass = PointerEventPass.Initial,
+    onTap: ((Offset) -> Unit)? = null,
+) = coroutineScope {
+    if (onTap == null) return@coroutineScope
+
+    awaitEachGesture {
+        val down = awaitFirstDown(pass = pass)
+//        onTap(down.position)
+        val downTime = System.currentTimeMillis()
+        val tapTimeout = viewConfiguration.longPressTimeoutMillis
+        val tapPosition = down.position
+
+        do {
+            val event = awaitPointerEvent(pass)
+            val currentTime = System.currentTimeMillis()
+
+            if (event.changes.size != 1) break // More than one event: not a tap
+            if (currentTime - downTime >= tapTimeout) break // Too slow: not a tap
+
+            val change = event.changes[0]
+//            if (change.id == down.id && change.pressed) {
+//                onTap(change.position)
+//                break
+//            }
+
+            // Too much movement: not a tap
+            if ((change.position - tapPosition).getDistance() > viewConfiguration.touchSlop) break
+
+            if (change.id == down.id && !change.pressed) {
+                onTap(change.position)
+            }
+        } while (event.changes.any { it.id == down.id && it.pressed })
     }
 }
 
@@ -339,9 +383,10 @@ private fun ArticleTopBar(
 @Composable
 fun ParagraphViewItem(
     item: BaseViewItem<*>,
-    onSentenceClick: (sentence: NLPSentence, offset: Int) -> Unit
+    onSentenceClick: (sentence: NLPSentence, offset: Int) -> Unit,
+    onSentenceLongPressed: (sentence: NLPSentence, offset: Int) -> Unit,
 ) = when (item) {
-    is ParagraphViewItem -> ArticleParagraphView(item, onSentenceClick)
+    is ParagraphViewItem -> ArticleParagraphView(item, onSentenceClick, onSentenceLongPressed)
     else -> {
         Text(
             text = "unknown item $item"
@@ -352,7 +397,8 @@ fun ParagraphViewItem(
 @Composable
 private fun ArticleParagraphView(
     paragraphViewItem: ParagraphViewItem,
-    onSentenceClick: (sentence: NLPSentence, offset: Int) -> Unit
+    onSentenceClick: (sentence: NLPSentence, offset: Int) -> Unit,
+    onSentenceLongPressed: (sentence: NLPSentence, offset: Int) -> Unit,
 ) {
     val density = LocalDensity.current
     val isDarkTheme = LocalIsDarkTheme.current
@@ -397,7 +443,19 @@ private fun ArticleParagraphView(
             modifier = Modifier
                 .fillMaxWidth()
                 .pointerInput(onSentenceClick) {
-                    detectTapGestures { pos ->
+                    detectTapGestures(
+                        onLongPress = { pos ->
+                            val v = textLayoutResult
+                            if (v is TextLayoutResult) {
+                                textLayoutResult.let { layoutResult ->
+                                    val offset = v.getOffsetForPosition(pos)
+                                    findSentence(paragraphViewItem, offset)?.let { (sentence, offset) ->
+                                        onSentenceLongPressed(sentence, offset)
+                                    }
+                                }
+                            }
+                        }
+                    ) { pos ->
                         val v = textLayoutResult
                         if (v is TextLayoutResult) {
                             textLayoutResult.let { layoutResult ->

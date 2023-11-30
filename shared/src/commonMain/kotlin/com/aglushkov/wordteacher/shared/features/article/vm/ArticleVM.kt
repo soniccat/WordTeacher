@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.article.vm
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
-import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsContext
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsWordContext
@@ -29,7 +28,6 @@ import com.russhwolf.settings.coroutines.FlowSettings
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -48,6 +46,7 @@ interface ArticleVM: Clearable {
     fun onWordDefinitionHidden()
     fun onBackPressed()
     fun onTextClicked(sentence: NLPSentence, offset: Int)
+    fun onTextLongPressed(sentence: NLPSentence, offset: Int)
     fun onAnnotationChooserClicked(index: Int?)
     fun onTryAgainClicked()
     fun onCardSetWordSelectionChanged()
@@ -362,11 +361,19 @@ open class ArticleVMImpl(
             }
 
             val firstAnnotation = annotations.firstOrNull()
-            showAnnotationClicked(firstAnnotation, sentence, slice)
+            showDefinition(firstAnnotation, sentence, slice)
         }
     }
 
-    private fun showAnnotationClicked(
+    override fun onTextLongPressed(sentence: NLPSentence, offset: Int) {
+        // get the direct word below
+        val slice = sentence.sliceFromTextIndex(offset, true)
+        if (slice != null && slice.tokenSpan.length > 1 && annotations.value.isNotEmpty()) {
+            showDefinition(null, sentence, slice)
+        }
+    }
+
+    private fun showDefinition(
         firstAnnotation: ArticleAnnotation.DictWord?,
         sentence: NLPSentence,
         slice: NLPSentenceSlice,
@@ -401,7 +408,7 @@ open class ArticleVMImpl(
         stateController.updateAnnotationChooserState { null }
 
         annotation?.let { a ->
-            showAnnotationClicked(a, chooserState.sentence, chooserState.sentenceSlice)
+            showDefinition(a, chooserState.sentence, chooserState.sentenceSlice)
         }
     }
 
