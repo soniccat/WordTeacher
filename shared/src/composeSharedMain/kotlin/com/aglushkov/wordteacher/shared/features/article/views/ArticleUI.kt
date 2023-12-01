@@ -103,8 +103,11 @@ fun ArticleUI(
     var lastDownPoint: Offset by remember { mutableStateOf(Offset.Zero) }
     BoxWithConstraints(
         modifier = Modifier.pointerInput(Unit){
-            interceptTap {
-                lastDownPoint = it
+            awaitEachGesture {
+                val down = awaitFirstDown(pass = PointerEventPass.Initial)
+                awaitPointerEvent(PointerEventPass.Initial)
+                // have to put this line after awaitPointerEvent, otherwise coming recomposition breaks detectTapGestures in children
+                lastDownPoint = down.position
             }
         },
     ) {
@@ -194,42 +197,6 @@ fun ArticleUI(
                 }
             }
         }
-    }
-}
-
-suspend fun PointerInputScope.interceptTap(
-    pass: PointerEventPass = PointerEventPass.Initial,
-    onTap: ((Offset) -> Unit)? = null,
-) = coroutineScope {
-    if (onTap == null) return@coroutineScope
-
-    awaitEachGesture {
-        val down = awaitFirstDown(pass = pass)
-//        onTap(down.position)
-        val downTime = System.currentTimeMillis()
-        val tapTimeout = viewConfiguration.longPressTimeoutMillis
-        val tapPosition = down.position
-
-        do {
-            val event = awaitPointerEvent(pass)
-            val currentTime = System.currentTimeMillis()
-
-            if (event.changes.size != 1) break // More than one event: not a tap
-            if (currentTime - downTime >= tapTimeout) break // Too slow: not a tap
-
-            val change = event.changes[0]
-//            if (change.id == down.id && change.pressed) {
-//                onTap(change.position)
-//                break
-//            }
-
-            // Too much movement: not a tap
-            if ((change.position - tapPosition).getDistance() > viewConfiguration.touchSlop) break
-
-            if (change.id == down.id && !change.pressed) {
-                onTap(change.position)
-            }
-        } while (event.changes.any { it.id == down.id && it.pressed })
     }
 }
 
