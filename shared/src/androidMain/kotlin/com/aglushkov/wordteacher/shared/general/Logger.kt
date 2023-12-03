@@ -1,12 +1,12 @@
 package com.aglushkov.wordteacher.shared.general
 
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.LoggerConfig
 
 actual class Logger {
     actual companion object {}
 
-    actual fun setupDebug() {
-        Napier.base(DebugAntilog())
+    actual fun setupDebug(config: LoggerConfig) {
+        co.touchlab.kermit.Logger.setMinSeverity(config.minSeverity)
+        co.touchlab.kermit.Logger.setLogWriters(config.logWriterList)
     }
 }

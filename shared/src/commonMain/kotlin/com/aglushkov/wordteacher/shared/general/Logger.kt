@@ -1,21 +1,21 @@
 package com.aglushkov.wordteacher.shared.general
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.LoggerConfig
 import kotlinx.datetime.Clock
 
 expect class Logger {
     // TODO: consider using a variable instead of a singleton
     companion object {}
 
-    fun setupDebug()
+    fun setupDebug(config: LoggerConfig)
 }
 
 fun Logger.Companion.v(message: String, tag: String? = null) {
-    Napier.v(message, tag = tag)
+    co.touchlab.kermit.Logger.v(message, tag = tag.orEmpty())
 }
 
 fun Logger.Companion.e(message: String, tag: String? = null) {
-    Napier.e(message, tag = tag)
+    co.touchlab.kermit.Logger.e(message, tag = tag.orEmpty())
 }
 
 fun Logger.Companion.exception(e: Throwable, tag: String? = null) {

@@ -67,14 +67,9 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.compose.localized
-import io.github.aakira.napier.Napier
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.v
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

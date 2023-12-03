@@ -28,7 +28,7 @@ essenty = "0.2.2"
 coroutines = "1.7.3"
 ktor = "2.2.2"
 okio = "3.0.0"
-napier = "2.6.1"
+kermit = "2.0.2"
 uuid = "0.3.0"
 junit = "4.13.2"
 stately = "1.2.0"
@@ -110,7 +110,7 @@ mockitoKotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "m
 
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okioFakeFileSystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
-logger = { module = "io.github.aakira:napier", version.ref = "napier" }
+logger = { module = "co.touchlab:kermit", version.ref = "kermit" }
 junit = { module = "junit:junit", version.ref = "junit" }
 
 mokoResourcesLib = { module = "dev.icerock.moko:resources", version.ref = "mokoResources"}

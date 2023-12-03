@@ -34,7 +34,6 @@ import dagger.Provides
 import io.ktor.client.*
 import io.ktor.client.plugins.cookies.*
 import okio.Path
-import opennlp.tools.namefind.BilouCodec
 
 @Module
 class SharedAppModule {
@@ -305,5 +304,24 @@ class SharedAppModule {
     @Provides
     fun timeSource(): TimeSource {
         return TimeSourceImpl()
+    }
+
+    @AppComp
+    @Provides
+    fun fileLogger(
+        @BasePath basePath: Path,
+        fileSystem: FileSystem,
+        timeSource: TimeSource,
+    ): FileLogger {
+        val dirPath = basePath.div("logs")
+        if (!fileSystem.exists(dirPath)) {
+            fileSystem.createDirectory(dirPath)
+        }
+
+        return FileLogger(
+            dirPath,
+            fileSystem,
+            timeSource,
+        )
     }
 }

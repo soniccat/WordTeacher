@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="api_base_url">http://193.168.0.1</string>
+    <string name="api_base_url">http://192.168.0.78:9090</string>
     <string name="app_name">WordTeacher</string>
     <string name="tab_definitions">Words</string>
     <string name="tab_add_article">New Article</string>

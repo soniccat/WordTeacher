@@ -1,12 +1,16 @@
 package com.aglushkov.wordteacher.android_app
 
 import android.app.Application
+import co.touchlab.kermit.CommonWriter
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.StaticConfig
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.android_app.di.DaggerAppComponent
 import com.aglushkov.wordteacher.android_app.di.GeneralModule
 import com.aglushkov.wordteacher.android_app.general.ActivityVisibilityResolver
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
+import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
@@ -30,15 +34,22 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var databaseCardWorker: DatabaseCardWorker
     @Inject lateinit var cookieStorage: CookiesStorage
 
+    @Inject lateinit var fileLogger: FileLogger
+
     override fun onCreate() {
         super.onCreate()
-
-        Logger().setupDebug()
 
         appComponent = DaggerAppComponent.builder()
             .generalModule(GeneralModule(this))
             .build()
         appComponent.injectApplication(this)
+
+        Logger().setupDebug(
+            StaticConfig(
+                Severity.Verbose,
+                listOf(CommonWriter(), fileLogger),
+            )
+        )
 
         routerResolver.attach()
         activityVisibilityResolver.listener = this

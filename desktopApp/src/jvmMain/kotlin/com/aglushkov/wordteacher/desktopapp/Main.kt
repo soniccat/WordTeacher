@@ -10,6 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import co.touchlab.kermit.CommonWriter
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.StaticConfig
 import com.aglushkov.wordteacher.desktopapp.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.desktopapp.di.DaggerAppComponent
 import com.aglushkov.wordteacher.desktopapp.features.webauth.WebAuthUI
@@ -65,7 +68,12 @@ private val bottomBarTabs = listOf(
 )
 
 fun main() {
-    Logger().setupDebug()
+    Logger().setupDebug(
+        StaticConfig(
+            Severity.Verbose,
+            listOf(CommonWriter()),
+        )
+    )
     System.setProperty("apple.awt.application.appearance", "system") // for system light/dark mode
 
     application {

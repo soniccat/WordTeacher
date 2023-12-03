@@ -40,7 +40,7 @@ kotlin {
                 implementation(libs.coroutinesCommon)
                 api(libs.okio)
                 implementation(libs.kotlinxDateTime)
-                implementation(libs.logger)
+                api(libs.logger)
                 implementation(libs.sqlDelightRuntime)
                 implementation(libs.uuid)
                 implementation(libs.essentyParcelable)
