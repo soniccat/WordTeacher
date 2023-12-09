@@ -87,6 +87,8 @@
     <string name="settings_auth_signin">Sign In</string>
     <string name="settings_auth_signout">Sign Out</string>
     <string name="settings_dictconfigs">Dict Configs</string>
+    <string name="settings_logging_enabled">Enable logging</string>
+    <string name="settings_logging_share">Share log</string>
 
     <string name="dictconfigs_yandex_title">Yandex</string>
     <string name="dictconfigs_yandex_api_token_exists_placeholder">type to change api token</string>

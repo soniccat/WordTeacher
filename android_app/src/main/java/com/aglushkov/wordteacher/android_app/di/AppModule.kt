@@ -7,12 +7,15 @@ import com.aglushkov.wordteacher.android_app.BuildConfig
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.features.add_article.ContentProviderRepository
 import com.aglushkov.wordteacher.android_app.features.add_article.toArticleContentExtractor
+import com.aglushkov.wordteacher.android_app.features.settings.FileSharerRepository
+import com.aglushkov.wordteacher.android_app.features.settings.toFileSharer
 import com.aglushkov.wordteacher.android_app.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -122,6 +125,12 @@ class AppModule {
             ArticleParserRepository().toArticleContentExtractor(),
             ContentProviderRepository(context).toArticleContentExtractor(),
         )
+    }
+
+    @AppComp
+    @Provides
+    fun fileSharer(context: Context): FileSharer {
+        return FileSharerRepository(context).toFileSharer()
     }
 
     // Features

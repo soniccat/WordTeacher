@@ -380,16 +380,16 @@ open class ArticleVMImpl(
     ) {
         val resultWord = firstAnnotation?.entry?.word ?: slice.tokenString
         val resultPartOfSpeech = firstAnnotation?.entry?.partOfSpeech ?: slice.partOfSpeech()
-        val resultPartOfSpeechList =
-            if (resultPartOfSpeech == WordTeacherWord.PartOfSpeech.PhrasalVerb) {
-                listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.Verb)
-            } else {
-                listOf(resultPartOfSpeech)
-            }
+        val resultPartOfSpeechList = when(resultPartOfSpeech) {
+            // undefined to show dict results
+            WordTeacherWord.PartOfSpeech.PhrasalVerb -> listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.Verb, WordTeacherWord.PartOfSpeech.Undefined)
+            WordTeacherWord.PartOfSpeech.Undefined -> listOf()
+            else -> listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.Undefined)
+        }
 
         definitionsVM.onWordSubmitted(
             resultWord,
-            resultPartOfSpeechList + WordTeacherWord.PartOfSpeech.Undefined, // undefined to show dict result,
+            resultPartOfSpeechList,
             DefinitionsContext(
                 wordContexts = mapOf(
                     resultPartOfSpeech to DefinitionsWordContext(

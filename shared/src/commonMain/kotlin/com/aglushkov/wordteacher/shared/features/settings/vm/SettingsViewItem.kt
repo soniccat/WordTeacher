@@ -6,6 +6,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import okio.Path
 
 
 class SettingsViewTitleItem(title: StringDesc): BaseViewItem<StringDesc>(title, Type) {
@@ -46,4 +47,15 @@ class SettingsOpenDictConfigsItem: BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 1004
     }
+}
+
+class SettingsLogsConfigsItem(
+    val isEnabled: Boolean,
+    val paths: List<LogFileItem>
+): BaseViewItem<Boolean>(isEnabled, Type) {
+    companion object {
+        const val Type = 1005
+    }
+
+    data class LogFileItem(val path: Path)
 }

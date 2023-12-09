@@ -19,6 +19,7 @@ import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.dict.DictFactory
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepositoryImpl
+import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
@@ -322,6 +323,25 @@ class SharedAppModule {
             dirPath,
             fileSystem,
             timeSource,
+        )
+    }
+
+    @AppComp
+    @Provides
+    fun logsRepository(
+        @BasePath basePath: Path,
+        fileSystem: FileSystem,
+        settings: FlowSettings
+    ): LogsRepository {
+        val dirPath = basePath.div("logs")
+        if (!fileSystem.exists(dirPath)) {
+            fileSystem.createDirectory(dirPath)
+        }
+
+        return LogsRepository(
+            settings,
+            dirPath,
+            fileSystem,
         )
     }
 }

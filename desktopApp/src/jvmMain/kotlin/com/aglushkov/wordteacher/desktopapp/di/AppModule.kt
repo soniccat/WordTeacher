@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.di.SharedAppModule
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
@@ -145,5 +146,11 @@ class AppModule {
         return arrayOf(
             ArticleParserRepository().toArticleContentExtractor(),
         )
+    }
+
+    @AppComp
+    @Provides
+    fun fileSharer(): FileSharer? {
+        return null
     }
 }

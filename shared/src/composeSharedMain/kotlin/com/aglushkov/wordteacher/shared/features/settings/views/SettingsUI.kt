@@ -16,6 +16,8 @@ import com.aglushkov.wordteacher.shared.features.settings.vm.*
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.views.AddIcon
+import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -110,6 +112,52 @@ private fun showSettingsItem(
                 Text(stringResource(MR.strings.settings_dictconfigs))
             },
         )
+    }
+    is SettingsLogsConfigsItem -> {
+        CustomListItem(
+            modifier = Modifier.padding(
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+                bottom = LocalDimens.current.contentPadding
+            )
+                .clickable {
+                    vm.onLoggingIsEnabledChanged()
+                },
+            trailing = {
+                Checkbox(
+                    checked = item.isEnabled,
+                    onCheckedChange = null
+                )
+            },
+            content = { Text(stringResource(MR.strings.settings_logging_enabled)) },
+        )
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            var expanded by remember { mutableStateOf(false) }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                item.paths.map { logFileItem ->
+                    DropdownMenuItem(
+                        onClick = {
+                            vm.onLogFileShareClicked(logFileItem.path)
+                            expanded = false
+                        }
+                    ) {
+                        Text(logFileItem.path.name)
+                    }
+                }
+            }
+            Button(
+                onClick = { expanded = true },
+                modifier = Modifier.padding(
+                    start = LocalDimens.current.contentPadding,
+                )
+            ) {
+                Text(stringResource(MR.strings.settings_logging_share))
+            }
+        }
     }
     else -> {
         Text(

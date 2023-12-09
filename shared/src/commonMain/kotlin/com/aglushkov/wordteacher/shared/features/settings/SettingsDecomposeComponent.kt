@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.settings
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
+import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -12,6 +13,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
@@ -24,14 +26,18 @@ class SettingsDecomposeComponent (
     state: SettingsVM.State,
     connectivityManager: ConnectivityManager,
     spaceAuthRepository: SpaceAuthRepository,
+    logsRepository: LogsRepository,
     idGenerator: IdGenerator,
-    isDebug: Boolean
+    isDebug: Boolean,
+    fileSharer: FileSharer?,
 ) : SettingsVMImpl(
     state,
     connectivityManager,
     spaceAuthRepository,
+    logsRepository,
     idGenerator,
     isDebug,
+    fileSharer,
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
