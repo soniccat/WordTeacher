@@ -99,12 +99,14 @@ open class SettingsVMImpl (
         }
 
         resultItems += SettingsOpenDictConfigsItem()
-
-        if (canShareLogs) {
-            resultItems += SettingsLogsConfigsItem(
-                isLoggingEnabled,
-                logsRepository.logPaths().map { SettingsLogsConfigsItem.LogFileItem(it) })
-        }
+        resultItems += SettingsLogsConfigsItem(
+            isLoggingEnabled,
+            if (canShareLogs) {
+                logsRepository.logPaths().map { SettingsLogsConfigsItem.LogFileItem(it) }
+            } else {
+                emptyList()
+            }
+        )
 
         generateIds(resultItems)
         return resultItems

@@ -54,6 +54,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileWriter
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
@@ -68,12 +69,6 @@ private val bottomBarTabs = listOf(
 )
 
 fun main() {
-    Logger().setupDebug(
-        StaticConfig(
-            Severity.Verbose,
-            listOf(CommonWriter()),
-        )
-    )
     System.setProperty("apple.awt.application.appearance", "system") // for system light/dark mode
 
     application {
@@ -85,6 +80,13 @@ fun main() {
         )
         val appComponent = DaggerAppComponent.builder()
             .build()
+
+        Logger().setupDebug(
+            StaticConfig(
+                Severity.Verbose,
+                listOf(CommonWriter(), appComponent.fileLogger()),
+            )
+        )
 
         // declared here to force initialization on startup
         var databaseCardWorker = appComponent.databaseCardSetWorker()

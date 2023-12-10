@@ -313,6 +313,7 @@ class SharedAppModule {
         @BasePath basePath: Path,
         fileSystem: FileSystem,
         timeSource: TimeSource,
+        logsRepository: LogsRepository,
     ): FileLogger {
         val dirPath = basePath.div("logs")
         if (!fileSystem.exists(dirPath)) {
@@ -323,6 +324,7 @@ class SharedAppModule {
             dirPath,
             fileSystem,
             timeSource,
+            isEnabledProvider = { logsRepository.isLoggingEnabledState.value }
         )
     }
 

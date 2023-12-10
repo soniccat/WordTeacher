@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDepen
 import com.aglushkov.wordteacher.shared.features.dict_configs.di.DictConfigsDependencies
 import com.aglushkov.wordteacher.shared.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.shared.features.webauth.di.WebAuthDependencies
+import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
@@ -42,6 +43,7 @@ interface AppComponent:
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
     fun routerResolver(): RouterResolver
     fun googleAuthController(): GoogleAuthController
+    fun fileLogger(): FileLogger
 
     @IsDebug
     override fun isDebug(): Boolean

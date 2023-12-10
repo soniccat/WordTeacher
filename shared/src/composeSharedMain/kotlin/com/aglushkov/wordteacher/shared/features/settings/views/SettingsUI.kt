@@ -132,31 +132,35 @@ private fun showSettingsItem(
             content = { Text(stringResource(MR.strings.settings_logging_enabled)) },
         )
 
-        Box(modifier = Modifier.fillMaxWidth()) {
-            var expanded by remember { mutableStateOf(false) }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                item.paths.map { logFileItem ->
-                    DropdownMenuItem(
-                        onClick = {
-                            vm.onLogFileShareClicked(logFileItem.path)
-                            expanded = false
+        if (item.paths.isNotEmpty()) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                var expanded by remember { mutableStateOf(false) }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    item.paths.map { logFileItem ->
+                        DropdownMenuItem(
+                            onClick = {
+                                vm.onLogFileShareClicked(logFileItem.path)
+                                expanded = false
+                            }
+                        ) {
+                            Text(logFileItem.path.name)
                         }
-                    ) {
-                        Text(logFileItem.path.name)
                     }
                 }
+                Button(
+                    onClick = { expanded = true },
+                    modifier = Modifier.padding(
+                        start = LocalDimens.current.contentPadding,
+                    )
+                ) {
+                    Text(stringResource(MR.strings.settings_logging_share))
+                }
             }
-            Button(
-                onClick = { expanded = true },
-                modifier = Modifier.padding(
-                    start = LocalDimens.current.contentPadding,
-                )
-            ) {
-                Text(stringResource(MR.strings.settings_logging_share))
-            }
+        } else {
+            Unit
         }
     }
     else -> {

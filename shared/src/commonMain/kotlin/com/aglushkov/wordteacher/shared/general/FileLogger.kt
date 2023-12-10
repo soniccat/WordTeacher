@@ -24,6 +24,7 @@ open class FileLogger(
     private val dirPath: Path,
     private val fileSystem: FileSystem,
     private val timeSource: TimeSource,
+    private val isEnabledProvider: () -> Boolean,
     private val formatter: MessageStringFormatter = DefaultFormatter,
 ) : LogWriter() {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -51,9 +52,11 @@ open class FileLogger(
 
     override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
         scope.launch {
-            messageSharedFlow.emit(
-                LogMessage(severity, message, tag, throwable)
-            )
+            if (isEnabledProvider()) {
+                messageSharedFlow.emit(
+                    LogMessage(severity, message, tag, throwable)
+                )
+            }
         }
     }
 
