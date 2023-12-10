@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   nginx:
-    container_name: "apigateway"
+    container_name: "apigateway${TEST_SUFFIX}"
     hostname: "apigateway"
     image: nginx:alpine
     volumes:
@@ -11,7 +11,7 @@ services:
       mongo_net:
         ipv4_address: 172.16.0.12
     ports:
-      - 9090:9090
+      - '${API_GATEWAY_PORT}:${API_GATEWAY_PORT}'
     environment:
       - AUTH_PORT=${AUTH_PORT}
       - CARDSETS_PORT=${CARDSETS_PORT}

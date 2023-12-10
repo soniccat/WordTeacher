@@ -35,6 +35,10 @@ func New(logger *logger.Logger, mongoClient *mongo.Client) *Repository {
 	return model
 }
 
+func (m *Repository) DropAll(context context.Context) error {
+	return m.CardSetCollection.Drop(context)
+}
+
 func (m *Repository) FindCardSetByCreationId(
 	context context.Context,
 	creationId string,

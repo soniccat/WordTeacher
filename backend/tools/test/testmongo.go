@@ -14,8 +14,8 @@ func NewTestMongo() *TestMongo {
 	testMongo := &TestMongo{
 		logger: logger.New(true),
 	}
-	err := mongowrapper.SetupMongo(
-		testMongo,
+
+	mw, err := mongowrapper.New(
 		"mongodb://127.0.0.1:27018/?directConnection=true&replicaSet=rs0",
 		false,
 	)
@@ -23,6 +23,7 @@ func NewTestMongo() *TestMongo {
 		panic(err)
 	}
 
+	testMongo.mongoWrapper = mw
 	return testMongo
 }
 

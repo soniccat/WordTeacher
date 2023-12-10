@@ -60,6 +60,7 @@ type DbCardSet struct {
 	CreationDate     primitive.DateTime  `bson:"creationDate"`
 	ModificationDate primitive.DateTime  `bson:"modificationDate"`
 	CreationId       string              `bson:"creationId"`
+	IsDeleted        bool                `bson:"isDeleted"`
 }
 
 func (cs *DbCardSet) ToApi() *api.CardSet {
