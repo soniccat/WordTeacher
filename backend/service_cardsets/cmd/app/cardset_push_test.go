@@ -344,6 +344,62 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 }
 
+func (suite *CardSetPushTestSuite) TestCardSetPush_PushEmptyChangesWithOldDate_ReturnsStatusConflict() {
+	t := time.Now()
+	card1 := createApiCard(suite.CreateUUID().String())
+	card1.Term = "my term"
+	card1.ModificationDate = tools.TimeToApiDate(t)
+	card2 := createApiCard(suite.CreateUUID().String())
+	newCardSet := createApiCardSet(
+		"newTestCardSet",
+		suite.CreateUUID().String(),
+		t,
+		[]*api.Card{
+			card1,
+			card2,
+		},
+	)
+
+	userId := tools.Ptr(primitive.NewObjectID())
+	_, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), newCardSet, userId)
+	if errWithCode != nil {
+		suite.T().Fatal(errWithCode.Err)
+	}
+
+	suite.setupPushValidator(userId)
+	cardSetPushHandler := routing.NewCardSetPushHandler(
+		suite.application.logger,
+		suite.application.sessionValidator,
+		suite.application.cardSetRepository,
+	)
+
+	// client1 updates card
+	card1.Term = "my term 2"
+	card1.ModificationDate = tools.TimeToApiDate(t.Add(time.Minute * time.Duration(4)))
+	newCardSet.Cards = []*api.Card{card1, card2}
+	newCardSet.ModificationDate = tools.TimeToApiDate(t.Add(time.Minute * time.Duration(4)))
+	reqUpdate := suite.createPushRequest(
+		tools.Ptr(t.Add(time.Minute*time.Duration(2))),
+		routing.CardSetPushInput{UpdatedCardSets: []*api.CardSet{
+			newCardSet,
+		}, CurrentCardSetIds: []string{newCardSet.Id}},
+	)
+	reqUpdateWriter := httptest.NewRecorder()
+	cardSetPushHandler.CardSetPush(reqUpdateWriter, reqUpdate)
+	assert.Equal(suite.T(), http.StatusOK, reqUpdateWriter.Code)
+
+	// client2 pushes nothing
+	reqPushEmpty := suite.createPushRequest(
+		tools.Ptr(t.Add(time.Minute*time.Duration(3))),
+		routing.CardSetPushInput{UpdatedCardSets: []*api.CardSet{}, CurrentCardSetIds: []string{newCardSet.Id}},
+	)
+
+	reqPushEmptyWriter := httptest.NewRecorder()
+	cardSetPushHandler.CardSetPush(reqPushEmptyWriter, reqPushEmpty)
+
+	assert.Equal(suite.T(), http.StatusConflict, reqPushEmptyWriter.Code)
+}
+
 // Tools
 
 func (suite *CardSetPushTestSuite) loadCardSetDbById(id string) *model.DbCardSet {

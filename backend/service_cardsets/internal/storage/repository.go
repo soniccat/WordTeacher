@@ -260,11 +260,12 @@ func (m *Repository) DeleteByIds(
 func (m *Repository) MarkAsDeletedByIds(
 	ctx context.Context,
 	ids []primitive.ObjectID,
+	modificationDate time.Time,
 ) error {
 	_, err := m.CardSetCollection.UpdateMany(
 		ctx,
 		bson.M{"_id": bson.M{"$in": ids}},
-		bson.M{"$set": bson.M{"isDeleted": true}},
+		bson.M{"$set": bson.M{"isDeleted": true, "modificationDate": modificationDate}},
 	)
 	if err != nil {
 		return err

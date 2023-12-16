@@ -33,14 +33,16 @@ type CardSetPushInput struct {
 }
 
 type CardSetPushResponse struct {
-	CardSetIds map[string]string `json:"cardSetIds,omitempty"` // deduplication id to primitive.ObjectID
-	CardIds    map[string]string `json:"cardIds,omitempty"`    // deduplication id to primitive.ObjectID
+	CardSetIds             map[string]string `json:"cardSetIds,omitempty"`   // deduplication id to primitive.ObjectID
+	CardIds                map[string]string `json:"cardIds,omitempty"`      // deduplication id to primitive.ObjectID
+	LatestModificationDate string            `json:"latestModificationDate"` // includes deleted cardSet modificationDate
 }
 
 func NewCardSetSyncResponse() *CardSetPushResponse {
 	return &CardSetPushResponse{
 		make(map[string]string),
 		make(map[string]string),
+		"",
 	}
 }
 
@@ -181,7 +183,7 @@ func (h *CardSetPushHandler) CardSetPush(w http.ResponseWriter, r *http.Request)
 				return nil, sErr
 			}
 
-			sErr = h.cardSetRepository.MarkAsDeletedByIds(sCtx, deletedIds)
+			sErr = h.cardSetRepository.MarkAsDeletedByIds(sCtx, deletedIds, time.Now())
 			if sErr != nil {
 				return nil, sErr
 			}

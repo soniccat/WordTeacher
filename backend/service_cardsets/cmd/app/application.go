@@ -10,7 +10,7 @@ import (
 )
 
 type application struct {
-	mongowrapper.MongoApp
+	mongowrapper.MongoEnv
 	logger            *logger.Logger
 	sessionManager    *scs.SessionManager
 	cardSetRepository *storage.Repository
@@ -25,7 +25,7 @@ func createApplication(
 	sessionValidator session_validator.SessionValidator,
 ) (_ *application, err error) {
 	app := &application{
-		MongoApp:         mongowrapper.NewMongoApp(logger),
+		MongoEnv:         mongowrapper.NewMongoEnv(logger),
 		logger:           logger,
 		sessionManager:   sessionManager,
 		sessionValidator: sessionValidator,

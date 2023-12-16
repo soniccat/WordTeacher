@@ -14,7 +14,7 @@ import (
 )
 
 type application struct {
-	mongowrapper.MongoApp
+	mongowrapper.MongoEnv
 	ctx                     context.Context
 	logger                  *logger.Logger
 	sessionManager          *scs.SessionManager
@@ -33,7 +33,7 @@ func createApplication(
 	cardSetsClient cardsets_client.Contract,
 ) (_ *application, err error) {
 	app := &application{
-		MongoApp:         mongowrapper.NewMongoApp(logger),
+		MongoEnv:         mongowrapper.NewMongoEnv(logger),
 		ctx:              ctx,
 		logger:           logger,
 		sessionManager:   sessionManager,

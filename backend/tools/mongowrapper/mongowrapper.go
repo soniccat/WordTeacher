@@ -80,18 +80,18 @@ func (mw *MongoWrapper) Stop() error {
 	return nil
 }
 
-type MongoApp struct {
+type MongoEnv struct {
 	MongoWrapper *MongoWrapper
 	Logger       *logger.Logger
 }
 
-func NewMongoApp(logger *logger.Logger) MongoApp {
-	return MongoApp{
+func NewMongoEnv(logger *logger.Logger) MongoEnv {
+	return MongoEnv{
 		Logger: logger,
 	}
 }
 
-func (m *MongoApp) SetupMongo(mongoURI string, enableCredentials bool) error {
+func (m *MongoEnv) SetupMongo(mongoURI string, enableCredentials bool) error {
 	mongoWrapper, err := New(mongoURI, enableCredentials)
 	if err != nil {
 		m.Logger.Error.Printf("createMongoWrapper failed: %s\n", err.Error())
@@ -107,7 +107,7 @@ func (m *MongoApp) SetupMongo(mongoURI string, enableCredentials bool) error {
 	return nil
 }
 
-func (m *MongoApp) StopMongo() {
+func (m *MongoEnv) StopMongo() {
 	if m.MongoWrapper != nil {
 		err := m.MongoWrapper.Stop()
 		m.Logger.Error.Printf("mongoWrapper.Stop() failed: %s\n", err.Error())
