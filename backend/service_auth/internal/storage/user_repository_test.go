@@ -21,7 +21,7 @@ func (suite *UserModelTestSuite) SetupTest() {
 	suite.TestMongo = test.NewTestMongo()
 	suite.UserModel = NewUserRepository(
 		suite.TestMongo.GetLogger(),
-		suite.TestMongo.GetMongoWrapper().Client,
+		suite.TestMongo.MongoClient(),
 	)
 }
 

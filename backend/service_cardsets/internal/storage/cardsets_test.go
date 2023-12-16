@@ -5,6 +5,7 @@ import (
 	"context"
 	"testing"
 	"tools"
+	"tools/logger"
 	"tools/test"
 
 	"github.com/stretchr/testify/assert"
@@ -16,15 +17,17 @@ import (
 type CardSetTestSuite struct {
 	suite.Suite
 	CardSetModel *Storage
-	TestMongo    *test.TestMongo
 }
 
 func (suite *CardSetTestSuite) SetupTest() {
-	suite.TestMongo = test.NewTestMongo()
-	suite.CardSetModel, err := New(
-		suite.TestMongo.GetLogger(),
-		suite.TestMongo.GetMongoWrapper().Client,
+	var err error
+	logger := logger.New(true)
+	suite.CardSetModel, err = New(
+		logger,
+		test.ConnectionString,
+		false,
 	)
+
 	if err != nil {
 		suite.T().Fatal(err)
 	}
@@ -43,12 +46,12 @@ func (suite *CardSetTestSuite) TestCreateCardSet() {
 				Synonyms:      []string{"testSyn1", "testSyn2"},
 				Examples:      []string{"testEx1", "testEx2"},
 				DefinitionTermSpans: [][]api.Span{
-					[]api.Span{{1, 2}, {3, 4}},
-					[]api.Span{{5, 6}, {7, 8}},
+					{{1, 2}, {3, 4}},
+					{{5, 6}, {7, 8}},
 				},
 				ExampleTermSpans: [][]api.Span{
-					[]api.Span{{9, 10}, {11, 12}},
-					[]api.Span{{13, 14}, {15, 16}},
+					{{9, 10}, {11, 12}},
+					{{13, 14}, {15, 16}},
 				},
 				CreationId: "fb23d60c-02f9-4bae-be86-8359274e0e4e",
 			},
@@ -57,14 +60,14 @@ func (suite *CardSetTestSuite) TestCreateCardSet() {
 		ModificationDate: "2022-11-03T17:30:02Z",
 		CreationId:       "bf3d4938-3568-4da7-81ad-a2342745adee",
 	}
-	ownerId := primitive.NewObjectID()
+	ownerId := primitive.NewObjectID().Hex()
 
-	insertedCardSet, errWithCode := suite.CardSetModel.InsertCardSet(ctx, cardSet, &ownerId)
+	insertedCardSet, errWithCode := suite.CardSetModel.InsertCardSet(ctx, cardSet, ownerId)
 	assert.Nil(suite.T(), errWithCode)
 	assert.NotNil(suite.T(), insertedCardSet.Id)
-	assert.Equal(suite.T(), ownerId.Hex(), insertedCardSet.UserId)
+	assert.Equal(suite.T(), ownerId, insertedCardSet.UserId)
 	assert.NotNil(suite.T(), insertedCardSet.Cards[0].Id)
-	assert.Equal(suite.T(), ownerId.Hex(), insertedCardSet.Cards[0].UserId)
+	assert.Equal(suite.T(), ownerId, insertedCardSet.Cards[0].UserId)
 
 	loadedCardSetDb, err := suite.CardSetModel.LoadCardSetDbById(ctx, insertedCardSet.Id)
 	assert.NoError(suite.T(), err)
@@ -84,12 +87,12 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 				Synonyms:      []string{"testSyn1", "testSyn2"},
 				Examples:      []string{"testEx1", "testEx2"},
 				DefinitionTermSpans: [][]api.Span{
-					[]api.Span{{1, 2}, {3, 4}},
-					[]api.Span{{5, 6}, {7, 8}},
+					{{1, 2}, {3, 4}},
+					{{5, 6}, {7, 8}},
 				},
 				ExampleTermSpans: [][]api.Span{
-					[]api.Span{{9, 10}, {11, 12}},
-					[]api.Span{{13, 14}, {15, 16}},
+					{{9, 10}, {11, 12}},
+					{{13, 14}, {15, 16}},
 				},
 				CreationId: "fb23d60c-02f9-4bae-be86-8359274e0e4e",
 			},
@@ -98,9 +101,9 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 		ModificationDate: "2022-11-03T17:30:02Z",
 		CreationId:       "bf3d4938-3568-4da7-81ad-a2342745adee",
 	}
-	ownerId := primitive.NewObjectID()
+	ownerId := primitive.NewObjectID().Hex()
 
-	insertedCardSet, errWithCode := suite.CardSetModel.InsertCardSet(ctx, cardSet, &ownerId)
+	insertedCardSet, errWithCode := suite.CardSetModel.InsertCardSet(ctx, cardSet, ownerId)
 	assert.Nil(suite.T(), errWithCode)
 
 	insertedCardSet.Cards = append(
@@ -113,12 +116,12 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 			Synonyms:      []string{"testSyn3", "testSyn4"},
 			Examples:      []string{"testEx3", "testEx4"},
 			DefinitionTermSpans: [][]api.Span{
-				[]api.Span{{10, 20}, {3, 4}},
-				[]api.Span{{50, 60}, {7, 8}},
+				{{10, 20}, {3, 4}},
+				{{50, 60}, {7, 8}},
 			},
 			ExampleTermSpans: [][]api.Span{
-				[]api.Span{{90, 100}, {11, 12}},
-				[]api.Span{{130, 140}, {15, 16}},
+				{{90, 100}, {11, 12}},
+				{{130, 140}, {15, 16}},
 			},
 			CreationId: "1aed98e4-3ec7-403b-8e5e-3d2ca997e5d5",
 		},
