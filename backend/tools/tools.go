@@ -172,6 +172,12 @@ func IdsToMongoIds(ids []string) ([]primitive.ObjectID, error) {
 	})
 }
 
+func MongoIdsToStrings(mongoIds []primitive.ObjectID) []string {
+	return Map(mongoIds, func(i primitive.ObjectID) string {
+		return i.Hex()
+	})
+}
+
 func MapKeys[T comparable, V any](m map[T]V) []T {
 	i := 0
 	keys := make([]T, len(m))

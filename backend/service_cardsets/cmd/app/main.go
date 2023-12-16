@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc"
 
 	"models/session_validator"
+	"service_cardsets/internal/storage"
 	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
 )
 
@@ -30,13 +31,22 @@ func main() {
 	flag.Parse()
 
 	logger := logger.New(*isDebug)
+	storage, err := storage.New(
+		logger,
+		*mongoURI,
+		*enableCredentials,
+	)
+	if err != nil {
+		fmt.Println("app creation error: " + err.Error())
+		return
+	}
+
 	sessionManager := tools.CreateSessionManager(*redisAddress)
 	app, err := createApplication(
 		logger,
 		sessionManager,
-		*mongoURI,
-		*enableCredentials,
 		session_validator.NewSessionManagerValidator(sessionManager),
+		storage,
 	)
 
 	if err != nil {

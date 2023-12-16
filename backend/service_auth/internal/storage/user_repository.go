@@ -66,12 +66,12 @@ func (m *UserRepository) InsertUser(context context.Context, user *models.User) 
 
 func (m *UserRepository) GenerateUserAuthToken(
 	context context.Context,
-	userId *primitive.ObjectID,
+	userDbId string,
 	networkType models.UserNetworkType,
 	deviceType string,
 	deviceId string,
 ) (*models.UserAuthToken, error) {
-	token, err := appUsearAuthToken.GenerateUserAuthToken(userId, networkType, deviceType, deviceId)
+	token, err := appUsearAuthToken.GenerateUserAuthToken(userDbId, networkType, deviceType, deviceId)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (m *UserRepository) insertUserAuthToken(
 	}
 
 	objId := res.InsertedID.(primitive.ObjectID)
+	token.Id = objId.Hex()
 
-	token.Id = &objId
 	return token, nil
 }

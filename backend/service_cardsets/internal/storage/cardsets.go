@@ -19,27 +19,36 @@ import (
 
 var zeroTime = time.Time{}
 
-type Repository struct {
+type Storage struct {
+	mongowrapper.MongoEnv
 	Logger            *logger.Logger
-	MongoClient       *mongo.Client
 	CardSetCollection *mongo.Collection
 }
 
-func New(logger *logger.Logger, mongoClient *mongo.Client) *Repository {
-	model := &Repository{
-		Logger:            logger,
-		MongoClient:       mongoClient,
-		CardSetCollection: mongoClient.Database(mongowrapper.MongoDatabaseCardSets).Collection(mongowrapper.MongoCollectionCardSets),
+func New(
+	logger *logger.Logger,
+	mongoURI string,
+	enableCredentials bool,
+) (*Storage, error) {
+	r := &Storage{
+		MongoEnv: mongowrapper.NewMongoEnv(logger),
+		Logger:   logger,
+	}
+	err := r.SetupMongo(mongoURI, enableCredentials)
+	if err != nil {
+		return nil, err
 	}
 
-	return model
+	r.CardSetCollection = r.Collection(mongowrapper.MongoDatabaseCardSets, mongowrapper.MongoCollectionCardSets)
+
+	return r, nil
 }
 
-func (m *Repository) DropAll(context context.Context) error {
+func (m *Storage) DropAll(context context.Context) error {
 	return m.CardSetCollection.Drop(context)
 }
 
-func (m *Repository) FindCardSetByCreationId(
+func (m *Storage) FindCardSetByCreationId(
 	context context.Context,
 	creationId string,
 ) (*model.DbCardSet, error) {
@@ -60,7 +69,7 @@ func (m *Repository) FindCardSetByCreationId(
 	return &result, nil
 }
 
-func (m *Repository) DeleteCardSet(
+func (m *Storage) DeleteCardSet(
 	ctx context.Context,
 	id *primitive.ObjectID,
 ) error {
@@ -72,7 +81,7 @@ func (m *Repository) DeleteCardSet(
 	return nil
 }
 
-func (m *Repository) UpdateCardSet(
+func (m *Storage) UpdateCardSet(
 	ctx context.Context,
 	cardSet *api.CardSet,
 ) *tools.ErrorWithCode {
@@ -98,33 +107,33 @@ func (m *Repository) UpdateCardSet(
 	return nil
 }
 
-func (m *Repository) LoadCardSetDbById(
+func (m *Storage) LoadCardSetDbById(
 	ctx context.Context,
 	id string,
 ) (*model.DbCardSet, error) {
 	cardSetDbId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, err
+		return nil, tools.NewInvalidIdError(id)
 	}
 
-	return m.LoadCardSetDbByObjectID(ctx, cardSetDbId)
+	return m.loadCardSetDbByObjectID(ctx, cardSetDbId)
 }
 
-func (m *Repository) LoadCardSetDbByObjectID(
+func (m *Storage) loadCardSetDbByObjectID(
 	ctx context.Context,
 	id primitive.ObjectID,
 ) (*model.DbCardSet, error) {
 	return m.loadCardSetDb(ctx, bson.M{"_id": id})
 }
 
-func (m *Repository) LoadCardSetDbByCreationId(
+func (m *Storage) LoadCardSetDbByCreationId(
 	context context.Context,
 	creationId string,
 ) (*model.DbCardSet, error) {
 	return m.loadCardSetDb(context, bson.M{"creationId": creationId})
 }
 
-func (m *Repository) loadCardSetDb(
+func (m *Storage) loadCardSetDb(
 	context context.Context,
 	filter interface{},
 ) (*model.DbCardSet, error) {
@@ -137,12 +146,12 @@ func (m *Repository) loadCardSetDb(
 	return &cardSetDb, nil
 }
 
-func (m *Repository) InsertCardSet(
+func (m *Storage) InsertCardSet(
 	ctx context.Context,
 	cardSet *api.CardSet,
-	userId *primitive.ObjectID,
+	userId string,
 ) (*api.CardSet, *tools.ErrorWithCode) {
-	cardSet.UserId = userId.Hex()
+	cardSet.UserId = userId
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
 			c.Id = primitive.NewObjectID().Hex()
@@ -169,7 +178,7 @@ func (m *Repository) InsertCardSet(
 	return cardSet, nil
 }
 
-func (m *Repository) replaceCardSet(
+func (m *Storage) replaceCardSet(
 	ctx context.Context,
 	cardSetDb *model.DbCardSet,
 ) error {
@@ -185,16 +194,21 @@ func (m *Repository) replaceCardSet(
 	return nil
 }
 
-func (m *Repository) HasModificationsSince(
+func (m *Storage) HasModificationsSince(
 	ctx context.Context,
-	userId *primitive.ObjectID,
+	userId string,
 	date time.Time,
 ) (bool, error) {
+	dbUserId, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return false, tools.NewInvalidIdError(userId)
+	}
+
 	res := m.CardSetCollection.FindOne(
 		ctx,
-		bson.M{"userId": userId, "modificationDate": bson.M{"$gt": date}},
+		bson.M{"userId": dbUserId, "modificationDate": bson.M{"$gt": date}},
 	)
-	err := res.Err()
+	err = res.Err()
 
 	if err == mongo.ErrNoDocuments {
 		return false, nil
@@ -206,11 +220,22 @@ func (m *Repository) HasModificationsSince(
 	return true, nil
 }
 
-func (m *Repository) ModifiedCardSetsSince(
+func (m *Storage) ModifiedCardSetsSince(
 	ctx context.Context,
-	userId *primitive.ObjectID,
+	userId *string,
 	lastModificationDate *time.Time,
 ) ([]*model.DbCardSet, error) {
+	var mongoUserId *primitive.ObjectID
+
+	if userId != nil {
+		muid, err := primitive.ObjectIDFromHex(*userId)
+		if err != nil {
+			return nil, err
+		}
+
+		mongoUserId = &muid
+	}
+
 	var date time.Time
 	if lastModificationDate != nil {
 		date = *lastModificationDate
@@ -223,8 +248,8 @@ func (m *Repository) ModifiedCardSetsSince(
 		"modificationDate": bson.M{"$gt": dbTime},
 		"isDeleted":        bson.M{"$not": bson.M{"$eq": true}},
 	}
-	if userId != nil {
-		filter["userId"] = userId
+	if mongoUserId != nil {
+		filter["userId"] = mongoUserId
 	}
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
@@ -245,7 +270,7 @@ func (m *Repository) ModifiedCardSetsSince(
 	return dbCardSets, nil
 }
 
-func (m *Repository) DeleteByIds(
+func (m *Storage) DeleteByIds(
 	ctx context.Context,
 	ids []primitive.ObjectID,
 ) error {
@@ -257,14 +282,19 @@ func (m *Repository) DeleteByIds(
 	return nil
 }
 
-func (m *Repository) MarkAsDeletedByIds(
+func (m *Storage) MarkAsDeletedByIds(
 	ctx context.Context,
-	ids []primitive.ObjectID,
+	ids []string,
 	modificationDate time.Time,
 ) error {
-	_, err := m.CardSetCollection.UpdateMany(
+	mongoIds, err := tools.IdsToMongoIds(ids)
+	if err != nil {
+		return err
+	}
+
+	_, err = m.CardSetCollection.UpdateMany(
 		ctx,
-		bson.M{"_id": bson.M{"$in": ids}},
+		bson.M{"_id": bson.M{"$in": mongoIds}},
 		bson.M{"$set": bson.M{"isDeleted": true, "modificationDate": modificationDate}},
 	)
 	if err != nil {
@@ -274,19 +304,24 @@ func (m *Repository) MarkAsDeletedByIds(
 	return nil
 }
 
-func (m *Repository) IdsNotInList(
+func (m *Storage) IdsNotInList(
 	ctx context.Context,
-	ids []primitive.ObjectID,
-) ([]primitive.ObjectID, error) {
+	ids []string,
+) ([]string, error) {
+	mongoIds, err := tools.IdsToMongoIds(ids)
+	if err != nil {
+		return nil, err
+	}
+
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
+		bson.M{"_id": bson.M{"$not": bson.M{"$in": mongoIds}}, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
 		&options.FindOptions{
 			Projection: bson.M{"_id": 1},
 		},
 	)
 	if err != nil {
-		return []primitive.ObjectID{}, err
+		return []string{}, err
 	}
 
 	var result MongoIdWrapperList
@@ -295,17 +330,22 @@ func (m *Repository) IdsNotInList(
 		return nil, err
 	}
 
-	return result.toMongoIds(), err
+	return tools.MongoIdsToStrings(result.toMongoIds()), err
 }
 
-func (m *Repository) CardSetsNotInList(
+func (m *Storage) CardSetsNotInList(
 	ctx context.Context,
-	ids []*primitive.ObjectID,
+	ids []string,
 ) ([]*api.CardSet, error) {
+	mongoIds, err := tools.IdsToMongoIds(ids)
+	if err != nil {
+		return nil, err
+	}
+
 	var cardSetDbs []*model.DbCardSet
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"_id": bson.M{"$not": bson.M{"$in": ids}}, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
+		bson.M{"_id": bson.M{"$not": bson.M{"$in": mongoIds}}, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
 	)
 	if err != nil {
 		return nil, err
@@ -333,13 +373,18 @@ func (l *MongoIdWrapperList) toMongoIds() []primitive.ObjectID {
 	})
 }
 
-func (m *Repository) CardCardSetIds(
+func (m *Storage) CardCardSetIds(
 	ctx context.Context,
-	userId *primitive.ObjectID,
+	userId string,
 ) ([]string, error) {
+	userDbId, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return nil, tools.NewInvalidIdError(userId)
+	}
+
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"userId": userId, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
+		bson.M{"userId": userDbId, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
 		&options.FindOptions{
 			Projection: bson.M{"_id": 1},
 		},

@@ -110,7 +110,7 @@ func (h *RefreshHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 
 	token, err := h.userAuthTokenGenerator.Generate(
 		r.Context(),
-		userAuthToken.UserMongoId,
+		userAuthToken.UserDbId,
 		userAuthToken.NetworkType,
 		deviceType,
 		deviceId,

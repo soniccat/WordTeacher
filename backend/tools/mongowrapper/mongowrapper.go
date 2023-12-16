@@ -8,6 +8,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 )
 
 const EnvMongoUsername = "MONGODB_USERNAME"
@@ -112,4 +113,41 @@ func (m *MongoEnv) StopMongo() {
 		err := m.MongoWrapper.Stop()
 		m.Logger.Error.Printf("mongoWrapper.Stop() failed: %s\n", err.Error())
 	}
+}
+
+func (m *MongoEnv) MongoClient() *mongo.Client {
+	return m.MongoWrapper.Client
+}
+
+func (m *MongoEnv) Collection(
+	database string,
+	collection string,
+) *mongo.Collection {
+	return m.MongoClient().Database(database).Collection(collection)
+}
+
+func (m *MongoEnv) StartTransaction(ctx context.Context, block func(tCtx context.Context) (interface{}, error)) (interface{}, error) {
+	session, sessionErr := m.MongoClient().StartSession()
+	if sessionErr != nil {
+		return nil, sessionErr
+	}
+
+	defer func() {
+		session.EndSession(ctx)
+	}()
+
+	wc := writeconcern.New(writeconcern.WMajority())
+	txnOpts := options.Transaction().SetWriteConcern(wc)
+	return session.WithTransaction(
+		ctx,
+		func(sCtx mongo.SessionContext) (interface{}, error) {
+			response, sErr := block(sCtx)
+			if sErr != nil {
+				return nil, sErr
+			}
+
+			return response, nil
+		},
+		txnOpts,
+	)
 }

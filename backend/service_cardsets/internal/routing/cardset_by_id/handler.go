@@ -1,43 +1,49 @@
-package routing
+package cardset_by_id
 
 import (
 	"api"
+	"context"
 	"net/http"
 	"tools"
 	"tools/logger"
 
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"models/session_validator"
 	"service_cardsets/internal/model"
-	"service_cardsets/internal/storage"
 )
 
-type CardSetGetByIdResponse struct {
+type storage interface {
+	LoadCardSetDbById(
+		ctx context.Context,
+		id string,
+	) (*model.DbCardSet, error)
+}
+
+type response struct {
 	CardSet *api.CardSet `json:"cardSet"`
 }
 
-type CardSetByIdHandler struct {
+type Handler struct {
 	tools.BaseHandler
-	sessionValidator  session_validator.SessionValidator
-	cardSetRepository *storage.Repository
+	sessionValidator session_validator.SessionValidator
+	innerStorage     storage
 }
 
-func NewCardSetByIdHandler(
+func NewHandler(
 	logger *logger.Logger,
 	sessionValidator session_validator.SessionValidator,
-	cardSetRepository *storage.Repository,
-) *CardSetByIdHandler {
-	return &CardSetByIdHandler{
-		BaseHandler:       *tools.NewBaseHandler(logger),
-		sessionValidator:  sessionValidator,
-		cardSetRepository: cardSetRepository,
+	innerStorage storage,
+) *Handler {
+	return &Handler{
+		BaseHandler:      *tools.NewBaseHandler(logger),
+		sessionValidator: sessionValidator,
+		innerStorage:     innerStorage,
 	}
 }
 
-func (h *CardSetByIdHandler) CardSetById(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 	_, validateSessionErr := h.sessionValidator.Validate(r)
 	if validateSessionErr != nil {
 		h.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
@@ -52,15 +58,14 @@ func (h *CardSetByIdHandler) CardSetById(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	cardSetDbId, err := primitive.ObjectIDFromHex(cardSetId)
+	dbCardSet, err := h.innerStorage.LoadCardSetDbById(r.Context(), cardSetId)
 	if err != nil {
-		h.SetError(w, err, http.StatusBadRequest)
-		return
-	}
-
-	dbCardSet, err := h.cardSetRepository.LoadCardSetDbByObjectID(r.Context(), cardSetDbId)
-	if err != nil {
-		h.SetError(w, err, http.StatusServiceUnavailable)
+		switch err.(type) {
+		case tools.InvalidIdError:
+			h.SetError(w, err, http.StatusBadRequest)
+		default:
+			h.SetError(w, err, http.StatusServiceUnavailable)
+		}
 		return
 	}
 
@@ -76,7 +81,7 @@ func (h *CardSetByIdHandler) CardSetById(w http.ResponseWriter, r *http.Request)
 	})
 
 	apiCardSet := dbCardSet.ToApi()
-	response := CardSetGetByIdResponse{
+	response := response{
 		CardSet: apiCardSet,
 	}
 	h.WriteResponse(w, response)

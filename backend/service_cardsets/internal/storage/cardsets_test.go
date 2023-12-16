@@ -15,16 +15,19 @@ import (
 
 type CardSetTestSuite struct {
 	suite.Suite
-	CardSetModel *Repository
+	CardSetModel *Storage
 	TestMongo    *test.TestMongo
 }
 
 func (suite *CardSetTestSuite) SetupTest() {
 	suite.TestMongo = test.NewTestMongo()
-	suite.CardSetModel = New(
+	suite.CardSetModel, err := New(
 		suite.TestMongo.GetLogger(),
 		suite.TestMongo.GetMongoWrapper().Client,
 	)
+	if err != nil {
+		suite.T().Fatal(err)
+	}
 }
 
 func (suite *CardSetTestSuite) TestCreateCardSet() {

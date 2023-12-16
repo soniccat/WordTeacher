@@ -5,21 +5,23 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"service_cardsets/internal/routing"
+	"service_cardsets/internal/routing/cardset_by_id"
+	"service_cardsets/internal/routing/cardset_pull"
+	"service_cardsets/internal/routing/cardset_push"
 )
 
 func (app *application) routes() *mux.Router {
-	cardSetPushHandler := routing.NewCardSetPushHandler(
+	cardSetPushHandler := cardset_push.NewHandler(
 		app.logger,
 		app.sessionValidator,
 		app.cardSetRepository,
 	)
-	cardSetPullHandler := routing.NewCardSetPullHandler(
+	cardSetPullHandler := cardset_pull.NewHandler(
 		app.logger,
 		app.sessionValidator,
 		app.cardSetRepository,
 	)
-	cardSetByIdHandler := routing.NewCardSetByIdHandler(
+	cardSetByIdHandler := cardset_by_id.NewHandler(
 		app.logger,
 		app.sessionValidator,
 		app.cardSetRepository,

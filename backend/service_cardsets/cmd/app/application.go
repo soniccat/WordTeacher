@@ -6,29 +6,26 @@ import (
 	"models/session_validator"
 	"service_cardsets/internal/storage"
 	"tools/logger"
-	"tools/mongowrapper"
 )
 
 type application struct {
-	mongowrapper.MongoEnv
 	logger            *logger.Logger
 	sessionManager    *scs.SessionManager
-	cardSetRepository *storage.Repository
+	cardSetRepository *storage.Storage
 	sessionValidator  session_validator.SessionValidator
 }
 
 func createApplication(
 	logger *logger.Logger,
 	sessionManager *scs.SessionManager,
-	mongoURI string,
-	enableCredentials bool,
 	sessionValidator session_validator.SessionValidator,
+	cardSetRepository *storage.Storage,
 ) (_ *application, err error) {
 	app := &application{
-		MongoEnv:         mongowrapper.NewMongoEnv(logger),
-		logger:           logger,
-		sessionManager:   sessionManager,
-		sessionValidator: sessionValidator,
+		logger:            logger,
+		sessionManager:    sessionManager,
+		cardSetRepository: cardSetRepository,
+		sessionValidator:  sessionValidator,
 	}
 
 	defer func() {
@@ -37,16 +34,8 @@ func createApplication(
 		}
 	}()
 
-	err = app.SetupMongo(mongoURI, enableCredentials)
-	if err != nil {
-		return nil, err
-	}
-
-	app.cardSetRepository = storage.New(app.logger, app.MongoWrapper.Client)
-
 	return app, nil
 }
 
 func (app *application) stop() {
-	app.StopMongo()
 }

@@ -153,7 +153,7 @@ func (h *AuthHandler) Auth(w http.ResponseWriter, r *http.Request) {
 	// Create new access token / refresh token pair
 	token, err := h.userAuthTokenGenerator.Generate(
 		r.Context(),
-		&aUser.Id,
+		aUser.Id.Hex(),
 		userNetwork.NetworkType,
 		deviceType,
 		deviceId,

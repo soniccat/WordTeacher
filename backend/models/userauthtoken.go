@@ -3,9 +3,9 @@ package models
 import (
 	"context"
 	"errors"
-	"github.com/alexedwards/scs/v2"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
+
+	"github.com/alexedwards/scs/v2"
 )
 
 const AccessTokenTimeout = time.Hour // TODO: change to several days
@@ -15,19 +15,19 @@ const (
 	SessionAccessTokenExpirationDateKey = "accessTokenExpirationDate"
 	SessionRefreshTokenKey              = "refreshToken"
 	SessionNetworkTypeKey               = "networkType"
-	SessionUserMongoIdKey               = "userMongoId"
+	SessionUserDbIdKey                  = "userDbId"
 	SessionUserDeviceType               = "deviceType"
 	SessionUserDeviceId                 = "deviceId"
 )
 
 type UserAuthToken struct {
-	Id             *primitive.ObjectID `bson:"_id,omitempty"`    // TODO: use just string not to bind with mongo
-	UserMongoId    *primitive.ObjectID `bson:"userId,omitempty"` // TODO: use just string not to bind with mongo
-	NetworkType    UserNetworkType     `bson:"networkType,omitempty"`
-	AccessToken    AccessToken         `bson:"accessToken,omitempty"`
-	RefreshToken   string              `bson:"refreshToken,omitempty"`
-	UserDeviceType string              `bson:"deviceType,omitempty"`
-	UserDeviceId   string              `bson:"deviceId,omitempty"`
+	Id             string          `bson:"_id,omitempty"`
+	UserDbId       string          `bson:"userId,omitempty"`
+	NetworkType    UserNetworkType `bson:"networkType,omitempty"`
+	AccessToken    AccessToken     `bson:"accessToken,omitempty"`
+	RefreshToken   string          `bson:"refreshToken,omitempty"`
+	UserDeviceType string          `bson:"deviceType,omitempty"`
+	UserDeviceId   string          `bson:"deviceId,omitempty"`
 	// TODO: consider to add last usage date
 }
 
@@ -37,7 +37,7 @@ func New(
 	networkType UserNetworkType,
 	userDeviceType string,
 	userDeviceId string,
-	userMongoId *primitive.ObjectID,
+	userDbId string,
 ) *UserAuthToken {
 	return &UserAuthToken{
 		AccessToken:    *accessToken,
@@ -45,7 +45,7 @@ func New(
 		NetworkType:    networkType,
 		UserDeviceType: userDeviceType,
 		UserDeviceId:   userDeviceId,
-		UserMongoId:    userMongoId,
+		UserDbId:       userDbId,
 	}
 }
 
@@ -55,7 +55,7 @@ func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken,
 		return nil, errors.New("session access token is missing")
 	}
 
-	sessionAccessTokenExpirationDate, ok := manager.Get(context, SessionAccessTokenExpirationDateKey).(int64)
+	sessionAccessTokenExpirationDate, ok := manager.Get(context, SessionAccessTokenExpirationDateKey).(time.Time)
 	if !ok {
 		return nil, errors.New("session access token expiration date is missing")
 	}
@@ -80,31 +80,26 @@ func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken,
 		return nil, errors.New("session device id is missing")
 	}
 
-	sessionUserMongoIdHex, ok := manager.Get(context, SessionUserMongoIdKey).(string)
+	sessionUserDbId, ok := manager.Get(context, SessionUserDbIdKey).(string)
 	if !ok {
 		return nil, errors.New("session user mongo id is missing")
-	}
-
-	sessionUserMongoId, err := primitive.ObjectIDFromHex(sessionUserMongoIdHex)
-	if err != nil {
-		return nil, err
 	}
 
 	return &UserAuthToken{
 		AccessToken: AccessToken{
 			Value:          sessionAccessToken,
-			ExpirationDate: primitive.DateTime(sessionAccessTokenExpirationDate),
+			ExpirationDate: sessionAccessTokenExpirationDate,
 		},
 		RefreshToken:   sessionRefreshToken,
 		NetworkType:    UserNetworkType(networkType),
 		UserDeviceType: sessionDeviceType,
 		UserDeviceId:   sessionDeviceId,
-		UserMongoId:    &sessionUserMongoId,
+		UserDbId:       sessionUserDbId,
 	}, nil
 }
 
 func (sd *UserAuthToken) IsValid() bool {
-	return primitive.NewDateTimeFromTime(time.Now()) < sd.AccessToken.ExpirationDate
+	return time.Now().Compare(sd.AccessToken.ExpirationDate) < 0
 }
 
 func (sd *UserAuthToken) IsMatched(

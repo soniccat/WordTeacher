@@ -1,8 +1,8 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import "time"
 
 type AccessToken struct {
-	Value          string             `bson:"value"`
-	ExpirationDate primitive.DateTime `bson:"expirationDate"`
+	Value          string    `bson:"value"`
+	ExpirationDate time.Time `bson:"expirationDate"`
 }
