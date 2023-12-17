@@ -11,24 +11,27 @@ import (
 	"tools/logger"
 
 	mapset "github.com/deckarep/golang-set/v2"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"models/session_validator"
 	"service_cardsets/internal/model"
-	"service_cardsets/internal/routing"
 )
 
 type storage interface {
 	CardCardSetIds(ctx context.Context, userId string) ([]string, error)
 	ModifiedCardSetsSince(ctx context.Context, userId *string, lastModificationDate *time.Time) ([]*model.DbCardSet, error)
+	LastModificationDate(ctx context.Context, cardSetIds []string) (*time.Time, error)
 }
 
 type Input struct {
-	CurrentCardSetIds []string `json:"currentCardSetIds,omitempty"`
+	CurrentCardSetIds      []string `json:"currentCardSetIds,omitempty"`
+	LatestModificationDate *string  `json:"latestModificationDate,omitempty"`
 }
 
 type Response struct {
-	UpdatedCardSets   []*api.CardSet `json:"updatedCardSets,omitempty"`
-	DeletedCardSetIds []string       `json:"deletedCardSetIds,omitempty"`
+	UpdatedCardSets        []*api.CardSet `json:"updatedCardSets,omitempty"`
+	DeletedCardSetIds      []string       `json:"deletedCardSetIds,omitempty"`
+	LatestModificationDate string         `json:"latestModificationDate"`
 }
 
 type Handler struct {
@@ -69,8 +72,13 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var lastModificationDate *time.Time
-	if parsedDate, err := time.Parse(time.RFC3339, r.URL.Query().Get(routing.ParameterLatestCardSetModificationDate)); err == nil {
-		lastModificationDate = &parsedDate
+	if input.LatestModificationDate != nil {
+		date, err := tools.ParseApiDate(*input.LatestModificationDate)
+		if err != nil {
+			h.SetError(w, err, http.StatusBadRequest)
+			return
+		}
+		lastModificationDate = &date
 	}
 
 	ctx := r.Context()
@@ -88,9 +96,32 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var lastMongoModificationDate int64
+	for _, c := range dbCardSets {
+		if int64(c.ModificationDate) > lastMongoModificationDate {
+			lastMongoModificationDate = int64(c.ModificationDate)
+		}
+	}
+
+	lastCardSetModificationDate := primitive.DateTime(lastMongoModificationDate).Time()
+	if len(idsToDelete) > 0 {
+		lastDate, err := h.storage.LastModificationDate(ctx, idsToDelete)
+		if err != nil {
+			h.SetError(w, err, http.StatusInternalServerError)
+			return
+		}
+
+		if lastDate != nil {
+			if lastDate.Compare(lastCardSetModificationDate) > 0 {
+				lastCardSetModificationDate = *lastDate
+			}
+		}
+	}
+
 	response := Response{
-		UpdatedCardSets:   apiCardSets,
-		DeletedCardSetIds: idsToDelete,
+		UpdatedCardSets:        apiCardSets,
+		DeletedCardSetIds:      idsToDelete,
+		LatestModificationDate: tools.TimeToApiDate(lastCardSetModificationDate),
 	}
 	h.WriteResponse(w, response)
 }

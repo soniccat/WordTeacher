@@ -3,7 +3,6 @@ package storage
 import (
 	"api"
 	"context"
-	"net/http"
 	"time"
 	"tools"
 	"tools/logger"
@@ -84,7 +83,7 @@ func (m *Storage) DeleteCardSet(
 func (m *Storage) UpdateCardSet(
 	ctx context.Context,
 	cardSet *api.CardSet,
-) *tools.ErrorWithCode {
+) error {
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
 			c.Id = primitive.NewObjectID().Hex()
@@ -96,12 +95,12 @@ func (m *Storage) UpdateCardSet(
 
 	newCardSetDb, err := model.ApiCardSetToDb(cardSet)
 	if err != nil {
-		return tools.NewErrorWithCode(err, http.StatusBadRequest)
+		return tools.NewInvalidArgumentError("UpdateCardSet.cardSet", cardSet, "")
 	}
 
 	err = m.replaceCardSet(ctx, newCardSetDb)
 	if err != nil {
-		return tools.NewErrorWithCode(err, http.StatusInternalServerError)
+		return err
 	}
 
 	return nil
@@ -150,7 +149,7 @@ func (m *Storage) InsertCardSet(
 	ctx context.Context,
 	cardSet *api.CardSet,
 	userId string,
-) (*api.CardSet, *tools.ErrorWithCode) {
+) (*api.CardSet, error) {
 	cardSet.UserId = userId
 	for _, c := range cardSet.Cards {
 		if len(c.Id) == 0 {
@@ -163,12 +162,12 @@ func (m *Storage) InsertCardSet(
 
 	cardSetDb, err := model.ApiCardSetToDb(cardSet)
 	if err != nil {
-		return nil, tools.NewErrorWithCode(err, http.StatusBadRequest)
+		return nil, tools.NewInvalidArgumentError("InsertCardSet.cardSet", cardSet, "")
 	}
 
 	res, err := m.CardSetCollection.InsertOne(ctx, cardSetDb)
 	if err != nil {
-		return nil, tools.NewErrorWithCode(err, http.StatusInternalServerError)
+		return nil, err
 	}
 
 	objId := res.InsertedID.(primitive.ObjectID)
@@ -197,11 +196,18 @@ func (m *Storage) replaceCardSet(
 func (m *Storage) HasModificationsSince(
 	ctx context.Context,
 	userId string,
-	date time.Time,
+	lastModificationDate *time.Time,
 ) (bool, error) {
 	dbUserId, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return false, tools.NewInvalidIdError(userId)
+	}
+
+	var date time.Time
+	if lastModificationDate != nil {
+		date = *lastModificationDate
+	} else {
+		date = zeroTime
 	}
 
 	res := m.CardSetCollection.FindOne(
@@ -406,4 +412,53 @@ func (m *Storage) CardCardSetIds(
 	})
 
 	return cardSetApiIds, nil
+}
+
+type MongoModificationDateWrapper struct {
+	modificationDate time.Time `bson:"modificationDate"`
+}
+
+type MongoModificationDateWrapperList []MongoModificationDateWrapper
+
+func (m *Storage) LastModificationDates(
+	ctx context.Context,
+	cardSetIds []string,
+) (*time.Time, error) {
+	mongoIds, err := tools.IdsToMongoIds(cardSetIds)
+	if err != nil {
+		return nil, tools.NewInvalidIdError("cardSetIds")
+	}
+
+	cursor, err := m.CardSetCollection.Find(
+		ctx,
+		bson.M{"_id": bson.M{"$in": mongoIds}},
+		&options.FindOptions{
+			Projection: bson.M{"modificationDate": 1},
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() { cursor.Close(ctx) }()
+
+	var modificationDates MongoModificationDateWrapperList
+	err = cursor.All(ctx, &modificationDates)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(modificationDates) == 0 {
+		return nil, nil
+	}
+
+	var latestTime time.Time
+	for _, t := range modificationDates {
+		if t.modificationDate.Compare(latestTime) > 0 {
+			latestTime = t.modificationDate
+		}
+	}
+
+	return &latestTime, nil
 }
