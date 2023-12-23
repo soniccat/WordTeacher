@@ -74,16 +74,18 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutAnything_ReturnsBadReq
 }
 
 func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_ReturnsAllCardSets() {
+	creationTime1 := time.Now().Add(-time.Hour * time.Duration(10))
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet1",
 		suite.CreateUUID().String(),
-		time.Now().Add(-time.Hour*time.Duration(10)),
+		creationTime1,
 		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
+	creationTime2 := creationTime1.Add(time.Hour * time.Duration(2))
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
 		suite.CreateUUID().String(),
-		time.Now(),
+		creationTime2,
 		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 
@@ -121,20 +123,23 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 	sort.Sort(actualCardSets)
 
 	assert.Equal(suite.T(), expectedCardSets, actualCardSets)
+	assert.Equal(suite.T(), tools.TimeToApiDate(creationTime2), response.LatestModificationDate)
 }
 
 func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_ReturnsOnlyNewCardSet() {
+	creationTime1 := time.Now().Add(-time.Hour * time.Duration(20))
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet1",
 		suite.CreateUUID().String(),
-		time.Now().Add(-time.Hour*time.Duration(20)),
+		creationTime1,
 		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 
+	creationTime2 := creationTime1.Add(time.Hour * time.Duration(10))
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
 		suite.CreateUUID().String(),
-		time.Now().Add(-time.Hour*time.Duration(10)),
+		creationTime2,
 		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 
@@ -149,7 +154,7 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_Retu
 	}
 
 	suite.setupPullValidator(userId)
-	req := suite.createPullRequest(tools.Ptr(time.Now().Add(-time.Hour*time.Duration(15))), cardset_pull.Input{})
+	req := suite.createPullRequest(tools.Ptr(creationTime2.Add(-time.Hour*time.Duration(5))), cardset_pull.Input{})
 
 	cardSetPullHandler := cardset_pull.NewHandler(
 		suite.Logger(),
@@ -166,6 +171,7 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_Retu
 	assert.Len(suite.T(), response.DeletedCardSetIds, 0)
 	assert.Len(suite.T(), response.UpdatedCardSets, 1)
 	assert.Equal(suite.T(), oldCardSet2, response.UpdatedCardSets[0])
+	assert.Equal(suite.T(), tools.TimeToApiDate(creationTime2), response.LatestModificationDate)
 }
 
 func TestCardSetPullTestSuite(t *testing.T) {

@@ -151,7 +151,7 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 
 		var deleteModificationTime time.Time
 		if len(deletedIds) > 0 {
-			deleteModificationTime = time.Now()
+			deleteModificationTime = h.TimeProvider.Now()
 			sErr = h.storage.MarkAsDeletedByIds(tCtx, deletedIds, deleteModificationTime)
 			if sErr != nil {
 				return nil, sErr

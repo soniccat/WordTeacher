@@ -123,10 +123,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
 	cardCreationId := suite.CreateUUID().String()
+
+	createTime := time.Now().Add(time.Second * time.Duration(1000))
 	newCardSet := createApiCardSet(
 		"testCardSet",
 		cardSetCreationId,
-		time.Now(),
+		createTime,
 		[]*api.Card{createApiCard(cardCreationId)},
 	)
 
@@ -145,6 +147,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 	)
 
 	writer := httptest.NewRecorder()
+
 	cardSetPushHandler.CardSetPush(writer, req)
 	response := suite.readPushResponse(writer)
 
@@ -154,6 +157,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 	assert.NotNil(suite.T(), cardSetCreationId, response.CardSetIds[cardSetCreationId])
 	assert.Len(suite.T(), response.CardIds, 1)
 	assert.Equal(suite.T(), cardCreationId, tools.MapKeys(response.CardIds)[0])
+	assert.Equal(suite.T(), tools.TimeToApiDate(createTime), response.LatestModificationDate)
 
 	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
 	assert.NotNil(suite.T(), dbCardSet.UserId)
@@ -166,11 +170,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
 	apiCardCreationId := suite.CreateUUID().String()
-	modificationDate := time.Now()
+
+	createTime := time.Now().Add(time.Second * time.Duration(-1000))
 	newCardSet := createApiCardSet(
 		"testCardSet",
 		cardSetCreationId,
-		modificationDate,
+		createTime,
 		[]*api.Card{createApiCard(apiCardCreationId)},
 	)
 
@@ -180,10 +185,11 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 		suite.T().Fatal(err)
 	}
 
+	modificationTime := createTime.Add(time.Second * time.Duration(500))
 	newCardSet = createApiCardSet(
 		"testCardSet",
 		cardSetCreationId,
-		modificationDate,
+		modificationTime,
 		[]*api.Card{createApiCard(apiCardCreationId)},
 	)
 
@@ -206,6 +212,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 	assert.Equal(suite.T(), insertedCardSet.Id, response.CardSetIds[cardSetCreationId])
+	assert.Equal(suite.T(), tools.TimeToApiDate(modificationTime), response.LatestModificationDate)
 
 	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
 	assert.NotNil(suite.T(), dbCardSet.UserId)
@@ -213,10 +220,11 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_ReturnsNewCardSetAndDeleteOldOne() {
+	creationTime := time.Now().Add(time.Hour * time.Duration(-10))
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet",
 		suite.CreateUUID().String(),
-		time.Now().Add(-time.Hour*time.Duration(10)),
+		creationTime,
 		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 
@@ -228,10 +236,11 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 
 	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
+	newCreationTime := creationTime.Add(time.Hour * time.Duration(5))
 	newCardSet := createApiCardSet(
 		"newTestCardSet",
 		cardSetCreationId,
-		time.Now(),
+		newCreationTime,
 		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 
@@ -243,13 +252,14 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 		suite.application.cardSetRepository,
 	)
 
+	lastSyncTime := newCreationTime.Add(time.Hour * time.Duration(-1))
 	req := suite.createPushRequest(
-		tools.Ptr(time.Now()),
+		tools.Ptr(lastSyncTime),
 		cardset_push.Input{UpdatedCardSets: []*api.CardSet{newCardSet}, CurrentCardSetIds: []string{}},
 	)
 
-	t := time.Now()
-	suite.TestTimeProvider().Time = t
+	nowTime := newCreationTime.Add(time.Hour * time.Duration(10))
+	suite.TestTimeProvider().Time = nowTime
 	writer := httptest.NewRecorder()
 	cardSetPushHandler.CardSetPush(writer, req)
 	response := suite.readPushResponse(writer)
@@ -261,7 +271,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 
 	oo, _ := suite.application.cardSetRepository.LoadCardSetDbById(context.Background(), oldCardSet.Id)
 	assert.Equal(suite.T(), true, oo.IsDeleted)
-	assert.Equal(suite.T(), tools.TimeToApiDate(t), response.LatestModificationDate)
+	assert.Equal(suite.T(), tools.TimeToApiDate(nowTime), response.LatestModificationDate)
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsStatusConflict() {
@@ -297,7 +307,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 	)
 
 	req := suite.createPushRequest(
-		tools.Ptr(time.Now().Add(-time.Hour*time.Duration(20))),
+		tools.Ptr(time.Now().Add(time.Hour*time.Duration(-20))),
 		cardset_push.Input{UpdatedCardSets: []*api.CardSet{oldCardSet}, CurrentCardSetIds: []string{}},
 	)
 
@@ -308,10 +318,11 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet_ReturnsOk() {
+	creationTime := time.Now().Add(time.Hour * time.Duration(-20))
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet",
 		suite.CreateUUID().String(),
-		time.Now().Add(-time.Hour*time.Duration(20)),
+		creationTime,
 		[]*api.Card{createApiCard(suite.CreateUUID().String())},
 	)
 
@@ -324,10 +335,11 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
 	cardCreationId := suite.CreateUUID().String()
+	modificationTime := creationTime.Add(time.Hour * time.Duration(10))
 	newCardSet := createApiCardSet(
 		"newTestCardSet",
 		cardSetCreationId,
-		time.Now(),
+		modificationTime,
 		[]*api.Card{createApiCard(cardCreationId)},
 	)
 
@@ -339,12 +351,16 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 		suite.application.cardSetRepository,
 	)
 
+	lastChangeTime := modificationTime.Add(-time.Hour * time.Duration(5))
 	req := suite.createPushRequest(
-		tools.Ptr(time.Now().Add(-time.Hour*time.Duration(10))),
+		tools.Ptr(lastChangeTime),
 		cardset_push.Input{UpdatedCardSets: []*api.CardSet{newCardSet}, CurrentCardSetIds: []string{}},
 	)
 
 	writer := httptest.NewRecorder()
+
+	nowTime := modificationTime.Add(time.Duration(time.Hour * 5))
+	suite.TestTimeProvider().Time = nowTime
 	cardSetPushHandler.CardSetPush(writer, req)
 	response := suite.readPushResponse(writer)
 
@@ -354,6 +370,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 	assert.NotEmpty(suite.T(), cardSetCreationId, response.CardSetIds[cardSetCreationId])
 	assert.Len(suite.T(), response.CardIds, 1)
 	assert.Equal(suite.T(), cardCreationId, tools.MapKeys(response.CardIds)[0])
+	assert.Equal(suite.T(), tools.TimeToApiDate(nowTime), response.LatestModificationDate)
 
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 }

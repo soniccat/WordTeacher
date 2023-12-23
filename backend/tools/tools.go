@@ -15,7 +15,7 @@ func ParseApiDate(date string) (time.Time, error) {
 }
 
 func TimeToApiDate(t time.Time) string {
-	return t.Format(time.RFC3339)
+	return t.UTC().Format(time.RFC3339)
 }
 
 func ApiDateToDbDate(date string) (primitive.DateTime, error) {
