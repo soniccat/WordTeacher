@@ -33,11 +33,12 @@ type Handler struct {
 
 func NewHandler(
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	sessionValidator session_validator.SessionValidator,
 	innerStorage storage,
 ) *Handler {
 	return &Handler{
-		BaseHandler:      *tools.NewBaseHandler(logger),
+		BaseHandler:      *tools.NewBaseHandler(logger, timeProvider),
 		sessionValidator: sessionValidator,
 		innerStorage:     innerStorage,
 	}

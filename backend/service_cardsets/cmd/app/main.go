@@ -9,6 +9,7 @@ import (
 	"time"
 	"tools"
 	"tools/logger"
+	"tools/time_provider"
 
 	"google.golang.org/grpc"
 
@@ -44,6 +45,7 @@ func main() {
 	sessionManager := tools.CreateSessionManager(*redisAddress)
 	app, err := createApplication(
 		logger,
+		&time_provider.TimeProvider{},
 		sessionManager,
 		session_validator.NewSessionManagerValidator(sessionManager),
 		storage,

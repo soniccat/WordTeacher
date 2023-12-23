@@ -95,7 +95,7 @@ func (m *Storage) UpdateCardSet(
 
 	newCardSetDb, err := model.ApiCardSetToDb(cardSet)
 	if err != nil {
-		return tools.NewInvalidArgumentError("UpdateCardSet.cardSet", cardSet, "")
+		return tools.NewInvalidArgumentError("UpdateCardSet.cardSet", cardSet, "", err)
 	}
 
 	err = m.replaceCardSet(ctx, newCardSetDb)
@@ -162,7 +162,7 @@ func (m *Storage) InsertCardSet(
 
 	cardSetDb, err := model.ApiCardSetToDb(cardSet)
 	if err != nil {
-		return nil, tools.NewInvalidArgumentError("InsertCardSet.cardSet", cardSet, "")
+		return nil, tools.NewInvalidArgumentError("InsertCardSet.cardSet", cardSet, "", err)
 	}
 
 	res, err := m.CardSetCollection.InsertOne(ctx, cardSetDb)
@@ -420,7 +420,7 @@ type MongoModificationDateWrapper struct {
 
 type MongoModificationDateWrapperList []MongoModificationDateWrapper
 
-func (m *Storage) LastModificationDates(
+func (m *Storage) LastModificationDate(
 	ctx context.Context,
 	cardSetIds []string,
 ) (*time.Time, error) {

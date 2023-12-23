@@ -42,11 +42,12 @@ type Handler struct {
 
 func NewHandler(
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	sessionValidator session_validator.SessionValidator,
 	storage storage,
 ) *Handler {
 	return &Handler{
-		BaseHandler:      *tools.NewBaseHandler(logger),
+		BaseHandler:      *tools.NewBaseHandler(logger, timeProvider),
 		sessionValidator: sessionValidator,
 		storage:          storage,
 	}
@@ -90,25 +91,43 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 	}
 
 	apiCardSets := model.DbCardSetsToApi(dbCardSets)
-	idsToDelete, handlerErr := h.resolveDeletedCardIds(ctx, authToken.UserDbId, &input)
-	if handlerErr != nil {
-		h.SetHandlerError(w, handlerErr)
+	idsToDelete, err := h.resolveDeletedCardIds(ctx, authToken.UserDbId, &input)
+	if err != nil {
+		h.SetError(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	var lastMongoModificationDate int64
+	lastCardSetModificationDate, err := h.calcLastModificationDate(ctx, dbCardSets, idsToDelete)
+	if err != nil {
+		h.SetError(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	response := Response{
+		UpdatedCardSets:        apiCardSets,
+		DeletedCardSetIds:      idsToDelete,
+		LatestModificationDate: lastCardSetModificationDate,
+	}
+	h.WriteResponse(w, response)
+}
+
+func (h *Handler) calcLastModificationDate(
+	ctx context.Context,
+	dbCardSets []*model.DbCardSet,
+	idsToDelete []string,
+) (string, error) {
+	var lastMongoModificationDate primitive.DateTime
 	for _, c := range dbCardSets {
-		if int64(c.ModificationDate) > lastMongoModificationDate {
-			lastMongoModificationDate = int64(c.ModificationDate)
+		if c.ModificationDate > lastMongoModificationDate {
+			lastMongoModificationDate = c.ModificationDate
 		}
 	}
 
-	lastCardSetModificationDate := primitive.DateTime(lastMongoModificationDate).Time()
+	lastCardSetModificationDate := lastMongoModificationDate.Time()
 	if len(idsToDelete) > 0 {
 		lastDate, err := h.storage.LastModificationDate(ctx, idsToDelete)
 		if err != nil {
-			h.SetError(w, err, http.StatusInternalServerError)
-			return
+			return "", err
 		}
 
 		if lastDate != nil {
@@ -118,22 +137,17 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	response := Response{
-		UpdatedCardSets:        apiCardSets,
-		DeletedCardSetIds:      idsToDelete,
-		LatestModificationDate: tools.TimeToApiDate(lastCardSetModificationDate),
-	}
-	h.WriteResponse(w, response)
+	return tools.TimeToApiDate(lastCardSetModificationDate), nil
 }
 
 func (h *Handler) resolveDeletedCardIds(
 	ctx context.Context,
 	userId string,
 	input *Input,
-) ([]string, *tools.HandlerError) {
+) ([]string, error) {
 	userCardSetIds, err := h.storage.CardCardSetIds(ctx, userId)
 	if err != nil {
-		return nil, h.NewHandlerError(http.StatusInternalServerError, err)
+		return nil, err
 	}
 
 	currentCardSetIdSet := mapset.NewSet(input.CurrentCardSetIds...)

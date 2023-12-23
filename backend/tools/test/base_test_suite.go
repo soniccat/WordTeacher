@@ -3,15 +3,31 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"tools/logger"
+
+	"github.com/google/uuid"
 )
 
 type BaseTestSuite struct {
-	t *testing.T
+	t                *testing.T
+	logger           *logger.Logger
+	testTimeProvider TimeProvider
+}
+
+func (b *BaseTestSuite) TestTimeProvider() *TimeProvider {
+	return &b.testTimeProvider
+}
+
+func (b *BaseTestSuite) Logger() *logger.Logger {
+	if b.logger == nil {
+		b.logger = logger.New(true)
+	}
+
+	return b.logger
 }
 
 func (b *BaseTestSuite) CreateUUID() uuid.UUID {

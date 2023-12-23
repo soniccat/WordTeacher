@@ -13,16 +13,19 @@ import (
 func (app *application) routes() *mux.Router {
 	cardSetPushHandler := cardset_push.NewHandler(
 		app.logger,
+		app.timeProvider,
 		app.sessionValidator,
 		app.cardSetRepository,
 	)
 	cardSetPullHandler := cardset_pull.NewHandler(
 		app.logger,
+		app.timeProvider,
 		app.sessionValidator,
 		app.cardSetRepository,
 	)
 	cardSetByIdHandler := cardset_by_id.NewHandler(
 		app.logger,
+		app.timeProvider,
 		app.sessionValidator,
 		app.cardSetRepository,
 	)

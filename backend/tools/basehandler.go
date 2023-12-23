@@ -2,16 +2,23 @@ package tools
 
 import (
 	"net/http"
+	"time"
 	"tools/logger"
 )
 
 type BaseHandler struct {
-	Logger *logger.Logger
+	Logger       *logger.Logger
+	TimeProvider TimeProvider
 }
 
-func NewBaseHandler(logger *logger.Logger) *BaseHandler {
+type TimeProvider interface {
+	Now() time.Time
+}
+
+func NewBaseHandler(logger *logger.Logger, TimeProvider TimeProvider) *BaseHandler {
 	return &BaseHandler{
-		Logger: logger,
+		Logger:       logger,
+		TimeProvider: TimeProvider,
 	}
 }
 

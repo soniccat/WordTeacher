@@ -5,19 +5,16 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"models"
 	"models/session_validator"
 	"net/http"
 	"net/http/httptest"
 	"service_cardsets/internal/model"
-	"service_cardsets/internal/routing"
 	"service_cardsets/internal/routing/cardset_push"
 	"service_cardsets/internal/storage"
 	"testing"
 	"time"
 	"tools"
-	"tools/logger"
 	"tools/test"
 
 	"github.com/stretchr/testify/assert"
@@ -34,12 +31,10 @@ type CardSetPushTestSuite struct {
 
 func (suite *CardSetPushTestSuite) SetupTest() {
 	suite.sessionValidator = session_validator.NewMockSessionValidator()
-	l := logger.New(true)
-
-	sessionManager := tools.CreateSessionManager("172.16.0.3:6380")
+	sessionManager := tools.CreateSessionManager(test.RedisIP)
 	storage, err := storage.New(
-		l,
-		"mongodb://127.0.0.1:27018/?directConnection=true&replicaSet=rs0",
+		suite.Logger(),
+		test.MongoURI,
 		false,
 	)
 	if err != nil {
@@ -47,7 +42,8 @@ func (suite *CardSetPushTestSuite) SetupTest() {
 	}
 
 	app, err := createApplication(
-		l,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		sessionManager,
 		suite.sessionValidator,
 		storage,
@@ -67,7 +63,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithoutAnything_ReturnsBadReq
 	}
 
 	cardSetPushHandler := cardset_push.NewHandler(
-		suite.application.logger,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		suite.application.sessionValidator,
 		suite.application.cardSetRepository,
 	)
@@ -86,7 +83,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithCookieButWithoutLastModif
 	}
 
 	cardSetPushHandler := cardset_push.NewHandler(
-		suite.application.logger,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		suite.application.sessionValidator,
 		suite.application.cardSetRepository,
 	)
@@ -105,14 +103,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithInvalidSession_ReturnsUna
 		}
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("/?%s=2022-11-03T17:30:02Z", routing.ParameterLatestCardSetModificationDate), nil)
-	if err != nil {
-		suite.T().Fatal(err)
-	}
+	req := suite.createPushRequest(&time.Time{}, cardset_push.Input{})
 	req.AddCookie(&http.Cookie{Name: "session", Value: "testSession"})
 
 	cardSetPushHandler := cardset_push.NewHandler(
-		suite.application.logger,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		suite.application.sessionValidator,
 		suite.application.cardSetRepository,
 	)
@@ -137,7 +133,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 	suite.setupPushValidator(primitive.NewObjectID().Hex())
 
 	cardSetPushHandler := cardset_push.NewHandler(
-		suite.application.logger,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		suite.application.sessionValidator,
 		suite.application.cardSetRepository,
 	)
@@ -178,9 +175,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 	)
 
 	userId := primitive.NewObjectID().Hex()
-	insertedCardSet, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), newCardSet, userId)
-	if errWithCode != nil {
-		suite.T().Fatal(errWithCode.Err)
+	insertedCardSet, err := suite.application.cardSetRepository.InsertCardSet(context.Background(), newCardSet, userId)
+	if err != nil {
+		suite.T().Fatal(err)
 	}
 
 	newCardSet = createApiCardSet(
@@ -192,7 +189,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 
 	suite.setupPushValidator(userId)
 	cardSetPushHandler := cardset_push.NewHandler(
-		suite.application.logger,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		suite.application.sessionValidator,
 		suite.application.cardSetRepository,
 	)
@@ -223,9 +221,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 	)
 
 	userId := primitive.NewObjectID().Hex()
-	_, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), oldCardSet, userId)
-	if errWithCode != nil {
-		suite.T().Fatal(errWithCode.Err)
+	_, err := suite.application.cardSetRepository.InsertCardSet(context.Background(), oldCardSet, userId)
+	if err != nil {
+		suite.T().Fatal(err)
 	}
 
 	cardSetCreationIdUUID := suite.CreateUUID()
@@ -239,7 +237,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 
 	suite.setupPushValidator(userId)
 	cardSetPushHandler := cardset_push.NewHandler(
-		suite.application.logger,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		suite.application.sessionValidator,
 		suite.application.cardSetRepository,
 	)
@@ -249,6 +248,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 		cardset_push.Input{UpdatedCardSets: []*api.CardSet{newCardSet}, CurrentCardSetIds: []string{}},
 	)
 
+	t := time.Now()
+	suite.TestTimeProvider().Time = t
 	writer := httptest.NewRecorder()
 	cardSetPushHandler.CardSetPush(writer, req)
 	response := suite.readPushResponse(writer)
@@ -260,6 +261,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 
 	oo, _ := suite.application.cardSetRepository.LoadCardSetDbById(context.Background(), oldCardSet.Id)
 	assert.Equal(suite.T(), true, oo.IsDeleted)
+	assert.Equal(suite.T(), tools.TimeToApiDate(t), response.LatestModificationDate)
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsStatusConflict() {
@@ -271,9 +273,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 	)
 
 	userId := primitive.NewObjectID().Hex()
-	_, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), newCardSet, userId)
-	if errWithCode != nil {
-		suite.T().Fatal(errWithCode.Err)
+	_, err := suite.application.cardSetRepository.InsertCardSet(context.Background(), newCardSet, userId)
+	if err != nil {
+		suite.T().Fatal(err)
 	}
 
 	cardSetCreationIdUUID := suite.CreateUUID()
@@ -288,7 +290,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 
 	suite.setupPushValidator(userId)
 	cardSetPushHandler := cardset_push.NewHandler(
-		suite.application.logger,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		suite.application.sessionValidator,
 		suite.application.cardSetRepository,
 	)
@@ -313,9 +316,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 	)
 
 	userId := primitive.NewObjectID().Hex()
-	_, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), oldCardSet, userId)
-	if errWithCode != nil {
-		suite.T().Fatal(errWithCode.Err)
+	_, err := suite.application.cardSetRepository.InsertCardSet(context.Background(), oldCardSet, userId)
+	if err != nil {
+		suite.T().Fatal(err)
 	}
 
 	cardSetCreationIdUUID := suite.CreateUUID()
@@ -330,7 +333,8 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 
 	suite.setupPushValidator(userId)
 	cardSetPushHandler := cardset_push.NewHandler(
-		suite.application.logger,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		suite.application.sessionValidator,
 		suite.application.cardSetRepository,
 	)
@@ -371,14 +375,15 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_PushEmptyChangesWithOldDate_R
 	)
 
 	userId := primitive.NewObjectID().Hex()
-	_, errWithCode := suite.application.cardSetRepository.InsertCardSet(context.Background(), newCardSet, userId)
-	if errWithCode != nil {
-		suite.T().Fatal(errWithCode.Err)
+	_, err := suite.application.cardSetRepository.InsertCardSet(context.Background(), newCardSet, userId)
+	if err != nil {
+		suite.T().Fatal(err)
 	}
 
 	suite.setupPushValidator(userId)
 	cardSetPushHandler := cardset_push.NewHandler(
-		suite.application.logger,
+		suite.Logger(),
+		suite.TestTimeProvider(),
 		suite.application.sessionValidator,
 		suite.application.cardSetRepository,
 	)
@@ -423,13 +428,14 @@ func (suite *CardSetPushTestSuite) loadCardSetDbById(id string) *model.DbCardSet
 func (suite *CardSetPushTestSuite) createPushRequest(lastModificationDate *time.Time, input cardset_push.Input) *http.Request {
 	var resultPath = ""
 	if lastModificationDate != nil {
-		resultPath = fmt.Sprintf("/?%s=%s", routing.ParameterLatestCardSetModificationDate, lastModificationDate.UTC().Format(time.RFC3339))
+		input.LatestModificationDate = tools.Ptr(tools.TimeToApiDate(*lastModificationDate))
 	}
 
 	req, err := http.NewRequest("POST", resultPath, bytes.NewReader(test.TestMarshal(input)))
 	if err != nil {
 		suite.T().Fatal(err)
 	}
+
 	req.AddCookie(&http.Cookie{Name: "session", Value: "testSession"})
 	return req
 }

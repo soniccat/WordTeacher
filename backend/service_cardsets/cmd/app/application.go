@@ -1,6 +1,8 @@
 package main
 
 import (
+	"tools"
+
 	"github.com/alexedwards/scs/v2"
 
 	"models/session_validator"
@@ -10,6 +12,7 @@ import (
 
 type application struct {
 	logger            *logger.Logger
+	timeProvider      tools.TimeProvider
 	sessionManager    *scs.SessionManager
 	cardSetRepository *storage.Storage
 	sessionValidator  session_validator.SessionValidator
@@ -17,12 +20,14 @@ type application struct {
 
 func createApplication(
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	sessionManager *scs.SessionManager,
 	sessionValidator session_validator.SessionValidator,
 	cardSetRepository *storage.Storage,
 ) (_ *application, err error) {
 	app := &application{
 		logger:            logger,
+		timeProvider:      timeProvider,
 		sessionManager:    sessionManager,
 		cardSetRepository: cardSetRepository,
 		sessionValidator:  sessionValidator,

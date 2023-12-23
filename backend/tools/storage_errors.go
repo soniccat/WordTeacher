@@ -24,16 +24,22 @@ type InvalidArgumentError struct {
 	name        string
 	input       interface{}
 	description string
+	innerError  error
 }
 
-func NewInvalidArgumentError(name string, input interface{}, description string) InvalidArgumentError {
+func NewInvalidArgumentError(name string, input interface{}, description string, innerError error) InvalidArgumentError {
 	return InvalidArgumentError{
 		name:        name,
 		input:       input,
 		description: description,
+		innerError:  innerError,
 	}
 }
 
 func (e InvalidArgumentError) Error() string {
-	return fmt.Sprintf("invalid argument \"%s\": %v. %s", e.name, e.input, e.description)
+	return fmt.Sprintf("invalid argument \"%s\": %v. %s, innerError: %s", e.name, e.input, e.description, e.innerError.Error())
+}
+
+func (e InvalidArgumentError) Unwrap() error {
+	return e.innerError
 }

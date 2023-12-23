@@ -55,11 +55,12 @@ type Handler struct {
 
 func NewHandler(
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	sessionValidator session_validator.SessionValidator,
 	storage storage,
 ) *Handler {
 	return &Handler{
-		BaseHandler:      *tools.NewBaseHandler(logger),
+		BaseHandler:      *tools.NewBaseHandler(logger, timeProvider),
 		sessionValidator: sessionValidator,
 		storage:          storage,
 	}
@@ -189,13 +190,13 @@ func (h *Handler) handleUpdatedCardSets(
 
 	for _, cardSet := range updatedCardSets {
 		if len(cardSet.Id) == 0 && len(cardSet.CreationId) == 0 {
-			return nil, tools.NewInvalidArgumentError("updatedCardSets", updatedCardSets, "card set without id has no creation id too")
+			return nil, tools.NewInvalidArgumentError("updatedCardSets", updatedCardSets, "card set without id has no creation id too", nil)
 		}
 
 		for _, card := range cardSet.Cards {
 			if len(card.Id) == 0 {
 				if len(card.CreationId) == 0 {
-					return nil, tools.NewInvalidArgumentError("cardSet", cardSet, "card without id has no creation id too")
+					return nil, tools.NewInvalidArgumentError("cardSet", cardSet, "card without id has no creation id too", nil)
 				}
 
 				cardWithoutIds[card.CreationId] = true
