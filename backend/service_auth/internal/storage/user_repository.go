@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"models"
 	appUsearAuthToken "service_auth/internal/userauthtoken"
 	"tools/logger"
@@ -43,7 +44,7 @@ func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *s
 			},
 		},
 	).Decode(&user)
-	if err == mongo.ErrNoDocuments {
+	if errors.Is(err, mongo.ErrNoDocuments) {
 		return nil, nil
 	}
 

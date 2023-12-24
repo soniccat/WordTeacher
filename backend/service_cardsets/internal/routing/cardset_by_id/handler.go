@@ -61,10 +61,10 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 
 	dbCardSet, err := h.innerStorage.LoadCardSetDbById(r.Context(), cardSetId)
 	if err != nil {
-		switch err.(type) {
-		case tools.InvalidIdError:
+		var invalidIdError tools.InvalidIdError
+		if errors.As(err, &invalidIdError) {
 			h.SetError(w, err, http.StatusBadRequest)
-		default:
+		} else {
 			h.SetError(w, err, http.StatusServiceUnavailable)
 		}
 		return

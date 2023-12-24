@@ -21,28 +21,28 @@ import kotlinx.serialization.modules.subclass
 @Serializable
 data class CardSetPullInput(
     @SerialName("currentCardSetIds") val currentCardSetIds: List<String>,
-    @SerialName("latestModificationDate") val latestModificationDate: String?
+    @SerialName("latestModificationDate") val latestModificationDate: Instant?
 )
 
 @Serializable
 data class CardSetPullResponse(
     @SerialName("updatedCardSets") val updatedCardSets: List<CardSet>?,
     @SerialName("deletedCardSetIds") val deletedCardSetIds: List<String>?,
-    @SerialName("latestModificationDate") val latestModificationDate: String
+    @SerialName("latestModificationDate") val latestModificationDate: Instant
 )
 
 @Serializable
 data class CardSetPushInput(
     @SerialName("updatedCardSets") val updatedCardSets: List<CardSet>,
     @SerialName("currentCardSetIds") val currentCardSetIds: List<String>,
-    @SerialName("latestModificationDate") val latestModificationDate: String?
+    @SerialName("latestModificationDate") val latestModificationDate: Instant?
 )
 
 @Serializable
 data class CardSetPushResponse(
     @SerialName("cardSetIds") val cardSetIds: Map<String,String>?,
     @SerialName("cardIds") val cardIds: Map<String,String>?,
-    @SerialName("latestModificationDate") val latestModificationDate: String
+    @SerialName("latestModificationDate") val latestModificationDate: Instant
 )
 
 @Serializable
@@ -99,7 +99,7 @@ class SpaceCardSetService(
     suspend fun pull(currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<CardSetPullResponse> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/cardsets/pull") {
-                this.setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds, lastModificationDate?.toString())))
+                this.setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds, lastModificationDate)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
@@ -110,7 +110,7 @@ class SpaceCardSetService(
     suspend fun push(updatedCardSets: List<CardSet>, currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<CardSetPushResponse> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/cardsets/push") {
-                this.setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds, lastModificationDate?.toString())))
+                this.setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds, lastModificationDate)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()

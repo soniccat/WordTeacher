@@ -296,7 +296,7 @@ class CardSetSyncWorker(
                 }
 
                 val pushResponse = spaceCardSetService.push(updatedCardSets, cardSetRemoteIds, lastSyncDate).toOkResponse()
-                newSyncDate = timeSource.timeInstant()
+                newSyncDate = pushResponse.latestModificationDate
 
                 databaseWorker.run {
                     database.transaction {

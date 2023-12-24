@@ -24,7 +24,8 @@
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/service_cardsetsearch/cmd/app/"
+      "program": "${workspaceFolder}/service_cardsetsearch/cmd/app/",
+      "args": ["-debugMode", "true"]
     },
     {
       "name": "Dict Service",

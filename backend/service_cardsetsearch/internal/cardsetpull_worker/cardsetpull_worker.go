@@ -2,12 +2,15 @@ package cardsetpull_worker
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"service_cardsetsearch/internal/cardsets_client"
 	"service_cardsetsearch/internal/model"
 	"service_cardsetsearch/internal/storage"
 	"tools/logger"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type CardSetPullWorker struct {
@@ -32,7 +35,11 @@ func (w *CardSetPullWorker) Start(ctx context.Context) error {
 	lastModificationDate, err := w.repository.LastCardSetModificationDate(ctx)
 
 	if err != nil {
-		return err
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			lastModificationDate = &time.Time{}
+		} else {
+			return err
+		}
 	}
 
 	ticker := time.NewTicker(24 * time.Hour)

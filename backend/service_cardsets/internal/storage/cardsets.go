@@ -3,6 +3,7 @@ package storage
 import (
 	"api"
 	"context"
+	"errors"
 	"time"
 	"tools"
 	"tools/logger"
@@ -59,7 +60,7 @@ func (m *Storage) FindCardSetByCreationId(
 			"isDeleted":  bson.M{"$not": bson.M{"$eq": true}},
 		},
 	).Decode(&result)
-	if err == mongo.ErrNoDocuments {
+	if errors.Is(err, mongo.ErrNoDocuments) {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
@@ -216,7 +217,7 @@ func (m *Storage) HasModificationsSince(
 	)
 	err = res.Err()
 
-	if err == mongo.ErrNoDocuments {
+	if errors.Is(err, mongo.ErrNoDocuments) {
 		return false, nil
 
 	} else if err != nil {
