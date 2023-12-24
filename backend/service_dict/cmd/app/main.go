@@ -9,6 +9,7 @@ import (
 	"time"
 	"tools"
 	"tools/logger"
+	"tools/time_provider"
 
 	"models/session_validator"
 )
@@ -26,10 +27,12 @@ func main() {
 	flag.Parse()
 
 	logger := logger.New(*isDebug)
+	timeProvider := time_provider.TimeProvider{}
 	sessionManager := tools.CreateSessionManager(*redisAddress)
 	app, err := createApplication(
 		context.Background(),
 		logger,
+		&timeProvider,
 		sessionManager,
 		*mongoURI,
 		*enableCredentials,

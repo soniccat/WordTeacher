@@ -11,11 +11,13 @@ import (
 func (app *application) routes() *mux.Router {
 	authHandler := routing.NewAuthHandler(
 		app.logger,
+		app.timeProvider,
 		app.userRepository,
 		app.userAuthTokenGenerator,
 	)
 	refreshHandler := routing.NewRefreshHandler(
 		app.logger,
+		app.timeProvider,
 		app.sessionManager,
 		app.userRepository,
 		app.userAuthTokenGenerator,

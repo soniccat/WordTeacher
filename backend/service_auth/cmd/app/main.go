@@ -7,6 +7,7 @@ import (
 	"runtime/debug"
 	"time"
 	"tools/logger"
+	"tools/time_provider"
 )
 
 func main() {
@@ -22,7 +23,8 @@ func main() {
 	flag.Parse()
 
 	logger := logger.New(*isDebug)
-	app, err := createApplication(logger, *redisAddress, *mongoURI, *enableCredentials)
+	timeProvider := time_provider.TimeProvider{}
+	app, err := createApplication(logger, &timeProvider, *redisAddress, *mongoURI, *enableCredentials)
 
 	if err != nil {
 		fmt.Println("app creation error: " + err.Error())

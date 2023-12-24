@@ -42,11 +42,12 @@ type AuthHandler struct {
 
 func NewAuthHandler(
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	userRepository *storage.UserRepository,
 	userAuthTokenGenerator userauthtokengenerator.UserAuthTokenGenerator,
 ) *AuthHandler {
 	return &AuthHandler{
-		BaseHandler:            *tools.NewBaseHandler(logger),
+		BaseHandler:            *tools.NewBaseHandler(logger, timeProvider),
 		userRepository:         userRepository,
 		userAuthTokenGenerator: userAuthTokenGenerator,
 	}

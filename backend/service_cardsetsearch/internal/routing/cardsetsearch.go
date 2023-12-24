@@ -27,11 +27,12 @@ type CardSetSearchHandler struct {
 
 func NewCardSetSearchHandler(
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	sessionValidator session_validator.SessionValidator,
 	cardSetSearchRepository *storage.Repository,
 ) *CardSetSearchHandler {
 	return &CardSetSearchHandler{
-		BaseHandler:             *tools.NewBaseHandler(logger),
+		BaseHandler:             *tools.NewBaseHandler(logger, timeProvider),
 		sessionValidator:        sessionValidator,
 		cardSetSearchRepository: cardSetSearchRepository,
 	}

@@ -25,10 +25,11 @@ type WordHandler struct {
 
 func NewWordHandler(
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	wiktionary wiktionary.Contract,
 ) *WordHandler {
 	return &WordHandler{
-		BaseHandler: *tools.NewBaseHandler(logger),
+		BaseHandler: *tools.NewBaseHandler(logger, timeProvider),
 		logger:      logger,
 		wiktionary:  wiktionary,
 	}

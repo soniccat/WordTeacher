@@ -14,6 +14,7 @@ import (
 type application struct {
 	mongowrapper.MongoEnv
 	logger                 *logger.Logger
+	timeProvider           tools.TimeProvider
 	sessionManager         *scs.SessionManager
 	userRepository         *storage.UserRepository
 	userAuthTokenGenerator userauthtoken_generator.UserAuthTokenGenerator
@@ -21,6 +22,7 @@ type application struct {
 
 func createApplication(
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	redisAddress string,
 	mongoURI string,
 	enableCredentials bool,
@@ -28,6 +30,7 @@ func createApplication(
 	app := &application{
 		MongoEnv:       mongowrapper.NewMongoEnv(logger),
 		logger:         logger,
+		timeProvider:   timeProvider,
 		sessionManager: tools.CreateSessionManager(redisAddress),
 	}
 

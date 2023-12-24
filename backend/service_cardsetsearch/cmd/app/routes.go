@@ -11,6 +11,7 @@ import (
 func (app *application) routes() *mux.Router {
 	cardSetSearchHandler := routing.NewCardSetSearchHandler(
 		app.logger,
+		app.timeProvider,
 		app.sessionValidator,
 		app.cardSetSearchRepository,
 	)

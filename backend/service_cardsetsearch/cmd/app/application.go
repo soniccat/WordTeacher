@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"tools"
 
 	"github.com/alexedwards/scs/v2"
 
@@ -11,12 +12,14 @@ import (
 	"service_cardsetsearch/internal/storage"
 	"tools/logger"
 	"tools/mongowrapper"
+	"tools/time_provider"
 )
 
 type application struct {
 	mongowrapper.MongoEnv
 	ctx                     context.Context
 	logger                  *logger.Logger
+	timeProvider            tools.TimeProvider
 	sessionManager          *scs.SessionManager
 	cardSetSearchRepository *storage.Repository
 	sessionValidator        session_validator.SessionValidator
@@ -36,6 +39,7 @@ func createApplication(
 		MongoEnv:         mongowrapper.NewMongoEnv(logger),
 		ctx:              ctx,
 		logger:           logger,
+		timeProvider:     &time_provider.TimeProvider{},
 		sessionManager:   sessionManager,
 		sessionValidator: sessionValidator,
 		cardSetsClient:   cardSetsClient,

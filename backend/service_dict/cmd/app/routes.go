@@ -11,6 +11,7 @@ import (
 func (app *application) routes() *mux.Router {
 	wordHandler := routing.NewWordHandler(
 		app.logger,
+		app.timeProvider,
 		app.wiktionaryRepository,
 	)
 

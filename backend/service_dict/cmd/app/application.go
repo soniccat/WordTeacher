@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"tools"
 
 	"github.com/alexedwards/scs/v2"
 
@@ -14,6 +15,7 @@ import (
 type application struct {
 	mongowrapper.MongoEnv
 	logger               *logger.Logger
+	timeProvider         tools.TimeProvider
 	sessionManager       *scs.SessionManager
 	wiktionaryRepository wiktionary.Contract
 	sessionValidator     session_validator.SessionValidator
@@ -22,6 +24,7 @@ type application struct {
 func createApplication(
 	ctx context.Context,
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	sessionManager *scs.SessionManager,
 	mongoURI string,
 	enableCredentials bool,
@@ -30,6 +33,7 @@ func createApplication(
 	app := &application{
 		MongoEnv:         mongowrapper.NewMongoEnv(logger),
 		logger:           logger,
+		timeProvider:     timeProvider,
 		sessionManager:   sessionManager,
 		sessionValidator: sessionValidator,
 	}

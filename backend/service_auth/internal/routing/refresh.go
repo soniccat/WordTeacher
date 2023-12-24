@@ -33,12 +33,13 @@ type RefreshHandler struct {
 
 func NewRefreshHandler(
 	logger *logger.Logger,
+	timeProvider tools.TimeProvider,
 	sessionManager *scs.SessionManager,
 	userRepository *storage.UserRepository,
 	userAuthTokenGenerator userauthtokengenerator.UserAuthTokenGenerator,
 ) *RefreshHandler {
 	return &RefreshHandler{
-		BaseHandler:            *tools.NewBaseHandler(logger),
+		BaseHandler:            *tools.NewBaseHandler(logger, timeProvider),
 		sessionManager:         sessionManager,
 		userRepository:         userRepository,
 		userAuthTokenGenerator: userAuthTokenGenerator,
