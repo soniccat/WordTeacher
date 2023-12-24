@@ -71,8 +71,8 @@ func (cs *DbCardSet) ToApi() *api.CardSet {
 		Tags:             cs.Tags,
 		Cards:            tools.Map(cs.Cards, func(cardDb *DbCard) *api.Card { return cardDb.ToApi() }),
 		UserId:           cs.UserId.Hex(),
-		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339),
-		ModificationDate: cs.ModificationDate.Time().UTC().Format(time.RFC3339),
+		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339Nano),
+		ModificationDate: cs.ModificationDate.Time().UTC().Format(time.RFC3339Nano),
 		CreationId:       cs.CreationId,
 	}
 }
@@ -85,8 +85,8 @@ func (cs *DbCardSet) ToGrpc() *cardsetsgrpc.CardSet {
 		Tags:             cs.Tags,
 		Cards:            tools.Map(cs.Cards, func(cardDb *DbCard) *cardsetsgrpc.Card { return cardDb.ToGrpc() }),
 		UserId:           cs.UserId.Hex(),
-		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339),
-		ModificationDate: cs.ModificationDate.Time().UTC().Format(time.RFC3339),
+		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339Nano),
+		ModificationDate: cs.ModificationDate.Time().UTC().Format(time.RFC3339Nano),
 	}
 }
 

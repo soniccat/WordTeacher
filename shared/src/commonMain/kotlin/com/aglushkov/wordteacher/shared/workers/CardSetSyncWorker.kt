@@ -196,7 +196,7 @@ class CardSetSyncWorker(
                 }
 
                 val pullResponse = spaceCardSetService.pull(cardSetRemoteIds, lastSyncDate).toOkResponse()
-                newSyncDate = timeSource.timeInstant()
+                newSyncDate = pullResponse.latestModificationDate
 
                 databaseWorker.run {
                     database.transaction {
@@ -237,7 +237,7 @@ class CardSetSyncWorker(
                         }
 
                         // updates modificationDate for changed locally or just created but not pushed cardsets not to lose the changes
-                        database.cardSets.shiftCardSetModificationDate(newSyncDate.toEpochMilliseconds(), lastSyncDate.toEpochMilliseconds())
+                        database.cardSets.shiftCardSetModificationDate(newSyncDate.toEpochMilliseconds() + 1, lastSyncDate.toEpochMilliseconds())
                     }
                 }
 

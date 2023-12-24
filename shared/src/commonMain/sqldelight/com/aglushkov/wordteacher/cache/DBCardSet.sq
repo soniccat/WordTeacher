@@ -19,7 +19,7 @@ FROM DBCardSet;
 selectUpdated:
 SELECT *
 FROM DBCardSet
-WHERE modificationDate >= ?;
+WHERE modificationDate > ?;
 
 selectWithouRemoteId:
 SELECT *

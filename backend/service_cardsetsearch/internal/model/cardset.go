@@ -29,8 +29,8 @@ func (cs *DbCardSet) ToApi() *api.CardSet {
 		Tags:             cs.Tags,
 		Terms:            cs.Terms,
 		UserId:           cs.UserId.Hex(),
-		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339),
-		ModificationDate: cs.ModificationDate.Time().UTC().Format(time.RFC3339),
+		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339Nano),
+		ModificationDate: cs.ModificationDate.Time().UTC().Format(time.RFC3339Nano),
 	}
 }
 

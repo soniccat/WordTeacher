@@ -17,7 +17,8 @@
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/service_cardsets/cmd/app/"
+      "program": "${workspaceFolder}/service_cardsets/cmd/app/",
+      "args": ["-debugMode", "true"]
     },
     {
       "name": "CardSetSearch Service",

@@ -11,15 +11,15 @@ func Ptr[T any](x T) *T {
 }
 
 func ParseApiDate(date string) (time.Time, error) {
-	return time.Parse(time.RFC3339, date)
+	return time.Parse(time.RFC3339Nano, date)
 }
 
 func TimeToApiDate(t time.Time) string {
-	return t.UTC().Format(time.RFC3339)
+	return t.UTC().Format(time.RFC3339Nano)
 }
 
 func ApiDateToDbDate(date string) (primitive.DateTime, error) {
-	dateTime, err := time.Parse(time.RFC3339, date)
+	dateTime, err := time.Parse(time.RFC3339Nano, date)
 	if err != nil {
 		return 0, err
 	}
@@ -41,7 +41,7 @@ func ApiDatePtrToDbDatePtr(date *string) (*primitive.DateTime, error) {
 }
 
 func DbDateToApiDate(date primitive.DateTime) string {
-	return date.Time().UTC().Format(time.RFC3339)
+	return date.Time().UTC().Format(time.RFC3339Nano)
 }
 
 func DoubleSliceComparableEqual[T comparable](a [][]T, b [][]T) bool {

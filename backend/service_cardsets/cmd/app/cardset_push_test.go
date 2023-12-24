@@ -474,8 +474,8 @@ func createApiCardSet(name string, creationId string, creationDate time.Time, ca
 	return &api.CardSet{
 		Name:             name,
 		Cards:            cards,
-		CreationDate:     creationDate.UTC().Format(time.RFC3339),
-		ModificationDate: creationDate.UTC().Format(time.RFC3339),
+		CreationDate:     tools.TimeToApiDate(creationDate),
+		ModificationDate: tools.TimeToApiDate(creationDate),
 		CreationId:       creationId,
 	}
 }
