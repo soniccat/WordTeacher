@@ -21,24 +21,28 @@ import kotlinx.serialization.modules.subclass
 @Serializable
 data class CardSetPullInput(
     @SerialName("currentCardSetIds") val currentCardSetIds: List<String>,
+    @SerialName("latestModificationDate") val latestModificationDate: String?
 )
 
 @Serializable
 data class CardSetPullResponse(
     @SerialName("updatedCardSets") val updatedCardSets: List<CardSet>?,
     @SerialName("deletedCardSetIds") val deletedCardSetIds: List<String>?,
+    @SerialName("latestModificationDate") val latestModificationDate: String
 )
 
 @Serializable
 data class CardSetPushInput(
     @SerialName("updatedCardSets") val updatedCardSets: List<CardSet>,
     @SerialName("currentCardSetIds") val currentCardSetIds: List<String>,
+    @SerialName("latestModificationDate") val latestModificationDate: String?
 )
 
 @Serializable
 data class CardSetPushResponse(
     @SerialName("cardSetIds") val cardSetIds: Map<String,String>?,
     @SerialName("cardIds") val cardIds: Map<String,String>?,
+    @SerialName("latestModificationDate") val latestModificationDate: String
 )
 
 @Serializable
@@ -95,10 +99,7 @@ class SpaceCardSetService(
     suspend fun pull(currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<CardSetPullResponse> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/cardsets/pull") {
-                lastModificationDate?.let { date ->
-                    this.parameter(LastModificationDateKey, date.toString())
-                }
-                this.setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds)))
+                this.setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds, lastModificationDate?.toString())))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
@@ -109,10 +110,7 @@ class SpaceCardSetService(
     suspend fun push(updatedCardSets: List<CardSet>, currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<CardSetPushResponse> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/cardsets/push") {
-                lastModificationDate?.let { date ->
-                    this.parameter(LastModificationDateKey, date.toString())
-                }
-                this.setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds)))
+                this.setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds, lastModificationDate?.toString())))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
@@ -129,5 +127,3 @@ class SpaceCardSetService(
         }
     }
 }
-
-private const val LastModificationDateKey = "latestCardSetModificationDate"

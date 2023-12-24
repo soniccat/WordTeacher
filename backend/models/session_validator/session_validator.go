@@ -1,11 +1,14 @@
 package session_validator
 
 import (
+	"encoding/gob"
 	"errors"
-	"github.com/alexedwards/scs/v2"
 	"models"
 	"net/http"
+	"time"
 	"tools"
+
+	"github.com/alexedwards/scs/v2"
 )
 
 type ValidateSessionError struct {
@@ -33,6 +36,7 @@ type SessionManagerValidator struct {
 }
 
 func NewSessionManagerValidator(sm *scs.SessionManager) SessionValidator {
+	gob.Register(time.Time{})
 	return &SessionManagerValidator{sm}
 }
 

@@ -2,7 +2,9 @@ package userauthtoken_generator
 
 import (
 	"context"
+	"encoding/gob"
 	"models"
+	"time"
 
 	"github.com/alexedwards/scs/v2"
 
@@ -28,6 +30,7 @@ func NewUserAuthTokenGenerator(
 	userRepository *storage.UserRepository,
 	sessionManager *scs.SessionManager,
 ) UserAuthTokenGenerator {
+	gob.Register(time.Time{})
 	return &userAuthTokenGenerator{
 		userRepository: userRepository,
 		sessionManager: sessionManager,
