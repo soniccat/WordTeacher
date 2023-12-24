@@ -24,8 +24,7 @@ clean:
 up:
 	docker compose --env-file ./prod.env up -d
 
-allup:
-	authup && cardsetsup && cardsetsearchup && dictup
+allup: authup cardsetsup cardsetsearchup dictup
 
 stop:
 	docker compose --env-file ./prod.env stop
