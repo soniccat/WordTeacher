@@ -84,4 +84,4 @@ WHERE id = ?;
 shiftCardSetModificationDate:
 UPDATE DBCardSet
 SET modificationDate = ?
-WHERE modificationDate >= ?;
+WHERE modificationDate > ?;

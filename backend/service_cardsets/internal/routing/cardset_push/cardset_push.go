@@ -158,7 +158,7 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		latestModificationDate, sErr := resolveLastModificationDate(input.UpdatedCardSets, deleteModificationTime)
+		latestModificationDate, sErr := resolveLastModificationDate(lastModificationDate, input.UpdatedCardSets, deleteModificationTime)
 		if sErr != nil {
 			return nil, sErr
 		}
@@ -250,7 +250,7 @@ func (h *Handler) handleUpdatedCardSets(
 	return response, nil
 }
 
-func resolveLastModificationDate(cardSets []*api.CardSet, deletionTime time.Time) (time.Time, error) {
+func resolveLastModificationDate(pushLastModificationDate *time.Time, cardSets []*api.CardSet, deletionTime time.Time) (time.Time, error) {
 	var latestModificationDate time.Time
 	for _, cs := range cardSets {
 		md, err := tools.ParseApiDate(cs.ModificationDate) // TODO: not optimal to parse date again
@@ -265,6 +265,12 @@ func resolveLastModificationDate(cardSets []*api.CardSet, deletionTime time.Time
 
 	if deletionTime.Compare(latestModificationDate) > 0 {
 		latestModificationDate = deletionTime
+	}
+
+	if pushLastModificationDate != nil {
+		if pushLastModificationDate.Compare(latestModificationDate) > 0 {
+			latestModificationDate = *pushLastModificationDate
+		}
 	}
 
 	return latestModificationDate, nil

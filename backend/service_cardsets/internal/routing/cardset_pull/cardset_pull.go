@@ -97,7 +97,7 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lastCardSetModificationDate, err := h.calcLastModificationDate(ctx, dbCardSets, idsToDelete)
+	lastCardSetModificationDate, err := h.calcLastModificationDate(ctx, lastModificationDate, dbCardSets, idsToDelete)
 	if err != nil {
 		h.SetError(w, err, http.StatusInternalServerError)
 		return
@@ -113,6 +113,7 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) calcLastModificationDate(
 	ctx context.Context,
+	pullLastModificationDate *time.Time,
 	dbCardSets []*model.DbCardSet,
 	idsToDelete []string,
 ) (string, error) {
@@ -134,6 +135,12 @@ func (h *Handler) calcLastModificationDate(
 			if lastDate.Compare(lastCardSetModificationDate) > 0 {
 				lastCardSetModificationDate = *lastDate
 			}
+		}
+	}
+
+	if pullLastModificationDate != nil {
+		if pullLastModificationDate.Compare(lastCardSetModificationDate) > 0 {
+			lastCardSetModificationDate = *pullLastModificationDate
 		}
 	}
 
