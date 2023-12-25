@@ -237,7 +237,7 @@ class CardSetSyncWorker(
                         }
 
                         // updates modificationDate for changed locally or just created but not pushed cardsets not to lose the changes
-                        database.cardSets.shiftCardSetModificationDate(newSyncDate.toEpochMilliseconds(), lastSyncDate.toEpochMilliseconds())
+                        database.cardSets.shiftCardSetModificationDate(newSyncDate.toEpochMilliseconds() + 1000, lastSyncDate.toEpochMilliseconds())
                     }
                 }
 
