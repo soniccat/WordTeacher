@@ -6,5 +6,5 @@ type TimeProvider struct {
 }
 
 func (tp *TimeProvider) Now() time.Time {
-	return time.Now()
+	return time.Now().UTC().Truncate(time.Millisecond)
 }

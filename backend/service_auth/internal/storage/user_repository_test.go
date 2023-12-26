@@ -23,6 +23,10 @@ func (suite *UserModelTestSuite) SetupTest() {
 		suite.TestMongo.GetLogger(),
 		suite.TestMongo.MongoClient(),
 	)
+	err := suite.UserModel.DropAll(context.Background())
+	if err != nil {
+		suite.T().Fatal(err)
+	}
 }
 
 func (suite *UserModelTestSuite) TestUserCreationExample() {
@@ -30,10 +34,10 @@ func (suite *UserModelTestSuite) TestUserCreationExample() {
 	user := &models.User{
 		Networks: []models.UserNetwork{
 			{
-				models.Google,
-				"testUserId",
-				"testEmail",
-				"testName",
+				NetworkType:   models.Google,
+				NetworkUserId: "testUserId",
+				Email:         "testEmail",
+				Name:          "testName",
 			},
 		},
 	}

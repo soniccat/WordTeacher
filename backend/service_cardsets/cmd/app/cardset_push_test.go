@@ -201,8 +201,9 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 		suite.application.cardSetRepository,
 	)
 
+	latestModificationTime := time.Now()
 	req := suite.createPushRequest(
-		tools.Ptr(time.Now()),
+		tools.Ptr(latestModificationTime),
 		cardset_push.Input{UpdatedCardSets: []*api.CardSet{newCardSet}, CurrentCardSetIds: []string{}},
 	)
 
@@ -212,7 +213,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 	assert.Equal(suite.T(), insertedCardSet.Id, response.CardSetIds[cardSetCreationId])
-	assert.Equal(suite.T(), tools.TimeToApiDate(modificationTime), response.LatestModificationDate)
+	assert.Equal(suite.T(), tools.TimeToApiDate(latestModificationTime), response.LatestModificationDate)
 
 	dbCardSet := suite.loadCardSetDbById(response.CardSetIds[cardSetCreationId])
 	assert.NotNil(suite.T(), dbCardSet.UserId)

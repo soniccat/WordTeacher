@@ -109,3 +109,12 @@ func (m *UserRepository) insertUserAuthToken(
 
 	return token, nil
 }
+
+func (m *UserRepository) DropAll(context context.Context) error {
+	err := m.UserCollection.Drop(context)
+	if err != nil {
+		return err
+	}
+
+	return m.AuthTokens.Drop(context)
+}

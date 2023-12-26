@@ -227,7 +227,22 @@ func (m *Storage) HasModificationsSince(
 	return true, nil
 }
 
+func (m *Storage) ModifiedCardSetsSinceByUserId(
+	ctx context.Context,
+	userId string,
+	lastModificationDate *time.Time,
+) ([]*model.DbCardSet, error) {
+	return m.modifiedCardSetsSince(ctx, &userId, lastModificationDate)
+}
+
 func (m *Storage) ModifiedCardSetsSince(
+	ctx context.Context,
+	lastModificationDate *time.Time,
+) ([]*model.DbCardSet, error) {
+	return m.modifiedCardSetsSince(ctx, nil, lastModificationDate)
+}
+
+func (m *Storage) modifiedCardSetsSince(
 	ctx context.Context,
 	userId *string,
 	lastModificationDate *time.Time,
@@ -237,7 +252,7 @@ func (m *Storage) ModifiedCardSetsSince(
 	if userId != nil {
 		muid, err := primitive.ObjectIDFromHex(*userId)
 		if err != nil {
-			return nil, err
+			return nil, tools.NewInvalidIdError("userId")
 		}
 
 		mongoUserId = &muid
@@ -313,16 +328,22 @@ func (m *Storage) MarkAsDeletedByIds(
 
 func (m *Storage) IdsNotInList(
 	ctx context.Context,
+	userId string,
 	ids []string,
 ) ([]string, error) {
+	userDbId, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return nil, tools.NewInvalidIdError("IdsNotInList.userId")
+	}
+
 	mongoIds, err := tools.IdsToMongoIds(ids)
 	if err != nil {
-		return nil, err
+		return nil, tools.NewInvalidIdError("IdsNotInList.ids")
 	}
 
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"_id": bson.M{"$not": bson.M{"$in": mongoIds}}, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
+		bson.M{"_id": bson.M{"$not": bson.M{"$in": mongoIds}}, "userId": userDbId, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
 		&options.FindOptions{
 			Projection: bson.M{"_id": 1},
 		},
@@ -342,8 +363,14 @@ func (m *Storage) IdsNotInList(
 
 func (m *Storage) CardSetsNotInList(
 	ctx context.Context,
+	userId string,
 	ids []string,
 ) ([]*api.CardSet, error) {
+	userDbId, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return nil, tools.NewInvalidIdError("CardSetsNotInList.userId")
+	}
+
 	mongoIds, err := tools.IdsToMongoIds(ids)
 	if err != nil {
 		return nil, err
@@ -352,7 +379,7 @@ func (m *Storage) CardSetsNotInList(
 	var cardSetDbs []*model.DbCardSet
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"_id": bson.M{"$not": bson.M{"$in": mongoIds}}, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
+		bson.M{"_id": bson.M{"$not": bson.M{"$in": mongoIds}}, "userId": userDbId, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
 	)
 	if err != nil {
 		return nil, err
@@ -416,26 +443,24 @@ func (m *Storage) CardCardSetIds(
 }
 
 type MongoModificationDateWrapper struct {
-	modificationDate time.Time `bson:"modificationDate"`
+	ModificationDate primitive.DateTime `bson:"modificationDate"`
 }
 
 type MongoModificationDateWrapperList []MongoModificationDateWrapper
 
 func (m *Storage) LastModificationDate(
 	ctx context.Context,
-	cardSetIds []string,
+	userId string,
 ) (*time.Time, error) {
-	mongoIds, err := tools.IdsToMongoIds(cardSetIds)
+	mongoUserId, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
-		return nil, tools.NewInvalidIdError("cardSetIds")
+		return nil, tools.NewInvalidIdError("userId")
 	}
 
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{"_id": bson.M{"$in": mongoIds}},
-		&options.FindOptions{
-			Projection: bson.M{"modificationDate": 1},
-		},
+		bson.M{"userId": mongoUserId}, // include deleted
+		options.Find().SetProjection(bson.M{"modificationDate": 1}).SetLimit(int64(1)).SetSort(bson.M{"modificationDate": -1}),
 	)
 
 	if err != nil {
@@ -454,12 +479,5 @@ func (m *Storage) LastModificationDate(
 		return nil, nil
 	}
 
-	var latestTime time.Time
-	for _, t := range modificationDates {
-		if t.modificationDate.Compare(latestTime) > 0 {
-			latestTime = t.modificationDate
-		}
-	}
-
-	return &latestTime, nil
+	return tools.Ptr(modificationDates[0].ModificationDate.Time().UTC()), nil
 }

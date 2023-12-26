@@ -19,8 +19,8 @@ import (
 
 type storage interface {
 	CardCardSetIds(ctx context.Context, userId string) ([]string, error)
-	ModifiedCardSetsSince(ctx context.Context, userId *string, lastModificationDate *time.Time) ([]*model.DbCardSet, error)
-	LastModificationDate(ctx context.Context, cardSetIds []string) (*time.Time, error)
+	ModifiedCardSetsSinceByUserId(ctx context.Context, userId string, lastModificationDate *time.Time) ([]*model.DbCardSet, error)
+	LastModificationDate(ctx context.Context, userId string) (*time.Time, error)
 }
 
 type Input struct {
@@ -84,7 +84,7 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
-	dbCardSets, err := h.storage.ModifiedCardSetsSince(ctx, &authToken.UserDbId, lastModificationDate)
+	dbCardSets, err := h.storage.ModifiedCardSetsSinceByUserId(ctx, authToken.UserDbId, lastModificationDate)
 	if err != nil {
 		h.SetError(w, err, http.StatusInternalServerError)
 		return
@@ -97,7 +97,7 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lastCardSetModificationDate, err := h.calcLastModificationDate(ctx, lastModificationDate, dbCardSets, idsToDelete)
+	lastCardSetModificationDate, err := h.calcLastModificationDate(ctx, authToken.UserDbId, lastModificationDate, dbCardSets)
 	if err != nil {
 		h.SetError(w, err, http.StatusInternalServerError)
 		return
@@ -113,9 +113,9 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) calcLastModificationDate(
 	ctx context.Context,
+	userId string,
 	pullLastModificationDate *time.Time,
 	dbCardSets []*model.DbCardSet,
-	idsToDelete []string,
 ) (string, error) {
 	var lastMongoModificationDate primitive.DateTime
 	for _, c := range dbCardSets {
@@ -125,16 +125,14 @@ func (h *Handler) calcLastModificationDate(
 	}
 
 	lastCardSetModificationDate := lastMongoModificationDate.Time()
-	if len(idsToDelete) > 0 {
-		lastDate, err := h.storage.LastModificationDate(ctx, idsToDelete)
-		if err != nil {
-			return "", err
-		}
+	lastDateInDb, err := h.storage.LastModificationDate(ctx, userId)
+	if err != nil {
+		return "", err
+	}
 
-		if lastDate != nil {
-			if lastDate.Compare(lastCardSetModificationDate) > 0 {
-				lastCardSetModificationDate = *lastDate
-			}
+	if lastDateInDb != nil {
+		if lastDateInDb.Compare(lastCardSetModificationDate) > 0 {
+			lastCardSetModificationDate = *lastDateInDb
 		}
 	}
 

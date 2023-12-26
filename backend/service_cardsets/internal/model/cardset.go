@@ -2,7 +2,6 @@ package model
 
 import (
 	"api"
-	"time"
 	"tools"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -71,8 +70,8 @@ func (cs *DbCardSet) ToApi() *api.CardSet {
 		Tags:             cs.Tags,
 		Cards:            tools.Map(cs.Cards, func(cardDb *DbCard) *api.Card { return cardDb.ToApi() }),
 		UserId:           cs.UserId.Hex(),
-		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339Nano),
-		ModificationDate: cs.ModificationDate.Time().UTC().Format(time.RFC3339Nano),
+		CreationDate:     tools.DbDateToApiDate(cs.CreationDate),
+		ModificationDate: tools.DbDateToApiDate(cs.ModificationDate),
 		CreationId:       cs.CreationId,
 	}
 }
@@ -85,8 +84,8 @@ func (cs *DbCardSet) ToGrpc() *cardsetsgrpc.CardSet {
 		Tags:             cs.Tags,
 		Cards:            tools.Map(cs.Cards, func(cardDb *DbCard) *cardsetsgrpc.Card { return cardDb.ToGrpc() }),
 		UserId:           cs.UserId.Hex(),
-		CreationDate:     cs.CreationDate.Time().UTC().Format(time.RFC3339Nano),
-		ModificationDate: cs.ModificationDate.Time().UTC().Format(time.RFC3339Nano),
+		CreationDate:     tools.DbDateToApiDate(cs.CreationDate),
+		ModificationDate: tools.DbDateToApiDate(cs.ModificationDate),
 	}
 }
 

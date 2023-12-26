@@ -17,7 +17,7 @@ import (
 
 type storage interface {
 	HasModificationsSince(ctx context.Context, userId string, lastModificationDate *time.Time) (bool, error)
-	IdsNotInList(ctx context.Context, ids []string) ([]string, error)
+	IdsNotInList(ctx context.Context, userId string, ids []string) ([]string, error)
 	MarkAsDeletedByIds(ctx context.Context, ids []string, modificationDate time.Time) error
 	UpdateCardSet(ctx context.Context, cardSet *api.CardSet) error
 	InsertCardSet(ctx context.Context, cardSet *api.CardSet, userId string) (*api.CardSet, error)
@@ -144,7 +144,7 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 
 		insertedCardSetIds := tools.MapValues(response.CardSetIds)
 		currentCardSetIdsWithAdded := append(input.CurrentCardSetIds, insertedCardSetIds...)
-		deletedIds, sErr := h.storage.IdsNotInList(tCtx, currentCardSetIdsWithAdded)
+		deletedIds, sErr := h.storage.IdsNotInList(tCtx, authToken.UserDbId, currentCardSetIdsWithAdded)
 		if sErr != nil {
 			return nil, sErr
 		}
