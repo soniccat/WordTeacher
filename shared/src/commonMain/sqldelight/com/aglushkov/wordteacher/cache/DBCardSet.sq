@@ -21,7 +21,12 @@ SELECT *
 FROM DBCardSet
 WHERE modificationDate > ?;
 
-selectWithouRemoteId:
+selectUpdatedIds:
+SELECT id
+FROM DBCardSet
+WHERE modificationDate > ?;
+
+selectWithoutRemoteId:
 SELECT *
 FROM DBCardSet
 WHERE remoteId == "";
@@ -32,11 +37,11 @@ FROM DBCardSet
 WHERE id = ?;
 
 insert:
-INSERT INTO DBCardSet(name, date, modificationDate, creationId)
-VALUES (?, ?, ?, ?);
+INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId)
+VALUES (?, ?, ?, ?, ?);
 
 insertCardSet:
-INSERT INTO DBCardSet(name, date, modificationDate, creationId)
+INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId)
 VALUES ?;
 
 updateCardSet:
@@ -81,7 +86,7 @@ UPDATE DBCardSet
 SET modificationDate = ?
 WHERE id = ?;
 
-shiftCardSetModificationDate:
+updateCardSetModificationDateForIds:
 UPDATE DBCardSet
 SET modificationDate = ?
-WHERE modificationDate > ?;
+WHERE modificationDate < ? AND id IN ?;

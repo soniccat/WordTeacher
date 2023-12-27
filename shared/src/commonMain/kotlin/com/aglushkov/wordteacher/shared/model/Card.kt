@@ -61,10 +61,10 @@ data class Card (
 
 // here we don't merge the content of two cards, we just choose the newest one
 fun List<Card>.mergeCards(anotherCards: List<Card>): List<Card> {
-    val anotherCardsMap = anotherCards.associateBy { it.remoteId }.toMutableMap()
+    val anotherCardsMap = anotherCards.associateBy { it.creationId }.toMutableMap()
     return buildList<Card> {
         this.onEach { thisCard ->
-            anotherCardsMap[thisCard.remoteId]?.let { remoteCard ->
+            anotherCardsMap[thisCard.creationId]?.let { remoteCard ->
                 if (thisCard.modificationDate > remoteCard.modificationDate) {
                     add(thisCard)
                 } else {
@@ -73,7 +73,7 @@ fun List<Card>.mergeCards(anotherCards: List<Card>): List<Card> {
             } ?: run {
                 add(thisCard)
             }
-            anotherCardsMap.remove(thisCard.remoteId)
+            anotherCardsMap.remove(thisCard.creationId)
         }
 
         anotherCardsMap.onEach {

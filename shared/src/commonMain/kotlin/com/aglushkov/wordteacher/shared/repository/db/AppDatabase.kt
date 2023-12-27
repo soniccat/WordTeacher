@@ -157,7 +157,7 @@ class AppDatabase(
     }
 
     inner class CardSets {
-        fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString())
+        fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString(), "")
 
         private fun insertedCardSetId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
 
@@ -171,7 +171,10 @@ class AppDatabase(
             CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId)
         }).executeAsList()
 
-        fun selectWithoutRemoteId(): List<CardSet> = db.dBCardSetQueries.selectWithouRemoteId(mapper = { id, name, date, modificationDate, creationId, remoteId ->
+        fun selectUpdatedCardSetsIds(sinceDate: Long) =
+            db.dBCardSetQueries.selectUpdatedIds(sinceDate).executeAsList()
+
+        fun selectWithoutRemoteId(): List<CardSet> = db.dBCardSetQueries.selectWithoutRemoteId(mapper = { id, name, date, modificationDate, creationId, remoteId ->
             CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId)
         }).executeAsList()
 
@@ -247,7 +250,8 @@ class AppDatabase(
                     name = cardSet.name,
                     date = cardSet.creationDate.toEpochMilliseconds(),
                     modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
-                    creationId = cardSet.creationId
+                    creationId = cardSet.creationId,
+                    remoteId = cardSet.remoteId,
                 )
                 insertedCarSetId = insertedCardSetId()!!
                 cardSet.cards.onEach { card ->
@@ -314,8 +318,8 @@ class AppDatabase(
         fun updateCardSetRemoteId(remoteId: String, creationId: String) =
             db.dBCardSetQueries.updateCardSetRemoteId(remoteId, creationId)
 
-        fun shiftCardSetModificationDate(toDate: Long, sinceDate: Long) =
-            db.dBCardSetQueries.shiftCardSetModificationDate(toDate, sinceDate)
+        fun updateCardSetModificationDateForIds(toDate: Long, ids: List<Long>) =
+            db.dBCardSetQueries.updateCardSetModificationDateForIds(toDate, toDate, ids)
     }
 
     inner class Cards {
