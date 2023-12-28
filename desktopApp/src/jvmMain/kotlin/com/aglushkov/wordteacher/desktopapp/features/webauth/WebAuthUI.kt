@@ -3,6 +3,8 @@ package com.aglushkov.wordteacher.desktopapp.features.webauth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
@@ -16,9 +18,18 @@ import javafx.embed.swing.JFXPanel
 import javafx.scene.Scene
 import javafx.scene.web.WebView
 import javafx.application.Platform
+import kotlinx.coroutines.launch
 
 @Composable
 fun WebAuthUI(vm: WebAuthVM, onCompleted: () -> Unit) {
+    LaunchedEffect("state listener") {
+        vm.state.collect {
+            if (it.isCompleted) {
+                onCompleted()
+            }
+        }
+    }
+
     CustomDialogUI(onDismissRequest = {
         vm.onError(Cancelled)
         onCompleted()
@@ -35,7 +46,6 @@ fun WebAuthUI(vm: WebAuthVM, onCompleted: () -> Unit) {
                 }
             }
         )
-        Text("webview")
     }
 }
 

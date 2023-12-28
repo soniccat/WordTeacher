@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.webauth.vm
 
+import androidx.compose.runtime.MutableState
 import com.aglushkov.wordteacher.shared.features.AuthOpener
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
@@ -10,11 +12,16 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 interface WebAuthVM: Clearable {
     var router: WebAuthRouter?
     val initialUrl: Url
+    val state: StateFlow<InMemoryState>
 
     fun onCompleted(result: AuthOpener.AuthResult)
     fun onError(throwable: Throwable)
@@ -23,6 +30,10 @@ interface WebAuthVM: Clearable {
     @Parcelize
     class State: Parcelable {
     }
+
+    data class InMemoryState(
+        val isCompleted: Boolean
+    )
 }
 
 open class WebAuthVMImpl(
@@ -36,6 +47,7 @@ open class WebAuthVMImpl(
     private val authContext = googleOAuth2Service.buildAuthContext()
 
     override val initialUrl: Url = authContext.url
+    override val state: MutableStateFlow<WebAuthVM.InMemoryState> = MutableStateFlow(WebAuthVM.InMemoryState(isCompleted = false))
 
     override fun onUrlChanged(url: String) {
         when(val result = googleOAuth2Service.parseAuthResponseUrl(url, authContext.state)) {
@@ -80,6 +92,7 @@ open class WebAuthVMImpl(
     }
 
     override fun onCompleted(result: AuthOpener.AuthResult) {
+        state.update { it.copy(isCompleted = true) }
         router?.onCompleted(result)
     }
 
