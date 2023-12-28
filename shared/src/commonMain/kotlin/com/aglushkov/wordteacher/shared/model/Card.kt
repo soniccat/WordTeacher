@@ -63,7 +63,7 @@ data class Card (
 fun List<Card>.mergeCards(anotherCards: List<Card>): List<Card> {
     val anotherCardsMap = anotherCards.associateBy { it.creationId }.toMutableMap()
     return buildList<Card> {
-        this.onEach { thisCard ->
+        this@mergeCards.onEach { thisCard ->
             anotherCardsMap[thisCard.creationId]?.let { remoteCard ->
                 if (thisCard.modificationDate > remoteCard.modificationDate) {
                     add(thisCard)
