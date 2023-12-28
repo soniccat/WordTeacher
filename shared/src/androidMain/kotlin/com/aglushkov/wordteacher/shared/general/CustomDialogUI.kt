@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewParent
 import android.view.Window
 import android.view.WindowManager
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.v
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -87,7 +89,7 @@ data class WindowInsets(
     val bottom: Int = 0
 ) {
     fun log() {
-        Log.d(
+        Logger.v(
             "WindowInsets",
             "left:${left} right:${right} top:${top} bottom:${bottom}"
         )

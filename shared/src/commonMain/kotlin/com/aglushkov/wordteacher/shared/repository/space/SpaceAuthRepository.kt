@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.repository.space
 
 import com.aglushkov.wordteacher.shared.general.ErrorResponseException
 import com.aglushkov.wordteacher.shared.general.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.service.*
@@ -24,20 +25,10 @@ class SpaceAuthRepository(
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val spaceAuthStateFlow = MutableStateFlow<Resource<AuthData>>(Resource.Uninitialized())
 
-    private val stateFlow: StateFlow<Resource<AuthData>> = spaceAuthStateFlow
-    /*combine(
-        googleAuthController.googleAuthDataFlow,
-        spaceAuthStateFlow
-    ) { googleRes, spaceRes ->
-        googleRes.merge(spaceRes) { gr, sr ->
-            sr
-        }
-    }.stateIn(mainScope, SharingStarted.Eagerly, Resource.Uninitialized())*/
-
-    val authDataFlow: Flow<Resource<AuthData>> = stateFlow
+    val authDataFlow: Flow<Resource<AuthData>> = spaceAuthStateFlow
     val currentAuthData: Resource<AuthData>
     get() {
-        return stateFlow.value
+        return spaceAuthStateFlow.value
     }
 
     val networkType: SpaceAuthService.NetworkType?
@@ -80,19 +71,22 @@ class SpaceAuthRepository(
             throw RuntimeException("authInternal: unsupported network")
         }
 
-        val googleAuthDataRes = googleAuthController.googleAuthDataFlow.value
-        if (googleAuthDataRes.isLoading()) {
-            return currentAuthData
+        if (spaceAuthStateFlow.isLoading()) {
+            spaceAuthStateFlow.takeWhile { it.isNotLoading() }.collect()
         }
 
+        spaceAuthStateFlow.value = Resource.Loading()
+
+        val googleAuthDataRes = googleAuthController.googleAuthDataFlow.value
         val googleAuthData = if (!googleAuthDataRes.isLoaded()) {
             googleAuthController.signIn()
         } else {
             googleAuthDataRes
         }
 
+        var authResult: Resource<AuthData> = Resource.Uninitialized()
         googleAuthData.asLoaded()?.let { loadedGoogleAuthData ->
-            val authResult = auth(network, loadedGoogleAuthData.data.tokenId)
+            authResult = auth(network, loadedGoogleAuthData.data.tokenId)
             authResult.asError()?.let { errorAuthData ->
                 (errorAuthData.throwable as? ErrorResponseException)?.let {
                     // id token is expired, need to resign-in
@@ -101,7 +95,7 @@ class SpaceAuthRepository(
                         // on error just keep error in googleAuthRepository
                         googleAuthData2.asLoaded()?.let { loadedGoogleAuthData2 ->
                             // try second time
-                            auth(network, loadedGoogleAuthData2.data.tokenId)
+                            authResult = auth(network, loadedGoogleAuthData2.data.tokenId)
                         }
                     }
                 }
@@ -109,25 +103,17 @@ class SpaceAuthRepository(
         }
         // on error just keep error in googleAuthRepository
 
+        spaceAuthStateFlow.value = authResult
+
         return currentAuthData
     }
 
-    fun launchSignIn(network: SpaceAuthService.NetworkType, token: String) {
-        mainScope.launch {
-            auth(network, token)
-        }
-    }
-
     private suspend fun auth(network: SpaceAuthService.NetworkType, token: String): Resource<AuthData> {
-        var res: Resource<AuthData> = currentAuthData
-        loadResource(res) {
+        return loadResource(currentAuthData) {
             service.auth(network, token).toOkResponse()
         }.onEach {
             storeAuthDataIfNeeded(it)
-            res = it
-        }.collect(spaceAuthStateFlow)
-
-        return res
+        }.last()
     }
 
     fun signOut(network: SpaceAuthService.NetworkType) {

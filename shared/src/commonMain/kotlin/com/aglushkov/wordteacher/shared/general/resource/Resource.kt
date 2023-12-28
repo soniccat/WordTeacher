@@ -123,6 +123,10 @@ fun Resource<*>?.isNotLoadedAndNotLoading(): Boolean {
     return if (this == null) false else this !is Resource.Loaded && this !is Resource.Loading
 }
 
+fun Resource<*>?.isNotLoadedAndNotError(): Boolean {
+    return if (this == null) false else this !is Resource.Loaded && this !is Resource.Error
+}
+
 fun Resource<*>?.isNotLoading(): Boolean {
     return if (this == null) false else this !is Resource.Loading
 }

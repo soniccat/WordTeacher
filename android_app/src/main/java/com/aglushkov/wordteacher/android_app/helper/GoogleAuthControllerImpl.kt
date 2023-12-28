@@ -3,7 +3,8 @@ package com.aglushkov.wordteacher.android_app.helper
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
-import android.util.Log
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -13,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.v
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -67,19 +69,19 @@ class GoogleAuthControllerImpl(
         safeGoogleSignInClient.silentSignIn()
             .addOnSuccessListener { acc ->
                 acc.idToken?.let { idToken ->
-                    Log.v("GoogleAuthRepository", "silentSignIn success ${acc.idToken}")
+                    Logger.v("GoogleAuthRepository", "silentSignIn success ${acc.idToken}")
                     googleAuthDataState.value = Resource.Loaded(GoogleAuthData(acc.displayName, idToken, true))
                 } ?: run {
-                    Log.e("GoogleAuthRepository", "idToken is null")
+                    Logger.e("GoogleAuthRepository", "idToken is null")
                     googleAuthDataState.value = Resource.Error(RuntimeException("Google idToken is null"), canTryAgain = true)
                 }
             }
             .addOnFailureListener {
-                Log.e("GoogleAuthRepository", "silentSignIn failure")
+                Logger.e("GoogleAuthRepository", "silentSignIn failure")
                 googleAuthDataState.value = Resource.Error(it, canTryAgain = true)
             }
             .addOnCanceledListener {
-                Log.v("GoogleAuthRepository", "silentSignIn cancelled")
+                Logger.v("GoogleAuthRepository", "silentSignIn cancelled")
                 googleAuthDataState.value = Resource.Uninitialized()
             }
     }
@@ -103,7 +105,7 @@ class GoogleAuthControllerImpl(
                 try {
                     signInLauncher?.launch(IntentSenderRequest.Builder(result.pendingIntent.intentSender).build())
                 } catch (e: IntentSender.SendIntentException) {
-                    Log.e(
+                    Logger.e(
                         "GoogleAuthRepository",
                         "beginSignIn Couldn't start One Tap UI: ${e.localizedMessage}"
                     )
@@ -111,11 +113,11 @@ class GoogleAuthControllerImpl(
                 }
             }
             .addOnFailureListener {
-                Log.e("GoogleAuthRepository", "beginSignIn failure")
+                Logger.e("GoogleAuthRepository", "beginSignIn failure")
                 googleAuthDataState.value = Resource.Error(it, canTryAgain = true)
             }
             .addOnCanceledListener {
-                Log.v("GoogleAuthRepository", "beginSignIn cancelled")
+                Logger.v("GoogleAuthRepository", "beginSignIn cancelled")
                 googleAuthDataState.value = Resource.Uninitialized()
             }
     }

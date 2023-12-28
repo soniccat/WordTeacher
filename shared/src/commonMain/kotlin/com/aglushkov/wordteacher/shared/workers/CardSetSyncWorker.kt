@@ -169,16 +169,6 @@ class CardSetSyncWorker(
         state.update { it.toState(st) }
     }
 
-    fun pull() {
-        if (!canPull()) {
-            return
-        }
-
-        scope.launch {
-            pullInternal()
-        }
-    }
-
     private suspend fun pullInternal() {
         if (!canPull()) {
 //            waitUntilCanPull()

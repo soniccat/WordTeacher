@@ -24,7 +24,7 @@ clean:
 up:
 	docker compose --env-file ./prod.env up -d
 
-allup: down clean up
+reup: down clean up
 
 stop:
 	docker compose --env-file ./prod.env stop
