@@ -30,12 +30,13 @@ import kotlinx.coroutines.launch
 interface LearningVM: Clearable {
     var router: LearningRouter?
 
-    val termState: StateFlow<TermState>
-    val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
+    val challengeState: StateFlow<Resource<Challenge>>
     val titleErrorFlow: StateFlow<StringDesc?>
     val canShowHint: StateFlow<Boolean>
     val hintString: StateFlow<List<Char>>
 
+    fun onMatchTermPressed(matchRow: Challenge.MatchRow)
+    fun onMatchExamplePressed(matchRow: Challenge.MatchRow)
     fun onTestOptionPressed(answer: String)
     fun onCheckPressed(answer: String)
     fun onTextChanged()
@@ -47,14 +48,51 @@ interface LearningVM: Clearable {
     fun onClosePressed()
 
     fun save(): State
-    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+    fun getErrorText(res: Resource<*>): StringDesc?
 
-    data class TermState(
-        val term: String = "",
-        val index: Int = 0,
-        val count: Int = 0,
-        val testOptions: List<String> = emptyList() // for testSession
-    )
+    sealed interface Challenge {
+        data class Match(
+            val rows: List<MatchRow>
+        ): Challenge
+
+        data class MatchRow(
+            val id: Int,
+            val matchPair: MatchSession.MatchPair,
+        )
+
+        data class Test(
+            val term: String,
+            val index: Int,
+            val count: Int,
+            val testOptions: List<String>,
+            val termViewItems: List<BaseViewItem<*>>,
+        ): Challenge
+
+        data class Type(
+            val term: String,
+            val index: Int,
+            val count: Int,
+            val termViewItems: List<BaseViewItem<*>>,
+        ): Challenge
+
+        fun index(): Int = when(this) {
+            is Test -> index
+            is Type -> index
+            else -> 0
+        }
+
+        fun count(): Int = when(this) {
+            is Test -> count
+            is Type -> count
+            else -> 0
+        }
+
+        fun termViewItems(): List<BaseViewItem<*>> = when(this) {
+            is Test -> termViewItems
+            is Type -> termViewItems
+            else -> emptyList()
+        }
+    }
 
     @Parcelize
     data class State (
@@ -73,8 +111,7 @@ open class LearningVMImpl(
 
     override var router: LearningRouter? = null
 
-    override val termState = MutableStateFlow(LearningVM.TermState())
-    override val viewItems = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+    override val challengeState = MutableStateFlow<Resource<LearningVM.Challenge>>(Resource.Uninitialized())
     override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
     override val canShowHint = MutableStateFlow(true)
     override val hintString = MutableStateFlow(listOf<Char>())
@@ -98,65 +135,81 @@ open class LearningVMImpl(
     }
 
     // Screen state flow
-    private fun startLearning(cardIds: List<Long>, teacherState: CardTeacher.State?) {
-        viewModelScope.launch {
-            viewItems.value = Resource.Loading()
+    private fun startLearning(cardIds: List<Long>, teacherState: CardTeacher.State?) = viewModelScope.launch {
+        challengeState.update { Resource.Loading() }
 
-            // TODO: consider updating span priority to calculate required card spans first and skip not required for now
-            databaseCardWorker.updateSpansAndStartEditing()
+        // TODO: consider updating span priority to calculate required card spans first and skip not required for now
+        databaseCardWorker.updateSpansAndStartEditing()
 
-            // Need to load cards first
-            val cards = cardLoader.loadCardsUntilLoaded(
-                cardIds = cardIds,
-                onLoading = {
-                    viewItems.value = Resource.Loading()
-                },
-                onError = {
-                    viewItems.value = Resource.Error(it, canTryAgain = true)
-                }
-            )
-
-            val teacher = createTeacher(cards, teacherState)
-            launch { // start observing hint string
-                teacher.hintString.collect(hintString)
+        // Need to load cards first
+        val cards = cardLoader.loadCardsUntilLoaded(
+            cardIds = cardIds,
+            onLoading = {
+                //viewItems.value = Resource.Loading()
+            },
+            onError = { throwable ->
+                challengeState.update { Resource.Error(throwable, canTryAgain = true) }
             }
-            launch { // bind canShowHint
-                teacher.hintShowCount.map { it < 2 }.collect(canShowHint)
-            }
+        )
 
-            var sessionResults: List<SessionCardResult>? = null
-            do {
-                sessionResults = teacher.runSession { cardCount, testCards, sessionCards ->
-                    // test session
-                    testCards?.collectIndexed { index, testCard ->
-                        termState.update { it.copy(
-                            term = testCard.card.term,
-                            index = index,
-                            count = cardCount,
-                            testOptions = testCard.options
-                        ) }
-                        viewItems.value = Resource.Loaded(buildCardItem(testCard.card))
+        val teacher = createTeacher(cards, teacherState)
+        launch { // start observing hint string
+            teacher.hintString.collect(hintString)
+        }
+        launch { // bind canShowHint
+            teacher.hintShowCount.map { it < 2 }.collect(canShowHint)
+        }
+
+        var sessionResults: List<SessionCardResult>? = null
+        do {
+            sessionResults = teacher.runSession { cardCount, matchPairs, testCards, sessionCards ->
+                // match session
+                matchPairs?.collect { pairs ->
+                    challengeState.update {
+                        Resource.Loaded(
+                            LearningVM.Challenge.Match(
+                                rows = pairs.mapIndexed { index, matchPair ->
+                                    LearningVM.Challenge.MatchRow(index, matchPair)
+                                },
+                            )
+                        )
                     }
+                }
 
-                    // type session
-                    sessionCards.collectIndexed { index, card ->
-                        termState.update { it.copy(
+                // test session
+                testCards?.collectIndexed { index, testCard ->
+                    challengeState.update {
+                        Resource.Loaded(
+                            LearningVM.Challenge.Test(
+                                term = testCard.card.term,
+                                index = index,
+                                count = cardCount,
+                                testOptions = testCard.options,
+                                termViewItems = buildCardItem(testCard.card),
+                            )
+                        )
+                    }
+                }
+
+                // type session
+                sessionCards.collectIndexed { index, card ->
+                    Resource.Loaded(
+                        LearningVM.Challenge.Type(
                             term = card.term,
                             index = index,
                             count = cardCount,
-                            testOptions = emptyList()
-                        ) }
-                        viewItems.value = Resource.Loaded(buildCardItem(card))
-                    }
+                            termViewItems = buildCardItem(card),
+                        )
+                    )
                 }
+            }
 
-                if (sessionResults != null) {
-                    router?.openSessionResult(sessionResults)
-                }
-            } while (sessionResults != null)
+            if (sessionResults != null) {
+                router?.openSessionResult(sessionResults)
+            }
+        } while (sessionResults != null)
 
-            onLearningCompleted()
-        }
+        onLearningCompleted()
     }
 
     private fun stopLearning() {
@@ -214,7 +267,15 @@ open class LearningVMImpl(
     }
 
     private fun generateIds(items: List<BaseViewItem<*>>) {
-        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator)
+        generateViewItemIds(items, challengeState.value.data()?.termViewItems().orEmpty(), idGenerator)
+    }
+
+    override fun onMatchTermPressed(matchRow: LearningVM.Challenge.MatchRow) {
+        teacher?.onMatchTermSelected(matchRow.matchPair)
+    }
+
+    override fun onMatchExamplePressed(matchRow: LearningVM.Challenge.MatchRow) {
+        teacher?.onMatchExampleSelected(matchRow.matchPair)
     }
 
     override fun onTestOptionPressed(answer: String) {
@@ -274,7 +335,7 @@ open class LearningVMImpl(
         router?.onScreenFinished(this, SimpleRouter.Result(false))
     }
 
-    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
+    override fun getErrorText(res: Resource<*>): StringDesc? {
         return StringDesc.Resource(MR.strings.learning_error)
     }
 }

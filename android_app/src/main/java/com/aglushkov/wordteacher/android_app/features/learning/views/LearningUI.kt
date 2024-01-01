@@ -1,9 +1,8 @@
 package com.aglushkov.wordteacher.android_app.features.learning.views
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,10 +37,12 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeech
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
+import com.aglushkov.wordteacher.shared.features.learning.vm.MatchSession
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.desc.StringDesc
 import java.util.*
 
 @ExperimentalUnitApi
@@ -72,7 +73,6 @@ fun LearningUIDialog(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun LearningUI(
     vm: LearningVM,
@@ -80,11 +80,9 @@ fun LearningUI(
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val termState by vm.termState.collectAsState()
+    val challengeState by vm.challengeState.collectAsState()
     val errorString by vm.titleErrorFlow.collectAsState()
-    val viewItemsRes by vm.viewItems.collectAsState()
-    val data = viewItemsRes.data()
-    val isTestSession = termState.testOptions.isNotEmpty()
+    val data = challengeState.data()
     val canShowHint by vm.canShowHint.collectAsState()
     val hintString by vm.hintString.collectAsState()
     val focusRequester = remember { FocusRequester() }
@@ -102,124 +100,201 @@ fun LearningUI(
         ) {
             TopAppBar(
                 title = {
-                    if (termState.term.isNotEmpty()) {
-                        Text(
-                            text = stringResource(id = MR.strings.learning_title.resourceId)
-                                .format(termState.index + 1, termState.count)
-                        )
+                    data?.let {
+                        if (data.count() != 0) {
+                            Text(
+                                text = stringResource(id = MR.strings.learning_title.resourceId)
+                                    .format(data.index() + 1, data.count())
+                            )
+                        }
                     }
                 },
                 actions = actions
             )
 
             if (data != null) {
-                if (isTestSession) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(dimensionResource(id = R.dimen.learning_testOption_margin))
-                    ) {
-                        Column {
-                            val itemPerRow = 2
-                            var rowCount = termState.testOptions.size / itemPerRow
-                            if (termState.testOptions.size % itemPerRow != 0) {
-                                rowCount += 1
-                            }
-
-                            for (i in 0 until rowCount) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    OptionButton(vm, termState.testOptions[i * itemPerRow])
-
-                                    if (i * itemPerRow + 1 < termState.testOptions.size) {
-                                        OptionButton(vm, termState.testOptions[i * itemPerRow + 1])
-                                    }
-                                }
-                            }
-                        }
+                when(data) {
+                    is LearningVM.Challenge.Test -> {
+                        testChallengeUI(data, vm)
                     }
-                } else {
-                    TermInput(
-                        term = termState.term,
-                        errorString = errorString?.resolveString(),
-                        focusRequester = focusRequester,
-                        onDone = { value ->
-                            vm.onCheckPressed(value)
-                        }
-                    )
-                    LaunchedEffect(key1 = "editing") {
-                        focusRequester.requestFocus()
+                    is LearningVM.Challenge.Type -> {
+                        typeChallengeUI(data, errorString, focusRequester, vm)
+                        this@Box.typeBottomButtons(canShowHint, snackbarHostState, hintString, vm)
                     }
-                }
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(
-                        bottom = 300.dp
-                    )
-                ) {
-                    items(data, key = { it.id }) { item ->
-                        LearningViewItems(itemView = item, vm = vm)
+                    is LearningVM.Challenge.Match -> {
+                        matchChallengeUI(data, vm)
                     }
                 }
             } else {
                 LoadingStatusView(
-                    resource = viewItemsRes,
+                    resource = challengeState,
                     loadingText = null,
-                    errorText = vm.getErrorText(viewItemsRes)?.resolveString()
+                    errorText = vm.getErrorText(challengeState)?.resolveString()
                 ) {
                     vm.onTryAgainClicked()
                 }
             }
         }
+    }
+}
 
-        if (data != null && !isTestSession) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomEnd)
-            ) {
-                ExtendedFloatingActionButton(
-                    text = {
-                        Text(
-                            text = stringResource(
-                                id = if (canShowHint) {
-                                    MR.strings.learning_show_hint.resourceId
-                                } else {
-                                    MR.strings.learning_give_up.resourceId
-                                }
-                            ).uppercase(Locale.getDefault()),
-                            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
-                        )
-                    },
-                    onClick = {
-                        if (canShowHint) {
-                            vm.onHintAskedPressed()
+@Composable
+private fun typeChallengeUI(
+    data: LearningVM.Challenge.Type,
+    errorString: StringDesc?,
+    focusRequester: FocusRequester,
+    vm: LearningVM
+) {
+    TermInput(
+        term = data.term,
+        errorString = errorString?.resolveString(),
+        focusRequester = focusRequester,
+        onDone = { value ->
+            vm.onCheckPressed(value)
+        }
+    )
+    LaunchedEffect(key1 = "editing") {
+        focusRequester.requestFocus()
+    }
+    termInfo(data.termViewItems)
+}
+
+
+@Composable
+private fun BoxScope.typeBottomButtons(
+    canShowHint: Boolean,
+    snackbarHostState: SnackbarHostState,
+    hintString: List<Char>,
+    vm: LearningVM,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomEnd)
+    ) {
+        ExtendedFloatingActionButton(
+            text = {
+                Text(
+                    text = stringResource(
+                        id = if (canShowHint) {
+                            MR.strings.learning_show_hint.resourceId
                         } else {
-                            vm.onGiveUpPressed()
+                            MR.strings.learning_give_up.resourceId
                         }
-                    },
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(dimensionResource(id = R.dimen.content_padding))
+                    ).uppercase(Locale.getDefault()),
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
                 )
+            },
+            onClick = {
+                if (canShowHint) {
+                    vm.onHintAskedPressed()
+                } else {
+                    vm.onGiveUpPressed()
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(dimensionResource(id = R.dimen.content_padding))
+        )
 
-                SnackbarHost(
-                    modifier = Modifier.animateContentSize(),
-                    hostState = snackbarHostState
+        SnackbarHost(
+            modifier = Modifier.animateContentSize(),
+            hostState = snackbarHostState
+        ) {
+            Snackbar(snackbarData = it)
+        }
+    }
+
+    LaunchedEffect(key1 = hintString) {
+        if (hintString.isNotEmpty()) {
+            val resultString = hintString.fold("") { str, char ->
+                "$str $char"
+            }
+            snackbarHostState.showSnackbar(resultString)
+        }
+    }
+}
+
+@Composable
+private fun matchChallengeUI(
+    data: LearningVM.Challenge.Match,
+    vm: LearningVM
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(
+            bottom = 300.dp
+        )
+    ) {
+        items(data.rows, key = { it.id }) { item ->
+            matchPairItemUI(item.matchPair, { vm.onMatchTermPressed(item) }, { vm.onMatchExamplePressed(item)})
+        }
+    }
+}
+
+@Composable
+private fun matchPairItemUI(
+    matchPair: MatchSession.MatchPair,
+    onTermClicked: () -> Unit,
+    onExampleClicked: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            modifier = Modifier.weight(1.0f).clickable(onClick = onTermClicked),
+            text = matchPair.term,
+        )
+        Text(
+            modifier = Modifier.weight(1.0f).clickable(onClick = onExampleClicked),
+            text = matchPair.example,
+        )
+    }
+}
+
+@Composable
+private fun testChallengeUI(
+    data: LearningVM.Challenge.Test,
+    vm: LearningVM
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(dimensionResource(id = R.dimen.learning_testOption_margin))
+    ) {
+        Column {
+            val itemPerRow = 2
+            var rowCount = data.testOptions.size / itemPerRow
+            if (data.testOptions.size % itemPerRow != 0) {
+                rowCount += 1
+            }
+
+            for (i in 0 until rowCount) {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Snackbar(snackbarData = it)
-                }
-            }
+                    OptionButton(vm, data.testOptions[i * itemPerRow])
 
-            LaunchedEffect(key1 = hintString) {
-                if (hintString.isNotEmpty()) {
-                    val resultString = hintString.fold("") { str, char ->
-                        "$str $char"
+                    if (i * itemPerRow + 1 < data.testOptions.size) {
+                        OptionButton(vm, data.testOptions[i * itemPerRow + 1])
                     }
-                    snackbarHostState.showSnackbar(resultString)
                 }
             }
+        }
+    }
+    termInfo(data.termViewItems)
+}
+
+@Composable
+fun termInfo(termViewItems: List<BaseViewItem<*>>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(
+            bottom = 300.dp
+        )
+    ) {
+        items(termViewItems, key = { it.id }) { item ->
+            LearningViewItems(itemView = item)
         }
     }
 }
@@ -310,7 +385,6 @@ fun TermInput(
 fun LearningViewItems(
     modifier: Modifier = Modifier,
     itemView: BaseViewItem<*>,
-    vm: LearningVM,
 ) {
     when(val item = itemView) {
         is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier, topPadding = 0.dp)

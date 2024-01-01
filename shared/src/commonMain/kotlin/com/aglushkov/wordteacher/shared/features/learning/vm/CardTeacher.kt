@@ -9,6 +9,8 @@ import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 class CardTeacher(
@@ -22,6 +24,8 @@ class CardTeacher(
     private var currentTestCardStateFlow = MutableStateFlow<TestSession.TestCard?>(null)
     private val currentTestCard: TestSession.TestCard?
         get() = currentTestCardStateFlow.value
+
+    private var matchSession: MatchSession? = null
 
     private var sessions = mutableListOf<LearningSession>()
     private var currentSession: LearningSession? = null
@@ -42,9 +46,13 @@ class CardTeacher(
         private set
 
     suspend fun runSession(
-        block: suspend (count:Int, testCards: Flow<TestSession.TestCard>?, cards: Flow<Card>) -> Unit
+        block: suspend (count:Int, matchSessionFlow:  Flow<List<MatchSession.MatchPair>>?, testCards: Flow<TestSession.TestCard>?, cards: Flow<Card>) -> Unit
     ): List<SessionCardResult>? {
         val session = buildLearnSession() ?: return null
+
+        if (session.cards.size > 2) {
+            matchSession = MatchSession(session.cards)
+        }
 
         if (session.cards.size >= TEST_SESSION_OPTION_COUNT) {
             val testSession = TestSession(session.cards, cards.map { it.term })
@@ -57,6 +65,7 @@ class CardTeacher(
 
         block(
             session.size,
+            matchSession?.matchPairFlow?.takeWhile { it != null } as? Flow<List<MatchSession.MatchPair>>,
             if (currentTestSession != null) {
                 currentTestCardStateFlow.takeWhileNonNull()
             } else {
@@ -200,6 +209,14 @@ class CardTeacher(
         }
 
         return nextTestCard
+    }
+
+    fun onMatchTermSelected(matchPair: MatchSession.MatchPair) {
+        matchSession?.selectTerm(matchPair)
+    }
+
+    fun onMatchExampleSelected(matchPair: MatchSession.MatchPair) {
+        matchSession?.selectExample(matchPair)
     }
 
     fun save() = State(

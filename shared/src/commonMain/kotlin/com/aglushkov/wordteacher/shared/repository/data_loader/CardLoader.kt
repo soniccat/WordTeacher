@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 
+// TODO: refactor to ResourceRepository
 class CardLoader(
     private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker
