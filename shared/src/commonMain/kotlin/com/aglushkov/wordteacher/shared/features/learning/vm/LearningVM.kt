@@ -253,15 +253,15 @@ open class LearningVMImpl(
 
         // bind new groups with colors
         activeGroups.onEach {
-            if (!matchColorMap.contains(it)) {
-                matchColorMap[it] = findAnotherColorIndex(matchColorMap.keys)
+            if (!matchColorMap.keys.contains(it)) {
+                matchColorMap[it] = findAnotherColorIndex(matchColorMap.values)
             }
         }
     }
 
-    private fun findAnotherColorIndex(exclude: Set<Int>): Int {
+    private fun findAnotherColorIndex(excludedColorIndexes: Collection<Int>): Int {
         for (i in MatchColors.indices) {
-            if (!exclude.contains(i)) {
+            if (!excludedColorIndexes.contains(i)) {
                 return i
             }
         }

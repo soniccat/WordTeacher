@@ -60,41 +60,39 @@ class MatchSession(
         updatePairs { i, p ->
             if (i == index) {
                 if (!pair.termSelection.isSelected) {
-                    val newPair = pair.copy(
+                    pair.copy(
                         termSelection = MatchSelection(
                             isSelected = !pair.termSelection.isSelected,
                             oppositeSelectedIndex = lastSelectedExampleIndex,
                             group = currentSelectionGroup,
                         ),
-                    )
-                    if (newPair.termSelection.hasMatch()) {
-                        ++currentSelectionGroup
-                        lastSelectedTermIndex = -1
-                        lastSelectedExampleIndex = -1
+                    ).also {
+                        if (it.termSelection.hasMatch()) {
+                            ++currentSelectionGroup
+                            lastSelectedTermIndex = -1
+                            lastSelectedExampleIndex = -1
+                        }
                     }
-                    updatedPair = newPair
-                    newPair
                 } else {
-                    pair.copy(
-                        termSelection = MatchSelection()
-                    )
+                    pair.copy(termSelection = MatchSelection())
+                }.also {
+                    updatedPair = it
                 }
-            } else if (p.exampleSelection.oppositeSelectedIndex == index) {
-                // TODO: it seems here we need to clear selection with the same group and above
-                p.copy(exampleSelection = p.exampleSelection.copy(oppositeSelectedIndex = -1, group = -1))
             } else {
                 p
             }
         }
 
         // update opposite exampleSelection
-        updatedPair?.let { up ->
-            updatePairs { i, p ->
-                if (i == up.termSelection.oppositeSelectedIndex) {
-                    p.copy(exampleSelection = p.exampleSelection.copy(oppositeSelectedIndex = index))
-                } else {
-                    p
-                }
+        updatePairs { i, p ->
+            // after deselecting clear corresponding example selection
+            if (pair.termSelection.isSelected && pair.termSelection.oppositeSelectedIndex == i) {
+                p.copy(exampleSelection = MatchSelection())
+            // after selection update corresponding example oppositeIndex
+            } else if (updatedPair?.termSelection?.oppositeSelectedIndex == i) {
+                p.copy(exampleSelection = p.exampleSelection.copy(oppositeSelectedIndex = index))
+            } else {
+                p
             }
         }
     }
@@ -116,41 +114,39 @@ class MatchSession(
         updatePairs { i, p ->
             if (i == index) {
                 if (!pair.exampleSelection.isSelected) {
-                    val newPair = pair.copy(
+                    pair.copy(
                         exampleSelection = MatchSelection(
                             isSelected = true,
                             oppositeSelectedIndex = lastSelectedTermIndex,
                             group = currentSelectionGroup,
                         ),
-                    )
-                    if (newPair.exampleSelection.hasMatch()) {
-                        ++currentSelectionGroup
-                        lastSelectedTermIndex = -1
-                        lastSelectedExampleIndex = -1
+                    ).also {
+                        if (it.exampleSelection.hasMatch()) {
+                            ++currentSelectionGroup
+                            lastSelectedTermIndex = -1
+                            lastSelectedExampleIndex = -1
+                        }
                     }
-                    updatedPair = newPair
-                    newPair
                 } else {
-                    pair.copy(
-                        exampleSelection = MatchSelection()
-                    )
+                    pair.copy(exampleSelection = MatchSelection())
+                }.also {
+                    updatedPair = it
                 }
-            } else if (p.termSelection.oppositeSelectedIndex == index) {
-                // TODO: it seems here we need to clear selection with the same group and above
-                p.copy(termSelection = p.termSelection.copy(oppositeSelectedIndex = -1, group = -1))
             } else {
                 p
             }
         }
 
         // update opposite termSelection
-        updatedPair?.let { up ->
-            updatePairs { i, p ->
-                if (i == up.exampleSelection.oppositeSelectedIndex) {
-                    p.copy(termSelection = p.termSelection.copy(oppositeSelectedIndex = index))
-                } else {
-                    p
-                }
+        updatePairs { i, p ->
+            // after deselecting clear corresponding term selection
+            if (pair.exampleSelection.isSelected && pair.exampleSelection.oppositeSelectedIndex == i) {
+                p.copy(termSelection = MatchSelection())
+            // after selection update corresponding term oppositeIndex
+            } else if (updatedPair?.exampleSelection?.oppositeSelectedIndex == i) {
+                p.copy(termSelection = p.termSelection.copy(oppositeSelectedIndex = index))
+            } else {
+                p
             }
         }
     }
