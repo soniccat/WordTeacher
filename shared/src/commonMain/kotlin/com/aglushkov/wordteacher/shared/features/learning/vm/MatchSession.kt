@@ -1,11 +1,14 @@
 package com.aglushkov.wordteacher.shared.features.learning.vm
 
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.resolveStringWithHiddenSpans
+import com.aglushkov.wordteacher.shared.model.resolveStringsWithHiddenSpans
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlin.random.Random
 
 class MatchSession(
     cards: List<Card>,
@@ -19,11 +22,17 @@ class MatchSession(
 
     init {
         val indexToExample = cards.mapIndexed { index, card ->
-            index to card.examples.random()
+            val exampleIndex = Random.nextInt(card.examples.size)
+            val exampleWithGaps = resolveStringWithHiddenSpans(card.examples[exampleIndex], card.exampleTermSpans[exampleIndex])
+            index to exampleWithGaps
         }.shuffled().toMutableList()
+
         matchPairStateFlow.update {
             cards.mapIndexed { index, card ->
-                val randExampleIndex = indexToExample.indexOfFirst { it.first != index }
+                var randExampleIndex = indexToExample.indexOfFirst { it.first != index }
+                if (randExampleIndex == -1) {
+                    randExampleIndex = 0
+                }
                 val example = indexToExample.removeAt(randExampleIndex).second
                 MatchPair(card.term, example, index)
             }
@@ -46,24 +55,46 @@ class MatchSession(
             }
         }
 
+        // update termSelection
+        var updatedPair: MatchPair? = null
         updatePairs { i, p ->
             if (i == index) {
-                val newPair = pair.copy(
-                    termSelection = MatchSelection(
-                        isSelected = !pair.termSelection.isSelected,
-                        oppositeSelectedIndex = lastSelectedTermIndex,
-                        group = currentSelectionGroup,
-                    ),
-                )
-                if (pair.termSelection.hasMatch()) {
-                    ++currentSelectionGroup
+                if (!pair.termSelection.isSelected) {
+                    val newPair = pair.copy(
+                        termSelection = MatchSelection(
+                            isSelected = !pair.termSelection.isSelected,
+                            oppositeSelectedIndex = lastSelectedExampleIndex,
+                            group = currentSelectionGroup,
+                        ),
+                    )
+                    if (newPair.termSelection.hasMatch()) {
+                        ++currentSelectionGroup
+                        lastSelectedTermIndex = -1
+                        lastSelectedExampleIndex = -1
+                    }
+                    updatedPair = newPair
+                    newPair
+                } else {
+                    pair.copy(
+                        termSelection = MatchSelection()
+                    )
                 }
-                newPair
             } else if (p.exampleSelection.oppositeSelectedIndex == index) {
                 // TODO: it seems here we need to clear selection with the same group and above
                 p.copy(exampleSelection = p.exampleSelection.copy(oppositeSelectedIndex = -1, group = -1))
             } else {
                 p
+            }
+        }
+
+        // update opposite exampleSelection
+        updatedPair?.let { up ->
+            updatePairs { i, p ->
+                if (i == up.termSelection.oppositeSelectedIndex) {
+                    p.copy(exampleSelection = p.exampleSelection.copy(oppositeSelectedIndex = index))
+                } else {
+                    p
+                }
             }
         }
     }
@@ -80,24 +111,46 @@ class MatchSession(
             lastSelectedExampleIndex = -1
         }
 
+        // update example selection
+        var updatedPair: MatchPair? = null
         updatePairs { i, p ->
             if (i == index) {
-                val newPair = pair.copy(
-                    exampleSelection = MatchSelection(
-                        isSelected = !pair.exampleSelection.isSelected,
-                        oppositeSelectedIndex = lastSelectedTermIndex,
-                        group = currentSelectionGroup,
-                    ),
-                )
-                if (pair.exampleSelection.hasMatch()) {
-                    ++currentSelectionGroup
+                if (!pair.exampleSelection.isSelected) {
+                    val newPair = pair.copy(
+                        exampleSelection = MatchSelection(
+                            isSelected = true,
+                            oppositeSelectedIndex = lastSelectedTermIndex,
+                            group = currentSelectionGroup,
+                        ),
+                    )
+                    if (newPair.exampleSelection.hasMatch()) {
+                        ++currentSelectionGroup
+                        lastSelectedTermIndex = -1
+                        lastSelectedExampleIndex = -1
+                    }
+                    updatedPair = newPair
+                    newPair
+                } else {
+                    pair.copy(
+                        exampleSelection = MatchSelection()
+                    )
                 }
-                newPair
             } else if (p.termSelection.oppositeSelectedIndex == index) {
                 // TODO: it seems here we need to clear selection with the same group and above
                 p.copy(termSelection = p.termSelection.copy(oppositeSelectedIndex = -1, group = -1))
             } else {
                 p
+            }
+        }
+
+        // update opposite termSelection
+        updatedPair?.let { up ->
+            updatePairs { i, p ->
+                if (i == up.exampleSelection.oppositeSelectedIndex) {
+                    p.copy(termSelection = p.termSelection.copy(oppositeSelectedIndex = index))
+                } else {
+                    p
+                }
             }
         }
     }
@@ -122,6 +175,8 @@ class MatchSession(
             var result = term.hashCode()
             result = 31 * result + example.hashCode()
             result = 31 * result + rightExampleIndex
+            result = 31 * result + termSelection.hashCode()
+            result = 31 * result + exampleSelection.hashCode()
             return result
         }
 
@@ -129,7 +184,13 @@ class MatchSession(
             val otherMatchPair = other as? MatchPair ?: return false
             return term == otherMatchPair.term &&
                     example == otherMatchPair.example &&
-                    rightExampleIndex == other.rightExampleIndex
+                    rightExampleIndex == other.rightExampleIndex &&
+                    termSelection == other.termSelection &&
+                    exampleSelection == other.exampleSelection
+        }
+
+        fun hasMatch(): Boolean {
+            return termSelection.hasMatch() || exampleSelection.hasMatch()
         }
     }
 

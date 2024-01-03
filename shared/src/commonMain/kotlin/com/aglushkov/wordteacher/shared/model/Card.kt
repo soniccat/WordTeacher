@@ -38,26 +38,31 @@ data class Card (
         )
 
     fun resolveDefinitionsWithHiddenTerm(): List<String> =
-        resolveWithHiddenTerm(definitions, definitionTermSpans)
+        resolveStringsWithHiddenSpans(definitions, definitionTermSpans)
 
     fun resolveExamplesWithHiddenTerm(): List<String> =
-        resolveWithHiddenTerm(examples, exampleTermSpans)
-
-    fun resolveWithHiddenTerm(strings: List<String>, spans: List<List<CardSpan>>): List<String> =
-        strings.mapIndexed { i, str ->
-            spans.getOrNull(i)?.let { spans ->
-                var resString: CharSequence = str
-                spans.asReversed().forEach { span ->
-                    if (span.end <= resString.length) {
-                        resString = resString.replaceRange(span.start, span.end, TERM_REPLACEMENT)
-                    } else {
-                        Logger.e("$resString is shorter than expected span ${span.start}:${span.end}")
-                    }
-                }
-                resString.toString()
-            } ?: str
-        }
+        resolveStringsWithHiddenSpans(examples, exampleTermSpans)
 }
+
+fun resolveStringsWithHiddenSpans(strings: List<String>, spans: List<List<CardSpan>>): List<String> =
+    strings.mapIndexed { i, str ->
+        spans.getOrNull(i)?.let { spans ->
+            resolveStringWithHiddenSpans(str, spans)
+        } ?: str
+    }
+
+fun resolveStringWithHiddenSpans(str: String, spans: List<CardSpan>): String {
+    var resString: CharSequence = str
+    spans.asReversed().forEach { span ->
+        if (span.end <= resString.length) {
+            resString = resString.replaceRange(span.start, span.end, TERM_REPLACEMENT)
+        } else {
+            Logger.e("$resString is shorter than expected span ${span.start}:${span.end}")
+        }
+    }
+    return resString.toString()
+}
+
 
 // here we don't merge the content of two cards, we just choose the newest one
 fun List<Card>.mergeCards(anotherCards: List<Card>): List<Card> {

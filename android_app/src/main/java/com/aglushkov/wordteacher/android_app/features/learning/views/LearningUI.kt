@@ -22,6 +22,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,6 +40,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.MatchSession
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
+import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
@@ -105,6 +107,12 @@ fun LearningUI(
                             Text(
                                 text = stringResource(id = MR.strings.learning_title.resourceId)
                                     .format(data.index() + 1, data.count())
+                            )
+                        } else if (data is LearningVM.Challenge.Match) {
+                            val readyMatches = data.rows.filter { it.matchPair.hasMatch() }.size
+                            Text(
+                                text = stringResource(id = MR.strings.learning_title.resourceId)
+                                    .format(readyMatches, data.rows.size)
                             )
                         }
                     }
@@ -227,14 +235,14 @@ private fun matchChallengeUI(
         )
     ) {
         items(data.rows, key = { it.id }) { item ->
-            matchPairItemUI(item.matchPair, { vm.onMatchTermPressed(item) }, { vm.onMatchExamplePressed(item)})
+            matchRowUI(item, { vm.onMatchTermPressed(item) }, { vm.onMatchExamplePressed(item)})
         }
     }
 }
 
 @Composable
-private fun matchPairItemUI(
-    matchPair: MatchSession.MatchPair,
+private fun matchRowUI(
+    matchRow: LearningVM.Challenge.MatchRow,
     onTermClicked: () -> Unit,
     onExampleClicked: () -> Unit,
 ) {
@@ -242,12 +250,28 @@ private fun matchPairItemUI(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            modifier = Modifier.weight(1.0f).clickable(onClick = onTermClicked),
-            text = matchPair.term,
+            modifier = Modifier.weight(1.0f)
+                .clickable(onClick = onTermClicked)
+                .background(
+                    color = matchRow.termColor?.let {
+                        val alpha = if (matchRow.matchPair.termSelection.hasMatch()) { 153 } else { 80 }
+                        Color(it.red, it.green, it.blue, alpha)
+                    } ?: Color.Transparent,
+                )
+                .padding(start = LocalDimens.current.contentPadding, top = LocalDimens.current.contentPadding, end = LocalDimens.current.contentPadding / 2),
+            text = matchRow.matchPair.term,
         )
         Text(
-            modifier = Modifier.weight(1.0f).clickable(onClick = onExampleClicked),
-            text = matchPair.example,
+            modifier = Modifier.weight(2.0f)
+                .clickable(onClick = onExampleClicked)
+                .background(
+                    color = matchRow.exampleColor?.let {
+                        val alpha = if (matchRow.matchPair.exampleSelection.hasMatch()) { 153 } else { 80 }
+                        Color(it.red, it.green, it.blue, alpha)
+                    } ?: Color.Transparent,
+                )
+                .padding(start = LocalDimens.current.contentPadding / 2, top = LocalDimens.current.contentPadding, end = LocalDimens.current.contentPadding),
+            text = matchRow.matchPair.example,
         )
     }
 }

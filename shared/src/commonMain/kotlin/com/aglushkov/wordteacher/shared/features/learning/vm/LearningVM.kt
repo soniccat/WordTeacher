@@ -16,12 +16,14 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import dev.icerock.moko.graphics.Color
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.*
@@ -57,6 +59,8 @@ interface LearningVM: Clearable {
 
         data class MatchRow(
             val id: Int,
+            val termColor: Color?,
+            val exampleColor: Color?,
             val matchPair: MatchSession.MatchPair,
         )
 
@@ -115,6 +119,7 @@ open class LearningVMImpl(
     override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
     override val canShowHint = MutableStateFlow(true)
     override val hintString = MutableStateFlow(listOf<Char>())
+    private val matchColorMap: MutableMap<Int, Int> = mutableMapOf() // selection group to color index from MatchColors
 
     private var teacher: CardTeacher? = null
 
@@ -165,11 +170,17 @@ open class LearningVMImpl(
             sessionResults = teacher.runSession { cardCount, matchPairs, testCards, sessionCards ->
                 // match session
                 matchPairs?.collect { pairs ->
+                    updateMatchColorMap(pairs)
                     challengeState.update {
                         Resource.Loaded(
                             LearningVM.Challenge.Match(
                                 rows = pairs.mapIndexed { index, matchPair ->
-                                    LearningVM.Challenge.MatchRow(index, matchPair)
+                                    LearningVM.Challenge.MatchRow(
+                                        index,
+                                        resolveColorForGroup(matchPair.termSelection.group),
+                                        resolveColorForGroup(matchPair.exampleSelection.group),
+                                        matchPair,
+                                    )
                                 },
                             )
                         )
@@ -210,6 +221,52 @@ open class LearningVMImpl(
         } while (sessionResults != null)
 
         onLearningCompleted()
+    }
+
+    private fun resolveColorForGroup(group: Int): Color? {
+        if (group == -1) {
+            return null
+        }
+
+        val colorIndex = matchColorMap[group] ?: return null
+        return MatchColors[colorIndex]
+    }
+
+    private fun updateMatchColorMap(activePairs: List<MatchSession.MatchPair>) {
+        val activeGroups = LinkedHashSet<Int>().apply {
+            activePairs.onEach {
+                if (it.termSelection.group != -1) {
+                    add(it.termSelection.group)
+                }
+                if (it.exampleSelection.group != -1) {
+                    add(it.exampleSelection.group)
+                }
+            }
+        }
+
+        // remove stale groups
+        matchColorMap.keys.toList().onEach { group ->
+            if (!activeGroups.contains(group)) {
+                matchColorMap.remove(group)
+            }
+        }
+
+        // bind new groups with colors
+        activeGroups.onEach {
+            if (!matchColorMap.contains(it)) {
+                matchColorMap[it] = findAnotherColorIndex(matchColorMap.keys)
+            }
+        }
+    }
+
+    private fun findAnotherColorIndex(exclude: Set<Int>): Int {
+        for (i in MatchColors.indices) {
+            if (!exclude.contains(i)) {
+                return i
+            }
+        }
+
+        return 0
     }
 
     private fun stopLearning() {
@@ -340,3 +397,17 @@ open class LearningVMImpl(
     }
 }
 
+private val MatchColors = listOf(
+    Color(0xCE00F1FF),
+    Color(0xD8302BFF),
+    Color(0x584383FF),
+    Color(0xE06F1FFF),
+    Color(0xDF3E6DFF),
+    Color(0xEDD32FFF),
+    Color(0x309449FF),
+    Color(0x98F0AEFF),
+    Color(0xBEAE13FF),
+    Color(0xE40202FF),
+    Color(0x14E2B9FF),
+    Color(0x5F5D5DFF),
+)
