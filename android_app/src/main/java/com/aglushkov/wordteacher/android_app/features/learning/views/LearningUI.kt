@@ -27,6 +27,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
@@ -109,7 +110,7 @@ fun LearningUI(
                                     .format(data.index() + 1, data.count())
                             )
                         } else if (data is LearningVM.Challenge.Match) {
-                            val readyMatches = data.rows.filter { it.matchPair.hasMatch() }.size
+                            val readyMatches = data.rows.filter { it.matchPair.termSelection.hasMatch() }.size
                             Text(
                                 text = stringResource(id = MR.strings.learning_title.resourceId)
                                     .format(readyMatches, data.rows.size)
@@ -251,26 +252,64 @@ private fun matchRowUI(
     ) {
         Text(
             modifier = Modifier.weight(1.0f)
-                .clickable(onClick = onTermClicked)
+                .run {
+                    if (!matchRow.matchPair.termSelection.isChecked) {
+                        clickable(onClick = onTermClicked)
+                    } else {
+                        this
+                    }
+                }
                 .background(
                     color = matchRow.termColor?.let {
-                        val alpha = if (matchRow.matchPair.termSelection.hasMatch()) { 153 } else { 80 }
+                        val alpha = if (matchRow.matchPair.termSelection.hasMatch()) {
+                            153
+                        } else {
+                            80
+                        }
                         Color(it.red, it.green, it.blue, alpha)
                     } ?: Color.Transparent,
                 )
-                .padding(start = LocalDimens.current.contentPadding, top = LocalDimens.current.contentPadding, end = LocalDimens.current.contentPadding / 2),
+                .padding(
+                    start = LocalDimens.current.contentPadding,
+                    top = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding / 2
+                ),
+            textDecoration = if (matchRow.matchPair.termSelection.isChecked) {
+                TextDecoration.LineThrough
+            } else {
+                TextDecoration.None
+            },
             text = matchRow.matchPair.term,
         )
         Text(
             modifier = Modifier.weight(2.0f)
-                .clickable(onClick = onExampleClicked)
+                .run {
+                    if (!matchRow.matchPair.exampleSelection.isChecked) {
+                        clickable(onClick = onExampleClicked)
+                    } else {
+                        this
+                    }
+                }
                 .background(
                     color = matchRow.exampleColor?.let {
-                        val alpha = if (matchRow.matchPair.exampleSelection.hasMatch()) { 153 } else { 80 }
+                        val alpha = if (matchRow.matchPair.exampleSelection.hasMatch()) {
+                            153
+                        } else {
+                            80
+                        }
                         Color(it.red, it.green, it.blue, alpha)
                     } ?: Color.Transparent,
                 )
-                .padding(start = LocalDimens.current.contentPadding / 2, top = LocalDimens.current.contentPadding, end = LocalDimens.current.contentPadding),
+                .padding(
+                    start = LocalDimens.current.contentPadding / 2,
+                    top = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding
+                ),
+            textDecoration = if (matchRow.matchPair.exampleSelection.isChecked) {
+                TextDecoration.LineThrough
+            } else {
+                TextDecoration.None
+            },
             text = matchRow.matchPair.example,
         )
     }

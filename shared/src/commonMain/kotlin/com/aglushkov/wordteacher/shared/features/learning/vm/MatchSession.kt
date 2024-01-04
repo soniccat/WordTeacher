@@ -34,7 +34,7 @@ class MatchSession(
                     randExampleIndex = 0
                 }
                 val example = indexToExample.removeAt(randExampleIndex).second
-                MatchPair(card.term, example, index)
+                MatchPair(card.term, example, randExampleIndex)
             }
         }
     }
@@ -45,11 +45,20 @@ class MatchSession(
             return
         }
 
-//        var groupToClear: Int = -1
         if (!pair.termSelection.isSelected) {
+            if (lastSelectedTermIndex != -1) {
+                // remove previous selection
+                updatePairs { i, p ->
+                    if (i == lastSelectedTermIndex) {
+                        p.copy(termSelection = MatchSelection())
+                    } else {
+                        p
+                    }
+                }
+            }
+
             lastSelectedTermIndex = index
         } else {
-//            groupToClear = pair.termSelection.group
             if (lastSelectedTermIndex == index) {
                 lastSelectedTermIndex = -1
             }
@@ -61,8 +70,7 @@ class MatchSession(
             if (i == index) {
                 if (!pair.termSelection.isSelected) {
                     pair.copy(
-                        termSelection = MatchSelection(
-                            isSelected = !pair.termSelection.isSelected,
+                            termSelection = MatchSelection(
                             oppositeSelectedIndex = lastSelectedExampleIndex,
                             group = currentSelectionGroup,
                         ),
@@ -95,6 +103,8 @@ class MatchSession(
                 p
             }
         }
+
+        makeCheckIfNeeded()
     }
 
     fun selectExample(pair: MatchPair) {
@@ -104,6 +114,17 @@ class MatchSession(
         }
 
         if (!pair.exampleSelection.isSelected) {
+            if (lastSelectedExampleIndex != -1) {
+                // remove previous selection
+                updatePairs { i, p ->
+                    if (i == lastSelectedExampleIndex) {
+                        p.copy(exampleSelection = MatchSelection())
+                    } else {
+                        p
+                    }
+                }
+            }
+
             lastSelectedExampleIndex = index
         } else if (lastSelectedExampleIndex == index) {
             lastSelectedExampleIndex = -1
@@ -115,8 +136,7 @@ class MatchSession(
             if (i == index) {
                 if (!pair.exampleSelection.isSelected) {
                     pair.copy(
-                        exampleSelection = MatchSelection(
-                            isSelected = true,
+                            exampleSelection = MatchSelection(
                             oppositeSelectedIndex = lastSelectedTermIndex,
                             group = currentSelectionGroup,
                         ),
@@ -148,6 +168,38 @@ class MatchSession(
             } else {
                 p
             }
+        }
+
+        makeCheckIfNeeded()
+    }
+
+    private fun makeCheckIfNeeded() {
+        if (matchPairStateFlow.value?.all { it.termSelection.hasMatch() } == false) {
+            return
+        }
+
+        // update termSelection
+        val rightExampleIndexes = mutableSetOf<Int>()
+        updatePairs { i, pair ->
+            if (pair.rightExampleIndex == pair.termSelection.oppositeSelectedIndex) {
+                rightExampleIndexes.add(pair.termSelection.oppositeSelectedIndex)
+                pair.copy(termSelection = pair.termSelection.copy(isChecked = true))
+            } else {
+                pair
+            }
+        }
+
+        // update exampleSelection
+        updatePairs { i, pair ->
+            if (rightExampleIndexes.contains(i)) {
+                pair.copy(exampleSelection = pair.exampleSelection.copy(isChecked = true))
+            } else {
+                pair
+            }
+        }
+
+        if (rightExampleIndexes.size == matchPairStateFlow.value?.size) {
+            matchPairStateFlow.update { null }
         }
     }
 
@@ -184,19 +236,18 @@ class MatchSession(
                     termSelection == other.termSelection &&
                     exampleSelection == other.exampleSelection
         }
-
-        fun hasMatch(): Boolean {
-            return termSelection.hasMatch() || exampleSelection.hasMatch()
-        }
     }
 
     data class MatchSelection(
-        val isSelected: Boolean = false,
         val oppositeSelectedIndex: Int = -1,
         val group: Int = -1,
+        val isChecked: Boolean = false,
     ) {
+        val isSelected: Boolean
+            get() = oppositeSelectedIndex != -1
+
         fun hasMatch(): Boolean {
-            return isSelected && oppositeSelectedIndex != -1
+            return oppositeSelectedIndex != -1
         }
     }
 }
