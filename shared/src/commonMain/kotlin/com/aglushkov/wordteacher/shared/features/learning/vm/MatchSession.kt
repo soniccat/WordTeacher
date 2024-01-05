@@ -34,7 +34,8 @@ class MatchSession(
                     randExampleIndex = 0
                 }
                 val example = indexToExample.removeAt(randExampleIndex).second
-                MatchPair(card.term, example, randExampleIndex)
+                val rightExampleIndex = indexToExample.indexOfFirst { it.first == index }
+                MatchPair(card.term, example, rightExampleIndex)
             }
         }
     }
