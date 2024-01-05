@@ -56,7 +56,7 @@ func (w *CardSetPullWorker) Start(ctx context.Context) error {
 					break
 				} else if r.CardSet != nil {
 					dbCardSet, outErr := model.GRPCCardSetToDb(r.CardSet)
-					if err != nil {
+					if outErr != nil {
 						w.logger.Error.Printf("CardSetPullWorker GRPCCardSetToDb cardset %s %s", r.CardSet.Id, outErr.Error())
 						continue
 					}
