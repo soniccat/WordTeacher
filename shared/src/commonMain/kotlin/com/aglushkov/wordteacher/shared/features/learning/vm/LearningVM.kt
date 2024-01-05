@@ -204,14 +204,16 @@ open class LearningVMImpl(
 
                 // type session
                 sessionCards.collectIndexed { index, card ->
-                    Resource.Loaded(
-                        LearningVM.Challenge.Type(
-                            term = card.term,
-                            index = index,
-                            count = cardCount,
-                            termViewItems = buildCardItem(card),
+                    challengeState.update {
+                        Resource.Loaded(
+                            LearningVM.Challenge.Type(
+                                term = card.term,
+                                index = index,
+                                count = cardCount,
+                                termViewItems = buildCardItem(card),
+                            )
                         )
-                    )
+                    }
                 }
             }
 

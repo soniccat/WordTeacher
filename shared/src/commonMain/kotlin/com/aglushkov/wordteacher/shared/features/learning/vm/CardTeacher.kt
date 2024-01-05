@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class CardTeacher(
     private val cards: List<Card>,
@@ -42,19 +43,20 @@ class CardTeacher(
         get() = hintShowCountStateFlow
 
     private var checkCount = 0
-    var isWrongAnswerCounted = false
+    private var isWrongAnswerCounted = false
         private set
 
     suspend fun runSession(
         block: suspend (count:Int, matchSessionFlow:  Flow<List<MatchSession.MatchPair>>?, testCards: Flow<TestSession.TestCard>?, cards: Flow<Card>) -> Unit
     ): List<SessionCardResult>? {
         val session = buildLearnSession() ?: return null
+        val warmupSession = Random.nextInt(2)
 
-        if (session.cards.size > 2) {
+        if (warmupSession == 0 && session.cards.size >= MATCH_SESSION_OPTION_COUNT) {
             matchSession = MatchSession(session.cards)
         }
 
-        if (session.cards.size >= TEST_SESSION_OPTION_COUNT) {
+        if (warmupSession == 1 && session.cards.size >= TEST_SESSION_OPTION_COUNT) {
             val testSession = TestSession(session.cards, cards.map { it.term })
             currentTestSession = testSession
             scope.launch {

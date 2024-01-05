@@ -21,21 +21,16 @@ class MatchSession(
     private var lastSelectedExampleIndex: Int = -1
 
     init {
-        val indexToExample = cards.mapIndexed { index, card ->
+        val examples = cards.map { card ->
             val exampleIndex = Random.nextInt(card.examples.size)
             val exampleWithGaps = resolveStringWithHiddenSpans(card.examples[exampleIndex], card.exampleTermSpans[exampleIndex])
-            index to exampleWithGaps
-        }.shuffled().toMutableList()
+            exampleWithGaps
+        }
+        val shuffledExampleIndices = examples.indices.shuffled().toMutableList()
 
         matchPairStateFlow.update {
             cards.mapIndexed { index, card ->
-                var randExampleIndex = indexToExample.indexOfFirst { it.first != index }
-                if (randExampleIndex == -1) {
-                    randExampleIndex = 0
-                }
-                val example = indexToExample.removeAt(randExampleIndex).second
-                val rightExampleIndex = indexToExample.indexOfFirst { it.first == index }
-                MatchPair(card.term, example, rightExampleIndex)
+                MatchPair(card.term, examples[shuffledExampleIndices[index]], shuffledExampleIndices.indexOf(index))
             }
         }
     }
@@ -51,7 +46,7 @@ class MatchSession(
                 // remove previous selection
                 updatePairs { i, p ->
                     if (i == lastSelectedTermIndex) {
-                        p.copy(termSelection = MatchSelection())
+                        p.copy(termSelection = EmptyMatchSelection)
                     } else {
                         p
                     }
@@ -83,7 +78,7 @@ class MatchSession(
                         }
                     }
                 } else {
-                    pair.copy(termSelection = MatchSelection())
+                    pair.copy(termSelection = EmptyMatchSelection)
                 }.also {
                     updatedPair = it
                 }
@@ -96,7 +91,7 @@ class MatchSession(
         updatePairs { i, p ->
             // after deselecting clear corresponding example selection
             if (pair.termSelection.isSelected && pair.termSelection.oppositeSelectedIndex == i) {
-                p.copy(exampleSelection = MatchSelection())
+                p.copy(exampleSelection = EmptyMatchSelection)
             // after selection update corresponding example oppositeIndex
             } else if (updatedPair?.termSelection?.oppositeSelectedIndex == i) {
                 p.copy(exampleSelection = p.exampleSelection.copy(oppositeSelectedIndex = index))
@@ -119,7 +114,7 @@ class MatchSession(
                 // remove previous selection
                 updatePairs { i, p ->
                     if (i == lastSelectedExampleIndex) {
-                        p.copy(exampleSelection = MatchSelection())
+                        p.copy(exampleSelection = EmptyMatchSelection)
                     } else {
                         p
                     }
@@ -149,7 +144,7 @@ class MatchSession(
                         }
                     }
                 } else {
-                    pair.copy(exampleSelection = MatchSelection())
+                    pair.copy(exampleSelection = EmptyMatchSelection)
                 }.also {
                     updatedPair = it
                 }
@@ -162,7 +157,7 @@ class MatchSession(
         updatePairs { i, p ->
             // after deselecting clear corresponding term selection
             if (pair.exampleSelection.isSelected && pair.exampleSelection.oppositeSelectedIndex == i) {
-                p.copy(termSelection = MatchSelection())
+                p.copy(termSelection = EmptyMatchSelection)
             // after selection update corresponding term oppositeIndex
             } else if (updatedPair?.exampleSelection?.oppositeSelectedIndex == i) {
                 p.copy(termSelection = p.termSelection.copy(oppositeSelectedIndex = index))
@@ -186,7 +181,7 @@ class MatchSession(
                 rightExampleIndexes.add(pair.termSelection.oppositeSelectedIndex)
                 pair.copy(termSelection = pair.termSelection.copy(isChecked = true))
             } else {
-                pair
+                pair.copy(termSelection = EmptyMatchSelection)
             }
         }
 
@@ -195,7 +190,7 @@ class MatchSession(
             if (rightExampleIndexes.contains(i)) {
                 pair.copy(exampleSelection = pair.exampleSelection.copy(isChecked = true))
             } else {
-                pair
+                pair.copy(exampleSelection = EmptyMatchSelection)
             }
         }
 
@@ -217,8 +212,8 @@ class MatchSession(
         val term: String,
         val example: String,
         val rightExampleIndex: Int,
-        var termSelection: MatchSelection = MatchSelection(),
-        var exampleSelection: MatchSelection = MatchSelection(),
+        var termSelection: MatchSelection = EmptyMatchSelection,
+        var exampleSelection: MatchSelection = EmptyMatchSelection,
     ) {
         override fun hashCode(): Int {
             var result = term.hashCode()
@@ -252,3 +247,7 @@ class MatchSession(
         }
     }
 }
+
+val EmptyMatchSelection = MatchSession.MatchSelection()
+
+const val MATCH_SESSION_OPTION_COUNT = 3
