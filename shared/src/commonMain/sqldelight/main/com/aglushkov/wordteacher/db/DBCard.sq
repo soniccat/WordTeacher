@@ -1,19 +1,22 @@
 import com.aglushkov.wordteacher.shared.model.CardSpan;
-import kotlin.Int;
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord.PartOfSpeech;
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord;
+import kotlin.Long;
+import kotlin.String;
 import kotlin.collections.List;
 
 CREATE TABLE IF NOT EXISTS DBCard (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   date INTEGER NOT NULL, -- creation date
   term TEXT NOT NULL,
-  partOfSpeech TEXT NOT NULL,
+  partOfSpeech TEXT AS WordTeacherWord.PartOfSpeech NOT NULL,
   transcription TEXT,
   definitions TEXT AS List<String> NOT NULL,
   synonyms TEXT AS List<String> NOT NULL,
   examples TEXT AS List<String> NOT NULL,
 -- Progress
-  progressLevel INTEGER AS Int DEFAULT 0,
-  progressLastMistakeCount INTEGER AS Int DEFAULT 0,
+  progressLevel INTEGER AS Long DEFAULT 0,
+  progressLastMistakeCount INTEGER AS Long DEFAULT 0,
   progressLastLessonDate INTEGER DEFAULT 0,
 -- Spans
   definitionTermSpans TEXT AS List<List<CardSpan>> NOT NULL DEFAULT "",

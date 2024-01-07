@@ -1,11 +1,13 @@
 package com.aglushkov.wordteacher.shared.repository.db
 
-import com.aglushkov.extensions.asFlow
-import com.aglushkov.extensions.firstLong
-import com.aglushkov.wordteacher.cache.DBCard
-import com.aglushkov.wordteacher.cache.DBNLPSentence
-import com.aglushkov.wordteacher.shared.cache.SQLDelightDatabase
+import app.cash.sqldelight.ColumnAdapter
+import app.cash.sqldelight.TransactionWithoutReturn
+import com.aglushkov.wordteacher.db.DBCard
+import com.aglushkov.wordteacher.db.DBNLPSentence
+import com.aglushkov.wordteacher.maindb.MainDB
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.extensions.asFlow
+import com.aglushkov.wordteacher.shared.general.extensions.firstLong
 import com.aglushkov.wordteacher.shared.model.CardProgress
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
@@ -16,8 +18,6 @@ import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
 import com.benasher44.uuid.uuid4
-import com.squareup.sqldelight.ColumnAdapter
-import com.squareup.sqldelight.TransactionWithoutReturn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -36,7 +36,7 @@ class AppDatabase(
     private val defaultScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     private val driver = driverFactory.createDriver()
-    private var db = SQLDelightDatabase(
+    private var db = MainDB(
         driver,
         DBCardAdapter = DBCard.Adapter(
             StringListAdapter(),
@@ -84,7 +84,7 @@ class AppDatabase(
     }
 
     private fun createDb() {
-        SQLDelightDatabase.Schema.create(driver)
+        MainDB.Schema.create(driver)
     }
 
     fun transaction(
@@ -253,7 +253,7 @@ class AppDatabase(
                     creationId = cardSet.creationId,
                     remoteId = cardSet.remoteId,
                 )
-                insertedCarSetId = insertedCardSetId()!!
+                insertedCarSetId = insertedCardSetId().value!!
                 cardSet.cards.onEach { card ->
                     cards.insertCard(insertedCarSetId, card, card.creationDate, card.modificationDate)
                 }
@@ -353,50 +353,50 @@ class AppDatabase(
         )
 
         fun cardMapper(): (
-            id: Long?,
-            date: Long?,
-            term: String?,
-            partOfSpeech: String?,
+            id: Long,
+            date: Long,
+            term: String,
+            partOfSpeech: WordTeacherWord.PartOfSpeech,
             transcription: String?,
-            definitions: List<String>?,
-            synonyms: List<String>?,
-            examples: List<String>?,
-            progressLevel: Int?,
-            progressLastMistakeCount: Int?,
+            definitions: List<String>,
+            synonyms: List<String>,
+            examples: List<String>,
+            progressLevel: Long?,
+            progressLastMistakeCount: Long?,
             progressLastLessonDate: Long?,
-            definitionTermSpans: List<List<CardSpan>>?,
-            exampleTermSpans: List<List<CardSpan>>?,
-            needToUpdateDefinitionSpans: Long?,
-            needToUpdateExampleSpans: Long?,
-            modificationDate: Long?,
-            creationId: String?,
-            remoteId: String?
+            definitionTermSpans: List<List<CardSpan>>,
+            exampleTermSpans: List<List<CardSpan>>,
+            needToUpdateDefinitionSpans: Long,
+            needToUpdateExampleDefinitionSpans: Long,
+            modificationDate: Long,
+            creationId: String,
+            remoteId: String,
         ) -> Card =
             { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId ->
                 Card(
-                    id!!,
-                    remoteId.orEmpty(),
-                    Instant.fromEpochMilliseconds(date!!),
-                    Instant.fromEpochMilliseconds(modificationDate!!),
-                    term!!,
-                    definitions.orEmpty(),
-                    definitionTermSpans.orEmpty(),
-                    partOfSpeechEnum(partOfSpeech),
+                    id,
+                    remoteId,
+                    Instant.fromEpochMilliseconds(date),
+                    Instant.fromEpochMilliseconds(modificationDate),
+                    term,
+                    definitions,
+                    definitionTermSpans,
+                    partOfSpeech,
                     transcription,
                     synonyms.orEmpty(),
                     examples.orEmpty(),
                     exampleTermSpans.orEmpty(),
                     progress = CardProgress(
-                        progressLevel ?: 0,
-                        progressLastMistakeCount ?: 0,
+                        progressLevel?.toInt() ?: 0,
+                        progressLastMistakeCount?.toInt() ?: 0,
                         progressLastLessonDate.takeIf { it != 0L }?.let {
                             Instant.fromEpochMilliseconds(it)
                         }
 
                     ),
-                    needToUpdateDefinitionSpans = needToUpdateDefinitionSpans!! != 0L,
-                    needToUpdateExampleSpans = needToUpdateExampleSpans!! != 0L,
-                    creationId = creationId!!
+                    needToUpdateDefinitionSpans = needToUpdateDefinitionSpans != 0L,
+                    needToUpdateExampleSpans = needToUpdateExampleSpans != 0L,
+                    creationId = creationId
                 )
             }
 
@@ -437,7 +437,7 @@ class AppDatabase(
             )
 
             cards.insertCard(setId, newCard)
-            newCard = newCard.copy(id = cards.insertedCardId()!!)
+            newCard = newCard.copy(id = cards.insertedCardId().value!!)
             return newCard
         }
 
