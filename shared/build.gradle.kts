@@ -97,20 +97,20 @@ kotlin {
                 implementation(libs.okioFakeFileSystem)
             }
         }
-        val iosMain by getting {
-            dependencies {
-                implementation(libs.ktoriOSClient)
-                implementation(libs.coroutinesCommon)/* {
-                    version {
-                        // HACK: to fix InvalidMutabilityException: mutation attempt of frozen kotlinx.coroutines.ChildHandleNode
-                        // during HttpClient initialization
-                        strictly(libs.versions.coroutines.get())
-                    }
-                }*/
-                implementation(libs.sqlDelightiOSDriver)
-            }
-        }
-        val iosTest by getting
+//        val iosMain by getting {
+//            dependencies {
+//                implementation(libs.ktoriOSClient)
+//                implementation(libs.coroutinesCommon)/* {
+//                    version {
+//                        // HACK: to fix InvalidMutabilityException: mutation attempt of frozen kotlinx.coroutines.ChildHandleNode
+//                        // during HttpClient initialization
+//                        strictly(libs.versions.coroutines.get())
+//                    }
+//                }*/
+//                implementation(libs.sqlDelightiOSDriver)
+//            }
+//        }
+//        val iosTest by getting
         val desktopMain by getting {
             dependsOn(composeSharedMain)
             dependencies {
@@ -138,29 +138,29 @@ android {
 
 // HACK:
 // See https://youtrack.jetbrains.com/issue/KT-55751
-val myAttribute = Attribute.of("myOwnAttribute", String::class.java)
+//val myAttribute = Attribute.of("myOwnAttribute", String::class.java)
 
-configurations.named("podDebugFrameworkIosFat").configure {
-    attributes {
-        // put a unique attribute
-        attribute(myAttribute, "podDebugFrameworkIosFat")
-    }
-}
-
-configurations.named("podDebugFrameworkIos").configure {
-    attributes {
-        attribute(myAttribute, "podDebugFrameworkIos")
-    }
-}
-
-configurations.named("podReleaseFrameworkIosFat").configure {
-    attributes {
-        attribute(myAttribute, "podReleaseFrameworkIosFat")
-    }
-}
-
-configurations.named("podReleaseFrameworkIos").configure {
-    attributes {
-        attribute(myAttribute, "podReleaseFrameworkIos")
-    }
-}
+//configurations.named("podDebugFrameworkIosFat").configure {
+//    attributes {
+//        // put a unique attribute
+//        attribute(myAttribute, "podDebugFrameworkIosFat")
+//    }
+//}
+//
+//configurations.named("podDebugFrameworkIos").configure {
+//    attributes {
+//        attribute(myAttribute, "podDebugFrameworkIos")
+//    }
+//}
+//
+//configurations.named("podReleaseFrameworkIosFat").configure {
+//    attributes {
+//        attribute(myAttribute, "podReleaseFrameworkIosFat")
+//    }
+//}
+//
+//configurations.named("podReleaseFrameworkIos").configure {
+//    attributes {
+//        attribute(myAttribute, "podReleaseFrameworkIos")
+//    }
+//}
