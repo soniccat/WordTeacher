@@ -31,19 +31,20 @@ import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
-import com.arkivanov.decompose.router.Router
-import com.arkivanov.decompose.router.RouterState
-import com.arkivanov.decompose.router.router
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.active
+import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.destroy
 import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import kotlin.properties.Delegates
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.Serializable
 
 interface MainDecomposeComponent: DefinitionsRouter,
     CardSetsRouter,
@@ -52,7 +53,8 @@ interface MainDecomposeComponent: DefinitionsRouter,
     ArticleRouter,
     SettingsRouter,
     AuthOpener {
-    val routerState: Value<RouterState<*, Child>>
+    val childStack: Value<ChildStack<*, Child>>
+    //val routerState: Value<RouterState<*, Child>>
     val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
 
     override fun openAddArticle()
@@ -88,19 +90,20 @@ interface MainDecomposeComponent: DefinitionsRouter,
         }
     }
 
-    sealed class ChildConfiguration: Parcelable {
-        @Parcelize data class ArticleConfiguration(val id: Long) : ChildConfiguration()
-        @Parcelize data class CardSetConfiguration(val id: Long) : ChildConfiguration()
-        @Parcelize data class LearningConfiguration(val ids: List<Long>) : ChildConfiguration()
-        @Parcelize data class LearningSessionResultConfiguration(val results: List<SessionCardResult>) : ChildConfiguration()
-        @Parcelize data class WebAuthConfiguration(val networkType: SpaceAuthService.NetworkType) : ChildConfiguration()
-        @Parcelize object DictConfigs : ChildConfiguration()
-        @Parcelize object CardSetJsonImportConfiguration : ChildConfiguration()
-        @Parcelize object CardSetsConfiguration : ChildConfiguration()
-        @Parcelize object TabsConfiguration : ChildConfiguration()
+    @Serializable
+    sealed class ChildConfiguration {
+        @Serializable data class ArticleConfiguration(val id: Long) : ChildConfiguration()
+        @Serializable data class CardSetConfiguration(val id: Long) : ChildConfiguration()
+        @Serializable data class LearningConfiguration(val ids: List<Long>) : ChildConfiguration()
+        @Serializable data class LearningSessionResultConfiguration(val results: List<SessionCardResult>) : ChildConfiguration()
+        @Serializable data class WebAuthConfiguration(val networkType: SpaceAuthService.NetworkType) : ChildConfiguration()
+        @Serializable object DictConfigs : ChildConfiguration()
+        @Serializable object CardSetJsonImportConfiguration : ChildConfiguration()
+        @Serializable object CardSetsConfiguration : ChildConfiguration()
+        @Serializable object TabsConfiguration : ChildConfiguration()
 
-        @Parcelize object AddArticleConfiguration : ChildConfiguration()
-        @Parcelize object EmptyDialogConfiguration : ChildConfiguration() // TODO: it seems we can remove that
+        @Serializable object AddArticleConfiguration : ChildConfiguration()
+        @Serializable object EmptyDialogConfiguration : ChildConfiguration() // TODO: it seems we can remove that
     }
 }
 
@@ -109,19 +112,30 @@ class MainDecomposeComponentImpl(
     val childComponentFactory: (context: ComponentContext, configuration: MainDecomposeComponent.ChildConfiguration) -> Any
 ) : MainDecomposeComponent, ComponentContext by componentContext {
 
-    private val router: Router<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child> =
-        router(
+    private val navigation = StackNavigation<MainDecomposeComponent.ChildConfiguration>()
+
+    override val childStack: Value<ChildStack<*, MainDecomposeComponent.Child>> =
+        childStack(
+            source = navigation,
+            serializer = MainDecomposeComponent.ChildConfiguration.serializer(), // Or null to disable navigation state saving
             initialConfiguration = MainDecomposeComponent.ChildConfiguration.TabsConfiguration,
-            key = "MainRouter",
-            handleBackButton = true,
-            childFactory = ::resolveChild
+            handleBackButton = true, // Pop the back stack on back button press
+            childFactory = ::resolveChild,
         )
 
-    private val routerStateChangeHandler = RouterStateChangeHandler()
-    override val routerState: Value<RouterState<*, MainDecomposeComponent.Child>> = router.state.map {
-        routerStateChangeHandler.onClearableChanged(it.toClearables())
-        it
-    }
+//    private val router: Router<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child> =
+//        router(
+//            initialConfiguration = MainDecomposeComponent.ChildConfiguration.TabsConfiguration,
+//            key = "MainRouter",
+//            handleBackButton = true,
+//            childFactory = ::resolveChild
+//        )
+//
+//    private val routerStateChangeHandler = RouterStateChangeHandler()
+//    override val routerState: Value<RouterState<*, MainDecomposeComponent.Child>> = router.state.map {
+//        routerStateChangeHandler.onClearableChanged(it.toClearables())
+//        it
+//    }
 
     private val dialogStateChangeHandler = RouterStateChangeHandler()
     override val dialogsStateFlow = MutableStateFlow<List<Child.Created<*, MainDecomposeComponent.Child>>>(emptyList())
@@ -183,7 +197,8 @@ class MainDecomposeComponentImpl(
     }
 
     override fun openArticle(id: Long) =
-        router.pushChildConfigurationIfNotAtTop(
+        navigation.pushChildConfigurationIfNotAtTop(
+            childStack.active,
             MainDecomposeComponent.ChildConfiguration.ArticleConfiguration(id)
         )
 

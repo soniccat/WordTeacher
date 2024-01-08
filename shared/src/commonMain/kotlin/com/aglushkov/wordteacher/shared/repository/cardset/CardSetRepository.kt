@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.cardset
 
-import com.aglushkov.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource

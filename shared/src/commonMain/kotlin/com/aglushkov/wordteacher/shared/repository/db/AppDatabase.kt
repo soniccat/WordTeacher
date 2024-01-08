@@ -39,6 +39,7 @@ class AppDatabase(
     private var db = MainDB(
         driver,
         DBCardAdapter = DBCard.Adapter(
+            WordPartOfSpeechAdapter(),
             StringListAdapter(),
             StringListAdapter(),
             StringListAdapter(),
@@ -117,7 +118,7 @@ class AppDatabase(
     inner class Articles {
         fun insert(name: String, date: Long, style: ArticleStyle) =
             db.dBArticleQueries.insert(name, date, encodeStyle(style))
-        fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong()
+        fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong().value
 //        fun selectAll() = db.dBArticleQueries.selectAll { id, name, date, style ->
 //            Article(id,name, date, style = decodeStyle(style))
 //        }
@@ -232,11 +233,11 @@ class AppDatabase(
         }
 
         fun selectAllSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectAllSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId ->
-            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId)
+            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId)
         }
 
         fun selectSetIdsWithCards(setIds: List<Long>) = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards(setIds) { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId ->
-            setId to cards.cardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId)
+            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId)
         }
 
         fun lastModificationDate() = db.dBCardSetQueries.lastModificationDate().executeAsList().firstOrNull()?.MAX ?: 0L
@@ -349,7 +350,7 @@ class AppDatabase(
 
         fun selectCards(setId: Long) = db.dBCardSetToCardRelationQueries.selectCards(
             setId,
-            mapper = cardMapper()
+            mapper = optionalCardMapper()
         )
 
         fun cardMapper(): (
@@ -383,6 +384,55 @@ class AppDatabase(
                     definitionTermSpans,
                     partOfSpeech,
                     transcription,
+                    synonyms,
+                    examples,
+                    exampleTermSpans,
+                    progress = CardProgress(
+                        progressLevel?.toInt() ?: 0,
+                        progressLastMistakeCount?.toInt() ?: 0,
+                        progressLastLessonDate.takeIf { it != 0L }?.let {
+                            Instant.fromEpochMilliseconds(it)
+                        }
+
+                    ),
+                    needToUpdateDefinitionSpans = needToUpdateDefinitionSpans != 0L,
+                    needToUpdateExampleSpans = needToUpdateExampleSpans != 0L,
+                    creationId = creationId
+                )
+            }
+
+
+        fun optionalCardMapper(): (
+            id: Long?,
+            date: Long?,
+            term: String?,
+            partOfSpeech: WordTeacherWord.PartOfSpeech?,
+            transcription: String?,
+            definitions: List<String>?,
+            synonyms: List<String>?,
+            examples: List<String>?,
+            progressLevel: Long?,
+            progressLastMistakeCount: Long?,
+            progressLastLessonDate: Long?,
+            definitionTermSpans: List<List<CardSpan>>?,
+            exampleTermSpans: List<List<CardSpan>>?,
+            needToUpdateDefinitionSpans: Long?,
+            needToUpdateExampleDefinitionSpans: Long?,
+            modificationDate: Long?,
+            creationId: String?,
+            remoteId: String?,
+        )  -> Card =
+            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId ->
+                Card(
+                    id!!,
+                    remoteId.orEmpty(),
+                    Instant.fromEpochMilliseconds(date!!),
+                    Instant.fromEpochMilliseconds(modificationDate!!),
+                    term!!,
+                    definitions!!,
+                    definitionTermSpans!!,
+                    partOfSpeech ?: WordTeacherWord.PartOfSpeech.Undefined,
+                    transcription,
                     synonyms.orEmpty(),
                     examples.orEmpty(),
                     exampleTermSpans.orEmpty(),
@@ -396,7 +446,7 @@ class AppDatabase(
                     ),
                     needToUpdateDefinitionSpans = needToUpdateDefinitionSpans != 0L,
                     needToUpdateExampleSpans = needToUpdateExampleSpans != 0L,
-                    creationId = creationId
+                    creationId = creationId!!
                 )
             }
 
@@ -490,13 +540,13 @@ class AppDatabase(
                 db.dBCardQueries.insert(
                     creationDate,
                     term,
-                    partOfSpeech.toString(),
+                    partOfSpeech,
                     transcription,
                     definitions,
                     synonyms,
                     examples,
-                    progress.currentLevel,
-                    progress.lastMistakeCount,
+                    progress.currentLevel.toLong(),
+                    progress.lastMistakeCount.toLong(),
                     progress.lastLessonDate?.toEpochMilliseconds() ?: 0L,
                     definitionTermSpans,
                     exampleTermSpans,
@@ -507,7 +557,7 @@ class AppDatabase(
                     remoteId
                 )
 
-                val cardId = db.dBCardQueries.lastInsertedRowId().firstLong()!!
+                val cardId = db.dBCardQueries.lastInsertedRowId().firstLong().value!!
                 db.dBCardSetToCardRelationQueries.insert(setId, cardId)
             }
         }
@@ -565,13 +615,13 @@ class AppDatabase(
                 db.dBCardQueries.updateCard(
                     creationDate,
                     term,
-                    partOfSpeech.toString(),
+                    partOfSpeech,
                     transcription,
                     definitions,
                     synonyms,
                     examples,
-                    progressLevel,
-                    progressLastMistakeCount,
+                    progressLevel.toLong(),
+                    progressLastMistakeCount.toLong(),
                     progressLastLessonDate,
                     definitionTermSpans,
                     exampleTermSpans,
@@ -654,6 +704,16 @@ private fun tokensToTokenSpans(text: String, tokenStrings: List<String>): List<T
 }
 
 // TODO: write tests
+private class WordPartOfSpeechAdapter: ColumnAdapter<WordTeacherWord.PartOfSpeech, String> {
+    override fun decode(databaseValue: String): WordTeacherWord.PartOfSpeech {
+        return WordTeacherWord.PartOfSpeech.valueOf(databaseValue)
+    }
+
+    override fun encode(value: WordTeacherWord.PartOfSpeech): String {
+        return value.name
+    }
+}
+
 private class StringListAdapter(
     private val divider: Char = LIST_DIVIDER,
     private val escape: Char = LIST_ESCAPE

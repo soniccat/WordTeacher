@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.note
 
-import com.aglushkov.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
@@ -59,7 +59,7 @@ class NotesRepository(
 
         val noteId = database.notes.run {
             insert(date, text)
-            insertedNoteId()
+            insertedNoteId().value
         } ?: 0L
 
         return Note(noteId, date, text)

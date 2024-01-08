@@ -4,6 +4,7 @@ import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.router.Router
 import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.router.pop
+import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.value.Value
 
 interface RouterDecomposeComponent<TChildConfiguration: Any, TChild: Any> {
@@ -14,8 +15,11 @@ interface RouterDecomposeComponent<TChildConfiguration: Any, TChild: Any> {
 }
 
 inline fun <reified C: Any, reified C2: C>
-        Router<C,*>.pushChildConfigurationIfNotAtTop(configuration: C2) {
-    if (state.value.activeChild.configuration is C2) {
+        StackNavigation<C>.pushChildConfigurationIfNotAtTop(
+            activeChild: Child.Created<C, *>,
+            configuration: C2
+        ) {
+    if (activeChild is C2) {
         return
     }
 

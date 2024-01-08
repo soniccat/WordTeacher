@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.workers
 
-import com.aglushkov.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.CardSpan
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
