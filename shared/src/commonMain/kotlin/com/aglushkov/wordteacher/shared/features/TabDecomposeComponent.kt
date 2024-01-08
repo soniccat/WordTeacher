@@ -12,16 +12,17 @@ import com.aglushkov.wordteacher.shared.general.popToRoot
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationOrPopIfExists
 import com.aglushkov.wordteacher.shared.general.toClearables
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.Router
-import com.arkivanov.decompose.router.RouterState
-import com.arkivanov.decompose.router.router
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
+import kotlinx.serialization.Serializable
 
 interface TabDecomposeComponent: Clearable {
-    val routerState: Value<RouterState<*, Child>>
+    val childStack: Value<ChildStack<*, Child>>
 
     fun openDefinitions()
     fun openCardSets()
@@ -44,12 +45,13 @@ interface TabDecomposeComponent: Clearable {
         }
     }
 
-    sealed class ChildConfiguration: Parcelable {
-        @Parcelize data class DefinitionConfiguration(val word: String? = null) : ChildConfiguration()
-        @Parcelize object CardSetsConfiguration : ChildConfiguration()
-        @Parcelize object ArticlesConfiguration : ChildConfiguration()
-        @Parcelize object SettingsConfiguration : ChildConfiguration()
-        @Parcelize object NotesConfiguration : ChildConfiguration()
+    @Serializable
+    sealed class ChildConfiguration {
+        @Serializable data class DefinitionConfiguration(val word: String? = null) : ChildConfiguration()
+        @Serializable object CardSetsConfiguration : ChildConfiguration()
+        @Serializable object ArticlesConfiguration : ChildConfiguration()
+        @Serializable object SettingsConfiguration : ChildConfiguration()
+        @Serializable object NotesConfiguration : ChildConfiguration()
     }
 }
 
@@ -58,19 +60,16 @@ class TabDecomposeComponentImpl(
     val childComponentFactory: (context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration) -> Any
 ) : TabDecomposeComponent, ComponentContext by componentContext {
 
-    private val router: Router<TabDecomposeComponent.ChildConfiguration, TabDecomposeComponent.Child> =
-        router(
-            initialConfiguration = TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration(),
-            key = "TabRouter",
-            handleBackButton = true,
-            childFactory = ::resolveChild
-        )
+    private val navigation = StackNavigation<TabDecomposeComponent.ChildConfiguration>()
 
-    private val routerStateChangeHandler = RouterStateChangeHandler()
-    override val routerState: Value<RouterState<*, TabDecomposeComponent.Child>> = router.state.map {
-        routerStateChangeHandler.onClearableChanged(it.toClearables())
-        it
-    }
+    override val childStack: Value<ChildStack<TabDecomposeComponent.ChildConfiguration, TabDecomposeComponent.Child>> =
+        childStack(
+            source = navigation,
+            serializer = TabDecomposeComponent.ChildConfiguration.serializer(), // Or null to disable navigation state saving
+            initialConfiguration = TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration(),
+            handleBackButton = true, // Pop the back stack on back button press
+            childFactory = ::resolveChild,
+        )
 
     private fun resolveChild(
         configuration: TabDecomposeComponent.ChildConfiguration,
@@ -94,23 +93,23 @@ class TabDecomposeComponentImpl(
         )
     }
 
-    override fun openDefinitions() = router.popToRoot()
+    override fun openDefinitions() = navigation.popToRoot()
 
     override fun openCardSets() =
-        router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration)
+        navigation.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration)
 
     override fun openArticles() =
-        router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
+        navigation.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration)
 
     override fun openSettings() =
-        router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.SettingsConfiguration)
+        navigation.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.SettingsConfiguration)
 
     override fun openNotes() =
-        router.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.NotesConfiguration)
+        navigation.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.NotesConfiguration)
 
-    override fun back() = router.popIfNotEmpty()
+    override fun back() = navigation.popIfNotEmpty()
 
     override fun onCleared() {
-        router.navigate({ emptyList() }, { _, _ -> })
+        navigation.navigate({ emptyList() }, { _, _ -> })
     }
 }

@@ -7,11 +7,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
-import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.essenty.instancekeeper.InstanceKeeper
-import com.arkivanov.essenty.instancekeeper.getOrCreate
-import com.arkivanov.essenty.statekeeper.consume
 
 class LearningDecomposeComponent (
     state: LearningVM.State,
@@ -29,20 +25,14 @@ class LearningDecomposeComponent (
     idGenerator
 ), ComponentContext by componentContext {
 
-    private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
-        Handler(stateKeeper.consume(KEY_STATE) ?: state)
-    }
+    private var instanceState: LearningVM.State = stateKeeper.consume(key = KEY_STATE, strategy = LearningVM.State.serializer()) ?: state
 
     init {
-        stateKeeper.register(KEY_STATE) {
-            save()
+        stateKeeper.register(KEY_STATE, strategy = LearningVM.State.serializer()) {
+            state
         }
 
-        restore(instanceState.state)
-    }
-
-    private class Handler(val state: LearningVM.State) : InstanceKeeper.Instance {
-        override fun onDestroy() {}
+        restore(instanceState)
     }
 
     private companion object {

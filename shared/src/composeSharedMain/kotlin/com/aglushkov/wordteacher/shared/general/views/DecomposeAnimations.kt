@@ -5,17 +5,17 @@ import androidx.compose.animation.core.tween
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.ChildAnimator
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.Direction
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimator
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.Direction
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimator
 
 internal val defaultChildAnimationSpec: FiniteAnimationSpec<Float> = tween()
 
 @ExperimentalDecomposeApi
 fun slideFromBottom(
     animationSpec: FiniteAnimationSpec<Float> = defaultChildAnimationSpec,
-): ChildAnimator =
-    childAnimator(animationSpec = animationSpec) { factor, direction, content ->
+): StackAnimator =
+    stackAnimator(animationSpec = animationSpec) { factor, direction, content ->
         if (direction == Direction.ENTER_FRONT || direction == Direction.EXIT_FRONT) {
             content(
                 Modifier.offsetYFactor(factor = factor)
@@ -28,8 +28,8 @@ fun slideFromBottom(
 @ExperimentalDecomposeApi
 fun slideFromRight(
     animationSpec: FiniteAnimationSpec<Float> = defaultChildAnimationSpec,
-): ChildAnimator =
-    childAnimator(animationSpec = animationSpec) { factor, direction, content ->
+): StackAnimator =
+    stackAnimator(animationSpec = animationSpec) { factor, direction, content ->
         if (direction == Direction.ENTER_FRONT || direction == Direction.EXIT_FRONT) {
             content(
                 Modifier.offsetXFactor(factor = factor)

@@ -41,9 +41,9 @@ import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
-import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 
@@ -146,8 +146,8 @@ class TextActionActivity: AppCompatActivity() {
                 }
             ) { innerPadding ->
                 Children(
-                    routerState = textActionDecomposeComponent.routerState,
-                    animation = childAnimation(slide())
+                    stack = textActionDecomposeComponent.childStack,
+                    animation = stackAnimation(slide())
                 ) {
                     when (val instance = it.instance) {
                         is TextActionDecomposeComponent.Child.Definitions -> DefinitionsUI(
@@ -199,7 +199,7 @@ class TextActionActivity: AppCompatActivity() {
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
                 BottomNavigationItem(
-                    selected = tab.decomposeChildConfigClass == component.routerState.value.activeChild.configuration::class.java,
+                    selected = tab.decomposeChildConfigClass == component.childStack.value.active.configuration::class.java,
                     onClick = {
                         when (tab) {
                             is ScreenTab.Definitions -> component.openDefinitions()

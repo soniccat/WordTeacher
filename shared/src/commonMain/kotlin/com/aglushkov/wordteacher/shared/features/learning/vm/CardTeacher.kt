@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
 class CardTeacher(
@@ -258,7 +259,7 @@ class CardTeacher(
             it.restore(sessionState)
         }
 
-    @Parcelize
+    @Serializable
     data class State(
         val currentTestSessionState: TestSession.State?,
         val sessionStates: List<LearningSession.State>,
@@ -266,7 +267,7 @@ class CardTeacher(
         val checkCount: Int,
         val hintShowCount: Int,
         val isWrongAnswerCounted: Boolean
-    ) : Parcelable
+    )
 }
 
 private const val CARD_PER_SESSION = 7

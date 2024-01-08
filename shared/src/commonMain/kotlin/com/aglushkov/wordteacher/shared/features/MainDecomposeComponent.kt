@@ -53,9 +53,8 @@ interface MainDecomposeComponent: DefinitionsRouter,
     ArticleRouter,
     SettingsRouter,
     AuthOpener {
-    val childStack: Value<ChildStack<*, Child>>
-    //val routerState: Value<RouterState<*, Child>>
-    val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<*, Child>>>
+    val childStack: Value<ChildStack<ChildConfiguration, Child>>
+    val dialogsStateFlow: StateFlow<List<com.arkivanov.decompose.Child.Created<ChildConfiguration, Child>>>
 
     override fun openAddArticle()
 //    fun popDialog(inner: Any)
@@ -114,7 +113,7 @@ class MainDecomposeComponentImpl(
 
     private val navigation = StackNavigation<MainDecomposeComponent.ChildConfiguration>()
 
-    override val childStack: Value<ChildStack<*, MainDecomposeComponent.Child>> =
+    override val childStack: Value<ChildStack<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child>> =
         childStack(
             source = navigation,
             serializer = MainDecomposeComponent.ChildConfiguration.serializer(), // Or null to disable navigation state saving
@@ -123,22 +122,8 @@ class MainDecomposeComponentImpl(
             childFactory = ::resolveChild,
         )
 
-//    private val router: Router<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child> =
-//        router(
-//            initialConfiguration = MainDecomposeComponent.ChildConfiguration.TabsConfiguration,
-//            key = "MainRouter",
-//            handleBackButton = true,
-//            childFactory = ::resolveChild
-//        )
-//
-//    private val routerStateChangeHandler = RouterStateChangeHandler()
-//    override val routerState: Value<RouterState<*, MainDecomposeComponent.Child>> = router.state.map {
-//        routerStateChangeHandler.onClearableChanged(it.toClearables())
-//        it
-//    }
-
     private val dialogStateChangeHandler = RouterStateChangeHandler()
-    override val dialogsStateFlow = MutableStateFlow<List<Child.Created<*, MainDecomposeComponent.Child>>>(emptyList())
+    override val dialogsStateFlow = MutableStateFlow<List<Child.Created<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child>>>(emptyList())
     private var dialogHolders: List<DialogHolder> by Delegates.observable(emptyList()) { _, _, newValue ->
         dialogStateChangeHandler.onClearableChanged(newValue.map { it.child.instance })
         dialogsStateFlow.value = newValue.map { it.child }
@@ -198,18 +183,17 @@ class MainDecomposeComponentImpl(
 
     override fun openArticle(id: Long) =
         navigation.pushChildConfigurationIfNotAtTop(
-            childStack.active,
-            MainDecomposeComponent.ChildConfiguration.ArticleConfiguration(id)
+            childStack.active.configuration
         )
 
     override fun openCardSet(id: Long) {
-        router.pushChildConfigurationIfNotAtTop(
+        navigation.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.CardSetConfiguration(id)
         )
     }
 
     override fun openCardSets() {
-        router.pushChildConfigurationIfNotAtTop(
+        navigation.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration
         )
     }
@@ -227,7 +211,7 @@ class MainDecomposeComponentImpl(
     }
 
     override fun openDictConfigs() {
-        router.pushChildConfigurationIfNotAtTop(
+        navigation.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.DictConfigs
         )
     }
@@ -248,10 +232,10 @@ class MainDecomposeComponentImpl(
         )
     }
 
-    override fun back() = router.popIfNotEmpty()
+    override fun back() = navigation.popIfNotEmpty()
     override fun popToRoot() {
         closeDialogs()
-        router.popToRoot()
+        navigation.popToRoot()
 
     }
 

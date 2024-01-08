@@ -42,6 +42,8 @@ import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.parcelable.ParcelableContainer
 import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
@@ -129,8 +131,8 @@ private fun mainUI() {
         modifier = Modifier.fillMaxSize()
     ) {
         Children(
-            routerState = mainDecomposeComponent.routerState,
-            animation = childAnimation(slideFromRight())
+            routerState = mainDecomposeComponent.childStack,
+            animation = stackAnimation(slideFromRight())
         ) {
             when (val instance = it.instance) {
                 is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)

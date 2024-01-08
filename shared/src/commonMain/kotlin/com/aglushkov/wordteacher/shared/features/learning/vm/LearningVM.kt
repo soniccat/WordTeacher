@@ -28,6 +28,7 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 interface LearningVM: Clearable {
     var router: LearningRouter?
@@ -98,11 +99,11 @@ interface LearningVM: Clearable {
         }
     }
 
-    @Parcelize
+    @Serializable
     data class State (
         val cardIds: List<Long>,
         val teacherState: CardTeacher.State?
-    ): Parcelable
+    )
 }
 
 open class LearningVMImpl(

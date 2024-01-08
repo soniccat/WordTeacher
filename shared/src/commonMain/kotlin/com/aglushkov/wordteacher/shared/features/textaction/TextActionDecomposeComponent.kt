@@ -16,20 +16,21 @@ import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationOrPopIfExists
 import com.aglushkov.wordteacher.shared.general.toClearables
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.Router
-import com.arkivanov.decompose.router.RouterState
-import com.arkivanov.decompose.router.router
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import io.ktor.http.Url
+import kotlinx.serialization.Serializable
 
 interface TextActionDecomposeComponent
     : RouterDecomposeComponent<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child> {
 
     val text: CharSequence
-    override val router: Router<ChildConfiguration, Child>
+    val childStack: Value<ChildStack<ChildConfiguration, Child>>
 
     fun openDefinitions()
     fun openAddArticle(url: String? = null)
@@ -50,10 +51,11 @@ interface TextActionDecomposeComponent
         }
     }
 
-    sealed class ChildConfiguration: Parcelable {
-        @Parcelize object DefinitionConfiguration : ChildConfiguration()
-        @Parcelize data class AddArticleConfiguration(val url: String? = null) : ChildConfiguration()
-        @Parcelize object AddNoteConfiguration : ChildConfiguration()
+    @Serializable
+    sealed class ChildConfiguration {
+        @Serializable object DefinitionConfiguration : ChildConfiguration()
+        @Serializable data class AddArticleConfiguration(val url: String? = null) : ChildConfiguration()
+        @Serializable object AddNoteConfiguration : ChildConfiguration()
     }
 }
 
@@ -63,20 +65,31 @@ class TextActionDecomposeComponentImpl(
     val childComponentFactory: (context: ComponentContext, configuration: TextActionDecomposeComponent.ChildConfiguration) -> Any
 ) : TextActionDecomposeComponent, ComponentContext by componentContext {
 
-    override val router: Router<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child> =
-        router(
+    private val navigation = StackNavigation<TextActionDecomposeComponent.ChildConfiguration>()
+
+    override val childStack: Value<ChildStack<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child>> =
+        childStack(
+            source = navigation,
+            serializer = TextActionDecomposeComponent.ChildConfiguration.serializer(), // Or null to disable navigation state saving
             initialConfiguration = TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration,
-            key = "TextActionRouter",
-            handleBackButton = true,
-            childFactory = ::resolveChild
+            handleBackButton = true, // Pop the back stack on back button press
+            childFactory = ::resolveChild,
         )
 
-    private val routerStateChangeHandler = RouterStateChangeHandler()
-    override val routerState: Value<RouterState<*, TextActionDecomposeComponent.Child>>
-        get() = super.routerState.map {
-            routerStateChangeHandler.onClearableChanged(it.toClearables())
-            it
-        }
+//    override val router: Router<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child> =
+//        router(
+//            initialConfiguration = TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration,
+//            key = "TextActionRouter",
+//            handleBackButton = true,
+//            childFactory = ::resolveChild
+//        )
+//
+//    private val routerStateChangeHandler = RouterStateChangeHandler()
+//    override val routerState: Value<RouterState<*, TextActionDecomposeComponent.Child>>
+//        get() = super.routerState.map {
+//            routerStateChangeHandler.onClearableChanged(it.toClearables())
+//            it
+//        }
 
     private fun resolveChild(
         configuration: TextActionDecomposeComponent.ChildConfiguration,
@@ -93,15 +106,15 @@ class TextActionDecomposeComponentImpl(
         )
     }
 
-    override fun openDefinitions() = router.popToRoot()
+    override fun openDefinitions() = navigation.popToRoot()
 
     override fun openAddArticle(url: String?) =
-        router.pushChildConfigurationOrPopIfExists(
+        navigation.pushChildConfigurationOrPopIfExists(
             TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration(url = url)
         )
 
     override fun openAddNote() =
-        router.pushChildConfigurationOrPopIfExists(
+        navigation.pushChildConfigurationOrPopIfExists(
             TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration
         )
 
@@ -112,5 +125,5 @@ class TextActionDecomposeComponentImpl(
 //        )
     }
 
-    override fun back() = router.popIfNotEmpty()
+    override fun back() = navigation.popIfNotEmpty()
 }

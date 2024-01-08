@@ -18,6 +18,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 interface LearningSessionResultVM: Clearable {
     var router: LearningSessionResultRouter?
@@ -29,10 +30,10 @@ interface LearningSessionResultVM: Clearable {
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
-    @Parcelize
+    @Serializable
     data class State(
         val sessionResults: List<SessionCardResult>
-    ) : Parcelable
+    )
 }
 
 open class LearningSessionResultVMImpl(

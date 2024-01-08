@@ -53,9 +53,12 @@ import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.decompose.defaultComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.value.Value
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -102,7 +105,7 @@ class MainActivity : AppCompatActivity(), Router {
     private fun handleIntent() {
         intent?.extras?.getLong(EXTRA_ARTICLE_ID, 0L).takeIf { it != 0L }?.let { articleId ->
             mainDecomposeComponent.popToRoot()
-            (mainDecomposeComponent.routerState.value.activeChild.instance as? MainDecomposeComponent.Child.Tabs)?.let { tabs ->
+            (mainDecomposeComponent.childStack.value.active.instance as? MainDecomposeComponent.Child.Tabs)?.let { tabs ->
                 tabs.vm.openArticles()
                 mainDecomposeComponent.openArticle(articleId)
             }
@@ -154,8 +157,9 @@ class MainActivity : AppCompatActivity(), Router {
             modifier = Modifier.fillMaxSize()
         ) {
             Children(
-                routerState = mainDecomposeComponent.routerState,
-                animation = childAnimation(slideFromRight())
+                stack = mainDecomposeComponent.childStack,
+                modifier = Modifier,
+                animation = stackAnimation(slideFromRight())
             ) {
                 when (val instance = it.instance) {
                     is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)
@@ -196,8 +200,8 @@ class MainActivity : AppCompatActivity(), Router {
             }
         ) { innerPadding ->
             Children(
-                routerState = component.routerState,
-                animation = childAnimation(slide())
+                stack = component.childStack,
+                animation = stackAnimation(slide())
             ) {
                 when (val instance = it.instance) {
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
@@ -287,7 +291,7 @@ class MainActivity : AppCompatActivity(), Router {
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
                 BottomNavigationItem(
-                    selected = tab.decomposeChildConfigClass == component.routerState.value.activeChild.configuration::class.java,
+                    selected = tab.decomposeChildConfigClass == component.childStack.value.active.configuration::class.java,
                     onClick = {
                         when (tab) {
                             is ScreenTab.Definitions -> component.openDefinitions()

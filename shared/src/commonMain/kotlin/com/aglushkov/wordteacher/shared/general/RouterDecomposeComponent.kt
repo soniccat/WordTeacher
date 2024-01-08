@@ -1,66 +1,52 @@
 package com.aglushkov.wordteacher.shared.general
 
 import com.arkivanov.decompose.Child
-import com.arkivanov.decompose.router.Router
-import com.arkivanov.decompose.router.RouterState
-import com.arkivanov.decompose.router.pop
+import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.popTo
+import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.value.Value
 
 interface RouterDecomposeComponent<TChildConfiguration: Any, TChild: Any> {
 
-    val router: Router<TChildConfiguration, TChild>
-    val routerState: Value<RouterState<*, TChild>>
-        get() = router.state
+//    val router: Router<TChildConfiguration, TChild>
+//    val routerState: Value<RouterState<*, TChild>>
+//        get() = router.state
 }
 
-inline fun <reified C: Any, reified C2: C>
-        StackNavigation<C>.pushChildConfigurationIfNotAtTop(
-            activeChild: Child.Created<C, *>,
-            configuration: C2
-        ) {
-    if (activeChild is C2) {
-        return
-    }
-
+@OptIn(ExperimentalDecomposeApi::class)
+inline fun <reified C: Any, reified C2: C> StackNavigation<C>.pushChildConfigurationIfNotAtTop(
+    configuration: C2
+) {
     navigate(
-        { it + listOf(configuration) },
-        {_, _ -> }
+        transformer = { stack -> if (stack.last() is C2) stack else stack + configuration },
+        onComplete = { _, _ ->  },
     )
 }
 
-inline fun <reified C: Any, reified C2: C>
-        Router<C,*>.pushChildConfigurationOrPopIfExists(configuration: C2) {
-    if (state.value.activeChild.configuration is C2) {
-        return
-    }
+inline fun <reified C: Any, reified C2: C> StackNavigation<C>.pushChildConfigurationOrPopIfExists(
+    configuration: C2
+) {
+    navigate( { stack ->
+        if (stack.last() is C2) {
+            stack
+        } else {
+            val i = stack.indexOfFirst { it is C2 }
+            if (i >= 0) {
+                stack.take(i + 1)
+            } else {
+                stack + configuration
+            }
 
-    val i = state.value.backStack.indexOfFirst { it.configuration is C2 }
-    if (i >= 0) {
-        navigate(
-            { it.take(i + 1) },
-            { _,_ -> }
-        )
-    } else {
-        navigate(
-            { it + listOf(configuration) },
-            { _, _ -> }
-        )
-    }
+        }
+    }, {_, _ ->})
 }
 
-fun Router<*, *>.popIfNotEmpty() {
-    if (state.value.backStack.isNotEmpty()) {
-        pop()
-    }
-}
+fun StackNavigation<*>.popIfNotEmpty() = pop()
 
-fun <T: Any> Router<T, *>.popToRoot() {
-    navigate(
-        { listOf(it.first()) },
-        { _, _ -> }
-    )
-}
+fun StackNavigation<*>.popToRoot() = popTo(0)
 
 class RouterStateChangeHandler {
     private var prevClearables: List<Clearable>? = null
@@ -82,14 +68,10 @@ class RouterStateChangeHandler {
     }
 }
 
-fun RouterState<*, Clearable>.toClearables(): List<Clearable> =
+fun ChildStack<*, *>.toClearables(): List<Clearable> =
     listOfNotNull(
         *backStack.mapNotNull {
-            if (it is Child.Created<*, Clearable>) {
-                it.instance
-            } else {
-                null
-            }
+            it.instance as? Clearable
         }.toTypedArray(),
-        activeChild.instance,
+        active.instance as? Clearable,
     )

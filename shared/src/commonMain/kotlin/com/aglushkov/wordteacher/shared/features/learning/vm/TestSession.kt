@@ -6,6 +6,7 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.serialization.Serializable
 
 class TestSession(
     val cards: List<Card>,
@@ -71,12 +72,12 @@ class TestSession(
         currentTestCardStateFlow.value = testCards[currentIndex]
     }
 
-    @Parcelize
+    @Serializable
     data class State(
         val cardIds: List<Long>,
         val currentIndex: Int,
         val options: List<List<String>>
-    ) : Parcelable
+    )
 
     data class TestCard(
         val card : Card,

@@ -55,7 +55,7 @@ android {
     composeOptions {
         //kotlinCompilerVersion = libs.versions.kotlinVersion.get()
         // for compose-jb - comment - start
-//        kotlinCompilerExtensionVersion = libs.versions.composeJetpackCompiler.get()
+        kotlinCompilerExtensionVersion = libs.versions.composeJetpackCompiler.get()
         // for compose-jb - comment - end
     }
 

@@ -7,7 +7,9 @@ androidGradlePlugin = "8.1.4"
 
 kotlinPoet = "1.14.2"
 
-#composeJetpackCompiler = "1.4.7"
+# https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compatibility-and-versioning.html#use-a-developer-version-of-compose-multiplatform-compiler
+composeJetpackCompiler = "1.5.4"
+
 composeJetpackUiTooling = "1.5.2"
 #composeJetpack = "1.4.0"
 androidComposeActivity = "1.7.2"
