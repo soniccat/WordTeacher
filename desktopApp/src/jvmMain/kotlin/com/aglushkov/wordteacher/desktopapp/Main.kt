@@ -44,6 +44,8 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.chil
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
+import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.parcelable.ParcelableContainer
 import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
@@ -172,7 +174,7 @@ private fun TabsUI(component: TabDecomposeComponent) {
         }
     ) { innerPadding ->
         Children(
-            routerState = component.routerState,
+            routerState = component.childStack,
             animation = childAnimation(slide())
         ) {
             when (val instance = it.instance) {
@@ -215,9 +217,10 @@ private fun TabsUI(component: TabDecomposeComponent) {
 
 @Composable
 private fun dialogUI() {
-    val dialogs = mainDecomposeComponent.dialogsStateFlow.collectAsState()
+    val dialogs = mainDecomposeComponent.dialogsStateFlow.subscribeAsState()
+    val children = listOf(dialogs.value.active) + dialogs.value.backStack
 
-    dialogs.value.onEach { instance ->
+    children.onEach { instance ->
         when (val instance = instance.instance) {
             is MainDecomposeComponent.Child.AddArticle ->
                 AddArticleUIDialog(
@@ -281,7 +284,7 @@ private fun BottomNavigationBarUI(component: TabDecomposeComponent) {
     ) {
         bottomBarTabs.forEachIndexed { index, tab ->
             BottomNavigationItem(
-                selected = tab.decomposeChildConfigClass == component.routerState.value.activeChild.configuration::class.java,
+                selected = tab.decomposeChildConfigClass == component.childStack.active.configuration::class.java,
                 onClick = {
                     when (tab) {
                         is ScreenTab.Definitions -> component.openDefinitions()

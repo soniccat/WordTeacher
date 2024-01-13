@@ -53,11 +53,11 @@ class CardTeacher(
         val session = buildLearnSession() ?: return null
         val warmupSession = Random.nextInt(2)
 
-        if (warmupSession == 0 && session.cards.size >= MATCH_SESSION_OPTION_COUNT) {
+        if (MatchSession.isValid(session.cards) && warmupSession == 0 && session.cards.size >= MATCH_SESSION_OPTION_COUNT) {
             matchSession = MatchSession(session.cards)
         }
 
-        if (warmupSession == 1 && session.cards.size >= TEST_SESSION_OPTION_COUNT) {
+        if ((matchSession == null || warmupSession == 1) && session.cards.size >= TEST_SESSION_OPTION_COUNT) {
             val testSession = TestSession(session.cards, cards.map { it.term })
             currentTestSession = testSession
             scope.launch {

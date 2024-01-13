@@ -13,6 +13,11 @@ import kotlin.random.Random
 class MatchSession(
     cards: List<Card>,
 ) {
+    companion object {
+        fun isValid(cards: List<Card>): Boolean =
+            cards.all { it.examples.isNotEmpty() }
+    }
+
     private val matchPairStateFlow = MutableStateFlow<List<MatchPair>?>(null)
     val matchPairFlow: Flow<List<MatchPair>?> = matchPairStateFlow
 

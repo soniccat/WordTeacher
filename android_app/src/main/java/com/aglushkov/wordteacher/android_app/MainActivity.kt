@@ -57,6 +57,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.value.Value
 
@@ -239,15 +240,16 @@ class MainActivity : AppCompatActivity(), Router {
 
     @Composable
     private fun dialogUI() {
-        val dialogs = mainDecomposeComponent.dialogsStateFlow.collectAsState()
+        val dialogs = mainDecomposeComponent.dialogsStateFlow.subscribeAsState()
+        val children = listOf(dialogs.value.active) + dialogs.value.backStack
 
-        dialogs.value.onEach { instance ->
-            when (val instance = instance.instance) {
+        children.onEach { child ->
+            when (val instance = child.instance) {
                 is MainDecomposeComponent.Child.AddArticle ->
                     AddArticleUIDialog(
                         vm = instance.vm,
                         onArticleCreated = {
-                            mainDecomposeComponent.popDialog(instance)
+                            mainDecomposeComponent.popDialog(child.configuration)
                         }
                     )
                 is MainDecomposeComponent.Child.Learning ->
@@ -262,7 +264,7 @@ class MainActivity : AppCompatActivity(), Router {
                                     inner: Any,
                                     result: SimpleRouter.Result
                                 ) {
-                                    mainDecomposeComponent.popDialog(instance)
+                                    mainDecomposeComponent.popDialog(child.configuration)
                                 }
                             }
                         }
@@ -272,7 +274,7 @@ class MainActivity : AppCompatActivity(), Router {
                         vm = instance.vm.apply {
                             router = object : LearningSessionResultRouter {
                                 override fun onScreenFinished(inner: Any, result: SimpleRouter.Result) {
-                                    mainDecomposeComponent.popDialog(instance)
+                                    mainDecomposeComponent.popDialog(child.configuration)
                                 }
                             }
                         }
