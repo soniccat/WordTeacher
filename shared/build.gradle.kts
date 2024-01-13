@@ -18,9 +18,9 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
-dependencies {
-    add("kapt", libs.daggerCompiler)
-}
+//dependencies {
+//    add("kapt", libs.daggerCompiler)
+//}
 
 kotlin {
     jvmToolchain(17)

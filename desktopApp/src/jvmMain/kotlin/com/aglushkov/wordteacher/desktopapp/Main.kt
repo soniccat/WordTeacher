@@ -25,8 +25,6 @@ import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.views.CardSetJsonImportUIDialog
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
-import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
-import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
@@ -39,9 +37,6 @@ import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
@@ -61,6 +56,8 @@ import java.io.File
 import java.io.FileWriter
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 
 lateinit var mainDecomposeComponent: MainDecomposeComponent
 val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -133,7 +130,7 @@ private fun mainUI() {
         modifier = Modifier.fillMaxSize()
     ) {
         Children(
-            routerState = mainDecomposeComponent.childStack,
+            stack = mainDecomposeComponent.childStack,
             animation = stackAnimation(slideFromRight())
         ) {
             when (val instance = it.instance) {
@@ -174,8 +171,8 @@ private fun TabsUI(component: TabDecomposeComponent) {
         }
     ) { innerPadding ->
         Children(
-            routerState = component.childStack,
-            animation = childAnimation(slide())
+            stack = component.childStack,
+            animation = stackAnimation(slide())
         ) {
             when (val instance = it.instance) {
                 is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
@@ -220,27 +217,27 @@ private fun dialogUI() {
     val dialogs = mainDecomposeComponent.dialogsStateFlow.subscribeAsState()
     val children = listOf(dialogs.value.active) + dialogs.value.backStack
 
-    children.onEach { instance ->
-        when (val instance = instance.instance) {
+    children.onEach { ins ->
+        when (val instance = ins.instance) {
             is MainDecomposeComponent.Child.AddArticle ->
                 AddArticleUIDialog(
                     vm = instance.vm,
                     onArticleCreated = {
-                        mainDecomposeComponent.popDialog(instance)
+                        mainDecomposeComponent.popDialog(ins.configuration)
                     }
                 )
             is MainDecomposeComponent.Child.WebAuth ->
                 WebAuthUI(
                     vm = instance.vm,
                     onCompleted = {
-                        mainDecomposeComponent.popDialog(instance)
+                        mainDecomposeComponent.popDialog(ins.configuration)
                     }
                 )
             is MainDecomposeComponent.Child.CardSetJsonImport ->
                 CardSetJsonImportUIDialog(
                     vm = instance.vm,
                     onCardSetCreated = {
-                        mainDecomposeComponent.popDialog(instance)
+                        mainDecomposeComponent.popDialog(ins.configuration)
                     }
                 )
 //            is MainDecomposeComponent.Child.Learning ->

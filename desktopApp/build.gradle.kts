@@ -38,6 +38,7 @@ kotlin {
         javaPluginConvention.sourceSets.onEach { javaSourceSet ->
             // HACK: adds Dagger generated classes
 //            println("java sourceSet:" + javaSourceSet.name + " " + javaSourceSet.java.srcDirs.size)
+            javaSourceSet.java.srcDir(project.rootDir.absolutePath + "/shared/build/generated/source/kapt/debug/")
             javaSourceSet.java.srcDir(project.rootDir.absolutePath + "/shared/build/generated/source/kapt/main/")
 //            javaSourceSet.java.srcDirs.onEach { dir ->
 //                println("srcDir file:" + dir.absolutePath)
