@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS wiki (
+  word TEXT,
+  frequency REAL
+);
+
+selectFrequencies:
+SELECT *
+FROM wiki
+WHERE word IN ?;
+
+selectFrequency:
+SELECT *
+FROM wiki
+WHERE word = ?;

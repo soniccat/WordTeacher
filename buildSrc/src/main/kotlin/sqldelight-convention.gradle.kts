@@ -9,6 +9,11 @@ sqldelight {
             schemaOutputDirectory.set(File("./src/commonMain/sqldelight/main/com/aglushkov/wordteacher/schemes"))
             srcDirs.setFrom("src/commonMain/sqldelight/main")
         }
+        create("WordFrequencyDB") {
+            packageName.set("com.aglushkov.wordteacher.wordfrequencydb")
+            schemaOutputDirectory.set(File("./src/commonMain/sqldelight/wordfrequency/com/aglushkov/wordteacher/schemes"))
+            srcDirs.setFrom("src/commonMain/sqldelight/wordfrequency")
+        }
     }
 //    database("SQLDelightDatabase") {
 //        packageName = "com.aglushkov.wordteacher.shared.data"
