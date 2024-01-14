@@ -8,7 +8,7 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.v
 
 actual class DatabaseDriverFactory(private val context: Context) {
-    actual fun createDriver(): SqlDriver {
+    actual fun createMainDBDriver(): SqlDriver {
         return AndroidSqliteDriver(
             Schema,
             context,
@@ -19,6 +19,17 @@ actual class DatabaseDriverFactory(private val context: Context) {
 //
 //                    Logger.v("migrated to 2")
 //                }
+            )
+        )
+    }
+
+    actual fun createFrequencyDBDriver(): SqlDriver {
+        return AndroidSqliteDriver(
+            Schema,
+            context,
+            "word_frequency.db",
+            callback = AndroidSqliteDriver.Callback(
+                schema = Schema,
             )
         )
     }

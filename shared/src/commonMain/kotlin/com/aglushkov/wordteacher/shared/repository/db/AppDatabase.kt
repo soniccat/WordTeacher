@@ -24,7 +24,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -35,7 +34,7 @@ class AppDatabase(
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val defaultScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-    private val driver = driverFactory.createDriver()
+    private val driver = driverFactory.createMainDBDriver()
     private var db = MainDB(
         driver,
         DBCardAdapter = DBCard.Adapter(
@@ -232,12 +231,12 @@ class AppDatabase(
             }
         }
 
-        fun selectAllSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectAllSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId ->
-            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId)
+        fun selectAllSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectAllSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency->
+            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency)
         }
 
-        fun selectSetIdsWithCards(setIds: List<Long>) = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards(setIds) { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId ->
-            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId)
+        fun selectSetIdsWithCards(setIds: List<Long>) = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards(setIds) { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency ->
+            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency)
         }
 
         fun lastModificationDate() = db.dBCardSetQueries.lastModificationDate().executeAsList().firstOrNull()?.MAX ?: 0L
@@ -340,8 +339,12 @@ class AppDatabase(
         ) { a, b ->
             a + b
         }
+
         fun selectCardsWithOutdatedSpans() =
             db.dBCardQueries.selectCardsWithOutdatedSpans(mapper = cardMapper())
+
+        fun selectCardsWithNotDefinedFrequency() =
+            db.dBCardQueries.selectCardsWithNotDefinedFrequency(mapper = cardMapper())
 
         fun selectCards(ids: List<Long>) = db.dBCardQueries.selectCards(
             ids,
@@ -372,8 +375,9 @@ class AppDatabase(
             modificationDate: Long,
             creationId: String,
             remoteId: String,
+            termFrequency: Double,
         ) -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId ->
+            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId, termFrequency ->
                 Card(
                     id,
                     remoteId,
@@ -397,7 +401,8 @@ class AppDatabase(
                     ),
                     needToUpdateDefinitionSpans = needToUpdateDefinitionSpans != 0L,
                     needToUpdateExampleSpans = needToUpdateExampleSpans != 0L,
-                    creationId = creationId
+                    creationId = creationId,
+                    termFrequency = termFrequency,
                 )
             }
 
@@ -421,8 +426,9 @@ class AppDatabase(
             modificationDate: Long?,
             creationId: String?,
             remoteId: String?,
+            termFrequency: Double?,
         )  -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId ->
+            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId, termFrequency ->
                 Card(
                     id!!,
                     remoteId.orEmpty(),
@@ -446,7 +452,8 @@ class AppDatabase(
                     ),
                     needToUpdateDefinitionSpans = needToUpdateDefinitionSpans != 0L,
                     needToUpdateExampleSpans = needToUpdateExampleSpans != 0L,
-                    creationId = creationId!!
+                    creationId = creationId!!,
+                    termFrequency = termFrequency!!,
                 )
             }
 
@@ -484,6 +491,7 @@ class AppDatabase(
                 needToUpdateDefinitionSpans = needToUpdateDefinitionSpans,
                 needToUpdateExampleSpans = needToUpdateExampleSpans,
                 creationId = creationId,
+                termFrequency = -1.0
             )
 
             cards.insertCard(setId, newCard)

@@ -26,6 +26,7 @@ data class Card (
     val needToUpdateDefinitionSpans: Boolean,
     val needToUpdateExampleSpans: Boolean,
     val creationId: String,
+    val termFrequency: Double,
 ) {
     fun withRightAnswer(timeSource: TimeSource) =
         copy(

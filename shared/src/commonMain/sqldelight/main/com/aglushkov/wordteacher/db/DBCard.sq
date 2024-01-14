@@ -25,7 +25,10 @@ CREATE TABLE IF NOT EXISTS DBCard (
   needToUpdateExampleDefinitionSpans INTEGER NOT NULL DEFAULT 0,
   modificationDate INTEGER NOT NULL DEFAULT 0,
   creationId TEXT NOT NULL DEFAULT "",
-  remoteId TEXT NOT NULL DEFAULT ""
+  remoteId TEXT NOT NULL DEFAULT "",
+
+-- Frequency
+  termFrequency REAL NOT NULL DEFAULT -1.0
 );
 
 selectAllCardIds:
@@ -90,3 +93,8 @@ updateCardRemoteId:
 UPDATE DBCard
 SET remoteId = ?
 WHERE creationId = ?;
+
+selectCardsWithNotDefinedFrequency:
+SELECT *
+FROM DBCard
+WHERE DBCard.termFrequency = -1.0;

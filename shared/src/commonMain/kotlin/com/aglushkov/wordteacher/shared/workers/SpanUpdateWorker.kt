@@ -182,7 +182,7 @@ sealed interface State {
     }
 }
 
-private fun MutableStateFlow<State>.tryPauseIfPendingPause(): Boolean =
+fun MutableStateFlow<State>.tryPauseIfPendingPause(): Boolean =
     updateAndGet {
         if (it.isPendingPause()) {
             it.toPaused()

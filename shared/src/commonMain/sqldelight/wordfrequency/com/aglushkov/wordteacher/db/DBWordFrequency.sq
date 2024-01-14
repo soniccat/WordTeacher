@@ -3,6 +3,13 @@ CREATE TABLE IF NOT EXISTS wiki (
   frequency REAL
 );
 
+selectOrderedFrequencyWithOffset:
+SELECT frequency
+FROM wiki
+ORDER BY frequency DESC
+LIMIT 1
+OFFSET ?;
+
 selectFrequencies:
 SELECT *
 FROM wiki
@@ -12,3 +19,7 @@ selectFrequency:
 SELECT *
 FROM wiki
 WHERE word = ?;
+
+selectCount:
+SELECT COUNT(*)
+FROM wiki;

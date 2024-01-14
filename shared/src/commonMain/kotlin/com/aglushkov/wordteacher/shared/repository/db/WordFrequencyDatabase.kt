@@ -1,0 +1,106 @@
+package com.aglushkov.wordteacher.shared.repository.db
+
+import co.touchlab.kermit.Logger
+import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.wordfrequencydb.WordFrequencyDB
+import com.russhwolf.settings.coroutines.FlowSettings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import okio.Path
+import kotlin.math.pow
+
+@Serializable
+data class WordFrequencyGradation(
+    val levels: List<WordFrequencyLevel>
+)
+
+@Serializable
+data class WordFrequencyLevel(
+    val index: Int,
+    val frequency: Double
+)
+
+class WordFrequencyDatabase(
+    driverFactory: DatabaseDriverFactory,
+    private val dbPreparer: () -> Path,
+    private val settings: FlowSettings,
+) {
+    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val defaultScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    private val driver = driverFactory.createFrequencyDBDriver()
+    private var db = WordFrequencyDB(driver)
+
+    val state = MutableStateFlow<Resource<WordFrequencyDatabase>>(Resource.Uninitialized())
+
+    private val jsonCoder = Json {
+        ignoreUnknownKeys = true
+    }
+    private var gradation: WordFrequencyGradation? = null
+
+    init {
+        create()
+    }
+
+    fun create() {
+        mainScope.launch(Dispatchers.Default) {
+            loadResource {
+                dbPreparer()
+                val res = db.dBWordFrequencyQueries.selectFrequency("cat").executeAsOne()
+                Logger.i("test", null)
+
+                resolveGradation()
+
+                this@WordFrequencyDatabase
+            }.flowOn(Dispatchers.Default).collect(state)
+        }
+    }
+
+    private suspend fun resolveGradation() {
+        try {
+            val gradationString = settings.getStringOrNull(WORD_FREQUENCY_GRADATION_SETTINGS_NAME)
+            if (gradationString != null) {
+                gradation = jsonCoder.decodeFromString(gradationString) as? WordFrequencyGradation
+            }
+        } catch (_: Exception) {
+        }
+
+        if (gradation == null) {
+            val newGradation = calcGradation()
+            gradation = newGradation
+            settings.putString(WORD_FREQUENCY_GRADATION_SETTINGS_NAME, jsonCoder.encodeToString(newGradation))
+        }
+    }
+
+    private fun calcGradation(): WordFrequencyGradation {
+        val levelCount = 5
+        val m = 4.0 // multiplier
+
+        // calc x in x + m*x + m^2*x + m^3*x + m^4*x ... = rowCount
+        val xSum = (0 until levelCount).fold(0) { acc, i -> acc + m.pow(i).toInt() }
+        val rowCount = db.dBWordFrequencyQueries.selectCount().executeAsOne()
+        val x = rowCount.toDouble() / xSum.toDouble()
+        val rowIndexes = (0 until levelCount).map { (m.pow(it) * x).toInt() }
+        val levels = rowIndexes.mapIndexed { i, v ->
+            val frequency = db.dBWordFrequencyQueries.selectOrderedFrequencyWithOffset(v.toLong())
+                .executeAsOne().frequency ?: 0.0
+            WordFrequencyLevel(i, frequency)
+        }
+
+        return WordFrequencyGradation(levels)
+    }
+
+    suspend fun waitUntilInitialized() = state.first { it.isLoaded() }
+}
+
+private const val WORD_FREQUENCY_GRADATION_SETTINGS_NAME = "wordFrequencyGradation"

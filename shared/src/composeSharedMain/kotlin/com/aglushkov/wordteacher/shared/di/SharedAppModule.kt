@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.dict.DictFactory
@@ -160,6 +161,17 @@ class SharedAppModule {
     fun database(driver: DatabaseDriverFactory, timeSource: TimeSource): AppDatabase {
         return AppDatabase(driver, timeSource)
     }
+
+    @AppComp
+    @Provides
+    fun wordFrequencyDatabase(
+        driver: DatabaseDriverFactory,
+        @WordFrequencyPreparer dbPreparer: () -> Path,
+        settings: FlowSettings,
+    ): WordFrequencyDatabase {
+        return WordFrequencyDatabase(driver, dbPreparer, settings)
+    }
+
 
     @AppComp
     @Provides

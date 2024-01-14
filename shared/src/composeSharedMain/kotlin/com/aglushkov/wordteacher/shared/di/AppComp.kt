@@ -22,6 +22,9 @@ annotation class Platform
 @Qualifier
 annotation class ApiBaseUrl
 
+@Qualifier
+annotation class WordFrequencyPreparer
+
 val LocalIsDebug = staticCompositionLocalOf { false }
 
 val LocalIsDarkTheme = staticCompositionLocalOf { false }

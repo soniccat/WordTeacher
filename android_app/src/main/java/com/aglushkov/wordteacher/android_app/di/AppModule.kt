@@ -27,8 +27,13 @@ import com.russhwolf.settings.datastore.DataStoreSettings
 import okio.FileSystem
 import dagger.Module
 import dagger.Provides
+import okio.Buffer
 import okio.Path
+import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
+import okio.buffer
+import okio.source
+import okio.use
 
 @Module(includes = [SharedAppModule::class])
 class AppModule {
@@ -131,6 +136,33 @@ class AppModule {
     @Provides
     fun fileSharer(context: Context): FileSharer {
         return FileSharerRepository(context).toFileSharer()
+    }
+
+    @WordFrequencyPreparer
+    @AppComp
+    @Provides
+    fun wordFrequencyPreparer(context: Context, fileSystem: FileSystem): () -> Path {
+        return {
+            // copy db in database folder if needed
+            val dbPath = context.getDatabasePath("word_frequency.db").toOkioPath()
+            if (!fileSystem.exists(dbPath)) {
+                fileSystem.write(dbPath) {
+                    MR.assets.word_frequency.getInputStream(context).buffered().use { readStream ->
+                        val source = readStream.source().buffer()
+                        val readByteArray = ByteArray(100 * 1024)
+                        var readByteCount = 0
+                        while (true) {
+                            readByteCount = source.read(readByteArray, 0, readByteArray.size)
+                            if (readByteCount == -1) {
+                                break
+                            }
+                            write(readByteArray, 0, readByteCount)
+                        }
+                    }
+                }
+            }
+            "".toPath()
+        }
     }
 
     // Features

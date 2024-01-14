@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import io.ktor.client.plugins.cookies.CookiesStorage
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +34,7 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     // declare here to force initialization on startup
     @Inject lateinit var databaseCardWorker: DatabaseCardWorker
     @Inject lateinit var cookieStorage: CookiesStorage
+    @Inject lateinit var freqDb: WordFrequencyDatabase
 
     @Inject lateinit var fileLogger: FileLogger
 
