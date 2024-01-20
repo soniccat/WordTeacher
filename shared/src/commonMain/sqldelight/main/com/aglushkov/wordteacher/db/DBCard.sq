@@ -26,9 +26,7 @@ CREATE TABLE IF NOT EXISTS DBCard (
   modificationDate INTEGER NOT NULL DEFAULT 0,
   creationId TEXT NOT NULL DEFAULT "",
   remoteId TEXT NOT NULL DEFAULT "",
-
--- Frequency
-  termFrequency REAL NOT NULL DEFAULT -1.0
+  termFrequency REAL NOT NULL DEFAULT -1.0 -- frequency is stored locally and won't be synced with backend
 );
 
 selectAllCardIds:
@@ -94,7 +92,12 @@ UPDATE DBCard
 SET remoteId = ?
 WHERE creationId = ?;
 
-selectCardsWithNotDefinedFrequency:
-SELECT *
+selectCardsWithUndefinedFrequency:
+SELECT id, term
 FROM DBCard
 WHERE DBCard.termFrequency = -1.0;
+
+updateCardFrequency:
+UPDATE DBCard
+SET termFrequency = ?
+WHERE id = ?;

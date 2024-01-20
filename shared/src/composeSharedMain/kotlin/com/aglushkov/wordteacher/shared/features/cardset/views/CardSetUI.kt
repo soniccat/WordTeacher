@@ -8,6 +8,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -19,6 +20,8 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
@@ -156,12 +159,20 @@ fun CardSetViewItems(
                     viewItem = item,
                     textContent = { text, textStyle ->
                         CardTextField(
-                            Modifier,
+                            Modifier.weight(1.0f),
                             text,
                             textStyle,
                             item,
                             item.cardId,
                             vm,
+                        )
+                        Box(
+                            Modifier
+                                .size(40.dp).padding(10.dp)
+                                .background(
+                                    color = wordFrequencyInterpolatedColor(item.frequencyLevel),
+                                    shape = RoundedCornerShape(30.dp)
+                                ),
                         )
                     }
                 )
@@ -435,3 +446,14 @@ private fun PartOfSpeechSelectPopup(
         }
     }
 }
+
+fun wordFrequencyInterpolatedColor(level: Float): Color {
+    return lerp(
+        StartWordFrequencyColor,
+        EndWordFrequencyColor,
+        level,
+    )
+}
+
+private val StartWordFrequencyColor = Color(0xFF60D838)
+private val EndWordFrequencyColor = Color(0xFFFF634D)

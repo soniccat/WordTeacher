@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
@@ -24,6 +25,7 @@ class CardSetModule {
     fun cardSetDecomposeComponent(
         state: CardSetVM.State,
         cardSetRepository: CardSetRepository,
+        wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         databaseCardWorker: DatabaseCardWorker,
         componentContext: ComponentContext,
         timeSource: TimeSource,
@@ -31,6 +33,7 @@ class CardSetModule {
     ) = CardSetDecomposeComponent(
         state,
         cardSetRepository,
+        wordFrequencyGradationProvider,
         databaseCardWorker,
         componentContext,
         timeSource,

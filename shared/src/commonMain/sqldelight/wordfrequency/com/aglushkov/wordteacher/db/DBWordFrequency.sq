@@ -16,7 +16,7 @@ FROM wiki
 WHERE word IN ?;
 
 selectFrequency:
-SELECT *
+SELECT frequency
 FROM wiki
 WHERE word = ?;
 

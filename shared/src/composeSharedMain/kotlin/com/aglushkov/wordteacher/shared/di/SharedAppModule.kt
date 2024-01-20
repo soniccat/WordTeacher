@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.dict.DictFactory
@@ -26,6 +27,7 @@ import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.*
+import com.aglushkov.wordteacher.shared.workers.CardFrequencyUpdateWorker
 import com.aglushkov.wordteacher.shared.workers.CardSetSyncWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
@@ -172,15 +174,23 @@ class SharedAppModule {
         return WordFrequencyDatabase(driver, dbPreparer, settings)
     }
 
+    @AppComp
+    @Provides
+    fun wordFrequencyGradationProvider(
+        db: WordFrequencyDatabase,
+    ): WordFrequencyGradationProvider {
+        return db // TODO: user dagger bind instead
+    }
 
     @AppComp
     @Provides
     fun databaseCardWorker(
         databaseWorker: DatabaseWorker,
         spanUpdateWorker: SpanUpdateWorker,
-        cardSetSyncWorker: CardSetSyncWorker
+        cardSetSyncWorker: CardSetSyncWorker,
+        cardFrequencyUpdateWorker: CardFrequencyUpdateWorker,
     ): DatabaseCardWorker {
-        return DatabaseCardWorker(databaseWorker, spanUpdateWorker, cardSetSyncWorker)
+        return DatabaseCardWorker(databaseWorker, spanUpdateWorker, cardSetSyncWorker, cardFrequencyUpdateWorker)
     }
 
     @AppComp
@@ -193,6 +203,15 @@ class SharedAppModule {
         timeSource: TimeSource
     ): SpanUpdateWorker {
         return SpanUpdateWorker(database, databaseWorker, nlpCore, nlpSentenceProcessor, timeSource)
+    }
+
+    @AppComp
+    @Provides
+    fun cardFrequencyUpdateWorker(
+        databaseWorker: DatabaseWorker,
+        frequencyDatabase: WordFrequencyDatabase,
+    ): CardFrequencyUpdateWorker {
+        return CardFrequencyUpdateWorker(databaseWorker, frequencyDatabase)
     }
 
     @AppComp

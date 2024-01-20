@@ -1,23 +1,18 @@
 package com.aglushkov.wordteacher.shared.workers
 
 import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
+import com.aglushkov.wordteacher.shared.general.extensions.splitByChunks
 import com.aglushkov.wordteacher.shared.general.v
-import com.aglushkov.wordteacher.shared.model.CardSpan
-import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
-import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
-import com.aglushkov.wordteacher.shared.repository.cardset.findTermSpans
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class CardFrequencyUpdateWorker (
-    private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
     private val frequencyDatabase: WordFrequencyDatabase,
-    private val timeSource: TimeSource
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val state = MutableStateFlow<State>(State.Paused(State.Done))
@@ -27,7 +22,7 @@ class CardFrequencyUpdateWorker (
         scope.launch {
             frequencyDatabase.waitUntilInitialized()
 
-            database.cards.selectCardsWithNotDefinedFrequency().asFlow().collect { query ->
+            databaseWorker.database.cards.selectCardsWithUndefinedFrequency().asFlow().collect { query ->
                 do {
                     val cards = query.executeAsList() // execute or re-execute the query
                     if (cards.isEmpty()) {
@@ -42,7 +37,7 @@ class CardFrequencyUpdateWorker (
                         }
                     }
 
-                    Logger.v("wait until not paused", "SpanUpdateWorker")
+                    Logger.v("wait until not paused", TAG)
                     state.takeWhile { it.isPaused() }.collect()
                     state.update {
                         if (it.isPendingPause()) {
@@ -52,60 +47,36 @@ class CardFrequencyUpdateWorker (
                         }
                     }
 
-                    Logger.v("is in progress or pending pause (${cards.size}, ${state.value})", "SpanUpdateWorker")
+                    Logger.v("is in progress or pending pause (${cards.size}, ${state.value})", TAG)
 
-
-                    cards.forEach { card ->
+                    cards.splitByChunks(20).forEach br@ { cardChunk ->
                         if (state.tryPauseIfPendingPause()) {
-                            Logger.v("paused", "SpanUpdateWorker")
-                            return@forEach
+                            Logger.v("paused", TAG)
+                            return@br
                         }
 
-//                        var defSpans = emptyList<List<CardSpan>>()
-//                        if (card.needToUpdateDefinitionSpans) {
-//                            defSpans = card.definitions.map {
-//                                if (state.tryPauseIfPendingPause()) {
-//                                    Logger.v("paused", "SpanUpdateWorker")
-//                                    return@forEach
-//                                }
-//                                findTermSpans(it, card.term, nlpCoreCopy, nlpSentenceProcessor)
-//                            }
-//                        }
-//
-//                        var exampleSpans = emptyList<List<CardSpan>>()
-//                        if (card.needToUpdateExampleSpans) {
-//                            exampleSpans = card.examples.map {
-//                                if (state.tryPauseIfPendingPause()) {
-//                                    Logger.v("paused", "SpanUpdateWorker")
-//                                    return@forEach
-//                                }
-//                                findTermSpans(it, card.term, nlpCoreCopy, nlpSentenceProcessor)
-//                            }
-//                        }
-
-                        if (state.tryPauseIfPendingPause()) {
-                            Logger.v("paused", "SpanUpdateWorker")
-                            return@forEach
+                        var frequencies = listOf<Double>()
+                        try {
+                            frequencies = frequencyDatabase.resolveFrequencyForWords(cardChunk.map { it.term })
+                        } catch (e: Exception) {
+                            Logger.e("updateCardFrequency exception " + e.message, TAG)
                         }
-
-//                        databaseWorker.run {
-//                            database.cards.updateCard(
-//                                card = card.copy(
-//                                    definitionTermSpans = defSpans,
-//                                    exampleTermSpans = exampleSpans,
-//                                    needToUpdateDefinitionSpans = false,
-//                                    needToUpdateExampleSpans = false
-//                                ),
-//                                modificationDate = timeSource.timeInMilliseconds()
-//                            )
-//                        }
+                        databaseWorker.run {
+                            try {
+                                cardChunk.onEachIndexed { cardIndex, card ->
+                                    it.cards.updateCardFrequency(card.id, frequencies[cardIndex])
+                                }
+                            } catch (e: Exception) {
+                                Logger.e("updateCardFrequency exception " + e.message, TAG)
+                            }
+                        }
                     }
 
-                    Logger.v("completed, paused=${ state.value.isPaused() }", "SpanUpdateWorker")
+                    Logger.v("completed, paused=${ state.value.isPaused() }", TAG)
                 } while (state.value.isPaused()) // we were interrupted, need to try again
 
                 state.update { State.Done }
-                Logger.v("Done", "SpanUpdateWorker")
+                Logger.v("Done", TAG)
             }
         }
     }
@@ -140,3 +111,4 @@ class CardFrequencyUpdateWorker (
     }
 }
 
+private const val TAG = "CardFrequencyUpdateWorker"

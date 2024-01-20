@@ -73,6 +73,7 @@ class CardSetSyncWorker(
     val stateFlow: Flow<State> = state
     private var lastPullDate: Instant = Instant.fromEpochMilliseconds(0)
     private var lastPushDate: Instant = Instant.fromEpochMilliseconds(0)
+    private var pullErrorCount: Int = 0
 
     // last push/pull date, stored in settings
     var lastSyncDate: Instant = Instant.fromEpochMilliseconds(0)
@@ -241,7 +242,19 @@ class CardSetSyncWorker(
             }
         } catch (e: Exception) {
             if (state.value == State.Pulling) {
-                toState(State.PullRequired(e))
+                if (pullErrorCount >= 2) {
+                    pullErrorCount = 0
+                    toState(State.Idle)
+                    scope.launch {
+                        delay(PULL_AUTO_TRY_AGAIN_INTERVAL)
+                        if (canPull()) {
+                            toState(State.PullRequired())
+                        }
+                    }
+                } else {
+                    ++pullErrorCount
+                    toState(State.PullRequired(e))
+                }
             }
         }
     }
@@ -342,3 +355,4 @@ class CardSetSyncWorker(
 private const val LAST_SYNC_DATE_KEY = "LAST_SYNC_DATE_KEY"
 private const val PULL_RETRY_INTERVAL = 5000L
 private const val PUSH_RETRY_INTERVAL = 20000L
+private const val PULL_AUTO_TRY_AGAIN_INTERVAL = PULL_RETRY_INTERVAL * 10

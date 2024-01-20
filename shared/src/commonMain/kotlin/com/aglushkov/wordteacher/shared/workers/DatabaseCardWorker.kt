@@ -17,7 +17,8 @@ import kotlin.properties.Delegates
 // Represents 3 states of card state management
 // SYNCING - pulling new state, merging and pushing a new state
 // EDITING - we're editing cards on the editing screen or the learning screen
-// UPDATING_SPANS - we're calculating spans
+// UPDATING_SPANS - we're calculating spans to be able to hide terms from examples and synonyms while learning
+// UPDATING_FREQUENCY - we're calculating word frequency to learn more popular words first
 //
 // Card updating queries shouldn't intersect to avoid data loss. Therefore, we need to be sure that they arent'
 // executed in parallel. So, this class provides a state switching interface
@@ -25,13 +26,14 @@ class DatabaseCardWorker(
     private val databaseWorker: DatabaseWorker,
     private val spanUpdateWorker: SpanUpdateWorker,
     private val cardSetSyncWorker: CardSetSyncWorker,
+    private val cardFrequencyUpdateWorker: CardFrequencyUpdateWorker,
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val serialQueue = SerialQueue(Dispatchers.Main)
     private val editOperationCount = MutableStateFlow(0)
     private var stateStack by Delegates.observable(listOf<State>()) { _, _, new ->
         currentStateFlow.value = currentState
-        Logger.v("state: ${new}", "DatabaseCardWorker")
+        Logger.v("state: $new", "DatabaseCardWorker")
     }
 
     val currentStateFlow = MutableStateFlow(State.NONE)
@@ -87,11 +89,27 @@ class DatabaseCardWorker(
             }
         }
 
+        // handle requests from cardFrequencyUpdateWorker
+        scope.launch {
+            cardFrequencyUpdateWorker.stateFlow.collect {
+                if (it is com.aglushkov.wordteacher.shared.workers.State.Paused && it.hasWorkToDo) {
+                    val cs = currentState
+                    if (cs != State.EDITING && cs != State.SYNCING) {
+                        pushState(State.UPDATING_FREQUENCY)
+                    } else if (!stateStack.contains(State.UPDATING_FREQUENCY)) {
+                        stateStack = listOf(State.UPDATING_FREQUENCY, *stateStack.toTypedArray())
+                    }
+                } else if (it.isDone()) {
+                    popState(State.UPDATING_FREQUENCY)
+                }
+            }
+        }
+
         // initial work queue
         serialQueue.send {
-            val initialStack = listOf(State.UPDATING_SPANS, State.SYNCING)
+            val initialStack = listOf(/*State.UPDATING_FREQUENCY, State.UPDATING_SPANS,*/ State.SYNCING)
             prepareToNewState(initialStack.last(), State.NONE)
-            stateStack = stateStack + listOf(State.UPDATING_SPANS, State.SYNCING)
+            stateStack = stateStack + initialStack
         }
     }
 
@@ -139,6 +157,11 @@ class DatabaseCardWorker(
     }
 
     private suspend fun popStateInternal(state: State) {
+        if (!stateStack.contains(state)) {
+            Logger.e("Trying to pop not existing state ${state} when the current is ${currentState}", "DatabaseCardWorker")
+            return
+        }
+
         if (currentState == state && stateStack.isNotEmpty()) {
             prepareToNewState(previousState, currentState)
             stateStack = stateStack.take(stateStack.size - 1)
@@ -154,6 +177,10 @@ class DatabaseCardWorker(
         }
 
         when (fromState) {
+            State.UPDATING_FREQUENCY -> {
+                Logger.v("cardFrequencyUpdateWorker.pauseAndWaitUntilPausedOrDone", "DatabaseCardWorker")
+                cardFrequencyUpdateWorker.pauseAndWaitUntilPausedOrDone()
+            }
             State.UPDATING_SPANS -> {
                 Logger.v("spanUpdateWorker.pauseAndWaitUntilPausedOrDone", "DatabaseCardWorker")
                 spanUpdateWorker.pauseAndWaitUntilPausedOrDone()
@@ -170,6 +197,10 @@ class DatabaseCardWorker(
         }
 
         when(newState) {
+            State.UPDATING_FREQUENCY -> {
+                Logger.v("cardFrequencyUpdateWorker.resume()", "DatabaseCardWorker")
+                cardFrequencyUpdateWorker.resume()
+            }
             State.UPDATING_SPANS -> {
                 Logger.v("spanUpdateWorker.resume()", "DatabaseCardWorker")
                 spanUpdateWorker.resume()
@@ -274,7 +305,7 @@ class DatabaseCardWorker(
         NONE,
         SYNCING,
         EDITING,
-        UPDATING_SPANS
+        UPDATING_SPANS,
+        UPDATING_FREQUENCY,
     }
 }
-

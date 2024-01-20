@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class SpanUpdateWorker (
-    private val database: AppDatabase,
+    private val database: AppDatabase, // TODO: get rid of it
     private val databaseWorker: DatabaseWorker,
     private val nlpCore: NLPCore,
     private val nlpSentenceProcessor: NLPSentenceProcessor,

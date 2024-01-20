@@ -343,8 +343,8 @@ class AppDatabase(
         fun selectCardsWithOutdatedSpans() =
             db.dBCardQueries.selectCardsWithOutdatedSpans(mapper = cardMapper())
 
-        fun selectCardsWithNotDefinedFrequency() =
-            db.dBCardQueries.selectCardsWithNotDefinedFrequency(mapper = cardMapper())
+        fun selectCardsWithUndefinedFrequency() =
+            db.dBCardQueries.selectCardsWithUndefinedFrequency()
 
         fun selectCards(ids: List<Long>) = db.dBCardQueries.selectCards(
             ids,
@@ -660,6 +660,10 @@ class AppDatabase(
 
         fun updateCardSetRemoteId(remoteId: String, creationId: String) =
             db.dBCardQueries.updateCardRemoteId(remoteId, creationId)
+
+        // here we don't need to care of cardSet modificationDate as frequency is stored locally
+        fun updateCardFrequency(id: Long, frequency: Double) =
+            db.dBCardQueries.updateCardFrequency(frequency, id)
     }
 
     inner class Notes {

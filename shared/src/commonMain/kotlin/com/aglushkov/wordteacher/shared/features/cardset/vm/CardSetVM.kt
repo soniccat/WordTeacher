@@ -6,8 +6,11 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.data
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.workers.UPDATE_DELAY
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
@@ -52,6 +55,7 @@ interface CardSetVM: Clearable {
 open class CardSetVMImpl(
     override var state: CardSetVM.State,
     private val repository: CardSetRepository,
+    wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator
@@ -95,10 +99,13 @@ open class CardSetVMImpl(
     private val events = MutableStateFlow<List<Event>>(emptyList())
     override val eventFlow = events.map { eventList -> eventList.filter { !it.isHandled } }
 
-    override val viewItems = cardSet.map {
-        //Logger.v("build view items")
-        it.copyWith(buildViewItems(it))
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    override val viewItems = combine(
+        cardSet, wordFrequencyGradationProvider.gradationState,
+        transform = { cardSet, gradation ->
+            //Logger.v("build view items")
+            cardSet.copyWith(buildViewItems(cardSet, gradation))
+        }
+    ).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     init {
         viewModelScope.launch {
@@ -122,10 +129,10 @@ open class CardSetVMImpl(
         }
     }
 
-    private fun buildViewItems(cardSetRes: Resource<out CardSet>): List<BaseViewItem<*>> {
+    private fun buildViewItems(cardSetRes: Resource<out CardSet>, frequencyGradationRes: Resource<WordFrequencyGradation>): List<BaseViewItem<*>> {
         return when (cardSetRes) {
             is Resource.Loaded -> {
-                makeViewItems(cardSetRes.data)
+                makeViewItems(cardSetRes.data, frequencyGradationRes.data())
             }
             else -> emptyList()
         }
@@ -153,7 +160,7 @@ open class CardSetVMImpl(
         }
     }
 
-    private fun makeViewItems(loadedCardSet: CardSet): List<BaseViewItem<*>>  {
+    private fun makeViewItems(loadedCardSet: CardSet, frequencyGradation: WordFrequencyGradation?): List<BaseViewItem<*>>  {
         val result = mutableListOf<BaseViewItem<*>>()
 
         loadedCardSet.cards.onEach { card ->
@@ -162,7 +169,12 @@ open class CardSetVMImpl(
             var lastSynViewItem: BaseViewItem<*>? = null
 
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
-            cardViewItems += WordTitleViewItem(card.term, providers = emptyList(), cardId = card.id)
+            cardViewItems += WordTitleViewItem(
+                card.term,
+                providers = emptyList(),
+                cardId = card.id,
+                frequencyLevel = frequencyGradation?.gradationLevelNormalized(card.termFrequency) ?: 0.0f,
+            )
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty(), cardId = card.id)
             cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech, cardId = card.id)
 

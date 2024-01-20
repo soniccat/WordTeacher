@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
@@ -29,6 +30,7 @@ interface CardSetDependencies {
     fun database(): AppDatabase
     fun databaseWorker(): DatabaseWorker
     fun databaseCardSetWorker(): DatabaseCardWorker
+    fun wordFrequencyGradationProvider(): WordFrequencyGradationProvider
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
 }

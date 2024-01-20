@@ -36,7 +36,7 @@ class CardSetRepository(
                 transform = { cardSetRes, cardsRes ->
                     cardSetRes.merge(cardsRes) { cardSet, cards ->
                         if (cardSet != null && cards != null) {
-                            cardSet.copy(cards = cards.orEmpty())
+                            cardSet.copy(cards = cards)
                         } else {
                             cardSet
                         }

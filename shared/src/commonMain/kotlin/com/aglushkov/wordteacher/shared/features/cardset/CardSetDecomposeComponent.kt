@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
@@ -15,6 +16,7 @@ import com.arkivanov.essenty.statekeeper.consume
 class CardSetDecomposeComponent (
     initialState: CardSetVM.State,
     cardSetsRepository: CardSetRepository,
+    wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     databaseCardWorker: DatabaseCardWorker,
     componentContext: ComponentContext,
     timeSource: TimeSource,
@@ -22,6 +24,7 @@ class CardSetDecomposeComponent (
 ) : CardSetVMImpl(
     initialState,
     cardSetsRepository,
+    wordFrequencyGradationProvider,
     databaseCardWorker,
     timeSource,
     idGenerator
