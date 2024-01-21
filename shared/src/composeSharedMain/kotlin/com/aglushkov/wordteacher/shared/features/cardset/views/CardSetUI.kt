@@ -3,30 +3,27 @@ package com.aglushkov.wordteacher.shared.features.cardset.views
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
@@ -35,6 +32,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.views.*
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.DropdownMenu
 import com.aglushkov.wordteacher.shared.general.DropdownMenuItem
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
@@ -43,9 +41,11 @@ import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevel
 import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
+import dev.icerock.moko.resources.compose.localized
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -166,14 +166,34 @@ fun CardSetViewItems(
                             item.cardId,
                             vm,
                         )
-                        Box(
-                            Modifier
-                                .size(40.dp).padding(10.dp)
-                                .background(
-                                    color = wordFrequencyInterpolatedColor(item.frequencyLevel),
-                                    shape = RoundedCornerShape(30.dp)
-                                ),
-                        )
+                        if (item.frequencyLevel != null) {
+                            Box(
+                                Modifier
+                                    .size(40.dp).padding(10.dp)
+                                    .run {
+                                        if (item.frequencyLevel != WordFrequencyGradation.UNKNOWN_LEVEL) {
+                                            background(
+                                                color = wordFrequencyColor(item.frequencyRatio),
+                                                shape = RoundedCornerShape(30.dp)
+                                            )
+                                        } else {
+                                            this
+                                        }
+                                    }
+                                    .border(
+                                        1.dp,
+                                        color = StartWordFrequencyColor,
+                                        shape = RoundedCornerShape(30.dp)
+                                    ),
+                            ) {
+                                Text(
+                                    text = "${ if (item.frequencyLevel == WordFrequencyGradation.UNKNOWN_LEVEL) "?" else item.frequencyLevel}",
+                                    modifier = Modifier.fillMaxSize(),
+                                    textAlign = TextAlign.Center,
+                                    style = LocalAppTypography.current.wordFrequency
+                                )
+                            }
+                        }
                     }
                 )
             }
@@ -447,12 +467,17 @@ private fun PartOfSpeechSelectPopup(
     }
 }
 
-fun wordFrequencyInterpolatedColor(level: Float): Color {
-    return lerp(
-        StartWordFrequencyColor,
-        EndWordFrequencyColor,
-        level,
-    )
+fun wordFrequencyColor(ratio: Float?): Color {
+    if (ratio == null) {
+        return Color.Transparent
+    }
+
+    return StartWordFrequencyColor.copy(alpha = 1 - ratio)
+//    return lerp(
+//        StartWordFrequencyColor,
+//        EndWordFrequencyColor,
+//        level,
+//    )
 }
 
 private val StartWordFrequencyColor = Color(0xFF60D838)

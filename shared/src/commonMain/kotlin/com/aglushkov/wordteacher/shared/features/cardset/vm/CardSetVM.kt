@@ -169,11 +169,13 @@ open class CardSetVMImpl(
             var lastSynViewItem: BaseViewItem<*>? = null
 
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
+            val gradationLevel = frequencyGradation?.gradationLevelByFrequency(card.termFrequency)
             cardViewItems += WordTitleViewItem(
                 card.term,
                 providers = emptyList(),
                 cardId = card.id,
-                frequencyLevel = frequencyGradation?.gradationLevelNormalized(card.termFrequency) ?: 0.0f,
+                frequencyLevel = gradationLevel,
+                frequencyRatio = frequencyGradation?.gradationLevelNormalized(gradationLevel),
             )
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty(), cardId = card.id)
             cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech, cardId = card.id)

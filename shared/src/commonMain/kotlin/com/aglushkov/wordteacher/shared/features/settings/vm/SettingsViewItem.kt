@@ -1,11 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.settings.vm
 
-import com.aglushkov.wordteacher.shared.features.definitions.vm.WordTitleViewItem
-import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.config.Config
 import okio.Path
 
 

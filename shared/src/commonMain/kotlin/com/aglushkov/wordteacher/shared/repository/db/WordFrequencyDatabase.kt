@@ -26,7 +26,17 @@ import kotlin.math.pow
 data class WordFrequencyGradation(
     val levels: List<WordFrequencyLevel>
 ) {
-    fun gradationLevelByFrequency(frequency: Double): Int {
+    companion object {
+        const val UNKNOWN_LEVEL = -1
+    }
+
+    fun gradationLevelByFrequency(frequency: Double?): Int? {
+        if (frequency == null) {
+            return null
+        } else if (frequency == UNKNOWN_FREQUENCY) {
+            return UNKNOWN_LEVEL
+        }
+
         for (i in levels.indices) {
             if (frequency > levels[i].frequency) {
                 return i
@@ -36,8 +46,10 @@ data class WordFrequencyGradation(
         return levels.size
     }
 
-    fun gradationLevelNormalized(frequency: Double): Float {
-        return gradationLevelByFrequency(frequency) / levels.size.toFloat()
+    fun gradationLevelNormalized(level: Int?): Float? {
+        if (level == null) return null
+
+        return level / levels.size.toFloat()
     }
 }
 
@@ -68,7 +80,7 @@ class WordFrequencyDatabase(
 
     override var gradationState = MutableStateFlow<Resource<WordFrequencyGradation>>(Resource.Uninitialized())
     // private var gradation: WordFrequencyGradation? = null
-    private var defaultFrequency: Double = UNKNOWN_FREQUENCY
+    private val defaultFrequency: Double = UNKNOWN_FREQUENCY
 
     init {
         create()
@@ -157,5 +169,4 @@ class WordFrequencyDatabase(
 private const val WORD_FREQUENCY_GRADATION_SETTINGS_NAME = "wordFrequencyGradation"
 //private const val WORD_FREQUENCY_DEFAULT_SETTINGS_NAME = "wordFrequencyDefault"
 
-// for now threat such terms as frequent in favor for phrasal verbs, idioms and other complicated terms
-private const val UNKNOWN_FREQUENCY = 1.0
+private const val UNKNOWN_FREQUENCY = -1.0
