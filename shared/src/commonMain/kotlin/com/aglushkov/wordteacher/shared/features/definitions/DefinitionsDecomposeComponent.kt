@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
@@ -23,6 +24,7 @@ class DefinitionsDecomposeComponent (
     wordDefinitionRepository: WordDefinitionRepository,
     dictRepository: DictRepository,
     cardSetsRepository: CardSetsRepository,
+    wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     idGenerator: IdGenerator,
 ) : DefinitionsVMImpl(
     DefinitionsVM.State(word = word),
@@ -30,6 +32,7 @@ class DefinitionsDecomposeComponent (
     wordDefinitionRepository,
     dictRepository,
     cardSetsRepository,
+    wordFrequencyGradationProvider,
     idGenerator,
 ), ComponentContext by componentContext {
 

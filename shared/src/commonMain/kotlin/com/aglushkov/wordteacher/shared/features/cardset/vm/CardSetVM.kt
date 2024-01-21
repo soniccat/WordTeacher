@@ -6,7 +6,6 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.data
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
@@ -169,13 +168,12 @@ open class CardSetVMImpl(
             var lastSynViewItem: BaseViewItem<*>? = null
 
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
-            val gradationLevel = frequencyGradation?.gradationLevelByFrequency(card.termFrequency)
+            val gradationLevelAndRatio = frequencyGradation?.gradationLevelAndRatio(card.termFrequency)
             cardViewItems += WordTitleViewItem(
                 card.term,
                 providers = emptyList(),
                 cardId = card.id,
-                frequencyLevel = gradationLevel,
-                frequencyRatio = frequencyGradation?.gradationLevelNormalized(gradationLevel),
+                frequencyLevelAndRatio = gradationLevelAndRatio,
             )
             cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty(), cardId = card.id)
             cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech, cardId = card.id)

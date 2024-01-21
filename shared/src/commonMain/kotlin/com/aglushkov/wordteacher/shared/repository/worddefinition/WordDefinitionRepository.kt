@@ -80,13 +80,12 @@ class WordDefinitionRepository(
         word: String,
         reload: Boolean = false
     ): Flow<Resource<List<WordTeacherWord>>> {
-        val lowercasedWord = word.lowercase()
         val tag = "WordDefinitionRepository.define"
         val services = serviceRepository.services.value.data().orEmpty() +
                 dictRepository.dicts.value.data().orEmpty()
 
         // Decide if we need to load or reuse what we've already loaded or what we're loading now
-        val stateFlow = obtainMutableStateFlow(lowercasedWord)
+        val stateFlow = obtainMutableStateFlow(word)
         val currentValue = stateFlow.value
         val needLoad = reload || currentValue.isNotLoadedAndNotLoading()
 
@@ -101,9 +100,9 @@ class WordDefinitionRepository(
             // Update the version of a resource as soon as possible to filter changes from the current flow if it exists
             stateFlow.value = Resource.Loading(version = nextVersion)
 
-            jobs[lowercasedWord]?.cancel()
-            jobs[lowercasedWord] = scope.launch { // use our scope here to avoid cancellation by Structured Concurrency
-                loadDefinitionsFlow(lowercasedWord, nextVersion, services).onEach {
+            jobs[word]?.cancel()
+            jobs[word] = scope.launch { // use our scope here to avoid cancellation by Structured Concurrency
+                loadDefinitionsFlow(word, nextVersion, services).onEach {
                     if (it.version == nextVersion) {
                         stateFlow.value = it
                     }
@@ -130,11 +129,10 @@ class WordDefinitionRepository(
     }
 
     private fun obtainMutableStateFlow(word: String): MutableStateFlow<Resource<List<WordTeacherWord>>> {
-        val lowercasedWord = word.lowercase()
-        var stateFlow = stateFlows[lowercasedWord]
+        var stateFlow = stateFlows[word]
         if (stateFlow == null) {
             stateFlow = MutableStateFlow(Resource.Uninitialized())
-            stateFlows[lowercasedWord] = stateFlow
+            stateFlows[word] = stateFlow
         }
 
         return stateFlow

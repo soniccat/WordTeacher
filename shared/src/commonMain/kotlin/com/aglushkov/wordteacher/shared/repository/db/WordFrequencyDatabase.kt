@@ -46,12 +46,28 @@ data class WordFrequencyGradation(
         return levels.size
     }
 
-    fun gradationLevelNormalized(level: Int?): Float? {
+    fun gradationLevelRatio(level: Int?): Float? {
         if (level == null) return null
 
         return level / levels.size.toFloat()
     }
+
+    fun gradationLevelAndRatio(frequency: Double?): WordFrequencyLevelAndRatio? {
+        if (frequency == null) {
+            return null
+        }
+
+        val level = gradationLevelByFrequency(frequency) ?: return null
+        val ratio = gradationLevelRatio(level) ?: return null
+        return WordFrequencyLevelAndRatio(level, ratio)
+    }
 }
+
+@Serializable
+data class WordFrequencyLevelAndRatio(
+    val level: Int,
+    val ratio: Float,
+)
 
 @Serializable
 data class WordFrequencyLevel(
@@ -61,6 +77,9 @@ data class WordFrequencyLevel(
 
 interface WordFrequencyGradationProvider {
     val gradationState: Flow<Resource<WordFrequencyGradation>>
+
+    suspend fun resolveFrequencyForWord(word: String): Double
+    suspend fun resolveFrequencyForWords(words: List<String>): List<Double>
 }
 
 class WordFrequencyDatabase(
@@ -88,14 +107,14 @@ class WordFrequencyDatabase(
 
     suspend fun waitUntilInitialized() = state.first { it.isLoaded() }
 
-    suspend fun resolveFrequencyForWord(word: String): Double {
+    override suspend fun resolveFrequencyForWord(word: String): Double {
         return withContext(Dispatchers.Default) {
             waitUntilInitialized()
-            db.dBWordFrequencyQueries.selectFrequency(word).executeAsOne().frequency ?: defaultFrequency
+            db.dBWordFrequencyQueries.selectFrequency(word).executeAsOneOrNull()?.frequency ?: defaultFrequency
         }
     }
 
-    suspend fun resolveFrequencyForWords(words: List<String>): List<Double> {
+    override suspend fun resolveFrequencyForWords(words: List<String>): List<Double> {
         return withContext(Dispatchers.Default) {
             waitUntilInitialized()
             val list = db.dBWordFrequencyQueries.selectFrequencies(words).executeAsList()

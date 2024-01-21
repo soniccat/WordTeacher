@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecompos
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
@@ -32,4 +33,5 @@ interface DefinitionsDependencies {
     fun idGenerator(): IdGenerator
     fun cardSetsRepository(): CardSetsRepository
     fun dictRepository(): DictRepository
+    fun wordFrequencyGradationProvider(): WordFrequencyGradationProvider
 }

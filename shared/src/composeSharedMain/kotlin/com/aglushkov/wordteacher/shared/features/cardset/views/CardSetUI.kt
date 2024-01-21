@@ -166,34 +166,6 @@ fun CardSetViewItems(
                             item.cardId,
                             vm,
                         )
-                        if (item.frequencyLevel != null) {
-                            Box(
-                                Modifier
-                                    .size(40.dp).padding(10.dp)
-                                    .run {
-                                        if (item.frequencyLevel != WordFrequencyGradation.UNKNOWN_LEVEL) {
-                                            background(
-                                                color = wordFrequencyColor(item.frequencyRatio),
-                                                shape = RoundedCornerShape(30.dp)
-                                            )
-                                        } else {
-                                            this
-                                        }
-                                    }
-                                    .border(
-                                        1.dp,
-                                        color = StartWordFrequencyColor,
-                                        shape = RoundedCornerShape(30.dp)
-                                    ),
-                            ) {
-                                Text(
-                                    text = "${ if (item.frequencyLevel == WordFrequencyGradation.UNKNOWN_LEVEL) "?" else item.frequencyLevel}",
-                                    modifier = Modifier.fillMaxSize(),
-                                    textAlign = TextAlign.Center,
-                                    style = LocalAppTypography.current.wordFrequency
-                                )
-                            }
-                        }
                     }
                 )
             }
@@ -467,18 +439,3 @@ private fun PartOfSpeechSelectPopup(
     }
 }
 
-fun wordFrequencyColor(ratio: Float?): Color {
-    if (ratio == null) {
-        return Color.Transparent
-    }
-
-    return StartWordFrequencyColor.copy(alpha = 1 - ratio)
-//    return lerp(
-//        StartWordFrequencyColor,
-//        EndWordFrequencyColor,
-//        level,
-//    )
-}
-
-private val StartWordFrequencyColor = Color(0xFF60D838)
-private val EndWordFrequencyColor = Color(0xFFFF634D)

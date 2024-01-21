@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
@@ -20,6 +21,7 @@ class DefinitionsModule {
         wordDefinitionRepository: WordDefinitionRepository,
         dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
+        wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         idGenerator: IdGenerator,
     ) = DefinitionsDecomposeComponent(
         componentContext,
@@ -28,6 +30,7 @@ class DefinitionsModule {
         wordDefinitionRepository,
         dictRepository,
         cardSetsRepository,
+        wordFrequencyGradationProvider,
         idGenerator
     )
 }

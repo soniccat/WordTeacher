@@ -5,6 +5,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 
 
 class WordViewItem(word: WordTeacherWord): BaseViewItem<WordTeacherWord>(word, Type) {
@@ -13,13 +14,13 @@ class WordViewItem(word: WordTeacherWord): BaseViewItem<WordTeacherWord>(word, T
     }
 }
 
-class WordTitleViewItem(title: String, val providers: List<Config.Type>, val cardId: Long = -1, val frequencyLevel: Int? = null, val frequencyRatio: Float? = null): BaseViewItem<String>(title, Type) {
+class WordTitleViewItem(title: String, val providers: List<Config.Type>, val cardId: Long = -1, val frequencyLevelAndRatio: WordFrequencyLevelAndRatio?): BaseViewItem<String>(title, Type) {
     companion object {
         const val Type = 101
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        return super.equalsByContent(other) && providers == (other as WordTitleViewItem).providers && frequencyLevel == other.frequencyLevel && frequencyRatio == other.frequencyRatio
+        return super.equalsByContent(other) && providers == (other as WordTitleViewItem).providers && frequencyLevelAndRatio == other.frequencyLevelAndRatio
     }
 }
 

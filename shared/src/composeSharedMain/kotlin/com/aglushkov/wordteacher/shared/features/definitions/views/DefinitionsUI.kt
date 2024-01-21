@@ -1,24 +1,26 @@
 package com.aglushkov.wordteacher.shared.features.definitions.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import dev.icerock.moko.resources.desc.Raw
-import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
@@ -33,6 +35,7 @@ import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.stringResource
@@ -426,17 +429,67 @@ fun WordTitleView(
             )
     ) {
         textContent(viewItem.firstItem(), textStyle)
-        if (viewItem.providers.isNotEmpty()) {
-            Text(
-                text = MR.strings.word_providedBy_template.format(viewItem.providers.joinToString()).localized(),
-                modifier = Modifier
-                    .widthIn(max = LocalDimensWord.current.wordProvidedByMaxWidth),
-                textAlign = TextAlign.End,
-                style = LocalAppTypography.current.wordDefinitionProvidedBy
-            )
+        Column {
+            if (viewItem.providers.isNotEmpty()) {
+                Text(
+                    text = MR.strings.word_providedBy_template.format(viewItem.providers.joinToString()).localized(),
+                    modifier = Modifier
+                        .widthIn(max = LocalDimensWord.current.wordProvidedByMaxWidth),
+                    textAlign = TextAlign.End,
+                    style = LocalAppTypography.current.wordDefinitionProvidedBy
+                )
+            }
+
+            if (viewItem.frequencyLevelAndRatio != null) {
+                Box(
+                    Modifier
+                        .size(40.dp).padding(10.dp)
+                        .run {
+                            if (viewItem.frequencyLevelAndRatio.level != WordFrequencyGradation.UNKNOWN_LEVEL) {
+                                background(
+                                    color = wordFrequencyColor(viewItem.frequencyLevelAndRatio.ratio),
+                                    shape = RoundedCornerShape(30.dp)
+                                )
+                            } else {
+                                this
+                            }
+                        }
+                        .border(
+                            1.dp,
+                            color = StartWordFrequencyColor,
+                            shape = RoundedCornerShape(30.dp)
+                        ),
+                ) {
+                    Text(
+                        text = if (viewItem.frequencyLevelAndRatio.level == WordFrequencyGradation.UNKNOWN_LEVEL)
+                            "?"
+                        else
+                            viewItem.frequencyLevelAndRatio.level.toString(),
+                        modifier = Modifier.fillMaxSize(),
+                        textAlign = TextAlign.Center,
+                        style = LocalAppTypography.current.wordFrequency
+                    )
+                }
+            }
         }
     }
 }
+
+fun wordFrequencyColor(ratio: Float?): Color {
+    if (ratio == null) {
+        return Color.Transparent
+    }
+
+    return StartWordFrequencyColor.copy(alpha = 1 - ratio)
+//    return lerp(
+//        StartWordFrequencyColor,
+//        EndWordFrequencyColor,
+//        level,
+//    )
+}
+
+private val StartWordFrequencyColor = Color(0xFF60D838)
+private val EndWordFrequencyColor = Color(0xFFFF634D)
 
 @Composable
 fun WordTranscriptionView(

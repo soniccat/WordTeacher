@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDepen
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsModule
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.arkivanov.decompose.ComponentContext
 import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.BindsInstance

@@ -15,6 +15,8 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -24,6 +26,8 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSpan
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -87,6 +91,7 @@ open class DefinitionsVMImpl(
     private val wordDefinitionRepository: WordDefinitionRepository,
     private val dictRepository: DictRepository,
     private val cardSetsRepository: CardSetsRepository,
+    private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     private val idGenerator: IdGenerator,
 ): ViewModel(), DefinitionsVM {
 
@@ -95,6 +100,7 @@ open class DefinitionsVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
+    private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
     final override var displayModeStateFlow = MutableStateFlow(DefinitionsDisplayMode.BySource)
     final override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(emptyList())
@@ -102,14 +108,16 @@ open class DefinitionsVMImpl(
     override val definitions = combine(
         definitionWords,
         displayModeStateFlow,
-        selectedPartsOfSpeechStateFlow
-    ) { a, b, c -> Triple(a, b, c) }
-    .map { (wordDefinitions, displayMode, partOfSpeechFilter) ->
+        selectedPartsOfSpeechStateFlow,
+        wordFrequencyGradationProvider.gradationState,
+        wordFrequency,
+        transform = { wordDefinitions, displayMode, partOfSpeechFilter, wordFrequencyGradation, wordFrequency ->
         //Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
-        wordDefinitions.copyWith(
-            buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter, wordDefinitions.isLoading())
-        )
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+            val wordFrequencyLevelAndRatio = wordFrequencyGradation.data()?.gradationLevelAndRatio(wordFrequency.data())
+            wordDefinitions.copyWith(
+                buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter, wordDefinitions.isLoading(), wordFrequencyLevelAndRatio)
+            )
+    }).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override val partsOfSpeechFilterStateFlow = definitionWords.map {
         it.data().orEmpty().map { word ->
@@ -192,7 +200,8 @@ open class DefinitionsVMImpl(
 
     // Actions
 
-    private fun loadIfNeeded(word: String) {
+    private fun loadIfNeeded(aWord: String) {
+        val word = aWord.lowercase()
         this.word = word
 
         val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
@@ -208,7 +217,8 @@ open class DefinitionsVMImpl(
         }
     }
 
-    private fun load(word: String) {
+    private fun load(aWord: String) {
+        val word = aWord.lowercase()
         val tag = "DefinitionsVM.load"
         Logger.v("Start Loading $word", tag)
 
@@ -220,6 +230,12 @@ open class DefinitionsVMImpl(
         }) {
             wordDefinitionRepository.define(word, false).forward(definitionWords)
             Logger.v("Finish Loading $word", tag)
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            loadResource {
+                wordFrequencyGradationProvider.resolveFrequencyForWord(word)
+            }.collect(wordFrequency)
         }
 
         observeJob = viewModelScope.launch {
@@ -235,7 +251,8 @@ open class DefinitionsVMImpl(
         words: List<WordTeacherWord>,
         displayMode: DefinitionsDisplayMode,
         partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
-        isLoading: Boolean
+        isLoading: Boolean,
+        wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         if (words.isNotEmpty()) {
@@ -249,8 +266,8 @@ open class DefinitionsVMImpl(
         }
 
         when (displayMode) {
-            DefinitionsDisplayMode.Merged -> addMergedWords(words, partsOfSpeechFilter, items)
-            else -> addWordsGroupedBySource(words, partsOfSpeechFilter, items)
+            DefinitionsDisplayMode.Merged -> addMergedWords(words, partsOfSpeechFilter, items, wordFrequencyLevelAndRatio)
+            else -> addWordsGroupedBySource(words, partsOfSpeechFilter, items, wordFrequencyLevelAndRatio)
         }
 
         if (items.isNotEmpty() && isLoading) {
@@ -279,21 +296,23 @@ open class DefinitionsVMImpl(
     private fun addMergedWords(
         words: List<WordTeacherWord>,
         partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
-        items: MutableList<BaseViewItem<*>>
+        items: MutableList<BaseViewItem<*>>,
+        wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ) {
         val word = mergeWords(words, partsOfSpeechFilter)
 
-        addWordViewItems(word, partsOfSpeechFilter, items)
+        addWordViewItems(word, partsOfSpeechFilter, items, wordFrequencyLevelAndRatio)
         items.add(WordDividerViewItem())
     }
 
     private fun addWordsGroupedBySource(
         words: List<WordTeacherWord>,
         partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
-        items: MutableList<BaseViewItem<*>>
+        items: MutableList<BaseViewItem<*>>,
+        wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ) {
-        for (word in words) {
-            val isAdded = addWordViewItems(word, partsOfSpeechFilter, items)
+        words.onEachIndexed { i, word ->
+            val isAdded = addWordViewItems(word, partsOfSpeechFilter, items, if (i == 0) wordFrequencyLevelAndRatio else null)
             if (isAdded) {
                 items.add(WordDividerViewItem())
             }
@@ -303,7 +322,8 @@ open class DefinitionsVMImpl(
     private fun addWordViewItems(
         word: WordTeacherWord,
         partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
-        items: MutableList<BaseViewItem<*>>
+        items: MutableList<BaseViewItem<*>>,
+        wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ): Boolean {
         val topIndex = items.size
         for (partOfSpeech in word.definitions.keys.filter {
@@ -352,7 +372,7 @@ open class DefinitionsVMImpl(
 
         val hasNewItems = items.size - topIndex > 0
         if (hasNewItems) {
-            items.add(topIndex, WordTitleViewItem(word.word, word.types))
+            items.add(topIndex, WordTitleViewItem(word.word, word.types, frequencyLevelAndRatio = wordFrequencyLevelAndRatio))
             if (word.transcriptions?.isNotEmpty() == true) {
                 items.add(topIndex + 1, WordTranscriptionViewItem(word.transcriptions.joinToString(", ")))
             }

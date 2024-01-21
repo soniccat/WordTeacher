@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
 import java.io.IOException
@@ -32,11 +33,13 @@ private fun DefinitionsUIPreviewWithResponse() {
                         WordDividerViewItem(),
                         WordTitleViewItem(
                             title = "Word",
-                            providers = listOf(Config.Type.Yandex)
+                            providers = listOf(Config.Type.Yandex),
+                            frequencyLevelAndRatio = WordFrequencyLevelAndRatio(2, 0.5f)
                         ),
                         WordTitleViewItem(
                             title = "Word 2",
-                            providers = listOf(Config.Type.Yandex, Config.Type.WordTeacher, Config.Type.Local)
+                            providers = listOf(Config.Type.Yandex, Config.Type.WordTeacher, Config.Type.Local),
+                            frequencyLevelAndRatio = WordFrequencyLevelAndRatio(0, 0.1f),
                         ),
                         WordTranscriptionViewItem("[omg]"),
                         WordPartOfSpeechViewItem(StringDesc.Raw("Noun"), WordTeacherWord.PartOfSpeech.Noun),
