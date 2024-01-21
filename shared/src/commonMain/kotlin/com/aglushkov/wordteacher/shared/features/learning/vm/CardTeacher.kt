@@ -87,7 +87,7 @@ class CardTeacher(
 
         val sessionCards = cards.filter { card ->
             !rightAnsweredCardSet.contains(card.id)
-        }.shuffled().take(CARD_PER_SESSION)
+        }.sortedBy { it.termFrequency }.take(CARD_PER_SESSION)
 
         if (sessionCards.isEmpty()) {
             currentSession = null

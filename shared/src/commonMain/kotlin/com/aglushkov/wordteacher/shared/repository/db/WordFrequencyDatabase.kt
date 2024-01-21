@@ -128,9 +128,6 @@ class WordFrequencyDatabase(
         mainScope.launch(Dispatchers.Default) {
             loadResource {
                 dbPreparer()
-                val res = db.dBWordFrequencyQueries.selectFrequency("cat").executeAsOne()
-                Logger.i("test", null)
-
                 resolveGradation()
 
                 this@WordFrequencyDatabase

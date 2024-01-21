@@ -443,12 +443,13 @@ fun WordTitleView(
             if (viewItem.frequencyLevelAndRatio != null) {
                 Box(
                     Modifier
-                        .size(40.dp).padding(10.dp)
+                        .padding(vertical = 10.dp, horizontal = 2.dp)
+                        .size(20.dp)
                         .run {
                             if (viewItem.frequencyLevelAndRatio.level != WordFrequencyGradation.UNKNOWN_LEVEL) {
                                 background(
                                     color = wordFrequencyColor(viewItem.frequencyLevelAndRatio.ratio),
-                                    shape = RoundedCornerShape(30.dp)
+                                    shape = RoundedCornerShape(20.dp)
                                 )
                             } else {
                                 this
@@ -457,15 +458,16 @@ fun WordTitleView(
                         .border(
                             1.dp,
                             color = StartWordFrequencyColor,
-                            shape = RoundedCornerShape(30.dp)
+                            shape = RoundedCornerShape(20.dp)
                         ),
+                    contentAlignment = Alignment.CenterStart
                 ) {
                     Text(
                         text = if (viewItem.frequencyLevelAndRatio.level == WordFrequencyGradation.UNKNOWN_LEVEL)
                             "?"
                         else
                             viewItem.frequencyLevelAndRatio.level.toString(),
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.align(Alignment.Center).offset(y = (-1).dp),
                         textAlign = TextAlign.Center,
                         style = LocalAppTypography.current.wordFrequency
                     )

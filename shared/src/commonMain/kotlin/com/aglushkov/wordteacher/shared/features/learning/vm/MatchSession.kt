@@ -15,7 +15,7 @@ class MatchSession(
 ) {
     companion object {
         fun isValid(cards: List<Card>): Boolean =
-            cards.all { it.examples.isNotEmpty() }
+            cards.all { it.examples.isNotEmpty() && it.exampleTermSpans.isNotEmpty() }
     }
 
     private val matchPairStateFlow = MutableStateFlow<List<MatchPair>?>(null)
