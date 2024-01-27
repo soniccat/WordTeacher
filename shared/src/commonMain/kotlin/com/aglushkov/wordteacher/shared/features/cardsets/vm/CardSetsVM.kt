@@ -155,25 +155,40 @@ open class CardSetsVMImpl(
         }
     }
 
-    private fun buildViewItems(cardSets: List<ShortCardSet>, newCardSetText: String?): List<BaseViewItem<*>> {
-        val (readyToLearnGroup, learntGroup) = cardSets.splitBy { it.readyToLearnProgress < 1.0 }
-        val resultList = mutableListOf<BaseViewItem<*>>()
+    enum class SectionType{
+        READY,
+        NOT_READY,
+        DONE,
+    }
 
+    private fun buildViewItems(cardSets: List<ShortCardSet>, newCardSetText: String?): List<BaseViewItem<*>> {
+        val groups = cardSets.groupBy {
+            if (it.totalProgress < 1.0) {
+                if (it.readyToLearnProgress < 1.0) {
+                    SectionType.READY
+                } else {
+                    SectionType.NOT_READY
+                }
+            } else {
+                SectionType.DONE
+            }
+        }
+        val titles = mapOf(
+            SectionType.READY to StringDesc.Resource(MR.strings.cardsets_section_ready_to_learn),
+            SectionType.NOT_READY to StringDesc.Resource(MR.strings.cardsets_section_not_ready_to_learn),
+            SectionType.DONE to StringDesc.Resource(MR.strings.cardsets_section_done),
+        )
+        val resultList = mutableListOf<BaseViewItem<*>>()
         resultList += CreateCardSetViewItem(
             placeholder = StringDesc.Resource(MR.strings.cardsets_create_cardset),
             text = newCardSetText.orEmpty()
         )
-        if (readyToLearnGroup.isNotEmpty()) {
-            resultList += SectionViewItem(StringDesc.Resource(MR.strings.cardsets_section_ready_to_learn))
-            resultList.addAll(
-                readyToLearnGroup.map(::cardSetViewItem)
-            )
-        }
-        if (learntGroup.isNotEmpty()) {
-            resultList += SectionViewItem(StringDesc.Resource(MR.strings.cardsets_section_not_ready_to_learn))
-            resultList.addAll(
-                learntGroup.map(::cardSetViewItem)
-            )
+
+        groups.onEach { e ->
+            if (e.value.isNotEmpty()) {
+                resultList += SectionViewItem(titles[e.key]!!)
+                resultList.addAll(e.value.map(::cardSetViewItem))
+            }
         }
 
         generateViewItemIds(resultList, this.cardSets.value.data().orEmpty(), idGenerator)

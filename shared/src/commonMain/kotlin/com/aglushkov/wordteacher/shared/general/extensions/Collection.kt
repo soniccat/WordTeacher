@@ -35,7 +35,7 @@ fun <T> List<T>.splitBy(splitter: (T) -> Boolean): Pair<List<T>, List<T>> {
         if (splitter(it)) {
             firstList.add(it)
         } else {
-            firstList.add(it)
+            secondList.add(it)
         }
     }
     return Pair(firstList, secondList)
