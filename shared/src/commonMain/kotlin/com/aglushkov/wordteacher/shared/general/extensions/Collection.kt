@@ -27,3 +27,16 @@ fun <T> List<T>.splitByChunks(chunkSize: Int): List<List<T>> {
     }
     return resultList
 }
+
+fun <T> List<T>.splitBy(splitter: (T) -> Boolean): Pair<List<T>, List<T>> {
+    val firstList = mutableListOf<T>()
+    val secondList = mutableListOf<T>()
+    onEach {
+        if (splitter(it)) {
+            firstList.add(it)
+        } else {
+            firstList.add(it)
+        }
+    }
+    return Pair(firstList, secondList)
+}

@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import dev.icerock.moko.resources.desc.StringDesc
 
 class CardSetViewItem(
     val cardSetId: Long,
@@ -35,5 +36,13 @@ class RemoteCardSetViewItem(
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
         other as RemoteCardSetViewItem
         return super.equalsByContent(other) && terms == other.terms
+    }
+}
+
+class SectionViewItem(
+    val name: StringDesc
+): BaseViewItem<StringDesc>(name, Type) {
+    companion object {
+        const val Type = 402
     }
 }

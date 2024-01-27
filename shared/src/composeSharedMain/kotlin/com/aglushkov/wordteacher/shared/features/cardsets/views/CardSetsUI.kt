@@ -18,6 +18,9 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.SectionViewItem
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
+import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
@@ -191,6 +194,11 @@ private fun CardSetsViewItem(
             vm.onCardSetAdded(it)
         }
     )
+    is SectionViewItem -> Text(
+        item.name.localized(),
+        modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding, vertical = 8.dp),
+        style = LocalAppTypography.current.wordDefinitionSubHeader
+    )
     is CardSetViewItem -> CardSetItemView(
         item,
         onClick = { vm.onCardSetClicked(item) },
@@ -216,9 +224,9 @@ private fun CardSetItemView(
         onClick,
         onDeleted
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth()
-        ) {
+//        Box(
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
             ListItem(
                 text = { Text(item.name) },
                 secondaryText = { Text(item.date) },
@@ -235,14 +243,14 @@ private fun CardSetItemView(
                     }
                 }
             )
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomStart),
-                progress = item.readyToLearnProgress,
-                color = MaterialTheme.colors.secondary
-            )
-        }
+//            LinearProgressIndicator(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .align(Alignment.BottomStart),
+//                progress = item.readyToLearnProgress,
+//                color = MaterialTheme.colors.secondary
+//            )
+//        }
     }
 }
 

@@ -5,6 +5,8 @@ import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.extensions.addElements
+import com.aglushkov.wordteacher.shared.general.extensions.splitBy
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -154,27 +156,38 @@ open class CardSetsVMImpl(
     }
 
     private fun buildViewItems(cardSets: List<ShortCardSet>, newCardSetText: String?): List<BaseViewItem<*>> {
-        val items = mutableListOf<BaseViewItem<*>>()
-        cardSets.forEach {
-            items.add(
-                CardSetViewItem(
-                    it.id,
-                    it.name,
-                    timeSource.stringDate(it.creationDate),
-                    it.readyToLearnProgress,
-                    it.totalProgress
-                )
+        val (readyToLearnGroup, learntGroup) = cardSets.splitBy { it.readyToLearnProgress < 1.0 }
+        val resultList = mutableListOf<BaseViewItem<*>>()
+
+        resultList += CreateCardSetViewItem(
+            placeholder = StringDesc.Resource(MR.strings.cardsets_create_cardset),
+            text = newCardSetText.orEmpty()
+        )
+        if (readyToLearnGroup.isNotEmpty()) {
+            resultList += SectionViewItem(StringDesc.Resource(MR.strings.cardsets_section_ready_to_learn))
+            resultList.addAll(
+                readyToLearnGroup.map(::cardSetViewItem)
+            )
+        }
+        if (learntGroup.isNotEmpty()) {
+            resultList += SectionViewItem(StringDesc.Resource(MR.strings.cardsets_section_not_ready_to_learn))
+            resultList.addAll(
+                learntGroup.map(::cardSetViewItem)
             )
         }
 
-        val list = listOf(
-            CreateCardSetViewItem(
-                placeholder = StringDesc.Resource(MR.strings.cardsets_create_cardset),
-                text = newCardSetText.orEmpty()
-            ),
-            *items.toTypedArray())
-        generateViewItemIds(list, this.cardSets.value.data().orEmpty(), idGenerator)
-        return list
+        generateViewItemIds(resultList, this.cardSets.value.data().orEmpty(), idGenerator)
+        return resultList
+    }
+
+    private fun cardSetViewItem(shortCardSet: ShortCardSet): CardSetViewItem {
+        return CardSetViewItem(
+            shortCardSet.id,
+            shortCardSet.name,
+            timeSource.stringDate(shortCardSet.creationDate),
+            shortCardSet.readyToLearnProgress,
+            shortCardSet.totalProgress
+        )
     }
 
     override fun getErrorText(): StringDesc {
