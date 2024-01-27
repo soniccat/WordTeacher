@@ -79,7 +79,9 @@ class SpaceAuthRepository(
 
         val googleAuthDataRes = googleAuthController.googleAuthDataFlow.value
         val googleAuthData = if (!googleAuthDataRes.isLoaded()) {
-            googleAuthController.signIn()
+            withContext(Dispatchers.Main) {
+                googleAuthController.signIn()
+            }
         } else {
             googleAuthDataRes
         }

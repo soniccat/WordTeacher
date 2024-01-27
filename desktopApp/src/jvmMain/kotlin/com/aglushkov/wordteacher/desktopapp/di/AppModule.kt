@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.di.BasePath
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.Platform
 import com.aglushkov.wordteacher.shared.di.SharedAppModule
+import com.aglushkov.wordteacher.shared.di.WordFrequencyPreparer
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
@@ -152,5 +153,12 @@ class AppModule {
     @Provides
     fun fileSharer(): FileSharer? {
         return null
+    }
+
+    @WordFrequencyPreparer
+    @AppComp
+    @Provides
+    fun wordFrequencyPreparer(): () -> Path {
+        return {"".toPath()}
     }
 }

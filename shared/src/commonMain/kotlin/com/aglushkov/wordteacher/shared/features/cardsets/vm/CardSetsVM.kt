@@ -133,12 +133,12 @@ open class CardSetsVMImpl(
     }
 
     override fun onCardSetClicked(item: CardSetViewItem) {
-        router?.openCardSet(item.id)
+        router?.openCardSet(item.cardSetId)
     }
 
     override fun onCardSetRemoved(item: CardSetViewItem) {
         viewModelScope.launch {
-            cardSetsRepository.removeCardSet(item.id)
+            cardSetsRepository.removeCardSet(item.cardSetId)
         }
     }
 
@@ -155,7 +155,6 @@ open class CardSetsVMImpl(
 
     private fun buildViewItems(cardSets: List<ShortCardSet>, newCardSetText: String?): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
-
         cardSets.forEach {
             items.add(
                 CardSetViewItem(
@@ -168,12 +167,14 @@ open class CardSetsVMImpl(
             )
         }
 
-        return listOf(
+        val list = listOf(
             CreateCardSetViewItem(
                 placeholder = StringDesc.Resource(MR.strings.cardsets_create_cardset),
                 text = newCardSetText.orEmpty()
             ),
             *items.toTypedArray())
+        generateViewItemIds(list, this.cardSets.value.data().orEmpty(), idGenerator)
+        return list
     }
 
     override fun getErrorText(): StringDesc {

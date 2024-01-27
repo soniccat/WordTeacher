@@ -228,14 +228,14 @@ open class DefinitionsVMImpl(
         loadJob = viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             Logger.e("Load Word exception for $word ${e.message}", tag)
         }) {
+            launch(Dispatchers.Default) {
+                loadResource {
+                    wordFrequencyGradationProvider.resolveFrequencyForWord(word)
+                }.collect(wordFrequency)
+            }
+
             wordDefinitionRepository.define(word, false).forward(definitionWords)
             Logger.v("Finish Loading $word", tag)
-        }
-
-        viewModelScope.launch(Dispatchers.Default) {
-            loadResource {
-                wordFrequencyGradationProvider.resolveFrequencyForWord(word)
-            }.collect(wordFrequency)
         }
 
         observeJob = viewModelScope.launch {
@@ -474,11 +474,11 @@ open class DefinitionsVMImpl(
 
         viewModelScope.launch {
             cardSetsRepository.addCard(
-                setId = cardSetViewItem.id,
+                setId = cardSetViewItem.cardSetId,
                 term = viewData.word.word,
                 definitions = viewData.def.definitions,
                 partOfSpeech = viewData.partOfSpeech,
-                transcription = viewData.word.transcriptions?.firstOrNull(), // TODO: support several transcriptions
+                transcription = viewData.word.transcriptions?.firstOrNull(),
                 synonyms = viewData.def.synonyms.orEmpty(),
                 examples = viewData.def.examples.orEmpty() + contextExamples
             )

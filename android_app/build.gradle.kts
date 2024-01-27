@@ -116,6 +116,8 @@ dependencies {
     kapt(libs.daggerCompiler)
 
     implementation(libs.playServicesAuth)
+
+    kapt(libs.daggerCompiler)
 }
 
 kotlin {

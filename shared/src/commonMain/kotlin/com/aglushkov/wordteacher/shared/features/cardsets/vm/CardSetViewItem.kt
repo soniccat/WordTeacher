@@ -3,19 +3,23 @@ package com.aglushkov.wordteacher.shared.features.cardsets.vm
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 
 class CardSetViewItem(
-    setId: Long,
+    val cardSetId: Long,
     val name: String,
     val date: String,
     val readyToLearnProgress: Float = 0f,
     val totalProgress: Float = 0f
-): BaseViewItem<String>(name, Type, setId) {
+): BaseViewItem<Long>(cardSetId, Type) {
     companion object {
         const val Type = 400
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
         other as CardSetViewItem
-        return super.equalsByContent(other) && date == other.date
+        return super.equalsByContent(other) &&
+                name == other.name &&
+                date == other.date &&
+                readyToLearnProgress == other.readyToLearnProgress &&
+                totalProgress == other.totalProgress
     }
 }
 

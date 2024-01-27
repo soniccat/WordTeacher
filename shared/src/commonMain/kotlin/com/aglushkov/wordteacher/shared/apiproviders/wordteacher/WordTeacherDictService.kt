@@ -12,6 +12,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
 import io.ktor.http.encodeURLQueryComponent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,6 +21,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import java.time.Instant
+import kotlin.random.Random
 
 @Serializable
 data class WordTeacherDictResponse(

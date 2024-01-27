@@ -185,4 +185,5 @@ class WordFrequencyDatabase(
 private const val WORD_FREQUENCY_GRADATION_SETTINGS_NAME = "wordFrequencyGradation"
 //private const val WORD_FREQUENCY_DEFAULT_SETTINGS_NAME = "wordFrequencyDefault"
 
-private const val UNKNOWN_FREQUENCY = -1.0
+const val UNKNOWN_FREQUENCY = -1.0 // not found in db
+const val UNDEFINED_FREQUENCY = -2.0 // haven't checked yet

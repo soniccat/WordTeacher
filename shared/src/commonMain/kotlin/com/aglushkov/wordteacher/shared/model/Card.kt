@@ -3,6 +3,8 @@ package com.aglushkov.wordteacher.shared.model
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.repository.db.UNDEFINED_FREQUENCY
+import com.aglushkov.wordteacher.shared.repository.db.UNKNOWN_FREQUENCY
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,7 +28,7 @@ data class Card (
     val needToUpdateDefinitionSpans: Boolean,
     val needToUpdateExampleSpans: Boolean,
     val creationId: String,
-    val termFrequency: Double,
+    @Transient val termFrequency: Double = UNDEFINED_FREQUENCY,
 ) {
     fun withRightAnswer(timeSource: TimeSource) =
         copy(
