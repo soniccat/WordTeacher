@@ -51,8 +51,8 @@ FROM DBCard
 WHERE DBCard.needToUpdateDefinitionSpans OR DBCard.needToUpdateExampleDefinitionSpans;
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, termFrequency)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?);
 
 insertCard:
 INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId)

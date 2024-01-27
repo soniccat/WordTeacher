@@ -163,15 +163,26 @@ class WordFrequencyDatabase(
     }
 
     private fun calcGradation(): WordFrequencyGradation {
-        val levelCount = 5
-        val m = 4.0 // multiplier
-        val range = (0 until levelCount)
+        // let's take
+        // x in x + m*x + m^2*x + m^3*x + m^4*x ... = rowCount
+        // where levelCount = x count
 
-        // calc x in x + m*x + m^2*x + m^3*x + m^4*x ... = rowCount
-        val xSum = range.fold(0) { acc, i -> acc + m.pow(i).toInt() }
+        val firstLevelSize = 400 // x
+        val m = 4.0 // multiplier
         val rowCount = db.dBWordFrequencyQueries.selectCount().executeAsOne()
-        val x = rowCount.toDouble() / xSum.toDouble()
-        val rowIndexes = range.map { (m.pow(it) * x).toInt() }
+
+        var levelCount = 0
+        var offset = 0
+        val rowIndexes = mutableListOf<Int>()
+        while (offset < rowCount) {
+            offset += (m.pow(levelCount) * firstLevelSize).toInt()
+            levelCount += 1
+
+            if (offset < rowCount) {
+                rowIndexes.add(offset)
+            }
+        }
+
         val levels = rowIndexes.mapIndexed { i, v ->
             val frequency = db.dBWordFrequencyQueries.selectOrderedFrequencyWithOffset(v.toLong())
                 .executeAsOne().frequency ?: 0.0

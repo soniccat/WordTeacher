@@ -457,7 +457,7 @@ fun WordTitleView(
                         }
                         .border(
                             1.dp,
-                            color = StartWordFrequencyColor,
+                            color = MaterialTheme.colors.secondary,
                             shape = RoundedCornerShape(20.dp)
                         ),
                     contentAlignment = Alignment.CenterStart
@@ -466,7 +466,7 @@ fun WordTitleView(
                         text = if (viewItem.frequencyLevelAndRatio.level == WordFrequencyGradation.UNKNOWN_LEVEL)
                             "?"
                         else
-                            viewItem.frequencyLevelAndRatio.level.toString(),
+                            (viewItem.frequencyLevelAndRatio.level + 1).toString(),
                         modifier = Modifier.align(Alignment.Center).offset(y = (-1).dp),
                         textAlign = TextAlign.Center,
                         style = LocalAppTypography.current.wordFrequency
@@ -477,12 +477,13 @@ fun WordTitleView(
     }
 }
 
+@Composable
 fun wordFrequencyColor(ratio: Float?): Color {
     if (ratio == null) {
         return Color.Transparent
     }
 
-    return StartWordFrequencyColor.copy(alpha = 1 - ratio)
+    return MaterialTheme.colors.secondary.copy(alpha = 1 - ratio)
 //    return lerp(
 //        StartWordFrequencyColor,
 //        EndWordFrequencyColor,
@@ -490,8 +491,8 @@ fun wordFrequencyColor(ratio: Float?): Color {
 //    )
 }
 
-private val StartWordFrequencyColor = Color(0xFF60D838)
-private val EndWordFrequencyColor = Color(0xFFFF634D)
+//private val StartWordFrequencyColor = MaterialTheme.colors.secondary
+//private val EndWordFrequencyColor = Color(0xFFFF634D)
 
 @Composable
 fun WordTranscriptionView(

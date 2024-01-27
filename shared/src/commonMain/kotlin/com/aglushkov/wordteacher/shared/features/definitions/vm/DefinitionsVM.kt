@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.data
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -480,7 +481,8 @@ open class DefinitionsVMImpl(
                 partOfSpeech = viewData.partOfSpeech,
                 transcription = viewData.word.transcriptions?.firstOrNull(),
                 synonyms = viewData.def.synonyms.orEmpty(),
-                examples = viewData.def.examples.orEmpty() + contextExamples
+                examples = viewData.def.examples.orEmpty() + contextExamples,
+                termFrequency = wordFrequency.value.data()
             )
         }
     }

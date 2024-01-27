@@ -472,7 +472,8 @@ class AppDatabase(
             progress: CardProgress = CardProgress.EMPTY,
             needToUpdateDefinitionSpans: Boolean = false,
             needToUpdateExampleSpans: Boolean = false,
-            creationId: String = uuid4().toString()
+            creationId: String = uuid4().toString(),
+            termFrequency: Double? = null
         ): Card {
             var newCard = Card(
                 id = -1,
@@ -491,7 +492,7 @@ class AppDatabase(
                 needToUpdateDefinitionSpans = needToUpdateDefinitionSpans,
                 needToUpdateExampleSpans = needToUpdateExampleSpans,
                 creationId = creationId,
-                termFrequency = -1.0
+                termFrequency = termFrequency ?: UNDEFINED_FREQUENCY
             )
 
             cards.insertCard(setId, newCard)
@@ -521,6 +522,7 @@ class AppDatabase(
                 needToUpdateExampleSpans = card.needToUpdateExampleSpans,
                 creationId = card.creationId,
                 remoteId = card.remoteId,
+                termFrequency = card.termFrequency,
             )
         }
 
@@ -541,6 +543,7 @@ class AppDatabase(
             needToUpdateExampleSpans: Boolean,
             creationId: String,
             remoteId: String,
+            termFrequency: Double,
         ) {
             db.transaction {
                 db.dBCardSetQueries.updateCardSetModificationDate(modificationDate, setId)
@@ -562,7 +565,8 @@ class AppDatabase(
                     needToUpdateExampleSpans.toLong(),
                     modificationDate,
                     creationId,
-                    remoteId
+                    remoteId,
+                    termFrequency
                 )
 
                 val cardId = db.dBCardQueries.lastInsertedRowId().firstLong().value!!

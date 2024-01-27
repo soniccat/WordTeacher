@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.db.UNDEFINED_FREQUENCY
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import kotlinx.coroutines.*
@@ -67,7 +68,8 @@ class CardSetsRepository(
         partOfSpeech: WordTeacherWord.PartOfSpeech,
         transcription: String?,
         synonyms: List<String>,
-        examples: List<String>
+        examples: List<String>,
+        termFrequency: Double?
     ): Card {
         nlpCore.waitUntilInitialized()
         val nlpCoreCopy = nlpCore.clone()
@@ -90,7 +92,8 @@ class CardSetsRepository(
                     transcription = transcription,
                     synonyms = synonyms,
                     examples = examples,
-                    exampleTermSpans = exampleSpans
+                    exampleTermSpans = exampleSpans,
+                    termFrequency = termFrequency
                 )
             }
         }.await()
