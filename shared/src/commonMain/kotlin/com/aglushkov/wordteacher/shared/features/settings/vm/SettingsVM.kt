@@ -9,7 +9,11 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isError
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.AuthData
@@ -23,6 +27,7 @@ import kotlinx.coroutines.flow.*
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import dev.icerock.moko.resources.desc.Raw
+import dev.icerock.moko.resources.desc.ResourceFormatted
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,6 +43,7 @@ interface SettingsVM: Clearable {
     fun restore(newState: State)
     fun onAuthButtonClicked(type: SettingsViewAuthButtonItem.ButtonType)
     fun onAuthRefreshClicked()
+    fun onUploadWordFrequencyFileClicked()
     fun onLoggingIsEnabledChanged()
     fun onLogFileShareClicked(path: Path)
 
@@ -57,7 +63,8 @@ open class SettingsVMImpl (
     private val logsRepository: LogsRepository,
     private val idGenerator: IdGenerator,
     private val isDebug: Boolean,
-    private val fileSharer: FileSharer?
+    private val fileSharer: FileSharer?,
+    private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
 ): ViewModel(), SettingsVM {
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -70,9 +77,10 @@ open class SettingsVMImpl (
 
     override val items: StateFlow<List<BaseViewItem<*>>> = combine(
         spaceAuthRepository.authDataFlow,
-        logsRepository.isLoggingEnabledState
-    ) { authRes, isLoggingEnabled ->
-        buildItems(authRes, isLoggingEnabled, isDebug)
+        logsRepository.isLoggingEnabledState,
+        wordFrequencyGradationProvider.gradationState,
+    ) { authRes, isLoggingEnabled, gradationState ->
+        buildItems(authRes, gradationState, isLoggingEnabled, isDebug)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     override fun restore(newState: SettingsVM.State) {
@@ -81,24 +89,38 @@ open class SettingsVMImpl (
 
     private fun buildItems(
         authDataRes: Resource<AuthData>,
+        gradationState: Resource<WordFrequencyGradation>,
         isLoggingEnabled: Boolean,
         isDebug: Boolean
     ): List<BaseViewItem<*>> {
-        val title = SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_auth_title))
-        val button = when(authDataRes) {
+        val resultItems: MutableList<BaseViewItem<*>> = mutableListOf()
+
+        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_auth_title))
+        resultItems += when(authDataRes) {
             is Resource.Error -> SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.error_try_again), SettingsViewAuthButtonItem.ButtonType.TryAgain)
             is Resource.Loaded -> SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.settings_auth_signout), SettingsViewAuthButtonItem.ButtonType.SignOut)
             is Resource.Loading -> SettingsViewLoading()
             is Resource.Uninitialized -> SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.settings_auth_signin), SettingsViewAuthButtonItem.ButtonType.SignIn)
         }
 
-        val authItems: MutableList<BaseViewItem<*>> = mutableListOf(title, button)
-        val resultItems = authItems
         if (isDebug) {
-            resultItems += SettingsViewAuthRefreshButtonItem(StringDesc.Raw("Refresh"))
+            resultItems += SettingsViewAuthRefreshButtonItem(StringDesc.Resource(MR.strings.settings_auth_refresh))
         }
 
         resultItems += SettingsOpenDictConfigsItem()
+        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_frequency_title))
+        val wordFrequencyGradationData = gradationState.data()
+        if (wordFrequencyGradationData != null) {
+            resultItems += SettingsViewTextItem(StringDesc.ResourceFormatted(MR.strings.settings_frequency_gradation_info_format, wordFrequencyGradationData.levels.size))
+            resultItems += SettingsWordFrequencyUploadFileItem(StringDesc.Resource(MR.strings.settings_frequency_upload_file))
+        } else if (gradationState.isLoading()) {
+            resultItems += SettingsViewLoading()
+        } else {
+            resultItems += SettingsViewTextItem(StringDesc.Resource(MR.strings.error_default))
+            resultItems += SettingsWordFrequencyUploadFileItem(StringDesc.Resource(MR.strings.settings_frequency_upload_file))
+        }
+
+        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_logging_title))
         resultItems += SettingsLogsConfigsItem(
             isLoggingEnabled,
             if (canShareLogs) {
@@ -131,6 +153,10 @@ open class SettingsVMImpl (
 
     override fun onAuthRefreshClicked() {
         spaceAuthRepository.launchRefresh()
+    }
+
+    override fun onUploadWordFrequencyFileClicked() {
+
     }
 
     override fun onLoggingIsEnabledChanged() {

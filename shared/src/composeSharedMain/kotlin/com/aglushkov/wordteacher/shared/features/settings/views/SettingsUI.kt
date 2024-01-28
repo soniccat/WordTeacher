@@ -69,6 +69,16 @@ private fun showSettingsItem(
             text = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsTitle) }
         )
     }
+    is SettingsViewTextItem -> {
+        CustomListItem (
+            Modifier.padding(
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+                bottom = LocalDimens.current.contentPadding
+            ),
+            content = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsText) }
+        )
+    }
     is SettingsViewLoading -> {
         val side = 30.dp
         Box(
@@ -112,6 +122,14 @@ private fun showSettingsItem(
                 Text(stringResource(MR.strings.settings_dictconfigs))
             },
         )
+    }
+    is SettingsWordFrequencyUploadFileItem -> {
+        Button(
+            onClick = { vm.onUploadWordFrequencyFileClicked() },
+            modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
+        ) {
+            Text(text = item.firstItem().localized())
+        }
     }
     is SettingsLogsConfigsItem -> {
         CustomListItem(

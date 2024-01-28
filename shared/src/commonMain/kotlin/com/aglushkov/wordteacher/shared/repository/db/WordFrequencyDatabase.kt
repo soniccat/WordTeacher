@@ -143,7 +143,6 @@ class WordFrequencyDatabase(
                     gradationState.update { Resource.Loaded(gradation) }
                 }
             }
-
 //            defaultFrequency = settings.getDoubleOrNull(WORD_FREQUENCY_DEFAULT_SETTINGS_NAME) ?: UNKNOWN_FREQUENCY
         } catch (_: Exception) {
         }
@@ -164,8 +163,8 @@ class WordFrequencyDatabase(
 
     private fun calcGradation(): WordFrequencyGradation {
         // let's take
-        // x in x + m*x + m^2*x + m^3*x + m^4*x ... = rowCount
-        // where levelCount = x count
+        // x + m*x + m^2*x + m^3*x + m^4*x ... = rowCount
+        // where levelCount = count of x
 
         val firstLevelSize = 400 // x
         val m = 4.0 // multiplier

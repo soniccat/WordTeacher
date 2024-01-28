@@ -86,7 +86,12 @@
     <string name="settings_auth_title">Space</string>
     <string name="settings_auth_signin">Sign In</string>
     <string name="settings_auth_signout">Sign Out</string>
+    <string name="settings_auth_refresh">Refresh</string>
     <string name="settings_dictconfigs">Dict Configs</string>
+    <string name="settings_frequency_title">Word Frequency</string>
+    <string name="settings_frequency_gradation_info_format">There\'re %d levels</string>
+    <string name="settings_frequency_upload_file">Choose db file</string>
+    <string name="settings_logging_title">Logging</string>
     <string name="settings_logging_enabled">Enable logging</string>
     <string name="settings_logging_share">Share log</string>
 

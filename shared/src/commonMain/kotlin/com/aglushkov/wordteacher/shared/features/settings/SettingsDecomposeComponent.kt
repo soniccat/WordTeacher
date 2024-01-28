@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
@@ -30,6 +31,7 @@ class SettingsDecomposeComponent (
     idGenerator: IdGenerator,
     isDebug: Boolean,
     fileSharer: FileSharer?,
+    wordFrequencyGradationProvider: WordFrequencyGradationProvider,
 ) : SettingsVMImpl(
     state,
     connectivityManager,
@@ -38,6 +40,7 @@ class SettingsDecomposeComponent (
     idGenerator,
     isDebug,
     fileSharer,
+    wordFrequencyGradationProvider,
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {

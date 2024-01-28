@@ -2,6 +2,8 @@ package com.aglushkov.wordteacher.shared.features.settings.vm
 
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import okio.Path
 
 
@@ -11,9 +13,15 @@ class SettingsViewTitleItem(title: StringDesc): BaseViewItem<StringDesc>(title, 
     }
 }
 
-class SettingsViewLoading: BaseViewItem<Unit>(Unit, Type) {
+class SettingsViewTextItem(title: StringDesc): BaseViewItem<StringDesc>(title, Type) {
     companion object {
         const val Type = 1001
+    }
+}
+
+class SettingsViewLoading: BaseViewItem<Unit>(Unit, Type) {
+    companion object {
+        const val Type = 1002
     }
 }
 
@@ -25,7 +33,7 @@ class SettingsViewAuthButtonItem(text: StringDesc, val buttonType: ButtonType): 
     }
 
     companion object {
-        const val Type = 1002
+        const val Type = 1003
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
@@ -35,13 +43,13 @@ class SettingsViewAuthButtonItem(text: StringDesc, val buttonType: ButtonType): 
 
 class SettingsViewAuthRefreshButtonItem(text: StringDesc): BaseViewItem<StringDesc>(text, Type) {
     companion object {
-        const val Type = 1003
+        const val Type = 1004
     }
 }
 
 class SettingsOpenDictConfigsItem: BaseViewItem<Unit>(Unit, Type) {
     companion object {
-        const val Type = 1004
+        const val Type = 1005
     }
 }
 
@@ -50,8 +58,24 @@ class SettingsLogsConfigsItem(
     val paths: List<LogFileItem>
 ): BaseViewItem<Boolean>(isEnabled, Type) {
     companion object {
-        const val Type = 1005
+        const val Type = 1006
     }
 
     data class LogFileItem(val path: Path)
+}
+
+class SettingsWordFrequencyGradationItem(
+    val gradation: WordFrequencyGradation,
+): BaseViewItem<WordFrequencyGradation>(gradation, Type) {
+    companion object {
+        const val Type = 1007
+    }
+}
+
+class SettingsWordFrequencyUploadFileItem(
+    text: StringDesc,
+): BaseViewItem<StringDesc>(text, Type) {
+    companion object {
+        const val Type = 1008
+    }
 }

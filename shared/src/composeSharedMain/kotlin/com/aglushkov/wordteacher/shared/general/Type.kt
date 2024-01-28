@@ -49,6 +49,7 @@ data class AppTypography(
     var dictParamText: TextStyle = materialTypography.body2,
 
     var settingsTitle: TextStyle = materialTypography.h5,
+    var settingsText: TextStyle = materialTypography.body1,
     var wordFrequency: TextStyle = materialTypography.body2,
 ) {
     @Composable
