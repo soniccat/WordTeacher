@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.db
 
 import co.touchlab.kermit.Logger
+import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -83,12 +85,12 @@ interface WordFrequencyGradationProvider {
 }
 
 class WordFrequencyDatabase(
-    driverFactory: DatabaseDriverFactory,
+    private val driverFactory: DatabaseDriverFactory,
     private val dbPreparer: () -> Path,
     private val settings: FlowSettings,
 ): WordFrequencyGradationProvider {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val driver = driverFactory.createFrequencyDBDriver()
+    private var driver = driverFactory.createFrequencyDBDriver()
     private var db = WordFrequencyDB(driver)
 
     val state = MutableStateFlow<Resource<WordFrequencyDatabase>>(Resource.Uninitialized())
@@ -148,17 +150,24 @@ class WordFrequencyDatabase(
         }
 
         if (gradationState.value.isUninitialized()) {
-            val newGradation = calcGradation()
-            gradationState.update { Resource.Loaded(newGradation) }
-//            val defaultFrequency = if (newGradation.levels.isEmpty()) {
-//                UNKNOWN_FREQUENCY
-//            } else {
-//                newGradation.levels[newGradation.levels.size/2].frequency
-//            }
-
-            settings.putString(WORD_FREQUENCY_GRADATION_SETTINGS_NAME, jsonCoder.encodeToString(newGradation))
-//            settings.putDouble(WORD_FREQUENCY_DEFAULT_SETTINGS_NAME, defaultFrequency)
+            updateGradation()
         }
+    }
+
+    private suspend fun updateGradation() {
+        val newGradation = calcGradation()
+        gradationState.update { Resource.Loaded(newGradation) }
+        //            val defaultFrequency = if (newGradation.levels.isEmpty()) {
+        //                UNKNOWN_FREQUENCY
+        //            } else {
+        //                newGradation.levels[newGradation.levels.size/2].frequency
+        //            }
+
+        settings.putString(
+            WORD_FREQUENCY_GRADATION_SETTINGS_NAME,
+            jsonCoder.encodeToString(newGradation)
+        )
+        //            settings.putDouble(WORD_FREQUENCY_DEFAULT_SETTINGS_NAME, defaultFrequency)
     }
 
     private fun calcGradation(): WordFrequencyGradation {
@@ -189,6 +198,40 @@ class WordFrequencyDatabase(
         }
 
         return WordFrequencyGradation(levels)
+    }
+
+    fun validateTmpDb(): Boolean {
+        val driver = driverFactory.createTestFrequencyDBDriver()
+        val db = WordFrequencyDB(driver)
+        val count = db.dBWordFrequencyQueries.selectCount().executeAsOne()
+        if (count == 0L) {
+            throw RuntimeException("Empty database")
+        }
+
+        val first = db.dBWordFrequencyQueries.selectFirst().executeAsOne()
+        return first.word != null && first.frequency != null
+    }
+
+    inner class Validator: FileOpenController.Validator {
+        override fun validateFile(path: Path): Boolean {
+            return validateTmpDb()
+        }
+    }
+
+    inner class UpdateHandler: FileOpenController.SuccessHandler {
+        override fun prepare(path: Path): Boolean {
+            driver.close()
+            driver = driverFactory.createFrequencyDBDriver()
+            db = WordFrequencyDB(driver)
+            return true
+        }
+
+        override fun handle(path: Path): Boolean {
+            runBlocking {
+                updateGradation()
+            }
+            return true
+        }
     }
 }
 

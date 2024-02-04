@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImp
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVMImpl
+import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -32,6 +33,7 @@ class SettingsDecomposeComponent (
     isDebug: Boolean,
     fileSharer: FileSharer?,
     wordFrequencyGradationProvider: WordFrequencyGradationProvider,
+    wordFrequencyFileOpenController: FileOpenController
 ) : SettingsVMImpl(
     state,
     connectivityManager,
@@ -41,6 +43,7 @@ class SettingsDecomposeComponent (
     isDebug,
     fileSharer,
     wordFrequencyGradationProvider,
+    wordFrequencyFileOpenController
 ), ComponentContext by componentContext {
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {

@@ -23,3 +23,8 @@ WHERE word = ?;
 selectCount:
 SELECT COUNT(*)
 FROM wiki;
+
+selectFirst:
+SELECT *
+FROM wiki
+LIMIT 1;

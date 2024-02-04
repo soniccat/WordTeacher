@@ -5,6 +5,7 @@ import app.cash.sqldelight.TransactionWithoutReturn
 import com.aglushkov.wordteacher.db.DBCard
 import com.aglushkov.wordteacher.db.DBNLPSentence
 import com.aglushkov.wordteacher.maindb.MainDB
+import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.extensions.firstLong
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okio.Path
 
 class AppDatabase(
     driverFactory: DatabaseDriverFactory,
@@ -677,6 +679,18 @@ class AppDatabase(
         fun removeNote(id: Long) = db.dBNoteQueries.removeNote(id)
         fun removeAll() = db.dBNoteQueries.removeAll()
         fun updateNote(id: Long, text: String) = db.dBNoteQueries.update(text, id)
+    }
+
+
+    inner class WordFrequencyUpdateHandler: FileOpenController.SuccessHandler {
+        override fun prepare(path: Path): Boolean {
+            return true
+        }
+
+        override fun handle(path: Path): Boolean {
+            db.dBCardQueries.resetCardFrequencies()
+            return true
+        }
     }
 }
 

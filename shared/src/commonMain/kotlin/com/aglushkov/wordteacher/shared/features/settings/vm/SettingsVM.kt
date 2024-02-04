@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.settings.vm
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContent
 import com.aglushkov.wordteacher.shared.general.Clearable
+import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -65,6 +66,7 @@ open class SettingsVMImpl (
     private val isDebug: Boolean,
     private val fileSharer: FileSharer?,
     private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
+    private val wordFrequencyFileOpenController: FileOpenController
 ): ViewModel(), SettingsVM {
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -156,7 +158,9 @@ open class SettingsVMImpl (
     }
 
     override fun onUploadWordFrequencyFileClicked() {
-
+        mainScope.launch {
+            wordFrequencyFileOpenController.chooseFile()
+        }
     }
 
     override fun onLoggingIsEnabledChanged() {

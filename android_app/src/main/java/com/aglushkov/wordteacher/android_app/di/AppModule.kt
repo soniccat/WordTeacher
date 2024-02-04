@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.android_app.features.add_article.toArticleConte
 import com.aglushkov.wordteacher.android_app.features.settings.FileSharerRepository
 import com.aglushkov.wordteacher.android_app.features.settings.toFileSharer
 import com.aglushkov.wordteacher.android_app.general.crypto.SecureCodecBuilder
+import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
@@ -18,9 +19,14 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
+import com.aglushkov.wordteacher.shared.general.okio.writeTo
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
+import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
+import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME
+import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME_TMP
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
@@ -31,9 +37,12 @@ import okio.Buffer
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
+import okio.Sink
+import okio.Source
 import okio.buffer
 import okio.source
 import okio.use
+import java.util.UUID
 
 @Module(includes = [SharedAppModule::class])
 class AppModule {
@@ -147,22 +156,36 @@ class AppModule {
             val dbPath = context.getDatabasePath("word_frequency.db").toOkioPath()
             if (!fileSystem.exists(dbPath)) {
                 fileSystem.write(dbPath) {
-                    MR.assets.word_frequency.getInputStream(context).buffered().use { readStream ->
-                        val source = readStream.source().buffer()
-                        val readByteArray = ByteArray(100 * 1024)
-                        var readByteCount = 0
-                        while (true) {
-                            readByteCount = source.read(readByteArray, 0, readByteArray.size)
-                            if (readByteCount == -1) {
-                                break
-                            }
-                            write(readByteArray, 0, readByteCount)
-                        }
-                    }
+                    MR.assets.word_frequency.getInputStream(context).source().writeTo(this)
                 }
             }
             "".toPath()
         }
+    }
+
+    @WordFrequencyFileOpener
+    @AppComp
+    @Provides
+    fun wordFrequencyFileOpener(
+        context: Context,
+        wordFrequencyDB: WordFrequencyDatabase,
+        mainDB: AppDatabase,
+    ): FileOpenController {
+        val tmpDestinationPath = context.getDatabasePath(FREQUENCY_DB_NAME_TMP).toOkioPath()
+        val dstPath = context.getDatabasePath(FREQUENCY_DB_NAME).toOkioPath()
+        return FileOpenControllerImpl(
+            "WordFrequencyFileOpener",
+            listOf("application/octet-stream"),
+            tmpDestinationPath,
+            dstPath,
+            wordFrequencyDB.Validator(),
+            FileOpenCompositeSuccessHandler(
+                listOf(
+                    wordFrequencyDB.UpdateHandler(),
+                    mainDB.WordFrequencyUpdateHandler()
+                )
+            )
+        )
     }
 
     // Features

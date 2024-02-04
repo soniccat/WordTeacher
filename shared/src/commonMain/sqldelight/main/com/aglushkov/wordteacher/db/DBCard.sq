@@ -104,3 +104,7 @@ updateCardFrequency:
 UPDATE DBCard
 SET termFrequency = ?
 WHERE id = ?;
+
+resetCardFrequencies:
+UPDATE DBCard
+SET termFrequency = -2.0;

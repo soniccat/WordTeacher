@@ -33,6 +33,7 @@ import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
 import com.aglushkov.wordteacher.shared.general.WindowInsets
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
+import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUIDialog
@@ -98,7 +99,8 @@ class MainActivity : AppCompatActivity(), Router {
             v.onApplyWindowInsets(insets)
         }
 
-        appComponent().googleAuthRepository().bind(this@MainActivity)
+        (appComponent().wordFrequencyFileOpenController() as FileOpenControllerImpl).bind(this)
+        appComponent().googleAuthRepository().bind(this)
         setupComposeLayout()
         handleIntent()
     }
