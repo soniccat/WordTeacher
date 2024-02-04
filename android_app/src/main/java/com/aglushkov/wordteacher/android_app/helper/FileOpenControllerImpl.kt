@@ -4,16 +4,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.aglushkov.wordteacher.shared.general.FileOpenController
+import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
 import com.aglushkov.wordteacher.shared.general.okio.deleteIfExists
 import com.aglushkov.wordteacher.shared.general.okio.useAsTmp
 import com.aglushkov.wordteacher.shared.general.okio.writeTo
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,35 +35,33 @@ class FileOpenControllerImpl(
 ): FileOpenController {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var openDocumentLauncher: ActivityResultLauncher<Array<String>>? = null
-    private val requestResource: MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Uninitialized())
+    override val state: MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Uninitialized())
 
 //    @SuppressLint("Recycle")
     fun bind(activity: ComponentActivity) {
         openDocumentLauncher = activity.registerForActivityResult(ActivityResultContracts.OpenDocument()) { result ->
             mainScope.launch(Dispatchers.Default) {
-                requestResource.update {
-                    tryInResource {
-                        if (result == null) {
-                            throw NullPointerException("OpenDocument result is null")
-                        }
-                        tmpPath.useAsTmp {
-                            activity.contentResolver.openInputStream(result)?.source()
-                                ?.writeTo(it.toFile().sink())
-                            validator.validateFile(it)
-
-                            it.toFile().source()?.writeTo(dstPath.toFile().sink())
-                            successHandler.handle(dstPath)
-                        }
+                loadResource {
+                    if (result == null) {
+                        throw NullPointerException("OpenDocument result is null")
                     }
-                }
+                    tmpPath.useAsTmp {
+                        activity.contentResolver.openInputStream(result)?.source()
+                            ?.writeTo(it.toFile().sink())
+                        validator.validateFile(it)
+
+                        it.toFile().source()?.writeTo(dstPath.toFile().sink())
+                        successHandler.handle(dstPath)
+                    }
+                    Unit
+                }.collect(state)
             }
         }
     }
 
     override suspend fun chooseFile(): Resource<Unit> {
-        requestResource.update { Resource.Loading() }
+        state.update { Resource.Loading() }
         openDocumentLauncher?.launch(mimeTypes.toTypedArray())
-        val res = requestResource.waitUntilLoadedOrError()
-        return res
+        return state.value
     }
 }

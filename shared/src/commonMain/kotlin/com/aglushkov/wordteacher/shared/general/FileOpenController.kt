@@ -1,6 +1,9 @@
 package com.aglushkov.wordteacher.shared.general
 
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import okio.Path
 
 interface FileOpenController {
@@ -13,6 +16,8 @@ interface FileOpenController {
         fun prepare(path: Path): Boolean
         fun handle(path: Path): Boolean
     }
+
+    val state: StateFlow<Resource<Unit>>
 
     suspend fun chooseFile(): Resource<Unit>
 }

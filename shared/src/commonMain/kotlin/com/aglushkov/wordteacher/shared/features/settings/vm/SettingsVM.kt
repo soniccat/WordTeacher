@@ -10,8 +10,11 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.data
+import com.aglushkov.wordteacher.shared.general.resource.downgradeToErrorOrLoading
 import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
@@ -80,7 +83,10 @@ open class SettingsVMImpl (
     override val items: StateFlow<List<BaseViewItem<*>>> = combine(
         spaceAuthRepository.authDataFlow,
         logsRepository.isLoggingEnabledState,
-        wordFrequencyGradationProvider.gradationState,
+        combine(
+            wordFrequencyGradationProvider.gradationState,
+            wordFrequencyFileOpenController.state
+        ) { a, b -> a.downgradeToErrorOrLoading(b) }
     ) { authRes, isLoggingEnabled, gradationState ->
         buildItems(authRes, gradationState, isLoggingEnabled, isDebug)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
@@ -112,11 +118,11 @@ open class SettingsVMImpl (
         resultItems += SettingsOpenDictConfigsItem()
         resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_frequency_title))
         val wordFrequencyGradationData = gradationState.data()
-        if (wordFrequencyGradationData != null) {
-            resultItems += SettingsViewTextItem(StringDesc.ResourceFormatted(MR.strings.settings_frequency_gradation_info_format, wordFrequencyGradationData.levels.size))
-            resultItems += SettingsWordFrequencyUploadFileItem(StringDesc.Resource(MR.strings.settings_frequency_upload_file))
-        } else if (gradationState.isLoading()) {
+        if (gradationState.isLoading()) {
             resultItems += SettingsViewLoading()
+        } else if (wordFrequencyGradationData != null) {
+            resultItems += SettingsViewTextItem(StringDesc.ResourceFormatted(MR.strings.settings_frequency_gradation_info_format, wordFrequencyGradationData.levels.size + 1))
+            resultItems += SettingsWordFrequencyUploadFileItem(StringDesc.Resource(MR.strings.settings_frequency_upload_file))
         } else {
             resultItems += SettingsViewTextItem(StringDesc.Resource(MR.strings.error_default))
             resultItems += SettingsWordFrequencyUploadFileItem(StringDesc.Resource(MR.strings.settings_frequency_upload_file))

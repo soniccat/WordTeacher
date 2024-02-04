@@ -53,7 +53,7 @@ sealed interface Resource<T> {
     fun <R> copyWith(data: R?): Resource<R> {
         return when(this) {
             is Uninitialized -> Uninitialized(version = version)
-            is Loaded -> Loaded(data!!, canLoadNextPage, version)
+            is Loaded -> Loaded(data!!, canLoadNextPage, version) // TODO: force unwrap looks dangerous
             is Loading -> Loading(data, canLoadNextPage, version)
             is Error -> Error(throwable, canTryAgain, data, canLoadNextPage, version)
         }
@@ -72,6 +72,19 @@ sealed interface Resource<T> {
     fun bumpVersion() = copy(version = this.version + 1)
 }
 
+
+fun <T,R> Resource<T>.downgradeToErrorOrLoading(r: Resource<R>): Resource<T> = when(this) {
+    is Resource.Loaded -> when(r) {
+        is Resource.Error -> this.toError(r.throwable, r.canTryAgain)
+        is Resource.Loading -> this.toLoading()
+        is Resource.Loaded, is Resource.Uninitialized -> this
+    }
+    is Resource.Loading -> when(r) {
+        is Resource.Error -> this.toError(r.throwable, r.canTryAgain)
+        is Resource.Loading, is Resource.Loaded, is Resource.Uninitialized -> this
+    }
+    is Resource.Error, is Resource.Uninitialized -> this
+}
 
 fun <T> Resource<T>?.data(): T? {
     return this?.data()

@@ -82,7 +82,10 @@ private fun showSettingsItem(
     is SettingsViewLoading -> {
         val side = 30.dp
         Box(
-            modifier = Modifier.size(side, side)
+            modifier = Modifier.padding(
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+            ).size(side, side)
         ) {
             CircularProgressIndicator(
                 color = Color.LightGray.copy(alpha = 0.2f)
