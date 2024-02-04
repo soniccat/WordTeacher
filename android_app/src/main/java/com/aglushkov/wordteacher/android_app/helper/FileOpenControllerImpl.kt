@@ -41,20 +41,21 @@ class FileOpenControllerImpl(
     fun bind(activity: ComponentActivity) {
         openDocumentLauncher = activity.registerForActivityResult(ActivityResultContracts.OpenDocument()) { result ->
             mainScope.launch(Dispatchers.Default) {
-                loadResource {
-                    if (result == null) {
-                        throw NullPointerException("OpenDocument result is null")
-                    }
-                    tmpPath.useAsTmp {
-                        activity.contentResolver.openInputStream(result)?.source()
-                            ?.writeTo(it.toFile().sink())
-                        validator.validateFile(it)
+                if (result == null) {
+                    state.update { it.toUninitialized() }
+                } else {
+                    loadResource {
+                        tmpPath.useAsTmp {
+                            activity.contentResolver.openInputStream(result)?.source()
+                                ?.writeTo(it.toFile().sink())
+                            validator.validateFile(it)
 
-                        it.toFile().source()?.writeTo(dstPath.toFile().sink())
-                        successHandler.handle(dstPath)
-                    }
-                    Unit
-                }.collect(state)
+                            it.toFile().source()?.writeTo(dstPath.toFile().sink())
+                            successHandler.handle(dstPath)
+                        }
+                        Unit
+                    }.collect(state)
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.desktopapp.configs.GoogleConfig
 import com.aglushkov.wordteacher.desktopapp.configs.KeyStoreConfig
 import com.aglushkov.wordteacher.desktopapp.general.crypto.CertCreator
 import com.aglushkov.wordteacher.desktopapp.general.crypto.SecureCodecBuilder
+import com.aglushkov.wordteacher.desktopapp.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.ApiBaseUrl
 import com.aglushkov.wordteacher.shared.di.AppComp
@@ -12,18 +13,25 @@ import com.aglushkov.wordteacher.shared.di.BasePath
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.Platform
 import com.aglushkov.wordteacher.shared.di.SharedAppModule
+import com.aglushkov.wordteacher.shared.di.WordFrequencyFileOpener
 import com.aglushkov.wordteacher.shared.di.WordFrequencyPreparer
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.AppInfo
+import com.aglushkov.wordteacher.shared.general.FileOpenCompositeSuccessHandler
+import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
+import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
+import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME
+import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME_TMP
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.PreferencesSettings
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -33,6 +41,7 @@ import dagger.Provides
 import io.ktor.http.Url
 import okio.FileSystem
 import okio.Path
+import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.io.FileInputStream
@@ -160,5 +169,30 @@ class AppModule {
     @Provides
     fun wordFrequencyPreparer(): () -> Path {
         return {"".toPath()}
+    }
+
+    @WordFrequencyFileOpener
+    @AppComp
+    @Provides
+    fun wordFrequencyFileOpener(
+        @BasePath basePath: Path,
+        wordFrequencyDB: WordFrequencyDatabase,
+        mainDB: AppDatabase,
+    ): FileOpenController {
+        val tmpDestinationPath = basePath.div(FREQUENCY_DB_NAME_TMP)
+        val dstPath = basePath.div(FREQUENCY_DB_NAME)
+        return FileOpenControllerImpl(
+            "WordFrequencyFileOpener",
+            listOf(".db"),
+            tmpDestinationPath,
+            dstPath,
+            wordFrequencyDB.Validator(),
+            FileOpenCompositeSuccessHandler(
+                listOf(
+                    wordFrequencyDB.UpdateHandler(),
+                    mainDB.WordFrequencyUpdateHandler()
+                )
+            )
+        )
     }
 }

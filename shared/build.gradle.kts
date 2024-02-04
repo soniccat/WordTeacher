@@ -18,6 +18,7 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+// For now you have to comment this to be able to build desktop... I'm investigating...
 dependencies {
     add("kapt", libs.daggerCompiler)
 }
