@@ -278,7 +278,7 @@ open class LearningVMImpl(
 
     private fun createTeacher(cards: List<Card>, teacherState: CardTeacher.State?): CardTeacher {
         return CardTeacher(
-            cards.shuffled(),
+            cards,
             databaseCardWorker,
             timeSource,
             viewModelScope

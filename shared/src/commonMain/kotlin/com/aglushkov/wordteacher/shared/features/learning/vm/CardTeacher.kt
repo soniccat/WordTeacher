@@ -92,7 +92,7 @@ class CardTeacher(
         if (sessionCards.isEmpty()) {
             currentSession = null
         } else {
-            val session = LearningSession(sessionCards)
+            val session = LearningSession(sessionCards.shuffled())
             currentSession = session
 
             scope.launch {
