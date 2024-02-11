@@ -164,6 +164,64 @@ fun Resource<*>?.isLoadedOrLoading(): Boolean {
     return if (this == null) false else (this !is Resource.Loaded || this !is Resource.Error)
 }
 
+fun <T> Resource<T>.on(
+    uninitialized: (() -> Unit)? = null,
+    loaded: ((T) -> Unit)? = null,
+    loading: ((T?) -> Unit)? = null,
+    error: ((Throwable) -> Unit)? = null
+) {
+    uninitialized?.let { onUnitialized(it) }
+    loaded?.let { onLoaded(it) }
+    loading?.let { onLoading(it) }
+    error?.let { onError(it) }
+}
+
+fun <T> Resource<T>.onUnitialized(block: () -> Unit): Boolean {
+    return when (this) {
+        is Resource.Uninitialized -> {
+            block()
+            true
+        }
+        else -> false
+    }
+}
+
+fun <T> Resource<T>.onLoaded(block: (T) -> Unit): Boolean {
+    return when (this) {
+        is Resource.Loaded -> {
+            block(data)
+            true
+        }
+        else -> false
+    }
+}
+
+fun <T> Resource<T>.onLoading(block: (T?) -> Unit): Boolean {
+    return when (this) {
+        is Resource.Loading -> {
+            block(data)
+            true
+        }
+        else -> false
+    }
+}
+
+fun <T> Resource<T>.onData(block: (T) -> Unit): Boolean {
+    return data()?.let {
+        block(it)
+        true
+    } ?: run {
+        false
+    }
+}
+
+fun Resource<*>.onError(block: (Throwable) -> Unit) {
+    when (this) {
+        is Resource.Error -> block(throwable)
+        else -> return
+    }
+}
+
 fun <T, D> Resource<T>.merge(res2: Resource<D>): Resource<Pair<T?, D?>> =
     merge(res2, transform = { a, b -> a to b })
 
@@ -222,11 +280,5 @@ fun <T> loadResource(
         Logger.e(e.message.orEmpty(), "loadResource")
         e.printStackTrace()
         emit(initialValue.toError(e, canTryAgain))
-    }
-}
-
-fun Resource<*>?.onError(block: (Throwable) -> Unit) {
-    if (this is Resource.Error) {
-        block(this.throwable)
     }
 }

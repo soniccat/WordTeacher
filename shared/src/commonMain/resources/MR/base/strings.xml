@@ -87,7 +87,7 @@
     <string name="settings_auth_signin">Sign In</string>
     <string name="settings_auth_signout">Sign Out</string>
     <string name="settings_auth_refresh">Refresh</string>
-    <string name="settings_dictconfigs">Dict Configs</string>
+    <string name="settings_dictconfigs">Dicts</string>
     <string name="settings_frequency_title">Word Frequency</string>
     <string name="settings_frequency_gradation_info_format">There\'re %d levels</string>
     <string name="settings_frequency_upload_file">Choose db file</string>
@@ -95,6 +95,8 @@
     <string name="settings_logging_enabled">Enable logging</string>
     <string name="settings_logging_share">Share log</string>
 
+    <string name="dictconfigs_online_section_title">Online dicts</string>
+    <string name="dictconfigs_offline_section_title">Offline dicts</string>
     <string name="dictconfigs_yandex_title">Yandex</string>
     <string name="dictconfigs_yandex_api_token_exists_placeholder">type to change api token</string>
     <string name="dictconfigs_yandex_api_token_doesnt_exist_placeholder">type your api token</string>
@@ -102,6 +104,7 @@
     <string name="dictconfigs_yandex_param_family_search_filter">Apply the family search filter</string>
     <string name="dictconfigs_yandex_param_search_by_word_form">Enable searching by word form</string>
     <string name="dictconfigs_yandex_param_require_matching_parts">Enable a filter that requires matching parts of speech for the search word and translation</string>
+    <string name="dictconfigs_settings_dsl_title">Dsl file</string>
 
     <string name="notes_error">Something went wrong :(</string>
     <string name="notes_create_note">Create a note</string>

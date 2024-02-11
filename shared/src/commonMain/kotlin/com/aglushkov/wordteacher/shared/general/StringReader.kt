@@ -29,12 +29,14 @@ class StringReader(
             }
         }
 
-    fun skip(count: Int = 1) {
-        for (i in 0 until count) {
-            if (!isEnd()) {
-                readChar()
+    fun skip(count: Int = 1, withInvisibleSpace: Boolean = false) {
+        var needToReadCount = count
+        while (!isEnd() && needToReadCount > 0) {
+            val ch = readChar()
+            if (withInvisibleSpace && ch == UNICODE_INVISIBLE_SPACE) {
+                continue
             } else {
-                break;
+                --needToReadCount
             }
         }
     }
@@ -84,3 +86,4 @@ class StringReader(
 }
 
 private val SPACE_CHAR_SET = setOf(' ', '\t', '\n', '\r')
+const val UNICODE_INVISIBLE_SPACE = '\uFEFF'

@@ -13,7 +13,7 @@ interface FileOpenController {
     }
 
     interface SuccessHandler {
-        fun prepare(path: Path): Boolean
+        fun prepare(path: Path): Boolean // TODO: check if we can remove it
         fun handle(path: Path): Boolean
     }
 

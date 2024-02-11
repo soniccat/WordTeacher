@@ -11,6 +11,9 @@ annotation class AppComp
 annotation class BasePath
 
 @Qualifier
+annotation class DictPath
+
+@Qualifier
 annotation class SpaceHttpClient
 
 @Qualifier
@@ -27,6 +30,9 @@ annotation class WordFrequencyPreparer
 
 @Qualifier
 annotation class WordFrequencyFileOpener
+
+@Qualifier
+annotation class DslFileOpener
 
 val LocalIsDebug = staticCompositionLocalOf { false }
 

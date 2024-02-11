@@ -1,24 +1,33 @@
 package com.aglushkov.wordteacher.shared.features.dict_configs.vm
 
-import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService
 import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.Lookup
 import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.LookupFlags
 import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.LookupLang
 import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.LookupLangDefault
+import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.general.Clearable
+import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.on
+import com.aglushkov.wordteacher.shared.general.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
-import kotlinx.coroutines.flow.Flow
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import dev.icerock.moko.resources.desc.ResourceStringDesc
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import com.aglushkov.wordteacher.shared.res.MR
 
 // https://yandex.com/dev/dictionary/doc/dg/reference/lookup.html
 data class YandexSettings(
@@ -54,41 +63,85 @@ data class YandexSettings(
 interface DictConfigsVM: Clearable {
     val viewItems: StateFlow<List<BaseViewItem<*>>>
 
-    fun onConfigDeleteClicked(item: YandexConfigViewItem)
-    fun onYandexConfigChanged(item: YandexConfigViewItem, key: String?, lang: String?, settings: YandexSettings?)
-    fun onYandexConfigAddClicked()
+    fun onConfigDeleteClicked(item: ConfigYandexViewItem)
+    fun onYandexConfigChanged(item: ConfigYandexViewItem, key: String?, lang: String?, settings: YandexSettings?)
+    fun onConfigAddClicked(type: ConfigCreateViewItem.Type)
+    fun onDictDeleted(item: ConfigDictViewItem)
 }
 
 open class DictConfigsVMImpl(
     private val configRepository: ConfigRepository,
+    private val dslDictOpenController: FileOpenController,
+    private val dictRepository: DictRepository,
     private val idGenerator: IdGenerator,
 ): ViewModel(), DictConfigsVM {
 
-    override val viewItems = configRepository.flow.map { res ->
-        res.data().orEmpty().filter {
-            it.type == Config.Type.Yandex
-        }.map { config ->
-            val flag = config.methods[Lookup]?.get(LookupFlags)?.toIntOrNull() ?: 0
-            YandexConfigViewItem(
-                id = config.id.toLong(),
-                hasToken = config.connectParams.securedKey.isNotEmpty(),
-                lang = config.methods[Lookup]?.get(LookupLang) ?: LookupLangDefault,
-                settings = YandexSettings.fromInt(flag)
-            ) as BaseViewItem<*>
-        } + CreateConfigViewItem(Long.MAX_VALUE)
+    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+    override val viewItems = combine(
+        configRepository.flow,
+        dictRepository.dicts
+    ) { configs, dicts ->
+        buildViewItems(configs, dicts)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    override fun onConfigDeleteClicked(item: YandexConfigViewItem) {
+    override fun onConfigDeleteClicked(item: ConfigYandexViewItem) {
         yandexConfig(item)?.let {
             configRepository.removeConfig(it.id)
         }
     }
 
-    private fun yandexConfig(item: YandexConfigViewItem) =
+    private fun yandexConfig(item: ConfigYandexViewItem) =
         configRepository.value.data()
             ?.firstOrNull { it.id == item.id.toInt() }
 
-    override fun onYandexConfigChanged(item: YandexConfigViewItem, key: String?, lang: String?, settings: YandexSettings?) {
+    private fun buildViewItems(configs: Resource<List<Config>>, dicts: Resource<List<Dict>>): List<BaseViewItem<*>> = buildList<BaseViewItem<*>> {
+        add(ConfigHeaderViewItem(ResourceStringDesc(MR.strings.dictconfigs_online_section_title)))
+        configs.on(
+            loaded = {
+                it.onEach { config ->
+                    if (config.type == Config.Type.Yandex) {
+                        val flag = config.methods[Lookup]?.get(LookupFlags)?.toIntOrNull() ?: 0
+                        add(
+                            ConfigYandexViewItem(
+                                id = config.id.toLong(),
+                                hasToken = config.connectParams.securedKey.isNotEmpty(),
+                                lang = config.methods[Lookup]?.get(LookupLang) ?: LookupLangDefault,
+                                settings = YandexSettings.fromInt(flag)
+                            )
+                        )
+                    }
+                }
+            },
+            loading = {
+                add(ConfigLoadingViewItem())
+            },
+            error = {
+                add(ConfigTextViewItem(it.toStringDesc()))
+            }
+        )
+        add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Online))
+
+        add(ConfigHeaderViewItem(ResourceStringDesc(MR.strings.dictconfigs_offline_section_title)))
+        dicts.on(
+            loaded = {
+                it.onEach { dict ->
+                    add(ConfigDictViewItem(dict.name, dict.path))
+                }
+            },
+            loading = {
+                add(ConfigLoadingViewItem())
+            },
+            error = {
+                add(ConfigTextViewItem(it.toStringDesc()))
+            }
+        )
+        add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Offline))
+    }.let {
+        generateViewItemIds(it, viewItems.value, idGenerator)
+    }
+
+    override fun onYandexConfigChanged(item: ConfigYandexViewItem, key: String?, lang: String?, settings: YandexSettings?) {
         yandexConfig(item)?.let { config ->
             config.copy(
                 id = config.id,
@@ -114,7 +167,14 @@ open class DictConfigsVMImpl(
         }
     }
 
-    override fun onYandexConfigAddClicked() {
+    override fun onConfigAddClicked(type: ConfigCreateViewItem.Type) {
+        when (type) {
+            ConfigCreateViewItem.Type.Online -> onYandexConfigAddClicked()
+            ConfigCreateViewItem.Type.Offline -> onDslDictAddClicked()
+        }
+    }
+
+    private fun onYandexConfigAddClicked() {
         val yandexConfig = Config(
             id = configRepository.value.data()?.maxOfOrNull { it.id + 1 } ?: 1,
             type = Config.Type.Yandex,
@@ -126,6 +186,16 @@ open class DictConfigsVMImpl(
             methods = mapOf(Lookup to mapOf(LookupLang to LookupLangDefault)),
         )
         configRepository.addConfig(yandexConfig)
+    }
+
+    private fun onDslDictAddClicked() {
+        mainScope.launch(Dispatchers.Default) {
+            dslDictOpenController.chooseFile()
+        }
+    }
+
+    override fun onDictDeleted(item: ConfigDictViewItem) {
+        dictRepository.delete(item.path)
     }
 
     override fun onCleared() {

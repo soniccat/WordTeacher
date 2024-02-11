@@ -4,16 +4,13 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Checkbox
 import androidx.compose.material.ExperimentalMaterialApi
@@ -31,29 +28,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
-import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
-import com.aglushkov.wordteacher.shared.features.dict_configs.vm.CreateConfigViewItem
+import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigCreateViewItem
+import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigDictViewItem
+import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigHeaderViewItem
+import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigTextViewItem
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
-import com.aglushkov.wordteacher.shared.features.dict_configs.vm.YandexConfigViewItem
-import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
+import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigYandexViewItem
+import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTextItem
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
-import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
@@ -61,6 +51,7 @@ import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
+import dev.icerock.moko.resources.compose.localized
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -110,20 +101,48 @@ fun DictConfigsUI(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun showDictConfigsItem(
     modifier: Modifier,
     item: BaseViewItem<*>,
     vm: DictConfigsVM,
 ) = when (item) {
-    is YandexConfigViewItem -> {
+    is ConfigYandexViewItem -> {
         YandexConfigViewItemUI(item, vm, modifier)
     }
-    is CreateConfigViewItem -> {
-        CreateYandexConfigView(
-            modifier
+    is ConfigCreateViewItem -> {
+        AddConfigItemUI(
+            vm,
+            item.firstItem(),
+            modifier,
+        )
+    }
+    is ConfigHeaderViewItem -> {
+        ListItem (
+            text = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsTitle) }
+        )
+    }
+    is ConfigTextViewItem -> {
+        CustomListItem (
+            Modifier.padding(
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+                bottom = LocalDimens.current.contentPadding
+            ),
+            content = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsText) }
+        )
+    }
+    is ConfigDictViewItem -> {
+        DeletableCell(
+            stateKey = item.id,
+            onDeleted = {
+                vm.onDictDeleted(item)
+            }
         ) {
-            vm.onYandexConfigAddClicked()
+            ListItem(
+                text = { Text(item.firstItem(), style = LocalAppTypography.current.settingsText) }
+            )
         }
     }
     else -> {
@@ -137,7 +156,7 @@ private fun showDictConfigsItem(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun YandexConfigViewItemUI(
-    item: YandexConfigViewItem,
+    item: ConfigYandexViewItem,
     vm: DictConfigsVM,
     modifier: Modifier
 ) {
@@ -235,24 +254,27 @@ private fun YandexConfigViewItemUI(
 }
 
 @Composable
-private fun CreateYandexConfigView(
+private fun AddConfigItemUI(
+    vm: DictConfigsVM,
+    type: ConfigCreateViewItem.Type,
     modifier: Modifier,
-    onClicked: () -> Unit
 ) {
-    Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        IconButton(
-            onClick = onClicked
+        Box(
+            modifier = modifier.fillMaxWidth(),
+            contentAlignment = Alignment.TopCenter
         ) {
-            Icon(
-                painter = painterResource(MR.images.create_note),
-                contentDescription = null,
-                tint = MaterialTheme.colors.secondary
-            )
+            IconButton(
+                onClick = {
+                    vm.onConfigAddClicked(type)
+                }
+            ) {
+                Icon(
+                    painter = painterResource(MR.images.create_note),
+                    contentDescription = null,
+                    tint = MaterialTheme.colors.secondary
+                )
+            }
         }
-    }
 }
 
 @Composable

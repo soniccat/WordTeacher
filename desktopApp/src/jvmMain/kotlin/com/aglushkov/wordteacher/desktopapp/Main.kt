@@ -123,6 +123,7 @@ fun main() {
             }
             LaunchedEffect("wordFrequencyFileOpenController init") {
                 (appComponent.wordFrequencyFileOpenController() as FileOpenControllerImpl).parent = window
+                (appComponent.dslDictOpenController() as FileOpenControllerImpl).parent = window
             }
         }
     }

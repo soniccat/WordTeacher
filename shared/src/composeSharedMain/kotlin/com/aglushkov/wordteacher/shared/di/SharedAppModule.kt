@@ -84,16 +84,24 @@ class SharedAppModule {
 
     @AppComp
     @Provides
-    fun dictRepository(
+    @DictPath
+    fun dictPath(
         @BasePath basePath: Path,
+    ): Path {
+        return basePath.div("dicts")
+    }
+
+    @AppComp
+    @Provides
+    fun dictRepository(
+        @DictPath dictPath: Path,
         dictFactory: DictFactory,
         fileSystem: FileSystem
     ): DictRepository {
-        val dictsPath = basePath.div("dicts")
-        if (!fileSystem.exists(dictsPath)) {
-            fileSystem.createDirectory(dictsPath)
+        if (!fileSystem.exists(dictPath)) {
+            fileSystem.createDirectory(dictPath)
         }
-        return DictRepositoryImpl(dictsPath, dictFactory, fileSystem)
+        return DictRepositoryImpl(dictPath, dictFactory, fileSystem)
     }
 
     @AppComp

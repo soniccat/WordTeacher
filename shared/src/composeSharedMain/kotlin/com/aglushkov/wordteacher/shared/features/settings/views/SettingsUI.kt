@@ -122,7 +122,10 @@ private fun showSettingsItem(
                 )
             },
             text = {
-                Text(stringResource(MR.strings.settings_dictconfigs))
+                Text(
+                    stringResource(MR.strings.settings_dictconfigs),
+                    style = LocalAppTypography.current.settingsTitle
+                )
             },
         )
     }

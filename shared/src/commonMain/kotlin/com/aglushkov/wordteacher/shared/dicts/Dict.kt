@@ -16,6 +16,8 @@ interface Dict: WordTeacherWordService {
     suspend fun define(word: String, indexEntry: Index.Entry): List<WordTeacherWord>
 
     interface Index {
+        val path: Path
+
         fun allEntries(): Sequence<Entry>
         fun indexEntry(word: String): Entry?
         fun entriesStartWith(prefix: String, limit: Int): List<Entry>

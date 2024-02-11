@@ -16,7 +16,7 @@ import okio.Path
 
 class DslIndex(
     private val dict: Dict,
-    private val path: Path,
+    override val path: Path,
     private val fileSystem: FileSystem,
 ) : Dict.Index {
     private val index = DictTrie()

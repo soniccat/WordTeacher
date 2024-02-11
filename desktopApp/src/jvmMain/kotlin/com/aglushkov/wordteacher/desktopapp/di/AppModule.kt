@@ -10,6 +10,8 @@ import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.ApiBaseUrl
 import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.di.BasePath
+import com.aglushkov.wordteacher.shared.di.DictPath
+import com.aglushkov.wordteacher.shared.di.DslFileOpener
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.Platform
 import com.aglushkov.wordteacher.shared.di.SharedAppModule
@@ -32,6 +34,9 @@ import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME
 import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME_TMP
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
+import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.PreferencesSettings
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -51,6 +56,7 @@ import java.security.KeyStore.PasswordProtection
 import java.security.Security
 import java.security.cert.X509Certificate
 import java.util.Date
+import javax.inject.Qualifier
 
 
 @Module(includes = [SharedAppModule::class])
@@ -195,4 +201,38 @@ class AppModule {
             )
         )
     }
+
+
+    @AppComp
+    @TmpPath
+    @Provides
+    fun tmpPath(@BasePath basePath: Path): Path = basePath.div("tmp")
+
+    @DslFileOpener
+    @AppComp
+    @Provides
+    fun dslFileOpener(
+        @TmpPath tmpPath: Path,
+        @DictPath dictPath: Path,
+        fileSystem: FileSystem,
+        dictRepository: DictRepository
+    ): FileOpenController {
+        return FileOpenControllerImpl(
+            "DslFileOpener",
+            listOf(".dsl"),
+            tmpPath,
+            dictPath,
+            DslDictValidator(fileSystem),
+            FileOpenCompositeSuccessHandler(
+                listOf(
+                    OnNewDictAddedHandler(dictRepository)
+                )
+            )
+        )
+    }
+
+
 }
+
+@Qualifier
+annotation class TmpPath

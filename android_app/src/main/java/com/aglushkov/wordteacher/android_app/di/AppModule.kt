@@ -27,6 +27,9 @@ import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME
 import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME_TMP
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
+import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
+import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
@@ -183,6 +186,30 @@ class AppModule {
                 listOf(
                     wordFrequencyDB.UpdateHandler(),
                     mainDB.WordFrequencyUpdateHandler()
+                )
+            )
+        )
+    }
+
+    @DslFileOpener
+    @AppComp
+    @Provides
+    fun dslFileOpener(
+        @DictPath dictPath: Path,
+        context: Context,
+        fileSystem: FileSystem,
+        dictRepository: DictRepository
+    ): FileOpenController {
+        val tmpDestinationPath = context.cacheDir.toOkioPath()
+        return FileOpenControllerImpl(
+            "DslFileOpener",
+            listOf("application/octet-stream"),
+            tmpDestinationPath,
+            dictPath,
+            DslDictValidator(fileSystem),
+            FileOpenCompositeSuccessHandler(
+                listOf(
+                    OnNewDictAddedHandler(dictRepository)
                 )
             )
         )

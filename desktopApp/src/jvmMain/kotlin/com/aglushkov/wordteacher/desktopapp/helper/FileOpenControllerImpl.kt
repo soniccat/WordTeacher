@@ -18,6 +18,7 @@ import okio.sink
 import okio.source
 import java.awt.FileDialog
 import java.awt.Frame
+import java.util.UUID
 
 class FileOpenControllerImpl(
     private val name: String,
@@ -35,18 +36,28 @@ class FileOpenControllerImpl(
         state.update { Resource.Loading() }
         val fd = FileDialog(parent, "Choose a file", FileDialog.LOAD)
         fd.directory = "./"
-        fd.file = "*.db"
         fd.isVisible = true
         fd.setFilenameFilter { file, s -> mimeTypes.any { file.endsWith(it) } }
         fd.file?.let { choseFile ->
             val choseFilePath = fd.directory.toPath().div(choseFile)
             withContext(Dispatchers.Default) {
                 loadResource {
-                    tmpPath.useAsTmp {
+                    val tmpFilePath = if (tmpPath.toFile().isDirectory) {
+                        tmpPath.div(choseFile)
+                    } else {
+                        tmpPath
+                    }
+                    val dstFilePath = if (dstPath.toFile().isDirectory) {
+                        dstPath.div(choseFile)
+                    } else {
+                        dstPath
+                    }
+
+                    tmpFilePath.useAsTmp {
                         choseFilePath.toFile().source().writeTo(it.toFile().sink())
                         validator.validateFile(it)
-                        it.toFile().source().writeTo(dstPath.toFile().sink())
-                        successHandler.handle(dstPath)
+                        it.toFile().source().writeTo(dstFilePath.toFile().sink())
+                        successHandler.handle(dstFilePath)
                     }
                     Unit
                 }.collect(state)

@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.Language
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.StringReader
+import com.aglushkov.wordteacher.shared.general.UNICODE_INVISIBLE_SPACE
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
 import com.aglushkov.wordteacher.shared.general.okio.newLineSize
@@ -48,12 +49,20 @@ class DslDict(
         this.dslIndex = dslIndex
     }
 
+    fun validate(): Boolean {
+        fromLang = Language.UNKNOWN
+        toLang = Language.UNKNOWN
+        readHeader()
+
+        return name.isNotEmpty() || fromLang != Language.UNKNOWN || toLang != Language.UNKNOWN
+    }
+
     private fun readHeader() {
         var headerLineCount = 10
         fileSystem.read(path) {
             while (!exhausted() && headerLineCount > 0) {
                 readUtf8Line()?.let { line ->
-                    if (line.isNotEmpty() && line.first() == '#') {
+                    if (line.isNotEmpty() && (line.first() == '#' || line.length > 2 && line.first() == UNICODE_INVISIBLE_SPACE && line[1] == '#' )) {
                         readHeader(line)
                     }
                 } ?: break
@@ -226,7 +235,7 @@ class DslDict(
 
     private fun readHeader(line: String) {
         stringReader.read(line) {
-            skip(1)
+            skip(1, withInvisibleSpace = true)
             val namePos = pos
             val endNamePos = readWord()
 
@@ -241,8 +250,8 @@ class DslDict(
                     val valueString = line.substring(valuePos, endValuePos)
                     when (nameString) {
                         "NAME" -> name = valueString
-                        "INDEX_LANGUAGE" -> fromLang = Language.parse(valueString)
-                        "CONTENTS_LANGUAGE" -> toLang = Language.parse(valueString)
+                        "INDEX_LANGUAGE" -> fromLang = Language.parse(valueString.lowercase())
+                        "CONTENTS_LANGUAGE" -> toLang = Language.parse(valueString.lowercase())
                     }
                 }
             }
