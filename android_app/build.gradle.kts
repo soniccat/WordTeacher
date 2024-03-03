@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("android-app-convention")
     id("android-base-convention")
@@ -17,15 +20,33 @@ repositories {
 //    maven(url = "https://androidx.dev/snapshots/builds/8003490/artifacts/repository")
 
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-andorid/")
 }
 
+// VK props
+var vkProps: Properties? = null
+val vkPropFile = file("${project.rootDir}/android_app/vk.properties")
+if (vkPropFile.exists()) {
+    vkProps = Properties().apply {
+        load(FileInputStream(vkPropFile))
+    }
+}
 
 android {
     defaultConfig {
         applicationId = "com.aglushkov.wordteacher"
         versionCode = appVersionCode
         versionName = appVersionName
+
+        addManifestPlaceholders(
+            buildMap {
+                vkProps?.onEach {
+                    put(it.key.toString(), it.value)
+                }
+            }
+        )
     }
+
     namespace = "com.aglushkov.wordteacher.android_app"
 
     buildFeatures {
@@ -116,6 +137,7 @@ dependencies {
     kapt(libs.daggerCompiler)
 
     implementation(libs.playServicesAuth)
+    implementation(libs.vkId)
 
     kapt(libs.daggerCompiler)
 }

@@ -311,10 +311,11 @@ class SharedAppModule {
         @BasePath basePath: Path,
         service: SpaceAuthService,
         googleAuthController: GoogleAuthController,
+        vkAuthController: VKAuthController,
         fileSystem: FileSystem,
     ): SpaceAuthRepository {
         val path = obtainSpaceDirPath(basePath,fileSystem).div("authData")
-        return SpaceAuthRepository(service, googleAuthController, path, fileSystem)
+        return SpaceAuthRepository(service, googleAuthController, vkAuthController, path, fileSystem)
     }
 
     private fun obtainSpaceDirPath(basePath: Path, fileSystem: FileSystem): Path {

@@ -110,7 +110,7 @@ class SpaceHttpClientBuilder(
 
                         if(status == HttpStatusCode.Unauthorized) {
                             try {
-                                var result: Resource<AuthData> = Resource.Uninitialized()
+                                var result: Resource<SpaceAuthData> = Resource.Uninitialized()
 
                                 // if we have valid cookies then we can call refresh
                                 val session = cookieStorage.get(this.request.url).firstOrNull { it.name == CookieSession }?.value
@@ -154,7 +154,7 @@ class SpaceHttpClientBuilder(
         )
     }
 
-    private fun HttpRequestBuilder.setAuthData(authData: AuthData): HttpRequestBuilder {
+    private fun HttpRequestBuilder.setAuthData(authData: SpaceAuthData): HttpRequestBuilder {
         headers {
             set(HeaderAccessToken, authData.authToken.accessToken)
         }

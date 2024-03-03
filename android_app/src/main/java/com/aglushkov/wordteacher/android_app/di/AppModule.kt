@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.android_app.features.settings.toFileSharer
 import com.aglushkov.wordteacher.android_app.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
+import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
@@ -36,16 +37,10 @@ import com.russhwolf.settings.datastore.DataStoreSettings
 import okio.FileSystem
 import dagger.Module
 import dagger.Provides
-import okio.Buffer
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
-import okio.Sink
-import okio.Source
-import okio.buffer
 import okio.source
-import okio.use
-import java.util.UUID
 
 @Module(includes = [SharedAppModule::class])
 class AppModule {
@@ -100,9 +95,20 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun googleAuthRepository(
+    fun googleAuthController(
         impl: GoogleAuthControllerImpl
     ): GoogleAuthController = impl
+
+    @AppComp
+    @Provides
+    fun vkAuthControllerImpl(): VKAuthControllerImpl = VKAuthControllerImpl()
+
+    // TODO: replace with bind
+    @AppComp
+    @Provides
+    fun vkAuthController(
+        impl: VKAuthControllerImpl
+    ): VKAuthController = impl
 
     @AppComp
     @Provides

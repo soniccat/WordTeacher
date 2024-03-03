@@ -11,6 +11,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import com.aglushkov.wordteacher.shared.general.GoogleAuthData
 import com.aglushkov.wordteacher.shared.general.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -25,6 +26,8 @@ import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.takeWhile
 
 class GoogleAuthControllerImpl(
@@ -34,8 +37,8 @@ class GoogleAuthControllerImpl(
     private var client: SignInClient? = null
     private var signInRequest: BeginSignInRequest? = null
     private var signInLauncher: ActivityResultLauncher<IntentSenderRequest>? = null
-    private var googleAuthDataState: MutableStateFlow<Resource<GoogleAuthData>> = MutableStateFlow(Resource.Uninitialized())
-    override var googleAuthDataFlow: StateFlow<Resource<GoogleAuthData>> = googleAuthDataState
+    private var googleAuthDataState: MutableStateFlow<Resource<NetworkAuthData>> = MutableStateFlow(Resource.Uninitialized())
+    override var authDataFlow: StateFlow<Resource<NetworkAuthData>> = googleAuthDataState
 
     fun bind(activity: ComponentActivity) {
         val safeClient = Identity.getSignInClient(activity)
@@ -86,13 +89,13 @@ class GoogleAuthControllerImpl(
             }
     }
 
-    override suspend fun signIn(): Resource<GoogleAuthData> {
+    override suspend fun signIn(): Resource<NetworkAuthData> {
         launchSignIn()
         googleAuthDataState.takeWhile { !it.isLoadedOrError() }.collect()
         return googleAuthDataState.value
     }
 
-    override fun launchSignIn() {
+    private fun launchSignIn() {
         if (googleAuthDataState.value.isLoading()) {
             return
         }

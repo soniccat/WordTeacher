@@ -4,6 +4,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import okio.Path
 
 
@@ -25,11 +26,14 @@ class SettingsViewLoading: BaseViewItem<Unit>(Unit, Type) {
     }
 }
 
-class SettingsViewAuthButtonItem(text: StringDesc, val buttonType: ButtonType): BaseViewItem<StringDesc>(text, Type) {
+class SettingsViewAuthButtonItem(
+    text: StringDesc,
+    val buttonType: ButtonType,
+    val networkType: SpaceAuthService.NetworkType,
+): BaseViewItem<StringDesc>(text, Type) {
     enum class ButtonType {
         SignIn,
         SignOut,
-        TryAgain
     }
 
     companion object {
@@ -37,7 +41,9 @@ class SettingsViewAuthButtonItem(text: StringDesc, val buttonType: ButtonType): 
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        return super.equalsByContent(other) && buttonType == (other as SettingsViewAuthButtonItem).buttonType
+        return super.equalsByContent(other) &&
+                buttonType == (other as SettingsViewAuthButtonItem).buttonType &&
+                networkType == other.networkType
     }
 }
 

@@ -2,9 +2,6 @@ package com.aglushkov.wordteacher.shared.service
 
 import com.aglushkov.wordteacher.shared.general.*
 import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.api.*
-import io.ktor.client.plugins.auth.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -22,19 +19,19 @@ const val HeaderDeviceType = "X-Device-Type"
 const val HeaderAccessToken = "X-Access-Token"
 
 @Serializable
-data class AuthData(
-    @SerialName("token") val authToken: AuthToken,
-    @SerialName("user") val user: AuthUser
+data class SpaceAuthData(
+    @SerialName("token") val authToken: SpaceAuthToken,
+    @SerialName("user") val user: SpaceAuthUser
 )
 
 @Serializable
-data class AuthToken(
+data class SpaceAuthToken(
     @SerialName("accessToken") val accessToken: String,
     @SerialName("refreshToken") val refreshToken: String,
 )
 
 @Serializable
-data class AuthUser(
+data class SpaceAuthUser(
     @SerialName("id") val id: String,
     @SerialName("networkType") val networkType: SpaceAuthService.NetworkType?,
 )
@@ -47,6 +44,8 @@ class SpaceAuthService(
     enum class NetworkType(val value: String) {
         @SerialName("google")
         Google("google"),
+        @SerialName("vkid")
+        VKID("vkid"),
     }
 
     @Serializable
@@ -66,7 +65,7 @@ class SpaceAuthService(
             classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
-                    subclass(Response.Ok.serializer(AuthData.serializer()))
+                    subclass(Response.Ok.serializer(SpaceAuthData.serializer()))
                     subclass(Response.Err.serializer())
                 }
             }
@@ -79,32 +78,32 @@ class SpaceAuthService(
             classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
-                    subclass(Response.Ok.serializer(AuthToken.serializer()))
+                    subclass(Response.Ok.serializer(SpaceAuthToken.serializer()))
                     subclass(Response.Err.serializer())
                 }
             }
         }
     }
 
-    suspend fun auth(network: NetworkType, token: String): Response<AuthData> {
+    suspend fun auth(network: NetworkType, token: String): Response<SpaceAuthData> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/auth/social/" + network.value) {
                 this.setBody(authJson.encodeToString(AuthInput(token)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            authJson.decodeFromString<Response<AuthData>>(stringResponse).setStatusCode(res.status.value)
+            authJson.decodeFromString<Response<SpaceAuthData>>(stringResponse).setStatusCode(res.status.value)
         }
     }
 
-    suspend fun refresh(token: AuthToken): Response<AuthToken> {
+    suspend fun refresh(token: SpaceAuthToken): Response<SpaceAuthToken> {
         val res: HttpResponse =
             httpClient.post(urlString = "${baseUrl}/api/auth/refresh") {
                 this.setBody(refreshJson.encodeToString(RefreshInput(token.accessToken, token.refreshToken)))
             }
         return withContext(Dispatchers.Default) {
             val stringResponse = res.readBytes().decodeToString()
-            refreshJson.decodeFromString<Response<AuthToken>>(stringResponse).setStatusCode(res.status.value)
+            refreshJson.decodeFromString<Response<SpaceAuthToken>>(stringResponse).setStatusCode(res.status.value)
         }
     }
 

@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity(), Router {
         (appComponent().wordFrequencyFileOpenController() as FileOpenControllerImpl).bind(this)
         (appComponent().dslDictOpenController() as FileOpenControllerImpl).bind(this)
         appComponent().googleAuthRepository().bind(this)
+        appComponent().vkAuthController().bind(this)
         setupComposeLayout()
         handleIntent()
     }

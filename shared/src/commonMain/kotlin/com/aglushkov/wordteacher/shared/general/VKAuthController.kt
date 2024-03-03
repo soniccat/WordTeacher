@@ -5,10 +5,13 @@ import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import kotlinx.coroutines.flow.StateFlow
 
-data class GoogleAuthData(val name: String?, val tokenId: String, val isSilent: Boolean): NetworkAuthData {
-    override val token: String
-        get() = tokenId
-}
+data class VKAuthData(
+    override val token: String,
+    val userID: Long,
+    val expireTime: Long,
+    val firstName: String,
+    val lastName: String,
+) : NetworkAuthData
 
-interface GoogleAuthController: NetworkAuthController {
+interface VKAuthController: NetworkAuthController {
 }

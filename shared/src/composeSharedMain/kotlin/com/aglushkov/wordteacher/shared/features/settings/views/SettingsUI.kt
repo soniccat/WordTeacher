@@ -94,7 +94,7 @@ private fun showSettingsItem(
     }
     is SettingsViewAuthButtonItem -> {
         Button(
-            onClick = { vm.onAuthButtonClicked(item.buttonType) },
+            onClick = { vm.onAuthButtonClicked(item.buttonType, item.networkType) },
             modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
         ) {
             Text(text = item.firstItem().localized())
