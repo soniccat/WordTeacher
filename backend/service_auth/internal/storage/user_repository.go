@@ -30,7 +30,7 @@ func NewUserRepository(logger *logger.Logger, mongoClient *mongo.Client) *UserRe
 	return model
 }
 
-func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *string) (*models.User, error) {
+func (m *UserRepository) FindUserById(context context.Context, networkType models.UserNetworkType, userId string) (*models.User, error) {
 	var user = models.User{}
 
 	err := m.UserCollection.FindOne(
@@ -38,8 +38,8 @@ func (m *UserRepository) FindGoogleUser(context context.Context, googleUserId *s
 		bson.M{
 			"networks": bson.M{
 				"$elemMatch": bson.M{
-					"type":          models.Google,
-					"networkUserId": *googleUserId,
+					"type":          networkType,
+					"networkUserId": userId,
 				},
 			},
 		},

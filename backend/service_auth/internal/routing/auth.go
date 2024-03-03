@@ -7,6 +7,8 @@ import (
 	"errors"
 	"models"
 	"net/http"
+	"net/url"
+	"time"
 	"tools"
 	"tools/logger"
 
@@ -208,17 +210,17 @@ func (h *AuthHandler) resolveGoogleUser(
 		return nil, nil, NewAuthErrorInvalidToken("google Id Token doesn't have a sub")
 	}
 
-	googleEmail, ok := payload.Claims["email"].(string)
-	if !ok {
-		return nil, nil, NewAuthErrorInvalidToken("google Id Token doesn't have an email")
-	}
+	// googleEmail, ok := payload.Claims["email"].(string)
+	// if !ok {
+	// 	return nil, nil, NewAuthErrorInvalidToken("google Id Token doesn't have an email")
+	// }
 
-	googleName, ok := payload.Claims["name"].(string)
-	if !ok {
-		return nil, nil, NewAuthErrorInvalidToken("google Id Token doesn't have a name")
-	}
+	// googleName, ok := payload.Claims["name"].(string)
+	// if !ok {
+	// 	return nil, nil, NewAuthErrorInvalidToken("google Id Token doesn't have a name")
+	// }
 
-	googleUser, err := h.userRepository.FindGoogleUser(context, &googleUserId)
+	googleUser, err := h.userRepository.FindUserById(context, models.Google, googleUserId)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -227,9 +229,69 @@ func (h *AuthHandler) resolveGoogleUser(
 	userNetwork := &models.UserNetwork{
 		NetworkType:   models.Google,
 		NetworkUserId: googleUserId,
-		Email:         googleEmail,
-		Name:          googleName,
+		// Email:         googleEmail,
+		// Name:          googleName,
 	}
 
 	return googleUser, userNetwork, nil
+}
+
+type VKSecureCheckTokenResponse struct {
+	UserId  string `json:"user_id"`
+	Success int    `json:"success"`
+	Expire  int64  `json:"expire"`
+}
+
+func (h *AuthHandler) resolveVKUser(
+	context context.Context,
+	credentials *AuthInput,
+	deviceType string,
+) (*models.User, *models.UserNetwork, error) {
+	if deviceType != tools.DeviceTypeAndroid {
+		return nil, nil, errors.New("VKID is supported only in android")
+	}
+
+	url, e := url.Parse("https://api.vk.com/method/secure.checkToken")
+	if e != nil {
+		return nil, nil, e
+	}
+	values := url.Query()
+	values.Add("token", credentials.Token)
+	values.Add("v", "5.131")
+	values.Add("access_token", "")
+	url.RawQuery = values.Encode()
+
+	r, e := http.NewRequest("GET", url.RequestURI(), nil)
+	if e != nil {
+		return nil, nil, e
+	}
+
+	var response VKSecureCheckTokenResponse
+	e = json.NewDecoder(r.Body).Decode(&response)
+	if e != nil {
+		return nil, nil, e
+	}
+
+	if response.Success != 1 {
+		return nil, nil, errors.New("can't validate user")
+	}
+
+	if response.Expire != 0 && response.Expire <= time.Now().UTC().Unix() {
+		return nil, nil, errors.New("token is expired")
+	}
+
+	vkIDUser, err := h.userRepository.FindUserById(context, models.VKID, response.UserId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// TODO: if user exists, update its network if it changed
+	userNetwork := &models.UserNetwork{
+		NetworkType:   models.VKID,
+		NetworkUserId: response.UserId,
+		// Email:         googleEmail,
+		// Name:          googleName,
+	}
+
+	return vkIDUser, userNetwork, nil
 }
