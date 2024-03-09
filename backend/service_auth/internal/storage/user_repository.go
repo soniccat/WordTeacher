@@ -65,6 +65,7 @@ func (m *UserRepository) InsertUser(context context.Context, user *models.User) 
 	return &newUser, nil
 }
 
+// TODO: move to a service
 func (m *UserRepository) GenerateUserAuthToken(
 	context context.Context,
 	userDbId string,

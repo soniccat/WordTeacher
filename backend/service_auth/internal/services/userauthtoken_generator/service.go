@@ -11,17 +11,7 @@ import (
 	"service_auth/internal/storage"
 )
 
-type UserAuthTokenGenerator interface {
-	Generate(
-		context context.Context,
-		userDbId string,
-		networkType models.UserNetworkType,
-		deviceType string,
-		deviceId string,
-	) (*models.UserAuthToken, error)
-}
-
-type userAuthTokenGenerator struct {
+type Service struct {
 	userRepository *storage.UserRepository
 	sessionManager *scs.SessionManager
 }
@@ -29,15 +19,15 @@ type userAuthTokenGenerator struct {
 func NewUserAuthTokenGenerator(
 	userRepository *storage.UserRepository,
 	sessionManager *scs.SessionManager,
-) UserAuthTokenGenerator {
+) *Service {
 	gob.Register(time.Time{})
-	return &userAuthTokenGenerator{
+	return &Service{
 		userRepository: userRepository,
 		sessionManager: sessionManager,
 	}
 }
 
-func (g *userAuthTokenGenerator) Generate(
+func (g *Service) Generate(
 	context context.Context,
 	userDbId string,
 	networkType models.UserNetworkType,

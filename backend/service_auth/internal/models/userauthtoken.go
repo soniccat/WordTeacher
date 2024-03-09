@@ -1,4 +1,4 @@
-package userauthtoken
+package models
 
 import (
 	"models"
