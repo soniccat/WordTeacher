@@ -1,8 +1,10 @@
 version: "3.8"
 
 secrets:
-  vk_id:
-    file: ./vkid.json
+  vkid:
+    file: ./vkid
+  google:
+    file: ./google
 
 services:
   nginx:
@@ -44,7 +46,8 @@ services:
       - "-redisAddress"
       - "redis:${REDIS_PORT}"
     secrets:
-      - vk_id
+      - vkid
+      - google
     networks:
       mongo_net:
         ipv4_address: 172.16.0.10

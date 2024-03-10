@@ -5,6 +5,7 @@ import (
 	"tools/logger"
 	"tools/mongowrapper"
 
+	"service_auth/internal/service_models"
 	"service_auth/internal/services/authorizer"
 	"service_auth/internal/services/token_refresher"
 	"service_auth/internal/services/user_provider"
@@ -26,6 +27,7 @@ type application struct {
 
 func createApplication(
 	logger *logger.Logger,
+	config service_models.Configs,
 	timeProvider tools.TimeProvider,
 	redisAddress string,
 	mongoURI string,
@@ -55,7 +57,7 @@ func createApplication(
 		userRepository,
 		sessionManager,
 	)
-	userResolver := user_provider.New(userRepository)
+	userResolver := user_provider.New(config.GoogleConfig, config.VKIDConfig, userRepository)
 
 	app.authorizer = authorizer.New(
 		userResolver,

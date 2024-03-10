@@ -10,11 +10,7 @@ import (
 	"service_auth/internal/service_models"
 )
 
-// TODO: move in params
-const GoogleIdTokenAndroidAudience = "435809636010-8kf32mn6jdokebe03cd9g8p2giudiq1c.apps.googleusercontent.com"
-const GoogleIdDesktopTokenAudience = "166526384655-9ji25ddl02vg3d91g8vc2tbvbupl6o3k.apps.googleusercontent.com"
-
-func (h *Service) GoogleUser(
+func (s *Service) GoogleUser(
 	context context.Context,
 	token string,
 	deviceType string,
@@ -27,9 +23,9 @@ func (h *Service) GoogleUser(
 
 	var idToken string
 	if deviceType == tools.DeviceTypeAndroid {
-		idToken = GoogleIdTokenAndroidAudience
+		idToken = s.googleConfig.GoogleIdTokenAndroidAudience
 	} else {
-		idToken = GoogleIdDesktopTokenAudience
+		idToken = s.googleConfig.GoogleIdTokenDesktopAudience
 	}
 
 	// TODO: consider to make validation more strict
@@ -43,7 +39,7 @@ func (h *Service) GoogleUser(
 		return nil, service_models.NewErrorInvalidToken("google Id Token doesn't have a sub")
 	}
 
-	googleUser, err := h.userStorage.FindUserById(context, models.Google, googleUserId)
+	googleUser, err := s.userStorage.FindUserById(context, models.Google, googleUserId)
 	if err != nil {
 		return nil, err
 	}

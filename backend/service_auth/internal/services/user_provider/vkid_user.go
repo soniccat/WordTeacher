@@ -8,17 +8,22 @@ import (
 	"net/http"
 	"net/url"
 	"service_auth/internal/service_models"
+	"strconv"
 	"time"
 	"tools"
 )
 
-type VKSecureCheckTokenResponse struct {
-	UserId  string `json:"user_id"`
-	Success int    `json:"success"`
-	Expire  int64  `json:"expire"`
+type VKSecureCheckTokenBody struct {
+	Response VKSecureCheckTokenResponse `json:"response"`
 }
 
-func (h *Service) VKUser(
+type VKSecureCheckTokenResponse struct {
+	UserId  int64 `json:"user_id"`
+	Success int   `json:"success"`
+	Expire  int64 `json:"expire"`
+}
+
+func (s *Service) VKUser(
 	context context.Context,
 	token string,
 	deviceType string,
@@ -27,36 +32,41 @@ func (h *Service) VKUser(
 		return nil, errors.New("VKID is supported only in android")
 	}
 
-	url, e := url.Parse("https://api.vk.com/method/secure.checkToken")
-	if e != nil {
-		return nil, e
+	url, err := url.Parse("https://api.vk.com/method/secure.checkToken")
+	if err != nil {
+		return nil, err
 	}
 	values := url.Query()
 	values.Add("token", token)
 	values.Add("v", "5.131")
-	values.Add("access_token", "")
+	values.Add("access_token", s.vkIdConfig.AccessToken)
 	url.RawQuery = values.Encode()
 
-	r, e := http.NewRequest("GET", url.RequestURI(), nil)
-	if e != nil {
-		return nil, e
+	r, err := http.NewRequest("GET", url.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	requestResponse, err := s.httpClient.Do(r)
+	if err != nil {
+		return nil, err
 	}
 
-	var response VKSecureCheckTokenResponse
-	e = json.NewDecoder(r.Body).Decode(&response)
-	if e != nil {
-		return nil, e
+	var resposeBody VKSecureCheckTokenBody
+	err = json.NewDecoder(requestResponse.Body).Decode(&resposeBody)
+	if err != nil {
+		return nil, err
 	}
 
-	if response.Success != 1 {
+	if resposeBody.Response.Success != 1 {
 		return nil, errors.New("can't validate user")
 	}
 
-	if response.Expire != 0 && response.Expire <= time.Now().UTC().Unix() {
+	if resposeBody.Response.Expire != 0 && resposeBody.Response.Expire <= time.Now().UTC().Unix() {
 		return nil, errors.New("token is expired")
 	}
 
-	vkIDUser, err := h.userStorage.FindUserById(context, models.VKID, response.UserId)
+	userIdAsString := strconv.FormatInt(resposeBody.Response.UserId, 10)
+	vkIDUser, err := s.userStorage.FindUserById(context, models.VKID, userIdAsString)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +75,7 @@ func (h *Service) VKUser(
 		User: vkIDUser,
 		Network: models.UserNetwork{
 			NetworkType:   models.VKID,
-			NetworkUserId: response.UserId,
+			NetworkUserId: userIdAsString,
 		},
 	}, nil
 }

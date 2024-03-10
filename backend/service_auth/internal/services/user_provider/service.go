@@ -1,11 +1,28 @@
 package user_provider
 
+import (
+	"net/http"
+	"service_auth/internal/service_models"
+)
+
 type Service struct {
-	userStorage userStorage
+	googleConfig service_models.GoogleConfig
+	vkIdConfig   service_models.VKIDConfig
+	userStorage  userStorage
+	httpClient   http.Client
 }
 
-func New(userStorage userStorage) *Service {
+func New(
+	googleConfig service_models.GoogleConfig,
+	vkIdConfig service_models.VKIDConfig,
+	userStorage userStorage,
+) *Service {
+
+	httpClient := http.Client{}
 	return &Service{
-		userStorage: userStorage,
+		googleConfig: googleConfig,
+		vkIdConfig:   vkIdConfig,
+		userStorage:  userStorage,
+		httpClient:   httpClient,
 	}
 }
