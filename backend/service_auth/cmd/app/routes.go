@@ -5,22 +5,20 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"service_auth/internal/routing"
+	"service_auth/internal/routing/auth"
+	"service_auth/internal/routing/refresh"
 )
 
 func (app *application) routes() *mux.Router {
-	authHandler := routing.NewAuthHandler(
+	authHandler := auth.New(
 		app.logger,
 		app.timeProvider,
-		app.userRepository,
-		app.userAuthTokenGenerator,
+		app.authorizer,
 	)
-	refreshHandler := routing.NewRefreshHandler(
+	refreshHandler := refresh.New(
 		app.logger,
 		app.timeProvider,
-		app.sessionManager,
-		app.userRepository,
-		app.userAuthTokenGenerator,
+		app.tokenRefresher,
 	)
 
 	r := mux.NewRouter()

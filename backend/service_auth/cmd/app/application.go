@@ -5,19 +5,23 @@ import (
 	"tools/logger"
 	"tools/mongowrapper"
 
-	"github.com/alexedwards/scs/v2"
-
+	"service_auth/internal/services/authorizer"
+	"service_auth/internal/services/token_refresher"
+	"service_auth/internal/services/user_provider"
+	"service_auth/internal/services/userauthtoken_generator"
 	"service_auth/internal/storage"
-	"service_auth/internal/userauthtoken_generator"
+
+	"github.com/alexedwards/scs/v2"
 )
 
 type application struct {
 	mongowrapper.MongoEnv
-	logger                 *logger.Logger
-	timeProvider           tools.TimeProvider
-	sessionManager         *scs.SessionManager
-	userRepository         *storage.UserRepository
-	userAuthTokenGenerator userauthtoken_generator.UserAuthTokenGenerator
+	logger         *logger.Logger
+	timeProvider   tools.TimeProvider
+	sessionManager *scs.SessionManager
+	// userRepository *storage.UserRepository
+	authorizer     *authorizer.Service
+	tokenRefresher *token_refresher.Service
 }
 
 func createApplication(
@@ -27,11 +31,12 @@ func createApplication(
 	mongoURI string,
 	enableCredentials bool,
 ) (_ *application, err error) {
+	sessionManager := tools.CreateSessionManager(redisAddress)
 	app := &application{
 		MongoEnv:       mongowrapper.NewMongoEnv(logger),
 		logger:         logger,
 		timeProvider:   timeProvider,
-		sessionManager: tools.CreateSessionManager(redisAddress),
+		sessionManager: sessionManager,
 	}
 
 	defer func() {
@@ -45,10 +50,21 @@ func createApplication(
 		return nil, err
 	}
 
-	app.userRepository = storage.NewUserRepository(app.logger, app.MongoWrapper.Client)
-	app.userAuthTokenGenerator = userauthtoken_generator.NewUserAuthTokenGenerator(
-		app.userRepository,
-		app.sessionManager,
+	userRepository := storage.NewUserRepository(app.logger, app.MongoWrapper.Client)
+	userAuthTokenGenerator := userauthtoken_generator.NewUserAuthTokenGenerator(
+		userRepository,
+		sessionManager,
+	)
+	userResolver := user_provider.New(userRepository)
+
+	app.authorizer = authorizer.New(
+		userResolver,
+		userRepository,
+		userAuthTokenGenerator,
+	)
+	app.tokenRefresher = token_refresher.New(
+		userAuthTokenGenerator,
+		sessionManager,
 	)
 
 	return app, nil

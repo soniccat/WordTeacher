@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/api/idtoken"
 
-	serviceModels "service_auth/internal/models"
+	"service_auth/internal/service_models"
 )
 
 // TODO: move in params
@@ -18,7 +18,7 @@ func (h *Service) GoogleUser(
 	context context.Context,
 	token string,
 	deviceType string,
-) (*serviceModels.UserWithNetwork, error) {
+) (*service_models.UserWithNetwork, error) {
 
 	validator, err := idtoken.NewValidator(context)
 	if err != nil {
@@ -35,12 +35,12 @@ func (h *Service) GoogleUser(
 	// TODO: consider to make validation more strict
 	payload, err := validator.Validate(context, token, idToken)
 	if err != nil {
-		return nil, NewErrorInvalidToken(err.Error())
+		return nil, service_models.NewErrorInvalidToken(err.Error())
 	}
 
 	googleUserId, ok := payload.Claims["sub"].(string)
 	if !ok {
-		return nil, NewErrorInvalidToken("google Id Token doesn't have a sub")
+		return nil, service_models.NewErrorInvalidToken("google Id Token doesn't have a sub")
 	}
 
 	googleUser, err := h.userStorage.FindUserById(context, models.Google, googleUserId)
@@ -48,7 +48,7 @@ func (h *Service) GoogleUser(
 		return nil, err
 	}
 
-	return &serviceModels.UserWithNetwork{
+	return &service_models.UserWithNetwork{
 		User: googleUser,
 		Network: models.UserNetwork{
 			NetworkType:   models.Google,

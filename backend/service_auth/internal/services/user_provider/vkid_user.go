@@ -7,7 +7,7 @@ import (
 	"models"
 	"net/http"
 	"net/url"
-	serviceModels "service_auth/internal/models"
+	"service_auth/internal/service_models"
 	"time"
 	"tools"
 )
@@ -22,7 +22,7 @@ func (h *Service) VKUser(
 	context context.Context,
 	token string,
 	deviceType string,
-) (*serviceModels.UserWithNetwork, error) {
+) (*service_models.UserWithNetwork, error) {
 	if deviceType != tools.DeviceTypeAndroid {
 		return nil, errors.New("VKID is supported only in android")
 	}
@@ -61,7 +61,7 @@ func (h *Service) VKUser(
 		return nil, err
 	}
 
-	return &serviceModels.UserWithNetwork{
+	return &service_models.UserWithNetwork{
 		User: vkIDUser,
 		Network: models.UserNetwork{
 			NetworkType:   models.VKID,

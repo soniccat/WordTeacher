@@ -3,7 +3,7 @@ package authorizer
 import (
 	"context"
 	"models"
-	serviceModels "service_auth/internal/models"
+	"service_auth/internal/service_models"
 )
 
 type userResolver interface {
@@ -12,7 +12,7 @@ type userResolver interface {
 		networkType models.UserNetworkType,
 		token string,
 		deviceType string,
-	) (*serviceModels.UserWithNetwork, error)
+	) (*service_models.UserWithNetwork, error)
 }
 
 type userStorage interface {

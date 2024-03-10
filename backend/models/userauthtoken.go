@@ -49,6 +49,7 @@ func New(
 	}
 }
 
+// TODO: replace *scs.SessionManager dep with an interface
 func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken, error) {
 	sessionAccessToken, ok := manager.Get(context, SessionAccessTokenKey).(string)
 	if !ok {

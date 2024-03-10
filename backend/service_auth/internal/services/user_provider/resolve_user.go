@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"models"
-	serviceModels "service_auth/internal/models"
+	"service_auth/internal/service_models"
 )
 
 func (s *Service) ResolveUser(
@@ -12,9 +12,9 @@ func (s *Service) ResolveUser(
 	networkType models.UserNetworkType,
 	token string,
 	deviceType string,
-) (*serviceModels.UserWithNetwork, error) {
+) (*service_models.UserWithNetwork, error) {
 
-	var userWithNetwork *serviceModels.UserWithNetwork
+	var userWithNetwork *service_models.UserWithNetwork
 	var err error
 	if networkType == models.Google {
 		userWithNetwork, err = s.GoogleUser(ctx, token, deviceType)

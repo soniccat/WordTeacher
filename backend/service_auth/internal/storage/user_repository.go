@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"models"
-	appUsearAuthToken "service_auth/internal/userauthtoken"
 	"tools/logger"
 	"tools/mongowrapper"
 
@@ -65,23 +64,7 @@ func (m *UserRepository) InsertUser(context context.Context, user *models.User) 
 	return &newUser, nil
 }
 
-// TODO: move to a service
-func (m *UserRepository) GenerateUserAuthToken(
-	context context.Context,
-	userDbId string,
-	networkType models.UserNetworkType,
-	deviceType string,
-	deviceId string,
-) (*models.UserAuthToken, error) {
-	token, err := appUsearAuthToken.GenerateUserAuthToken(userDbId, networkType, deviceType, deviceId)
-	if err != nil {
-		return nil, err
-	}
-
-	return m.insertUserAuthToken(context, token)
-}
-
-func (m *UserRepository) insertUserAuthToken(
+func (m *UserRepository) InsertUserAuthToken(
 	context context.Context,
 	token *models.UserAuthToken,
 ) (*models.UserAuthToken, error) {
