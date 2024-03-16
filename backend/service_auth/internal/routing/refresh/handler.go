@@ -88,7 +88,12 @@ func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
 			DeviceId:   deviceId,
 		},
 	)
-	if err != nil {
+	if _, ok := err.(*service_models.ErrorInvalidToken); ok {
+		h.SetError(w, err, http.StatusUnauthorized)
+		return
+
+	} else if err != nil {
+		h.SetError(w, err, http.StatusInternalServerError)
 		return
 	}
 
