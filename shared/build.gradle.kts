@@ -19,9 +19,9 @@ repositories {
 }
 
 // For now you have to comment this to be able to build desktop... I'm investigating...
-dependencies {
-    add("kapt", libs.daggerCompiler)
-}
+//dependencies {
+//    add("kapt", libs.daggerCompiler)
+//}
 
 kotlin {
     jvmToolchain(17)

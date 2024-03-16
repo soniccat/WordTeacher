@@ -5,72 +5,39 @@ import (
 )
 
 type CardSet struct {
-	Id               string   `json:"id,omitempty"`
-	Name             string   `json:"name"`
-	Description      string   `json:"description"`
-	Tags             []string `json:"tags"`
-	Cards            []*Card  `json:"cards"`
-	Terms            []string `json:"terms,omitempty"`
-	UserId           string   `json:"userId"` // TODO: consider several owners via a permission filed
-	CreationDate     string   `json:"creationDate"`
-	ModificationDate string   `json:"modificationDate"`
-	CreationId       string   `json:"creationId"`
+	Id                  string      `json:"id,omitempty"`
+	Name                string      `json:"name"`
+	Tags                []string    `json:"tags"`
+	Cards               []*Card     `json:"cards"`
+	Terms               []string    `json:"terms,omitempty"`
+	UserId              string      `json:"userId"` // TODO: consider several owners via a permission filed
+	CreationDate        string      `json:"creationDate"`
+	ModificationDate    string      `json:"modificationDate"`
+	CreationId          string      `json:"creationId"`
+	Info                CardSetInfo `json:"info"`
+	IsAvailableInSearch bool        `json:"isAvailableInSearch"`
 }
 
-func (cs *CardSet) IsEqual(a *CardSet) bool {
-	if cs.Id != a.Id {
-		return false
-	}
-	if cs.Name != a.Name {
-		return false
-	}
-	if cs.Description != a.Description {
-		return false
-	}
-	if !tools.CompareSlices(cs.Tags, a.Tags) {
-		return false
-	}
-	if cs.UserId != a.UserId {
-		return false
-	}
-	if cs.CreationDate != a.CreationDate {
-		return false
-	}
-	if cs.ModificationDate != a.ModificationDate {
-		return false
-	}
-	if cs.CreationId != a.CreationId {
-		return false
-	}
-	if len(cs.Cards) != len(a.Cards) {
-		return false
-	}
-	if !tools.CompareSlices(cs.Terms, a.Terms) {
-		return false
-	}
-	for i, c := range cs.Cards {
-		if !c.IsEqual(a.Cards[i]) {
-			return false
-		}
-	}
-
-	return true
+type CardSetInfo struct {
+	Description string  `json:"description"`
+	Source      *string `json:"source"` // url
 }
 
 func (cs *CardSet) WithoutIDs() *CardSet {
 	return &CardSet{
-		Id:          "",
-		Name:        cs.Name,
-		Description: cs.Description,
-		Tags:        cs.Tags,
+		Id:   "",
+		Name: cs.Name,
+		Tags: cs.Tags,
 		Cards: tools.Map(cs.Cards, func(c *Card) *Card {
 			return c.WithoutIds()
 		}),
-		Terms:            cs.Terms,
-		UserId:           "",
-		CreationDate:     cs.CreationDate,
-		ModificationDate: cs.ModificationDate,
-		CreationId:       cs.CreationId,
+		Terms:               cs.Terms,
+		UserId:              "",
+		CreationDate:        cs.CreationDate,
+		ModificationDate:    cs.ModificationDate,
+		CreationId:          cs.CreationId,
+		Info:                cs.Info,
+		IsAvailableInSearch: cs.IsAvailableInSearch,
 	}
 }
 

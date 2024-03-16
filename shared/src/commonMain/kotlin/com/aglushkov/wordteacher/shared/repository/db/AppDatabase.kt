@@ -159,25 +159,25 @@ class AppDatabase(
     }
 
     inner class CardSets {
-        fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString(), "")
+        fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString(), "", "", null, false)
 
         private fun insertedCardSetId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
 
         fun selectShortCardSets(): List<ShortCardSet> {
-            return db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId ->
+            return db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
                 ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId)
             }).executeAsList()
         }
 
-        fun selectUpdatedCardSets(afterDate: Long): List<CardSet> = db.dBCardSetQueries.selectUpdated(afterDate, mapper = { id, name, date, modificationDate, creationId, remoteId ->
-            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId)
+        fun selectUpdatedCardSets(afterDate: Long): List<CardSet> = db.dBCardSetQueries.selectUpdated(afterDate, mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
+            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch)
         }).executeAsList()
 
         fun selectUpdatedCardSetsIds(sinceDate: Long) =
             db.dBCardSetQueries.selectUpdatedIds(sinceDate).executeAsList()
 
-        fun selectWithoutRemoteId(): List<CardSet> = db.dBCardSetQueries.selectWithoutRemoteId(mapper = { id, name, date, modificationDate, creationId, remoteId ->
-            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId)
+        fun selectWithoutRemoteId(): List<CardSet> = db.dBCardSetQueries.selectWithoutRemoteId(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
+            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch)
         }).executeAsList()
 
         fun changeFlow(): Flow<Int> {
@@ -187,7 +187,7 @@ class AppDatabase(
 
         fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
             // TODO: reorganize db to pull progress from it instead of loading all the cards
-            val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId ->
+            val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
                 ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId)
             }).asFlow()
             val setsWithCardsFlow = selectAllSetIdsWithCards().asFlow()
@@ -215,8 +215,8 @@ class AppDatabase(
             )
         }
 
-        fun selectCardSetWithoutCards(id: Long) = db.dBCardSetQueries.selectCardSet(id) { id, name, date, modificationDate, creationId, remoteId ->
-            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId)
+        fun selectCardSetWithoutCards(id: Long) = db.dBCardSetQueries.selectCardSet(id) { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
+            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch)
         }
 
         fun loadCardSetWithCards(id: Long): CardSet? {
@@ -254,6 +254,9 @@ class AppDatabase(
                     modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
                     creationId = cardSet.creationId,
                     remoteId = cardSet.remoteId,
+                    infoDescription = cardSet.info.description,
+                    infoSource = cardSet.info.source,
+                    isAvailableInSearch = cardSet.isAvailableInSearch,
                 )
                 insertedCarSetId = insertedCardSetId().value!!
                 cardSet.cards.onEach { card ->
@@ -277,6 +280,9 @@ class AppDatabase(
                     modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
                     creationId = cardSet.creationId,
                     remoteId = cardSet.remoteId,
+                    infoDescription = cardSet.info.description,
+                    infoSource = cardSet.info.source,
+                    isAvailableInSearch = cardSet.isAvailableInSearch
                 )
 
                 val currentCards = cards.selectCards(cardSet.id).executeAsList()
@@ -308,6 +314,9 @@ class AppDatabase(
             modificationDate: Long,
             creationId: String,
             remoteId: String,
+            infoDescription: String,
+            infoSource: String?,
+            isAvailableInSearch: Boolean
         ) = db.dBCardSetQueries.updateCardSet(
             name = name,
             date = date,
@@ -315,6 +324,9 @@ class AppDatabase(
             creationId = creationId,
             remoteId = remoteId,
             id = id,
+            infoDescription = infoDescription,
+            infoSource = infoSource,
+            isAvailableInSearch = isAvailableInSearch,
         )
 
         fun updateCardSetRemoteId(remoteId: String, creationId: String) =

@@ -1,10 +1,15 @@
+import kotlin.Boolean;
+
 CREATE TABLE IF NOT EXISTS DBCardSet (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT NOT NULL,
   date INTEGER NOT NULL, -- creation date
   modificationDate INTEGER NOT NULL DEFAULT 0,
   creationId TEXT NOT NULL DEFAULT "",
-  remoteId TEXT NOT NULL DEFAULT ""
+  remoteId TEXT NOT NULL DEFAULT "",
+  infoDescription TEXT NOT NULL DEFAULT "",
+  infoSource TEXT,
+  isAvailableInSearch INTEGER AS Boolean NOT NULL DEFAULT 0
 );
 
 selectAll:
@@ -37,16 +42,16 @@ FROM DBCardSet
 WHERE id = ?;
 
 insert:
-INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId)
-VALUES (?, ?, ?, ?, ?);
+INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 insertCardSet:
-INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId)
+INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch)
 VALUES ?;
 
 updateCardSet:
 UPDATE DBCardSet
-SET name = ?, date = ?, modificationDate = ?, creationId = ?, remoteId = ?
+SET name = ?, date = ?, modificationDate = ?, creationId = ?, remoteId = ?, infoDescription = ?, infoSource = ?, isAvailableInSearch = ?
 WHERE id = ?;
 
 lastInsertedRowId:

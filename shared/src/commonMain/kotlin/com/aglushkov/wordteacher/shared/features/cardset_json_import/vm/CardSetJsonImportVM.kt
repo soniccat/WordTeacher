@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.exception
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardProgress
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.aglushkov.wordteacher.shared.model.CardSetInfo
 import com.aglushkov.wordteacher.shared.model.CardSpan
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -53,6 +54,8 @@ data class ImportCardSet (
     val name: String,
     val cards: List<ImportCard> = emptyList(),
     var terms: List<String> = emptyList(), // for cardsets from search
+    var info: CardSetInfo,
+    var isAvailableInSearch: Boolean,
 )
 
 @Serializable
@@ -128,7 +131,9 @@ open class CardSetJsonImportVMImpl(
                 )
             },
             terms = listOf(),
-            creationId = UUID.randomUUID().toString()
+            creationId = UUID.randomUUID().toString(),
+            info = importCardSet.info,
+            isAvailableInSearch = importCardSet.isAvailableInSearch,
         )
 
         createCardSet(cardSet)

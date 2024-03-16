@@ -41,12 +41,18 @@ message GetCardSetOut {
 message CardSet {
 	string id = 1;
 	string name = 2;
-	string description = 3;
-	repeated string tags = 4;
-	repeated Card cards = 5;
-	string userId = 6;
-	string creationDate = 7;
-	string modificationDate = 8;
+	repeated string tags = 3;
+	repeated Card cards = 4;
+	string userId = 5;
+	string creationDate = 6;
+	string modificationDate = 7;
+	CardSetInfo info = 8;
+	bool isAvailableInSearch = 9;
+}
+
+message CardSetInfo {
+	string description = 1;
+	optional string source = 2;
 }
 
 message Card {

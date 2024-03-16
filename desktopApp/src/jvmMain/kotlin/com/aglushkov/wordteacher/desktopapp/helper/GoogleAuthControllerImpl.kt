@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.features.AuthOpener
 import com.aglushkov.wordteacher.shared.features.Cancelled
 import com.aglushkov.wordteacher.shared.general.GoogleAuthData
 import com.aglushkov.wordteacher.shared.general.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -21,41 +22,41 @@ class GoogleAuthControllerImpl(): GoogleAuthController, AuthOpener.Listener {
             field?.addAuthListener(this)
         }
 
-    private var googleAuthDataState: MutableStateFlow<Resource<GoogleAuthData>> = MutableStateFlow(Resource.Uninitialized())
-    override var googleAuthDataFlow: StateFlow<Resource<GoogleAuthData>> = googleAuthDataState
+    private var authDataState: MutableStateFlow<Resource<NetworkAuthData>> = MutableStateFlow(Resource.Uninitialized())
+    override var authDataFlow: StateFlow<Resource<NetworkAuthData>> = authDataState
 
-    override suspend fun signIn(): Resource<GoogleAuthData> {
+    override suspend fun signIn(): Resource<NetworkAuthData> {
         launchSignIn()
-        googleAuthDataState.takeWhile { !it.isLoadedOrError() }.collect()
-        return googleAuthDataState.value
+        authDataState.takeWhile { !it.isLoadedOrError() }.collect()
+        return authDataState.value
     }
 
-    override fun launchSignIn() {
-        if (googleAuthDataState.value.isLoading()) {
+    private fun launchSignIn() {
+        if (authDataState.value.isLoading()) {
             return
         }
-        googleAuthDataState.value = Resource.Loading()
+        authDataState.value = Resource.Loading()
 
         authOpener?.openWebAuth(networkType = SpaceAuthService.NetworkType.Google)
     }
 
     override fun launchSignOut() {
-        val prevValue = googleAuthDataState.value
-        googleAuthDataState.value = Resource.Uninitialized()
+        val prevValue = authDataState.value
+        authDataState.value = Resource.Uninitialized()
     }
 
     // AuthOpener.Listener
 
     override fun onCompleted(result: AuthOpener.AuthResult) {
         result as AuthOpener.AuthResult.GoogleResult
-        googleAuthDataState.value = Resource.Loaded(result.data)
+        authDataState.value = Resource.Loaded(result.data)
     }
 
     override fun onError(throwable: Throwable) {
         if (throwable is Cancelled) {
-            googleAuthDataState.value = Resource.Uninitialized()
+            authDataState.value = Resource.Uninitialized()
         } else {
-            googleAuthDataState.value = Resource.Error(throwable, canTryAgain = true)
+            authDataState.value = Resource.Error(throwable, canTryAgain = true)
         }
     }
 }

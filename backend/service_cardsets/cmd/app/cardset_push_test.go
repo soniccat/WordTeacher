@@ -473,11 +473,13 @@ func (suite *CardSetPushTestSuite) readPushResponse(writer *httptest.ResponseRec
 
 func createApiCardSet(name string, creationId string, creationDate time.Time, cards []*api.Card) *api.CardSet {
 	return &api.CardSet{
-		Name:             name,
-		Cards:            cards,
-		CreationDate:     tools.TimeToApiDate(creationDate),
-		ModificationDate: tools.TimeToApiDate(creationDate),
-		CreationId:       creationId,
+		Name:                name,
+		Cards:               cards,
+		CreationDate:        tools.TimeToApiDate(creationDate),
+		ModificationDate:    tools.TimeToApiDate(creationDate),
+		CreationId:          creationId,
+		Info:                api.CardSetInfo{},
+		IsAvailableInSearch: false,
 	}
 }
 

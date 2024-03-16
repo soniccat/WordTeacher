@@ -18,6 +18,8 @@ data class CardSet (
     @SerialName("cards") val cards: List<Card> = emptyList(),
     var terms: List<String> = emptyList(), // for cardsets from search
     val creationId: String,
+    val info: CardSetInfo,
+    val isAvailableInSearch: Boolean,
 ) {
     fun findCard(id: Long) =
         cards.firstOrNull { it.id == id }
@@ -35,7 +37,7 @@ data class CardSet (
                     creationId = uuid4().toString(),
                     remoteId = "",
                 )
-            }
+            },
         )
     }
 
@@ -74,5 +76,13 @@ fun CardSet.merge(anotherCardSet: CardSet, newModificationDate: Instant): CardSe
         modificationDate = newModificationDate,
         cards = oldCardSet.cards.mergeCards(newCardSet.cards),
         creationId = newCardSet.creationId,
+        info = newCardSet.info,
+        isAvailableInSearch = newCardSet.isAvailableInSearch,
     )
 }
+
+@Serializable
+data class CardSetInfo(
+    val description: String,
+    val source:      String?,
+)

@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.desktopapp.general.crypto.CertCreator
 import com.aglushkov.wordteacher.desktopapp.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.desktopapp.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
+import com.aglushkov.wordteacher.desktopapp.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.shared.di.ApiBaseUrl
 import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.di.BasePath
@@ -25,6 +26,7 @@ import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.FileOpenCompositeSuccessHandler
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.VKAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -98,6 +100,17 @@ class AppModule {
     @Provides
     fun googleAuthRepositoryImpl(
     ): GoogleAuthController = GoogleAuthControllerImpl()
+
+    @AppComp
+    @Provides
+    fun vkAuthControllerImpl(): VKAuthControllerImpl = VKAuthControllerImpl()
+
+    // TODO: replace with bind
+    @AppComp
+    @Provides
+    fun vkAuthController(
+        impl: VKAuthControllerImpl
+    ): VKAuthController = impl
 
     @AppComp
     @Provides

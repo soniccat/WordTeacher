@@ -54,7 +54,7 @@ func (w *CardSetPullWorker) Start(ctx context.Context) error {
 			for r := range ch {
 				if r.Error != nil {
 					break
-				} else if r.CardSet != nil {
+				} else if r.CardSet != nil && r.CardSet.IsAvailableInSearch {
 					dbCardSet, outErr := model.GRPCCardSetToDb(r.CardSet)
 					if outErr != nil {
 						w.logger.Error.Printf("CardSetPullWorker GRPCCardSetToDb cardset %s %s", r.CardSet.Id, outErr.Error())

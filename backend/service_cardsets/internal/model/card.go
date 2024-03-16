@@ -59,53 +59,6 @@ type DbCard struct {
 	NeedToUpdateExampleSpans    bool                `bson:"needToUpdateExampleSpans"`
 }
 
-func (c *DbCard) IsEqual(a *DbCard) bool {
-	if c.Id != a.Id {
-		return false
-	}
-	if c.Term != a.Term {
-		return false
-	}
-	if c.Transcription != a.Transcription {
-		return false
-	}
-	if c.PartOfSpeech != a.PartOfSpeech {
-		return false
-	}
-	if !tools.SliceComparableEqual(c.Definitions, a.Definitions) {
-		return false
-	}
-	if !tools.SliceComparableEqual(c.Synonyms, a.Synonyms) {
-		return false
-	}
-	if !tools.SliceComparableEqual(c.Examples, a.Examples) {
-		return false
-	}
-	if !tools.DoubleSliceComparableEqual(c.DefinitionTermSpans, a.DefinitionTermSpans) {
-		return false
-	}
-	if !tools.DoubleSliceComparableEqual(c.ExampleTermSpans, a.ExampleTermSpans) {
-		return false
-	}
-	if c.UserId != a.UserId {
-		return false
-	}
-	if c.CreationId != a.CreationId {
-		return false
-	}
-	if !tools.ComparePtrs(c.Progress, a.Progress) {
-		return false
-	}
-	if c.NeedToUpdateDefinitionSpans != a.NeedToUpdateDefinitionSpans {
-		return false
-	}
-	if c.NeedToUpdateExampleSpans != a.NeedToUpdateExampleSpans {
-		return false
-	}
-
-	return true
-}
-
 func (c *DbCard) ToApi() *api.Card {
 	return &api.Card{
 		Id:                          c.Id.Hex(),

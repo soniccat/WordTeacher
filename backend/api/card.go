@@ -1,9 +1,5 @@
 package api
 
-import (
-	"tools"
-)
-
 type CardProgress struct {
 	CurrentLevel     int    `json:"currentLevel" bson:"_id,omitempty"`
 	LastMistakeCount int    `json:"lastMistakeCount" bson:"lastMistakeCount"`
@@ -32,59 +28,6 @@ type Card struct {
 	ModificationDate            string        `json:"modificationDate"`
 	NeedToUpdateDefinitionSpans bool          `json:"needToUpdateDefinitionSpans"`
 	NeedToUpdateExampleSpans    bool          `json:"needToUpdateExampleSpans"`
-}
-
-func (c *Card) IsEqual(a *Card) bool {
-	if c.Id != a.Id {
-		return false
-	}
-	if c.Term != a.Term {
-		return false
-	}
-	if c.Transcription != a.Transcription {
-		return false
-	}
-	if c.PartOfSpeech != a.PartOfSpeech {
-		return false
-	}
-	if !tools.SliceComparableEqual(c.Definitions, a.Definitions) {
-		return false
-	}
-	if !tools.SliceComparableEqual(c.Synonyms, a.Synonyms) {
-		return false
-	}
-	if !tools.SliceComparableEqual(c.Examples, a.Examples) {
-		return false
-	}
-	if !tools.DoubleSliceComparableEqual(c.DefinitionTermSpans, a.DefinitionTermSpans) {
-		return false
-	}
-	if !tools.DoubleSliceComparableEqual(c.ExampleTermSpans, a.ExampleTermSpans) {
-		return false
-	}
-	if c.UserId != a.UserId {
-		return false
-	}
-	if c.CreationId != a.CreationId {
-		return false
-	}
-	if !tools.ComparePtrs(c.Progress, a.Progress) {
-		return false
-	}
-	if c.CreationDate != a.CreationDate {
-		return false
-	}
-	if c.ModificationDate != a.ModificationDate {
-		return false
-	}
-	if c.NeedToUpdateDefinitionSpans != a.NeedToUpdateDefinitionSpans {
-		return false
-	}
-	if c.NeedToUpdateExampleSpans != a.NeedToUpdateExampleSpans {
-		return false
-	}
-
-	return true
 }
 
 func (c *Card) WithoutIds() *Card {

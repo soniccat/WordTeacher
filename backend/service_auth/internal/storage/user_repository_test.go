@@ -4,7 +4,6 @@ import (
 	"context"
 	"models"
 	"testing"
-	"tools"
 	"tools/test"
 
 	"github.com/stretchr/testify/assert"
@@ -36,8 +35,6 @@ func (suite *UserModelTestSuite) TestUserCreationExample() {
 			{
 				NetworkType:   models.Google,
 				NetworkUserId: "testUserId",
-				Email:         "testEmail",
-				Name:          "testName",
 			},
 		},
 	}
@@ -46,7 +43,7 @@ func (suite *UserModelTestSuite) TestUserCreationExample() {
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), insertedUser.Id)
 
-	loadedUser, err := suite.UserModel.FindGoogleUser(ctx, tools.Ptr("testUserId"))
+	loadedUser, err := suite.UserModel.FindUserById(ctx, models.Google, "testUserId")
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), insertedUser, loadedUser)
 }

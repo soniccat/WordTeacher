@@ -82,7 +82,7 @@ open class CardSetsVMImpl(
                 RemoteCardSetViewItem(
                     cardSet.remoteId,
                     cardSet.name,
-                    cardSet.terms,
+                    cardSet.terms.take(10),
                 ) as BaseViewItem<*>
             }
             generateSearchViewItemIds(viewItems)

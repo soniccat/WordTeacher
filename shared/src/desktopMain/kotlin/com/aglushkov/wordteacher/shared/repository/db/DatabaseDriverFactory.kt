@@ -9,7 +9,10 @@ import java.io.File
 actual class DatabaseDriverFactory(val path: String) {
     actual fun createMainDBDriver(): SqlDriver {
         val databasePath = File(path, "test.db")
-        return JdbcSqliteDriver(url = "jdbc:sqlite:${databasePath.absolutePath}")
+        return JdbcSqliteDriver(
+            url = "jdbc:sqlite:${databasePath.absolutePath}",
+            schema = MainDB.Schema,
+        )
     }
 
     actual fun createFrequencyDBDriver(): SqlDriver =
