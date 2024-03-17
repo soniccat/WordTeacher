@@ -54,6 +54,8 @@
     <string name="add_article_error_empty_title">Title is required</string>
     <string name="add_article_create_set_option">Create a new set</string>
 
+    <string name="cardset_info_error_empty_name">Name is required</string>
+
     <string name="learning_title">%d out of %d</string>
     <string name="learning_error">Something went wrong :(</string>
     <string name="learning_wrong_input">Something is wrong</string>

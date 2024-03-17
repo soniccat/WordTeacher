@@ -23,6 +23,12 @@ class CardSetRepository(
     val cardSet: StateFlow<Resource<CardSet>> = stateFlow
     private var loadJob: Job? = null
 
+    fun loadCardSetWithoutCards(id: Long): Flow<Resource<CardSet>> {
+        return databaseWorker.database.cardSets.selectCardSetWithoutCards(id).asFlow().map {
+            tryInResource(canTryAgain = true) { it.executeAsOne() }
+        }
+    }
+
     suspend fun loadCardSet(id: Long) {
         loadJob?.cancel()
         loadJob = scope.launch(Dispatchers.Default) {
