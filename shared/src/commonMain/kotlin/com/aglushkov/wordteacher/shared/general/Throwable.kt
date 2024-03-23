@@ -12,3 +12,8 @@ fun Throwable.toStringDesc(): StringDesc {
         ResourceStringDesc(MR.strings.error_default)
     }
 }
+
+class StringDescThrowable(
+    val stringDesc: StringDesc,
+    cause: Throwable? = null,
+): Throwable(null, cause)

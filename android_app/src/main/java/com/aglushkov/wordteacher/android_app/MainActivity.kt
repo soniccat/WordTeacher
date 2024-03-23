@@ -40,6 +40,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUID
 import com.aglushkov.wordteacher.shared.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
@@ -177,6 +178,15 @@ class MainActivity : AppCompatActivity(), Router {
                     is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.vm.apply {
                         router = mainDecomposeComponent
                     })
+                    is MainDecomposeComponent.Child.CardSetInfo -> CardSetInfoUI(
+                        vm = instance.vm.apply {
+                            router = object : CardSetInfoRouter {
+                                override fun onClosed() {
+                                    mainDecomposeComponent.back()
+                                }
+                            }
+                        }
+                    )
                     is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.vm.apply {
                         router = mainDecomposeComponent
                     }, onBackHandler = {

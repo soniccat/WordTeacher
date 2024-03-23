@@ -1,9 +1,11 @@
 package com.aglushkov.wordteacher.shared.workers
 
+import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Card
+import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -114,13 +116,23 @@ class DatabaseCardWorker(
     }
 
     fun untilFirstEditingFlow() = flow {
-        currentStateFlow.takeWhile { it != State.EDITING }.collect {
-            emit(it)
+        if (currentState != State.EDITING) {
+            currentStateFlow.takeWhile { it != State.EDITING }.collect {
+                emit(it)
+            }
         }
+
         emit(State.EDITING)
     }
 
-    fun startEditing() = pushState(State.EDITING)
+    fun startEditing(): Clearable {
+        pushState(State.EDITING)
+        return object : Clearable {
+            override fun onCleared() {
+                endEditing()
+            }
+        }
+    }
 
     fun endEditing() = popState(State.EDITING)
 
@@ -249,6 +261,14 @@ class DatabaseCardWorker(
         performEditOperation {
             databaseWorker.run {
                 it.cards.updateCard(card, modificationDate)
+            }
+        }
+    }
+
+    suspend fun updateCardSetInfo(cardSet: CardSet) = serialQueue.sendAndWait {
+        performEditOperation {
+            databaseWorker.runCancellable(cardSet.creationId) {
+                it.cardSets.updateCardSetInfo(cardSet)
             }
         }
     }

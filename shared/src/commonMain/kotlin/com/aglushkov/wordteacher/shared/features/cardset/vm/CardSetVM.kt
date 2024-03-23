@@ -107,18 +107,8 @@ open class CardSetVMImpl(
     ).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     init {
-        viewModelScope.launch {
-            databaseCardWorker.startEditing()
-        }
+        addClearable(databaseCardWorker.startEditing())
     }
-
-    override fun onCleared() {
-        super.onCleared()
-        onEndEditing()
-    }
-
-    private fun onEndEditing() =
-        databaseCardWorker.endEditing()
 
     fun restore(newState: CardSetVM.State) {
         state = newState

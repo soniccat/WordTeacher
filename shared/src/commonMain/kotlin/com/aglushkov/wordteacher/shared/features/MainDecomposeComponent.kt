@@ -8,6 +8,8 @@ import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
+import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.CardSetJsonImportDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJsonImportVM
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
@@ -65,6 +67,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
     fun popDialog(config: ChildConfiguration)
     override fun openArticle(id: Long)
     override fun openCardSet(id: Long)
+    fun openCardSetInfo(id: Long)
     override fun openCardSets()
     override fun openLearning(ids: List<Long>)
     fun openLearningSessionResult(results: List<SessionCardResult>)
@@ -77,6 +80,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
     ): Clearable {
         data class Article(val vm: ArticleVM): Child(vm)
         data class CardSet(val vm: CardSetVM): Child(vm)
+        data class CardSetInfo(val vm: CardSetInfoVM): Child(vm)
         data class CardSets(val vm: CardSetsVM): Child(vm)
         data class Learning(val vm: LearningVM): Child(vm)
         data class LearningSessionResult(val vm: LearningSessionResultVM): Child(vm)
@@ -95,18 +99,18 @@ interface MainDecomposeComponent: DefinitionsRouter,
 
     @Serializable
     sealed class ChildConfiguration {
+        @Serializable data class CardSetInfoConfiguration(val id: Long) : ChildConfiguration()
         @Serializable data class ArticleConfiguration(val id: Long) : ChildConfiguration()
         @Serializable data class CardSetConfiguration(val id: Long) : ChildConfiguration()
         @Serializable data class LearningConfiguration(val ids: List<Long>) : ChildConfiguration()
         @Serializable data class LearningSessionResultConfiguration(val results: List<SessionCardResult>) : ChildConfiguration()
         @Serializable data class WebAuthConfiguration(val networkType: SpaceAuthService.NetworkType) : ChildConfiguration()
-        @Serializable object DictConfigs : ChildConfiguration()
-        @Serializable object CardSetJsonImportConfiguration : ChildConfiguration()
-        @Serializable object CardSetsConfiguration : ChildConfiguration()
-        @Serializable object TabsConfiguration : ChildConfiguration()
-
-        @Serializable object AddArticleConfiguration : ChildConfiguration()
-        @Serializable object EmptyDialogConfiguration : ChildConfiguration() // TODO: it seems we can remove that
+        @Serializable data object DictConfigs : ChildConfiguration()
+        @Serializable data object CardSetJsonImportConfiguration : ChildConfiguration()
+        @Serializable data object CardSetsConfiguration : ChildConfiguration()
+        @Serializable data object TabsConfiguration : ChildConfiguration()
+        @Serializable data object AddArticleConfiguration : ChildConfiguration()
+        @Serializable data object EmptyDialogConfiguration : ChildConfiguration() // TODO: it seems we can remove that
     }
 }
 
@@ -154,6 +158,10 @@ class MainDecomposeComponentImpl(
         is MainDecomposeComponent.ChildConfiguration.CardSetConfiguration ->
             MainDecomposeComponent.Child.CardSet(
                 vm = childComponentFactory(componentContext, configuration) as CardSetDecomposeComponent
+            )
+        is MainDecomposeComponent.ChildConfiguration.CardSetInfoConfiguration ->
+            MainDecomposeComponent.Child.CardSetInfo(
+                vm = childComponentFactory(componentContext, configuration) as CardSetInfoDecomposeComponent
             )
         is MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
             MainDecomposeComponent.Child.CardSets(
@@ -203,6 +211,12 @@ class MainDecomposeComponentImpl(
     override fun openCardSet(id: Long) {
         navigation.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.CardSetConfiguration(id)
+        )
+    }
+
+    override fun openCardSetInfo(id: Long) {
+        navigation.pushChildConfigurationIfNotAtTop(
+            MainDecomposeComponent.ChildConfiguration.CardSetInfoConfiguration(id)
         )
     }
 

@@ -14,7 +14,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class SerialQueue(
     dispatcher: CoroutineDispatcher
-) { // like iOS serial queue
+) { // execute suspended tasks one by one like iOS serial queue
     private val scope = CoroutineScope(dispatcher + SupervisorJob())
     private val channel = Channel<TaskItem<*>>(UNLIMITED)
 
@@ -86,7 +86,7 @@ class SerialQueue(
 
             task = aTask
             turnStateJob = scope.launch {
-                kotlinx.coroutines.delay(time)
+                delay(time)
                 readyState.value = true
             }
 

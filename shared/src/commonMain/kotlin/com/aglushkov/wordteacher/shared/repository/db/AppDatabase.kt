@@ -273,17 +273,7 @@ class AppDatabase(
             cardSet: CardSet
         ): CardSet {
             db.transaction {
-                updateCardSet(
-                    id = cardSet.id,
-                    name = cardSet.name,
-                    date = cardSet.creationDate.toEpochMilliseconds(),
-                    modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
-                    creationId = cardSet.creationId,
-                    remoteId = cardSet.remoteId,
-                    infoDescription = cardSet.info.description,
-                    infoSource = cardSet.info.source,
-                    isAvailableInSearch = cardSet.isAvailableInSearch
-                )
+                updateCardSetInfo(cardSet)
 
                 val currentCards = cards.selectCards(cardSet.id).executeAsList()
                 val currentCardSet = currentCards.toMutableSet()
@@ -307,7 +297,21 @@ class AppDatabase(
             return cardSet
         }
 
-        private fun updateCardSet(
+        fun updateCardSetInfo(cardSet: CardSet) {
+            updateCardSetInfo(
+                id = cardSet.id,
+                name = cardSet.name,
+                date = cardSet.creationDate.toEpochMilliseconds(),
+                modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
+                creationId = cardSet.creationId,
+                remoteId = cardSet.remoteId,
+                infoDescription = cardSet.info.description,
+                infoSource = cardSet.info.source,
+                isAvailableInSearch = cardSet.isAvailableInSearch
+            )
+        }
+
+        private fun updateCardSetInfo(
             id: Long,
             name: String,
             date: Long,

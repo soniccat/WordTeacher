@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.shared.general.StringDescThrowable
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -70,8 +71,15 @@ fun <T> LoadingStatusView(
                     )
                 }
                 resource is Resource.Error -> {
+                    val throwable = resource.throwable
+                    val text = if (throwable is StringDescThrowable) {
+                        throwable.stringDesc.localized()
+                    } else {
+                        errorText
+                    }
+
                     LoadingStatusViewState.Error(
-                        text = errorText,
+                        text = text,
                         tryAgainText = stringResource(MR.strings.error_try_again)
                     )
                 }

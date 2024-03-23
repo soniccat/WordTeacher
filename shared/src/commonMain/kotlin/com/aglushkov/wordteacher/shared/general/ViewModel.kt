@@ -11,8 +11,15 @@ interface Clearable {
 
 open class ViewModel: Clearable {
     val viewModelScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var clearables = mutableListOf<Clearable>()
+
+    fun addClearable(clearable: Clearable) {
+        clearables.add(clearable)
+    }
 
     override fun onCleared() {
+        clearables.onEach(Clearable::onCleared)
+        clearables.clear()
         viewModelScope.cancel()
     }
 }

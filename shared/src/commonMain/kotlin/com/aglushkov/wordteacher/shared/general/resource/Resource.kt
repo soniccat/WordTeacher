@@ -61,11 +61,12 @@ sealed interface Resource<T> {
 
     fun <R> transform(
         from: Resource<R> = Uninitialized(),
+        errorTransformer: ((Throwable) -> Throwable)? = null,
         loadedDataTransformer: (T) -> R
     ): Resource<R> = when (this) {
         is Loaded -> from.toLoaded(data = loadedDataTransformer(data))
-        is Loading -> from.toLoading(data = data?.let{ loadedDataTransformer(it) }, canLoadNextPage, version)
-        is Error -> from.toError(throwable, canTryAgain, data = data?.let{ loadedDataTransformer(it) }, canLoadNextPage, version)
+        is Loading -> from.toLoading(data = data?.let { loadedDataTransformer(it) }, canLoadNextPage, version)
+        is Error -> from.toError(throwable, canTryAgain, data = data?.let { loadedDataTransformer(it) }, canLoadNextPage, version)
         is Uninitialized -> from.toUninitialized()
     }
 

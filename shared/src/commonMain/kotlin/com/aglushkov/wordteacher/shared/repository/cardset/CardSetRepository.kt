@@ -1,14 +1,15 @@
 package com.aglushkov.wordteacher.shared.repository.cardset
 
+import com.aglushkov.wordteacher.db.DBCardSet
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -23,9 +24,15 @@ class CardSetRepository(
     val cardSet: StateFlow<Resource<CardSet>> = stateFlow
     private var loadJob: Job? = null
 
-    fun loadCardSetWithoutCards(id: Long): Flow<Resource<CardSet>> {
+    fun cardSetWithoutCardsFlow(id: Long): Flow<Resource<CardSet>> {
         return databaseWorker.database.cardSets.selectCardSetWithoutCards(id).asFlow().map {
             tryInResource(canTryAgain = true) { it.executeAsOne() }
+        }
+    }
+
+    fun loadCardSetWithoutCards(id: Long): Flow<Resource<CardSet>> {
+        return loadResource {
+            databaseWorker.database.cardSets.selectCardSetWithoutCards(id).executeAsOne()
         }
     }
 
