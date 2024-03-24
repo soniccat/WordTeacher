@@ -2,6 +2,8 @@ package com.aglushkov.wordteacher.shared.features.cardset_info.di
 
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
+import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
@@ -22,21 +24,15 @@ class CardSetInfoModule {
     ) = CardSetRepository(databaseWorker, timeSource)
 
     @Provides
-    fun cardSetDecomposeComponent(
-        state: CardSetVM.State,
-        cardSetRepository: CardSetRepository,
-        wordFrequencyGradationProvider: WordFrequencyGradationProvider,
-        databaseCardWorker: DatabaseCardWorker,
+    fun cardSetInfoDecomposeComponent(
         componentContext: ComponentContext,
-        timeSource: TimeSource,
-        idGenerator: IdGenerator
-    ) = CardSetDecomposeComponent(
-        state,
-        cardSetRepository,
-        wordFrequencyGradationProvider,
-        databaseCardWorker,
+        initState: CardSetInfoVM.State,
+        databaseCardWorker: DatabaseCardWorker,
+        cardSetRepository: CardSetRepository,
+    ) = CardSetInfoDecomposeComponent(
         componentContext,
-        timeSource,
-        idGenerator
+        initState,
+        databaseCardWorker,
+        cardSetRepository,
     )
 }

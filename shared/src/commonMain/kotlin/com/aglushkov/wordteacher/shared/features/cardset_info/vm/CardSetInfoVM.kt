@@ -68,7 +68,6 @@ open class CardSetInfoVMImpl(
     restoredState: CardSetInfoVM.State,
     private val databaseCardWorker: DatabaseCardWorker,
     private val cardSetRepository: CardSetRepository,
-    private val idGenerator: IdGenerator,
 ): ViewModel(), CardSetInfoVM {
     override var router: CardSetInfoRouter? = null
     final override val state: CardSetInfoVM.State = restoredState
@@ -107,15 +106,8 @@ open class CardSetInfoVMImpl(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     init {
-        if (databaseCardWorker.currentState != DatabaseCardWorker.State.EDITING) {
-            addClearable(databaseCardWorker.startEditing())
-        }
+        addClearable(databaseCardWorker.startEditing())
         loadCardSet()
-
-        // subscribe on card set db state to render
-        viewModelScope.launch {
-            cardSetRepository.cardSetWithoutCardsFlow(state.id).collect(cardSetState)
-        }
 
         // subscribe on input state to update db data
         viewModelScope.launch {

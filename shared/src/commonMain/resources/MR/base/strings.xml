@@ -55,6 +55,8 @@
     <string name="add_article_create_set_option">Create a new set</string>
 
     <string name="cardset_info_error_empty_name">Name is required</string>
+    <string name="cardset_info_field_name_hint">Title</string>
+    <string name="cardset_info_field_description_hint">Text</string>
 
     <string name="learning_title">%d out of %d</string>
     <string name="learning_error">Something went wrong :(</string>
@@ -114,7 +116,7 @@
     <string name="cardsets_section_ready_to_learn">Ready to learn:</string>
     <string name="cardsets_section_not_ready_to_learn">Come tomorrow:</string>
     <string name="cardsets_section_done">Done:</string>
-    <string name="cardset_info_error">Can't load card set</string>
+    <string name="cardset_info_error">Can\'t load card set</string>
 
     <string name="card_title_placeholder">Enter name</string>
     <string name="card_transcription_placeholder">Enter transcription</string>

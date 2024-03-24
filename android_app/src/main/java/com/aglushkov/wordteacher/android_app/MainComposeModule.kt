@@ -13,6 +13,8 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.di.DaggerDictConfigsComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.di.DaggerCardSetInfoComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.arkivanov.decompose.ComponentContext
@@ -49,6 +51,13 @@ class MainComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .cardSetsDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.CardSetInfoConfiguration ->
+                    DaggerCardSetInfoComponent.builder()
+                        .setComponentContext(context)
+                        .setInitialState(CardSetInfoVM.State(configuration.id))
+                        .setDeps(appComponent)
+                        .build()
+                        .cardSetInfoDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.TabsConfiguration ->
                     DaggerTabComposeComponent.builder()
                         .setComponentContext(context)

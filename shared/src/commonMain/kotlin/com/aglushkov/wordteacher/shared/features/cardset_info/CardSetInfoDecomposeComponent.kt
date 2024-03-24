@@ -12,7 +12,6 @@ class CardSetInfoDecomposeComponent(
     initialState: CardSetInfoVM.State,
     databaseCardWorker: DatabaseCardWorker,
     cardSetRepository: CardSetRepository,
-    idGenerator: IdGenerator,
 ) : CardSetInfoVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -20,7 +19,6 @@ class CardSetInfoDecomposeComponent(
     ) ?: initialState,
     databaseCardWorker,
     cardSetRepository,
-    idGenerator,
 ), ComponentContext by componentContext {
 
     init {

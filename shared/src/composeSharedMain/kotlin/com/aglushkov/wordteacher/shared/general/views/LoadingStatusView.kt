@@ -18,6 +18,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.stringResource
+import dev.icerock.moko.resources.compose.localized
 
 @Composable
 fun <T> LoadingStatusView(

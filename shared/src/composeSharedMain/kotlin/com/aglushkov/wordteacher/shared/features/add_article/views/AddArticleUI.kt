@@ -34,6 +34,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.OutlinedTextFieldWithError
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -166,7 +167,6 @@ private fun AddArticlesFieldsUI(
         }
     } else {
         val focusRequester = remember { FocusRequester() }
-        val hasTitleError = remember(uiState.data()?.titleError) { uiState.data()?.titleError != null }
         val scrollableState = rememberScrollState()
         var wasTitleFocused by remember { mutableStateOf(false) }
         val focusManager = LocalFocusManager.current
@@ -181,54 +181,23 @@ private fun AddArticlesFieldsUI(
                     bottom = 88.dp,
                 )
         ) {
-            OutlinedTextField(
+            OutlinedTextFieldWithError(
                 value = data.title,
                 onValueChange = { vm.onTitleChanged(it) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester)
-                    .onFocusChanged {
-                        if (it.isFocused) {
-                            wasTitleFocused = true
-                        }
+                hint = stringResource(MR.strings.add_article_field_title_hint),
+                errorText = data.titleError,
+                onFocusChanged = {
+                    if (it.isFocused) {
+                        wasTitleFocused = true
+                    }
 
-                        if (wasTitleFocused) {
-                            vm.onTitleFocusChanged(it.isFocused)
-                        }
-                    },
-                label = { Text(stringResource(MR.strings.add_article_field_title_hint)) },
-                isError = hasTitleError,
-                trailingIcon = {
-                    if (hasTitleError) {
-                        Icon(
-                            painter = painterResource(MR.images.error_24),
-                            contentDescription = null
-                        )
+                    if (wasTitleFocused) {
+                        vm.onTitleFocusChanged(it.isFocused)
                     }
                 },
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    }
-                ),
-                singleLine = true
+                focusRequester = focusRequester,
+                focusManager = focusManager,
             )
-
-            Box(
-                modifier = Modifier
-                    .defaultMinSize(minHeight = 16.dp)
-                    .padding(horizontal = 16.dp)
-            ) {
-                val titleErrorDesc = data.titleError
-                if (titleErrorDesc != null) {
-                    Text(
-                        titleErrorDesc.localized(),
-                        color = MaterialTheme.colors.error,
-                        style = MaterialTheme.typography.caption
-                    )
-                }
-            }
 
             Row(
                 modifier = Modifier

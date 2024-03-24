@@ -40,6 +40,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUID
 import com.aglushkov.wordteacher.shared.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
+import com.aglushkov.wordteacher.shared.features.cardset_info.views.CardSetInfoUI
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI

@@ -1,17 +1,25 @@
 package com.aglushkov.wordteacher.shared.features.cardset_info.views
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
@@ -24,9 +32,14 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.shared.events.CompletionData
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
@@ -37,6 +50,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.OutlinedTextFieldWithError
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -73,7 +87,7 @@ fun CardSetInfoUI(
                 },
             )
 
-            if (!uiStateRes.isLoaded() && uiStateData == null) {
+            if (!uiStateRes.isLoaded() || uiStateData == null) {
                 LoadingStatusView(
                     resource = uiStateRes,
                     loadingText = null,
@@ -81,8 +95,78 @@ fun CardSetInfoUI(
                     vm.onTryAgainPressed()
                 }
             } else {
-
+                CardSetInfoFieldsUI(vm, uiStateData)
             }
         }
+    }
+}
+
+@Composable
+fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
+    val focusRequester = remember { FocusRequester() }
+    val scrollableState = rememberScrollState()
+//    var wasTitleFocused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollableState)
+            .padding(
+                top = LocalDimens.current.contentPadding,
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+                bottom = 88.dp,
+            )
+    ) {
+        OutlinedTextFieldWithError(
+            value = uiState.name,
+            onValueChange = { vm.onNameChanged(it) },
+            hint = stringResource(MR.strings.cardset_info_field_name_hint),
+            errorText = uiState.nameError,
+//            onFocusChanged = {
+//                if (it.isFocused) {
+//                    wasTitleFocused = true
+//                }
+//
+//                if (wasTitleFocused) {
+//                    vm.onTitleFocusChanged(it.isFocused)
+//                }
+//            },
+            focusRequester = focusRequester,
+            focusManager = focusManager,
+        )
+
+        OutlinedTextField(
+            value = uiState.description,
+            onValueChange = { vm.onDescriptionChanged(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .sizeIn(minHeight = with(LocalDensity.current) {
+                    (42 * 2).sp.toDp()
+                }),
+            label = { Text(stringResource(MR.strings.cardset_info_field_description_hint)) }
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = { vm.onIsAvailableInSearchChanged(!uiState.isAvailableInSearch) })
+                .padding(top = 16.dp, bottom = 16.dp)
+        ) {
+            Text(
+                text = stringResource(MR.strings.add_article_create_set_option),
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .weight(1.0f)
+            )
+            Checkbox(
+                checked = uiState.isAvailableInSearch,
+                onCheckedChange = null
+            )
+        }
+    }
+
+    LaunchedEffect("focus") {
+        focusRequester.requestFocus()
     }
 }

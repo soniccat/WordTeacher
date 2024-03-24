@@ -126,6 +126,12 @@ class DatabaseCardWorker(
     }
 
     fun startEditing(): Clearable {
+        if (currentState == State.EDITING) {
+            return object : Clearable {
+                override fun onCleared() {}
+            }
+        }
+
         pushState(State.EDITING)
         return object : Clearable {
             override fun onCleared() {
