@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigCreateViewItem
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigDictViewItem
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigHeaderViewItem
+import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigLoadingViewItem
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigTextViewItem
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigYandexViewItem
@@ -48,6 +49,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.InlineTextField
+import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -144,6 +146,9 @@ private fun showDictConfigsItem(
                 text = { Text(item.firstItem(), style = LocalAppTypography.current.settingsText) }
             )
         }
+    }
+    is ConfigLoadingViewItem -> {
+        LoadingViewItemUI()
     }
     else -> {
         Text(

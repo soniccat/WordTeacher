@@ -109,7 +109,6 @@ fun CardSetInfoUI(
 fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
     val focusRequester = remember { FocusRequester() }
     val scrollableState = rememberScrollState()
-//    var wasTitleFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
         var nameState by remember { mutableStateOf(TextFieldValue(uiState.name, TextRange(uiState.name.length))) }
     var descriptionState by remember { mutableStateOf(TextFieldValue(uiState.description, TextRange(uiState.description.length))) }
@@ -133,15 +132,6 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
             },
             hint = stringResource(MR.strings.cardset_info_field_name_hint),
             errorText = uiState.nameError,
-//            onFocusChanged = {
-//                if (it.isFocused) {
-//                    wasTitleFocused = true
-//                }
-//
-//                if (wasTitleFocused) {
-//                    vm.onTitleFocusChanged(it.isFocused)
-//                }
-//            },
             focusRequester = focusRequester,
             focusManager = focusManager,
         )

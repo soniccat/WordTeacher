@@ -73,7 +73,7 @@ open class CardSetInfoVMImpl(
     final override val state: CardSetInfoVM.State = restoredState
 
     private val cardSetState = MutableStateFlow<Resource<CardSet>>(Resource.Uninitialized())
-    private val inputState = MutableStateFlow<CardSetInfoVM.InputState>(CardSetInfoVM.InputState())
+    private val inputState = MutableStateFlow(CardSetInfoVM.InputState())
     override val uiStateFlow: StateFlow<Resource<CardSetInfoVM.UIState>> = combine(
         combine(cardSetState, databaseCardWorker.untilFirstEditingFlow()) { cardSetState, workerState ->
             if (workerState == DatabaseCardWorker.State.EDITING) {
@@ -99,9 +99,7 @@ open class CardSetInfoVMImpl(
                 description = inputState.description ?: cardSet.info.description,
                 source = inputState.source ?: cardSet.info.source,
                 isAvailableInSearch = inputState.isAvailableInSearch ?: cardSet.isAvailableInSearch,
-            ).also { _ ->
-//                syncInputStateWithCardSet(inputState, cardSet)
-            }
+            )
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
@@ -115,7 +113,7 @@ open class CardSetInfoVMImpl(
                 cardSetState.value.data()?.let { dbCardSet ->
                     databaseCardWorker.updateCardSetInfo(
                         dbCardSet.copy(
-                            name = lastInputState.name ?: dbCardSet.name,
+                            name = lastInputState.validatedName ?: dbCardSet.name,
                             info = dbCardSet.info.copy(
                                 description = lastInputState.description ?: dbCardSet.info.description,
                                 source = lastInputState.source ?: dbCardSet.info.source,
@@ -153,35 +151,4 @@ open class CardSetInfoVMImpl(
             cardSetRepository.loadCardSetWithoutCards(state.id).collect(cardSetState)
         }
     }
-
-//    private fun syncInputStateWithCardSet(
-//        inputState: CardSetInfoVM.InputState,
-//        cardSet: CardSet
-//    ) {
-//        // clear inputState changes if they match cardset
-//        this.inputState.update {
-//            it.copy(
-//                name = if (inputState.name == cardSet.name) {
-//                    null
-//                } else {
-//                    it.name
-//                },
-//                description = if (inputState.description == cardSet.info.description) {
-//                    null
-//                } else {
-//                    it.description
-//                },
-//                source = if (inputState.source == cardSet.info.source) {
-//                    null
-//                } else {
-//                    it.source
-//                },
-//                isAvailableInSearch = if (inputState.isAvailableInSearch == cardSet.isAvailableInSearch) {
-//                    null
-//                } else {
-//                    it.isAvailableInSearch
-//                },
-//            )
-//        }
-//    }
 }

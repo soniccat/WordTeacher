@@ -71,15 +71,22 @@ class DictRepositoryImpl(
         }
 
         val currentDicts = dicts
-        fileSystem.listOrNull(path)?.onEach { filePath ->
-            val isDictLoaded = currentDicts.value.data()?.firstOrNull {
-                it.path == filePath
-            } != null
-            if (!isDictLoaded) {
-                dictFactory.createDict(filePath)?.let { dict ->
-                    dict.load()
-                    dicts.update {
-                        Resource.Loaded( (it.data() ?: emptyList()) + listOf(dict))
+        val filePaths = fileSystem.listOrNull(path).orEmpty()
+        if (filePaths.isEmpty()) {
+            dicts.update {
+                Resource.Loaded( emptyList())
+            }
+        } else {
+            filePaths.onEach { filePath ->
+                val isDictLoaded = currentDicts.value.data()?.firstOrNull {
+                    it.path == filePath
+                } != null
+                if (!isDictLoaded) {
+                    dictFactory.createDict(filePath)?.let { dict ->
+                        dict.load()
+                        dicts.update {
+                            Resource.Loaded((it.data() ?: emptyList()) + listOf(dict))
+                        }
                     }
                 }
             }

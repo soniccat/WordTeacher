@@ -18,6 +18,7 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
+import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -80,17 +81,7 @@ private fun showSettingsItem(
         )
     }
     is SettingsViewLoading -> {
-        val side = 30.dp
-        Box(
-            modifier = Modifier.padding(
-                start = LocalDimens.current.contentPadding,
-                end = LocalDimens.current.contentPadding,
-            ).size(side, side)
-        ) {
-            CircularProgressIndicator(
-                color = Color.LightGray.copy(alpha = 0.2f)
-            )
-        }
+        LoadingViewItemUI()
     }
     is SettingsViewAuthButtonItem -> {
         Button(
