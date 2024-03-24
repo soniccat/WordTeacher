@@ -8,6 +8,8 @@ import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.article.di.DaggerArticleComposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.di.DaggerCardSetComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
+import com.aglushkov.wordteacher.shared.features.cardset_info.di.DaggerCardSetInfoComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.di.DaggerCardSetJsonImportComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
@@ -40,6 +42,13 @@ class MainComposeModule {
                         .setState(CardSetVM.State(configuration.id))
                         .build()
                         .cardSetDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.CardSetInfoConfiguration ->
+                    DaggerCardSetInfoComponent.builder()
+                        .setComponentContext(context)
+                        .setInitialState(CardSetInfoVM.State(configuration.id))
+                        .setDeps(appComponent)
+                        .build()
+                        .cardSetInfoDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration ->
                     DaggerCardSetsComponent.builder()
                         .setComponentContext(context)

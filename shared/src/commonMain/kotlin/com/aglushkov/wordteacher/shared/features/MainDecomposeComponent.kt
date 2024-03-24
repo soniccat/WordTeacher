@@ -54,7 +54,6 @@ import kotlinx.serialization.Serializable
 
 interface MainDecomposeComponent: DefinitionsRouter,
     CardSetsRouter,
-    CardSetRouter,
     ArticlesRouter,
     ArticleRouter,
     SettingsRouter,
@@ -67,7 +66,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
     fun popDialog(config: ChildConfiguration)
     override fun openArticle(id: Long)
     override fun openCardSet(id: Long)
-    override fun openCardSetInfo(id: Long)
+    fun openCardSetInfo(id: Long)
     override fun openCardSets()
     override fun openLearning(ids: List<Long>)
     fun openLearningSessionResult(results: List<SessionCardResult>)
@@ -242,10 +241,6 @@ class MainDecomposeComponentImpl(
         navigation.pushChildConfigurationIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.DictConfigs
         )
-    }
-
-    override fun closeCardSet() {
-        back()
     }
 
     override fun openLearningSessionResult(results: List<SessionCardResult>) {
