@@ -67,7 +67,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
     fun popDialog(config: ChildConfiguration)
     override fun openArticle(id: Long)
     override fun openCardSet(id: Long)
-    fun openCardSetInfo(id: Long)
+    override fun openCardSetInfo(id: Long)
     override fun openCardSets()
     override fun openLearning(ids: List<Long>)
     fun openLearningSessionResult(results: List<SessionCardResult>)

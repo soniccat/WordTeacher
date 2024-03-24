@@ -16,8 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
@@ -170,6 +172,8 @@ private fun AddArticlesFieldsUI(
         val scrollableState = rememberScrollState()
         var wasTitleFocused by remember { mutableStateOf(false) }
         val focusManager = LocalFocusManager.current
+        var titleState by remember { mutableStateOf(TextFieldValue(data.title, TextRange(data.title.length))) }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -182,8 +186,11 @@ private fun AddArticlesFieldsUI(
                 )
         ) {
             OutlinedTextFieldWithError(
-                value = data.title,
-                onValueChange = { vm.onTitleChanged(it) },
+                value = titleState,
+                onValueChange = {
+                    titleState = it
+                    vm.onTitleChanged(titleState.text)
+                },
                 hint = stringResource(MR.strings.add_article_field_title_hint),
                 errorText = data.titleError,
                 onFocusChanged = {

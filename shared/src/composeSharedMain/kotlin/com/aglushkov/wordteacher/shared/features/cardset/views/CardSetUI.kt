@@ -50,11 +50,9 @@ import dev.icerock.moko.resources.compose.localized
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
-    val coroutineScope = rememberCoroutineScope()
     val cardSet by vm.cardSet.collectAsState()
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
-    val focusManager = LocalFocusManager.current
     val events by vm.eventFlow.collectAsState(initial = emptyList())
     val focusEvent by remember {
         derivedStateOf {
@@ -77,6 +75,17 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 ) {
                     Icon(
                         painter = painterResource(MR.images.arrow_back_24),
+                        contentDescription = null,
+                        tint = LocalContentColor.current
+                    )
+                }
+            },
+            actions = {
+                IconButton(
+                    onClick = { vm.onInfoPressed() }
+                ) {
+                    Icon(
+                        painter = painterResource(MR.images.info_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )

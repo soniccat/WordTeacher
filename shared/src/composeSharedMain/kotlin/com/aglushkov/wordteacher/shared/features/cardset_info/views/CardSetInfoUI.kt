@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardset_info.views
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.shared.events.CompletionData
@@ -69,11 +72,12 @@ fun CardSetInfoUI(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(color = MaterialTheme.colors.background)
             .then(modifier)
     ) {
         Column {
             TopAppBar(
-                title = { Text(text = stringResource(MR.strings.add_article_title)) },
+                title = { Text(text = stringResource(MR.strings.cardset_info_title)) },
                 navigationIcon = {
                     IconButton(
                         onClick = { vm.router?.onClosed() }
@@ -107,6 +111,9 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
     val scrollableState = rememberScrollState()
 //    var wasTitleFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+        var nameState by remember { mutableStateOf(TextFieldValue(uiState.name, TextRange(uiState.name.length))) }
+    var descriptionState by remember { mutableStateOf(TextFieldValue(uiState.description, TextRange(uiState.description.length))) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -119,8 +126,11 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
             )
     ) {
         OutlinedTextFieldWithError(
-            value = uiState.name,
-            onValueChange = { vm.onNameChanged(it) },
+            value = nameState,
+            onValueChange = {
+                nameState = it
+                vm.onNameChanged(it.text)
+            },
             hint = stringResource(MR.strings.cardset_info_field_name_hint),
             errorText = uiState.nameError,
 //            onFocusChanged = {
@@ -137,8 +147,11 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
         )
 
         OutlinedTextField(
-            value = uiState.description,
-            onValueChange = { vm.onDescriptionChanged(it) },
+            value = descriptionState,
+            onValueChange = {
+                descriptionState = it
+                vm.onDescriptionChanged(it.text)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .sizeIn(minHeight = with(LocalDensity.current) {
@@ -154,7 +167,7 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                 .padding(top = 16.dp, bottom = 16.dp)
         ) {
             Text(
-                text = stringResource(MR.strings.add_article_create_set_option),
+                text = stringResource(MR.strings.cardset_info_enable_sharing),
                 modifier = Modifier
                     .padding(end = 16.dp)
                     .weight(1.0f)

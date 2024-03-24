@@ -40,6 +40,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUID
 import com.aglushkov.wordteacher.shared.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
 import com.aglushkov.wordteacher.shared.features.cardset_info.views.CardSetInfoUI
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
@@ -176,9 +177,21 @@ class MainActivity : AppCompatActivity(), Router {
                             definitionsVM.router = mainDecomposeComponent
                         }
                     )
-                    is MainDecomposeComponent.Child.CardSet -> CardSetUI(vm = instance.vm.apply {
-                        router = mainDecomposeComponent
-                    })
+                    is MainDecomposeComponent.Child.CardSet -> CardSetUI(
+                        vm = instance.vm.apply {
+                            router = object : CardSetRouter {
+                                override fun openLearning(ids: List<Long>) {
+                                    mainDecomposeComponent.openLearning(ids)
+                                }
+                                override fun closeCardSet() {
+                                    mainDecomposeComponent.back()
+                                }
+                                override fun openCardSetInfo(id: Long) {
+                                    mainDecomposeComponent.openCardSetInfo(id)
+                                }
+                            }
+                        }
+                    )
                     is MainDecomposeComponent.Child.CardSetInfo -> CardSetInfoUI(
                         vm = instance.vm.apply {
                             router = object : CardSetInfoRouter {
@@ -353,10 +366,6 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun openLearning(ids: List<Long>) {
         mainDecomposeComponent.openLearning(ids)
-    }
-
-    override fun closeCardSet() {
-        mainDecomposeComponent.back()
     }
 
     override fun openJsonImport() {

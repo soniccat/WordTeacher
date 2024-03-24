@@ -40,6 +40,7 @@ interface CardSetVM: Clearable {
     fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long)
     fun onBackPressed()
     fun onTryAgainClicked()
+    fun onInfoPressed()
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun getPlaceholder(viewItem: BaseViewItem<*>): StringDesc?
 
@@ -260,6 +261,10 @@ open class CardSetVMImpl(
 
     override fun onTryAgainClicked() {
         // TODO: do sth with articlesRepository
+    }
+
+    override fun onInfoPressed() {
+        router?.openCardSetInfo(state.cardSetId)
     }
 
     override fun onItemTextChanged(text: String, item: BaseViewItem<*>, cardId: Long) {
