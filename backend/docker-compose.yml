@@ -172,6 +172,33 @@ services:
       - /tmp/mongodatadb:/data/db
       - /tmp/mongodataconfigdb:/data/configdb
 
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+     - '3000:3000'
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.15
+    volumes:
+      - ${VOLUME_GRAFANA}:/var/lib/grafana
+
+  graphite:
+    image: graphiteapp/graphite-statsd
+    container_name: graphite
+    restart: always
+    ports:
+     - '8080:8080'
+     - '2003:2003'
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.16
+    volumes:
+      - ${VOLUME_GRAPHITECONFIG}:/opt/graphite/conf
+      - ${VOLUME_GRAPHITEDATA}:/opt/graphite/storage
+      - ${VOLUME_GRAPHITESTATSDCONFIG}:/opt/statsd/config
+
 networks:
   mongo_net:
     driver: bridge
@@ -218,3 +245,28 @@ volumes:
 #      o: bind
 #      type: none
 #      device: "${VOLUME_MONGOCONFIG_PATH}"
+  grafana-storage:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${VOLUME_GRAFANA_PATH}"
+  grafana-storage-test:
+  graphite-config:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${VOLUME_GRAPHITECONFIG_PATH}"
+  graphite-data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${VOLUME_GRAPHITEDATA_PATH}"
+  graphite-statsdconfig:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "${VOLUME_GRAPHITESTATSDCONFIG_PATH}"
