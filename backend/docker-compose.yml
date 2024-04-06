@@ -172,6 +172,25 @@ services:
       - /tmp/mongodatadb:/data/db
       - /tmp/mongodataconfigdb:/data/configdb
 
+  mongo-exporter:
+    container_name: "mongo-exporter${TEST_SUFFIX}"
+    hostname: "mongo-exporter"
+    image: percona/mongodb_exporter:0.40.0
+    command:
+      - '--mongodb.uri=mongodb://mongo:${MONGODB_PORT}'
+      - '--collector.diagnosticdata'
+      - '--collect-all'
+      - '--compatible-mode'
+    ports:
+     - '9216:9216'
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.17
+    # environment:
+    #   - 'MONGODB_URI=mongodb://mongo:${MONGODB_PORT}'
+    depends_on:
+      - mongosetup
+
   grafana:
     image: grafana/grafana-enterprise
     container_name: grafana
@@ -184,20 +203,21 @@ services:
     volumes:
       - ${VOLUME_GRAFANA}:/var/lib/grafana
 
-  graphite:
-    image: graphiteapp/graphite-statsd
-    container_name: graphite
-    restart: always
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--web.listen-address=:9091'
+      - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
-     - '8080:8080'
-     - '2003:2003'
+      - 9091:9091
     networks:
       mongo_net:
         ipv4_address: 172.16.0.16
+    restart: unless-stopped
     volumes:
-      - ${VOLUME_GRAPHITECONFIG}:/opt/graphite/conf
-      - ${VOLUME_GRAPHITEDATA}:/opt/graphite/storage
-      - ${VOLUME_GRAPHITESTATSDCONFIG}:/opt/statsd/config
+      - ./prometheus:/etc/prometheus
+      - ${VOLUME_PROMETHEUS}:/prometheus
 
 networks:
   mongo_net:
@@ -252,21 +272,10 @@ volumes:
       type: none
       device: "${VOLUME_GRAFANA_PATH}"
   grafana-storage-test:
-  graphite-config:
+  prometheus-data:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: "${VOLUME_GRAPHITECONFIG_PATH}"
-  graphite-data:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: "${VOLUME_GRAPHITEDATA_PATH}"
-  graphite-statsdconfig:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: "${VOLUME_GRAPHITESTATSDCONFIG_PATH}"
+      device: "${VOLUME_PROMETHEUS_PATH}"
+  prometheus-test:
