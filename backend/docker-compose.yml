@@ -221,6 +221,31 @@ services:
       - ./prometheus:/etc/prometheus
       - ${VOLUME_PROMETHEUS}:/prometheus
 
+  loki:
+   image: grafana/loki:2.8.11
+   container_name: loki
+   volumes:
+     - ./config/loki.yaml:/etc/config/loki.yaml
+   entrypoint:
+     - /usr/bin/loki
+     - -config.file=/etc/config/loki.yaml
+   ports:
+     - "3100:3100"
+
+  promtail:
+    image: grafana/promtail:2.8.11
+    container_name: promtail
+    user: root
+    volumes:
+      - ./log:/var/log/test
+      - /var/log/system.log:/var/log/root/system.log
+      - ./config/promtail-local-config.yaml:/etc/config/promtail-local-config.yaml
+    entrypoint:
+      - /usr/bin/promtail
+      - -config.file=/etc/config/promtail-local-config.yaml
+    ports:
+      - "9080:9080"
+
 networks:
   mongo_net:
     driver: bridge

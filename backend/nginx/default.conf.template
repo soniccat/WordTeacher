@@ -1,3 +1,32 @@
+map $http_referer $httpReferer {
+    default "$http_referer";
+    ""      "(direct)";
+  }
+
+  map $http_user_agent $httpAgent {
+    default "$http_user_agent";
+    ""      "Unknown";
+  }
+
+#  map $geoip_country_code $geoIP {
+#    default "$geoip_country_code";
+#    ""      "Unknown";
+#  }
+
+  # geoip_country /usr/share/GeoIP/GeoIP.dat;
+
+  log_format json_analytics escape=json '{'
+    '"time_local": "$time_local", '
+    '"remote_addr": "$remote_addr", '
+    '"request_uri": "$request_uri", '
+    '"status": "$status", '
+    '"http_referer": "$httpReferer", '
+    '"http_user_agent": "$httpAgent", '
+    '"server_name": "$server_name", '
+    '"request_time": "$request_time", '
+#   '"geoip_country_code": "$geoIP"'
+    '}';
+
 server {
     listen 9090 default_server http2;
     listen [::]:9090 default_server http2;
@@ -10,6 +39,8 @@ server {
         set $auth http://auth:${AUTH_PORT};
         proxy_pass $auth;
     }
+
+    access_log /var/log/nginx/analytics.log json_analytics;
 
     #
     # CardSets Search
