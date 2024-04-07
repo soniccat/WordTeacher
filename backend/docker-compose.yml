@@ -25,10 +25,14 @@ services:
       - CARDSETS_GPRC_PORT=${CARDSETS_GPRC_PORT}
       - DICT_PORT=${DICT_PORT}
     logging:
-      driver: "json-file"
+      driver: loki
       options:
-        max-size: "1m"
-        max-file: "5"
+        # max_retries: 2
+        loki-max-backoff: 800ms
+        loki-timeout: 1s
+        keep-file: 1
+        loki-url: http://172.16.0.18:3100/loki/api/v1/push
+        loki-external-labels: job=dockerlogs,owner=maniuk,environment=development
     restart: always
 
   auth:
@@ -197,6 +201,7 @@ services:
     image: grafana/grafana-enterprise
     container_name: grafana
     restart: unless-stopped
+    hostname: "grafana"
     ports:
      - '3000:3000'
     networks:
@@ -208,6 +213,7 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    hostname: "prometheus"
     command:
       - '--web.listen-address=:9091'
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -222,19 +228,24 @@ services:
       - ${VOLUME_PROMETHEUS}:/prometheus
 
   loki:
-   image: grafana/loki:2.8.11
-   container_name: loki
-   volumes:
+    image: grafana/loki:2.8.11
+    container_name: loki
+    hostname: "loki"
+    volumes:
      - ./config/loki.yaml:/etc/config/loki.yaml
-   entrypoint:
+    entrypoint:
      - /usr/bin/loki
      - -config.file=/etc/config/loki.yaml
-   ports:
-     - "3100:3100"
+    ports:
+     - 3100:3100
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.18
 
   promtail:
     image: grafana/promtail:2.8.11
     container_name: promtail
+    hostname: "promtail"
     user: root
     volumes:
       - ./log:/var/log/test
@@ -245,6 +256,9 @@ services:
       - -config.file=/etc/config/promtail-local-config.yaml
     ports:
       - "9080:9080"
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.19
 
 networks:
   mongo_net:

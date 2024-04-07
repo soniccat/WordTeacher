@@ -1,4 +1,4 @@
-map $http_referer $httpReferer {
+ map $http_referer $httpReferer {
     default "$http_referer";
     ""      "(direct)";
   }
@@ -40,7 +40,7 @@ server {
         proxy_pass $auth;
     }
 
-    access_log /var/log/nginx/analytics.log json_analytics;
+    # access_log /var/log/nginx/analytics.log json_analytics;
 
     #
     # CardSets Search

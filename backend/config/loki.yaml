@@ -7,7 +7,7 @@ ingester:
   wal:
     dir: "/tmp/wal"
   lifecycler:
-    address: 127.0.0.1
+    address: 172.16.0.18
     ring:
       kvstore:
         store: inmemory
