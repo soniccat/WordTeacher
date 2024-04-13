@@ -220,7 +220,7 @@ services:
       - ${VOLUME_PROMETHEUS}:/prometheus
 
   loki:
-    image: grafana/loki:2.8.11
+    image: grafana/loki:3.0.0
     container_name: loki
     hostname: "loki"
     volumes:

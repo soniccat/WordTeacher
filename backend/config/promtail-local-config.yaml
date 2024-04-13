@@ -20,9 +20,11 @@ scrape_configs:
   - json:
       expressions:
         time: time
-        request_uri: request_uri
+        status:
+        request_uri:
   - labels:
       request_uri:
+      status:
   - timestamp:
       source: time
       format: RFC3339
