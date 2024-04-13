@@ -191,6 +191,7 @@ services:
 
   grafana:
     image: grafana/grafana-enterprise
+    user: "0"
     container_name: grafana
     restart: unless-stopped
     hostname: "grafana"
@@ -225,7 +226,7 @@ services:
     hostname: "loki"
     volumes:
      - ./config/loki.yaml:/etc/config/loki.yaml
-     - ${VOLUME_LOKI_PATH}:/var/lib/loki
+     - ${VOLUME_LOKI_PATH}:/loki
     entrypoint:
      - /usr/bin/loki
      - -config.file=/etc/config/loki.yaml
