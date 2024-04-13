@@ -5,7 +5,7 @@ server:
 
 ingester:
   wal:
-    dir: "/var/lib/loki/wal"
+    dir: "/var/loki/wal"
   lifecycler:
     address: 172.16.0.18
     ring:
@@ -27,13 +27,13 @@ schema_config:
 
 storage_config:
   filesystem:
-    directory: /var/lib/loki/chunks
+    directory: /var/loki/chunks
   tsdb_shipper:
-    active_index_directory: /var/lib/loki/tsdb-index
-    cache_location: /var/lib/loki/tsdb-cache
+    active_index_directory: /var/loki/tsdb-index
+    cache_location: /var/loki/tsdb-cache
 
 compactor:
-  working_directory: /var/lib/loki/compactor
+  working_directory: /var/loki/compactor
 
 query_scheduler:
   # the TSDB index dispatches many more, but each individually smaller, requests. 
