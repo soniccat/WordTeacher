@@ -5,7 +5,7 @@ server:
 
 ingester:
   wal:
-    dir: "/tmp/wal"
+    dir: "/var/lib/loki/wal"
   lifecycler:
     address: 172.16.0.18
     ring:
@@ -28,10 +28,10 @@ schema_config:
 
 storage_config:
   boltdb:
-    directory: /tmp/loki/index
+    directory: /var/lib/loki/index
 
   filesystem:
-    directory: /tmp/loki/chunks
+    directory: /var/lib/loki/chunks
 
 limits_config:
   enforce_metric_name: false

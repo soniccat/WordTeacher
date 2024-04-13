@@ -13,6 +13,7 @@ services:
     image: nginx:alpine
     volumes:
       - ./nginx:/etc/nginx/templates
+      - '${VOLUME_NGINX_PATH}:/var/log/nginx'
     networks:
       mongo_net:
         ipv4_address: 172.16.0.12
@@ -24,15 +25,6 @@ services:
       - CARDSETSEARCH_PORT=${CARDSETSEARCH_PORT}
       - CARDSETS_GPRC_PORT=${CARDSETS_GPRC_PORT}
       - DICT_PORT=${DICT_PORT}
-    logging:
-      driver: loki
-      options:
-        # max_retries: 2
-        loki-max-backoff: 800ms
-        loki-timeout: 1s
-        keep-file: 1
-        loki-url: http://172.16.0.18:3100/loki/api/v1/push
-        loki-external-labels: job=dockerlogs,owner=maniuk,environment=development
     restart: always
 
   auth:
@@ -233,6 +225,7 @@ services:
     hostname: "loki"
     volumes:
      - ./config/loki.yaml:/etc/config/loki.yaml
+     - ${VOLUME_LOKI_PATH}:/var/lib/loki
     entrypoint:
      - /usr/bin/loki
      - -config.file=/etc/config/loki.yaml
@@ -251,6 +244,8 @@ services:
       - ./log:/var/log/test
       - /var/log/system.log:/var/log/root/system.log
       - ./config/promtail-local-config.yaml:/etc/config/promtail-local-config.yaml
+      - '${VOLUME_NGINX_PATH}:/var/log/nginx'
+      - '${VOLUME_PROMTAIL_PATH}:/var/lib/promtail'
     entrypoint:
       - /usr/bin/promtail
       - -config.file=/etc/config/promtail-local-config.yaml
@@ -289,23 +284,8 @@ volumes:
       type: none
       device: "${VOLUME_MONGOCONFIG_PATH}"
   redis_test:
-#    driver: local
-#    driver_opts:
-#      o: bind
-#      type: none
-#      device: "${VOLUME_REDIS_PATH}"
   mongodb_test:
-#    driver: local
-#    driver_opts:
-#      o: bind
-#      type: none
-#      device: "${VOLUME_MONGODB_PATH}"
   mongoconfig_test:
-#    driver: local
-#    driver_opts:
-#      o: bind
-#      type: none
-#      device: "${VOLUME_MONGOCONFIG_PATH}"
   grafana-storage:
     driver: local
     driver_opts:

@@ -17,13 +17,14 @@
 
   log_format json_analytics escape=json '{'
     '"time_local": "$time_local", '
+    '"time": "$time_iso8601", '
     '"remote_addr": "$remote_addr", '
     '"request_uri": "$request_uri", '
     '"status": "$status", '
     '"http_referer": "$httpReferer", '
     '"http_user_agent": "$httpAgent", '
     '"server_name": "$server_name", '
-    '"request_time": "$request_time", '
+    '"request_time": "$request_time" '
 #   '"geoip_country_code": "$geoIP"'
     '}';
 
@@ -40,7 +41,7 @@ server {
         proxy_pass $auth;
     }
 
-    access_log /dev/stdout json_analytics;
+    access_log /var/log/nginx/access_log json_analytics;
 
     #
     # CardSets Search
