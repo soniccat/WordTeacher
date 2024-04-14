@@ -226,7 +226,7 @@ services:
     user: root
     volumes:
      - ./config/loki.yaml:/etc/config/loki.yaml
-     - ${VOLUME_LOKI_PATH}:/loki
+     - ${VOLUME_LOKI_PATH}:/var/lib/loki
     entrypoint:
      - /usr/bin/loki
      - -config.file=/etc/config/loki.yaml
@@ -242,7 +242,6 @@ services:
     hostname: "promtail"
     user: root
     volumes:
-      - ./log:/var/log/test
       - /var/log/system.log:/var/log/root/system.log
       - ./config/promtail-local-config.yaml:/etc/config/promtail-local-config.yaml
       - '${VOLUME_NGINX_PATH}:/var/log/nginx'
