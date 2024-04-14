@@ -1,0 +1,73 @@
+ map $http_referer $httpReferer {
+    default "$http_referer";
+    ""      "(direct)";
+  }
+
+  map $http_user_agent $httpAgent {
+    default "$http_user_agent";
+    ""      "Unknown";
+  }
+
+#  map $geoip_country_code $geoIP {
+#    default "$geoip_country_code";
+#    ""      "Unknown";
+#  }
+
+  # geoip_country /usr/share/GeoIP/GeoIP.dat;
+
+  log_format json_analytics escape=json '{'
+    '"time": "$time_iso8601", '
+    '"remote_addr": "$remote_addr", '
+    '"request_uri": "$request_uri", '
+    '"status": "$status", '
+    '"http_referer": "$httpReferer", '
+    '"http_user_agent": "$httpAgent", '
+    '"server_name": "$server_name", '
+    '"request_time": "$request_time" '
+#   '"geoip_country_code": "$geoIP"'
+    '}';
+
+server {
+    listen 9090 default_server http2;
+    listen [::]:9090 default_server http2;
+
+    # set DNS resolver as Docker internal DNS
+    resolver 127.0.0.11 valid=10s;
+    resolver_timeout 5s;
+
+    location /api/auth {
+        set $auth http://auth:${AUTH_PORT};
+        proxy_pass $auth;
+    }
+
+    access_log /var/log/nginx/access_log json_analytics;
+
+    #
+    # CardSets Search
+    #
+    location /api/cardsets/search {
+        set $cardsetsearch http://cardsetsearch:${CARDSETSEARCH_PORT};
+        proxy_pass $cardsetsearch;
+    }
+
+    #
+    # CardSets
+    #
+    location /api/cardsets {
+        set $cardsets http://cardsets:${CARDSETS_PORT};
+        proxy_pass $cardsets;
+    }
+
+    location /cardsetsgrpc.CardSets {
+        set $cardsetsPRPC grpc://cardsets:${CARDSETS_GPRC_PORT};
+        grpc_pass $cardsetsPRPC;
+    }
+
+    #
+    # Dict
+    #
+    location /api/dict {
+        set $dict http://dict:${DICT_PORT};
+        proxy_pass $dict;
+    }
+}

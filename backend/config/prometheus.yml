@@ -1,0 +1,53 @@
+global:
+  scrape_interval: 5m
+  scrape_timeout: 10s
+  evaluation_interval: 1m
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: []
+    scheme: http
+    timeout: 10s
+    api_version: v1
+
+scrape_configs:
+- job_name: prometheus
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - localhost:9091
+
+- job_name: mongo-exporter
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - mongo-exporter:9216
+
+- job_name: promtail
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - promtail:9080
+
+- job_name: loki
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - loki:3100
+
+- job_name: grafana
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - grafana:3000
