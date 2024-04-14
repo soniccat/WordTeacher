@@ -203,7 +203,7 @@ services:
       - ${VOLUME_GRAFANA}:/var/lib/grafana
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus #TODO: add v2.51.2
     container_name: prometheus
     hostname: "prometheus"
     command:
@@ -247,11 +247,14 @@ services:
       - ./config/promtail-local-config.yaml:/etc/config/promtail-local-config.yaml
       - '${VOLUME_NGINX_PATH}:/var/log/nginx'
       - '${VOLUME_PROMTAIL_PATH}:/var/lib/promtail'
+    environment:
+      - PROMTAIL_PORT=${PROMTAIL_PORT}
     entrypoint:
       - /usr/bin/promtail
       - -config.file=/etc/config/promtail-local-config.yaml
+      - -config.expand-env=true
     ports:
-      - "9080:9080"
+      - ${PROMTAIL_PORT}:${PROMTAIL_PORT}
     networks:
       mongo_net:
         ipv4_address: 172.16.0.19
