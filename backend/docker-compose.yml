@@ -12,7 +12,7 @@ services:
     hostname: "apigateway"
     image: nginx:alpine
     volumes:
-      - ./nginx:/etc/nginx/templates
+      - ./config/default.conf.template:/etc/nginx/templates/default.conf.template
       - '${VOLUME_NGINX_PATH}:/var/log/nginx'
     networks:
       mongo_net:
@@ -216,7 +216,7 @@ services:
         ipv4_address: 172.16.0.16
     restart: unless-stopped
     volumes:
-      - ./prometheus:/etc/prometheus
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - ${VOLUME_PROMETHEUS}:/prometheus
 
   loki:
