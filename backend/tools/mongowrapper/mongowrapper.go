@@ -2,6 +2,7 @@ package mongowrapper
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 	"tools/logger"
@@ -95,24 +96,26 @@ func NewMongoEnv(logger *logger.Logger) MongoEnv {
 func (m *MongoEnv) SetupMongo(mongoURI string, enableCredentials bool) error {
 	mongoWrapper, err := New(mongoURI, enableCredentials)
 	if err != nil {
-		m.Logger.Error.Printf("createMongoWrapper failed: %s\n", err.Error())
-		return err
+		return logger.WrapError(context.Background(), fmt.Errorf("createMongoWrapper failed: %w", err))
 	}
 
 	if err = mongoWrapper.Connect(); err != nil {
-		m.Logger.Error.Printf("mongoWrapper.connect() failed: %s\n", err.Error())
-		return err
+		return logger.WrapError(context.Background(), fmt.Errorf("mongoWrapper.connect() failed: %w", err))
 	}
 
 	m.MongoWrapper = mongoWrapper
 	return nil
 }
 
-func (m *MongoEnv) StopMongo() {
+func (m *MongoEnv) StopMongo() error {
 	if m.MongoWrapper != nil {
 		err := m.MongoWrapper.Stop()
-		m.Logger.Error.Printf("mongoWrapper.Stop() failed: %s\n", err.Error())
+		if err != nil {
+			return logger.WrapError(context.Background(), fmt.Errorf("mongoWrapper.Stop() failed: %w", err))
+		}
 	}
+
+	return nil
 }
 
 func (m *MongoEnv) MongoClient() *mongo.Client {

@@ -7,6 +7,8 @@ import (
 	"service_auth/internal/service_models"
 	"tools"
 	"tools/logger"
+
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -77,8 +79,15 @@ func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authorizedUser, err := h.tokenRefresher.RefreshToken(
+	ctx := logger.WrapContext(
 		r.Context(),
+		"logId", uuid.NewString(),
+		"deviceId", deviceId,
+		"deviceType", deviceType,
+	)
+
+	authorizedUser, err := h.tokenRefresher.RefreshToken(
+		ctx,
 		service_models.UserTokens{
 			AccessToken:  input.AccessToken,
 			RefreshToken: &input.RefreshToken,

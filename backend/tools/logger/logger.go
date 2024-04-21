@@ -196,7 +196,20 @@ type LogError struct {
 	stack      []byte
 }
 
-func WrapError(ctx context.Context, err error) LogError {
+func Error(ctx context.Context, str string) error {
+	return WrapError(ctx, errors.New(str))
+}
+
+func WrapError(ctx context.Context, err error) error {
+	if err == nil {
+		return nil
+	}
+
+	var lError LogError
+	if errors.As(err, &lError) {
+		return err
+	}
+
 	var lCtx *logCtx
 	if c, ok := ctx.Value(logCtxKey).(logCtx); ok {
 		lCtx = &c

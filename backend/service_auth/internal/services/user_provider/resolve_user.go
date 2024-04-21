@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"models"
 	"service_auth/internal/service_models"
+	"tools/logger"
 )
 
 func (s *Service) ResolveUser(
@@ -21,7 +22,7 @@ func (s *Service) ResolveUser(
 	} else if networkType == models.VKID {
 		userWithNetwork, err = s.VKUser(ctx, token, deviceType)
 	} else {
-		return nil, fmt.Errorf("unsupported networkType: %d", networkType)
+		err = logger.WrapError(ctx, fmt.Errorf("unsupported networkType: %d", networkType))
 	}
 
 	return userWithNetwork, err

@@ -3,6 +3,7 @@ package token_refresher
 import (
 	"context"
 	"models"
+	"tools/logger"
 
 	"service_auth/internal/service_models"
 )
@@ -18,7 +19,7 @@ func (s *Service) RefreshToken(
 	}
 
 	if !userAuthToken.IsValid() {
-		return nil, service_models.NewErrorInvalidToken("token is invalid")
+		return nil, service_models.NewErrorInvalidToken(logger.Error(ctx, "token is invalid"))
 	}
 
 	if !userAuthToken.IsMatched(
@@ -27,7 +28,7 @@ func (s *Service) RefreshToken(
 		userInfo.DeviceType,
 		userInfo.DeviceId,
 	) {
-		return nil, service_models.NewErrorInvalidToken("token is invalid")
+		return nil, service_models.NewErrorInvalidToken(logger.Error(ctx, "token is invalid"))
 	}
 
 	token, err := s.authTokenGenerator.Generate(

@@ -9,6 +9,7 @@ import (
 	"tools"
 	"tools/logger"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -92,8 +93,15 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authorizedUser, err := h.authorizer.Authorize(
+	ctx := logger.WrapContext(
 		r.Context(),
+		"logId", uuid.NewString(),
+		"networkType", networkType,
+		"deviceType", deviceType,
+	)
+
+	authorizedUser, err := h.authorizer.Authorize(
+		ctx,
 		credentials.Token,
 		service_models.UserInfo{
 			NetworkType: networkTypeInt,

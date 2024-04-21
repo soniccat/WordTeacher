@@ -4,6 +4,7 @@ import (
 	"context"
 	"models"
 	"time"
+	"tools/logger"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/google/uuid"
@@ -17,6 +18,7 @@ func (g *Service) Generate(
 	deviceId string,
 ) (*models.UserAuthToken, error) {
 	token, err := generateUserAuthToken(
+		ctx,
 		userDbId,
 		networkType,
 		deviceType,
@@ -37,6 +39,7 @@ func (g *Service) Generate(
 }
 
 func generateUserAuthToken(
+	ctx context.Context,
 	userDbId string,
 	networkType models.UserNetworkType,
 	deviceType string,
@@ -44,12 +47,12 @@ func generateUserAuthToken(
 ) (*models.UserAuthToken, error) {
 	accessTokenValue, err := uuid.NewRandom()
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	refreshTokenValue, err := uuid.NewRandom()
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return &models.UserAuthToken{

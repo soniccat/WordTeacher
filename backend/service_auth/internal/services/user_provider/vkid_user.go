@@ -3,7 +3,6 @@ package user_provider
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"models"
 	"net/http"
 	"net/url"
@@ -11,6 +10,7 @@ import (
 	"strconv"
 	"time"
 	"tools"
+	"tools/logger"
 )
 
 type VKSecureCheckTokenBody struct {
@@ -24,17 +24,17 @@ type VKSecureCheckTokenResponse struct {
 }
 
 func (s *Service) VKUser(
-	context context.Context,
+	ctx context.Context,
 	token string,
 	deviceType string,
 ) (*service_models.UserWithNetwork, error) {
 	if deviceType != tools.DeviceTypeAndroid {
-		return nil, errors.New("VKID is supported only in android")
+		return nil, logger.Error(ctx, "VKID is supported only in android")
 	}
 
 	url, err := url.Parse("https://api.vk.com/method/secure.checkToken")
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 	values := url.Query()
 	values.Add("token", token)
@@ -44,31 +44,31 @@ func (s *Service) VKUser(
 
 	r, err := http.NewRequest("GET", url.String(), nil)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 	requestResponse, err := s.httpClient.Do(r)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	var resposeBody VKSecureCheckTokenBody
 	err = json.NewDecoder(requestResponse.Body).Decode(&resposeBody)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	if resposeBody.Response.Success != 1 {
-		return nil, errors.New("can't validate user")
+		return nil, logger.Error(ctx, "can't validate user")
 	}
 
 	if resposeBody.Response.Expire != 0 && resposeBody.Response.Expire <= time.Now().UTC().Unix() {
-		return nil, errors.New("token is expired")
+		return nil, logger.Error(ctx, "token is expired")
 	}
 
 	userIdAsString := strconv.FormatInt(resposeBody.Response.UserId, 10)
-	vkIDUser, err := s.userStorage.FindUserById(context, models.VKID, userIdAsString)
+	vkIDUser, err := s.userStorage.FindUserById(ctx, models.VKID, userIdAsString)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return &service_models.UserWithNetwork{

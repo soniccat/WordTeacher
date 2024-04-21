@@ -4,6 +4,7 @@ import (
 	"context"
 	"models"
 	"tools"
+	"tools/logger"
 
 	"google.golang.org/api/idtoken"
 
@@ -11,14 +12,14 @@ import (
 )
 
 func (s *Service) GoogleUser(
-	context context.Context,
+	ctx context.Context,
 	token string,
 	deviceType string,
 ) (*service_models.UserWithNetwork, error) {
 
-	validator, err := idtoken.NewValidator(context)
+	validator, err := idtoken.NewValidator(ctx)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	var idToken string
@@ -29,19 +30,19 @@ func (s *Service) GoogleUser(
 	}
 
 	// TODO: consider to make validation more strict
-	payload, err := validator.Validate(context, token, idToken)
+	payload, err := validator.Validate(ctx, token, idToken)
 	if err != nil {
-		return nil, service_models.NewErrorInvalidToken(err.Error())
+		return nil, service_models.NewErrorInvalidToken(logger.WrapError(ctx, err))
 	}
 
 	googleUserId, ok := payload.Claims["sub"].(string)
 	if !ok {
-		return nil, service_models.NewErrorInvalidToken("google Id Token doesn't have a sub")
+		return nil, service_models.NewErrorInvalidToken(logger.Error(ctx, "google Id Token doesn't have a sub"))
 	}
 
-	googleUser, err := s.userStorage.FindUserById(context, models.Google, googleUserId)
+	googleUser, err := s.userStorage.FindUserById(ctx, models.Google, googleUserId)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return &service_models.UserWithNetwork{

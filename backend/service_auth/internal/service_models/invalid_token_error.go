@@ -1,13 +1,19 @@
 package service_models
 
 type ErrorInvalidToken struct {
-	s string
+	innerErr error
 }
 
-func NewErrorInvalidToken(str string) *ErrorInvalidToken {
+func NewErrorInvalidToken(err error) *ErrorInvalidToken {
 	return &ErrorInvalidToken{
-		s: str,
+		innerErr: err,
 	}
 }
 
-func (e *ErrorInvalidToken) Error() string { return e.s }
+func (e *ErrorInvalidToken) Error() string {
+	return e.innerErr.Error()
+}
+
+func (e *ErrorInvalidToken) Unwrap() error {
+	return e.innerErr
+}

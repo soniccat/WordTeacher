@@ -2,8 +2,8 @@ package models
 
 import (
 	"context"
-	"errors"
 	"time"
+	"tools/logger"
 
 	"github.com/alexedwards/scs/v2"
 )
@@ -50,40 +50,40 @@ func New(
 }
 
 // TODO: replace *scs.SessionManager dep with an interface
-func Load(context context.Context, manager *scs.SessionManager) (*UserAuthToken, error) {
-	sessionAccessToken, ok := manager.Get(context, SessionAccessTokenKey).(string)
+func Load(ctx context.Context, manager *scs.SessionManager) (*UserAuthToken, error) {
+	sessionAccessToken, ok := manager.Get(ctx, SessionAccessTokenKey).(string)
 	if !ok {
-		return nil, errors.New("session access token is missing")
+		return nil, logger.Error(ctx, "session access token is missing")
 	}
 
-	sessionAccessTokenExpirationDate, ok := manager.Get(context, SessionAccessTokenExpirationDateKey).(time.Time)
+	sessionAccessTokenExpirationDate, ok := manager.Get(ctx, SessionAccessTokenExpirationDateKey).(time.Time)
 	if !ok {
-		return nil, errors.New("session access token expiration date is missing")
+		return nil, logger.Error(ctx, "session access token expiration date is missing")
 	}
 
-	sessionRefreshToken, ok := manager.Get(context, SessionRefreshTokenKey).(string)
+	sessionRefreshToken, ok := manager.Get(ctx, SessionRefreshTokenKey).(string)
 	if !ok {
-		return nil, errors.New("session refresh token is missing")
+		return nil, logger.Error(ctx, "session refresh token is missing")
 	}
 
-	networkType, ok := manager.Get(context, SessionNetworkTypeKey).(int8)
+	networkType, ok := manager.Get(ctx, SessionNetworkTypeKey).(int8)
 	if !ok {
-		return nil, errors.New("session networkType is missing")
+		return nil, logger.Error(ctx, "session networkType is missing")
 	}
 
-	sessionDeviceType, ok := manager.Get(context, SessionUserDeviceType).(string)
+	sessionDeviceType, ok := manager.Get(ctx, SessionUserDeviceType).(string)
 	if !ok || len(sessionDeviceType) == 0 {
-		return nil, errors.New("session device type is missing")
+		return nil, logger.Error(ctx, "session device type is missing")
 	}
 
-	sessionDeviceId, ok := manager.Get(context, SessionUserDeviceId).(string)
+	sessionDeviceId, ok := manager.Get(ctx, SessionUserDeviceId).(string)
 	if !ok || len(sessionDeviceId) == 0 {
-		return nil, errors.New("session device id is missing")
+		return nil, logger.Error(ctx, "session device id is missing")
 	}
 
-	sessionUserDbId, ok := manager.Get(context, SessionUserDbIdKey).(string)
+	sessionUserDbId, ok := manager.Get(ctx, SessionUserDbIdKey).(string)
 	if !ok {
-		return nil, errors.New("session user mongo id is missing")
+		return nil, logger.Error(ctx, "session user mongo id is missing")
 	}
 
 	return &UserAuthToken{

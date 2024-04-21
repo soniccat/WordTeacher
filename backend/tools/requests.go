@@ -1,10 +1,9 @@
 package tools
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"runtime/debug"
 	"tools/logger"
 )
 
@@ -18,53 +17,53 @@ const (
 	DeviceTypeDesktop = "desktop"
 )
 
-const (
-	ErrorWrongInput = 1000
-	ErrorInnerError = 1001
-)
+// const (
+// 	ErrorWrongInput = 1000
+// 	ErrorInnerError = 1001
+// )
 
-type ErrorWithCode struct {
-	Err  error
-	Code int
-}
+// type ErrorWithCode struct {
+// 	Err  error
+// 	Code int
+// }
 
-func (e ErrorWithCode) Error() string {
-	return e.Err.Error()
-}
+// func (e ErrorWithCode) Error() string {
+// 	return e.Err.Error()
+// }
 
-func NewErrorWithCode(err error, code int) *ErrorWithCode {
-	return &ErrorWithCode{err, code}
-}
+// func NewErrorWithCode(err error, code int) *ErrorWithCode {
+// 	return &ErrorWithCode{err, code}
+// }
 
-func NewHandlerError(err error, code int, withStack bool) *HandlerError {
-	var stack *[]byte
-	if withStack {
-		stack = Ptr(debug.Stack())
-	}
+// func NewHandlerError(err error, code int, withStack bool) *HandlerError {
+// 	var stack *[]byte
+// 	if withStack {
+// 		stack = Ptr(debug.Stack())
+// 	}
 
-	return &HandlerError{
-		StatusCode: code,
-		InnerError: err,
-		Stack:      stack,
-	}
-}
+// 	return &HandlerError{
+// 		StatusCode: code,
+// 		InnerError: err,
+// 		Stack:      stack,
+// 	}
+// }
 
-func (v *HandlerError) Error() string {
-	return v.InnerError.Error()
-}
+// func (v *HandlerError) Error() string {
+// 	return v.InnerError.Error()
+// }
 
-func SetHandlerError(w http.ResponseWriter, outErr *HandlerError, logger *logger.Logger) {
-	var stack *[]byte
-	if logger.AllowStackTraces {
-		stack = outErr.Stack
+// func SetHandlerError(w http.ResponseWriter, outErr *HandlerError, logger *logger.Logger) {
+// 	var stack *[]byte
+// 	if logger.AllowStackTraces {
+// 		stack = outErr.Stack
 
-		if stack == nil {
-			stack = Ptr(debug.Stack())
-		}
-	}
+// 		if stack == nil {
+// 			stack = Ptr(debug.Stack())
+// 		}
+// 	}
 
-	SetErrorWithStack(w, outErr.InnerError, outErr.StatusCode, logger, stack)
-}
+// 	SetErrorWithStack(w, outErr.InnerError, outErr.StatusCode, logger, stack)
+// }
 
 const (
 	ResponseStatusOk    = "ok"
@@ -104,17 +103,19 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-type HandlerError struct {
-	StatusCode int
-	InnerError error
-	Stack      *[]byte
-}
+// type HandlerError struct {
+// 	StatusCode int
+// 	InnerError error
+// 	Stack      *[]byte
+// }
 
 func SetError(w http.ResponseWriter, outErr error, code int, logger *logger.Logger) {
-	SetErrorWithStack(w, outErr, code, logger, Ptr(debug.Stack()))
-}
+	if code >= 500 {
+		logger.ErrorWithError(context.Background(), outErr, "")
+	} else {
+		logger.InfoWithError(context.Background(), outErr, "") // TODO: remove it, now it's here just for testing
+	}
 
-func SetErrorWithStack(w http.ResponseWriter, outErr error, code int, logger *logger.Logger, stack *[]byte) {
 	w.WriteHeader(code)
 
 	marshaledResponse, err := json.Marshal(NewResponseError(outErr))
@@ -128,10 +129,10 @@ func SetErrorWithStack(w http.ResponseWriter, outErr error, code int, logger *lo
 		return
 	}
 
-	if logger.AllowStackTraces {
-		trace := fmt.Sprintf("%s\n%s", outErr.Error(), stack)
-		err = logger.Error.Output(2, trace)
-	}
+	// if logger.AllowStackTraces {
+	// 	trace := fmt.Sprintf("%s\n%s", outErr.Error(), stack)
+	// 	err = logger.Error.Output(2, trace)
+	// }
 }
 
 func setJsonData(w http.ResponseWriter, data []byte) error {

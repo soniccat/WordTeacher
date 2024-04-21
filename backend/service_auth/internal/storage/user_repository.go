@@ -29,11 +29,11 @@ func NewUserRepository(logger *logger.Logger, mongoClient *mongo.Client) *UserRe
 	return model
 }
 
-func (m *UserRepository) FindUserById(context context.Context, networkType models.UserNetworkType, userId string) (*models.User, error) {
+func (m *UserRepository) FindUserById(ctx context.Context, networkType models.UserNetworkType, userId string) (*models.User, error) {
 	var user = models.User{}
 
 	err := m.UserCollection.FindOne(
-		context,
+		ctx,
 		bson.M{
 			"networks": bson.M{
 				"$elemMatch": bson.M{
@@ -47,13 +47,13 @@ func (m *UserRepository) FindUserById(context context.Context, networkType model
 		return nil, nil
 	}
 
-	return &user, err
+	return &user, logger.WrapError(ctx, err)
 }
 
-func (m *UserRepository) InsertUser(context context.Context, user *models.User) (*models.User, error) {
-	res, err := m.UserCollection.InsertOne(context, user)
+func (m *UserRepository) InsertUser(ctx context.Context, user *models.User) (*models.User, error) {
+	res, err := m.UserCollection.InsertOne(ctx, user)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	objId := res.InsertedID.(primitive.ObjectID)
@@ -65,27 +65,27 @@ func (m *UserRepository) InsertUser(context context.Context, user *models.User) 
 }
 
 func (m *UserRepository) InsertUserAuthToken(
-	context context.Context,
+	ctx context.Context,
 	token *models.UserAuthToken,
 ) (*models.UserAuthToken, error) {
 	// Remove stale service_auth tokens
 	_, err := m.AuthTokens.DeleteMany(
-		context,
+		ctx,
 		bson.M{
 			"deviceId": token.UserDeviceId,
 		},
 	)
 	if err != nil {
-		m.Logger.Error.Printf("InsertUserToken DeleteMany error %s", err.Error())
+		m.Logger.Warn(ctx, "InsertUserToken DeleteMany", "error", err)
 	}
 
 	// Add the new one
 	res, err := m.AuthTokens.InsertOne(
-		context,
+		ctx,
 		token,
 	)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	objId := res.InsertedID.(primitive.ObjectID)
@@ -94,11 +94,16 @@ func (m *UserRepository) InsertUserAuthToken(
 	return token, nil
 }
 
-func (m *UserRepository) DropAll(context context.Context) error {
-	err := m.UserCollection.Drop(context)
+func (m *UserRepository) DropAll(ctx context.Context) error {
+	err := m.UserCollection.Drop(ctx)
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
-	return m.AuthTokens.Drop(context)
+	err = m.AuthTokens.Drop(ctx)
+	if err != nil {
+		return logger.WrapError(ctx, err)
+	}
+
+	return nil
 }
