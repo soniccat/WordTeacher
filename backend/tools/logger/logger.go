@@ -3,6 +3,7 @@ package logger
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"path/filepath"
@@ -18,6 +19,7 @@ type logCtxKeyType string
 const logCtxKey logCtxKeyType = "logCtxKey"
 const invalidLogParamKey = "invalidKey"
 const stackKey = "stack"
+const errorKey = "error"
 
 type logCtx struct {
 	parent *logCtx
@@ -39,7 +41,7 @@ func New(w io.Writer, minimumLevel slog.Level) *Logger {
 			slog.NewJSONHandler(
 				w,
 				&slog.HandlerOptions{
-					AddSource:   true,
+					// AddSource:   true,
 					Level:       minimumLevel,
 					ReplaceAttr: replacer,
 				},
@@ -49,7 +51,11 @@ func New(w io.Writer, minimumLevel slog.Level) *Logger {
 }
 
 func (l *Logger) Info(ctx context.Context, msg string, args ...any) {
-	l.InfoWithError(ctx, nil, msg, args...)
+	if !l.log.Enabled(ctx, slog.LevelInfo) {
+		return
+	}
+
+	l.log.InfoContext(ctx, msg, l.buildArgsFromContext(ctx, args...)...)
 }
 
 func (l *Logger) InfoWithError(ctx context.Context, err error, msg string, args ...any) {
@@ -57,17 +63,73 @@ func (l *Logger) InfoWithError(ctx context.Context, err error, msg string, args 
 		return
 	}
 
-	l.log.InfoContext(ctx, msg, l.buildArgs(err, args)...)
-
-	// var pcs [1]uintptr
-	// runtime.Callers(2, pcs[:]) // skip [Callers, Info]
-	// r := slog.NewRecord(time.Now(), slog.LevelInfo, fmt.Sprintf(format, args...), pcs[0])
-	// _ = l.log.Handler().Handle(ctx, r)
-	// l.log.Info()
+	l.log.InfoContext(ctx, msg, l.buildArgsFromError(err, args...)...)
 }
 
-func (*Logger) buildArgs(err error, args []any) []any {
+func (l *Logger) Warn(ctx context.Context, msg string, args ...any) {
+	if !l.log.Enabled(ctx, slog.LevelInfo) {
+		return
+	}
+
+	l.log.WarnContext(ctx, msg, l.buildArgsFromContext(ctx, args...)...)
+}
+
+func (l *Logger) WarnWithError(ctx context.Context, err error, msg string, args ...any) {
+	if !l.log.Enabled(ctx, slog.LevelInfo) {
+		return
+	}
+
+	l.log.WarnContext(ctx, msg, l.buildArgsFromError(err, args...)...)
+}
+
+func (l *Logger) Debug(ctx context.Context, msg string, args ...any) {
+	if !l.log.Enabled(ctx, slog.LevelInfo) {
+		return
+	}
+
+	l.log.DebugContext(ctx, msg, l.buildArgsFromContext(ctx, args...)...)
+}
+
+func (l *Logger) DebugWithError(ctx context.Context, err error, msg string, args ...any) {
+	if !l.log.Enabled(ctx, slog.LevelInfo) {
+		return
+	}
+
+	l.log.DebugContext(ctx, msg, l.buildArgsFromError(err, args...)...)
+}
+
+func (l *Logger) Error(ctx context.Context, msg string, args ...any) {
+	if !l.log.Enabled(ctx, slog.LevelInfo) {
+		return
+	}
+
+	l.log.ErrorContext(ctx, msg, l.buildArgsFromContext(ctx, args...)...)
+}
+
+func (l *Logger) ErrorWithError(ctx context.Context, err error, msg string, args ...any) {
+	if !l.log.Enabled(ctx, slog.LevelInfo) {
+		return
+	}
+
+	l.log.ErrorContext(ctx, msg, l.buildArgsFromError(err, args...)...)
+}
+
+// Tools
+
+func (l *Logger) buildArgsFromContext(ctx context.Context, args ...any) []any {
 	resultArgs := make([]any, 0, len(args))
+	resultArgs = append(resultArgs, args...)
+
+	lCtx, ok := ctx.Value(logCtxKey).(logCtx)
+	if ok {
+		resultArgs = l.buildArgsFromLContext(lCtx, resultArgs)
+	}
+	return resultArgs
+}
+
+func (l *Logger) buildArgsFromError(err error, args ...any) []any {
+	resultArgs := make([]any, 0, len(args))
+	resultArgs = append(resultArgs, errorKey, fmt.Errorf("%w", err))
 	resultArgs = append(resultArgs, args...)
 
 	var lError LogError
@@ -75,47 +137,26 @@ func (*Logger) buildArgs(err error, args []any) []any {
 		resultArgs = append(resultArgs, stackKey, string(lError.stack))
 
 		if lError.lCtx != nil {
-			lCtx := lError.lCtx
-			for lCtx != nil {
-				for k, v := range lCtx.params {
-					resultArgs = append(resultArgs, k, v)
-				}
-
-				lCtx = lCtx.parent
-			}
+			resultArgs = l.buildArgsFromLContext(*lError.lCtx, resultArgs)
 		}
 	}
 	return resultArgs
 }
 
-// func buildSlogArgs(ctx context.Context, args ...any) []any {
-// 	resultArgs := make([]any, 0, len(args))
+func (*Logger) buildArgsFromLContext(lCtx logCtx, dst []any) []any {
+	innerLCtx := &lCtx
+	for innerLCtx != nil {
+		for k, v := range innerLCtx.params {
+			dst = append(dst, k, v)
+		}
 
-// 	for i, _ := range args {
+		innerLCtx = innerLCtx.parent
+	}
 
-// 		resultArgs = append(resultArgs)
-// 	}
+	return dst
+}
 
-// 	return resultArgs
-// }
-
-// func convertArgToSlogArg(in any) any {
-// 	switch x := in.(type) {
-// 	case string:
-// 		return x
-// 	case error:
-// 		return fmt.Errorf("error: %w", x)
-// 	default:
-// 		return in
-// 	}
-// }
-
-// func buildRecord(ctx context.Context, format string, args ...any) slog.Record {
-// 	lCtx, ok := ctx.Value(logCtxKey).(logCtx)
-
-// }
-
-func WithLogParams(ctx context.Context, args ...any) context.Context {
+func WrapContext(ctx context.Context, args ...any) context.Context {
 	var parentLogCtx *logCtx
 	if lCtx, ok := ctx.Value(logCtxKey).(logCtx); ok {
 		parentLogCtx = &lCtx
@@ -155,19 +196,25 @@ type LogError struct {
 	stack      []byte
 }
 
-func NewLogError(ctx context.Context, err error) LogError {
+func WrapError(ctx context.Context, err error) LogError {
 	var lCtx *logCtx
 	if c, ok := ctx.Value(logCtxKey).(logCtx); ok {
 		lCtx = &c
 	}
 
+	// var pcs [1]uintptr
+	// runtime.Callers(2, pcs[:]) // skip [Callers, Info]
 	return LogError{
 		lCtx:       lCtx,
 		innerError: err,
-		stack:      debug.Stack(),
+		stack:      debug.Stack(), // TODO: try runtime.CallersFrames()/runtime.Callers()
 	}
 }
 
 func (le LogError) Error() string {
 	return le.innerError.Error()
+}
+
+func (le LogError) Undwrap() error {
+	return le.innerError
 }
