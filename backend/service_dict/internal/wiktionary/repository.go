@@ -2,7 +2,6 @@ package wiktionary
 
 import (
 	"context"
-	"log"
 	"tools/logger"
 	"tools/mongowrapper"
 
@@ -47,31 +46,33 @@ func New(logger *logger.Logger, mongoClient *mongo.Client) Contract {
 }
 
 func (r *Repository) Definitions(ctx context.Context, term string) ([]Word, error) {
-	cursor, err := r.WordCollection.Find(ctx, bson.M{"term": term}, options.Find().SetSort(bson.M{"order": 1}))
-
+	cursor, err := r.WordCollection.Find(
+		ctx,
+		bson.M{"term": term},
+		options.Find().SetSort(bson.M{"order": 1}),
+	)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	var result []Word
 	err = cursor.All(ctx, &result)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
-	return result, err
+	return result, nil
 }
 
 func (m *Repository) CreateIndexIfNeeded(ctx context.Context) error {
 	cursor, err := m.WordCollection.Indexes().List(ctx)
-
 	if err != nil {
-		log.Fatal(err)
+		return logger.WrapError(ctx, err)
 	}
 
 	var result []bson.M
 	if err = cursor.All(ctx, &result); err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	var termIndexName = "term_index"
@@ -93,7 +94,7 @@ func (m *Repository) CreateIndexIfNeeded(ctx context.Context) error {
 	}
 	_, err = m.WordCollection.Indexes().CreateOne(ctx, indexModel)
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	return nil

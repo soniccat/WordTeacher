@@ -30,8 +30,8 @@ func run() int {
 	// Define command-line flags
 	isDebug := flag.Bool("debugMode", false, "Shows stack traces in logs")
 	minLogLevel := flag.Int("logLevel", int(slog.LevelInfo), "minimum log level")
-	serviceLogPath := flag.String("serviceLogPath", "/var/log/service_log", "service log file path")
-	serverLogPath := flag.String("serverLogPath", "/var/log/server_log", "server log file path")
+	serviceLogPath := flag.String("serviceLogPath", "/var/log/service.log", "service log file path")
+	serverLogPath := flag.String("serverLogPath", "/var/log/server.log", "server log file path")
 
 	serverAddr := flag.String("serverAddr", "", "HTTP server network address")
 	serverPort := flag.Int("serverPort", 4000, "HTTP server network port")

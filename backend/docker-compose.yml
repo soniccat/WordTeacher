@@ -44,6 +44,9 @@ services:
     secrets:
       - vkid
       - google
+    volumes:
+      - ${VOLUME_AUTH_SERVICELOG_PATH}:/var/log/service.log
+      - ${VOLUME_AUTH_SERVERLOG_PATH}:/var/log/server.log
     networks:
       mongo_net:
         ipv4_address: 172.16.0.10

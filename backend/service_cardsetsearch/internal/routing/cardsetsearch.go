@@ -9,6 +9,8 @@ import (
 	"tools/logger"
 
 	"tools"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -56,9 +58,15 @@ func (h *CardSetSearchHandler) CardSetSearch(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	cardSets, err := h.cardSetSearchRepository.SearchCardSets(r.Context(), query)
+	ctx := logger.WrapContext(
+		r.Context(),
+		"logId", uuid.NewString(),
+		"query", query,
+	)
+
+	cardSets, err := h.cardSetSearchRepository.SearchCardSets(ctx, query)
 	if err != nil {
-		h.SetError(w, errors.New("query is empty"), http.StatusInternalServerError)
+		h.SetError(w, err, http.StatusInternalServerError)
 		return
 	}
 

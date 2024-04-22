@@ -8,6 +8,7 @@ import (
 	"tools"
 	"tools/logger"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 
 	"service_dict/internal/wiktionary"
@@ -43,7 +44,13 @@ func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	words, err := h.wiktionary.Definitions(r.Context(), strings.ToLower(term))
+	ctx := logger.WrapContext(
+		r.Context(),
+		"logId", uuid.NewString(),
+		"term", term,
+	)
+
+	words, err := h.wiktionary.Definitions(ctx, strings.ToLower(term))
 	if err != nil {
 		h.SetError(w, err, http.StatusInternalServerError)
 	}

@@ -50,7 +50,7 @@ func New(mongoURI string, enableCredentials bool) (*MongoWrapper, error) {
 
 	client, err := mongo.NewClient(co)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(context.Background(), err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), MongoTimeout)
@@ -74,7 +74,7 @@ func (mw *MongoWrapper) Stop() error {
 
 	if mw.Client != nil {
 		if err := mw.Client.Disconnect(*mw.Context); err != nil {
-			return err
+			return logger.WrapError(context.Background(), err)
 		}
 		mw.Client = nil
 	}
