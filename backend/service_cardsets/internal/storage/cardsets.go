@@ -44,17 +44,17 @@ func New(
 	return r, nil
 }
 
-func (m *Storage) DropAll(context context.Context) error {
-	return m.CardSetCollection.Drop(context)
+func (m *Storage) DropAll(ctx context.Context) error {
+	return logger.WrapError(ctx, m.CardSetCollection.Drop(ctx))
 }
 
 func (m *Storage) FindCardSetByCreationId(
-	context context.Context,
+	ctx context.Context,
 	creationId string,
 ) (*model.DbCardSet, error) {
 	var result model.DbCardSet
 	err := m.CardSetCollection.FindOne(
-		context,
+		ctx,
 		bson.M{
 			"creationId": creationId,
 			"isDeleted":  bson.M{"$not": bson.M{"$eq": true}},
@@ -63,7 +63,7 @@ func (m *Storage) FindCardSetByCreationId(
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return nil, nil
 	} else if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return &result, nil
@@ -75,7 +75,7 @@ func (m *Storage) DeleteCardSet(
 ) error {
 	_, err := m.CardSetCollection.DeleteOne(ctx, bson.M{"_id": id})
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	return nil
@@ -94,9 +94,9 @@ func (m *Storage) UpdateCardSet(
 		}
 	}
 
-	newCardSetDb, err := model.ApiCardSetToDb(cardSet)
+	newCardSetDb, err := model.ApiCardSetToDb(ctx, cardSet)
 	if err != nil {
-		return tools.NewInvalidArgumentError("UpdateCardSet.cardSet", cardSet, "", err)
+		return logger.WrapError(ctx, tools.NewInvalidArgumentError("UpdateCardSet.cardSet", cardSet, "", err))
 	}
 
 	err = m.replaceCardSet(ctx, newCardSetDb)
@@ -111,12 +111,12 @@ func (m *Storage) LoadCardSetDbById(
 	ctx context.Context,
 	id string,
 ) (*model.DbCardSet, error) {
-	cardSetDbId, err := primitive.ObjectIDFromHex(id)
+	cardSetDbId, err := tools.ParseObjectID(ctx, id)
 	if err != nil {
-		return nil, tools.NewInvalidIdError(id)
+		return nil, err
 	}
 
-	return m.loadCardSetDbByObjectID(ctx, cardSetDbId)
+	return m.loadCardSetDbByObjectID(ctx, *cardSetDbId)
 }
 
 func (m *Storage) loadCardSetDbByObjectID(
@@ -134,13 +134,13 @@ func (m *Storage) LoadCardSetDbByCreationId(
 }
 
 func (m *Storage) loadCardSetDb(
-	context context.Context,
+	ctx context.Context,
 	filter interface{},
 ) (*model.DbCardSet, error) {
 	var cardSetDb model.DbCardSet
-	err := m.CardSetCollection.FindOne(context, filter).Decode(&cardSetDb)
+	err := m.CardSetCollection.FindOne(ctx, filter).Decode(&cardSetDb)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return &cardSetDb, nil
@@ -161,14 +161,14 @@ func (m *Storage) InsertCardSet(
 		}
 	}
 
-	cardSetDb, err := model.ApiCardSetToDb(cardSet)
+	cardSetDb, err := model.ApiCardSetToDb(ctx, cardSet)
 	if err != nil {
 		return nil, tools.NewInvalidArgumentError("InsertCardSet.cardSet", cardSet, "", err)
 	}
 
 	res, err := m.CardSetCollection.InsertOne(ctx, cardSetDb)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	objId := res.InsertedID.(primitive.ObjectID)
@@ -184,11 +184,11 @@ func (m *Storage) replaceCardSet(
 ) error {
 	res, err := m.CardSetCollection.ReplaceOne(ctx, bson.M{"_id": cardSetDb.Id}, cardSetDb)
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	if res.MatchedCount == 0 {
-		return mongo.ErrNoDocuments
+		return logger.WrapError(ctx, mongo.ErrNoDocuments)
 	}
 
 	return nil
@@ -199,9 +199,9 @@ func (m *Storage) HasModificationsSince(
 	userId string,
 	lastModificationDate *time.Time,
 ) (bool, error) {
-	dbUserId, err := primitive.ObjectIDFromHex(userId)
+	dbUserId, err := tools.ParseObjectID(ctx, userId)
 	if err != nil {
-		return false, tools.NewInvalidIdError(userId)
+		return false, err
 	}
 
 	var date time.Time
@@ -221,7 +221,7 @@ func (m *Storage) HasModificationsSince(
 		return false, nil
 
 	} else if err != nil {
-		return false, res.Err()
+		return false, logger.WrapError(ctx, err)
 	}
 
 	return true, nil
@@ -250,12 +250,12 @@ func (m *Storage) modifiedCardSetsSince(
 	var mongoUserId *primitive.ObjectID
 
 	if userId != nil {
-		muid, err := primitive.ObjectIDFromHex(*userId)
+		muid, err := tools.ParseObjectID(ctx, *userId)
 		if err != nil {
-			return nil, tools.NewInvalidIdError("userId")
+			return nil, err
 		}
 
-		mongoUserId = &muid
+		mongoUserId = muid
 	}
 
 	var date time.Time
@@ -278,7 +278,7 @@ func (m *Storage) modifiedCardSetsSince(
 		filter,
 	)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	defer func() { cursor.Close(ctx) }()
@@ -286,7 +286,7 @@ func (m *Storage) modifiedCardSetsSince(
 	var dbCardSets []*model.DbCardSet
 	err = cursor.All(ctx, &dbCardSets)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return dbCardSets, nil
@@ -298,7 +298,7 @@ func (m *Storage) DeleteByIds(
 ) error {
 	_, err := m.CardSetCollection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	return nil
@@ -309,7 +309,7 @@ func (m *Storage) MarkAsDeletedByIds(
 	ids []string,
 	modificationDate time.Time,
 ) error {
-	mongoIds, err := tools.IdsToMongoIds(ids)
+	mongoIds, err := tools.IdsToMongoIds(ctx, ids)
 	if err != nil {
 		return err
 	}
@@ -320,7 +320,7 @@ func (m *Storage) MarkAsDeletedByIds(
 		bson.M{"$set": bson.M{"isDeleted": true, "modificationDate": modificationDate}},
 	)
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	return nil
@@ -331,14 +331,14 @@ func (m *Storage) IdsNotInList(
 	userId string,
 	ids []string,
 ) ([]string, error) {
-	userDbId, err := primitive.ObjectIDFromHex(userId)
+	userDbId, err := tools.ParseObjectID(ctx, userId)
 	if err != nil {
-		return nil, tools.NewInvalidIdError("IdsNotInList.userId")
+		return nil, err
 	}
 
-	mongoIds, err := tools.IdsToMongoIds(ids)
+	mongoIds, err := tools.IdsToMongoIds(ctx, ids)
 	if err != nil {
-		return nil, tools.NewInvalidIdError("IdsNotInList.ids")
+		return nil, err
 	}
 
 	cursor, err := m.CardSetCollection.Find(
@@ -349,16 +349,16 @@ func (m *Storage) IdsNotInList(
 		},
 	)
 	if err != nil {
-		return []string{}, err
+		return []string{}, logger.WrapError(ctx, err)
 	}
 
 	var result MongoIdWrapperList
 	err = cursor.All(ctx, &result)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
-	return tools.MongoIdsToStrings(result.toMongoIds()), err
+	return tools.MongoIdsToStrings(result.toMongoIds()), nil
 }
 
 func (m *Storage) CardSetsNotInList(
@@ -366,12 +366,12 @@ func (m *Storage) CardSetsNotInList(
 	userId string,
 	ids []string,
 ) ([]*api.CardSet, error) {
-	userDbId, err := primitive.ObjectIDFromHex(userId)
+	userDbId, err := tools.ParseObjectID(ctx, userId)
 	if err != nil {
-		return nil, tools.NewInvalidIdError("CardSetsNotInList.userId")
+		return nil, err
 	}
 
-	mongoIds, err := tools.IdsToMongoIds(ids)
+	mongoIds, err := tools.IdsToMongoIds(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -382,14 +382,14 @@ func (m *Storage) CardSetsNotInList(
 		bson.M{"_id": bson.M{"$not": bson.M{"$in": mongoIds}}, "userId": userDbId, "isDeleted": bson.M{"$not": bson.M{"$eq": true}}},
 	)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	defer func() { cursor.Close(ctx) }()
 
 	err = cursor.All(ctx, &cardSetDbs)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return model.DbCardSetsToApi(cardSetDbs), nil
@@ -411,9 +411,9 @@ func (m *Storage) CardCardSetIds(
 	ctx context.Context,
 	userId string,
 ) ([]string, error) {
-	userDbId, err := primitive.ObjectIDFromHex(userId)
+	userDbId, err := tools.ParseObjectID(ctx, userId)
 	if err != nil {
-		return nil, tools.NewInvalidIdError(userId)
+		return nil, err
 	}
 
 	cursor, err := m.CardSetCollection.Find(
@@ -424,7 +424,7 @@ func (m *Storage) CardCardSetIds(
 		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	defer func() { cursor.Close(ctx) }()
@@ -432,7 +432,7 @@ func (m *Storage) CardCardSetIds(
 	var cardSetDbIds2 MongoIdWrapperList
 	err = cursor.All(ctx, &cardSetDbIds2)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	cardSetApiIds := tools.Map(cardSetDbIds2.toMongoIds(), func(cardSetDbId primitive.ObjectID) string {
@@ -452,9 +452,9 @@ func (m *Storage) LastModificationDate(
 	ctx context.Context,
 	userId string,
 ) (*time.Time, error) {
-	mongoUserId, err := primitive.ObjectIDFromHex(userId)
+	mongoUserId, err := tools.ParseObjectID(ctx, userId)
 	if err != nil {
-		return nil, tools.NewInvalidIdError("userId")
+		return nil, err
 	}
 
 	cursor, err := m.CardSetCollection.Find(
@@ -464,7 +464,7 @@ func (m *Storage) LastModificationDate(
 	)
 
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	defer func() { cursor.Close(ctx) }()
@@ -472,7 +472,7 @@ func (m *Storage) LastModificationDate(
 	var modificationDates MongoModificationDateWrapperList
 	err = cursor.All(ctx, &modificationDates)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	if len(modificationDates) == 0 {

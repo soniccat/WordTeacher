@@ -3,6 +3,7 @@ package cardsetpull_worker
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"service_cardsetsearch/internal/cardsets_client"
@@ -47,7 +48,7 @@ func (w *CardSetPullWorker) Start(ctx context.Context) error {
 		for ; true; <-ticker.C { // run immediately and every tick
 			ch, outErr := w.cardsetsClient.GetCardSets(ctx, *lastModificationDate)
 			if outErr != nil {
-				w.logger.Error.Print(outErr)
+				w.logger.ErrorWithError(ctx, outErr, "CardSetPullWorker GetCardSets")
 				continue
 			}
 
@@ -55,18 +56,16 @@ func (w *CardSetPullWorker) Start(ctx context.Context) error {
 				if r.Error != nil {
 					break
 				} else if r.CardSet != nil && r.CardSet.IsAvailableInSearch {
-					dbCardSet, outErr := model.GRPCCardSetToDb(r.CardSet)
+					dbCardSet, outErr := model.GRPCCardSetToDb(ctx, r.CardSet)
 					if outErr != nil {
-						w.logger.Error.Printf("CardSetPullWorker GRPCCardSetToDb cardset %s %s", r.CardSet.Id, outErr.Error())
+						w.logger.ErrorWithError(ctx, outErr, fmt.Sprintf("CardSetPullWorker GRPCCardSetToDb cardset %s %v", r.CardSet.Id, outErr))
 						continue
 					}
 					w.repository.UpsertCardSet(ctx, dbCardSet)
 				}
 			}
 
-			if outErr != nil {
-				*lastModificationDate = time.Now()
-			}
+			*lastModificationDate = time.Now()
 		}
 	}()
 

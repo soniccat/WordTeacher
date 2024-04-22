@@ -2,6 +2,7 @@ package model
 
 import (
 	"api"
+	"context"
 	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
 	"time"
 	"tools"
@@ -48,23 +49,23 @@ func DbCardSetsToApi(cs []*DbCardSet) []*api.CardSet {
 	})
 }
 
-func GRPCCardSetToDb(cs *cardsetsgrpc.CardSet) (*DbCardSet, error) {
-	id, err := tools.ParseObjectID(cs.Id)
+func GRPCCardSetToDb(ctx context.Context, cs *cardsetsgrpc.CardSet) (*DbCardSet, error) {
+	id, err := tools.ParseObjectID(ctx, cs.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	userId, err := tools.ParseObjectID(cs.UserId)
+	userId, err := tools.ParseObjectID(ctx, cs.UserId)
 	if err != nil {
 		return nil, err
 	}
 
-	creationDate, err := tools.ApiDateToDbDate(cs.CreationDate)
+	creationDate, err := tools.ApiDateToDbDate(ctx, cs.CreationDate)
 	if err != nil {
 		return nil, err
 	}
 
-	modificationDateTime, err := tools.ApiDateToDbDate(cs.ModificationDate)
+	modificationDateTime, err := tools.ApiDateToDbDate(ctx, cs.ModificationDate)
 	if err != nil {
 		return nil, err
 	}

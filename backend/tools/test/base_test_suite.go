@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"tools/logger"
 
@@ -24,7 +26,7 @@ func (b *BaseTestSuite) TestTimeProvider() *TimeProvider {
 
 func (b *BaseTestSuite) Logger() *logger.Logger {
 	if b.logger == nil {
-		b.logger = logger.New(true)
+		b.logger = logger.New(os.Stdout, slog.LevelDebug)
 	}
 
 	return b.logger

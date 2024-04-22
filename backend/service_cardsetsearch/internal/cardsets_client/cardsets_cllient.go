@@ -40,7 +40,7 @@ func (c *client) GetCardSets(ctx context.Context, since time.Time) (chan CardSet
 	)
 
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	cardSetChan := make(chan CardSetResult)
@@ -48,7 +48,7 @@ func (c *client) GetCardSets(ctx context.Context, since time.Time) (chan CardSet
 		for {
 			cs, err := grpcCardSetStream.Recv()
 			if err != nil {
-				cardSetChan <- CardSetResult{Error: err}
+				cardSetChan <- CardSetResult{Error: logger.WrapError(ctx, err)}
 				break
 			} else {
 				cardSetChan <- CardSetResult{CardSet: cs}

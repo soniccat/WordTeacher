@@ -3,6 +3,8 @@ package storage
 import (
 	"api"
 	"context"
+	"log/slog"
+	"os"
 	"testing"
 	"tools"
 	"tools/logger"
@@ -21,7 +23,7 @@ type CardSetTestSuite struct {
 
 func (suite *CardSetTestSuite) SetupTest() {
 	var err error
-	logger := logger.New(true)
+	logger := logger.New(os.Stdout, slog.LevelDebug)
 	suite.CardSetModel, err = New(
 		logger,
 		test.ConnectionString,

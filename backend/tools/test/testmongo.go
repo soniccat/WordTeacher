@@ -1,6 +1,8 @@
 package test
 
 import (
+	"log/slog"
+	"os"
 	"tools/logger"
 	"tools/mongowrapper"
 )
@@ -15,7 +17,7 @@ type TestMongo struct {
 }
 
 func NewTestMongo() *TestMongo {
-	logger := logger.New(true)
+	logger := logger.New(os.Stdout, slog.LevelDebug)
 	testMongo := &TestMongo{
 		MongoEnv: mongowrapper.NewMongoEnv(logger),
 		logger:   logger,

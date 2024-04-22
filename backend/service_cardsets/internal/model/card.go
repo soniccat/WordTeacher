@@ -2,6 +2,7 @@ package model
 
 import (
 	"api"
+	"context"
 	"tools"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -9,13 +10,13 @@ import (
 	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
 )
 
-func ApiCardToDb(c *api.Card) (*DbCard, error) {
-	cardDbId, err := tools.ParseObjectID(c.Id)
+func ApiCardToDb(ctx context.Context, c *api.Card) (*DbCard, error) {
+	cardDbId, err := tools.ParseObjectID(ctx, c.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	cardDbUserId, err := tools.ParseObjectID(c.UserId)
+	cardDbUserId, err := tools.ParseObjectID(ctx, c.UserId)
 	if err != nil {
 		return nil, err
 	}

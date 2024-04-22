@@ -79,7 +79,7 @@ func run() int {
 	app, err := createApplication(logger, cfg, &timeProvider, *redisAddress, *mongoURI, *enableCredentials)
 
 	if err != nil {
-		fmt.Println("app creation error: " + err.Error())
+		logger.ErrorWithError(context.Background(), err, "app creation error")
 		return failCode
 	}
 
@@ -93,13 +93,13 @@ func run() int {
 			msg = fmt.Sprintf("panic: %v\n%s\n", r, string(debug.Stack()))
 		}
 		if err != nil {
-			logger.ErrorWithError(context.Background(), err, msg) //Error.Print(err)
+			logger.ErrorWithError(context.Background(), err, msg)
 		} else {
 			logger.Error(context.Background(), msg)
 		}
 	}()
 
-	// Initialize a new http.Server struct.
+	// server
 	serverLogger := log.New(serverLogWriter, "", log.LstdFlags)
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)
 	srv := &http.Server{
@@ -111,10 +111,11 @@ func run() int {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	// logger.Info.Printf("Starting server on %s", serverURI)
+	fmt.Printf("Starting server on %s", serverURI)
 	err = srv.ListenAndServe()
 	if err != nil {
 		logger.ErrorWithError(context.Background(), err, "server error")
+		return failCode
 	}
 
 	return successCode

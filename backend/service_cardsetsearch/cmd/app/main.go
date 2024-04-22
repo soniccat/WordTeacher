@@ -4,27 +4,40 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"runtime/debug"
 	"time"
-	"tools"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"models/session_validator"
 	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
 	"service_cardsetsearch/internal/cardsets_client"
 	"tools/logger"
 )
 
+const (
+	successCode = 0
+	failCode    = 1
+)
+
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	// flags
 	isDebug := flag.Bool("debugMode", false, "Shows stack traces in logs")
+	minLogLevel := flag.Int("logLevel", int(slog.LevelInfo), "minimum log level")
+	serviceLogPath := flag.String("serviceLogPath", "/var/log/service_log", "service log file path")
+	serverLogPath := flag.String("serverLogPath", "/var/log/server_log", "server log file path")
+
 	serverAddr := flag.String("serverAddr", "", "HTTP server network address")
 	serverPort := flag.Int("serverPort", 4002, "HTTP server network port")
-
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
 	cardSetsGRPCAddress := flag.String("cardSetsGPRCAddress", "localhost:5001", "get new cardsets")
@@ -32,9 +45,29 @@ func main() {
 
 	flag.Parse()
 
+	var serverLogWriter io.Writer
+	var serviceLogWriter io.Writer
+	var err error
+
+	if *isDebug {
+		serverLogWriter = os.Stdout
+		serviceLogWriter = os.Stdout
+	} else {
+		serverLogWriter, err = os.OpenFile(*serverLogPath, os.O_CREATE|os.O_WRONLY, os.ModeAppend)
+		if err != nil {
+			fmt.Println("server logfile open error: " + err.Error())
+			return failCode
+		}
+
+		serviceLogWriter, err = os.OpenFile(*serviceLogPath, os.O_CREATE|os.O_WRONLY, os.ModeAppend)
+		if err != nil {
+			fmt.Println("service logfile open error: " + err.Error())
+			return failCode
+		}
+	}
+
 	ctx := context.Background()
-	logger := logger.New(*isDebug)
-	sessionManager := tools.CreateSessionManager(*redisAddress)
+	logger := logger.New(serviceLogWriter, slog.Level(*minLogLevel))
 
 	// grpc
 	cardSetGRPCConnection, err := grpc.Dial(*cardSetsGRPCAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -48,16 +81,15 @@ func main() {
 	app, err := createApplication(
 		ctx,
 		logger,
-		sessionManager,
+		*redisAddress,
 		*mongoURI,
 		*enableCredentials,
-		session_validator.NewSessionManagerValidator(sessionManager),
 		cardsets_client.NewClient(logger, cardSetGrpcClient),
 	)
 
 	if err != nil {
-		fmt.Println("app creation error: " + err.Error())
-		return
+		logger.ErrorWithError(context.Background(), err, "app creation error")
+		return failCode
 	}
 
 	defer func() {
@@ -65,30 +97,42 @@ func main() {
 	}()
 
 	defer func() {
+		msg := "panic"
 		if r := recover(); r != nil {
-			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
+			msg = fmt.Sprintf("panic: %v\n%s\n", r, string(debug.Stack()))
+		}
+		if err != nil {
+			logger.ErrorWithError(context.Background(), err, msg)
+		} else {
+			logger.Error(context.Background(), msg)
 		}
 	}()
 
-	logger.Info.Printf("Starting cardSetPullWorker")
+	fmt.Printf("Starting cardSetPullWorker")
 	err = app.startCardSetPullWorker()
 	if err != nil {
-		logger.Error.Fatal(err)
-		return
+		logger.ErrorWithError(context.Background(), err, "can't start cardSetPullWorker")
+		return failCode
 	}
 
 	// Initialize a new http.Server struct.
+	serverLogger := log.New(serverLogWriter, "", log.LstdFlags)
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)
 	srv := &http.Server{
 		Addr:         serverURI,
-		ErrorLog:     logger.Error,
+		ErrorLog:     serverLogger,
 		Handler:      app.routes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 
-	logger.Info.Printf("Starting server on %s", serverURI)
+	fmt.Printf("Starting server on %s", serverURI)
 	err = srv.ListenAndServe()
-	logger.Error.Fatal(err)
+	if err != nil {
+		logger.ErrorWithError(context.Background(), err, "server error")
+		return failCode
+	}
+
+	return successCode
 }

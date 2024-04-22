@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 	"tools"
+	"tools/logger"
 
 	"models/session_validator"
 	"service_cardsets/internal/model"
@@ -32,7 +33,7 @@ func NewHandler(
 func (s *Handler) GetCardSets(in *grpcapi.GetCardSetsIn, server grpcapi.CardSets_GetCardSetsServer) error {
 	var sinceDate *time.Time
 	if in.SinceDate != nil {
-		d, err := tools.ParseApiDate(*in.SinceDate)
+		d, err := tools.ParseApiDate(server.Context(), *in.SinceDate)
 		if err != nil {
 			return err
 		}
@@ -48,7 +49,7 @@ func (s *Handler) GetCardSets(in *grpcapi.GetCardSetsIn, server grpcapi.CardSets
 	for i := range cardSets {
 		err = server.Send(cardSets[i].ToGrpc())
 		if err != nil {
-			return err
+			return logger.WrapError(server.Context(), err)
 		}
 	}
 

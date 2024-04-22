@@ -7,6 +7,7 @@ import (
 	"tools"
 	"tools/logger"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 
@@ -59,7 +60,13 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dbCardSet, err := h.innerStorage.LoadCardSetDbById(r.Context(), cardSetId)
+	ctx := logger.WrapContext(
+		r.Context(),
+		"logId", uuid.NewString(),
+		"cardSetId", cardSetId,
+	)
+
+	dbCardSet, err := h.innerStorage.LoadCardSetDbById(ctx, cardSetId)
 	if err != nil {
 		var invalidIdError tools.InvalidIdError
 		if errors.As(err, &invalidIdError) {

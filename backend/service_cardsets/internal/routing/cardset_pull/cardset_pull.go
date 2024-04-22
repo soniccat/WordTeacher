@@ -11,6 +11,7 @@ import (
 	"tools/logger"
 
 	mapset "github.com/deckarep/golang-set/v2"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"models/session_validator"
@@ -74,7 +75,7 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 
 	var lastModificationDate *time.Time
 	if input.LatestModificationDate != nil {
-		date, err := tools.ParseApiDate(*input.LatestModificationDate)
+		date, err := tools.ParseApiDate(r.Context(), *input.LatestModificationDate)
 		if err != nil {
 			h.SetError(w, err, http.StatusBadRequest)
 			return
@@ -82,7 +83,17 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 		lastModificationDate = &date
 	}
 
-	ctx := r.Context()
+	var ctxParams []any
+	ctxParams = append(ctxParams, "logId", uuid.NewString())
+	inputBytes, err := json.Marshal(input)
+	if err != nil {
+		ctxParams = append(ctxParams, "body", string(inputBytes))
+	}
+
+	ctx := logger.WrapContext(
+		r.Context(),
+		ctxParams...,
+	)
 
 	dbCardSets, err := h.storage.ModifiedCardSetsSinceByUserId(ctx, authToken.UserDbId, lastModificationDate)
 	if err != nil {

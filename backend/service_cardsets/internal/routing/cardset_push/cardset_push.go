@@ -13,6 +13,8 @@ import (
 	"tools/logger"
 
 	"models/session_validator"
+
+	"github.com/google/uuid"
 )
 
 type storage interface {
@@ -66,6 +68,7 @@ func NewHandler(
 	}
 }
 
+// TODO: hide it in service classes
 type UserMutex struct {
 	mutexes map[string]*sync.Mutex
 }
@@ -114,7 +117,7 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 
 	var lastModificationDate *time.Time
 	if input.LatestModificationDate != nil {
-		date, err := tools.ParseApiDate(*input.LatestModificationDate)
+		date, err := tools.ParseApiDate(r.Context(), *input.LatestModificationDate)
 		if err != nil {
 			h.SetError(w, err, http.StatusBadRequest)
 			return
@@ -122,7 +125,19 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 		lastModificationDate = &date
 	}
 
-	hasModifications, err := h.storage.HasModificationsSince(r.Context(), authToken.UserDbId, lastModificationDate)
+	var ctxParams []any
+	ctxParams = append(ctxParams, "logId", uuid.NewString())
+	inputBytes, err := json.Marshal(input)
+	if err != nil {
+		ctxParams = append(ctxParams, "body", string(inputBytes))
+	}
+
+	ctx := logger.WrapContext(
+		r.Context(),
+		ctxParams...,
+	)
+
+	hasModifications, err := h.storage.HasModificationsSince(ctx, authToken.UserDbId, lastModificationDate)
 	if err != nil {
 		h.SetError(w, err, http.StatusInternalServerError)
 		return
@@ -136,7 +151,7 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 	userMutex.lockForUser(authToken.UserDbId)
 	defer func() { userMutex.unlockForUser(authToken.UserDbId) }()
 
-	response, err := h.storage.StartTransaction(r.Context(), func(tCtx context.Context) (interface{}, error) {
+	response, err := h.storage.StartTransaction(ctx, func(tCtx context.Context) (interface{}, error) {
 		response, sErr := h.handleUpdatedCardSets(tCtx, input.UpdatedCardSets, authToken.UserDbId)
 		if sErr != nil {
 			return nil, sErr
@@ -158,7 +173,7 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		latestModificationDate, sErr := resolveLastModificationDate(lastModificationDate, input.UpdatedCardSets, deleteModificationTime)
+		latestModificationDate, sErr := resolveLastModificationDate(ctx, lastModificationDate, input.UpdatedCardSets, deleteModificationTime)
 		if sErr != nil {
 			return nil, sErr
 		}
@@ -250,10 +265,10 @@ func (h *Handler) handleUpdatedCardSets(
 	return response, nil
 }
 
-func resolveLastModificationDate(pushLastModificationDate *time.Time, cardSets []*api.CardSet, deletionTime time.Time) (time.Time, error) {
+func resolveLastModificationDate(ctx context.Context, pushLastModificationDate *time.Time, cardSets []*api.CardSet, deletionTime time.Time) (time.Time, error) {
 	var latestModificationDate time.Time
 	for _, cs := range cardSets {
-		md, err := tools.ParseApiDate(cs.ModificationDate) // TODO: not optimal to parse date again
+		md, err := tools.ParseApiDate(ctx, cs.ModificationDate) // TODO: not optimal to parse date again
 		if err != nil {
 			return latestModificationDate, err
 		}

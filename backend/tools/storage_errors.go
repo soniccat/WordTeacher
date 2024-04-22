@@ -5,17 +5,23 @@ import "fmt"
 // InvalidIdError
 
 type InvalidIdError struct {
-	id string
+	id  string
+	err error
 }
 
-func NewInvalidIdError(id string) InvalidIdError {
+func NewInvalidIdError(id string, err error) InvalidIdError {
 	return InvalidIdError{
-		id: id,
+		id:  id,
+		err: err,
 	}
 }
 
 func (e InvalidIdError) Error() string {
-	return fmt.Sprintf("invalid id %s", e.id)
+	return fmt.Sprintf("invalid id %s: %v", e.id, e.err)
+}
+
+func (e InvalidIdError) Unwrap() error {
+	return e.err
 }
 
 // InvalidInputError
@@ -37,7 +43,7 @@ func NewInvalidArgumentError(name string, input interface{}, description string,
 }
 
 func (e InvalidArgumentError) Error() string {
-	return fmt.Sprintf("invalid argument \"%s\": %v. %s, innerError: %s", e.name, e.input, e.description, e.innerError.Error())
+	return fmt.Sprintf("invalid argument \"%s\": %v. %s, innerError: %v", e.name, e.input, e.description, e.innerError)
 }
 
 func (e InvalidArgumentError) Unwrap() error {

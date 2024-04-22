@@ -3,7 +3,6 @@ package storage
 import (
 	"api"
 	"context"
-	"log"
 	"time"
 	"tools"
 
@@ -37,12 +36,12 @@ func (m *Repository) CreateTextIndexIfNeeded(ctx context.Context) error {
 	cursor, err := m.CardSetCollection.Indexes().List(ctx)
 
 	if err != nil {
-		log.Fatal(err)
+		return logger.WrapError(ctx, err)
 	}
 
 	var result []bson.M
 	if err = cursor.All(ctx, &result); err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	var textIndexName = "search_index"
@@ -71,7 +70,7 @@ func (m *Repository) CreateTextIndexIfNeeded(ctx context.Context) error {
 	}
 	_, err = m.CardSetCollection.Indexes().CreateOne(ctx, indexModel)
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	return nil
@@ -83,31 +82,31 @@ func (m *Repository) DeleteSearchCardSetByCardSetId(
 ) error {
 	_, err := m.CardSetCollection.DeleteOne(ctx, bson.M{"cardSetId": cardSetId})
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	return nil
 }
 
 func (m *Repository) LoadCardSetDbById(
-	context context.Context,
+	ctx context.Context,
 	id string,
 ) (*model.DbCardSet, error) {
-	cardSetDbId, err := primitive.ObjectIDFromHex(id)
+	cardSetDbId, err := tools.ParseObjectID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return m.loadCardSetDb(context, bson.M{"_id": cardSetDbId})
+	return m.loadCardSetDb(ctx, bson.M{"_id": cardSetDbId})
 }
 
 func (m *Repository) loadCardSetDb(
-	context context.Context,
+	ctx context.Context,
 	filter interface{},
 ) (*model.DbCardSet, error) {
 	var cardSetDb model.DbCardSet
-	err := m.CardSetCollection.FindOne(context, filter).Decode(&cardSetDb)
+	err := m.CardSetCollection.FindOne(ctx, filter).Decode(&cardSetDb)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return &cardSetDb, nil
@@ -125,7 +124,7 @@ func (m *Repository) UpsertCardSet(
 	)
 
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	return nil
@@ -137,7 +136,7 @@ func (m *Repository) DeleteCardSets(
 ) error {
 	_, err := m.CardSetCollection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
 	if err != nil {
-		return err
+		return logger.WrapError(ctx, err)
 	}
 
 	return nil
@@ -154,7 +153,7 @@ func (m *Repository) SearchCardSets(
 		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	defer func() { cursor.Close(ctx) }()
@@ -162,7 +161,7 @@ func (m *Repository) SearchCardSets(
 	var dbCardSets []*model.DbCardSet
 	err = cursor.All(ctx, &dbCardSets)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return model.DbCardSetsToApi(dbCardSets), nil
@@ -182,7 +181,7 @@ func (m *Repository) LastCardSetModificationDate(
 		options.FindOne().SetProjection(bson.M{"modificationDate": 1}).SetSort(bson.M{"modificationDate": -1}),
 	).Decode(&r)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
 	return tools.Ptr(r.ModificationDate.Time()), nil

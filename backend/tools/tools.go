@@ -1,7 +1,9 @@
 package tools
 
 import (
+	"context"
 	"time"
+	"tools/logger"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -10,34 +12,35 @@ func Ptr[T any](x T) *T {
 	return &x
 }
 
-func ParseApiDate(date string) (time.Time, error) {
-	return time.Parse(time.RFC3339Nano, date)
+func ParseApiDate(ctx context.Context, date string) (time.Time, error) {
+	t, err := time.Parse(time.RFC3339Nano, date)
+	return t, logger.WrapError(ctx, err)
 }
 
 func TimeToApiDate(t time.Time) string {
 	return t.UTC().Truncate(time.Millisecond).Format(time.RFC3339Nano)
 }
 
-func ApiDateToDbDate(date string) (primitive.DateTime, error) {
+func ApiDateToDbDate(ctx context.Context, date string) (primitive.DateTime, error) {
 	dateTime, err := time.Parse(time.RFC3339Nano, date)
 	if err != nil {
-		return 0, err
+		return 0, logger.WrapError(ctx, err)
 	}
 
 	return primitive.NewDateTimeFromTime(dateTime), nil
 }
 
-func ApiDatePtrToDbDatePtr(date *string) (*primitive.DateTime, error) {
+func ApiDatePtrToDbDatePtr(ctx context.Context, date *string) (*primitive.DateTime, error) {
 	if date == nil {
 		return nil, nil
 	}
 
-	dbDate, err := ApiDateToDbDate(*date)
+	dbDate, err := ApiDateToDbDate(ctx, *date)
 	if err != nil {
-		return nil, err
+		return nil, logger.WrapError(ctx, err)
 	}
 
-	return &dbDate, err
+	return &dbDate, nil
 }
 
 func DbDateToApiDate(date primitive.DateTime) string {
@@ -58,14 +61,8 @@ func DoubleSliceComparableEqual[T comparable](a [][]T, b [][]T) bool {
 
 func SliceAppend[T any](s1 []T, s2 []T) []T {
 	res := make([]T, 0, len(s1)+len(s2))
-	for i := range s1 {
-		res = append(res, s1[i])
-	}
-
-	for i := range s2 {
-		res = append(res, s2[i])
-	}
-
+	res = append(res, s1...)
+	res = append(res, s2...)
 	return res
 }
 
@@ -152,23 +149,25 @@ func Reduce[T, U any](s []T, init U, f func(U, T) U) U {
 	return r
 }
 
-func ParseObjectID(idString string) (*primitive.ObjectID, error) {
+func ParseObjectID(ctx context.Context, idString string) (*primitive.ObjectID, error) {
 	var cardDbId *primitive.ObjectID
 	if len(idString) != 0 {
 		anId, err := primitive.ObjectIDFromHex(idString)
 		if err != nil {
-			return nil, err
+			return nil, logger.WrapError(ctx, NewInvalidIdError(idString, err))
 		}
 		cardDbId = &anId
+	} else {
+		return nil, logger.Error(ctx, "empty idString")
 	}
 
 	return cardDbId, nil
 }
 
-func IdsToMongoIds(ids []string) ([]primitive.ObjectID, error) {
+func IdsToMongoIds(ctx context.Context, ids []string) ([]primitive.ObjectID, error) {
 	return MapOrError(ids, func(hex string) (primitive.ObjectID, error) {
 		id, err := primitive.ObjectIDFromHex(hex)
-		return id, err
+		return id, logger.WrapError(ctx, NewInvalidIdError(hex, err))
 	})
 }
 

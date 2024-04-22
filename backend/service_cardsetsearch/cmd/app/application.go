@@ -29,12 +29,14 @@ type application struct {
 func createApplication(
 	ctx context.Context,
 	logger *logger.Logger,
-	sessionManager *scs.SessionManager,
+	redisAddress string,
 	mongoURI string,
 	enableCredentials bool,
-	sessionValidator session_validator.SessionValidator,
 	cardSetsClient cardsets_client.Contract,
 ) (_ *application, err error) {
+	sessionManager := tools.CreateSessionManager(redisAddress)
+	sessionValidator := session_validator.NewSessionManagerValidator(sessionManager)
+
 	app := &application{
 		MongoEnv:         mongowrapper.NewMongoEnv(logger),
 		ctx:              ctx,
