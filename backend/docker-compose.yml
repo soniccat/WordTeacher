@@ -249,6 +249,8 @@ services:
       - ./config/promtail-local-config.yaml:/etc/config/promtail-local-config.yaml
       - '${VOLUME_NGINX_PATH}:/var/log/nginx'
       - '${VOLUME_PROMTAIL_PATH}:/var/lib/promtail'
+      - ${VOLUME_AUTH_SERVICELOG_PATH}:/var/log/service_auth.log
+      - ${VOLUME_AUTH_SERVERLOG_PATH}:/var/log/server_auth.log
     environment:
       - PROMTAIL_PORT=${PROMTAIL_PORT}
     entrypoint:

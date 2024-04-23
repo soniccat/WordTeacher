@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "type": "db",
+    "canSave": false,
+    "canEdit": false,
+    "canAdmin": false,
+    "canStar": true,
+    "canDelete": false,
+    "slug": "metrics",
+    "url": "/dashboards/f/fdip6obfyvytcc/metrics",
+    "expires": "0001-01-01T00:00:00Z",
+    "created": "2024-04-14T10:05:13Z",
+    "updated": "2024-04-14T10:05:13Z",
+    "updatedBy": "admin",
+    "createdBy": "admin",
+    "version": 1,
+    "hasAcl": false,
+    "isFolder": true,
+    "folderId": 0,
+    "folderUid": "",
+    "folderTitle": "General",
+    "folderUrl": "",
+    "provisioned": false,
+    "provisionedExternalId": "",
+    "annotationsPermissions": {
+      "dashboard": {
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
+      },
+      "organization": {
+        "canAdd": false,
+        "canEdit": false,
+        "canDelete": false
+      }
+    }
+  },
+  "dashboard": {
+    "id": 19,
+    "schemaVersion": 17,
+    "title": "Metrics",
+    "uid": "fdip6obfyvytcc",
+    "version": 1
+  }
+}

@@ -14,7 +14,7 @@ scrape_configs:
   - targets:
       - localhost
     labels:
-      job: nginx
+      service_name: nginx
       __path__: /var/log/nginx/*
   pipeline_stages:
   - json:
@@ -33,6 +33,26 @@ scrape_configs:
   - targets:
       - localhost
     labels:
-      job: rootlogs
+      service_name: root
       __path__: /var/log/root/*log
-
+- job_name: service_auth
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      service_name: service_auth
+      __path__: /var/log/service_auth.log
+  pipeline_stages:
+  - json:
+      expressions:
+        time:
+        level:
+        networkType:
+        deviceType:
+  - labels:
+      level:
+      networkType:
+      deviceType:
+  - timestamp:
+      source: time
+      format: RFC3339Nano

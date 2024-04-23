@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "type": "db",
+    "canSave": false,
+    "canEdit": false,
+    "canAdmin": false,
+    "canStar": true,
+    "canDelete": false,
+    "slug": "logs",
+    "url": "/dashboards/f/adip7t93sv18ge/logs",
+    "expires": "0001-01-01T00:00:00Z",
+    "created": "2024-04-14T10:17:58Z",
+    "updated": "2024-04-14T10:17:58Z",
+    "updatedBy": "admin",
+    "createdBy": "admin",
+    "version": 1,
+    "hasAcl": false,
+    "isFolder": true,
+    "folderId": 0,
+    "folderUid": "",
+    "folderTitle": "General",
+    "folderUrl": "",
+    "provisioned": false,
+    "provisionedExternalId": "",
+    "annotationsPermissions": {
+      "dashboard": {
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
+      },
+      "organization": {
+        "canAdd": false,
+        "canEdit": false,
+        "canDelete": false
+      }
+    }
+  },
+  "dashboard": {
+    "id": 23,
+    "schemaVersion": 17,
+    "title": "Logs",
+    "uid": "adip7t93sv18ge",
+    "version": 1
+  }
+}
