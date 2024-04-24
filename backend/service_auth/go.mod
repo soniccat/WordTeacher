@@ -3,16 +3,18 @@ module service_auth
 go 1.19
 
 require tools v0.0.1
+
 replace tools => ../tools
 
 require models v0.0.1
+
 replace models => ../models
 
 require (
 	github.com/alexedwards/scs/v2 v2.5.1
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.8.0
 	go.mongodb.org/mongo-driver v1.10.3
 	google.golang.org/api v0.100.0
 )

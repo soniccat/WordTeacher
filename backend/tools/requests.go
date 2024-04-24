@@ -112,9 +112,9 @@ type ErrorResponse struct {
 func SetError(w http.ResponseWriter, outErr error, code int, logger *logger.Logger) {
 	if code >= 500 {
 		logger.ErrorWithError(context.Background(), outErr, "")
-	} else {
+	} /*else {
 		logger.InfoWithError(context.Background(), outErr, "") // TODO: remove it, now it's here just for testing
-	}
+	}*/
 
 	w.WriteHeader(code)
 

@@ -56,13 +56,13 @@ func run() int {
 		serverLogWriter = os.Stdout
 		serviceLogWriter = os.Stdout
 	} else {
-		serverLogWriter, err = os.OpenFile(*serverLogPath, os.O_CREATE|os.O_WRONLY, os.ModeAppend)
+		serverLogWriter, err = os.OpenFile(*serverLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModeAppend)
 		if err != nil {
 			fmt.Println("server logfile open error: " + err.Error())
 			return failCode
 		}
 
-		serviceLogWriter, err = os.OpenFile(*serviceLogPath, os.O_CREATE|os.O_WRONLY, os.ModeAppend)
+		serviceLogWriter, err = os.OpenFile(*serviceLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModeAppend)
 		if err != nil {
 			fmt.Println("service logfile open error: " + err.Error())
 			return failCode
