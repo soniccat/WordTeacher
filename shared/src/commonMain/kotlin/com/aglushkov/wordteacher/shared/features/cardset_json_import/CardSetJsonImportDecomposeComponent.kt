@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJ
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 
 class CardSetJsonImportDecomposeComponent (
     componentContext: ComponentContext,
@@ -16,4 +17,9 @@ class CardSetJsonImportDecomposeComponent (
     cardSetsRepository,
     timeSource,
 ), ComponentContext by componentContext {
+    init {
+        lifecycle.doOnDestroy {
+            onCleared()
+        }
+    }
 }

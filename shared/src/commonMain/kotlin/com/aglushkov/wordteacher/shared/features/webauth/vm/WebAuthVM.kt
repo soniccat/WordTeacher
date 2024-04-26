@@ -1,9 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.webauth.vm
 
-import androidx.compose.runtime.MutableState
 import com.aglushkov.wordteacher.shared.features.AuthOpener
-import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthData
 import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.essenty.parcelable.Parcelable
@@ -12,7 +11,6 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update

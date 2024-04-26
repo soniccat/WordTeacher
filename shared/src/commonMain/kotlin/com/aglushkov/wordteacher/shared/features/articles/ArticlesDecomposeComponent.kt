@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVMImpl
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 
 class ArticlesDecomposeComponent (
     componentContext: ComponentContext,
@@ -14,4 +15,9 @@ class ArticlesDecomposeComponent (
     articlesRepository,
     timeSource
 ), ComponentContext by componentContext {
+    init {
+        lifecycle.doOnDestroy {
+            onCleared()
+        }
+    }
 }

@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.di
 
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.service.SpaceHttpClientBuilder
@@ -45,12 +47,11 @@ class SharedAppModule {
     @Provides
     fun configRepository(
         @BasePath basePath: Path,
-        @ApiBaseUrl apiBaseUrl: String,
         fileSystem: FileSystem,
         secureCodec: SecureCodec,
     ): ConfigRepository {
         val configPath = basePath.div("services")
-        val wordTeacherDictServiceConfig = Config(0, Config.Type.WordTeacher, ConfigConnectParams(apiBaseUrl, "", ""), emptyMap())
+        val wordTeacherDictServiceConfig = Config(0, Config.Type.WordTeacher, ConfigConnectParams("", "", ""), emptyMap())
         return ConfigRepository(
             configPath,
             fileSystem,
@@ -117,9 +118,12 @@ class SharedAppModule {
     @AppComp
     @Provides
     fun wordTeacherWordServiceFactory(
+        @ApiBaseUrl apiBaseUrl: String,
+        deviceIdRepository: DeviceIdRepository,
+        appInfo: AppInfo,
         secureCodec: SecureCodec,
     ): WordTeacherWordServiceFactory {
-        return WordTeacherWordServiceFactory(secureCodec)
+        return WordTeacherWordServiceFactory(apiBaseUrl, deviceIdRepository, appInfo, secureCodec)
     }
 
     @AppComp
@@ -263,14 +267,12 @@ class SharedAppModule {
         appInfo: AppInfo,
         cookieStorage: CookiesStorage,
         spaceAuthRepository: dagger.Lazy<SpaceAuthRepository>,
-        @Platform platform: String,
         @IsDebug isDebug: Boolean,
     ): HttpClient = SpaceHttpClientBuilder(
         deviceIdRepository,
         appInfo,
         cookieStorage,
         { spaceAuthRepository.get() },
-        platform,
         isDebug,
     ).build()
 

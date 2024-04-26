@@ -35,7 +35,7 @@ class DatabaseCardWorker(
     private val editOperationCount = MutableStateFlow(0)
     private var stateStack by Delegates.observable(listOf<State>()) { _, _, new ->
         currentStateFlow.value = currentState
-        Logger.v("state: $new", "DatabaseCardWorker")
+        Logger.v("state: $new", TAG)
     }
 
     val currentStateFlow = MutableStateFlow(State.NONE)
@@ -176,7 +176,7 @@ class DatabaseCardWorker(
 
     private suspend fun popStateInternal(state: State) {
         if (!stateStack.contains(state)) {
-            Logger.e("Trying to pop not existing state ${state} when the current is ${currentState}", "DatabaseCardWorker")
+            Logger.e("Trying to pop not existing state ${state} when the current is ${currentState}", TAG)
             return
         }
 
@@ -184,31 +184,31 @@ class DatabaseCardWorker(
             prepareToNewState(previousState, currentState)
             stateStack = stateStack.take(stateStack.size - 1)
         } else {
-            Logger.e("Trying to pop a wrong state ${state} when the current is ${currentState}", "DatabaseCardWorker")
+            Logger.e("Trying to pop a wrong state ${state} when the current is ${currentState}", TAG)
         }
     }
 
     private suspend fun prepareToNewState(newState: State, fromState: State) {
         if (newState == fromState) {
-            Logger.e("Trying to prepare for the same state ${newState}", "DatabaseCardWorker")
+            Logger.e("Trying to prepare for the same state ${newState}", TAG)
             return
         }
 
         when (fromState) {
             State.UPDATING_FREQUENCY -> {
-                Logger.v("cardFrequencyUpdateWorker.pauseAndWaitUntilPausedOrDone", "DatabaseCardWorker")
+                Logger.v("cardFrequencyUpdateWorker.pauseAndWaitUntilPausedOrDone", TAG)
                 cardFrequencyUpdateWorker.pauseAndWaitUntilPausedOrDone()
             }
             State.UPDATING_SPANS -> {
-                Logger.v("spanUpdateWorker.pauseAndWaitUntilPausedOrDone", "DatabaseCardWorker")
+                Logger.v("spanUpdateWorker.pauseAndWaitUntilPausedOrDone", TAG)
                 spanUpdateWorker.pauseAndWaitUntilPausedOrDone()
             }
             State.EDITING -> {
-                Logger.v("waitUntilEditingIsDone", "DatabaseCardWorker")
+                Logger.v("waitUntilEditingIsDone", TAG)
                 waitUntilEditingIsDone()
             }
             State.SYNCING -> {
-                Logger.v("cardSetSyncWorker.pauseAndWaitUntilDone", "DatabaseCardWorker")
+                Logger.v("cardSetSyncWorker.pauseAndWaitUntilDone", TAG)
                 cardSetSyncWorker.pauseAndWaitUntilDone()
             }
             State.NONE -> {}
@@ -216,15 +216,15 @@ class DatabaseCardWorker(
 
         when(newState) {
             State.UPDATING_FREQUENCY -> {
-                Logger.v("cardFrequencyUpdateWorker.resume()", "DatabaseCardWorker")
+                Logger.v("cardFrequencyUpdateWorker.resume()", TAG)
                 cardFrequencyUpdateWorker.resume()
             }
             State.UPDATING_SPANS -> {
-                Logger.v("spanUpdateWorker.resume()", "DatabaseCardWorker")
+                Logger.v("spanUpdateWorker.resume()", TAG)
                 spanUpdateWorker.resume()
             }
             State.SYNCING -> {
-                Logger.v("cardSetSyncWorker.resume()", "DatabaseCardWorker")
+                Logger.v("cardSetSyncWorker.resume()", TAG)
                 cardSetSyncWorker.resume()
             }
             State.EDITING, State.NONE -> {}
@@ -307,14 +307,14 @@ class DatabaseCardWorker(
             validateEditingState()
             editOperationCount.update {
                 val v = it + 1
-                Logger.v("editOperationCount: $v", "DatabaseCardWorker")
+                Logger.v("editOperationCount: $v", TAG)
                 v
             }
             block()
         } finally {
             editOperationCount.update {
                 val v = it - 1
-                Logger.v("editOperationCount: $v", "DatabaseCardWorker")
+                Logger.v("editOperationCount: $v", TAG)
                 v
             }
         }
@@ -322,7 +322,7 @@ class DatabaseCardWorker(
 
     private fun validateEditingState() {
         if (currentState != State.EDITING) {
-            Logger.e("Editing operation was called when state is ${currentState.name}")
+            Logger.e("Editing operation was called when state is ${currentState.name}", TAG)
         }
         pushState(State.EDITING)
     }
@@ -335,3 +335,5 @@ class DatabaseCardWorker(
         UPDATING_FREQUENCY,
     }
 }
+
+private val TAG = "DatabaseCardWorker"

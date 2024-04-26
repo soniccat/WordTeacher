@@ -76,21 +76,6 @@ class TextActionDecomposeComponentImpl(
             childFactory = ::resolveChild,
         )
 
-//    override val router: Router<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child> =
-//        router(
-//            initialConfiguration = TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration,
-//            key = "TextActionRouter",
-//            handleBackButton = true,
-//            childFactory = ::resolveChild
-//        )
-//
-//    private val routerStateChangeHandler = RouterStateChangeHandler()
-//    override val routerState: Value<RouterState<*, TextActionDecomposeComponent.Child>>
-//        get() = super.routerState.map {
-//            routerStateChangeHandler.onClearableChanged(it.toClearables())
-//            it
-//        }
-
     private fun resolveChild(
         configuration: TextActionDecomposeComponent.ChildConfiguration,
         componentContext: ComponentContext

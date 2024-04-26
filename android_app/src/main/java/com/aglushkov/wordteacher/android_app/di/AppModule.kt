@@ -19,6 +19,8 @@ import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.okio.writeTo
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -83,7 +85,9 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun appInfo(): AppInfo = AppInfo(BuildConfig.VERSION_NAME, "Android")
+    fun appInfo(
+        @Platform platform: String,
+    ): AppInfo = AppInfo(BuildConfig.VERSION_NAME, platform)
 
     // TODO: replace with bind
     @AppComp

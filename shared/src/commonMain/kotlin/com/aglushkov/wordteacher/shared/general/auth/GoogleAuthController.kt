@@ -1,4 +1,4 @@
-package com.aglushkov.wordteacher.shared.general
+package com.aglushkov.wordteacher.shared.general.auth
 
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthController
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData

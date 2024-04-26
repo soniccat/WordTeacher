@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.repository.space
 
 import com.aglushkov.wordteacher.shared.general.ErrorResponseException
-import com.aglushkov.wordteacher.shared.general.GoogleAuthController
-import com.aglushkov.wordteacher.shared.general.VKAuthController
+import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthController
 import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.toOkResponse

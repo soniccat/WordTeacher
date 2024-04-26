@@ -16,8 +16,7 @@ import com.aglushkov.wordteacher.shared.features.dict_configs.di.DictConfigsDepe
 import com.aglushkov.wordteacher.shared.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.shared.features.webauth.di.WebAuthDependencies
 import com.aglushkov.wordteacher.shared.general.FileLogger
-import com.aglushkov.wordteacher.shared.general.GoogleAuthController
-import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
+import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import dagger.Component

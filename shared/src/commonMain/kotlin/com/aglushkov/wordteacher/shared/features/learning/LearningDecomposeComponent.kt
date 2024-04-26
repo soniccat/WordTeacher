@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 
 class LearningDecomposeComponent (
     state: LearningVM.State,
@@ -30,6 +31,10 @@ class LearningDecomposeComponent (
     init {
         stateKeeper.register(KEY_STATE, strategy = LearningVM.State.serializer()) {
             state
+        }
+
+        lifecycle.doOnDestroy {
+            onCleared()
         }
 
         restore(instanceState)

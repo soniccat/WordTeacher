@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.essenty.statekeeper.consume
 
 class SettingsDecomposeComponent (
@@ -53,6 +54,10 @@ class SettingsDecomposeComponent (
     init {
         stateKeeper.register(KEY_STATE) {
             state
+        }
+
+        lifecycle.doOnDestroy {
+            onCleared()
         }
 
         restore(instanceState.state)

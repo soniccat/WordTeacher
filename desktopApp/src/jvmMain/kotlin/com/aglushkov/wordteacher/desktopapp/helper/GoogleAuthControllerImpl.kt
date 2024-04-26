@@ -2,8 +2,7 @@ package com.aglushkov.wordteacher.desktopapp.helper
 
 import com.aglushkov.wordteacher.shared.features.AuthOpener
 import com.aglushkov.wordteacher.shared.features.Cancelled
-import com.aglushkov.wordteacher.shared.general.GoogleAuthData
-import com.aglushkov.wordteacher.shared.general.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError

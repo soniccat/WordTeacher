@@ -1,6 +1,6 @@
 package com.aglushkov.wordteacher.desktopapp.helper
 
-import com.aglushkov.wordteacher.shared.general.VKAuthController
+import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import kotlinx.coroutines.flow.MutableStateFlow

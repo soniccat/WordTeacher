@@ -1,14 +1,8 @@
 package com.aglushkov.wordteacher.android_app.helper
 
-import android.app.Activity
-import android.content.Intent
-import android.content.IntentSender
-import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.e
 import androidx.activity.ComponentActivity
-import com.aglushkov.wordteacher.shared.general.VKAuthController
-import com.aglushkov.wordteacher.shared.general.VKAuthData
-import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthController
+import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
+import com.aglushkov.wordteacher.shared.general.auth.VKAuthData
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError

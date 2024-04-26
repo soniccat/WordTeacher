@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.essenty.statekeeper.consume
 import com.russhwolf.settings.coroutines.FlowSettings
 
@@ -40,6 +41,10 @@ class ArticleDecomposeComponent(
     init {
         stateKeeper.register(KEY_STATE) {
             state.value.toState()
+        }
+
+        lifecycle.doOnDestroy {
+            onCleared()
         }
 
         restore(instanceState.state)

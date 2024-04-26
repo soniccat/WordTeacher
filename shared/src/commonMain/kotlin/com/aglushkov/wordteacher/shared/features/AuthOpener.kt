@@ -1,6 +1,6 @@
 package com.aglushkov.wordteacher.shared.features
 
-import com.aglushkov.wordteacher.shared.general.GoogleAuthData
+import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthData
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 
 interface AuthOpener {

@@ -302,7 +302,7 @@ class AppDatabase(
                 id = cardSet.id,
                 name = cardSet.name,
                 date = cardSet.creationDate.toEpochMilliseconds(),
-                modificationDate = cardSet.modificationDate.toEpochMilliseconds(),
+                modificationDate = timeSource.timeInMilliseconds(),
                 creationId = cardSet.creationId,
                 remoteId = cardSet.remoteId,
                 infoDescription = cardSet.info.description,

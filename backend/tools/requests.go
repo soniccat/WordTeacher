@@ -11,6 +11,7 @@ const CookieSession = "session"
 const HeaderDeviceId = "X-Device-Id"
 const HeaderDeviceType = "X-Device-Type"
 const HeaderAccessToken = "X-Access-Token"
+const HeaderAppVersion = "X-App-Version"
 
 const (
 	DeviceTypeAndroid = "android"

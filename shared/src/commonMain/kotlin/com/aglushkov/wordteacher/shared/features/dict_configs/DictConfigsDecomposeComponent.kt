@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 
 class DictConfigsDecomposeComponent (
     componentContext: ComponentContext,
@@ -19,4 +20,9 @@ class DictConfigsDecomposeComponent (
     dictRepository,
     idGenerator,
 ), ComponentContext by componentContext {
+    init {
+        lifecycle.doOnDestroy {
+            onCleared()
+        }
+    }
 }

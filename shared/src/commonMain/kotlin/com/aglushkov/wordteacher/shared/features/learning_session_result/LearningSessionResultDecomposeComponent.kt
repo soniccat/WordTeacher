@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.Lear
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 
 class LearningSessionResultDecomposeComponent (
     state: LearningSessionResultVM.State,
@@ -23,6 +24,10 @@ class LearningSessionResultDecomposeComponent (
     init {
         stateKeeper.register(KEY_STATE, strategy = LearningSessionResultVM.State.serializer()) {
             state
+        }
+
+        lifecycle.doOnDestroy {
+            onCleared()
         }
 
         restore(instanceState)

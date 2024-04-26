@@ -70,8 +70,8 @@ type DbCardSet struct {
 }
 
 type DbCardSetInfo struct {
-	Description string
-	Source      *string // url
+	Description string  `bson:"description"`
+	Source      *string `bson:"source"`
 }
 
 func (cs *DbCardSet) ToApi() *api.CardSet {

@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 
 class CardSetsDecomposeComponent (
     initialState: CardSetsVM.State,
@@ -25,4 +26,9 @@ class CardSetsDecomposeComponent (
     idGenerator,
     features
 ), ComponentContext by componentContext {
+    init {
+        lifecycle.doOnDestroy {
+            onCleared()
+        }
+    }
 }

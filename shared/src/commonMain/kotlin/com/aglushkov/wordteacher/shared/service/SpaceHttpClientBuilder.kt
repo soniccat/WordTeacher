@@ -21,7 +21,6 @@ class SpaceHttpClientBuilder(
     private val appInfo: AppInfo,
     private val cookieStorage: CookiesStorage,
     private val spaceAuthRepositoryProvider: () -> SpaceAuthRepository,
-    private val platform: String,
     private val isDebug: Boolean,
 ) {
     fun build() = HttpClient {
@@ -82,8 +81,9 @@ class SpaceHttpClientBuilder(
             createClientPlugin("SpacePlugin") {
                 onRequest { request, _ ->
                     request.headers {
-                        set(HeaderDeviceType, platform)
+                        set(HeaderDeviceType, appInfo.osName)
                         set(HeaderDeviceId, deviceIdRepository.deviceId())
+                        set(HeaderAppVersion, appInfo.version)
                         spaceAuthRepositoryProvider().currentAuthData.asLoaded()?.data?.let { authData ->
                             request.setAuthData(authData)
                         }

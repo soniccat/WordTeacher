@@ -18,8 +18,8 @@ data class CardSet (
     @SerialName("cards") val cards: List<Card> = emptyList(),
     var terms: List<String> = emptyList(), // for cardsets from search
     val creationId: String,
-    val info: CardSetInfo,
-    val isAvailableInSearch: Boolean,
+    val info: CardSetInfo = CardSetInfo("", null),
+    val isAvailableInSearch: Boolean = false,
 ) {
     fun findCard(id: Long) =
         cards.firstOrNull { it.id == id }

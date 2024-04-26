@@ -2,8 +2,6 @@
 package com.aglushkov.wordteacher.desktopapp.di
 
 import com.aglushkov.wordteacher.desktopapp.configs.GoogleConfig
-import com.aglushkov.wordteacher.desktopapp.configs.KeyStoreConfig
-import com.aglushkov.wordteacher.desktopapp.general.crypto.CertCreator
 import com.aglushkov.wordteacher.desktopapp.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.desktopapp.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
@@ -25,8 +23,8 @@ import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.FileOpenCompositeSuccessHandler
 import com.aglushkov.wordteacher.shared.general.FileOpenController
-import com.aglushkov.wordteacher.shared.general.GoogleAuthController
-import com.aglushkov.wordteacher.shared.general.VKAuthController
+import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -48,16 +46,7 @@ import dagger.Provides
 import io.ktor.http.Url
 import okio.FileSystem
 import okio.Path
-import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
-import org.bouncycastle.jce.provider.BouncyCastleProvider
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.security.KeyStore
-import java.security.KeyStore.PasswordProtection
-import java.security.Security
-import java.security.cert.X509Certificate
-import java.util.Date
 import javax.inject.Qualifier
 
 
@@ -93,7 +82,12 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun appInfo(): AppInfo = AppInfo("1.0", "Desktop") // TODO: figure out how to get version
+    fun appInfo(
+        @Platform platform: String,
+    ): AppInfo = AppInfo(
+        "1.0",
+        platform
+    ) // TODO: figure out how to get version
 
     // TODO: replace with bind
     @AppComp

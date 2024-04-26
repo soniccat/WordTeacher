@@ -139,12 +139,6 @@ class MainDecomposeComponentImpl(
             handleBackButton = true, // Pop the back stack on back button press
             childFactory = ::resolveChild,
         )
-//    private val dialogStateChangeHandler = RouterStateChangeHandler()
-//    override val dialogsStateFlow = MutableStateFlow<List<Child.Created<MainDecomposeComponent.ChildConfiguration, MainDecomposeComponent.Child>>>(emptyList())
-//    private var dialogHolders: List<DialogHolder> by Delegates.observable(emptyList()) { _, _, newValue ->
-//        dialogStateChangeHandler.onClearableChanged(newValue.map { it.child.instance })
-//        dialogsStateFlow.value = newValue.map { it.child }
-//    }
 
     private fun resolveChild(
         configuration: MainDecomposeComponent.ChildConfiguration,

@@ -17,6 +17,7 @@ const val CookieSession = "session"
 const val HeaderDeviceId = "X-Device-Id"
 const val HeaderDeviceType = "X-Device-Type"
 const val HeaderAccessToken = "X-Access-Token"
+const val HeaderAppVersion = "X-App-Version"
 
 @Serializable
 data class SpaceAuthData(

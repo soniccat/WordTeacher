@@ -6,6 +6,8 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.lifecycle.subscribe
 
 class CardSetInfoDecomposeComponent(
     componentContext: ComponentContext,
@@ -26,6 +28,10 @@ class CardSetInfoDecomposeComponent(
             key = KEY_STATE,
             strategy = CardSetInfoVM.State.serializer()
         ) { this.state }
+
+        lifecycle.doOnDestroy {
+            onCleared()
+        }
     }
 
     private companion object {

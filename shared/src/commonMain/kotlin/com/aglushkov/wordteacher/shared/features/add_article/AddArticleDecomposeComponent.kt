@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.essenty.statekeeper.consume
 
 class AddArticleDecomposeComponent(
@@ -32,6 +33,10 @@ class AddArticleDecomposeComponent(
     init {
         stateKeeper.register(KEY_STATE) {
             createState()
+        }
+
+        lifecycle.doOnDestroy {
+            onCleared()
         }
 
         restore(instanceState.state)
