@@ -41,7 +41,7 @@ scrape_configs:
       - localhost
     labels:
       service_name: service_auth
-      __path__: /var/log/service_auth.log
+      __path__: /var/log/auth/service*
   pipeline_stages:
   - json:
       expressions:

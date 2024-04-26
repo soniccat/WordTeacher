@@ -131,6 +131,7 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		ctxParams = append(ctxParams, "body", string(inputBytes))
 	}
+	ctxParams = append(ctxParams, authToken.LogParams()...)
 
 	ctx := logger.WrapContext(
 		r.Context(),

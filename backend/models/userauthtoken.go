@@ -114,3 +114,12 @@ func (sd *UserAuthToken) IsMatched(
 		sd.UserDeviceType == userDeviceType &&
 		sd.UserDeviceId == userDeviceId
 }
+
+func (sd *UserAuthToken) LogParams() []any {
+	return []any{
+		"networkType", int(sd.NetworkType),
+		"userId", sd.UserDbId,
+		"deviceId", sd.UserDeviceId,
+		"deviceType", sd.UserDeviceType,
+	}
+}

@@ -45,8 +45,7 @@ services:
       - vkid
       - google
     volumes:
-      - ${VOLUME_AUTH_SERVICELOG_PATH}:/var/log/service.log
-      - ${VOLUME_AUTH_SERVERLOG_PATH}:/var/log/server.log
+      - ${VOLUME_AUTH_LOG_PATH}:/var/log
     networks:
       mongo_net:
         ipv4_address: 172.16.0.10
@@ -72,6 +71,8 @@ services:
       - "redis:${REDIS_PORT}"
       - "-grpcPort"
       - "${CARDSETS_GPRC_PORT}"
+    volumes:
+      - ${VOLUME_CARDSETS_LOG_PATH}:/var/log
     networks:
       mongo_net:
         ipv4_address: 172.16.0.11
@@ -97,6 +98,8 @@ services:
       - "redis:${REDIS_PORT}"
       - "-cardSetsGPRCAddress"
       - "apigateway:9090"
+    volumes:
+      - ${VOLUME_CARDSETSEARCH_LOG_PATH}:/var/log
     networks:
       mongo_net:
         ipv4_address: 172.16.0.13
@@ -120,6 +123,8 @@ services:
       - "${DICT_PORT}"
       - "-mongoURI"
       - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
+    volumes:
+      - ${VOLUME_DICT_LOG_PATH}:/var/log
     networks:
       mongo_net:
         ipv4_address: 172.16.0.14
@@ -247,10 +252,12 @@ services:
     volumes:
       - /var/log/system.log:/var/log/root/system.log
       - ./config/promtail-local-config.yaml:/etc/config/promtail-local-config.yaml
-      - '${VOLUME_NGINX_PATH}:/var/log/nginx'
-      - '${VOLUME_PROMTAIL_PATH}:/var/lib/promtail'
-      - ${VOLUME_AUTH_SERVICELOG_PATH}:/var/log/service_auth.log
-      - ${VOLUME_AUTH_SERVERLOG_PATH}:/var/log/server_auth.log
+      - ${VOLUME_NGINX_PATH}:/var/log/nginx
+      - ${VOLUME_PROMTAIL_PATH}:/var/lib/promtail
+      - ${VOLUME_AUTH_LOG_PATH}:/var/log/auth
+      - ${VOLUME_CARDSETS_LOG_PATH}:/var/log/cardsets
+      - ${VOLUME_CARDSETSEARCH_LOG_PATH}:/var/log/cardsetsearch
+      - ${VOLUME_DICT_LOG_PATH}:/var/log/dict
     environment:
       - PROMTAIL_PORT=${PROMTAIL_PORT}
     entrypoint:

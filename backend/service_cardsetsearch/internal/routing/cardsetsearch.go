@@ -41,7 +41,7 @@ func NewCardSetSearchHandler(
 }
 
 func (h *CardSetSearchHandler) CardSetSearch(w http.ResponseWriter, r *http.Request) {
-	_, validateSessionErr := h.sessionValidator.Validate(r)
+	authToken, validateSessionErr := h.sessionValidator.Validate(r)
 	if validateSessionErr != nil {
 		h.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
 		return
@@ -60,8 +60,13 @@ func (h *CardSetSearchHandler) CardSetSearch(w http.ResponseWriter, r *http.Requ
 
 	ctx := logger.WrapContext(
 		r.Context(),
-		"logId", uuid.NewString(),
-		"query", query,
+		append(
+			[]any{
+				"logId", uuid.NewString(),
+				"query", query,
+			},
+			authToken.LogParams()...,
+		),
 	)
 
 	cardSets, err := h.cardSetSearchRepository.SearchCardSets(ctx, query)

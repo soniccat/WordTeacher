@@ -33,8 +33,8 @@ func run() int {
 	// flags
 	isDebug := flag.Bool("debugMode", false, "Shows stack traces in logs")
 	minLogLevel := flag.Int("logLevel", int(slog.LevelInfo), "minimum log level")
-	serviceLogPath := flag.String("serviceLogPath", "/var/log/service_log", "service log file path")
-	serverLogPath := flag.String("serverLogPath", "/var/log/server_log", "server log file path")
+	serviceLogPath := flag.String("serviceLogPath", "/var/log", "service log file path")
+	serverLogPath := flag.String("serverLogPath", "/var/log", "server log file path")
 
 	serverAddr := flag.String("serverAddr", "", "HTTP server network address")
 	serverPort := flag.Int("serverPort", 4002, "HTTP server network port")
@@ -53,17 +53,21 @@ func run() int {
 		serverLogWriter = os.Stdout
 		serviceLogWriter = os.Stdout
 	} else {
-		serverLogWriter, err = os.OpenFile(*serverLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModeAppend)
+		serverLW, err := logger.NewLogWriter(*serverLogPath, "server_", os.Stderr)
 		if err != nil {
-			fmt.Println("server logfile open error: " + err.Error())
+			fmt.Println("server NewLogWriter error: " + err.Error())
 			return failCode
 		}
+		serverLW.ScheduleRotation(context.Background())
+		serverLogWriter = serverLW
 
-		serviceLogWriter, err = os.OpenFile(*serviceLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModeAppend)
+		serviceLW, err := logger.NewLogWriter(*serviceLogPath, "service_", os.Stderr)
 		if err != nil {
-			fmt.Println("service logfile open error: " + err.Error())
+			fmt.Println("service NewLogWriter error: " + err.Error())
 			return failCode
 		}
+		serviceLW.ScheduleRotation(context.Background())
+		serviceLogWriter = serviceLW
 	}
 
 	ctx := context.Background()

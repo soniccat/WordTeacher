@@ -46,7 +46,7 @@ func NewHandler(
 }
 
 func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
-	_, validateSessionErr := h.sessionValidator.Validate(r)
+	authToken, validateSessionErr := h.sessionValidator.Validate(r)
 	if validateSessionErr != nil {
 		h.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
 		return
@@ -62,8 +62,13 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 
 	ctx := logger.WrapContext(
 		r.Context(),
-		"logId", uuid.NewString(),
-		"cardSetId", cardSetId,
+		append(
+			[]any{
+				"logId", uuid.NewString(),
+				"cardSetId", cardSetId,
+			},
+			authToken.LogParams()...,
+		),
 	)
 
 	dbCardSet, err := h.innerStorage.LoadCardSetDbById(ctx, cardSetId)
