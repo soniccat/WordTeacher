@@ -10,10 +10,10 @@
     "url": "/d/edipdzkb75logf/services",
     "expires": "0001-01-01T00:00:00Z",
     "created": "2024-04-14T11:27:12Z",
-    "updated": "2024-04-23T10:29:12Z",
+    "updated": "2024-04-27T18:41:42Z",
     "updatedBy": "admin",
     "createdBy": "admin",
-    "version": 20,
+    "version": 34,
     "hasAcl": false,
     "isFolder": false,
     "folderId": 0,
@@ -128,32 +128,7 @@
               ]
             }
           },
-          "overrides": [
-            {
-              "__systemRef": "hideSeriesFrom",
-              "matcher": {
-                "id": "byNames",
-                "options": {
-                  "mode": "exclude",
-                  "names": [
-                    "{request_uri=\"/cardsetsgrpc.CardSets/GetCardSets\"}"
-                  ],
-                  "prefix": "All except:",
-                  "readOnly": true
-                }
-              },
-              "properties": [
-                {
-                  "id": "custom.hideFrom",
-                  "value": {
-                    "legend": false,
-                    "tooltip": false,
-                    "viz": true
-                  }
-                }
-              ]
-            }
-          ]
+          "overrides": []
         },
         "gridPos": {
           "h": 8,
@@ -182,13 +157,13 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "label_replace(\n    quantile_over_time(\n        0.95,\n        {service_name=\"nginx\"} | status = 200 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]\n    ) by (request_uri), \n    \"request_uri\", \n    \"/api/dict/words/*\", \n    \"request_uri\", \n    \"/api/dict/words/.*\"\n)",
+            "expr": "label_replace(\n    quantile_over_time(\n        0.95,\n        {service_name=\"nginx\"} | status >= 200 and status < 300 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]\n    ) by (request_uri), \n    \"request_uri\", \n    \"/api/dict/words/*\", \n    \"request_uri\", \n    \"/api/dict/words/.*\"\n)",
             "hide": false,
             "queryType": "range",
             "refId": "B"
           }
         ],
-        "title": "nginx - access_log - 200",
+        "title": "nginx - access_log - 200...299",
         "type": "timeseries"
       },
       {
@@ -256,6 +231,101 @@
           "x": 12,
           "y": 1
         },
+        "id": 22,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "label_replace(\n    quantile_over_time(\n        0.95,\n        {service_name=\"nginx\"} | status >= 300 and status < 500 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]\n    ) by (request_uri), \n    \"request_uri\", \n    \"/api/dict/words/*\", \n    \"request_uri\", \n    \"/api/dict/words/.*\"\n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "B"
+          }
+        ],
+        "title": "nginx - access_log - 300..499",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "cdi1al0jre0aoc"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": 3600000,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 9
+        },
         "id": 17,
         "options": {
           "legend": {
@@ -277,13 +347,132 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "quantile_over_time(0.95,{service_name=\"nginx\"} | status != 200 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]) by (request_uri)",
+            "expr": "quantile_over_time(0.95,{service_name=\"nginx\"} | status >= 500 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]) by (request_uri)",
             "hide": false,
             "queryType": "range",
             "refId": "B"
           }
         ],
-        "title": "nginx - access_log - errors",
+        "title": "nginx - access_log - 500...",
+        "type": "timeseries"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 17
+        },
+        "id": 23,
+        "panels": [],
+        "title": "Auth Service",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "cdi1al0jre0aoc"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 18
+        },
+        "id": 24,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "count_over_time(\n    {service_name=\"service_auth\", level=\"INFO\"}[1m]\n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "count_over_time(\n    {service_name=\"service_auth\", level!=\"INFO\"}[1m]\n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "C"
+          }
+        ],
+        "title": "auth service log",
         "type": "timeseries"
       },
       {
@@ -294,8 +483,8 @@
         "gridPos": {
           "h": 8,
           "w": 12,
-          "x": 0,
-          "y": 9
+          "x": 12,
+          "y": 18
         },
         "id": 21,
         "options": {
@@ -310,17 +499,6 @@
         },
         "pluginVersion": "10.4.1",
         "targets": [
-          {
-            "datasource": {
-              "type": "loki",
-              "uid": "cdi1al0jre0aoc"
-            },
-            "editorMode": "code",
-            "expr": "label_replace(\n    quantile_over_time(\n        0.95,\n        {service_name=\"nginx\"} | status = 200 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]\n    ) by (request_uri), \n    \"request_uri\", \n    \"/api/dict/words/*\", \n    \"request_uri\", \n    \"/api/dict/words/.*\"\n)",
-            "hide": true,
-            "queryType": "range",
-            "refId": "B"
-          },
           {
             "datasource": {
               "type": "loki",
@@ -342,7 +520,481 @@
           "h": 1,
           "w": 24,
           "x": 0,
-          "y": 17
+          "y": 26
+        },
+        "id": 25,
+        "panels": [],
+        "title": "Cardsets",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "cdi1al0jre0aoc"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 27
+        },
+        "id": 26,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "count_over_time(\n    {service_name=\"service_cardsets\", level=\"INFO\"}[1m]\n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "count_over_time(\n    {service_name=\"service_cardsets\", level!=\"INFO\"}[1m]\n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "C"
+          }
+        ],
+        "title": "cardsets service log",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "cdi1al0jre0aoc"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 27
+        },
+        "id": 27,
+        "options": {
+          "dedupStrategy": "none",
+          "enableLogDetails": true,
+          "prettifyLogMessage": false,
+          "showCommonLabels": false,
+          "showLabels": false,
+          "showTime": false,
+          "sortOrder": "Descending",
+          "wrapLogMessage": false
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "{service_name=\"service_cardsets\"}",
+            "hide": false,
+            "queryType": "range",
+            "refId": "A"
+          }
+        ],
+        "title": "cardsets service log",
+        "type": "logs"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 35
+        },
+        "id": 28,
+        "panels": [],
+        "title": "Cardsetsearch",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "cdi1al0jre0aoc"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 36
+        },
+        "id": 29,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "count_over_time(\n    {service_name=\"service_cardsetsearch\", level=\"INFO\"}[1m]\n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "count_over_time(\n    {service_name=\"service_cardsetsearch\", level!=\"INFO\"}[1m]\n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "C"
+          }
+        ],
+        "title": "cardsetsearch service log",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "cdi1al0jre0aoc"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 36
+        },
+        "id": 30,
+        "options": {
+          "dedupStrategy": "none",
+          "enableLogDetails": true,
+          "prettifyLogMessage": false,
+          "showCommonLabels": false,
+          "showLabels": false,
+          "showTime": false,
+          "sortOrder": "Descending",
+          "wrapLogMessage": false
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "{service_name=\"service_cardsetsearch\"}",
+            "hide": false,
+            "queryType": "range",
+            "refId": "A"
+          }
+        ],
+        "title": "cardsetsearch service log",
+        "type": "logs"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 44
+        },
+        "id": 31,
+        "panels": [],
+        "title": "Dict",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "cdi1al0jre0aoc"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 45
+        },
+        "id": 32,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "count_over_time(\n    {service_name=\"service_dict\", level=\"INFO\"}[1m]\n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "count_over_time(\n    {service_name=\"service_dict\", level!=\"INFO\"}[1m]\n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "C"
+          }
+        ],
+        "title": "dict service log",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "cdi1al0jre0aoc"
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 45
+        },
+        "id": 33,
+        "options": {
+          "dedupStrategy": "none",
+          "enableLogDetails": true,
+          "prettifyLogMessage": false,
+          "showCommonLabels": false,
+          "showLabels": false,
+          "showTime": false,
+          "sortOrder": "Descending",
+          "wrapLogMessage": false
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "editorMode": "code",
+            "expr": "{service_name=\"service_dict\"}",
+            "hide": false,
+            "queryType": "range",
+            "refId": "A"
+          }
+        ],
+        "title": "dict service log",
+        "type": "logs"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 53
         },
         "id": 18,
         "panels": [],
@@ -358,7 +1010,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 18
+          "y": 54
         },
         "id": 9,
         "options": {
@@ -395,7 +1047,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 18
+          "y": 54
         },
         "id": 14,
         "options": {
@@ -432,7 +1084,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 26
+          "y": 62
         },
         "id": 15,
         "options": {
@@ -466,7 +1118,7 @@
           "h": 1,
           "w": 24,
           "x": 0,
-          "y": 34
+          "y": 70
         },
         "id": 19,
         "panels": [],
@@ -520,7 +1172,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -535,7 +1188,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 35
+          "y": 71
         },
         "id": 8,
         "options": {
@@ -618,7 +1271,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -634,7 +1288,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 35
+          "y": 71
         },
         "id": 6,
         "options": {
@@ -717,7 +1371,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -732,7 +1387,7 @@
           "h": 9,
           "w": 12,
           "x": 0,
-          "y": 43
+          "y": 79
         },
         "id": 7,
         "options": {
@@ -815,7 +1470,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -830,7 +1486,7 @@
           "h": 9,
           "w": 12,
           "x": 12,
-          "y": 43
+          "y": 79
         },
         "id": 4,
         "options": {
@@ -871,7 +1527,7 @@
           "h": 1,
           "w": 24,
           "x": 0,
-          "y": 52
+          "y": 88
         },
         "id": 5,
         "panels": [],
@@ -925,7 +1581,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -940,7 +1597,7 @@
           "h": 8,
           "w": 12,
           "x": 0,
-          "y": 53
+          "y": 89
         },
         "id": 1,
         "options": {
@@ -1022,7 +1679,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -1062,7 +1720,7 @@
           "h": 8,
           "w": 12,
           "x": 12,
-          "y": 53
+          "y": 89
         },
         "id": 2,
         "options": {
@@ -1145,7 +1803,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green"
+                  "color": "green",
+                  "value": null
                 },
                 {
                   "color": "red",
@@ -1154,38 +1813,13 @@
               ]
             }
           },
-          "overrides": [
-            {
-              "__systemRef": "hideSeriesFrom",
-              "matcher": {
-                "id": "byNames",
-                "options": {
-                  "mode": "exclude",
-                  "names": [
-                    "{__name__=\"go_memstats_alloc_bytes\", instance=\"localhost:9091\", job=\"prometheus\"}"
-                  ],
-                  "prefix": "All except:",
-                  "readOnly": true
-                }
-              },
-              "properties": [
-                {
-                  "id": "custom.hideFrom",
-                  "value": {
-                    "legend": false,
-                    "tooltip": false,
-                    "viz": true
-                  }
-                }
-              ]
-            }
-          ]
+          "overrides": []
         },
         "gridPos": {
           "h": 9,
           "w": 12,
           "x": 0,
-          "y": 61
+          "y": 97
         },
         "id": 3,
         "options": {
@@ -1222,6 +1856,7 @@
         "type": "timeseries"
       }
     ],
+    "refresh": "",
     "schemaVersion": 39,
     "tags": [],
     "templating": {
@@ -1235,7 +1870,7 @@
     "timezone": "browser",
     "title": "Services",
     "uid": "edipdzkb75logf",
-    "version": 20,
+    "version": 34,
     "weekStart": ""
   }
 }

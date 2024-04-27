@@ -1,7 +1,7 @@
 {
   "extra": null,
-  "message": "Unauthorized",
-  "messageId": "auth.unauthorized",
+  "message": "Invalid API key",
+  "messageId": "api-key.invalid",
   "statusCode": 401,
   "traceID": ""
 }
