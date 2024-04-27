@@ -18,6 +18,7 @@ const (
 	SessionUserDbIdKey                  = "userDbId"
 	SessionUserDeviceType               = "deviceType"
 	SessionUserDeviceId                 = "deviceId"
+	SessionAppVersion                   = "appVersion"
 )
 
 type UserAuthToken struct {
@@ -28,6 +29,7 @@ type UserAuthToken struct {
 	RefreshToken   string          `bson:"refreshToken,omitempty"`
 	UserDeviceType string          `bson:"deviceType,omitempty"`
 	UserDeviceId   string          `bson:"deviceId,omitempty"`
+	AppVersion     string          `bson:"version,omitempty"`
 	// TODO: consider to add last usage date
 }
 
@@ -38,6 +40,7 @@ func New(
 	userDeviceType string,
 	userDeviceId string,
 	userDbId string,
+	appVersion string,
 ) *UserAuthToken {
 	return &UserAuthToken{
 		AccessToken:    *accessToken,
@@ -46,6 +49,7 @@ func New(
 		UserDeviceType: userDeviceType,
 		UserDeviceId:   userDeviceId,
 		UserDbId:       userDbId,
+		AppVersion:     appVersion,
 	}
 }
 
@@ -86,6 +90,11 @@ func Load(ctx context.Context, manager *scs.SessionManager) (*UserAuthToken, err
 		return nil, logger.Error(ctx, "session user mongo id is missing")
 	}
 
+	appVersion, ok := manager.Get(ctx, SessionAppVersion).(string)
+	if !ok {
+		return nil, logger.Error(ctx, "session app version is missing")
+	}
+
 	return &UserAuthToken{
 		AccessToken: AccessToken{
 			Value:          sessionAccessToken,
@@ -96,6 +105,7 @@ func Load(ctx context.Context, manager *scs.SessionManager) (*UserAuthToken, err
 		UserDeviceType: sessionDeviceType,
 		UserDeviceId:   sessionDeviceId,
 		UserDbId:       sessionUserDbId,
+		AppVersion:     appVersion,
 	}, nil
 }
 
@@ -121,5 +131,6 @@ func (sd *UserAuthToken) LogParams() []any {
 		"userId", sd.UserDbId,
 		"deviceId", sd.UserDeviceId,
 		"deviceType", sd.UserDeviceType,
+		"appVersion", sd.AppVersion,
 	}
 }

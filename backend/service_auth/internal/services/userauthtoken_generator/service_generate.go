@@ -16,6 +16,7 @@ func (g *Service) Generate(
 	networkType models.UserNetworkType,
 	deviceType string,
 	deviceId string,
+	appVersion string,
 ) (*models.UserAuthToken, error) {
 	token, err := generateUserAuthToken(
 		ctx,
@@ -23,6 +24,7 @@ func (g *Service) Generate(
 		networkType,
 		deviceType,
 		deviceId,
+		appVersion,
 	)
 	if err != nil {
 		return nil, err
@@ -44,6 +46,7 @@ func generateUserAuthToken(
 	networkType models.UserNetworkType,
 	deviceType string,
 	deviceId string,
+	appVersion string,
 ) (*models.UserAuthToken, error) {
 	accessTokenValue, err := uuid.NewRandom()
 	if err != nil {
@@ -65,6 +68,7 @@ func generateUserAuthToken(
 		RefreshToken:   refreshTokenValue.String(),
 		UserDeviceType: deviceType,
 		UserDeviceId:   deviceId,
+		AppVersion:     appVersion,
 	}, nil
 }
 
@@ -76,4 +80,5 @@ func saveUserAuthTokenAsSession(sd *models.UserAuthToken, context context.Contex
 	manager.Put(context, models.SessionUserDbIdKey, sd.UserDbId)
 	manager.Put(context, models.SessionUserDeviceType, sd.UserDeviceType)
 	manager.Put(context, models.SessionUserDeviceId, sd.UserDeviceId)
+	manager.Put(context, models.SessionAppVersion, sd.AppVersion)
 }

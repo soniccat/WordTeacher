@@ -37,6 +37,7 @@ func (s *Service) RefreshToken(
 		userAuthToken.NetworkType,
 		userInfo.DeviceType,
 		userInfo.DeviceId,
+		userInfo.AppVersion,
 	)
 	if err != nil {
 		return nil, err

@@ -115,6 +115,8 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.Logger.Info(ctx, "pull", "isPull", true)
+
 	response := Response{
 		UpdatedCardSets:        apiCardSets,
 		DeletedCardSetIds:      idsToDelete,

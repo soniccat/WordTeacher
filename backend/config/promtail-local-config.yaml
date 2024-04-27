@@ -51,10 +51,12 @@ scrape_configs:
         level:
         networkType:
         deviceType:
+        appVersion:
   - labels:
       level:
       networkType:
       deviceType:
+      appVersion:
   - timestamp:
       source: time
       format: RFC3339Nano
@@ -74,59 +76,69 @@ scrape_configs:
         networkType:
         deviceType:
         userId:
+        appVersion:
+        isPush:
+        isPull:
   - labels:
       level:
       networkType:
       deviceType:
       userId:
+      appVersion:
+      isPush:
+      isPull:
   - timestamp:
       source: time
       format: RFC3339Nano
 
-  - job_name: service_cardsetsearch
-    static_configs:
-    - targets:
-        - localhost
-      labels:
-        service_name: service_cardsetsearch
-        __path__: /var/log/cardsetsearch/service*
-    pipeline_stages:
-    - json:
-        expressions:
-          time:
-          level:
-          networkType:
-          deviceType:
-          userId:
-    - labels:
+- job_name: service_cardsetsearch
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      service_name: service_cardsetsearch
+      __path__: /var/log/cardsetsearch/service*
+  pipeline_stages:
+  - json:
+      expressions:
+        time:
         level:
         networkType:
         deviceType:
         userId:
-    - timestamp:
-        source: time
-        format: RFC3339Nano
+        appVersion:
+  - labels:
+      level:
+      networkType:
+      deviceType:
+      userId:
+      appVersion:
+  - timestamp:
+      source: time
+      format: RFC3339Nano
 
-  - job_name: service_dict
-    static_configs:
-    - targets:
-        - localhost
-      labels:
-        service_name: service_dict
-        __path__: /var/log/dict/service*
-    pipeline_stages:
-    - json:
-        expressions:
-          time:
-          level:
-          networkType:
-          deviceType:
-          userId:
-    - labels:
+- job_name: service_dict
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      service_name: service_dict
+      __path__: /var/log/dict/service*
+  pipeline_stages:
+  - json:
+      expressions:
+        time:
         level:
         networkType:
         deviceType:
         userId:
-    - timestamp:
-        source: time
-        format: RFC3339Nano
+        appVersion:
+  - labels:
+      level:
+      networkType:
+      deviceType:
+      userId:
+      appVersion:
+  - timestamp:
+      source: time
+      format: RFC3339Nano

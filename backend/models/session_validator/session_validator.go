@@ -40,10 +40,6 @@ func NewSessionManagerValidator(sm *scs.SessionManager) SessionValidator {
 	return &SessionManagerValidator{sm}
 }
 
-//func (v *SessionManagerValidator[T, PT]) ToInterface() SessionValidator[T] {
-//	return v
-//}
-
 func (v *SessionManagerValidator) Validate(r *http.Request) (*models.UserAuthToken, *ValidateSessionError) {
 	return validateSession(r, v.SessionManager)
 }

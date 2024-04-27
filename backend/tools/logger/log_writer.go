@@ -73,19 +73,21 @@ func NewLogWriter(dirPath string, filePrefix string, errWriter io.Writer) (*LogW
 }
 
 func (w *LogWriter) ScheduleRotation(ctx context.Context) {
-	ticker := time.NewTicker(24 * time.Hour)
+	go func() {
+		ticker := time.NewTicker(24 * time.Hour)
 
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			err := w.CreateNewTopEntryIfNeeded()
-			if err != nil {
-				writeString(w.errWriter, "[LogWriter] can't update top entry: %v", err)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				err := w.CreateNewTopEntryIfNeeded()
+				if err != nil {
+					writeString(w.errWriter, "[LogWriter] can't update top entry: %v", err)
+				}
 			}
 		}
-	}
+	}()
 }
 
 // Write satisfies the io.Writer interface.

@@ -26,5 +26,6 @@ type authTokenGenerator interface {
 		networkType models.UserNetworkType,
 		deviceType string,
 		deviceId string,
+		appVersion string,
 	) (*models.UserAuthToken, error)
 }

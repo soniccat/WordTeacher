@@ -71,6 +71,12 @@ func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var appVersion = r.Header.Get(tools.HeaderAppVersion)
+	if len(appVersion) == 0 {
+		h.SetError(w, errors.New("appVersion is empty"), http.StatusBadRequest)
+		return
+	}
+
 	// Body params
 	var input Input
 	err = json.NewDecoder(r.Body).Decode(&input)
@@ -84,6 +90,7 @@ func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
 		"logId", uuid.NewString(),
 		"deviceId", deviceId,
 		"deviceType", deviceType,
+		"appVersion", appVersion,
 	)
 
 	authorizedUser, err := h.tokenRefresher.RefreshToken(

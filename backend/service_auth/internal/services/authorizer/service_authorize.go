@@ -33,6 +33,7 @@ func (s *Service) Authorize(ctx context.Context, networkToken string, userInfo s
 		userWithNetwork.Network.NetworkType,
 		userInfo.DeviceType,
 		userInfo.DeviceId,
+		userInfo.AppVersion,
 	)
 	if err != nil {
 		return nil, err

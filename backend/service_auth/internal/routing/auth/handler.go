@@ -85,6 +85,12 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var appVersion = r.Header.Get(tools.HeaderAppVersion)
+	if len(appVersion) == 0 {
+		h.SetError(w, errors.New("appVersion is empty"), http.StatusBadRequest)
+		return
+	}
+
 	// Body params
 	var credentials Input
 	err = json.NewDecoder(r.Body).Decode(&credentials)
@@ -98,6 +104,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 		"logId", uuid.NewString(),
 		"networkType", networkType,
 		"deviceType", deviceType,
+		"appVersion", appVersion,
 	)
 
 	authorizedUser, err := h.authorizer.Authorize(
@@ -107,6 +114,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 			NetworkType: networkTypeInt,
 			DeviceType:  deviceType,
 			DeviceId:    deviceId,
+			AppVersion:  appVersion,
 		},
 	)
 	if _, ok := err.(*service_models.ErrorInvalidToken); ok {
