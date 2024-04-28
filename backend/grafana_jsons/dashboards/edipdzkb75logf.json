@@ -10,10 +10,10 @@
     "url": "/d/edipdzkb75logf/services",
     "expires": "0001-01-01T00:00:00Z",
     "created": "2024-04-14T11:27:12Z",
-    "updated": "2024-04-27T18:41:42Z",
+    "updated": "2024-04-28T14:18:32Z",
     "updatedBy": "admin",
     "createdBy": "admin",
-    "version": 34,
+    "version": 39,
     "hasAcl": false,
     "isFolder": false,
     "folderId": 0,
@@ -156,7 +156,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "label_replace(\n    quantile_over_time(\n        0.95,\n        {service_name=\"nginx\"} | status >= 200 and status < 300 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]\n    ) by (request_uri), \n    \"request_uri\", \n    \"/api/dict/words/*\", \n    \"request_uri\", \n    \"/api/dict/words/.*\"\n)",
+            "expr": "label_replace(\n    label_replace(\n        quantile_over_time(\n            0.95,\n            {service_name=\"nginx\", filename = \"/var/log/nginx/access_log\"} | status >= 200 and status < 300 | json | unwrap request_time [$__auto]\n        ) by (request_uri), \n        \"request_uri\", \n        \"/api/dict/words/*\", \n        \"request_uri\", \n        \"/api/dict/words/.*\"\n    ),\n    \"request_uri\", \n    \"/api/cardsets/search*\", \n    \"request_uri\", \n    \"/api/cardsets/search.*\"\n)",
             "hide": false,
             "queryType": "range",
             "refId": "B"
@@ -454,7 +454,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "count_over_time(\n    {service_name=\"service_auth\", level=\"INFO\"}[1m]\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_auth\", level=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -465,7 +465,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "count_over_time(\n    {service_name=\"service_auth\", level!=\"INFO\"}[1m]\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_auth\", level!=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "C"
@@ -612,7 +612,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "count_over_time(\n    {service_name=\"service_cardsets\", level=\"INFO\"}[1m]\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsets\", level=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -623,7 +623,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "count_over_time(\n    {service_name=\"service_cardsets\", level!=\"INFO\"}[1m]\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsets\", level!=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "C"
@@ -770,7 +770,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "count_over_time(\n    {service_name=\"service_cardsetsearch\", level=\"INFO\"}[1m]\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsetsearch\", level=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -781,7 +781,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "count_over_time(\n    {service_name=\"service_cardsetsearch\", level!=\"INFO\"}[1m]\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsetsearch\", level!=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "C"
@@ -928,7 +928,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "count_over_time(\n    {service_name=\"service_dict\", level=\"INFO\"}[1m]\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dict\", level=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -939,7 +939,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "count_over_time(\n    {service_name=\"service_dict\", level!=\"INFO\"}[1m]\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dict\", level!=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "C"
@@ -1869,7 +1869,7 @@
     "timezone": "browser",
     "title": "Services",
     "uid": "edipdzkb75logf",
-    "version": 34,
+    "version": 39,
     "weekStart": ""
   }
 }
