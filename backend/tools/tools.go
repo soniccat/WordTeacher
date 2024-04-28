@@ -167,7 +167,10 @@ func ParseObjectID(ctx context.Context, idString string) (*primitive.ObjectID, e
 func IdsToMongoIds(ctx context.Context, ids []string) ([]primitive.ObjectID, error) {
 	return MapOrError(ids, func(hex string) (primitive.ObjectID, error) {
 		id, err := primitive.ObjectIDFromHex(hex)
-		return id, logger.WrapError(ctx, NewInvalidIdError(hex, err))
+		if err != nil {
+			return id, logger.WrapError(ctx, NewInvalidIdError(hex, err))
+		}
+		return id, nil
 	})
 }
 
