@@ -36,7 +36,6 @@
     }
   },
   "dashboard": {
-    "id": 19,
     "schemaVersion": 17,
     "title": "Metrics",
     "uid": "fdip6obfyvytcc",

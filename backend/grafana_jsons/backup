@@ -1,9 +1,10 @@
 #/bin/bash
 
 export GRAFANA_API_KEY=""
-curl -s -H "Authorization: Bearer ${GRAFANA_API_KEY}" http://localhost:3000/api/datasources > datasources.json
+
+curl -s -H "Authorization: Bearer ${GRAFANA_API_KEY}" "http://localhost:3000/api/datasources" | jq -c -M '.[]' | split -l 1 - datasources/$=
 
 mkdir -p ./dashboards
 	for uid in $(curl -s -H "Authorization: Bearer ${GRAFANA_API_KEY}" http://localhost:3000/api/search | jq '.[].uid' -r); do 
-		curl -s -H "Authorization: Bearer ${GRAFANA_API_KEY}" http://localhost:3000/api/dashboards/uid/$uid | jq . > ./dashboards/$uid.json 
+		curl -s -H "Authorization: Bearer ${GRAFANA_API_KEY}" http://localhost:3000/api/dashboards/uid/$uid | jq 'del(.dashboard.id)' > ./dashboards/$uid.json 
   done

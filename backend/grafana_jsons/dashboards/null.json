@@ -1,7 +1,0 @@
-{
-  "extra": null,
-  "message": "Invalid API key",
-  "messageId": "api-key.invalid",
-  "statusCode": 401,
-  "traceID": ""
-}
