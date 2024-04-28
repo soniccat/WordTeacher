@@ -11,7 +11,7 @@ import (
 )
 
 func ApiCardSetToDb(ctx context.Context, cs *api.CardSet) (*DbCardSet, error) {
-	id, err := tools.ParseObjectID(ctx, cs.Id)
+	id, err := tools.ParseObjectIDOrEmpty(ctx, cs.Id)
 	if err != nil {
 		return nil, err
 	}

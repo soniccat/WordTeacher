@@ -228,6 +228,6 @@ func (le LogError) Error() string {
 	return le.innerError.Error()
 }
 
-func (le LogError) Undwrap() error {
+func (le LogError) Unwrap() error {
 	return le.innerError
 }

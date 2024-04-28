@@ -314,4 +314,4 @@ volumes:
       o: bind
       type: none
       device: "${VOLUME_PROMETHEUS_PATH}"
-  prometheus-test:
+  prometheus-data-test:

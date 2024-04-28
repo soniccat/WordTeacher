@@ -149,6 +149,14 @@ func Reduce[T, U any](s []T, init U, f func(U, T) U) U {
 	return r
 }
 
+func ParseObjectIDOrEmpty(ctx context.Context, idString string) (*primitive.ObjectID, error) {
+	if len(idString) == 0 {
+		return nil, nil
+	}
+
+	return ParseObjectID(ctx, idString)
+}
+
 func ParseObjectID(ctx context.Context, idString string) (*primitive.ObjectID, error) {
 	var cardDbId *primitive.ObjectID
 	if len(idString) != 0 {
