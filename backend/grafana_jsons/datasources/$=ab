@@ -1,0 +1,1 @@
+{"id":3,"uid":"ddhxdbpp16qdcc","orgId":1,"name":"prometheus","type":"prometheus","typeName":"Prometheus","typeLogoUrl":"public/app/plugins/datasource/prometheus/img/prometheus_logo.svg","access":"proxy","url":"http://prometheus:9091","user":"","database":"","basicAuth":false,"isDefault":false,"jsonData":{"httpMethod":"POST"},"readOnly":false}

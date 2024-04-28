@@ -1,0 +1,15 @@
+#/bin/bash
+
+export GRAFANA_API_KEY=""
+
+for i in datasources/*; do \
+    curl -s -H "Authorization: Bearer ${GRAFANA_API_KEY}" -X "POST" "http://localhost:3000/api/datasources" \
+    -H "Content-Type: application/json" \
+     --data-binary @$i
+done
+
+for i in dashboards/*; do \
+    curl -s -H "Authorization: Bearer ${GRAFANA_API_KEY}" -X "POST" "http://localhost:3000/api/dashboards/db" \
+    -H "Content-Type: application/json" \
+     --data-binary @$i
+done
