@@ -193,7 +193,7 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Logger.Info(ctx, "push", "isPush", true)
+	h.Logger.Info(ctx, "push", "isPush", true, "body", string(inputBytes))
 
 	h.WriteResponse(w, response)
 }
