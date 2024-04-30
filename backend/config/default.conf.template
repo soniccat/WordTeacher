@@ -28,48 +28,18 @@
     '}';
 
 server {
-    listen 9090 default_server http2;
-    listen [::]:9090 default_server http2;
+    listen 80;
+    listen [::]:80;
 
-    server_name aglushkov.ru www.aglushkov.ru;
+    server_name aglushkov.org www.aglushkov.org;
+    server_tokens off;
 
-    # set DNS resolver as Docker internal DNS
-    resolver 127.0.0.11 valid=10s;
-    resolver_timeout 5s;
-
-    location /api/auth {
-        set $auth http://auth:${AUTH_PORT};
-        proxy_pass $auth;
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
     }
 
-    access_log /var/log/nginx/access_log json_analytics;
-
-    #
-    # CardSets Search
-    #
-    location /api/cardsets/search {
-        set $cardsetsearch http://cardsetsearch:${CARDSETSEARCH_PORT};
-        proxy_pass $cardsetsearch;
-    }
-
-    #
-    # CardSets
-    #
-    location /api/cardsets {
-        set $cardsets http://cardsets:${CARDSETS_PORT};
-        proxy_pass $cardsets;
-    }
-
-    location /cardsetsgrpc.CardSets {
-        set $cardsetsPRPC grpc://cardsets:${CARDSETS_GPRC_PORT};
-        grpc_pass $cardsetsPRPC;
-    }
-
-    #
-    # Dict
-    #
-    location /api/dict {
-        set $dict http://dict:${DICT_PORT};
-        proxy_pass $dict;
+    location / {
+        return 301 https://aglushkov.ru$request_uri;
     }
 }
+

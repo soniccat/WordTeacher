@@ -14,10 +14,14 @@ services:
     volumes:
       - ./config/default.conf.template:/etc/nginx/templates/default.conf.template
       - '${VOLUME_NGINX_PATH}:/var/log/nginx'
+      - ${VOLUME_CERTBOT_PATH}/www:/var/www/certbot/:ro
+      - ${VOLUME_CERTBOT_PATH}/conf:/etc/nginx/ssl/:ro
     networks:
       mongo_net:
         ipv4_address: 172.16.0.12
     ports:
+      - 80:80
+      - 443:443
       - '${API_GATEWAY_PORT}:${API_GATEWAY_PORT}'
     environment:
       - AUTH_PORT=${AUTH_PORT}
@@ -26,6 +30,17 @@ services:
       - CARDSETS_GPRC_PORT=${CARDSETS_GPRC_PORT}
       - DICT_PORT=${DICT_PORT}
     restart: always
+
+  certbot:
+    container_name: "certbot${TEST_SUFFIX}"
+    hostname: "certbot"
+    image: certbot/certbot:latest
+    volumes:
+      - ${VOLUME_CERTBOT_PATH}/www/:/var/www/certbot/:rw
+      - ${VOLUME_CERTBOT_PATH}/conf/:/etc/letsencrypt/:rw
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.20
 
   auth:
     container_name: "auth${TEST_SUFFIX}"
