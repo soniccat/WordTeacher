@@ -1,4 +1,4 @@
-FROM golang:1.21.5-alpine AS builder
+FROM golang:1.22.2-alpine3.19 AS builder
 # create appuser.
 RUN adduser --disabled-password --gecos '' elf
 # create workspace

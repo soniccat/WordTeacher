@@ -1,6 +1,6 @@
 module tools
 
-go 1.19
+go 1.22.2
 
 require (
 	github.com/alexedwards/scs/redisstore v0.0.0-20230305153148-62e546ce9d2d

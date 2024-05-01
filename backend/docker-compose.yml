@@ -1,5 +1,3 @@
-version: "3.8"
-
 secrets:
   vkid:
     file: ./vkid
@@ -63,6 +61,8 @@ services:
     networks:
       mongo_net:
         ipv4_address: 172.16.0.10
+    depends_on:
+      - mongosetup
     # ports:
     #   - target: "${AUTH_PORT}"
     #     published: "${AUTH_PORT}"
@@ -90,6 +90,8 @@ services:
     networks:
       mongo_net:
         ipv4_address: 172.16.0.11
+    depends_on:
+      - mongosetup
     # ports:
     #   - target: "${CARDSETS_PORT}"
     #     published: "${CARDSETS_PORT}"
@@ -142,6 +144,8 @@ services:
     networks:
       mongo_net:
         ipv4_address: 172.16.0.14
+    depends_on:
+      - mongosetup
     # ports:
     #   - target: "${DICT_PORT}"
     #     published: "${DICT_PORT}"
