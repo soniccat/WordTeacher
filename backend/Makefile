@@ -1,6 +1,3 @@
-# type your user name here `echo $USER` before calling make cronsetup
-CRONUSER=aglushkov
-
 # we will put our integration testing in this path
 INTEGRATION_TEST_PATH?=./it
 
@@ -48,17 +45,17 @@ downtest:
 # update domain in this file to yours
 # set CRONUSER to your $USER
 cronsetup:
-	mkdir -p /var/spool/cron/crontabs/$(CRONUSER) &&\
-	mkdir -p ~/wordteacher &&\
-	cp ./cron/crontab /var/spool/cron/crontabs/$(CRONUSER)/wordteacher_crontab &&\
-	cp ./cron/wordteacher_renew_cert.sh ~/wordteacher/wordteacher_renew_cert.sh &&\
-	cp ./prod.env ~/wordteacher/prod.env
+	sudo mkdir -p /var/spool/cron/crontabs/$(USER) &&\
+	sudo mkdir -p ~/wordteacher &&\
+	sudo cp ./cron/crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab &&\
+	sudo cp ./cron/wordteacher_renew_cert.sh ~/wordteacher/wordteacher_renew_cert.sh &&\
+	sudo cp ./prod.env ~/wordteacher/prod.env
 
 cronup:
-	crontab /var/spool/cron/crontabs/$(CRONUSER)/wordteacher_crontab
+	sudo crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab
 
 crondown:
-	crontab -r
+	sudo crontab -r
 
 # this command will trigger integration test
 # INTEGRATION_TEST_SUITE_PATH is used for run specific test in Golang, if it's not specified
