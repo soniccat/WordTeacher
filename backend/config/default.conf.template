@@ -27,12 +27,12 @@
 #   '"geoip_country_code": "$geoIP"'
     '}';
 
+# for certbot acme challenge
 server {
     listen 80;
     listen [::]:80;
 
-    server_name aglushkov.org www.aglushkov.org;
-    server_tokens off;
+    server_name aglushkov.ru www.aglushkov.ru;
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
@@ -56,24 +56,21 @@ server {
     resolver 127.0.0.11 valid=10s;
     resolver_timeout 5s;
 
+    access_log /var/log/nginx/access_log json_analytics;
+
+    # Auth
     location /api/auth {
         set $auth http://auth:${AUTH_PORT};
         proxy_pass $auth;
     }
 
-    access_log /var/log/nginx/access_log json_analytics;
-
-    #
     # CardSets Search
-    #
     location /api/cardsets/search {
         set $cardsetsearch http://cardsetsearch:${CARDSETSEARCH_PORT};
         proxy_pass $cardsetsearch;
     }
 
-    #
     # CardSets
-    #
     location /api/cardsets {
         set $cardsets http://cardsets:${CARDSETS_PORT};
         proxy_pass $cardsets;
@@ -84,9 +81,7 @@ server {
         grpc_pass $cardsetsPRPC;
     }
 
-    #
     # Dict
-    #
     location /api/dict {
         set $dict http://dict:${DICT_PORT};
         proxy_pass $dict;

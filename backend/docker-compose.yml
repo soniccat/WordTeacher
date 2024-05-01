@@ -20,8 +20,7 @@ services:
       mongo_net:
         ipv4_address: 172.16.0.12
     ports:
-      - 80:80
-      - 443:443
+      - 80:80 # for certbot acme challenge
       - '${API_GATEWAY_PORT}:${API_GATEWAY_PORT}'
     environment:
       - AUTH_PORT=${AUTH_PORT}
