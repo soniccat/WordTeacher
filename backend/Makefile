@@ -1,13 +1,3 @@
-# we will put our integration testing in this path
-INTEGRATION_TEST_PATH?=./it
-
-# set of env variables that you need for testing
-ENV_LOCAL_TEST=\
-  POSTGRES_PASSWORD=mysecretpassword \
-  POSTGRES_DB=myawesomeproject \
-  POSTGRES_HOST=postgres \
-  POSTGRES_USER=postgres
-
 RUNTESTSSTEPS := downtest removetestvolumes uptest runtests_step up
 
 runtests: $(RUNTESTSSTEPS)
@@ -42,8 +32,7 @@ downtest:
 	docker compose --env-file ./test.env down
 
 # need to enable running docker without sudo according that guide https://docs.docker.com/engine/install/linux-postinstall/
-# update domain in this file to yours
-# set CRONUSER to your $USER
+# update domain in ./cron/wordteacher_renew_cert.sh to yours
 cronsetup:
 	sudo mkdir -p /var/spool/cron/crontabs/$(USER) &&\
 	sudo mkdir -p ~/wordteacher &&\
@@ -56,18 +45,6 @@ cronup:
 
 crondown:
 	sudo crontab -r
-
-# this command will trigger integration test
-# INTEGRATION_TEST_SUITE_PATH is used for run specific test in Golang, if it's not specified
-# it will run all tests under ./it directory
-test.integration:
-	$(ENV_LOCAL_TEST) \
-	go test -tags=integration ./models/user -count=1 -run=$(INTEGRATION_TEST_SUITE_PATH)
-
-# this command will trigger integration test with verbose mode
-test.integration.debug:
-	$(ENV_LOCAL_TEST) \
-	go test -tags=integration $(INTEGRATION_TEST_PATH) -count=1 -v -run=$(INTEGRATION_TEST_SUITE_PATH)
 
 # service_auth
 
@@ -159,21 +136,3 @@ dictbuild:
 
 dictrun:
 	docker start dict
-
-#
-#cardsetsstop:
-#	docker container stop service_cardsets
-#
-#cardsetsrm: cardsetsstop
-#	docker container rm service_cardsets
-#	docker image rm service_cardsets
-#
-#cardsetsbuild:
-#	docker build -t service_cardsets -f ./CardSets.Dockerfile .
-#	docker container create -p 4001:4001 --name service_cardsets service_cardsets
-#
-#cardsetsrun:
-#	docker start service_cardsets
-#
-#cardsetsclearandbuild: cardsetsrm cardsetsbuild
-#cardsetsclearandrun: cardsetsclearandbuild cardsetsrun

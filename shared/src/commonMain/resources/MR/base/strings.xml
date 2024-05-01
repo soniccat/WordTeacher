@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="api_base_url">http://5.35.112.90:9090</string>
+    <string name="api_base_url">https://aglushkov.ru:9090</string>
     <string name="app_name">WordTeacher</string>
     <string name="tab_definitions">Words</string>
     <string name="tab_add_article">New Article</string>
