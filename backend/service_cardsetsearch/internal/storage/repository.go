@@ -56,15 +56,15 @@ func (m *Repository) CreateTextIndexIfNeeded(ctx context.Context) error {
 	indexModel := mongo.IndexModel{
 		Keys: bson.D{
 			{Key: "name", Value: "text"},
-			{Key: "description", Value: "text"},
-			{Key: "terms", Value: "text"},
+			{Key: "info.description", Value: "text"},
+			{Key: "info.terms", Value: "text"},
 		},
 		Options: &options.IndexOptions{
 			Name: &textIndexName,
 			Weights: bson.D{
 				{Key: "name", Value: 3},
-				{Key: "description", Value: 3},
-				{Key: "terms", Value: 1},
+				{Key: "info.description", Value: 3},
+				{Key: "info.terms", Value: 1},
 			},
 		},
 	}

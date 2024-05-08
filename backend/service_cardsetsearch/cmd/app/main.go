@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
 	"io"
@@ -13,6 +15,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
 	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
@@ -74,7 +77,26 @@ func run() int {
 	logger := logger.New(serviceLogWriter, slog.Level(*minLogLevel))
 
 	// grpc
-	cardSetGRPCConnection, err := grpc.Dial(*cardSetsGRPCAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	var grpcCreds credentials.TransportCredentials
+	if *isDebug {
+		grpcCreds = insecure.NewCredentials()
+	} else {
+		proxyCA := "/var/fullchain.pem" // CA cert that signed the proxy
+		f, err := os.ReadFile(proxyCA)
+		if err != nil {
+			logger.ErrorWithError(context.Background(), err, "can't read fullchain.pem")
+			return failCode
+		}
+
+		p := x509.NewCertPool()
+		p.AppendCertsFromPEM(f)
+		tlsConfig := &tls.Config{
+			RootCAs: p,
+		}
+		grpcCreds = credentials.NewTLS(tlsConfig)
+	}
+
+	cardSetGRPCConnection, err := grpc.Dial(*cardSetsGRPCAddress, grpc.WithTransportCredentials(grpcCreds))
 	if err != nil {
 		log.Fatalf("cardSetGRPCConnection did not connect: %v", err)
 	}

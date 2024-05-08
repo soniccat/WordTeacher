@@ -116,6 +116,7 @@ services:
       - "apigateway:9090"
     volumes:
       - ${VOLUME_CARDSETSEARCH_LOG_PATH}:/var/log
+      - ${VOLUME_CERTBOT_PATH}/conf/live/aglushkov.ru/fullchain.pem:/var/fullchain.pem
     networks:
       mongo_net:
         ipv4_address: 172.16.0.13
