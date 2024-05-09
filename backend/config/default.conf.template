@@ -29,6 +29,8 @@
 
 # for certbot acme challenge
 server {
+    http2 on;
+
     listen 80;
     listen [::]:80;
 
@@ -43,7 +45,7 @@ server {
     }
 
     location /cardsetsgrpc.CardSets {
-        set $cardsetsPRPC grpcs://cardsets:${CARDSETS_GPRC_PORT};
+        set $cardsetsPRPC grpc://cardsets:${CARDSETS_GPRC_PORT};
         grpc_pass $cardsetsPRPC;
     }
 }
