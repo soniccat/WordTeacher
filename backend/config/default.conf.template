@@ -41,15 +41,22 @@ server {
     location / {
         return 301 https://aglushkov.ru$request_uri;
     }
+
+    location /cardsetsgrpc.CardSets {
+        set $cardsetsPRPC grpcs://cardsets:${CARDSETS_GPRC_PORT};
+        grpc_pass $cardsetsPRPC;
+    }
 }
 
 server {
-    listen 9090 default_server http2;
-    listen [::]:9090 http2;
+    http2 on;
+
+    listen 9090 default_server;
+    listen [::]:9090;
 
     # enable after calling make cronsetup, make cronup
-    # listen 9090 default_server ssl http2;
-    # listen [::]:9090 ssl http2;
+    # listen 9090 default_server ssl;
+    # listen [::]:9090 ssl;
 
     server_name aglushkov.ru;
 
@@ -79,11 +86,6 @@ server {
     location /api/cardsets {
         set $cardsets http://cardsets:${CARDSETS_PORT};
         proxy_pass $cardsets;
-    }
-
-    location /cardsetsgrpc.CardSets {
-        set $cardsetsPRPC grpc://cardsets:${CARDSETS_GPRC_PORT};
-        grpc_pass $cardsetsPRPC;
     }
 
     # Dict
