@@ -40,7 +40,7 @@ func run() int {
 	serverPort := flag.Int("serverPort", 4002, "HTTP server network port")
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
-	cardSetsGRPCAddress := flag.String("cardSetsGPRCAddress", "localhost:5001", "get new cardsets")
+	cardSetsGRPCAddress := flag.String("cardSetsGRPCAddress", "localhost:5001", "get new cardsets")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
 	flag.Parse()

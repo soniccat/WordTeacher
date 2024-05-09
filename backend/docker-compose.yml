@@ -24,7 +24,7 @@ services:
       - AUTH_PORT=${AUTH_PORT}
       - CARDSETS_PORT=${CARDSETS_PORT}
       - CARDSETSEARCH_PORT=${CARDSETSEARCH_PORT}
-      - CARDSETS_GPRC_PORT=${CARDSETS_GPRC_PORT}
+      - CARDSETS_GRPC_PORT=${CARDSETS_GRPC_PORT}
       - DICT_PORT=${DICT_PORT}
     restart: always
 
@@ -84,7 +84,7 @@ services:
       - "-redisAddress"
       - "redis:${REDIS_PORT}"
       - "-grpcPort"
-      - "${CARDSETS_GPRC_PORT}"
+      - "${CARDSETS_GRPC_PORT}"
     volumes:
       - ${VOLUME_CARDSETS_LOG_PATH}:/var/log
     networks:
@@ -112,8 +112,8 @@ services:
       - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
       - "-redisAddress"
       - "redis:${REDIS_PORT}"
-      - "-cardSetsGPRCAddress"
-      - "apigateway:9090"
+      - "-cardSetsGRPCAddress"
+      - "apigateway:9091"
     volumes:
       - ${VOLUME_CARDSETSEARCH_LOG_PATH}:/var/log
       - ${VOLUME_CERTBOT_PATH}/conf/live/aglushkov.ru/fullchain.pem:/var/fullchain.pem
@@ -234,10 +234,10 @@ services:
     container_name: prometheus
     hostname: "prometheus"
     command:
-      - '--web.listen-address=:9091'
+      - '--web.listen-address=:9191'
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
-      - 9091:9091
+      - 9191:9191
     networks:
       mongo_net:
         ipv4_address: 172.16.0.16

@@ -18,7 +18,7 @@ scrape_configs:
   scheme: http
   static_configs:
   - targets:
-    - localhost:9091
+    - localhost:9191
 
 - job_name: mongo-exporter
   honor_timestamps: true

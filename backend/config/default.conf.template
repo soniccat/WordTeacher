@@ -43,13 +43,9 @@ server {
     location / {
         return 301 https://aglushkov.ru$request_uri;
     }
-
-    location /cardsetsgrpc.CardSets {
-        set $cardsetsPRPC grpc://cardsets:${CARDSETS_GPRC_PORT};
-        grpc_pass $cardsetsPRPC;
-    }
 }
 
+# main server
 server {
     http2 on;
 
@@ -97,3 +93,17 @@ server {
     }
 }
 
+# for insecure grpc handlers
+server {
+    http2 on;
+
+    listen 9091;
+    listen [::]:9091;
+
+    server_name aglushkov.ru;
+
+    location /cardsetsgrpc.CardSets {
+        set $cardsetsPRPC grpc://cardsets:${CARDSETS_GRPC_PORT};
+        grpc_pass $cardsetsPRPC;
+    }
+}

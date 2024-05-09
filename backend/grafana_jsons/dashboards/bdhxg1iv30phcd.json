@@ -1136,7 +1136,7 @@
                 "options": {
                   "mode": "exclude",
                   "names": [
-                    "{__name__=\"go_memstats_alloc_bytes\", instance=\"localhost:9091\", job=\"prometheus\"}"
+                    "{__name__=\"go_memstats_alloc_bytes\", instance=\"localhost:9191\", job=\"prometheus\"}"
                   ],
                   "prefix": "All except:",
                   "readOnly": true
@@ -1259,7 +1259,7 @@
                 "options": {
                   "mode": "exclude",
                   "names": [
-                    "{__name__=\"go_gc_duration_seconds\", instance=\"localhost:9091\", job=\"prometheus\", quantile=\"0.75\"}"
+                    "{__name__=\"go_gc_duration_seconds\", instance=\"localhost:9191\", job=\"prometheus\", quantile=\"0.75\"}"
                   ],
                   "prefix": "All except:",
                   "readOnly": true
