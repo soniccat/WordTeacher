@@ -4,6 +4,7 @@ import (
 	"api"
 	"context"
 	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
+	"slices"
 	"time"
 	"tools"
 
@@ -73,6 +74,8 @@ func GRPCCardSetToDb(ctx context.Context, cs *cardsetsgrpc.CardSet) (*DbCardSet,
 	terms := tools.Map(cs.Cards, func(c *cardsetsgrpc.Card) string {
 		return c.Term
 	})
+	// sort to find distance between card sets faster
+	slices.Sort(terms)
 
 	cardSetDb := &DbCardSet{
 		CardSetId:        id,

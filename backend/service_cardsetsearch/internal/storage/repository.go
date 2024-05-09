@@ -145,12 +145,14 @@ func (m *Repository) DeleteCardSets(
 func (m *Repository) SearchCardSets(
 	ctx context.Context,
 	query string,
+	limit int64,
 ) ([]*api.CardSet, error) {
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
 		bson.M{
 			"$text": bson.M{"$search": query, "$diacriticSensitive": true},
 		},
+		options.Find().SetLimit(limit),
 	)
 	if err != nil {
 		return nil, logger.WrapError(ctx, err)
