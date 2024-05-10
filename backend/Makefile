@@ -38,7 +38,8 @@ cronsetup:
 	sudo mkdir -p ~/wordteacher &&\
 	sudo cp ./cron/crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab &&\
 	sudo cp ./cron/wordteacher_renew_cert.sh ~/wordteacher/wordteacher_renew_cert.sh &&\
-	sudo cp ./prod.env ~/wordteacher/prod.env
+	sudo cp ./prod.env ~/wordteacher/prod.env &&\
+	sudo cp ./mongo_backup/mongo_backup.sh ~/wordteacher/mongo_backup.sh
 
 cronup:
 	sudo crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab

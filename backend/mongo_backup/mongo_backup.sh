@@ -17,10 +17,10 @@ echo $date
 echo $uri
 echo $out
 
-mongodump --uri="$uri" --out="$out" --db=admin
-mongodump --uri="$uri" --out="$out" --db=cardSets
-mongodump --uri="$uri" --out="$out" --db=cardSetSearch
-mongodump --uri="$uri" --out="$out" --db=users
-mongodump --uri="$uri" --out="$out" --db=config
+sudo mongodump --uri="$uri" --out="$out" --db=admin
+sudo mongodump --uri="$uri" --out="$out" --db=cardSets
+sudo mongodump --uri="$uri" --out="$out" --db=cardSetSearch
+sudo mongodump --uri="$uri" --out="$out" --db=users
+sudo mongodump --uri="$uri" --out="$out" --db=config
 
-ncftpput -R -v -u $WT_FTP_USER -p $WT_FTP_PASS 192.168.0.1 usb1_1/mongo_backups "$out"
+sudo ncftpput -R -v -u $WT_FTP_USER -p $WT_FTP_PASS 192.168.0.1 usb1_1/mongo_backups "$out"

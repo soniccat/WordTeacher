@@ -17,6 +17,6 @@ echo $date
 echo $uri
 echo $out
 
-mongodump --uri="$uri" --out="$out" --db=wiktionary
+sudo mongodump --uri="$uri" --out="$out" --db=wiktionary
 
-ncftpput -R -v -u $WT_FTP_USER -p $WT_FTP_PASS 192.168.0.1 usb1_1/mongo_backups "$out"
+sudo ncftpput -R -v -u $WT_FTP_USER -p $WT_FTP_PASS 192.168.0.1 usb1_1/mongo_backups "$out"
