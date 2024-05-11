@@ -39,7 +39,7 @@ class WordDefinitionRepository(
     private val nlpCore: NLPCore
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val stateFlows: MutableMap<String, MutableStateFlow<Resource<List<WordTeacherWord>>>> = hashMapOf()
+    private val stateFlows: MutableMap<String, MutableStateFlow<Resource<List<Pair<WordTeacherWordService, List<WordTeacherWord>>>>>> = hashMapOf()
     private val jobs: MutableMap<String, Job> = hashMapOf()
 
     init {
@@ -79,7 +79,7 @@ class WordDefinitionRepository(
     suspend fun define(
         word: String,
         reload: Boolean = false
-    ): Flow<Resource<List<WordTeacherWord>>> {
+    ): Flow<Resource<List<Pair<WordTeacherWordService, List<WordTeacherWord>>>>> {
         val tag = "WordDefinitionRepository.define"
         val services = serviceRepository.services.value.data().orEmpty() +
                 dictRepository.dicts.value.data().orEmpty()
@@ -124,11 +124,11 @@ class WordDefinitionRepository(
         return stateFlow.takeUntilLoadedOrErrorForVersion()
     }
 
-    fun obtainStateFlow(word: String): StateFlow<Resource<List<WordTeacherWord>>> {
+    fun obtainStateFlow(word: String): StateFlow<Resource<List<Pair<WordTeacherWordService, List<WordTeacherWord>>>>> {
         return obtainMutableStateFlow(word)
     }
 
-    private fun obtainMutableStateFlow(word: String): MutableStateFlow<Resource<List<WordTeacherWord>>> {
+    private fun obtainMutableStateFlow(word: String): MutableStateFlow<Resource<List<Pair<WordTeacherWordService, List<WordTeacherWord>>>>> {
         var stateFlow = stateFlows[word]
         if (stateFlow == null) {
             stateFlow = MutableStateFlow(Resource.Uninitialized())
@@ -142,12 +142,12 @@ class WordDefinitionRepository(
         word: String,
         version: Int,
         services: List<WordTeacherWordService>
-    ): Flow<Resource<List<WordTeacherWord>>> = channelFlow {
+    ): Flow<Resource<List<Pair<WordTeacherWordService, List<WordTeacherWord>>>>> = channelFlow {
         // ChannelFlow to be able to emit from different coroutines
         // SupervisorScope not to interrupt when a service fails
         supervisorScope {
             val tag = "WordDefinitionRepository.loadDefinitionsFlow"
-            val words = mutableListOf<WordTeacherWord>()
+            val words = mutableListOf<Pair<WordTeacherWordService, List<WordTeacherWord>>>()
             val jobs: MutableList<Job> = mutableListOf()
 
             send(Resource.Loading(version = version))
@@ -164,7 +164,7 @@ class WordDefinitionRepository(
                 val job = launch(CoroutineExceptionHandler { _, throwable ->
                     Logger.e("loadDefinitionsFlow Exception: " + throwable.message, service.type.toString())
                 }) {
-                    words.addAll(service.define(word))
+                    words.add(service to service.define(word))
 
                     if (lemmatizer != null) {
                         val lemmas = withContext(Dispatchers.Default) {
@@ -172,7 +172,7 @@ class WordDefinitionRepository(
                         }
 
                         lemmas.onEach { lemma ->
-                            words.addAll(service.define(lemma))
+                            words.add(service to service.define(lemma))
                         }
                     }
 

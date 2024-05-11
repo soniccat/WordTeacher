@@ -32,6 +32,7 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.*
@@ -100,7 +101,7 @@ open class DefinitionsVMImpl(
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
-    private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
+    private val definitionWords = MutableStateFlow<Resource<List<Pair<WordTeacherWordService, List<WordTeacherWord>>>>>(Resource.Uninitialized())
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
     final override var displayModeStateFlow = MutableStateFlow(DefinitionsDisplayMode.BySource)
@@ -122,7 +123,7 @@ open class DefinitionsVMImpl(
 
     override val partsOfSpeechFilterStateFlow = definitionWords.map {
         it.data().orEmpty().map { word ->
-            word.definitions.keys
+            word.second.map { it.definitions.keys }.flatten()
         }.flatten().distinct()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -249,7 +250,7 @@ open class DefinitionsVMImpl(
     }
 
     private fun buildViewItems(
-        words: List<WordTeacherWord>,
+        words: List<Pair<WordTeacherWordService, List<WordTeacherWord>>>,
         displayMode: DefinitionsDisplayMode,
         partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
         isLoading: Boolean,
