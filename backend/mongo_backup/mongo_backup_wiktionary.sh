@@ -1,4 +1,8 @@
 #/bin/bash
+set -e
+logs="/Users/Shared/WordTeacher/backups/mongo/logs"
+exec >> $logs
+exec 2>&1
 
 if [ -z ${WT_FTP_USER+x} ]; then
   echo "WT_FTP_USER variable isn't set"
@@ -17,6 +21,6 @@ echo $date
 echo $uri
 echo $out
 
-sudo mongodump --uri="$uri" --out="$out" --db=wiktionary
+mongodump --uri="$uri" --out="$out" --db=wiktionary
 
-sudo ncftpput -R -v -u $WT_FTP_USER -p $WT_FTP_PASS 192.168.0.1 usb1_1/mongo_backups "$out"
+ncftpput -R -v -u $WT_FTP_USER -p $WT_FTP_PASS 192.168.0.1 usb1_1/mongo_backups "$out"

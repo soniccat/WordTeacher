@@ -32,14 +32,13 @@ downtest:
 	docker compose --env-file ./test.env down
 
 # need to enable running docker without sudo according that guide https://docs.docker.com/engine/install/linux-postinstall/
+# uncomment and set valuer for variables in ./cron/crontab
 # update domain in ./cron/wordteacher_renew_cert.sh to yours
 cronsetup:
 	sudo mkdir -p /var/spool/cron/crontabs/$(USER) &&\
-	sudo mkdir -p ~/wordteacher &&\
-	sudo cp ./cron/crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab &&\
-	sudo cp ./cron/wordteacher_renew_cert.sh ~/wordteacher/wordteacher_renew_cert.sh &&\
-	sudo cp ./prod.env ~/wordteacher/prod.env &&\
-	sudo cp ./mongo_backup/mongo_backup.sh ~/wordteacher/mongo_backup.sh
+	sudo ln -s ./cron/crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab &&\
+	sudo mkdir /Users/Shared/WordTeacher/certbot/logs &&\
+	sudo mkdir /Users/Shared/WordTeacher/backups/mongo/logs
 
 cronup:
 	sudo crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab

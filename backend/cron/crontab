@@ -1,2 +1,6 @@
-00 4 * * * ~/wordteacher/wordteacher_renew_cert.sh
-00 4 * * * ~/wordteacher/mongo_backup.sh
+#put var values here
+#WT_PATH=""
+#WT_FTP_USER=""
+#WT_FTP_PASS=""
+00 4 * * * $WT_PATH/backend/cron/wordteacher_renew_cert.sh
+00 4 * * * $WT_PATH/backend/mongo_backup/mongo_backup.sh
