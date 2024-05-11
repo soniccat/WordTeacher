@@ -115,13 +115,19 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Logger.Info(ctx, "pull", "isPull", true, "body", string(inputBytes))
-
 	response := Response{
 		UpdatedCardSets:        apiCardSets,
 		DeletedCardSetIds:      idsToDelete,
 		LatestModificationDate: lastCardSetModificationDate,
 	}
+
+	bodyAndOutputParams := []any{"isPull", true, "body", string(inputBytes)}
+	outputBytes, err := json.Marshal(response)
+	if err != nil {
+		bodyAndOutputParams = append(bodyAndOutputParams, "output", string(outputBytes))
+	}
+	h.Logger.Info(ctx, "pull", bodyAndOutputParams...)
+
 	h.WriteResponse(w, response)
 }
 

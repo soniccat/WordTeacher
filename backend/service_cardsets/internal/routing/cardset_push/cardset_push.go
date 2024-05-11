@@ -193,7 +193,12 @@ func (h *Handler) CardSetPush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Logger.Info(ctx, "push", "isPush", true, "body", string(inputBytes))
+	bodyAndOutputParams := []any{"isPush", true, "body", string(inputBytes)}
+	outputBytes, err := json.Marshal(response)
+	if err != nil {
+		bodyAndOutputParams = append(bodyAndOutputParams, "output", string(outputBytes))
+	}
+	h.Logger.Info(ctx, "push", bodyAndOutputParams...)
 
 	h.WriteResponse(w, response)
 }
