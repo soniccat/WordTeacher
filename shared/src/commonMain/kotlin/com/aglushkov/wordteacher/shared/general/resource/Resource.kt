@@ -9,7 +9,7 @@ import kotlin.js.JsName
 
 
 sealed interface Resource<T> {
-    val canLoadNextPage: Boolean
+    val canLoadNextPage: Boolean // TODO: rename to canLoadMore to be able to use for stale data
     val version: Int
 
     data class Uninitialized<T>(override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
@@ -40,9 +40,23 @@ sealed interface Resource<T> {
         }
     }
 
-    fun copy(data: T? = this.data(), version: Int = this.version): Resource<T> {
+    fun throwable(): Throwable? {
+        return when (this) {
+            is Error -> this.throwable
+            else -> null
+        }
+    }
+
+    fun canTryAgain(): Boolean {
+        return when (this) {
+            is Error -> this.canTryAgain
+            else -> false
+        }
+    }
+
+    fun copy(data: T? = this.data(), version: Int = this.version, canLoadNextPage: Boolean = this.canLoadNextPage): Resource<T> {
         return when(this) {
-            is Uninitialized -> Uninitialized(version = version)
+            is Uninitialized -> Uninitialized(version = version, canLoadNextPage = canLoadNextPage)
             is Loaded -> Loaded(data!!, canLoadNextPage, version)
             is Loading -> Loading(data, canLoadNextPage, version)
             is Error -> Error(throwable, canTryAgain, data, canLoadNextPage, version)
@@ -59,6 +73,7 @@ sealed interface Resource<T> {
         }
     }
 
+    // that might be better replace with mergeWith as now logic is quite complicated
     fun <R> transform(
         from: Resource<R> = Uninitialized(),
         errorTransformer: ((Throwable) -> Throwable)? = null,
@@ -66,13 +81,43 @@ sealed interface Resource<T> {
     ): Resource<R> = when (this) {
         is Loaded -> from.toLoaded(data = loadedDataTransformer(data))
         is Loading -> from.toLoading(data = data?.let { loadedDataTransformer(it) }, canLoadNextPage, version)
-        is Error -> from.toError(throwable, canTryAgain, data = data?.let { loadedDataTransformer(it) }, canLoadNextPage, version)
-        is Uninitialized -> from.toUninitialized()
+        is Error -> from.toError(errorTransformer?.invoke(throwable) ?: throwable, canTryAgain, data = data?.let { loadedDataTransformer(it) }, canLoadNextPage, version)
+        is Uninitialized -> from.toUninitialized(canLoadNextPage, version)
+    }
+
+    fun <R> mergeWith(
+        res: Resource<R>,
+        canLoadNextPageTransformer: (Boolean, Boolean) -> Boolean = { a, _ -> a },
+        versionTransformer: (Int, Int) -> Int = { a, _ -> a },
+        throwableTransformer: (Throwable?, Throwable) -> Throwable = { a, b -> a ?: b },
+        canTryAgainTransformer: (Boolean, Boolean) -> Boolean = { a, _ -> a },
+        dataTransformer: (T?, R) -> T
+    ): Resource<T> = when (res) {
+        is Loaded -> this.toLoaded(
+            data = dataTransformer(data(), res.data),
+            canLoadNext = canLoadNextPageTransformer(canLoadNextPage, res.canLoadNextPage),
+            version = versionTransformer(version, res.version)
+        )
+        is Loading -> this.toLoading(
+            data = res.data?.let { dataTransformer(data(), it) } ?: data(),
+            canLoadNext = canLoadNextPageTransformer(canLoadNextPage, res.canLoadNextPage),
+            version = versionTransformer(version, res.version)
+        )
+        is Error -> this.toError(
+            throwable = throwable()?.let { throwableTransformer(it, res.throwable) } ?: res.throwable,
+            data = res.data?.let { dataTransformer(data(), it) } ?: data(),
+            canTryAgain = canTryAgainTransformer(canTryAgain(), res.canTryAgain),
+            canLoadNext = canLoadNextPageTransformer(canLoadNextPage, res.canLoadNextPage),
+            version = versionTransformer(version, res.version)
+        )
+        is Uninitialized -> this.toUninitialized(
+            canLoadNextPage = canLoadNextPageTransformer(canLoadNextPage, res.canLoadNextPage),
+            version = versionTransformer(version, res.version)
+        )
     }
 
     fun bumpVersion() = copy(version = this.version + 1)
 }
-
 
 fun <T,R> Resource<T>.downgradeToErrorOrLoading(r: Resource<R>): Resource<T> = when(this) {
     is Resource.Loaded -> when(r) {
@@ -187,13 +232,16 @@ fun <T> Resource<T>.onUnitialized(block: () -> Unit): Boolean {
     }
 }
 
-fun <T> Resource<T>.onLoaded(block: (T) -> Unit): Boolean {
+fun <T> Resource<T>.onLoaded(block: (T) -> Unit, elseBlock: () -> Unit = {}): Boolean {
     return when (this) {
         is Resource.Loaded -> {
             block(data)
             true
         }
-        else -> false
+        else -> {
+            elseBlock()
+            false
+        }
     }
 }
 

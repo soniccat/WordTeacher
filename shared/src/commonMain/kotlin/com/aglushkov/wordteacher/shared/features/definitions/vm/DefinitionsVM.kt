@@ -18,6 +18,8 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.merge
+import com.aglushkov.wordteacher.shared.general.resource.on
+import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -45,6 +47,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.update
 
 interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
@@ -101,7 +105,7 @@ open class DefinitionsVMImpl(
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
-    private val definitionWords = MutableStateFlow<Resource<List<Pair<WordTeacherWordService, List<WordTeacherWord>>>>>(Resource.Uninitialized())
+    private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
     final override var displayModeStateFlow = MutableStateFlow(DefinitionsDisplayMode.BySource)
@@ -123,7 +127,7 @@ open class DefinitionsVMImpl(
 
     override val partsOfSpeechFilterStateFlow = definitionWords.map {
         it.data().orEmpty().map { word ->
-            word.second.map { it.definitions.keys }.flatten()
+            word.definitions.keys
         }.flatten().distinct()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -207,16 +211,17 @@ open class DefinitionsVMImpl(
         this.word = word
 
         val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
-        if (stateFlow.value.isLoaded()) {
-            definitionWords.value = if (definitionWords.value != stateFlow.value) {
-                stateFlow.value
-            } else {
-                // HACK: copy to trigger flow event
-                stateFlow.value.copy()
-            }
-        } else {
-            load(word)
-        }
+        stateFlow.value.onLoaded(
+            block = {
+                val flattenedValue = it.map { it.second }.flatten()
+                definitionWords.update {
+                    it.transform { flattenedValue }.bumpVersion()
+                }
+            },
+            elseBlock = {
+                load(word)
+            },
+        )
     }
 
     private fun load(aWord: String) {
@@ -236,21 +241,23 @@ open class DefinitionsVMImpl(
                 }.collect(wordFrequency)
             }
 
-            wordDefinitionRepository.define(word, false).forward(definitionWords)
+            wordDefinitionRepository.define(word, false).map {
+                it.transform { it.map { it.second }.flatten() }
+            }.collect(definitionWords)
             Logger.v("Finish Loading $word", tag)
         }
 
         observeJob = viewModelScope.launch {
             wordDefinitionRepository.obtainStateFlow(word).collect {
-                if (it.isUninitialized()) {
-                    load(word) // reload when cache is unloaded
+                if (it is Resource.Loaded && it.canLoadNextPage) {
+                    load(word) // load new definitions from new services or dicts
                 }
             }
         }
     }
 
     private fun buildViewItems(
-        words: List<Pair<WordTeacherWordService, List<WordTeacherWord>>>,
+        words: List<WordTeacherWord>,
         displayMode: DefinitionsDisplayMode,
         partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
         isLoading: Boolean,

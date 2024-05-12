@@ -4,10 +4,12 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.data
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.isNotLoadedAndNotLoading
 import com.aglushkov.wordteacher.shared.general.resource.isUninitialized
+import com.aglushkov.wordteacher.shared.general.resource.toLoading
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPConstants.UNKNOWN_LEMMA
@@ -25,12 +27,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 
 
 class WordDefinitionRepository(
@@ -44,50 +50,56 @@ class WordDefinitionRepository(
 
     init {
         scope.launch {
-            serviceRepository.services.collect {
-                if (it.isLoaded()) {
+            combine(
+                serviceRepository.services,
+                dictRepository.dicts
+            ) { a, b -> Unit
+                a.data().orEmpty() + b.data().orEmpty()
+            }.distinctUntilChanged().collect {
+                //if (it.isLoaded()) {
+                    //val stateFlowsCopy = stateFlows.toMap()
+                    //stateFlows.clear() // invalidate cache(), do first to make obtainMutableStateFlow returning Uninitialized
+
                     stateFlows.onEach {
-                        it.value.value = Resource.Uninitialized() // mark as uninitialized to notify
+                        it.value.update {
+                            // use canLoadNextPage to mark that more data is available from new services or dicts
+                            it.copy(canLoadNextPage = true)
+                        }
+                        //it.value.value = Resource.Uninitialized() // mark as uninitialized to notify subscribers
                     }
-                    stateFlows.clear() // invalidate cache() // TODO: just load definition for new services
-
-                    defineUninitializedFlows()
-                    // TODO: consider to handle adding new services
-                } else if (it is Resource.Error) {
-                    setNotLoadedFlowsToError(it.throwable)
-                }
+//                } else if (it is Resource.Error) {
+//                    setNotLoadedFlowsToError(it.throwable)
+//                }
             }
         }
     }
 
-    private suspend fun defineUninitializedFlows() {
-        for (flowEntry in stateFlows) {
-            if (flowEntry.value.isUninitialized()) {
-                define(flowEntry.key, false)
-            }
-        }
-    }
-
-    private fun setNotLoadedFlowsToError(throwable: Throwable) {
-        for (flowEntry in stateFlows) {
-            if (flowEntry.value.isUninitialized() || flowEntry.value.isLoading()) {
-                flowEntry.value.value = flowEntry.value.value.toError(throwable, true)
-            }
-        }
-    }
+//    private fun setNotLoadedFlowsToError(throwable: Throwable) {
+//        for (flowEntry in stateFlows) {
+//            if (flowEntry.value.isUninitialized() || flowEntry.value.isLoading()) {
+//                flowEntry.value.value = flowEntry.value.value.toError(throwable, true)
+//            }
+//        }
+//    }
 
     suspend fun define(
         word: String,
         reload: Boolean = false
     ): Flow<Resource<List<Pair<WordTeacherWordService, List<WordTeacherWord>>>>> {
         val tag = "WordDefinitionRepository.define"
-        val services = serviceRepository.services.value.data().orEmpty() +
+        val allServices = serviceRepository.services.value.data().orEmpty() +
                 dictRepository.dicts.value.data().orEmpty()
 
         // Decide if we need to load or reuse what we've already loaded or what we're loading now
         val stateFlow = obtainMutableStateFlow(word)
+        val currentStateData = stateFlow.value.data().orEmpty()
+        val currentServices = currentStateData.map { it.first }
+        val newServices = allServices.filter {
+            !currentServices.contains(it)
+        }
+
         val currentValue = stateFlow.value
-        val needLoad = reload || currentValue.isNotLoadedAndNotLoading()
+        val needLoad = reload || currentValue.isNotLoadedAndNotLoading() || newServices.isNotEmpty()
 
         // Keep version for Uninitialized to support flow collecting in advance when services aren't loaded
         val nextVersion = if (needLoad && !currentValue.isUninitialized()) {
@@ -96,24 +108,42 @@ class WordDefinitionRepository(
             currentValue.version
         }
 
-        if (needLoad && services.isNotEmpty()) {
-            // Update the version of a resource as soon as possible to filter changes from the current flow if it exists
-            stateFlow.value = Resource.Loading(version = nextVersion)
+        if (stateFlow.value.canLoadNextPage) {
+            stateFlow.update {
+                it.copy(canLoadNextPage = false)
+            }
+        }
 
-            jobs[word]?.cancel()
+        if (needLoad) {
+            // Update the version of a resource as soon as possible to filter changes from the current flow if it exists
+            stateFlow.update {
+                it.toLoading(version = nextVersion)
+            }
+
+            jobs[word]?.cancelAndJoin()
             jobs[word] = scope.launch { // use our scope here to avoid cancellation by Structured Concurrency
-                loadDefinitionsFlow(word, nextVersion, services).onEach {
-                    if (it.version == nextVersion) {
-                        stateFlow.value = it
-                    }
-                }.onCompletion { cause ->
-                    cause?.let {
-                        // Keep resource state in sync after cancellation or an error
-                        Logger.e("Define flow error ($nextVersion) " + it.message, tag)
-                        val completionValue = stateFlow.value
-                        if (completionValue.version == nextVersion) {
-                            stateFlow.value = Resource.Error(it, true)
+                loadDefinitionsFlow(word, nextVersion, newServices).onEach { newWordsRes ->
+                    //if (it.version == nextVersion) {
+                        stateFlow.update {
+                            it.mergeWith(newWordsRes) { _, b ->
+                                currentStateData + b
+                            }
+//                            newWordsRes.transform(it) { newWordsData ->
+//                                it.data().orEmpty() + newWordsData
+//                            }
+//                            it.transform(newWords) { stateFlowData ->
+//                                stateFlowData + newWords.data().orEmpty()
+//                            }
                         }
+                    //}
+                }.onCompletion { cause ->
+                    cause?.let { throwable ->
+                        // Keep resource state in sync after cancellation or an error
+                        Logger.e("Define flow error ($nextVersion) " + throwable.message, tag)
+                        //val completionValue = stateFlow.value
+                        //if (completionValue.version == nextVersion) {
+                            stateFlow.update { it.toError(throwable, true) }
+                        //}
                     }
                 }.collect()
             }
@@ -121,7 +151,7 @@ class WordDefinitionRepository(
             Logger.v("Going to reuse resource state $currentValue", tag)
         }
 
-        return stateFlow.takeUntilLoadedOrErrorForVersion()
+        return stateFlow.takeUntilLoadedOrErrorForVersion(version = nextVersion)
     }
 
     fun obtainStateFlow(word: String): StateFlow<Resource<List<Pair<WordTeacherWordService, List<WordTeacherWord>>>>> {
