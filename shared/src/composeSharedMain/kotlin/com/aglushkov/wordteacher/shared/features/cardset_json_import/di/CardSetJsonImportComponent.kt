@@ -28,7 +28,6 @@ interface CardSetJsonImportComponent {
 
 interface CardSetJsonImportDependencies {
     fun cardSetsRepository(): CardSetsRepository
-    fun cardSetSearchRepository(): CardSetSearchRepository
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
 }

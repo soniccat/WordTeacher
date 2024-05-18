@@ -19,6 +19,8 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.SectionViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.views.BottomSheetStates
+import com.aglushkov.wordteacher.shared.general.BackHandler
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
@@ -29,6 +31,7 @@ import com.aglushkov.wordteacher.shared.general.views.*
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
+import kotlinx.coroutines.launch
 import okio.FileSystem
 import okio.Path.Companion.toPath
 
@@ -38,6 +41,7 @@ fun CardSetsUI(
     modifier: Modifier = Modifier,
     onBackHandler: (() -> Unit)? = null,
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val cardSets by vm.cardSets.collectAsState()
     val searchCardSets by vm.searchCardSets.collectAsState()
     var searchText by remember { mutableStateOf(vm.stateFlow.value.searchQuery.orEmpty()) }
@@ -45,6 +49,13 @@ fun CardSetsUI(
     val needShowSearch by remember(searchCardSets) { derivedStateOf { !searchCardSets.isUninitialized() } }
     val newCardSetTextState = vm.stateFlow.collectAsState()
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { newCardSetTextState.value.newCardSetText }) }
+
+    BackHandler(enabled = needShowSearch) {
+        coroutineScope.launch {
+            searchText = ""
+            vm.onSearchClosed()
+        }
+    }
 
     Box(
         modifier = modifier

@@ -79,7 +79,6 @@ interface AppComponent:
     override fun routerResolver(): RouterResolver
     override fun articlesRepository(): ArticlesRepository
     override fun cardSetsRepository(): CardSetsRepository
-    override fun cardSetSearchRepository(): CardSetSearchRepository
     override fun wordRepository(): WordDefinitionRepository
     override fun notesRepository(): NotesRepository
 

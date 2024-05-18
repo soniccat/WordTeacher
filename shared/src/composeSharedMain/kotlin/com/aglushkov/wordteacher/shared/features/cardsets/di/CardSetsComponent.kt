@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
+import com.aglushkov.wordteacher.shared.service.SpaceCardSetSearchService
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -26,7 +27,7 @@ interface CardSetsComponent {
 
 interface CardSetsDependencies {
     fun cardSetsRepository(): CardSetsRepository
-    fun cardSetSearchRepository(): CardSetSearchRepository
+    fun spaceCardSetSearchService(): SpaceCardSetSearchService
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
     fun cardSetsFeatures(): CardSetsVM.Features

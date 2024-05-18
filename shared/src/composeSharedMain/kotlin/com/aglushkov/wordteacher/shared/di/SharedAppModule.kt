@@ -151,14 +151,6 @@ class SharedAppModule {
 
     @AppComp
     @Provides
-    fun cardSetSearchRepository(
-        service: SpaceCardSetSearchService,
-    ): CardSetSearchRepository {
-        return CardSetSearchRepository(service)
-    }
-
-    @AppComp
-    @Provides
     fun notesRepository(
         database: AppDatabase,
         nlpCore: NLPCore,
