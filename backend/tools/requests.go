@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -65,37 +66,31 @@ func SetError(w http.ResponseWriter, outErr error, code int, logger *logger.Logg
 
 	w.WriteHeader(code)
 
-	marshaledResponse, err := json.Marshal(NewResponseError(outErr))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err = setJsonData(w, marshaledResponse); err != nil {
+	if err := setJsonData(w, NewResponseError(outErr)); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
-func setJsonData(w http.ResponseWriter, data []byte) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+func WriteResponse(w http.ResponseWriter, response interface{}, logger *logger.Logger) {
+	if err := setJsonData(w, NewResponseOk(response)); err != nil {
+		SetError(w, err, http.StatusInternalServerError, logger)
+		return
+	}
+}
 
-	if _, err := w.Write(data); err != nil {
+func setJsonData(w http.ResponseWriter, obj any) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Encoding", "gzip")
+
+	gw := gzip.NewWriter(w)
+	je := json.NewEncoder(gw)
+
+	defer gw.Close()
+
+	if err := je.Encode(obj); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func WriteResponse(w http.ResponseWriter, response interface{}, logger *logger.Logger) {
-	marshaledResponse, err := json.Marshal(NewResponseOk(response))
-	if err != nil {
-		SetError(w, err, http.StatusInternalServerError, logger)
-		return
-	}
-
-	if _, err = w.Write(marshaledResponse); err != nil {
-		SetError(w, err, http.StatusInternalServerError, logger)
-		return
-	}
 }

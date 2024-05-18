@@ -56,31 +56,15 @@ class WordDefinitionRepository(
             ) { a, b -> Unit
                 a.data().orEmpty() + b.data().orEmpty()
             }.distinctUntilChanged().collect {
-                //if (it.isLoaded()) {
-                    //val stateFlowsCopy = stateFlows.toMap()
-                    //stateFlows.clear() // invalidate cache(), do first to make obtainMutableStateFlow returning Uninitialized
-
-                    stateFlows.onEach {
-                        it.value.update {
-                            // use canLoadNextPage to mark that more data is available from new services or dicts
-                            it.copy(canLoadNextPage = true)
-                        }
-                        //it.value.value = Resource.Uninitialized() // mark as uninitialized to notify subscribers
+                stateFlows.onEach {
+                    it.value.update {
+                        // use canLoadNextPage to mark that more data is available from new services or dicts
+                        it.copy(canLoadNextPage = true)
                     }
-//                } else if (it is Resource.Error) {
-//                    setNotLoadedFlowsToError(it.throwable)
-//                }
+                }
             }
         }
     }
-
-//    private fun setNotLoadedFlowsToError(throwable: Throwable) {
-//        for (flowEntry in stateFlows) {
-//            if (flowEntry.value.isUninitialized() || flowEntry.value.isLoading()) {
-//                flowEntry.value.value = flowEntry.value.value.toError(throwable, true)
-//            }
-//        }
-//    }
 
     suspend fun define(
         word: String,
@@ -123,27 +107,16 @@ class WordDefinitionRepository(
             jobs[word]?.cancelAndJoin()
             jobs[word] = scope.launch { // use our scope here to avoid cancellation by Structured Concurrency
                 loadDefinitionsFlow(word, nextVersion, newServices).onEach { newWordsRes ->
-                    //if (it.version == nextVersion) {
-                        stateFlow.update {
-                            it.mergeWith(newWordsRes) { _, b ->
-                                currentStateData + b
-                            }
-//                            newWordsRes.transform(it) { newWordsData ->
-//                                it.data().orEmpty() + newWordsData
-//                            }
-//                            it.transform(newWords) { stateFlowData ->
-//                                stateFlowData + newWords.data().orEmpty()
-//                            }
+                    stateFlow.update {
+                        it.mergeWith(newWordsRes) { _, b ->
+                            currentStateData + b
                         }
-                    //}
+                    }
                 }.onCompletion { cause ->
                     cause?.let { throwable ->
                         // Keep resource state in sync after cancellation or an error
                         Logger.e("Define flow error ($nextVersion) " + throwable.message, tag)
-                        //val completionValue = stateFlow.value
-                        //if (completionValue.version == nextVersion) {
-                            stateFlow.update { it.toError(throwable, true) }
-                        //}
+                        stateFlow.update { it.toError(throwable, true) }
                     }
                 }.collect()
             }
