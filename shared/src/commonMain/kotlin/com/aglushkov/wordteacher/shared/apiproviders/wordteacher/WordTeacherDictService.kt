@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.service.HeaderDeviceType
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
+import io.ktor.client.call.body
 import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -72,7 +73,7 @@ class WordTeacherDictService (
 
         val res: HttpResponse = httpClient.get("${baseUrl}/api/dict/words/${word}")
         return withContext(Dispatchers.Default) {
-            val responseString = res.readBytes().decodeToString()
+            val responseString: String = res.body()
             logger.logLoadingCompleted(word, res, responseString)
             dictJson.decodeFromString(responseString)
         }

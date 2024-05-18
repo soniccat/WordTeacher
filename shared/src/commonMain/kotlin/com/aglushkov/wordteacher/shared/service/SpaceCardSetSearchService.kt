@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.setStatusCode
 import com.aglushkov.wordteacher.shared.model.CardSet
 import io.ktor.client.*
+import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +49,7 @@ class SpaceCardSetSearchService(
                 }
             }
         return withContext(Dispatchers.Default) {
-            val stringResponse = res.readBytes().decodeToString()
+            val stringResponse: String = res.body()
             json.decodeFromString<Response<CardSetSearchResponse>>(stringResponse).setStatusCode(res.status.value)
         }
     }

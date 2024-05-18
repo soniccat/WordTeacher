@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.article_parser.ArticleParser
 import com.aglushkov.wordteacher.shared.general.article_parser.ParsedArticle
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
@@ -17,7 +18,7 @@ class ArticleParserRepository: SimpleResourceRepository<ParsedArticle, String>()
 
     override suspend fun load(arg: String): ParsedArticle = withContext(Dispatchers.Default) {
         val res: HttpResponse = httpClient.get(arg)
-        val responseString = res.readBytes().decodeToString()
+        val responseString: String = res.body()
         parser.parse(responseString)
     }
 

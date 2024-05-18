@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.general.oauth2
 import com.aglushkov.wordteacher.shared.general.crypto.PkceGenerator
 import com.benasher44.uuid.uuid4
 import io.ktor.client.*
+import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -120,7 +121,7 @@ class OAuth2Service(
                 )
             }
         return withContext(Dispatchers.Default) {
-            val stringResponse = res.readBytes().decodeToString()
+            val stringResponse: String = res.body()
             json.decodeFromString(stringResponse)
         }
     }

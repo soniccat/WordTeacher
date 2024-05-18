@@ -36,7 +36,7 @@ class SpaceHttpClientBuilder(
 
     private fun HttpClientConfig<*>.installGzipForResponse() {
         install(ContentEncoding) {
-            gzip()
+            gzip(0.9F)
         }
     }
 

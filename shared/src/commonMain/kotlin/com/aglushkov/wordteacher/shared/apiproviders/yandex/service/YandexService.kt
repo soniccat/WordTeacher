@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
@@ -64,7 +65,7 @@ class YandexService(
             parameter("flags", flags)
         }
         return withContext(Dispatchers.Default) {
-            val responseString = res.readBytes().decodeToString()
+            val responseString: String = res.body()
             logger.logLoadingCompleted(word, res, responseString)
             json.decodeFromString(responseString)
         }

@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.setStatusCode
 import com.aglushkov.wordteacher.shared.model.CardSet
 import io.ktor.client.*
+import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.Dispatchers
@@ -102,7 +103,7 @@ class SpaceCardSetService(
                 this.setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds, lastModificationDate)))
             }
         return withContext(Dispatchers.Default) {
-            val stringResponse = res.readBytes().decodeToString()
+            val stringResponse: String = res.body()
             pullJson.decodeFromString<Response<CardSetPullResponse>>(stringResponse).setStatusCode(res.status.value)
         }
     }
@@ -113,7 +114,7 @@ class SpaceCardSetService(
                 this.setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds, lastModificationDate)))
             }
         return withContext(Dispatchers.Default) {
-            val stringResponse = res.readBytes().decodeToString()
+            val stringResponse: String = res.body()
             pushJson.decodeFromString<Response<CardSetPushResponse>>(stringResponse).setStatusCode(res.status.value)
         }
     }
@@ -122,7 +123,7 @@ class SpaceCardSetService(
         val res: HttpResponse =
             httpClient.get(urlString = "${baseUrl}/api/cardsets/" + id)
         return withContext(Dispatchers.Default) {
-            val stringResponse = res.readBytes().decodeToString()
+            val stringResponse: String = res.body()
             cardSetByIdJson.decodeFromString<Response<CardSetByIdResponse>>(stringResponse).setStatusCode(res.status.value)
         }
     }

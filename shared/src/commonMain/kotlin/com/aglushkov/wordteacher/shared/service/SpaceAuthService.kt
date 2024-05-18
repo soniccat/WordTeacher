@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.service
 
 import com.aglushkov.wordteacher.shared.general.*
 import io.ktor.client.*
+import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -92,7 +93,7 @@ class SpaceAuthService(
                 this.setBody(authJson.encodeToString(AuthInput(token)))
             }
         return withContext(Dispatchers.Default) {
-            val stringResponse = res.readBytes().decodeToString()
+            val stringResponse: String = res.body()
             authJson.decodeFromString<Response<SpaceAuthData>>(stringResponse).setStatusCode(res.status.value)
         }
     }
@@ -103,7 +104,7 @@ class SpaceAuthService(
                 this.setBody(refreshJson.encodeToString(RefreshInput(token.accessToken, token.refreshToken)))
             }
         return withContext(Dispatchers.Default) {
-            val stringResponse = res.readBytes().decodeToString()
+            val stringResponse: String = res.body()
             refreshJson.decodeFromString<Response<SpaceAuthToken>>(stringResponse).setStatusCode(res.status.value)
         }
     }
