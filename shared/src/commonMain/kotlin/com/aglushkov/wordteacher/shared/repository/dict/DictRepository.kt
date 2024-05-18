@@ -1,10 +1,6 @@
 package com.aglushkov.wordteacher.shared.repository.dict
 
-import co.touchlab.stately.concurrency.AtomicBoolean
-import co.touchlab.stately.concurrency.Lock
 import com.aglushkov.wordteacher.shared.dicts.Dict
-import com.aglushkov.wordteacher.shared.general.FileOpenCompositeSuccessHandler
-import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -18,11 +14,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.supervisorScope
 import okio.FileSystem
 import okio.Path
-import okio.withLock
 
 interface DictRepository {
     val dicts: StateFlow<Resource<List<Dict>>>
@@ -148,7 +142,7 @@ class DictRepositoryImpl(
         scope.launch(Dispatchers.Default) {
             fileSystem.delete(dict.index.path)
             fileSystem.delete(dict.path)
-            dicts.update { it.transform { it.filter { it != dict } } }
+            dicts.update { it.mapTo { it.filter { it != dict } } }
         }
     }
 }

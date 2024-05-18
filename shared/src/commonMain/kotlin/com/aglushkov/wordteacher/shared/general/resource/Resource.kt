@@ -74,15 +74,24 @@ sealed interface Resource<T> {
     }
 
     // that might be better replace with mergeWith as now logic is quite complicated
-    fun <R> transform(
-        from: Resource<R> = Uninitialized(),
+    fun <R> mapTo(
+        from: Resource<R>,
         errorTransformer: ((Throwable) -> Throwable)? = null,
-        loadedDataTransformer: (T) -> R
+        loadedDataTransformer: (T) -> R?
     ): Resource<R> = when (this) {
-        is Loaded -> from.toLoaded(data = loadedDataTransformer(data))
+        is Loaded -> from.toLoaded(data = loadedDataTransformer(data) ?: throw  RuntimeException("mapTo: nil data for Loaded resource isn't supported"))
         is Loading -> from.toLoading(data = data?.let { loadedDataTransformer(it) }, canLoadNextPage, version)
         is Error -> from.toError(errorTransformer?.invoke(throwable) ?: throwable, canTryAgain, data = data?.let { loadedDataTransformer(it) }, canLoadNextPage, version)
         is Uninitialized -> from.toUninitialized(canLoadNextPage, version)
+    }
+
+    fun updateData(
+        block: (T?) -> T?
+    ): Resource<T> = when (this) {
+        is Loaded -> this.toLoaded(data = block(data) ?: throw RuntimeException("updateData: nil data for Loaded resource isn't supported"))
+        is Loading -> this.toLoading(data = block(data))
+        is Error -> this.toError(throwable = throwable, canTryAgain = canTryAgain, data = block(data))
+        is Uninitialized -> this.toUninitialized()
     }
 
     fun <R> mergeWith(
@@ -91,10 +100,10 @@ sealed interface Resource<T> {
         versionTransformer: (Int, Int) -> Int = { a, _ -> a },
         throwableTransformer: (Throwable?, Throwable) -> Throwable = { a, b -> a ?: b },
         canTryAgainTransformer: (Boolean, Boolean) -> Boolean = { a, _ -> a },
-        dataTransformer: (T?, R) -> T
+        dataTransformer: (T?, R) -> T?
     ): Resource<T> = when (res) {
         is Loaded -> this.toLoaded(
-            data = dataTransformer(data(), res.data),
+            data = dataTransformer(data(), res.data) ?: throw RuntimeException("mergeWith: nil data for Loaded resource isn't supported"),
             canLoadNext = canLoadNextPageTransformer(canLoadNextPage, res.canLoadNextPage),
             version = versionTransformer(version, res.version)
         )

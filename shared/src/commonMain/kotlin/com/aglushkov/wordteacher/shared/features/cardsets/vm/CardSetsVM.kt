@@ -5,8 +5,6 @@ import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
-import com.aglushkov.wordteacher.shared.general.extensions.addElements
-import com.aglushkov.wordteacher.shared.general.extensions.splitBy
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -77,7 +75,7 @@ open class CardSetsVMImpl(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override val searchCardSets = cardSetSearchRepository.cardSets.map {
-        it.transform {
+        it.mapTo {
             val viewItems = it.map { cardSet ->
                 RemoteCardSetViewItem(
                     cardSet.remoteId,
@@ -248,7 +246,11 @@ open class CardSetsVMImpl(
     }
 
     override fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem) {
-        cardSetsRepository.addRemoteCardSet(item.remoteCardSetId)
+        val itemIndex = searchCardSets.value.data().orEmpty().indexOf(item)
+        if (itemIndex != -1) {
+            cardSetSearchRepository.removeAtIndex(itemIndex)
+            cardSetsRepository.addRemoteCardSet(item.remoteCardSetId)
+        }
     }
 
     override fun onJsonImportClicked() {

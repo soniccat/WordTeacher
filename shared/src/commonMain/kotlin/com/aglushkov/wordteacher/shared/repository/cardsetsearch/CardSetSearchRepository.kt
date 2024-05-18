@@ -51,4 +51,12 @@ class CardSetSearchRepository(
             cardSets.update { Resource.Uninitialized() }
         }
     }
+
+    fun removeAtIndex(i: Int) {
+        cardSets.update {
+            it.updateData { carSets ->
+                carSets?.filterIndexed { index, _ ->  index != i }
+            }
+        }
+    }
 }

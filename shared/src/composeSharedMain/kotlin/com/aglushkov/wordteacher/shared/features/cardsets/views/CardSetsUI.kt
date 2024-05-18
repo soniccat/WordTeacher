@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.views
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,17 +8,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.shared.di.LocalIsDebug
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.SectionViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.views.BottomSheetStates
 import com.aglushkov.wordteacher.shared.general.BackHandler
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
@@ -29,11 +25,8 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
 import com.aglushkov.wordteacher.shared.general.views.*
 import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
 import kotlinx.coroutines.launch
-import okio.FileSystem
-import okio.Path.Companion.toPath
 
 @Composable
 fun CardSetsUI(
@@ -46,11 +39,11 @@ fun CardSetsUI(
     val searchCardSets by vm.searchCardSets.collectAsState()
     var searchText by remember { mutableStateOf(vm.stateFlow.value.searchQuery.orEmpty()) }
 
-    val needShowSearch by remember(searchCardSets) { derivedStateOf { !searchCardSets.isUninitialized() } }
+    val needShowSearchResult by remember(searchCardSets) { derivedStateOf { !searchCardSets.isUninitialized() } }
     val newCardSetTextState = vm.stateFlow.collectAsState()
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { newCardSetTextState.value.newCardSetText }) }
 
-    BackHandler(enabled = needShowSearch) {
+    BackHandler(enabled = needShowSearchResult) {
         coroutineScope.launch {
             searchText = ""
             vm.onSearchClosed()
@@ -95,7 +88,7 @@ fun CardSetsUI(
             }
 
             // search result
-            if (needShowSearch) {
+            if (needShowSearchResult) {
                 val data = searchCardSets.data()
                 if (searchCardSets.isLoadedAndNotEmpty() && data != null) {
                     LazyColumn(

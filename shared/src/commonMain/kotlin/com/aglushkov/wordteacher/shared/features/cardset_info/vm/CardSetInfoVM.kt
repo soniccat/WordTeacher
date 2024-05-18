@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardset_info.vm
 
 import com.aglushkov.wordteacher.shared.general.Clearable
-import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.StringDescThrowable
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import java.lang.RuntimeException
 
 interface CardSetInfoVM: Clearable {
     var router: CardSetInfoRouter?
@@ -84,7 +82,8 @@ open class CardSetInfoVMImpl(
         },
         inputState,
     ) { cardSetRes, inputState ->
-        cardSetRes.transform(
+        cardSetRes.mapTo(
+            from = Resource.Uninitialized(),
             errorTransformer = {
                 StringDescThrowable(ResourceStringDesc(MR.strings.cardset_info_error), it)
             }

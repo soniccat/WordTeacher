@@ -145,7 +145,7 @@ class SpaceAuthRepository(
         loadResource(authDataRes.copyWith(authDataRes.data.authToken)) {
             service.refresh(authDataRes.data.authToken).toOkResponse()
         }.map { newTokenRes ->
-            newTokenRes.transform(authDataRes) { newToken ->
+            newTokenRes.mapTo(authDataRes) { newToken ->
                 authDataRes.data.copy(authToken = newToken)
             }
         }.onEach {

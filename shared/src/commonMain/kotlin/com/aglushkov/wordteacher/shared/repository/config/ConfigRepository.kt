@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.FileSystem
@@ -99,7 +98,7 @@ class ConfigRepository(
 
     fun removeConfig(id: Int) {
         val configs = stateFlow.updateAndGet { configListRes ->
-            configListRes.transform { configs ->
+            configListRes.mapTo { configs ->
                 configs.filter { it.id != id }
             }
         }
@@ -108,7 +107,7 @@ class ConfigRepository(
 
     fun updateConfig(config: Config) {
         val configs = stateFlow.updateAndGet { configListRes ->
-            configListRes.transform { configs ->
+            configListRes.mapTo { configs ->
                 configs.map {
                     if (it.id == config.id) {
                         config

@@ -55,9 +55,7 @@ class CardSetRepository(
                         }
                     }
                 }
-            ).collect {
-                stateFlow.value = it
-            }
+            ).collect(stateFlow)
         }
     }
 

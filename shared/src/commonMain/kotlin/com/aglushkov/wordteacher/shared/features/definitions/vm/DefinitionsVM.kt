@@ -1,31 +1,21 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
-import com.aglushkov.wordteacher.shared.dicts.Dict
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
-import com.aglushkov.wordteacher.shared.features.learning.vm.LearningLoadingViewItem
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.data
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
-import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
-import com.aglushkov.wordteacher.shared.general.resource.merge
-import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
-import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
-import com.aglushkov.wordteacher.shared.model.nlp.NLPSpan
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.config.Config
@@ -34,7 +24,6 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.*
@@ -47,7 +36,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.update
 
 interface DefinitionsVM: Clearable {
@@ -215,7 +203,7 @@ open class DefinitionsVMImpl(
             block = {
                 val flattenedValue = it.map { it.second }.flatten()
                 definitionWords.update {
-                    it.transform { flattenedValue }.bumpVersion()
+                    it.mapTo { flattenedValue }.bumpVersion()
                 }
             },
             elseBlock = {
@@ -242,7 +230,7 @@ open class DefinitionsVMImpl(
             }
 
             wordDefinitionRepository.define(word, false).map {
-                it.transform { it.map { it.second }.flatten() }
+                it.mapTo { it.map { it.second }.flatten() }
             }.collect(definitionWords)
             Logger.v("Finish Loading $word", tag)
         }
