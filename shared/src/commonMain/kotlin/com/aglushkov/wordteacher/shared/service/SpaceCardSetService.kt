@@ -98,31 +98,31 @@ class SpaceCardSetService(
     }
 
     suspend fun pull(currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<CardSetPullResponse> {
-        val res: HttpResponse =
-            httpClient.post(urlString = "${baseUrl}/api/cardsets/pull") {
-                this.setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds, lastModificationDate)))
-            }
         return withContext(Dispatchers.Default) {
+            val res: HttpResponse =
+                httpClient.post(urlString = "${baseUrl}/api/cardsets/pull") {
+                    this.setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds, lastModificationDate)))
+                }
             val stringResponse: String = res.body()
             pullJson.decodeFromString<Response<CardSetPullResponse>>(stringResponse).setStatusCode(res.status.value)
         }
     }
 
     suspend fun push(updatedCardSets: List<CardSet>, currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<CardSetPushResponse> {
-        val res: HttpResponse =
-            httpClient.post(urlString = "${baseUrl}/api/cardsets/push") {
-                this.setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds, lastModificationDate)))
-            }
         return withContext(Dispatchers.Default) {
+            val res: HttpResponse =
+                httpClient.post(urlString = "${baseUrl}/api/cardsets/push") {
+                    this.setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds, lastModificationDate)))
+                }
             val stringResponse: String = res.body()
             pushJson.decodeFromString<Response<CardSetPushResponse>>(stringResponse).setStatusCode(res.status.value)
         }
     }
 
     suspend fun getById(id: String): Response<CardSetByIdResponse> {
-        val res: HttpResponse =
-            httpClient.get(urlString = "${baseUrl}/api/cardsets/" + id)
         return withContext(Dispatchers.Default) {
+            val res: HttpResponse =
+                httpClient.get(urlString = "${baseUrl}/api/cardsets/" + id)
             val stringResponse: String = res.body()
             cardSetByIdJson.decodeFromString<Response<CardSetByIdResponse>>(stringResponse).setStatusCode(res.status.value)
         }

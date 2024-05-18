@@ -88,22 +88,22 @@ class SpaceAuthService(
     }
 
     suspend fun auth(network: NetworkType, token: String): Response<SpaceAuthData> {
-        val res: HttpResponse =
-            httpClient.post(urlString = "${baseUrl}/api/auth/social/" + network.value) {
-                this.setBody(authJson.encodeToString(AuthInput(token)))
-            }
         return withContext(Dispatchers.Default) {
+            val res: HttpResponse =
+                httpClient.post(urlString = "${baseUrl}/api/auth/social/" + network.value) {
+                    this.setBody(authJson.encodeToString(AuthInput(token)))
+                }
             val stringResponse: String = res.body()
             authJson.decodeFromString<Response<SpaceAuthData>>(stringResponse).setStatusCode(res.status.value)
         }
     }
 
     suspend fun refresh(token: SpaceAuthToken): Response<SpaceAuthToken> {
-        val res: HttpResponse =
-            httpClient.post(urlString = "${baseUrl}/api/auth/refresh") {
-                this.setBody(refreshJson.encodeToString(RefreshInput(token.accessToken, token.refreshToken)))
-            }
         return withContext(Dispatchers.Default) {
+            val res: HttpResponse =
+                httpClient.post(urlString = "${baseUrl}/api/auth/refresh") {
+                    this.setBody(refreshJson.encodeToString(RefreshInput(token.accessToken, token.refreshToken)))
+                }
             val stringResponse: String = res.body()
             refreshJson.decodeFromString<Response<SpaceAuthToken>>(stringResponse).setStatusCode(res.status.value)
         }

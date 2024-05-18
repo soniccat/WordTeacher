@@ -42,13 +42,13 @@ class SpaceCardSetSearchService(
     }
 
     suspend fun search(query: String): Response<CardSetSearchResponse> {
-        val res: HttpResponse =
-            httpClient.get(urlString = "${baseUrl}/api/cardsets/search") {
-                url {
-                    parameter("query", query)
-                }
-            }
         return withContext(Dispatchers.Default) {
+            val res: HttpResponse =
+                httpClient.get(urlString = "${baseUrl}/api/cardsets/search") {
+                    url {
+                        parameter("query", query)
+                    }
+                }
             val stringResponse: String = res.body()
             json.decodeFromString<Response<CardSetSearchResponse>>(stringResponse).setStatusCode(res.status.value)
         }

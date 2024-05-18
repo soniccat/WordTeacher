@@ -56,15 +56,14 @@ class YandexService(
         uiLang: String,
         flags: Int
     ): YandexWords {
-        logger.logLoadingStarted(word)
-
-        val res: HttpResponse = httpClient.get("${baseUrl}api/v1/dicservice.json/lookup") {
-            parameter("text", word)
-            parameter("lang", languages)
-            parameter("ui", uiLang)
-            parameter("flags", flags)
-        }
         return withContext(Dispatchers.Default) {
+            logger.logLoadingStarted(word)
+            val res: HttpResponse = httpClient.get("${baseUrl}api/v1/dicservice.json/lookup") {
+                parameter("text", word)
+                parameter("lang", languages)
+                parameter("ui", uiLang)
+                parameter("flags", flags)
+            }
             val responseString: String = res.body()
             logger.logLoadingCompleted(word, res, responseString)
             json.decodeFromString(responseString)

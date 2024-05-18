@@ -105,22 +105,22 @@ class OAuth2Service(
     }
 
     suspend fun accessToken(code: String, context: AuthContext): Token {
-        val res: HttpResponse =
-            httpClient.post(tokenUrl) {
-                setBody(
-                    FormDataContent(
-                        Parameters.build {
-                            append("client_id", clientId)
-                            append("client_secret", clientSecret)
-                            append("code", code)
-                            append("code_verifier", context.codeVerifier)
-                            append("grant_type", grantType)
-                            append("redirect_uri", redirectUrl.toString())
-                        }
-                    )
-                )
-            }
         return withContext(Dispatchers.Default) {
+            val res: HttpResponse =
+                httpClient.post(tokenUrl) {
+                    setBody(
+                        FormDataContent(
+                            Parameters.build {
+                                append("client_id", clientId)
+                                append("client_secret", clientSecret)
+                                append("code", code)
+                                append("code_verifier", context.codeVerifier)
+                                append("grant_type", grantType)
+                                append("redirect_uri", redirectUrl.toString())
+                            }
+                        )
+                    )
+                }
             val stringResponse: String = res.body()
             json.decodeFromString(stringResponse)
         }
