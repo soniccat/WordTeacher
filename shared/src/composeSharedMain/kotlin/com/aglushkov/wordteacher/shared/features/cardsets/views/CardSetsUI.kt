@@ -27,6 +27,7 @@ import com.aglushkov.wordteacher.shared.general.views.*
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import kotlinx.coroutines.launch
+import dev.icerock.moko.resources.compose.localized
 
 @Composable
 fun CardSetsUI(

@@ -29,10 +29,7 @@ fun <T> ResourceRepository<T, String>.toArticleContentExtractor(
 
         override fun extract(uri: String): Flow<Resource<ArticleContent>> {
             return this@toArticleContentExtractor.load(uri).map {
-                it.mapTo(
-                    Resource.Uninitialized(),
-                    loadedDataTransformer = transformer
-                )
+                it.map(loadedDataTransformer = transformer)
             }
         }
     }

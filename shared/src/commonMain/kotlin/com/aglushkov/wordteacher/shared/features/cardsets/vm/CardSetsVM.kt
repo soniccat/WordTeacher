@@ -75,7 +75,7 @@ open class CardSetsVMImpl(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override val searchCardSets = cardSetSearchRepository.cardSets.map {
-        it.mapTo {
+        it.map {
             val viewItems = it.map { cardSet ->
                 RemoteCardSetViewItem(
                     cardSet.remoteId,

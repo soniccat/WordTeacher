@@ -100,19 +100,15 @@ open class AddArticleVMImpl(
             var res: Resource<ArticleContent> = Resource.Uninitialized()
             for (extractor in contentExtractors) {
                 if (extractor.canExtract(uri)) {
-                    res = extractor.extract(uri).waitUntilLoadedOrError()
-                }
-
-                if (res.isLoadedOrError()) {
-                    break
+                    extractor.extract(uri).collect { res = it }
                 }
             }
 
             uiStateFlow.update { uiStateRes ->
-                res.mapTo(uiStateRes) {
+                res.map { articleContent ->
                     dataFromState.copy(
-                        title = it.title.orEmpty(),
-                        text = it.text.orEmpty(),
+                        title = articleContent.title.orEmpty(),
+                        text = articleContent.text.orEmpty(),
                     )
                 }
             }

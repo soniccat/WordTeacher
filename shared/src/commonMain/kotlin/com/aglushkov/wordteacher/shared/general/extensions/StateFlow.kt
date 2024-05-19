@@ -124,7 +124,7 @@ suspend fun <T> Flow<Resource<T>>.waitUntilLoadedOrError(): Resource<T> {
 }
 
 fun <T> MutableStateFlow<Resource<T>>.updateData(dataTransform: (T) -> T) {
-    this.update { it.mapTo( loadedDataTransformer= dataTransform) }
+    this.update { it.map( loadedDataTransformer= dataTransform) }
 }
 
 class AbortFlowException constructor(

@@ -54,44 +54,42 @@ sealed interface Resource<T> {
         }
     }
 
-    fun copy(data: T? = this.data(), version: Int = this.version, canLoadNextPage: Boolean = this.canLoadNextPage): Resource<T> {
-        return when(this) {
-            is Uninitialized -> Uninitialized(version = version, canLoadNextPage = canLoadNextPage)
-            is Loaded -> Loaded(data!!, canLoadNextPage, version)
-            is Loading -> Loading(data, canLoadNextPage, version)
-            is Error -> Error(throwable, canTryAgain, data, canLoadNextPage, version)
-        }
-    }
-
     // it's better to use transform instead not to access this.data outside
-    fun <R> copyWith(data: R?): Resource<R> {
-        return when(this) {
-            is Uninitialized -> Uninitialized(version = version)
-            is Loaded -> Loaded(data!!, canLoadNextPage, version) // TODO: force unwrap looks dangerous
-            is Loading -> Loading(data, canLoadNextPage, version)
-            is Error -> Error(throwable, canTryAgain, data, canLoadNextPage, version)
-        }
+    fun <R> copyWith(data: R?, canLoadNextPage: Boolean = this.canLoadNextPage, version: Int = this.version): Resource<R> {
+        return map(
+            canLoadNextPage = canLoadNextPage,
+            version = version,
+        ) { data }
     }
 
     // that might be better replace with mergeWith as now logic is quite complicated
-    fun <R> mapTo(
-        from: Resource<R>,
+    fun <R> map(
+        canLoadNextPage: Boolean = this.canLoadNextPage,
+        version: Int = this.version,
         errorTransformer: ((Throwable) -> Throwable)? = null,
         loadedDataTransformer: (T) -> R?
     ): Resource<R> = when (this) {
-        is Loaded -> from.toLoaded(data = loadedDataTransformer(data) ?: throw  RuntimeException("mapTo: nil data for Loaded resource isn't supported"))
-        is Loading -> from.toLoading(data = data?.let { loadedDataTransformer(it) }, canLoadNextPage, version)
-        is Error -> from.toError(errorTransformer?.invoke(throwable) ?: throwable, canTryAgain, data = data?.let { loadedDataTransformer(it) }, canLoadNextPage, version)
-        is Uninitialized -> from.toUninitialized(canLoadNextPage, version)
-    }
-
-    fun updateData(
-        block: (T?) -> T?
-    ): Resource<T> = when (this) {
-        is Loaded -> this.toLoaded(data = block(data) ?: throw RuntimeException("updateData: nil data for Loaded resource isn't supported"))
-        is Loading -> this.toLoading(data = block(data))
-        is Error -> this.toError(throwable = throwable, canTryAgain = canTryAgain, data = block(data))
-        is Uninitialized -> this.toUninitialized()
+        is Loaded -> Loaded(
+            data = loadedDataTransformer(data) ?: throw  RuntimeException("mapTo: nil data for Loaded resource isn't supported"),
+            canLoadNextPage = canLoadNextPage,
+            version = version
+        )
+        is Loading -> Loading(
+            data = data?.let { loadedDataTransformer(it) },
+            canLoadNextPage = canLoadNextPage,
+            version = version
+        )
+        is Error -> Error(
+            throwable = errorTransformer?.invoke(throwable) ?: throwable,
+            canTryAgain = canTryAgain,
+            data = data?.let { loadedDataTransformer(it) },
+            canLoadNextPage = canLoadNextPage,
+            version = version
+        )
+        is Uninitialized -> Uninitialized(
+            canLoadNextPage = canLoadNextPage,
+            version = version
+        )
     }
 
     fun <R> mergeWith(
@@ -125,7 +123,30 @@ sealed interface Resource<T> {
         )
     }
 
-    fun bumpVersion() = copy(version = this.version + 1)
+    fun updateData(
+        block: (T?) -> T?
+    ): Resource<T> = when (this) {
+        is Loaded -> this.toLoaded(data = block(data) ?: throw RuntimeException("updateData: nil data for Loaded resource isn't supported"))
+        is Loading -> this.toLoading(data = block(data))
+        is Error -> this.toError(throwable = throwable, canTryAgain = canTryAgain, data = block(data))
+        is Uninitialized -> this.toUninitialized()
+    }
+
+    fun updateCanLoadNextPage(
+        canLoadNextPage: Boolean,
+    ): Resource<T> = when (this) {
+        is Loaded -> this.toLoaded(data, canLoadNext = canLoadNextPage)
+        is Loading -> this.toLoading(canLoadNext = canLoadNextPage)
+        is Error -> this.toError(throwable = throwable, canTryAgain = canTryAgain, canLoadNext = canLoadNextPage)
+        is Uninitialized -> this.toUninitialized(canLoadNextPage = canLoadNextPage)
+    }
+
+    fun bumpVersion(): Resource<T> = when (this) {
+        is Loaded -> this.toLoaded(data, version = version + 1)
+        is Loading -> this.toLoading(version = version + 1)
+        is Error -> this.toError(throwable = throwable, canTryAgain = canTryAgain, version = version + 1)
+        is Uninitialized -> this.toUninitialized(version = version + 1)
+    }
 }
 
 fun <T,R> Resource<T>.downgradeToErrorOrLoading(r: Resource<R>): Resource<T> = when(this) {

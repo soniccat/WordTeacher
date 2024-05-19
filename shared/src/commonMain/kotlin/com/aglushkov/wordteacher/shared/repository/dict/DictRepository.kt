@@ -142,7 +142,7 @@ class DictRepositoryImpl(
         scope.launch(Dispatchers.Default) {
             fileSystem.delete(dict.index.path)
             fileSystem.delete(dict.path)
-            dicts.update { it.mapTo { it.filter { it != dict } } }
+            dicts.update { it.map { it.filter { it != dict } } }
         }
     }
 }

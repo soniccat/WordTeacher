@@ -82,8 +82,7 @@ open class CardSetInfoVMImpl(
         },
         inputState,
     ) { cardSetRes, inputState ->
-        cardSetRes.mapTo(
-            from = Resource.Uninitialized(),
+        cardSetRes.map(
             errorTransformer = {
                 StringDescThrowable(ResourceStringDesc(MR.strings.cardset_info_error), it)
             }

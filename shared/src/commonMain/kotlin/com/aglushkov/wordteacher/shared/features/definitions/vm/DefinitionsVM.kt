@@ -203,7 +203,7 @@ open class DefinitionsVMImpl(
             block = {
                 val flattenedValue = it.map { it.second }.flatten()
                 definitionWords.update {
-                    it.mapTo { flattenedValue }.bumpVersion()
+                    it.map { flattenedValue }.bumpVersion()
                 }
             },
             elseBlock = {
@@ -230,7 +230,7 @@ open class DefinitionsVMImpl(
             }
 
             wordDefinitionRepository.define(word, false).map {
-                it.mapTo { it.map { it.second }.flatten() }
+                it.map { it.map { it.second }.flatten() }
             }.collect(definitionWords)
             Logger.v("Finish Loading $word", tag)
         }

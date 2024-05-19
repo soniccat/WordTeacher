@@ -59,7 +59,7 @@ class WordDefinitionRepository(
                 stateFlows.onEach {
                     it.value.update {
                         // use canLoadNextPage to mark that more data is available from new services or dicts
-                        it.copy(canLoadNextPage = true)
+                        it.updateCanLoadNextPage(true)
                     }
                 }
             }
@@ -94,7 +94,7 @@ class WordDefinitionRepository(
 
         if (stateFlow.value.canLoadNextPage) {
             stateFlow.update {
-                it.copy(canLoadNextPage = false)
+                it.updateCanLoadNextPage(false)
             }
         }
 
