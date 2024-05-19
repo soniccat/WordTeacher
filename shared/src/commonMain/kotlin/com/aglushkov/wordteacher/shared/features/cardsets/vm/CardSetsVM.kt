@@ -1,13 +1,17 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.onError
+import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
@@ -20,17 +24,16 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 interface CardSetsVM: Clearable {
     var router: CardSetsRouter?
-
-    val stateFlow: StateFlow<State>
-    val eventFlow: Flow<Event>
+    val state: State
+    val uiStateFlow: StateFlow<UIState>
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
     val searchCardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
     val availableFeatures: Features
 
-    fun restore(newState: State)
     fun onCardSetAdded(text: String)
     fun onNewCardSetTextChange(text: String)
     fun onStartLearningClicked()
@@ -45,20 +48,44 @@ interface CardSetsVM: Clearable {
     fun onSearchCardSetClicked(item: RemoteCardSetViewItem)
     fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem)
     fun onJsonImportClicked()
+    fun onOpenCardSetEventHandled(event: Event.OpenCardSetEvent)
 
-    @Parcelize
-    data class State (
+    @Serializable
+    data class State(
         val searchQuery: String? = null,
-        val newCardSetText: String? = null
-    ): Parcelable
+        val newCardSetText: String? = null,
+    )
 
-    data class Features (
+    data class UIState(
+        val searchQuery: String? = null,
+        val newCardSetText: String? = null,
+        var openCardSetEvents: List<Event> = emptyList(),
+    ) {
+        fun toState() = State(
+            searchQuery = searchQuery,
+            newCardSetText = newCardSetText,
+        )
+    }
+
+    sealed interface Event {
+        data class OpenCardSetEvent(
+            val text: StringDesc,
+            val actionText: StringDesc,
+            val id: Long,
+        ): Event
+        data class CardSetLoadingError(
+            val text: StringDesc,
+            val remoteId: String,
+        ): Event
+    }
+
+    data class Features(
         val canImportCardSetFromJson: Boolean = false
     )
 }
 
 open class CardSetsVMImpl(
-    state: CardSetsVM.State = CardSetsVM.State(),
+    restoredState: CardSetsVM.State = CardSetsVM.State(),
     private val cardSetsRepository: CardSetsRepository,
     private val cardSetSearchRepository: CardSetSearchRepository,
     private val timeSource: TimeSource,
@@ -66,25 +93,39 @@ open class CardSetsVMImpl(
     override val availableFeatures: CardSetsVM.Features,
 ): ViewModel(), CardSetsVM {
     override var router: CardSetsRouter? = null
+    final override val state: CardSetsVM.State
+        get() { return uiStateFlow.value.toState() }
 
-    final override val stateFlow = MutableStateFlow(state)
-    private val eventChannel = Channel<Event>(Channel.BUFFERED)
-    override val eventFlow = eventChannel.receiveAsFlow()
+    final override val uiStateFlow = MutableStateFlow(
+        CardSetsVM.UIState(
+            searchQuery = restoredState.searchQuery,
+            newCardSetText = restoredState.newCardSetText,
+        )
+    )
+
+    private val loadingCardSets = MutableStateFlow<Set<String>>(setOf())
+
     override val cardSets = cardSetsRepository.cardSets.map {
-        it.copyWith(buildViewItems(it.data() ?: emptyList(), state.newCardSetText))
+        it.map {
+            buildViewItems(it, uiStateFlow.value.newCardSetText)
+        }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    override val searchCardSets = cardSetSearchRepository.cardSets.map {
-        it.map {
-            val viewItems = it.map { cardSet ->
+    override val searchCardSets = combine(
+        cardSetSearchRepository.cardSets,
+        loadingCardSets
+    ) { cardSets, loadingCardSets ->
+        cardSets.map {
+           it.map { cardSet ->
                 RemoteCardSetViewItem(
                     cardSet.remoteId,
                     cardSet.name,
                     cardSet.terms.take(10),
+                    isLoading = loadingCardSets.contains(cardSet.remoteId),
                 ) as BaseViewItem<*>
-            }
-            generateSearchViewItemIds(viewItems)
-            viewItems
+            }.also {
+               generateSearchViewItemIds(it)
+           }
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
@@ -92,21 +133,12 @@ open class CardSetsVMImpl(
         generateViewItemIds(viewItems, searchCardSets.value.data().orEmpty(), idGenerator)
     }
 
-    override fun restore(newState: CardSetsVM.State) {
-        updateState(newState)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        eventChannel.cancel()
-    }
-
     override fun onNewCardSetTextChange(text: String) {
-        stateFlow.update { it.copy(newCardSetText = text) }
+        uiStateFlow.update { it.copy(newCardSetText = text) }
     }
 
     override fun onCardSetAdded(name: String) {
-        stateFlow.update { it.copy(newCardSetText = null) }
+        uiStateFlow.update { it.copy(newCardSetText = null) }
 
         viewModelScope.launch {
             try {
@@ -114,21 +146,6 @@ open class CardSetsVMImpl(
             } catch (e: Exception) {
                 showError(e)
             }
-        }
-    }
-
-    private fun updateState(newState: CardSetsVM.State) {
-        //state = newState
-        stateFlow.update { newState }
-    }
-
-    fun onCreateTextCardSetClicked() {
-        eventChannel.trySend(ShowCreateSetEvent)
-    }
-
-    fun onCardSetNameEntered(name: String) {
-        viewModelScope.launch {
-            cardSetsRepository.createCardSet(name, timeSource.timeInMilliseconds())
         }
     }
 
@@ -229,12 +246,12 @@ open class CardSetsVMImpl(
     }
 
     private fun startSearch(query: String) {
-        stateFlow.update { it.copy(searchQuery = query) }
+        uiStateFlow.update { it.copy(searchQuery = query) }
         cardSetSearchRepository.search(query)
     }
 
     override fun onSearchClosed() {
-        stateFlow.update { it.copy(searchQuery = null) }
+        uiStateFlow.update { it.copy(searchQuery = null) }
         cardSetSearchRepository.clear()
     }
 
@@ -243,19 +260,42 @@ open class CardSetsVMImpl(
     }
 
     override fun onSearchCardSetClicked(item: RemoteCardSetViewItem) {
+        // TODO: show readonly cardset
     }
 
     override fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem) {
         val itemIndex = searchCardSets.value.data().orEmpty().indexOf(item)
         if (itemIndex != -1) {
-            cardSetSearchRepository.removeAtIndex(itemIndex)
-            cardSetsRepository.addRemoteCardSet(item.remoteCardSetId)
+            viewModelScope.launch {
+                val res = cardSetsRepository.addRemoteCardSet(item.remoteCardSetId).waitUntilLoadedOrError()
+                res.onLoaded { cardSet ->
+                    cardSetSearchRepository.removeAtIndex(itemIndex)
+                    uiStateFlow.update {
+                        it.copy(
+                            openCardSetEvents = it.openCardSetEvents + createOpenCardSetEvent(cardSet.id)
+                        )
+                    }
+                }
+                res.onError {
+                    тут надо слать ошибку
+                }
+            }
         }
     }
+
+    private fun createOpenCardSetEvent(id: Long) = CardSetsVM.Event.OpenCardSetEvent(
+        text = StringDesc.Resource(MR.strings.cardsets_search_added),
+        actionText = StringDesc.Resource(MR.strings.cardsets_search_added_open),
+        id = id
+    )
 
     override fun onJsonImportClicked() {
         router?.openJsonImport()
     }
-}
 
-object ShowCreateSetEvent: Event
+    override fun onOpenCardSetEventHandled(event: CardSetsVM.Event.OpenCardSetEvent) {
+        uiStateFlow.update {
+            it.copy(openCardSetEvents = it.openCardSetEvents.filter { it != event })
+        }
+    }
+}

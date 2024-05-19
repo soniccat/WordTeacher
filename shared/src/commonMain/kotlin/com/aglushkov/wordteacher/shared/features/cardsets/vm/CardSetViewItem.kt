@@ -28,6 +28,7 @@ class RemoteCardSetViewItem(
     val remoteCardSetId: String,
     val name: String,
     val terms: List<String>,
+    val isLoading: Boolean,
 ): BaseViewItem<String>(name, Type) {
     companion object {
         const val Type = 401

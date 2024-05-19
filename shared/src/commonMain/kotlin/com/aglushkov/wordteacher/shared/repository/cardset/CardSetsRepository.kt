@@ -5,6 +5,8 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.data
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.shared.general.resource.onLoaded
+import com.aglushkov.wordteacher.shared.general.resource.onLoading
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
@@ -120,13 +122,11 @@ class CardSetsRepository(
         return loadResource {
             cardSetService.getById(id).toOkResponse().cardSet
         }.onEach {
-            if (it.isLoaded()) {
-                it.data()?.let { cardSet ->
-                    databaseWorker.launch {  database ->
-                        database.cardSets.insert(cardSet.copyWithDate(timeSource.timeInstant()))
-                    }
+            it.onLoaded {
+                databaseWorker.launch { database ->
+                    database.cardSets.insert(it.copyWithDate(timeSource.timeInstant()))
                 }
             }
-        }.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
+        }//.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
     }
 }

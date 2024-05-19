@@ -61,6 +61,10 @@
     <string name="cardset_info_enable_sharing">Share with other users in search</string>
     <string name="cardset_info_error">Can\'t load card set</string>
 
+    <string name="cardsets_search_added">The card set has been added</string>
+    <string name="cardsets_search_added_open">Open</string>
+    <string name="cardsets_search_load_error">Can\'t load the card set</string>
+
     <string name="learning_title">%d out of %d</string>
     <string name="learning_error">Something went wrong :(</string>
     <string name="learning_wrong_input">Something is wrong</string>

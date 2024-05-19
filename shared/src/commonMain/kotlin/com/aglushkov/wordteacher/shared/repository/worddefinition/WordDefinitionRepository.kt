@@ -108,9 +108,7 @@ class WordDefinitionRepository(
             jobs[word] = scope.launch { // use our scope here to avoid cancellation by Structured Concurrency
                 loadDefinitionsFlow(word, nextVersion, newServices).onEach { newWordsRes ->
                     stateFlow.update {
-                        it.mergeWith(newWordsRes) { _, b ->
-                            currentStateData + b
-                        }
+                        newWordsRes.map { currentStateData + it }
                     }
                 }.onCompletion { cause ->
                     cause?.let { throwable ->
