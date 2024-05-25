@@ -6,9 +6,7 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.extensions.updateData
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository

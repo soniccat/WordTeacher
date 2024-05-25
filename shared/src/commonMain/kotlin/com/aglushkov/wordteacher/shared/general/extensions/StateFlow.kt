@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
+import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.v
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
@@ -111,7 +112,7 @@ suspend fun <T> Flow<Resource<T>>.waitUntilLoaded() {
     takeWhile { !it.isLoaded() }.collect()
 }
 
-suspend fun <T> Flow<Resource<T>>.waitUntilLoadedOrError(): Resource<T> {
+suspend fun <T> Flow<Resource<T>>.waitUntilDone(): Resource<T> {
     var res: Resource<T> = Resource.Uninitialized()
     takeWhile {
         val needTake = !it.isLoadedOrError()
@@ -121,6 +122,16 @@ suspend fun <T> Flow<Resource<T>>.waitUntilLoadedOrError(): Resource<T> {
         needTake
     }.collect()
     return res
+}
+
+suspend fun <T> Flow<Resource<T>>.waitUntilDone(
+    loaded: (T) -> Unit,
+    error: (Throwable) -> Unit
+) {
+    waitUntilDone().on(
+        loaded = loaded,
+        error = error,
+    )
 }
 
 fun <T> MutableStateFlow<Resource<T>>.updateData(dataTransform: (T) -> T) {

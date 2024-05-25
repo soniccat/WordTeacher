@@ -26,7 +26,6 @@ class CardSetsRepository(
     private val timeSource: TimeSource,
     private val nlpCore: NLPCore,
     private val nlpSentenceProcessor: NLPSentenceProcessor,
-    private val cardSetService: SpaceCardSetService
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     val cardSets = databaseWorker.database.cardSets.selectAll().stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
@@ -116,17 +115,5 @@ class CardSetsRepository(
                 it.progress.isReadyToLearn(timeSource)
             }.map { it.id }
         }
-    }
-
-    fun addRemoteCardSet(id: String): Flow<Resource<CardSet>> {
-        return loadResource {
-            cardSetService.getById(id).toOkResponse().cardSet
-        }.onEach {
-            it.onLoaded {
-                databaseWorker.launch { database ->
-                    database.cardSets.insert(it.copyWithDate(timeSource.timeInstant()))
-                }
-            }
-        }//.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
     }
 }
