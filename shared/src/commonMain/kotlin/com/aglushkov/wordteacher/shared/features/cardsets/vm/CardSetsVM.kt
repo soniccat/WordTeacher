@@ -67,12 +67,10 @@ interface CardSetsVM: Clearable {
         )
     }
 
-    //@Stable
     sealed interface Event {
         val text: StringDesc
         val actionText: StringDesc
 
-        //@Stable
         data class OpenCardSetEvent(
             override val text: StringDesc,
             val openText: StringDesc,
@@ -82,7 +80,6 @@ interface CardSetsVM: Clearable {
                 get() = openText
         }
 
-        //@Stable
         data class CardSetLoadingError(
             override val text: StringDesc,
             val remoteId: String,

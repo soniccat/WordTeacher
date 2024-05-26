@@ -4,6 +4,7 @@ import (
 	"api"
 	"context"
 	"net/http"
+	"time"
 	"tools"
 	"tools/logger"
 
@@ -88,12 +89,19 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 		LastMistakeCount: 0,
 		LastLessonDate:   "",
 	}
+	date := tools.TimeToApiDate(time.Now())
 	dbCardSet.Cards = tools.Map(dbCardSet.Cards, func(c *model.DbCard) *model.DbCard {
+		c.Id = nil
 		c.Progress = defaultCardProgress
+		c.CreationDate = date
+		c.ModificationDate = date
 		return c
 	})
 
 	apiCardSet := dbCardSet.ToApi()
+	apiCardSet.CreationDate = date
+	apiCardSet.ModificationDate = date
+
 	response := response{
 		CardSet: apiCardSet,
 	}

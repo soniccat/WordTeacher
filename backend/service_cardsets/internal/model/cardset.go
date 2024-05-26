@@ -75,8 +75,7 @@ type DbCardSetInfo struct {
 }
 
 func (cs *DbCardSet) ToApi() *api.CardSet {
-	return &api.CardSet{
-		Id:               cs.Id.Hex(),
+	apiCardSet := &api.CardSet{
 		Name:             cs.Name,
 		Tags:             cs.Tags,
 		Cards:            tools.Map(cs.Cards, func(cardDb *DbCard) *api.Card { return cardDb.ToApi() }),
@@ -90,6 +89,11 @@ func (cs *DbCardSet) ToApi() *api.CardSet {
 		},
 		IsAvailableInSearch: cs.IsAvailableInSearch,
 	}
+	if cs.Id != nil {
+		apiCardSet.Id = cs.Id.Hex()
+	}
+
+	return apiCardSet
 }
 
 func (cs *DbCardSet) ToGrpc() *cardsetsgrpc.CardSet {
