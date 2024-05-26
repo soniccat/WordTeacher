@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
+import androidx.compose.runtime.Stable
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -46,8 +47,7 @@ interface CardSetsVM: Clearable {
     fun onSearchCardSetClicked(item: RemoteCardSetViewItem)
     fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem)
     fun onJsonImportClicked()
-    fun onOpenCardSetEventHandled(event: Event.OpenCardSetEvent, needOpen: Boolean)
-    fun onCardSetLoadingErrorEventHandled(event: Event.CardSetLoadingError, needRetry: Boolean)
+    fun onEventHandled(event: Event, withAction: Boolean)
 
     @Serializable
     data class State(
@@ -67,17 +67,30 @@ interface CardSetsVM: Clearable {
         )
     }
 
+    //@Stable
     sealed interface Event {
+        val text: StringDesc
+        val actionText: StringDesc
+
+        //@Stable
         data class OpenCardSetEvent(
-            val text: StringDesc,
+            override val text: StringDesc,
             val openText: StringDesc,
             val id: Long,
-        ): Event
+        ): Event {
+            override val actionText: StringDesc
+                get() = openText
+        }
+
+        //@Stable
         data class CardSetLoadingError(
-            val text: StringDesc,
+            override val text: StringDesc,
             val remoteId: String,
             val reloadText: StringDesc,
-        ): Event
+        ): Event {
+            override val actionText: StringDesc
+                get() = reloadText
+        }
     }
 
     data class Features(
@@ -268,11 +281,11 @@ open class CardSetsVMImpl(
             cardSetSearchRepository.loadRemoteCardSet(remoteId)
                 .waitUntilDone(
                     loaded = { cardSet ->
-                        cardSetsRepository.insertCardSet(cardSet)
+                        val insertedCardSet = cardSetsRepository.insertCardSet(cardSet)
                         cardSetSearchRepository.removeCardSet(remoteId)
                         uiStateFlow.update {
                             it.copy(
-                                openCardSetEvents = it.openCardSetEvents + createOpenCardSetEvent(cardSet.id, cardSet.name)
+                                openCardSetEvents = it.openCardSetEvents + createOpenCardSetEvent(insertedCardSet.id, insertedCardSet.name)
                             )
                         }
                     },
@@ -304,7 +317,14 @@ open class CardSetsVMImpl(
         router?.openJsonImport()
     }
 
-    override fun onOpenCardSetEventHandled(
+    override fun onEventHandled(event: CardSetsVM.Event, withAction: Boolean) {
+        when (event) {
+            is CardSetsVM.Event.OpenCardSetEvent -> onOpenCardSetEventHandled(event, withAction)
+            is CardSetsVM.Event.CardSetLoadingError -> onCardSetLoadingErrorEventHandled(event, withAction)
+        }
+    }
+
+    private fun onOpenCardSetEventHandled(
         event: CardSetsVM.Event.OpenCardSetEvent,
         needOpen: Boolean,
     ) {
@@ -316,7 +336,7 @@ open class CardSetsVMImpl(
         }
     }
 
-    override fun onCardSetLoadingErrorEventHandled(
+    private fun onCardSetLoadingErrorEventHandled(
         event: CardSetsVM.Event.CardSetLoadingError,
         needRetry: Boolean
     ) {
