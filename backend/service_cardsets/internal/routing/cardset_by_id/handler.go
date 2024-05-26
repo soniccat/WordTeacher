@@ -99,6 +99,7 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 	})
 
 	apiCardSet := dbCardSet.ToApi()
+	apiCardSet.Id = ""
 	apiCardSet.CreationDate = date
 	apiCardSet.ModificationDate = date
 

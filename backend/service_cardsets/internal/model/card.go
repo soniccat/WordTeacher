@@ -61,7 +61,7 @@ type DbCard struct {
 }
 
 func (c *DbCard) ToApi() *api.Card {
-	return &api.Card{
+	apiCard := &api.Card{
 		Id:                          c.Id.Hex(),
 		Term:                        c.Term,
 		Transcription:               c.Transcription,
@@ -79,6 +79,11 @@ func (c *DbCard) ToApi() *api.Card {
 		NeedToUpdateDefinitionSpans: c.NeedToUpdateDefinitionSpans,
 		NeedToUpdateExampleSpans:    c.NeedToUpdateExampleSpans,
 	}
+	if c.Id != nil {
+		apiCard.Id = c.Id.Hex()
+	}
+
+	return apiCard
 }
 
 func (c *DbCard) ToGrpc() *cardsetsgrpc.Card {
