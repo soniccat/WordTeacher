@@ -125,13 +125,19 @@ suspend fun <T> Flow<Resource<T>>.waitUntilDone(): Resource<T> {
 }
 
 suspend fun <T> Flow<Resource<T>>.waitUntilDone(
-    loaded: (T) -> Unit,
-    error: (Throwable) -> Unit
+    loaded: suspend (T) -> Unit,
+    error: suspend (Throwable) -> Unit
 ) {
-    waitUntilDone().on(
-        loaded = loaded,
-        error = error,
-    )
+    val res = waitUntilDone()
+    if (res is Resource.Loaded) {
+        try {
+            loaded(res.data)
+        } catch (t: Throwable) {
+            error(t)
+        }
+    } else if (res is Resource.Error) {
+        error(res.throwable)
+    }
 }
 
 fun <T> MutableStateFlow<Resource<T>>.updateData(dataTransform: (T) -> T) {

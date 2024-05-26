@@ -38,10 +38,10 @@ fun CardSetsUI(
     val coroutineScope = rememberCoroutineScope()
     val cardSets by vm.cardSets.collectAsState()
     val searchCardSets by vm.searchCardSets.collectAsState()
-    var searchText by remember { mutableStateOf(vm.stateFlow.value.searchQuery.orEmpty()) }
+    var searchText by remember { mutableStateOf(vm.uiStateFlow.value.searchQuery.orEmpty()) }
 
     val needShowSearchResult by remember(searchCardSets) { derivedStateOf { !searchCardSets.isUninitialized() } }
-    val newCardSetTextState = vm.stateFlow.collectAsState()
+    val newCardSetTextState = vm.uiStateFlow.collectAsState()
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { newCardSetTextState.value.newCardSetText }) }
 
     BackHandler(enabled = needShowSearchResult) {

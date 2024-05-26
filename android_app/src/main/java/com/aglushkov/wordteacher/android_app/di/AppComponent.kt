@@ -66,21 +66,8 @@ interface AppComponent:
     LearningSessionResultDependencies,
     SettingsDependencies {
 
-    override fun settings(): FlowSettings
     fun serviceRepository(): ServiceRepository
-    override fun dictRepository(): DictRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
-    override fun database(): AppDatabase
-    override fun databaseWorker(): DatabaseWorker
-    override fun databaseCardSetWorker(): DatabaseCardWorker
-
-    override fun nlpCore(): NLPCore
-
-    override fun routerResolver(): RouterResolver
-    override fun articlesRepository(): ArticlesRepository
-    override fun cardSetsRepository(): CardSetsRepository
-    override fun wordRepository(): WordDefinitionRepository
-    override fun notesRepository(): NotesRepository
 
     fun googleAuthRepository(): GoogleAuthControllerImpl
     fun vkAuthController(): VKAuthControllerImpl
@@ -90,13 +77,6 @@ interface AppComponent:
     fun appInfo(): AppInfo
     fun deviceIdRepository(): DeviceIdRepository
     fun spaceAuthService(): SpaceAuthService
-    fun spaceCardSetService(): SpaceCardSetService
-    override fun spaceAuthRepository(): SpaceAuthRepository
-
-    override fun idGenerator(): IdGenerator
-    override fun timeSource(): TimeSource
-    override fun connectivityManager(): ConnectivityManager
-    override fun contentExtractors(): Array<ArticleContentExtractor>
 
     fun injectApplication(app: GApp)
 

@@ -1,16 +1,15 @@
 package com.aglushkov.wordteacher.shared.repository.cardsetsearch
 
-import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.extensions.updateData
 import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetSearchService
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
-import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -21,7 +20,7 @@ class CardSetSearchRepository(
 ) {
     data class SearchCardSet(
         val cardSet: CardSet,
-        val fullCardSetRes: MutableStateFlow<Resource<CardSet>> = MutableStateFlow(Resource.Uninitialized()),
+        val fullCardSetRes: Resource<CardSet> = Resource.Uninitialized(),
     )
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -65,44 +64,40 @@ class CardSetSearchRepository(
         }
     }
 
-    fun removeAtIndex(i: Int) {
+    fun cardSetByRemoteId(remoteId: String): CardSet? {
+        return cardSets.value.data().orEmpty().firstOrNull { it.cardSet.remoteId == remoteId }?.cardSet
+    }
+
+    fun removeCardSet(remoteId: String) {
         cardSets.update {
             it.updateData { carSets ->
-                carSets?.filterIndexed { index, _ ->  index != i }
+                carSets?.filter { it.cardSet.remoteId != remoteId }
             }
         }
     }
 
-    fun loadRemoteCardSet(id: String): Flow<Resource<CardSet>> {
+    fun loadRemoteCardSet(remoteId: String): Flow<Resource<CardSet>> {
         val searchCardSet = cardSets.value.data().orEmpty().firstOrNull {
-            it.cardSet.remoteId == id
+            it.cardSet.remoteId == remoteId
         } ?: return flowOf(Resource.Error(RuntimeException("Unknown card set id")))
 
         val fullCardSetRes = searchCardSet.fullCardSetRes
-        if (fullCardSetRes.value.isLoadedOrLoading()) {
-            return fullCardSetRes
+        if (fullCardSetRes.isLoadedOrLoading()) {
+            return flowOf(fullCardSetRes)
         }
 
         return loadResource {
-            cardSetService.getById(id).toOkResponse().cardSet
+            cardSetService.getById(remoteId).toOkResponse().cardSet
         }.onEach { res ->
-            fullCardSetRes.update { res }
-//            cardSets.update {
-//                it.map {
-//                    it.map {
-//                        if (it.cardSet.remoteId == id) {
-//                            it.copy(fullCardSetRes = res.map { Unit })
-//                        } else {
-//                            it
-//                        }
-//                    }
-//                }
-//            }
-//            it.onLoaded {
-//                databaseWorker.launch { database ->
-//                    database.cardSets.insert(it.copyWithDate(timeSource.timeInstant()))
-//                }
-//            }
+            cardSets.updateData {
+                it.map {
+                    if (it.cardSet.remoteId == remoteId) {
+                        it.copy(fullCardSetRes = fullCardSetRes)
+                    } else {
+                        it
+                    }
+                }
+            }
         }
     }
 }

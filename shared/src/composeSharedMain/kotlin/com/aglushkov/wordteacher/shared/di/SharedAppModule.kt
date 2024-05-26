@@ -144,9 +144,8 @@ class SharedAppModule {
         timeSource: TimeSource,
         nlpCore: NLPCore,
         nlpSentenceProcessor: NLPSentenceProcessor,
-        cardSetService: SpaceCardSetService,
     ): CardSetsRepository {
-        return CardSetsRepository(databaseWorker, timeSource, nlpCore, nlpSentenceProcessor, cardSetService)
+        return CardSetsRepository(databaseWorker, timeSource, nlpCore, nlpSentenceProcessor)
     }
 
     @AppComp

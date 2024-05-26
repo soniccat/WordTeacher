@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetSearchService
+import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -18,8 +19,9 @@ class CardSetsModule {
     @Provides
     fun cardSetSearchRepository(
         service: SpaceCardSetSearchService,
+        cardSetService: SpaceCardSetService,
     ): CardSetSearchRepository {
-        return CardSetSearchRepository(service)
+        return CardSetSearchRepository(service, cardSetService)
     }
 
     @Provides

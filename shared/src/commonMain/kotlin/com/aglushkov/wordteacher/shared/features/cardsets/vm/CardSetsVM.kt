@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.resource.onLoaded
@@ -45,7 +46,8 @@ interface CardSetsVM: Clearable {
     fun onSearchCardSetClicked(item: RemoteCardSetViewItem)
     fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem)
     fun onJsonImportClicked()
-    fun onOpenCardSetEventHandled(event: Event.OpenCardSetEvent)
+    fun onOpenCardSetEventHandled(event: Event.OpenCardSetEvent, needOpen: Boolean)
+    fun onCardSetLoadingErrorEventHandled(event: Event.CardSetLoadingError, needRetry: Boolean)
 
     @Serializable
     data class State(
@@ -108,19 +110,16 @@ open class CardSetsVMImpl(
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    override val searchCardSets = combine(
-        cardSetSearchRepository.cardSets,
-        loadingCardSets
-    ) { cardSets, loadingCardSets ->
-        cardSets.map {
-           it.map { cardSet ->
-                RemoteCardSetViewItem(
-                    cardSet.remoteId,
-                    cardSet.name,
-                    cardSet.terms.take(10),
-                    isLoading = loadingCardSets.contains(cardSet.remoteId),
-                ) as BaseViewItem<*>
-            }.also {
+    override val searchCardSets = cardSetSearchRepository.cardSets.map { cardSetsRes ->
+        cardSetsRes.map { cardSets ->
+           cardSets.map { searchCardSet ->
+               RemoteCardSetViewItem(
+                   searchCardSet.cardSet.remoteId,
+                   searchCardSet.cardSet.name,
+                   searchCardSet.cardSet.terms.take(10),
+                   isLoading = searchCardSet.fullCardSetRes.isLoading(),
+               ) as BaseViewItem<*>
+           }.also {
                generateSearchViewItemIds(it)
            }
         }
@@ -261,30 +260,31 @@ open class CardSetsVMImpl(
     }
 
     override fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem) {
-        val itemIndex = searchCardSets.value.data().orEmpty().indexOf(item)
-        if (itemIndex != -1) {
-            viewModelScope.launch {
-                cardSetSearchRepository.loadRemoteCardSet(item.remoteCardSetId)
-                    .waitUntilDone(
-                        loaded = { cardSet ->
+        loadCardSetAndAdd(item.remoteCardSetId)
+    }
 
-                            cardSetsRepository.insertCardSet(cardSet)
-                            cardSetSearchRepository.removeAtIndex(itemIndex)
-                            uiStateFlow.update {
-                                it.copy(
-                                    openCardSetEvents = it.openCardSetEvents + createOpenCardSetEvent(cardSet.id, item.name)
-                                )
-                            }
-                        },
-                        error = { _ ->
-                            uiStateFlow.update {
-                                it.copy(
-                                    loadCardSetErrorEvents = it.loadCardSetErrorEvents + createCardSetLoadingErrorEvent(item.remoteCardSetId, item.name)
-                                )
-                            }
-                        },
-                    )
-            }
+    private fun loadCardSetAndAdd(remoteId: String) {
+        viewModelScope.launch {
+            cardSetSearchRepository.loadRemoteCardSet(remoteId)
+                .waitUntilDone(
+                    loaded = { cardSet ->
+                        cardSetsRepository.insertCardSet(cardSet)
+                        cardSetSearchRepository.removeCardSet(remoteId)
+                        uiStateFlow.update {
+                            it.copy(
+                                openCardSetEvents = it.openCardSetEvents + createOpenCardSetEvent(cardSet.id, cardSet.name)
+                            )
+                        }
+                    },
+                    error = { _ ->
+                        val cardSet = cardSetSearchRepository.cardSetByRemoteId(remoteId) ?: return@waitUntilDone
+                        uiStateFlow.update {
+                            it.copy(
+                                loadCardSetErrorEvents = it.loadCardSetErrorEvents + createCardSetLoadingErrorEvent(remoteId, cardSet.name)
+                            )
+                        }
+                    },
+                )
         }
     }
 
@@ -304,9 +304,27 @@ open class CardSetsVMImpl(
         router?.openJsonImport()
     }
 
-    override fun onOpenCardSetEventHandled(event: CardSetsVM.Event.OpenCardSetEvent) {
+    override fun onOpenCardSetEventHandled(
+        event: CardSetsVM.Event.OpenCardSetEvent,
+        needOpen: Boolean,
+    ) {
         uiStateFlow.update {
             it.copy(openCardSetEvents = it.openCardSetEvents.filter { it != event })
+        }
+        if (needOpen) {
+            router?.openCardSet(event.id)
+        }
+    }
+
+    override fun onCardSetLoadingErrorEventHandled(
+        event: CardSetsVM.Event.CardSetLoadingError,
+        needRetry: Boolean
+    ) {
+        uiStateFlow.update {
+            it.copy(loadCardSetErrorEvents = it.loadCardSetErrorEvents.filter { it != event })
+        }
+        if (needRetry) {
+            loadCardSetAndAdd(event.remoteId)
         }
     }
 }

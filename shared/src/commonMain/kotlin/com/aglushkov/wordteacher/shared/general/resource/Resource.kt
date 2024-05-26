@@ -239,7 +239,7 @@ fun Resource<*>?.isLoadedOrError(): Boolean {
 }
 
 fun Resource<*>?.isLoadedOrLoading(): Boolean {
-    return if (this == null) false else (this !is Resource.Loaded || this !is Resource.Error)
+    return if (this == null) false else (this is Resource.Loaded || this is Resource.Loading)
 }
 
 fun <T> Resource<T>.on(
