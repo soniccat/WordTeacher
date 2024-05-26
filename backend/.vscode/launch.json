@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceFolder}/service_auth/cmd/app/",
-      "args": ["-debugMode", "true"]
+      "args": ["-debugMode=true"]
     },
     {
       "name": "CardSets Service",
@@ -18,7 +18,11 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceFolder}/service_cardsets/cmd/app/",
-      "args": ["-debugMode", "true"]
+      "args": [
+        "-debugMode=true",
+        "-mongoURI=mongodb://192.168.0.78:27017/?directConnection=true&replicaSet=rs0",
+        "-redisAddress=192.168.0.78:6379"
+      ]
     },
     {
       "name": "CardSetSearch Service",
@@ -26,7 +30,7 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceFolder}/service_cardsetsearch/cmd/app/",
-      "args": ["-debugMode", "true"]
+      "args": ["-debugMode=true"]
     },
     {
       "name": "Dict Service",
@@ -34,7 +38,7 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceFolder}/service_dict/cmd/app/",
-      "args": ["-debugMode", "true"]
+      "args": ["-debugMode=true"]
     }
   ]
 }
