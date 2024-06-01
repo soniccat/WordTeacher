@@ -5,13 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"log/slog"
 	"path/filepath"
 	"runtime/debug"
 )
 
 type Logger struct {
-	log *slog.Logger
+	level slog.Level
+	log   *slog.Logger
 }
 
 type logCtxKeyType string
@@ -37,6 +39,7 @@ func New(w io.Writer, minimumLevel slog.Level) *Logger {
 	}
 
 	return &Logger{
+		level: minimumLevel,
 		log: slog.New(
 			slog.NewJSONHandler(
 				w,
@@ -48,6 +51,14 @@ func New(w io.Writer, minimumLevel slog.Level) *Logger {
 			),
 		),
 	}
+}
+
+func (l *Logger) AsLogLogger() *log.Logger {
+	return slog.NewLogLogger(l.Handler(), l.level)
+}
+
+func (l *Logger) Handler() slog.Handler {
+	return l.log.Handler()
 }
 
 func (l *Logger) Info(ctx context.Context, msg string, args ...any) {
