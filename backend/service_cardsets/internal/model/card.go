@@ -80,6 +80,8 @@ func (c *DbCard) ToApi() *api.Card {
 	}
 	if c.Id != nil {
 		apiCard.Id = c.Id.Hex()
+	} else {
+		apiCard.Id = ""
 	}
 
 	return apiCard

@@ -91,6 +91,8 @@ func (cs *DbCardSet) ToApi() *api.CardSet {
 	}
 	if cs.Id != nil {
 		apiCardSet.Id = cs.Id.Hex()
+	} else {
+		apiCardSet.Id = ""
 	}
 
 	return apiCardSet
