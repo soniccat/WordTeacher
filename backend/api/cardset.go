@@ -5,7 +5,7 @@ import (
 )
 
 type CardSet struct {
-	Id                  string      `json:"id,omitempty"`
+	Id                  string      `json:"id"`
 	Name                string      `json:"name"`
 	Tags                []string    `json:"tags"`
 	Cards               []*Card     `json:"cards"`
