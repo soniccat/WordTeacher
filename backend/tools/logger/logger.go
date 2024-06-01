@@ -12,8 +12,7 @@ import (
 )
 
 type Logger struct {
-	level slog.Level
-	log   *slog.Logger
+	log *slog.Logger
 }
 
 type logCtxKeyType string
@@ -39,7 +38,6 @@ func New(w io.Writer, minimumLevel slog.Level) *Logger {
 	}
 
 	return &Logger{
-		level: minimumLevel,
 		log: slog.New(
 			slog.NewJSONHandler(
 				w,
@@ -53,8 +51,8 @@ func New(w io.Writer, minimumLevel slog.Level) *Logger {
 	}
 }
 
-func (l *Logger) AsLogLogger() *log.Logger {
-	return slog.NewLogLogger(l.Handler(), l.level)
+func (l *Logger) AsLogLogger(level slog.Level) *log.Logger {
+	return slog.NewLogLogger(l.Handler(), level)
 }
 
 func (l *Logger) Handler() slog.Handler {
