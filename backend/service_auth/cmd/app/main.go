@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -31,7 +30,6 @@ func run() int {
 	isDebug := flag.Bool("debugMode", false, "Shows stack traces in logs")
 	minLogLevel := flag.Int("logLevel", int(slog.LevelInfo), "minimum log level")
 	serviceLogPath := flag.String("serviceLogPath", "/var/log", "service log file path")
-	serverLogPath := flag.String("serverLogPath", "/var/log", "server log file path")
 
 	serverAddr := flag.String("serverAddr", "", "HTTP server network address")
 	serverPort := flag.Int("serverPort", 4000, "HTTP server network port")
@@ -42,7 +40,6 @@ func run() int {
 
 	var googleConfigPath string
 	var vkidConfigPath string
-	var serverLogWriter io.Writer
 	var serviceLogWriter io.Writer
 	var err error
 
@@ -50,19 +47,10 @@ func run() int {
 		googleConfigPath = "./../../../google"
 		vkidConfigPath = "./../../../vkid"
 
-		serverLogWriter = os.Stdout
 		serviceLogWriter = os.Stdout
 	} else {
 		googleConfigPath = "/run/secrets/google"
 		vkidConfigPath = "/run/secrets/vkid"
-
-		serverLW, err := logger.NewLogWriter(*serverLogPath, "server_", os.Stderr)
-		if err != nil {
-			fmt.Println("server NewLogWriter error: " + err.Error())
-			return failCode
-		}
-		serverLW.ScheduleRotation(context.Background())
-		serverLogWriter = serverLW
 
 		serviceLW, err := logger.NewLogWriter(*serviceLogPath, "service_", os.Stderr)
 		if err != nil {
@@ -104,11 +92,10 @@ func run() int {
 	}()
 
 	// server
-	serverLogger := log.New(serverLogWriter, "", log.LstdFlags)
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)
 	srv := &http.Server{
 		Addr:         serverURI,
-		ErrorLog:     serverLogger,
+		ErrorLog:     logger.AsLogLogger(slog.LevelError),
 		Handler:      app.routes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,

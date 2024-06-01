@@ -61,8 +61,7 @@ func run() int {
 		serviceLogWriter = serviceLW
 	}
 
-	sLogLevel := slog.Level(*minLogLevel)
-	logger := logger.New(serviceLogWriter, sLogLevel)
+	logger := logger.New(serviceLogWriter, slog.Level(*minLogLevel))
 	storage, err := storage.New(
 		logger,
 		*mongoURI,
