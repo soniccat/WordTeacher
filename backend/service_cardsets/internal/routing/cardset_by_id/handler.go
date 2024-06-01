@@ -83,7 +83,10 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// cut progress data
+	// return a copy:
+	// * cut progress data
+	// * clear cardset id and its card ids
+	// * clear modification date
 	defaultCardProgress := &api.CardProgress{
 		CurrentLevel:     0,
 		LastMistakeCount: 0,

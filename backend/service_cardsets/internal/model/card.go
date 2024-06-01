@@ -62,7 +62,6 @@ type DbCard struct {
 
 func (c *DbCard) ToApi() *api.Card {
 	apiCard := &api.Card{
-		Id:                          c.Id.Hex(),
 		Term:                        c.Term,
 		Transcription:               c.Transcription,
 		PartOfSpeech:                c.PartOfSpeech,
