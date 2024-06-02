@@ -92,7 +92,7 @@ class CardSetSearchRepository(
             cardSets.updateData {
                 it.map {
                     if (it.cardSet.remoteId == remoteId) {
-                        it.copy(fullCardSetRes = fullCardSetRes)
+                        it.copy(fullCardSetRes = res)
                     } else {
                         it
                     }

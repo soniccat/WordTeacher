@@ -70,19 +70,19 @@ class GoogleAuthControllerImpl(
         safeGoogleSignInClient.silentSignIn()
             .addOnSuccessListener { acc ->
                 acc.idToken?.let { idToken ->
-                    Logger.v("GoogleAuthRepository", "silentSignIn success ${acc.idToken}")
+                    Logger.v("silentSignIn success ${acc.idToken}", TAG)
                     googleAuthDataState.value = Resource.Loaded(GoogleAuthData(acc.displayName, idToken, true))
                 } ?: run {
-                    Logger.e("GoogleAuthRepository", "idToken is null")
+                    Logger.e("idToken is null", TAG)
                     googleAuthDataState.value = Resource.Error(RuntimeException("Google idToken is null"), canTryAgain = true)
                 }
             }
             .addOnFailureListener {
-                Logger.e("GoogleAuthRepository", "silentSignIn failure")
+                Logger.e("silentSignIn failure " + it.message.orEmpty(), TAG)
                 googleAuthDataState.value = Resource.Error(it, canTryAgain = true)
             }
             .addOnCanceledListener {
-                Logger.v("GoogleAuthRepository", "silentSignIn cancelled")
+                Logger.v("silentSignIn cancelled", TAG)
                 googleAuthDataState.value = Resource.Uninitialized()
             }
     }
@@ -107,18 +107,18 @@ class GoogleAuthControllerImpl(
                     signInLauncher?.launch(IntentSenderRequest.Builder(result.pendingIntent.intentSender).build())
                 } catch (e: IntentSender.SendIntentException) {
                     Logger.e(
-                        "GoogleAuthRepository",
-                        "beginSignIn Couldn't start One Tap UI: ${e.localizedMessage}"
+                        "beginSignIn Couldn't start One Tap UI: ${e.localizedMessage}",
+                        TAG
                     )
                     googleAuthDataState.value = Resource.Error(e, canTryAgain = true)
                 }
             }
             .addOnFailureListener {
-                Logger.e("GoogleAuthRepository", "beginSignIn failure")
+                Logger.e("beginSignIn failure", TAG)
                 googleAuthDataState.value = Resource.Error(it, canTryAgain = true)
             }
             .addOnCanceledListener {
-                Logger.v("GoogleAuthRepository", "beginSignIn cancelled")
+                Logger.v("beginSignIn cancelled", TAG)
                 googleAuthDataState.value = Resource.Uninitialized()
             }
     }
@@ -154,3 +154,5 @@ class GoogleAuthControllerImpl(
             .requestIdToken(serverClientId)
             .build()
 }
+
+private val TAG = "GoogleAuthRepository"

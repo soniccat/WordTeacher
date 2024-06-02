@@ -307,8 +307,14 @@ private fun CardSetSearchItemView(
             text = { Text(item.name) },
             secondaryText = { Text(item.terms.joinToString()) },
             trailing = {
-                AddIcon {
-                    onAdded()
+                Box(modifier = Modifier.size(24.dp)) {
+                    if (item.isLoading) {
+                        CircularProgressIndicator()
+                    } else {
+                        AddIcon {
+                            onAdded()
+                        }
+                    }
                 }
             }
         )
