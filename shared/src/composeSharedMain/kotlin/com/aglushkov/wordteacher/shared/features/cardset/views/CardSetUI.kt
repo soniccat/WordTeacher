@@ -50,6 +50,7 @@ import dev.icerock.moko.resources.compose.localized
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
+    val state by vm.state.collectAsState()
     val cardSet by vm.cardSet.collectAsState()
     val viewItemsRes by vm.viewItems.collectAsState()
     val data = viewItemsRes.data()
@@ -113,7 +114,8 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                                 true
                             } else {
                                 false
-                            }
+                            },
+                            isEditable = !state.isRemoteCardSet
                         )
                     }
                 }
@@ -153,7 +155,8 @@ fun CardSetViewItems(
     modifier: Modifier,
     itemView: BaseViewItem<*>,
     vm: CardSetVM,
-    needFocus: Boolean
+    needFocus: Boolean,
+    isEditable: Boolean,
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -161,6 +164,7 @@ fun CardSetViewItems(
         is WordTitleViewItem -> {
             DeletableCell(
                 stateKey = item.id,
+                enabled = isEditable,
                 onClick = { /*TODO*/ },
                 onDeleted = { vm.onCardDeleted(item.cardId) }
             ) {
@@ -173,6 +177,7 @@ fun CardSetViewItems(
                             textStyle,
                             item,
                             item.cardId,
+                            !isEditable,
                             vm,
                         )
                     }
@@ -190,6 +195,7 @@ fun CardSetViewItems(
                         textStyle,
                         item,
                         item.cardId,
+                        !isEditable,
                         vm,
                     )
                 }
@@ -203,19 +209,23 @@ fun CardSetViewItems(
             WordPartOfSpeechView(
                 item,
                 modifier = Modifier
-                    .clickable(onClick = onClicked)
+                    .clickable(
+                        enabled = isEditable,
+                        onClick = onClicked
+                    )
                     .focusable(false)
             )
         }
         is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
-            CardSetDefinitionView(Modifier, item, item.cardId, vm, focusRequester)
+            CardSetDefinitionView(Modifier, item, item.cardId, isEditable, vm, focusRequester)
         } else {
             DeletableCell(
                 stateKey = item.id,
+                enabled = isEditable,
                 onClick = { /*TODO*/ },
                 onDeleted = { vm.onDefinitionRemoved(item, item.cardId) }
             ) {
-                CardSetDefinitionView(Modifier, item, item.cardId, vm, focusRequester)
+                CardSetDefinitionView(Modifier, item, item.cardId, isEditable, vm, focusRequester)
             }
         }
         is WordSubHeaderViewItem -> {
@@ -228,7 +238,7 @@ fun CardSetViewItems(
                         style = ts,
                         modifier = Modifier.weight(1.0f),
                     )
-                    if (item.isOnlyHeader) {
+                    if (item.isOnlyHeader && isEditable) {
                         AddIcon {
                             when (item.contentType) {
                                 WordSubHeaderViewItem.ContentType.SYNONYMS -> vm.onAddSynonymPressed(
@@ -246,6 +256,7 @@ fun CardSetViewItems(
         }
         is WordSynonymViewItem -> DeletableCell(
             stateKey = item.id,
+            enabled = isEditable,
             onClick = { /*TODO*/ },
             onDeleted = { vm.onSynonymRemoved(item, item.cardId) }
         ) {
@@ -260,10 +271,11 @@ fun CardSetViewItems(
                         textStyle,
                         item,
                         item.cardId,
+                        !isEditable,
                         vm
                     )
 
-                    if (item.isLast) {
+                    if (item.isLast && isEditable) {
                         AddIcon {
                             vm.onAddSynonymPressed(item.cardId)
                         }
@@ -273,6 +285,7 @@ fun CardSetViewItems(
         }
         is WordExampleViewItem -> DeletableCell(
             stateKey = item.id,
+            enabled = isEditable,
             onClick = { /*TODO*/ },
             onDeleted = { vm.onExampleRemoved(item, item.cardId) }
         ) {
@@ -287,10 +300,11 @@ fun CardSetViewItems(
                         textStyle,
                         item,
                         item.cardId,
+                        !isEditable,
                         vm
                     )
 
-                    if (item.isLast) {
+                    if (item.isLast && isEditable) {
                         AddIcon {
                             vm.onAddExamplePressed(item.cardId)
                         }
@@ -342,6 +356,7 @@ private fun CardSetDefinitionView(
     modifier: Modifier = Modifier,
     item: WordDefinitionViewItem,
     cardId: Long,
+    isEditable: Boolean,
     vm: CardSetVM,
     focusRequester: FocusRequester
 ) {
@@ -356,10 +371,11 @@ private fun CardSetDefinitionView(
                 textStyle,
                 item,
                 cardId,
+                !isEditable,
                 vm,
             )
 
-            if (item.isLast) {
+            if (item.isLast && isEditable) {
                 AddIcon {
                     vm.onAddDefinitionPressed(cardId)
                 }
@@ -376,6 +392,7 @@ private fun CardTextField(
     textStyle: androidx.compose.ui.text.TextStyle,
     item: BaseViewItem<*>,
     cardId: Long,
+    readOnly: Boolean,
     vm: CardSetVM
 ) {
     val focusManager = LocalFocusManager.current
@@ -389,6 +406,7 @@ private fun CardTextField(
         ),
         focusManager = focusManager,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        readOnly = readOnly,
         onValueChange = {
             textState = it
             vm.onItemTextChanged(it.text, item, cardId)

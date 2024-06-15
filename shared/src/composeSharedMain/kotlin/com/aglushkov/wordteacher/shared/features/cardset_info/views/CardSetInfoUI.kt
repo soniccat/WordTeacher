@@ -134,6 +134,7 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
             errorText = uiState.nameError,
             focusRequester = focusRequester,
             focusManager = focusManager,
+            readOnly = !uiState.isEditable,
         )
 
         OutlinedTextField(
@@ -147,25 +148,28 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                 .sizeIn(minHeight = with(LocalDensity.current) {
                     (42 * 2).sp.toDp()
                 }),
-            label = { Text(stringResource(MR.strings.cardset_info_field_description_hint)) }
+            label = { Text(stringResource(MR.strings.cardset_info_field_description_hint)) },
+            readOnly = !uiState.isEditable,
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = { vm.onIsAvailableInSearchChanged(!uiState.isAvailableInSearch) })
-                .padding(top = 16.dp, bottom = 16.dp)
-        ) {
-            Text(
-                text = stringResource(MR.strings.cardset_info_enable_sharing),
+        if (uiState.isEditable) {
+            Row(
                 modifier = Modifier
-                    .padding(end = 16.dp)
-                    .weight(1.0f)
-            )
-            Checkbox(
-                checked = uiState.isAvailableInSearch,
-                onCheckedChange = null
-            )
+                    .fillMaxWidth()
+                    .clickable(onClick = { vm.onIsAvailableInSearchChanged(!uiState.isAvailableInSearch) })
+                    .padding(top = 16.dp, bottom = 16.dp)
+            ) {
+                Text(
+                    text = stringResource(MR.strings.cardset_info_enable_sharing),
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .weight(1.0f)
+                )
+                Checkbox(
+                    checked = uiState.isAvailableInSearch,
+                    onCheckedChange = null
+                )
+            }
         }
     }
 

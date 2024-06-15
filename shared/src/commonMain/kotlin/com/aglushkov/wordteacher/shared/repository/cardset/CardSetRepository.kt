@@ -1,20 +1,22 @@
 package com.aglushkov.wordteacher.shared.repository.cardset
 
-import com.aglushkov.wordteacher.db.DBCardSet
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
+import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class CardSetRepository(
+    private val cardSetService: SpaceCardSetService,
     private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource
 ) {
@@ -36,7 +38,7 @@ class CardSetRepository(
         }
     }
 
-    suspend fun loadCardSet(id: Long) {
+    suspend fun loadAndObserveCardSet(id: Long) {
         loadJob?.cancel()
         loadJob = scope.launch(Dispatchers.Default) {
             combine(
@@ -57,6 +59,12 @@ class CardSetRepository(
                 }
             ).collect(stateFlow)
         }
+    }
+
+    suspend fun loadRemoteCardSet(remoteId: String) {
+        return loadResource {
+            cardSetService.getById(remoteId).toOkResponse().cardSet
+        }.collect(stateFlow)
     }
 
     suspend fun createCard(

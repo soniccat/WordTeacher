@@ -65,8 +65,8 @@ interface MainDecomposeComponent: DefinitionsRouter,
 //    fun popDialog(inner: Any)
     fun popDialog(config: ChildConfiguration)
     override fun openArticle(id: Long)
-    override fun openCardSet(id: Long)
-    fun openCardSetInfo(id: Long)
+    override fun openCardSet(state: CardSetVM.State)
+    fun openCardSetInfo(state: CardSetInfoVM.State)
     override fun openCardSets()
     override fun openLearning(ids: List<Long>)
     fun openLearningSessionResult(results: List<SessionCardResult>)
@@ -98,9 +98,9 @@ interface MainDecomposeComponent: DefinitionsRouter,
 
     @Serializable
     sealed class ChildConfiguration {
-        @Serializable data class CardSetInfoConfiguration(val id: Long) : ChildConfiguration()
+        @Serializable data class CardSetInfoConfiguration(val state: CardSetInfoVM.State) : ChildConfiguration()
         @Serializable data class ArticleConfiguration(val id: Long) : ChildConfiguration()
-        @Serializable data class CardSetConfiguration(val id: Long) : ChildConfiguration()
+        @Serializable data class CardSetConfiguration(val state: CardSetVM.State) : ChildConfiguration()
         @Serializable data class LearningConfiguration(val ids: List<Long>) : ChildConfiguration()
         @Serializable data class LearningSessionResultConfiguration(val results: List<SessionCardResult>) : ChildConfiguration()
         @Serializable data class WebAuthConfiguration(val networkType: SpaceAuthService.NetworkType) : ChildConfiguration()
@@ -201,15 +201,15 @@ class MainDecomposeComponentImpl(
             MainDecomposeComponent.ChildConfiguration.ArticleConfiguration(id)
         )
 
-    override fun openCardSet(id: Long) {
+    override fun openCardSet(state: CardSetVM.State) {
         navigation.pushChildConfigurationIfNotAtTop(
-            MainDecomposeComponent.ChildConfiguration.CardSetConfiguration(id)
+            MainDecomposeComponent.ChildConfiguration.CardSetConfiguration(state)
         )
     }
 
-    override fun openCardSetInfo(id: Long) {
+    override fun openCardSetInfo(state: CardSetInfoVM.State) {
         navigation.pushChildConfigurationIfNotAtTop(
-            MainDecomposeComponent.ChildConfiguration.CardSetInfoConfiguration(id)
+            MainDecomposeComponent.ChildConfiguration.CardSetInfoConfiguration(state)
         )
     }
 

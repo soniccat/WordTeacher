@@ -29,6 +29,7 @@ import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.views.*
+import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -99,7 +100,7 @@ private fun NoteViews(
 ) = when (item) {
     is CreateNoteViewItem -> {
         TextFieldCellView(
-            placeholder = item.placeholder.toString(LocalContext.current),
+            placeholder = item.placeholder.localized(),
             textFieldValue = state.rememberTextFieldValueState(),
             focusRequester = state.focusRequester,
             onTextChanged = {
@@ -184,6 +185,7 @@ private fun NoteView(
         DeletableCell(
             Modifier,
             stateKey = noteViewItem.id,
+            enabled = true,
             onClick,
             onDeleted
         ) {

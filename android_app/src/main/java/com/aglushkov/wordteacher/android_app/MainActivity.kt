@@ -41,8 +41,10 @@ import com.aglushkov.wordteacher.shared.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.views.CardSetInfoUI
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoRouter
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
@@ -186,8 +188,8 @@ class MainActivity : AppCompatActivity(), Router {
                                 override fun closeCardSet() {
                                     mainDecomposeComponent.back()
                                 }
-                                override fun openCardSetInfo(id: Long) {
-                                    mainDecomposeComponent.openCardSetInfo(id)
+                                override fun openCardSetInfo(state: CardSetInfoVM.State) {
+                                    mainDecomposeComponent.openCardSetInfo(state)
                                 }
                             }
                         }
@@ -360,8 +362,8 @@ class MainActivity : AppCompatActivity(), Router {
         mainDecomposeComponent.back()
     }
 
-    override fun openCardSet(id: Long) {
-        mainDecomposeComponent.openCardSet(id)
+    override fun openCardSet(state: CardSetVM.State) {
+        mainDecomposeComponent.openCardSet(state)
     }
 
     override fun openLearning(ids: List<Long>) {
@@ -369,7 +371,7 @@ class MainActivity : AppCompatActivity(), Router {
     }
 
     override fun openJsonImport() {
-        TODO("Not yet implemented")
+        TODO("That's only desktop feature")
     }
 }
 

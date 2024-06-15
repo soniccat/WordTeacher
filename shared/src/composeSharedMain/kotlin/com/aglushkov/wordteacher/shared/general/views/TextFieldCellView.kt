@@ -127,6 +127,7 @@ fun InlineTextField(
     focusManager: FocusManager?,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    readOnly: Boolean = false,
     onValueChange: (TextFieldValue) -> Unit,
 ) {
     BasicTextField(
@@ -155,6 +156,7 @@ fun InlineTextField(
               )
           }
         },
+        readOnly = readOnly,
         cursorBrush = SolidColor(MaterialTheme.colors.secondary),
         decorationBox = @Composable { coreTextField ->
             Box(

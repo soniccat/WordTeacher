@@ -2,28 +2,28 @@ package com.aglushkov.wordteacher.shared.features.cardset.vm
 
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.workers.UPDATE_DELAY
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 interface CardSetVM: Clearable {
     var router: CardSetRouter?
-
-    val state: State
+    val state: StateFlow<State>
     val cardSet: StateFlow<Resource<out CardSet>>
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val eventFlow: Flow<List<Event>>
@@ -43,17 +43,30 @@ interface CardSetVM: Clearable {
     fun onInfoPressed()
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun getPlaceholder(viewItem: BaseViewItem<*>): StringDesc?
-
     fun onStartLearningClicked()
+    fun onAddClicked()
 
-    @Parcelize
-    data class State (
-        val cardSetId: Long
-    ): Parcelable
+    @Serializable
+    sealed interface State {
+        val isRemoteCardSet: Boolean
+        @Serializable
+        data class LocalCardSet(
+            val id: Long
+        ) : State {
+            override val isRemoteCardSet: Boolean = false
+        }
+        @Serializable
+        data class RemoteCardSet(
+            val id: String
+        ) : State {
+            override val isRemoteCardSet: Boolean = true
+        }
+    }
 }
 
 open class CardSetVMImpl(
-    override var state: CardSetVM.State,
+    restoredState: CardSetVM.State,
+    private val cardSetsRepository: CardSetsRepository,
     private val repository: CardSetRepository,
     wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     private val databaseCardWorker: DatabaseCardWorker,
@@ -62,6 +75,7 @@ open class CardSetVMImpl(
 ): ViewModel(), CardSetVM {
 
     override var router: CardSetRouter? = null
+    final override var state = MutableStateFlow<CardSetVM.State>(restoredState)
 
     private var pendingEvents = mutableListOf<PendingEvent>()
     private val notHandledPendingEvents: List<PendingEvent>
@@ -109,13 +123,17 @@ open class CardSetVMImpl(
 
     init {
         addClearable(databaseCardWorker.startEditing())
-    }
 
-    fun restore(newState: CardSetVM.State) {
-        state = newState
-
+        val safeState = state.value
         viewModelScope.launch {
-            repository.loadCardSet(state.cardSetId)
+            when (safeState) {
+                is CardSetVM.State.RemoteCardSet -> {
+                    repository.loadRemoteCardSet(safeState.id)
+                }
+                is CardSetVM.State.LocalCardSet -> {
+                    repository.loadAndObserveCardSet(safeState.id)
+                }
+            }
         }
     }
 
@@ -264,7 +282,19 @@ open class CardSetVMImpl(
     }
 
     override fun onInfoPressed() {
-        router?.openCardSetInfo(state.cardSetId)
+        val safeState = state.value
+        when (safeState) {
+            is CardSetVM.State.LocalCardSet -> CardSetInfoVM.State.LocalCardSet(
+                id = safeState.id
+            )
+            is CardSetVM.State.RemoteCardSet -> repository.cardSet.value.data()?.let {
+                CardSetInfoVM.State.RemoteCardSet(
+                    cardSet = it
+                )
+            }
+        }?.let {
+            router?.openCardSetInfo(it)
+        }
     }
 
     override fun onItemTextChanged(text: String, item: BaseViewItem<*>, cardId: Long) {
@@ -473,8 +503,16 @@ open class CardSetVMImpl(
 
     override fun getPlaceholder(viewItem: BaseViewItem<*>): StringDesc? {
         return when (val v = viewItem) {
-            is WordTitleViewItem -> StringDesc.Resource(MR.strings.card_title_placeholder)
-            is WordTranscriptionViewItem -> StringDesc.Resource(MR.strings.card_transcription_placeholder)
+            is WordTitleViewItem -> if (state.value.isRemoteCardSet) {
+                StringDesc.Resource(MR.strings.card_title_placeholder_readonly)
+            } else {
+                StringDesc.Resource(MR.strings.card_title_placeholder)
+            }
+            is WordTranscriptionViewItem -> if (state.value.isRemoteCardSet) {
+                StringDesc.Resource(MR.strings.card_transcription_placeholder_readonly)
+            } else {
+                StringDesc.Resource(MR.strings.card_transcription_placeholder)
+            }
             else -> null
         }
     }
@@ -493,6 +531,19 @@ open class CardSetVMImpl(
                 }
             } catch (e: Throwable) {
                 // TODO: handle error
+            }
+        }
+    }
+
+    override fun onAddClicked() {
+        viewModelScope.launch {
+            cardSet.value.data()?.let {
+                val insertedCardSet = cardSetsRepository.insertCardSet(it)
+                launch {
+                    repository.loadAndObserveCardSet(insertedCardSet.id)
+                }
+                state = CardSetVM.State.LocalCardSet(id = insertedCardSet.id)
+                тут надо переходить в loading
             }
         }
     }

@@ -2,12 +2,10 @@ package com.aglushkov.wordteacher.shared.features.cardset_info
 
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVMImpl
-import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
-import com.arkivanov.essenty.lifecycle.subscribe
 
 class CardSetInfoDecomposeComponent(
     componentContext: ComponentContext,

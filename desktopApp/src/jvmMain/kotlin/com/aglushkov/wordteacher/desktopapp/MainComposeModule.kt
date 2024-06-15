@@ -45,7 +45,7 @@ class MainComposeModule {
                 is MainDecomposeComponent.ChildConfiguration.CardSetInfoConfiguration ->
                     DaggerCardSetInfoComponent.builder()
                         .setComponentContext(context)
-                        .setInitialState(CardSetInfoVM.State(configuration.id))
+                        .setInitialState(configuration.state)
                         .setDeps(appComponent)
                         .build()
                         .cardSetInfoDecomposeComponent()

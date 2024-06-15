@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.general.StringDescThrowable
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.aglushkov.wordteacher.shared.model.CardSetInfo
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 interface CardSetInfoVM: Clearable {
@@ -33,9 +35,22 @@ interface CardSetInfoVM: Clearable {
     fun onIsAvailableInSearchChanged(isAvailableInSearch: Boolean)
 
     @Serializable
-    data class State(
-        val id: Long,
-    )
+    sealed interface State {
+        val isRemoteCardSet: Boolean
+
+        @Serializable
+        data class LocalCardSet(
+            val id: Long
+        ) : State {
+            override val isRemoteCardSet: Boolean = false
+        }
+        @Serializable
+        data class RemoteCardSet(
+            val cardSet: CardSet,
+        ) : State {
+            override val isRemoteCardSet: Boolean = true
+        }
+    }
 
     data class InputState(
         val name: String? = null,
@@ -58,7 +73,8 @@ interface CardSetInfoVM: Clearable {
         val nameError: StringDesc?,
         val description: String,
         val source: String?,
-        val isAvailableInSearch: Boolean
+        val isAvailableInSearch: Boolean,
+        val isEditable: Boolean,
     )
 }
 
@@ -67,17 +83,25 @@ open class CardSetInfoVMImpl(
     private val databaseCardWorker: DatabaseCardWorker,
     private val cardSetRepository: CardSetRepository,
 ): ViewModel(), CardSetInfoVM {
+
     override var router: CardSetInfoRouter? = null
     final override val state: CardSetInfoVM.State = restoredState
 
     private val cardSetState = MutableStateFlow<Resource<CardSet>>(Resource.Uninitialized())
     private val inputState = MutableStateFlow(CardSetInfoVM.InputState())
     override val uiStateFlow: StateFlow<Resource<CardSetInfoVM.UIState>> = combine(
-        combine(cardSetState, databaseCardWorker.untilFirstEditingFlow()) { cardSetState, workerState ->
-            if (workerState == DatabaseCardWorker.State.EDITING) {
-                cardSetState
-            } else {
-                Resource.Loading()
+        if (state.isRemoteCardSet) {
+            cardSetState
+        } else {
+            combine(
+                cardSetState,
+                databaseCardWorker.untilFirstEditingFlow()
+            ) { cardSetState, workerState ->
+                if (workerState == DatabaseCardWorker.State.EDITING) {
+                    cardSetState
+                } else {
+                    Resource.Loading()
+                }
             }
         },
         inputState,
@@ -97,6 +121,7 @@ open class CardSetInfoVMImpl(
                 description = inputState.description ?: cardSet.info.description,
                 source = inputState.source ?: cardSet.info.source,
                 isAvailableInSearch = inputState.isAvailableInSearch ?: cardSet.isAvailableInSearch,
+                isEditable = !state.isRemoteCardSet
             )
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
@@ -105,20 +130,24 @@ open class CardSetInfoVMImpl(
         addClearable(databaseCardWorker.startEditing())
         loadCardSet()
 
-        // subscribe on input state to update db data
-        viewModelScope.launch {
-            inputState.collect { lastInputState ->
-                cardSetState.value.data()?.let { dbCardSet ->
-                    databaseCardWorker.updateCardSetInfo(
-                        dbCardSet.copy(
-                            name = lastInputState.validatedName ?: dbCardSet.name,
-                            info = dbCardSet.info.copy(
-                                description = lastInputState.description ?: dbCardSet.info.description,
-                                source = lastInputState.source ?: dbCardSet.info.source,
-                            ),
-                            isAvailableInSearch = lastInputState.isAvailableInSearch ?: dbCardSet.isAvailableInSearch
+        if (!state.isRemoteCardSet) {
+            // subscribe on input state to update db data
+            viewModelScope.launch {
+                inputState.collect { lastInputState ->
+                    cardSetState.value.data()?.let { dbCardSet ->
+                        databaseCardWorker.updateCardSetInfo(
+                            dbCardSet.copy(
+                                name = lastInputState.validatedName ?: dbCardSet.name,
+                                info = dbCardSet.info.copy(
+                                    description = lastInputState.description
+                                        ?: dbCardSet.info.description,
+                                    source = lastInputState.source ?: dbCardSet.info.source,
+                                ),
+                                isAvailableInSearch = lastInputState.isAvailableInSearch
+                                    ?: dbCardSet.isAvailableInSearch
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
@@ -146,7 +175,30 @@ open class CardSetInfoVMImpl(
 
     private fun loadCardSet() {
         viewModelScope.launch(Dispatchers.Default) {
-            cardSetRepository.loadCardSetWithoutCards(state.id).collect(cardSetState)
+            when (state) {
+                is CardSetInfoVM.State.LocalCardSet -> {
+                    cardSetRepository.loadCardSetWithoutCards(state.id).collect(cardSetState)
+                }
+                is CardSetInfoVM.State.RemoteCardSet -> {
+                    cardSetState.value = Resource.Loaded(
+                        CardSet(
+                            id = 0,
+                            remoteId = "",
+                            name = state.cardSet.name,
+                            creationDate = Instant.DISTANT_PAST,
+                            modificationDate = Instant.DISTANT_PAST,
+                            cards = listOf(),
+                            terms = listOf(),
+                            creationId = "",
+                            info = CardSetInfo(
+                                description = state.cardSet.info.description,
+                                source = state.cardSet.info.source
+                            ),
+                            isAvailableInSearch = false
+                        )
+                    )
+                }
+            }
         }
     }
 }

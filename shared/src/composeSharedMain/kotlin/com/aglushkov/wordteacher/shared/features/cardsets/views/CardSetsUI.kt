@@ -256,6 +256,7 @@ private fun CardSetItemView(
     DeletableCell(
         Modifier,
         stateKey = item.id,
+        enabled = true,
         onClick,
         onDeleted
     ) {

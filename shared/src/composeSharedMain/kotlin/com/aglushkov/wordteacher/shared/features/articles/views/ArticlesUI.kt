@@ -111,6 +111,7 @@ private fun ArticleTitleView(
     DeletableCell(
         Modifier,
         stateKey = articleViewItem.id,
+        enabled = true,
         onClick,
         onDeleted
     ) {

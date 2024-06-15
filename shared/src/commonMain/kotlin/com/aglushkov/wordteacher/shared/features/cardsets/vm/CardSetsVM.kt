@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import androidx.compose.runtime.Stable
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -156,7 +157,7 @@ open class CardSetsVMImpl(
     }
 
     override fun onCardSetClicked(item: CardSetViewItem) {
-        router?.openCardSet(item.cardSetId)
+        router?.openCardSet(CardSetVM.State.LocalCardSet(item.cardSetId))
     }
 
     override fun onCardSetRemoved(item: CardSetViewItem) {
@@ -266,7 +267,7 @@ open class CardSetsVMImpl(
     }
 
     override fun onSearchCardSetClicked(item: RemoteCardSetViewItem) {
-        // TODO: show readonly cardset
+        router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId))
     }
 
     override fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem) {
@@ -329,7 +330,7 @@ open class CardSetsVMImpl(
             it.copy(openCardSetEvents = it.openCardSetEvents.filter { it != event })
         }
         if (needOpen) {
-            router?.openCardSet(event.id)
+            router?.openCardSet(CardSetVM.State.LocalCardSet(event.id))
         }
     }
 

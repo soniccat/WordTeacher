@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.shared.features.cardset
 
-import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -9,10 +8,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.essenty.instancekeeper.InstanceKeeper
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
-import com.arkivanov.essenty.statekeeper.consume
 
 class CardSetDecomposeComponent (
     initialState: CardSetVM.State,
@@ -23,7 +19,10 @@ class CardSetDecomposeComponent (
     timeSource: TimeSource,
     idGenerator: IdGenerator
 ) : CardSetVMImpl(
-    initialState,
+    componentContext.stateKeeper.consume(
+        key = KEY_STATE,
+        strategy = CardSetVM.State.serializer()
+    ) ?: initialState,
     cardSetsRepository,
     wordFrequencyGradationProvider,
     databaseCardWorker,
@@ -31,24 +30,15 @@ class CardSetDecomposeComponent (
     idGenerator
 ), ComponentContext by componentContext {
 
-    private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
-        Handler(stateKeeper.consume(KEY_STATE) ?: initialState)
-    }
-
     init {
-        stateKeeper.register(KEY_STATE) {
-            state
-        }
+        stateKeeper.register(
+            key = KEY_STATE,
+            strategy = CardSetVM.State.serializer()
+        ) { this.state }
 
         lifecycle.doOnDestroy {
             onCleared()
         }
-
-        restore(instanceState.state)
-    }
-
-    private class Handler(val state: CardSetVM.State) : InstanceKeeper.Instance {
-        override fun onDestroy() {}
     }
 
     private companion object {

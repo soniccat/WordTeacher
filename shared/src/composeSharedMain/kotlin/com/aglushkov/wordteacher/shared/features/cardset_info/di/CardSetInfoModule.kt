@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
+import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
@@ -19,9 +20,10 @@ class CardSetInfoModule {
 
     @Provides
     fun cardSetRepository(
+        cardSetService: SpaceCardSetService,
         databaseWorker: DatabaseWorker,
         timeSource: TimeSource
-    ) = CardSetRepository(databaseWorker, timeSource)
+    ) = CardSetRepository(cardSetService, databaseWorker, timeSource)
 
     @Provides
     fun cardSetInfoDecomposeComponent(

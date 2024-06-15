@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
+import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
@@ -27,6 +28,7 @@ interface CardSetComponent {
 }
 
 interface CardSetDependencies {
+    fun spaceCardSetService(): SpaceCardSetService
     fun database(): AppDatabase
     fun databaseWorker(): DatabaseWorker
     fun databaseCardSetWorker(): DatabaseCardWorker

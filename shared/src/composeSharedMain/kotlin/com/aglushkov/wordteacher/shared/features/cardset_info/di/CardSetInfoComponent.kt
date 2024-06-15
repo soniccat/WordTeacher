@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsModul
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
@@ -37,6 +38,7 @@ interface CardSetInfoComponent {
 }
 
 interface CardSetInfoDependencies {
+    fun spaceCardSetService(): SpaceCardSetService
     fun databaseCardWorker(): DatabaseCardWorker
     fun databaseWorker(): DatabaseWorker
     fun timeSource(): TimeSource

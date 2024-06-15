@@ -40,6 +40,7 @@ fun OutlinedTextFieldWithError(
     onFocusChanged: (FocusState) -> Unit = {},
     focusRequester: FocusRequester,
     focusManager: FocusManager = LocalFocusManager.current,
+    readOnly: Boolean = false,
 ) {
     val hasTitleError = errorText != null
     Column(
@@ -71,7 +72,8 @@ fun OutlinedTextFieldWithError(
                     focusManager.moveFocus(FocusDirection.Down)
                 }
             ),
-            singleLine = true
+            singleLine = true,
+            readOnly = readOnly,
         )
 
         Box(
