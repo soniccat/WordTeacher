@@ -17,8 +17,10 @@ import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
 interface CardSetVM: Clearable {
@@ -67,7 +69,7 @@ interface CardSetVM: Clearable {
 open class CardSetVMImpl(
     restoredState: CardSetVM.State,
     private val cardSetsRepository: CardSetsRepository,
-    private val repository: CardSetRepository,
+    private val cardSetRepository: CardSetRepository,
     wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
@@ -75,7 +77,7 @@ open class CardSetVMImpl(
 ): ViewModel(), CardSetVM {
 
     override var router: CardSetRouter? = null
-    final override var state = MutableStateFlow<CardSetVM.State>(restoredState)
+    final override var state = MutableStateFlow(restoredState)
 
     private var pendingEvents = mutableListOf<PendingEvent>()
     private val notHandledPendingEvents: List<PendingEvent>
@@ -87,7 +89,7 @@ open class CardSetVMImpl(
     // Contains cards being edited and haven't been synched with DB
     private var inMemoryCardSet = MutableStateFlow<CardSet?>(null)
     final override val cardSet: StateFlow<Resource<CardSet>> = combine(
-        repository.cardSet, inMemoryCardSet, databaseCardWorker.untilFirstEditingFlow(),
+        cardSetRepository.cardSet, inMemoryCardSet, databaseCardWorker.untilFirstEditingFlow(),
         transform = { cardSet, inMemoryCardSet, state ->
             if (state == DatabaseCardWorker.State.EDITING) {
                 if (inMemoryCardSet == null) {
@@ -128,10 +130,10 @@ open class CardSetVMImpl(
         viewModelScope.launch {
             when (safeState) {
                 is CardSetVM.State.RemoteCardSet -> {
-                    repository.loadRemoteCardSet(safeState.id)
+                    cardSetRepository.loadRemoteCardSet(safeState.id)
                 }
                 is CardSetVM.State.LocalCardSet -> {
-                    repository.loadAndObserveCardSet(safeState.id)
+                    cardSetRepository.loadAndObserveCardSet(safeState.id)
                 }
             }
         }
@@ -230,7 +232,9 @@ open class CardSetVMImpl(
             result += cardViewItems
             result += WordDividerViewItem()
 
-            makeFocusEvents(card.id, lastDefViewItem, lastExViewItem, lastSynViewItem)
+            if (!state.value.isRemoteCardSet) {
+                makeFocusEvents(card.id, lastDefViewItem, lastExViewItem, lastSynViewItem)
+            }
         }
 
         result += CreateCardViewItem()
@@ -287,7 +291,7 @@ open class CardSetVMImpl(
             is CardSetVM.State.LocalCardSet -> CardSetInfoVM.State.LocalCardSet(
                 id = safeState.id
             )
-            is CardSetVM.State.RemoteCardSet -> repository.cardSet.value.data()?.let {
+            is CardSetVM.State.RemoteCardSet -> cardSetRepository.cardSet.value.data()?.let {
                 CardSetInfoVM.State.RemoteCardSet(
                     cardSet = it
                 )
@@ -468,7 +472,7 @@ open class CardSetVMImpl(
 
     override fun onCardCreatePressed() {
         viewModelScope.launch {
-            repository.createCard()
+            cardSetRepository.createCard()
         }
     }
 
@@ -538,12 +542,12 @@ open class CardSetVMImpl(
     override fun onAddClicked() {
         viewModelScope.launch {
             cardSet.value.data()?.let {
-                val insertedCardSet = cardSetsRepository.insertCardSet(it)
-                launch {
-                    repository.loadAndObserveCardSet(insertedCardSet.id)
+                launch(Dispatchers.Default) {
+                    val insertedCardSet = cardSetsRepository.insertCardSet(it)
+                    cardSetRepository.loadAndObserveCardSet(insertedCardSet.id) {
+                        state.update { CardSetVM.State.LocalCardSet(insertedCardSet.id) }
+                    }
                 }
-                state = CardSetVM.State.LocalCardSet(id = insertedCardSet.id)
-                тут надо переходить в loading
             }
         }
     }

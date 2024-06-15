@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.merge
+import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.Card
@@ -38,7 +39,9 @@ class CardSetRepository(
         }
     }
 
-    suspend fun loadAndObserveCardSet(id: Long) {
+    suspend fun loadAndObserveCardSet(id: Long, onFirstLoaded: (() -> Unit)? = null) {
+        var onFirstLoadedCallback: (() -> Unit)? = onFirstLoaded
+
         loadJob?.cancel()
         loadJob = scope.launch(Dispatchers.Default) {
             combine(
@@ -49,13 +52,20 @@ class CardSetRepository(
                     tryInResource(canTryAgain = true) { it.executeAsList() }
                 },
                 transform = { cardSetRes, cardsRes ->
-                    cardSetRes.merge(cardsRes) { cardSet, cards ->
+                    val res = cardSetRes.merge(cardsRes) { cardSet, cards ->
                         if (cardSet != null && cards != null) {
                             cardSet.copy(cards = cards)
                         } else {
                             cardSet
                         }
                     }
+
+                    onFirstLoadedCallback?.let { callback ->
+                        res.onLoaded { callback.invoke() }
+                        onFirstLoadedCallback = null
+                    }
+
+                    res
                 }
             ).collect(stateFlow)
         }

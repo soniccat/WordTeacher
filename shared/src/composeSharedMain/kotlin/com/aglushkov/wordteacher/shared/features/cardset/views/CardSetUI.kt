@@ -133,16 +133,30 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 modifier = Modifier.matchParentSize(),
                 contentAlignment = Alignment.BottomEnd
             ) {
-                FloatingActionButton(
-                    onClick = { vm.onStartLearningClicked() },
-                    modifier = Modifier.padding(
-                        LocalDimensWord.current.articleHorizontalPadding
-                    )
-                ) {
-                    Icon(
-                        painter = painterResource(MR.images.start_learning_24),
-                        contentDescription = null
-                    )
+                if (state.isRemoteCardSet) {
+                    FloatingActionButton(
+                        onClick = { vm.onAddClicked() },
+                        modifier = Modifier.padding(
+                            LocalDimensWord.current.articleHorizontalPadding
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(MR.images.add_white_24),
+                            contentDescription = null
+                        )
+                    }
+                } else {
+                    FloatingActionButton(
+                        onClick = { vm.onStartLearningClicked() },
+                        modifier = Modifier.padding(
+                            LocalDimensWord.current.articleHorizontalPadding
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(MR.images.start_learning_24),
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         }
@@ -408,8 +422,10 @@ private fun CardTextField(
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         readOnly = readOnly,
         onValueChange = {
-            textState = it
-            vm.onItemTextChanged(it.text, item, cardId)
+            if (!readOnly) { // filter cursor position change in readOnly mode
+                textState = it
+                vm.onItemTextChanged(it.text, item, cardId)
+            }
         }
     )
 }
