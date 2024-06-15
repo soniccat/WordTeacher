@@ -232,9 +232,7 @@ open class CardSetVMImpl(
             result += cardViewItems
             result += WordDividerViewItem()
 
-            if (!state.value.isRemoteCardSet) {
-                makeFocusEvents(card.id, lastDefViewItem, lastExViewItem, lastSynViewItem)
-            }
+            makeFocusEvents(card.id, lastDefViewItem, lastExViewItem, lastSynViewItem)
         }
 
         result += CreateCardViewItem()
