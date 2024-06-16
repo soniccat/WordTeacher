@@ -13,8 +13,10 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -317,13 +319,19 @@ class MainActivity : AppCompatActivity(), Router {
 
     @Composable
     private fun BottomNavigationBarUI(component: TabDecomposeComponent) {
+        val childStack = component.childStack.subscribeAsState()
+        val activeChild by remember(childStack) {
+            derivedStateOf {
+                childStack.value.active
+            }
+        }
         BottomNavigation(
             modifier = Modifier
                 .requiredHeight(56.dp)
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
                 BottomNavigationItem(
-                    selected = tab.decomposeChildConfigClass == component.childStack.value.active.configuration::class.java,
+                    selected = tab.decomposeChildConfigClass == activeChild.configuration::class.java,
                     onClick = {
                         when (tab) {
                             is ScreenTab.Definitions -> component.openDefinitions()

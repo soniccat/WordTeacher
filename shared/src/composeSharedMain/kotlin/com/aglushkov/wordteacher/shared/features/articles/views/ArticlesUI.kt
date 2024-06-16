@@ -36,11 +36,14 @@ fun ArticlesUI(
         modifier = modifier.fillMaxSize(),
     ) {
         Column{
-            CustomTopAppBar {
-                SearchView(Modifier, searchText, onTextChanged = { searchText = it }) {
-                    //vm.onWordSubmitted(searchText)
-                }
-            }
+//            CustomTopAppBar {
+//                SearchView(Modifier, searchText, onTextChanged = { searchText = it }) {
+//                    //vm.onWordSubmitted(searchText)
+//                }
+//            }
+            TopAppBar(
+                title = { Text(text = stringResource(MR.strings.articles_title)) }
+            )
 
             val data = articles.data()
 

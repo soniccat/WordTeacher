@@ -26,6 +26,7 @@ fun <T> LoadingStatusView(
     resource: Resource<T>,
     loadingText: String? = null,
     errorText: String? = null,
+    tryAgainText: String? = null,
     emptyText: String?,
     tryAgainBlock: (() -> Unit)? = null
 ) where T : Collection<*> {
@@ -34,7 +35,7 @@ fun <T> LoadingStatusView(
             modifier,
             state = LoadingStatusViewState.Error(
                 text = emptyText,
-                tryAgainText = null
+                tryAgainText = tryAgainText
             ),
             tryAgainBlock
         )
@@ -118,7 +119,7 @@ fun LoadingStatusView(
                 }
             }
             is LoadingStatusViewState.Error -> {
-                Column {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     state.text?.let { text ->
                         Text(
                             text,

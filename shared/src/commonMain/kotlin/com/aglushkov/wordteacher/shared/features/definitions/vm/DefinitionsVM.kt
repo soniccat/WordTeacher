@@ -189,7 +189,10 @@ open class DefinitionsVMImpl(
     }
 
     override fun onTryAgainClicked() {
-        loadIfNeeded(word!!)
+        word?.let {
+            wordDefinitionRepository.clear(it)
+            loadIfNeeded(it)
+        }
     }
 
     // Actions

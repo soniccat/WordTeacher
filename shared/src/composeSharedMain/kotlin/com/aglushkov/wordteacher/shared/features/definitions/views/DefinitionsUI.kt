@@ -207,6 +207,7 @@ private fun DefinitionsWordUI(
                     resource = defsValue,
                     loadingText = null,
                     errorText = vm.getErrorText(defsValue)?.localized(),
+                    tryAgainText = stringResource(MR.strings.error_try_again),
                     emptyText = stringResource(MR.strings.error_no_definitions)
                 ) {
                     vm.onTryAgainClicked()

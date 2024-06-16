@@ -5,7 +5,7 @@
     <string name="tab_definitions">Words</string>
     <string name="tab_add_article">New Article</string>
     <string name="tab_articles">Articles</string>
-    <string name="tab_learning">Learning</string>
+    <string name="tab_learning">Card Sets</string>
     <string name="tab_cardsets">Card Sets</string>
     <string name="tab_notes">Notes</string>
     <string name="tab_settings">Settings</string>
@@ -44,6 +44,7 @@
     <string name="definitions_displayMode_merge">Combined</string>
     <string name="definitions_open_cardsets">Open card sets</string>
 
+    <string name="articles_title">Articles</string>
     <string name="articles_action_add_text">New Article</string>
     <string name="articles_action_article_created">Added!</string>
     <string name="articles_action_open">Open</string>
@@ -73,7 +74,7 @@
     <string name="learning_show_hint">Give me a clue</string>
     <string name="learning_give_up">Give up</string>
 
-    <string name="learning_session_result_title">Learning</string>
+    <string name="learning_session_result_title">Card Sets</string>
     <string name="learning_session_result_error">Something went wrong :(</string>
 
     <string name="empty_search_result">Can\'t find anything :(</string>

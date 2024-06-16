@@ -15,7 +15,9 @@ private val DarkColorPalette = darkColors(
     primary = primaryDark,
     primaryVariant = primaryVariantDark,
     secondary = secondaryDark,
-    onSecondary = Color.Black
+    onSecondary = Color.Black,
+    background = Color(0xFF2F2F2F),
+    surface = Color(0xFF2F2F2F),
 )
 
 private val LightColorPalette = lightColors(
