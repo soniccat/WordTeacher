@@ -85,7 +85,7 @@ class CardSetSyncWorker(
             if (spaceAuthRepository.isAuthorized()) {
                 toState(State.PullRequired())
             } else {
-                toState(State.AuthRequired)
+                toAuthRequiredState()
             }
 
             // handle authorizing
@@ -94,7 +94,7 @@ class CardSetSyncWorker(
                     if (state.value.innerState() is State.AuthRequired && spaceAuthRepository.isAuthorized()) {
                         toState(State.PullRequired())
                     } else if (!it.isLoaded()) {
-                        toState(State.AuthRequired)
+                        toAuthRequiredState()
                     }
                 }
             }
@@ -330,6 +330,18 @@ class CardSetSyncWorker(
                  }
             }
         }
+    }
+
+    private fun toAuthRequiredState() {
+        resetSyncDate()
+        toState(State.AuthRequired)
+    }
+
+    private fun resetSyncDate() {
+        runBlocking {
+            settings.remove(LAST_SYNC_DATE_KEY)
+        }
+        lastSyncDate = Instant.fromEpochMilliseconds(0)
     }
 
     fun canPush() = spaceAuthRepository.isAuthorized() && (state.value.innerState() is State.PushRequired || state.value.innerState() == State.Idle)

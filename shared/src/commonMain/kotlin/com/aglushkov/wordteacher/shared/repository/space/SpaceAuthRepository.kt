@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthController
 import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.service.*
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import io.ktor.http.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
@@ -22,6 +23,7 @@ class SpaceAuthRepository(
     private val vkAuthController: VKAuthController,
     private val cachePath: Path,
     private val fileSystem: FileSystem,
+    private val databaseCardWorker: () -> DatabaseCardWorker,
 ) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val spaceAuthStateFlow = MutableStateFlow<Resource<SpaceAuthData>>(Resource.Uninitialized())
@@ -124,12 +126,17 @@ class SpaceAuthRepository(
     }
 
     fun signOut(network: SpaceAuthService.NetworkType) {
-        if (spaceAuthStateFlow.value.data()?.user?.networkType == network) {
-            spaceAuthStateFlow.value = Resource.Uninitialized(version = 1) // version = 1 to distinguish this Uninitialized from a default one
-        }
+        mainScope.launch {
+            databaseCardWorker().waitUntilSyncIsDone()
+            fileSystem.delete(cachePath)
+            if (spaceAuthStateFlow.value.data()?.user?.networkType == network) {
+                spaceAuthStateFlow.value =
+                    Resource.Uninitialized(version = 1) // version = 1 to distinguish this Uninitialized from a default one
+            }
 
-        val authController = resolveAuthController(network)
-        authController?.launchSignOut()
+            val authController = resolveAuthController(network)
+            authController?.launchSignOut()
+        }
     }
 
     fun launchRefresh() {

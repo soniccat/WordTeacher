@@ -34,6 +34,7 @@ import com.aglushkov.wordteacher.shared.workers.CardSetSyncWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
 import com.russhwolf.settings.coroutines.FlowSettings
+import dagger.Lazy
 import okio.FileSystem
 import dagger.Module
 import dagger.Provides
@@ -306,9 +307,10 @@ class SharedAppModule {
         googleAuthController: GoogleAuthController,
         vkAuthController: VKAuthController,
         fileSystem: FileSystem,
+        databaseCardWorker: Lazy<DatabaseCardWorker>
     ): SpaceAuthRepository {
         val path = obtainSpaceDirPath(basePath,fileSystem).div("authData")
-        return SpaceAuthRepository(service, googleAuthController, vkAuthController, path, fileSystem)
+        return SpaceAuthRepository(service, googleAuthController, vkAuthController, path, fileSystem, { databaseCardWorker.get() })
     }
 
     private fun obtainSpaceDirPath(basePath: Path, fileSystem: FileSystem): Path {
