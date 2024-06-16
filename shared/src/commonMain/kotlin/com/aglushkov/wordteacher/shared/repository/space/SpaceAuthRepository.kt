@@ -128,14 +128,14 @@ class SpaceAuthRepository(
     fun signOut(network: SpaceAuthService.NetworkType) {
         mainScope.launch {
             databaseCardWorker().waitUntilSyncIsDone()
-            fileSystem.delete(cachePath)
             if (spaceAuthStateFlow.value.data()?.user?.networkType == network) {
+                fileSystem.delete(cachePath)
                 spaceAuthStateFlow.value =
                     Resource.Uninitialized(version = 1) // version = 1 to distinguish this Uninitialized from a default one
-            }
 
-            val authController = resolveAuthController(network)
-            authController?.launchSignOut()
+                val authController = resolveAuthController(network)
+                authController?.launchSignOut()
+            }
         }
     }
 

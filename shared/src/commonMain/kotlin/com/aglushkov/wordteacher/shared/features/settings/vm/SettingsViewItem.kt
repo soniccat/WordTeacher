@@ -2,7 +2,6 @@ package com.aglushkov.wordteacher.shared.features.settings.vm
 
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import okio.Path
@@ -14,7 +13,10 @@ class SettingsViewTitleItem(title: StringDesc): BaseViewItem<StringDesc>(title, 
     }
 }
 
-class SettingsViewTextItem(title: StringDesc): BaseViewItem<StringDesc>(title, Type) {
+class SettingsViewTextItem(
+    title: StringDesc,
+    val withBottomPadding: Boolean = true,
+): BaseViewItem<StringDesc>(title, Type) {
     companion object {
         const val Type = 1001
     }
@@ -26,24 +28,22 @@ class SettingsViewLoading: BaseViewItem<Unit>(Unit, Type) {
     }
 }
 
-class SettingsViewAuthButtonItem(
-    text: StringDesc,
-    val buttonType: ButtonType,
-    val networkType: SpaceAuthService.NetworkType,
-): BaseViewItem<StringDesc>(text, Type) {
-    enum class ButtonType {
-        SignIn,
-        SignOut,
-    }
-
+class SettingsSignInItem(
+    val networkTypes: List<SpaceAuthService.NetworkType>,
+): BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 1003
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
         return super.equalsByContent(other) &&
-                buttonType == (other as SettingsViewAuthButtonItem).buttonType &&
-                networkType == other.networkType
+                networkTypes == (other as SettingsSignInItem).networkTypes
+    }
+}
+
+class SettingsSignOutItem(text: StringDesc): BaseViewItem<StringDesc>(text, Type) {
+    companion object {
+        const val Type = 1009
     }
 }
 

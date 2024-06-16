@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.settings.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,19 +10,18 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.features.settings.vm.*
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
-import dev.icerock.moko.resources.compose.localized
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
+import dev.icerock.moko.resources.compose.localized
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -75,7 +75,11 @@ private fun showSettingsItem(
             Modifier.padding(
                 start = LocalDimens.current.contentPadding,
                 end = LocalDimens.current.contentPadding,
-                bottom = LocalDimens.current.contentPadding
+                bottom = if (item.withBottomPadding) {
+                    LocalDimens.current.contentPadding
+                } else {
+                    0.dp
+                }
             ),
             content = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsText) }
         )
@@ -83,9 +87,34 @@ private fun showSettingsItem(
     is SettingsViewLoading -> {
         LoadingViewItemUI()
     }
-    is SettingsViewAuthButtonItem -> {
+    is SettingsSignInItem -> {
+        Row(
+            modifier = Modifier.padding(
+                start = LocalDimens.current.contentPadding - 8.dp
+            )
+        ) {
+            item.networkTypes.onEach { networkType ->
+                Image(
+                    painter = painterResource(
+                        when (networkType) {
+                            SpaceAuthService.NetworkType.Google -> MR.images.google
+                            SpaceAuthService.NetworkType.VKID -> MR.images.vk
+                        }
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(8.dp)
+                        .clickable {
+                            vm.onSignInClicked(networkType)
+                        },
+                )
+            }
+        }
+    }
+    is SettingsSignOutItem -> {
         Button(
-            onClick = { vm.onAuthButtonClicked(item.buttonType, item.networkType) },
+            onClick = { vm.onSignOutClicked() },
             modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
         ) {
             Text(text = item.firstItem().localized())

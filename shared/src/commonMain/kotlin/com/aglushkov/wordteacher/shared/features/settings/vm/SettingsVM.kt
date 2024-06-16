@@ -39,7 +39,8 @@ interface SettingsVM: Clearable {
     val eventFlow: Flow<Event>
 
     fun restore(newState: State)
-    fun onAuthButtonClicked(type: SettingsViewAuthButtonItem.ButtonType, networkType: SpaceAuthService.NetworkType)
+    fun onSignInClicked(networkType: SpaceAuthService.NetworkType)
+    fun onSignOutClicked()
     fun onAuthRefreshClicked()
     fun onUploadWordFrequencyFileClicked()
     fun onLoggingIsEnabledChanged()
@@ -99,21 +100,20 @@ open class SettingsVMImpl (
 
         resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_auth_title))
         when(authDataRes) {
-            is Resource.Error -> {
-                resultItems += SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.settings_auth_signin), SettingsViewAuthButtonItem.ButtonType.SignIn, SpaceAuthService.NetworkType.Google)
-                resultItems += SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.settings_auth_signin), SettingsViewAuthButtonItem.ButtonType.SignIn, SpaceAuthService.NetworkType.VKID)
-
-            }
-            is Resource.Loaded -> resultItems += SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.settings_auth_signout), SettingsViewAuthButtonItem.ButtonType.SignOut, spaceAuthRepository.networkType!!)
-            is Resource.Loading -> resultItems += SettingsViewLoading()
+            is Resource.Error,
             is Resource.Uninitialized -> {
-                resultItems += SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.settings_auth_signin), SettingsViewAuthButtonItem.ButtonType.SignIn, SpaceAuthService.NetworkType.Google)
-                resultItems += SettingsViewAuthButtonItem(StringDesc.Resource(MR.strings.settings_auth_signin), SettingsViewAuthButtonItem.ButtonType.SignIn, SpaceAuthService.NetworkType.VKID)
+                resultItems += SettingsViewTextItem(StringDesc.Resource(MR.strings.settings_auth_signin), withBottomPadding = false)
+                resultItems += SettingsSignInItem(
+                    listOf(SpaceAuthService.NetworkType.Google, SpaceAuthService.NetworkType.VKID)
+                )
             }
-        }
-
-        if (isDebug) {
-            resultItems += SettingsViewAuthRefreshButtonItem(StringDesc.Resource(MR.strings.settings_auth_refresh))
+            is Resource.Loaded -> {
+                resultItems += SettingsSignOutItem(StringDesc.Resource(MR.strings.settings_auth_signout))
+                if (isDebug) {
+                    resultItems += SettingsViewAuthRefreshButtonItem(StringDesc.Resource(MR.strings.settings_auth_refresh))
+                }
+            }
+            is Resource.Loading -> resultItems += SettingsViewLoading()
         }
 
         resultItems += SettingsOpenDictConfigsItem()
@@ -152,10 +152,13 @@ open class SettingsVMImpl (
         eventChannel.cancel()
     }
 
-    override fun onAuthButtonClicked(type: SettingsViewAuthButtonItem.ButtonType, networkType: SpaceAuthService.NetworkType) {
-        when (type) {
-            SettingsViewAuthButtonItem.ButtonType.SignIn -> spaceAuthRepository.launchSignIn(networkType)
-            SettingsViewAuthButtonItem.ButtonType.SignOut -> spaceAuthRepository.signOut(networkType)
+    override fun onSignInClicked(networkType: SpaceAuthService.NetworkType) {
+        spaceAuthRepository.launchSignIn(networkType)
+    }
+
+    override fun onSignOutClicked() {
+        spaceAuthRepository.networkType?.let {
+            spaceAuthRepository.signOut(it)
         }
     }
 
