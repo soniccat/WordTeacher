@@ -22,6 +22,8 @@ import com.benasher44.uuid.uuid4
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -159,6 +161,8 @@ class AppDatabase(
     }
 
     inner class CardSets {
+        val cardSetInsertedFlow = MutableSharedFlow<CardSet>()
+
         fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString(), "", "", null, false)
 
         private fun insertedCardSetId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
@@ -262,6 +266,10 @@ class AppDatabase(
                 cardSet.cards.onEach { card ->
                     cards.insertCard(insertedCarSetId, card, card.creationDate, card.modificationDate)
                 }
+            }
+
+            defaultScope.launch {
+                cardSetInsertedFlow.emit(cardSet)
             }
 
             return cardSet.copy(

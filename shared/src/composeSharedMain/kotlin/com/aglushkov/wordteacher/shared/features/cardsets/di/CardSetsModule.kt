@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
+import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetSearchService
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.arkivanov.decompose.ComponentContext
@@ -20,8 +21,9 @@ class CardSetsModule {
     fun cardSetSearchRepository(
         service: SpaceCardSetSearchService,
         cardSetService: SpaceCardSetService,
+        appDatabase: AppDatabase,
     ): CardSetSearchRepository {
-        return CardSetSearchRepository(service, cardSetService)
+        return CardSetSearchRepository(service, cardSetService, appDatabase)
     }
 
     @Provides
