@@ -11,6 +11,16 @@ import okio.utf8Size
 import java.io.*
 import java.util.*
 
+//private class FilePool(val filePath: String) {
+//    private val maxCount = 3
+//    private val availableFiles = mutableListOf<File>()
+//    private val busyFiles = mutableListOf<File>()
+//
+//    fun take(): File {
+//    }
+//
+//}
+
 class MyLemmatizer(
     private val source: Source,
     private val nlpPath: Path,
@@ -20,6 +30,7 @@ class MyLemmatizer(
     // and its skip operation is very expensive
     private val unzippedLemmatizerPath = nlpPath.div("unzipped_lemmatizer")
     private val indexPath = nlpPath.div("unizppedlemmatizer_index")
+    private var randomAccessFile: RandomAccessFile? = null
 
     private val elemRegexp = "\t".toRegex()
     private lateinit var index: MyLemmatizerIndex
@@ -38,6 +49,7 @@ class MyLemmatizer(
         }
 
         index = anIndex
+        randomAccessFile = RandomAccessFile(unzippedLemmatizerPath.toFile(), "r")
     }
 
     private fun createUnzippedLemmatizerIfNeeded() {
@@ -103,13 +115,14 @@ class MyLemmatizer(
      * @return the lemma
      */
     private fun lemmatize(word: String, postag: String): String {
-        return fileSystem.read(unzippedLemmatizerPath) {
-            var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
-            index.offset(word)?.let { offset ->
-                skip(offset.toLong())
+        val safeRandomAccessFile = randomAccessFile ?: return NLPConstants.UNKNOWN_LEMMA
+        var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
+        index.offset(word)?.let { offset ->
+            synchronized(safeRandomAccessFile) { // TODO: consider using file pool not to wait here
+                safeRandomAccessFile.channel.position(offset.toLong())
 
                 while (true) {
-                    val line = readUtf8Line() ?: break
+                    val line = safeRandomAccessFile.readLine() ?: break
                     val elems = line.split(elemRegexp).toTypedArray()
                     if (elems[0] != word) {
                         break
@@ -120,8 +133,8 @@ class MyLemmatizer(
                     }
                 }
             }
-
-            resultLemma
         }
+
+        return resultLemma
     }
 }
