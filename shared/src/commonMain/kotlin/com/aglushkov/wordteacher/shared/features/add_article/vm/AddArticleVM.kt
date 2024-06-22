@@ -8,7 +8,10 @@ import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.extensions.updateData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.resource.onError
+import com.aglushkov.wordteacher.shared.general.resource.toLoading
+import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -26,7 +29,7 @@ import kotlinx.coroutines.launch
 interface AddArticleVM: Clearable {
     val eventFlow: Flow<Event>
     val uiStateFlow: StateFlow<Resource<UIState>>
-    val addingStateFlow: StateFlow<Resource<Unit>>
+    val addingStateFlow: StateFlow<Resource<Article>>
 
     fun createState(): State
     fun onTitleChanged(title: String)
@@ -66,7 +69,7 @@ open class AddArticleVMImpl(
 
     private var state = AddArticleVM.State()
     override val uiStateFlow = MutableStateFlow<Resource<AddArticleVM.UIState>>(Resource.Uninitialized())
-    override val addingStateFlow = MutableStateFlow<Resource<Unit>>(Resource.Uninitialized())
+    override val addingStateFlow = MutableStateFlow<Resource<Article>>(Resource.Uninitialized())
 
     override fun createState(): AddArticleVM.State {
         val data = uiStateFlow.value.data()
@@ -144,14 +147,27 @@ open class AddArticleVMImpl(
         uiStateFlow.value.data()?.let { data ->
             viewModelScope.launch {
                 if (data.titleError == null) {
-                    loadResource {
-                        if (data.needToCreateSet) {
-                            createCardSet()
-                        }
+                    addingStateFlow.update {
+                        it.toLoading()
+                    }
+                    if (data.needToCreateSet) {
+                        createCardSet()
+                    }
 
-                        createArticle()
-                        Unit
-                    }.collect(addingStateFlow)
+                    createArticle(data.title, data.text).collect(addingStateFlow)
+//                    loadResource {
+//                        createArticle(data.title, data.text)
+//                        Unit
+//                    }.collect(addingStateFlow)
+
+                    addingStateFlow.value.onData { article ->
+                        eventChannel.trySend(
+                            CompletionEvent(
+                                CompletionResult.COMPLETED,
+                                CompletionData.Article(article.id)
+                            )
+                        )
+                    }
 
                     addingStateFlow.value.onError { e ->
                         Logger.exception(e, TAG)
@@ -179,16 +195,11 @@ open class AddArticleVMImpl(
         }
     }
 
-    private suspend fun createArticle() {
-        uiStateFlow.value.data()?.let { data ->
-            val article = articlesRepository.createArticle(data.title, data.text)
-            eventChannel.trySend(
-                CompletionEvent(
-                    CompletionResult.COMPLETED,
-                    CompletionData.Article(article.id)
-                )
-            )
-        }
+    private suspend fun createArticle(title: String, text: String): Flow<Resource<Article>> {
+        return articlesRepository.createArticle(title, text)
+//        uiStateFlow.value.data()?.let { data ->
+//
+//        }
     }
 
     private fun updateTitleErrorFlow() {

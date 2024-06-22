@@ -6,6 +6,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.js.JsName
+import kotlin.math.min
 
 
 sealed interface Resource<T> {
@@ -14,11 +15,11 @@ sealed interface Resource<T> {
 
     data class Uninitialized<T>(override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
     data class Loaded<T>(val data: T, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
-    data class Loading<T>(val data: T? = null, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
+    data class Loading<T>(val data: T? = null, val progress: Float = 0.0f, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
     data class Error<T>(val throwable: Throwable, val canTryAgain: Boolean = true, val data: T? = null, override val canLoadNextPage: Boolean = false, override val version: Int = 0) : Resource<T>
 
     fun toUninitialized(canLoadNextPage: Boolean = this.canLoadNextPage, version: Int = this.version) = Uninitialized<T>(canLoadNextPage, version)
-    fun toLoading(data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loading(data, canLoadNext, version)
+    fun toLoading(data: T? = data(), progress: Float = 0.0f, canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loading(data, progress, canLoadNext, version)
     fun toLoaded(data: T, canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Loaded(data, canLoadNext, version)
     fun toError(throwable: Throwable, canTryAgain: Boolean, data: T? = data(), canLoadNext: Boolean = this.canLoadNextPage, version: Int = this.version) = Error(throwable, canTryAgain, data, canLoadNext, version)
 
@@ -37,6 +38,14 @@ sealed interface Resource<T> {
             is Loading -> this.data
             is Error -> this.data
             else -> null
+        }
+    }
+
+    fun progress(): Float {
+        return when (this) {
+            is Loaded -> 1.0f
+            is Loading -> progress
+            else -> 0.0f
         }
     }
 
@@ -77,6 +86,7 @@ sealed interface Resource<T> {
         )
         is Loading -> Loading(
             data = data?.let { loadedDataTransformer(it) },
+            progress = progress,
             canLoadNextPage = canLoadNextPage,
             version = version
         )
@@ -129,7 +139,7 @@ sealed interface Resource<T> {
         block: (T?) -> T?
     ): Resource<T> = when (this) {
         is Loaded -> this.toLoaded(data = block(data) ?: throw RuntimeException("updateData: nil data for Loaded resource isn't supported"))
-        is Loading -> this.toLoading(data = block(data))
+        is Loading -> this.toLoading(data = block(data), progress = progress)
         is Error -> this.toError(throwable = throwable, canTryAgain = canTryAgain, data = block(data))
         is Uninitialized -> this.toUninitialized()
     }
@@ -138,14 +148,14 @@ sealed interface Resource<T> {
         canLoadNextPage: Boolean,
     ): Resource<T> = when (this) {
         is Loaded -> this.toLoaded(data, canLoadNext = canLoadNextPage)
-        is Loading -> this.toLoading(canLoadNext = canLoadNextPage)
+        is Loading -> this.toLoading(canLoadNext = canLoadNextPage, progress = progress)
         is Error -> this.toError(throwable = throwable, canTryAgain = canTryAgain, canLoadNext = canLoadNextPage)
         is Uninitialized -> this.toUninitialized(canLoadNextPage = canLoadNextPage)
     }
 
     fun bumpVersion(): Resource<T> = when (this) {
         is Loaded -> this.toLoaded(data, version = version + 1)
-        is Loading -> this.toLoading(version = version + 1)
+        is Loading -> this.toLoading(version = version + 1, progress = progress)
         is Error -> this.toError(throwable = throwable, canTryAgain = canTryAgain, version = version + 1)
         is Uninitialized -> this.toUninitialized(version = version + 1)
     }
@@ -207,7 +217,7 @@ fun <T> Resource<T>.asLoadedOrError(): Resource<T>? {
 }
 
 fun <T> Resource<T>?.toLoading(): Resource.Loading<T> {
-    return this?.toLoading() ?: Resource.Loading()
+    return this?.toLoading(progress = 0.0f) ?: Resource.Loading(progress = 0.0f)
 }
 
 fun Resource<*>?.isNotLoadedAndNotLoading(): Boolean {
@@ -312,7 +322,7 @@ fun <T, D, O> Resource<T>.merge(res2: Resource<D>, transform: (T?, D?) -> O?): R
     }
 
     if (isLoading() || res2.isLoading()) {
-        return Resource.Loading(transform(data(), res2.data()))
+        return Resource.Loading(transform(data(), res2.data()), progress = min(progress(), res2.progress()))
     }
 
     if (isError() || res2.isError()) {
@@ -354,7 +364,29 @@ fun <T> loadResource(
     try {
         emit(initialValue.toLoading())
         val result = loader()
-        emit(Resource.Loaded(result))
+        emit(initialValue.toLoaded(result))
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Logger.e(e.message.orEmpty(), "loadResource")
+        e.printStackTrace()
+        emit(initialValue.toError(e, canTryAgain))
+    }
+}
+
+fun <T> loadResourceWithProgress(
+    initialValue: Resource<T> = Resource.Uninitialized(),
+    canTryAgain: Boolean = true,
+    loader: Flow<Pair<Float, T?>>
+): Flow<Resource<T>> = flow {
+    try {
+        emit(initialValue.toLoading())
+        var lastValue: T? = null
+        loader.collect { (progress, result) ->
+            lastValue = result
+            emit(initialValue.toLoading(result, progress))
+        }
+        emit(Resource.Loaded(lastValue ?: throw RuntimeException("loadResourceWithProgress: loaded data is null")))
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {

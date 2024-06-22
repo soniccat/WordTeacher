@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.db
 
 import app.cash.sqldelight.ColumnAdapter
+import app.cash.sqldelight.TransactionWithReturn
 import app.cash.sqldelight.TransactionWithoutReturn
 import com.aglushkov.wordteacher.db.DBCard
 import com.aglushkov.wordteacher.db.DBNLPSentence
@@ -95,6 +96,11 @@ class AppDatabase(
         noEnclosing: Boolean = false,
         body: TransactionWithoutReturn.() -> Unit
     ) = db.transaction(noEnclosing, body)
+
+    fun <R> transactionWithResult(
+        noEnclosing: Boolean = false,
+        body: TransactionWithReturn<R>.() -> R
+    ) = db.transactionWithResult(noEnclosing, body)
 
     inner class DBNLPSentences {
         fun insert(nlpSentence: NLPSentence) = db.dBNLPSentenceQueries.insert(

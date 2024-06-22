@@ -83,6 +83,7 @@ fun AddArticleUI(
     val needShowFloatingActionButton by remember(uiState) { derivedStateOf { uiState.isLoaded() } }
     val addingState by vm.addingStateFlow.collectAsState()
     val isAdding by remember(addingState){ derivedStateOf { addingState.isLoading() } }
+    val addingProgress by remember(addingState){ derivedStateOf { addingState.progress() } }
 
     Box(
         modifier = Modifier
@@ -106,6 +107,7 @@ fun AddArticleUI(
                 text = {
                     if (isAdding) {
                         CircularProgressIndicator(
+                            progress = addingProgress,
                             modifier = Modifier.then(Modifier.size(30.dp)),
                             color = contentColorFor(MaterialTheme.colors.secondary)
                         )
