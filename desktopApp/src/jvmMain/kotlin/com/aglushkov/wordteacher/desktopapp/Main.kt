@@ -31,6 +31,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
 import com.aglushkov.wordteacher.shared.features.cardset_info.views.CardSetInfoUI
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoRouter
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.views.CardSetJsonImportUIDialog
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
@@ -163,8 +164,8 @@ private fun mainUI() {
                             mainDecomposeComponent.back()
                         }
 
-                        override fun openCardSetInfo(id: Long) {
-                            mainDecomposeComponent.openCardSetInfo(id)
+                        override fun openCardSetInfo(state: CardSetInfoVM.State) {
+                            mainDecomposeComponent.openCardSetInfo(state)
                         }
                     }
                 })
