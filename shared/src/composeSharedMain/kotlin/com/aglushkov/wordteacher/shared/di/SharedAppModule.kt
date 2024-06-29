@@ -387,9 +387,9 @@ class SharedAppModule {
     @AppComp
     @Provides
     fun analytics(
-        analyticEngines: List<AnalyticEngine>
+        analyticEngines: Array<AnalyticEngine>
     ): Analytics {
-        return Analytics(engines = analyticEngines)
+        return Analytics(engines = analyticEngines.asList())
     }
 
 }

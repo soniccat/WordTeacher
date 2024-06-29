@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.android_app.di.GeneralModule
 import com.aglushkov.wordteacher.android_app.general.ActivityVisibilityResolver
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.WordFrequencyFileOpener
 import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.FileOpenController
@@ -38,7 +39,7 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var databaseCardWorker: DatabaseCardWorker
     @Inject lateinit var cookieStorage: CookiesStorage
     @Inject lateinit var freqDb: WordFrequencyDatabase
-
+    @Inject lateinit var analytics: Analytics
     @Inject lateinit var fileLogger: FileLogger
 
     override fun onCreate() {

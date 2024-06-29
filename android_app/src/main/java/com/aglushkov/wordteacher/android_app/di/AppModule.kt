@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.android_app.di
 
 import android.content.Context
+import android.app.Application
 import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.aglushkov.wordteacher.android_app.BuildConfig
@@ -14,6 +15,7 @@ import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
+import com.aglushkov.wordteacher.shared.analytics.AppMetricaEngine
 import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
@@ -228,8 +230,15 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun analyticEngines(): List<AnalyticEngine> {
-        return
+    fun analyticEngines(
+        app: Application
+    ): Array<AnalyticEngine> {
+        return arrayOf(
+            AppMetricaEngine(
+                app.getString(R.string.app_metrica_key),
+                app
+            )
+        )
     }
 
 

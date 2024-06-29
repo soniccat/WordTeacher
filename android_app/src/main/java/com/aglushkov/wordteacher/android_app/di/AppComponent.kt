@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.android_app.features.notes.di.NotesDependencies
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.Platform
@@ -77,6 +78,7 @@ interface AppComponent:
     fun appInfo(): AppInfo
     fun deviceIdRepository(): DeviceIdRepository
     fun spaceAuthService(): SpaceAuthService
+    fun analytics(): Analytics
 
     fun injectApplication(app: GApp)
 

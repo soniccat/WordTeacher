@@ -52,9 +52,6 @@ android {
                 vkProps?.onEach {
                     put(it.key.toString(), it.value)
                 }
-                yandexProps?.onEach {
-                    put(it.key.toString(), it.value)
-                }
             }
         )
     }
@@ -93,6 +90,12 @@ android {
     }
 
     buildTypes {
+        defaultConfig {
+            yandexProps?.onEach {
+                resValue("string", it.key.toString(), it.value.toString())
+            }
+        }
+
         getByName("debug") {
 
         }
@@ -150,6 +153,7 @@ dependencies {
 
     implementation(libs.playServicesAuth)
     implementation(libs.vkId)
+    implementation(libs.appmetrica)
 
     kapt(libs.daggerCompiler)
 }
