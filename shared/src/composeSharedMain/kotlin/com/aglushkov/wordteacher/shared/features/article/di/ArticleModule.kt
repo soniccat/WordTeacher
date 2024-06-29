@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.article.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
@@ -61,7 +62,8 @@ class ArticleModule {
         cardsRepository: CardsRepository,
         dictRepository: DictRepository,
         idGenerator: IdGenerator,
-        settings: FlowSettings
+        settings: FlowSettings,
+        analytics: Analytics,
     ) = ArticleDecomposeComponent(
         componentContext,
         configuration.id,
@@ -70,6 +72,7 @@ class ArticleModule {
         cardsRepository,
         dictRepository,
         idGenerator,
-        settings
+        settings,
+        analytics,
     )
 }

@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.android_app.features.notes.di
 
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -29,4 +30,5 @@ interface NotesDependencies {
     fun notesRepository(): NotesRepository
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
+    fun analytics(): Analytics
 }

@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.cardsets
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
@@ -19,7 +21,8 @@ class CardSetsDecomposeComponent (
     componentContext: ComponentContext,
     timeSource: TimeSource,
     idGenerator: IdGenerator,
-    features: CardSetsVM.Features
+    features: CardSetsVM.Features,
+    analytics: Analytics,
 ) : CardSetsVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -30,16 +33,16 @@ class CardSetsDecomposeComponent (
     timeSource,
     idGenerator,
     features
-), ComponentContext by componentContext {
+), ComponentContext by componentContext, BaseDecomposeComponent {
+    override val componentName: String = "CardSets"
+
     init {
+        baseInit(analytics)
+
         stateKeeper.register(
             key = KEY_STATE,
             strategy = CardSetsVM.State.serializer()
         ) { this.state }
-
-        lifecycle.doOnDestroy {
-            onCleared()
-        }
     }
 
     private companion object {

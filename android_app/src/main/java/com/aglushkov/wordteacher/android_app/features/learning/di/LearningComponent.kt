@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.android_app.features.learning.di
 
 import com.aglushkov.wordteacher.android_app.features.CardLoaderModule
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -40,4 +41,5 @@ interface LearningDependencies {
     fun timeSource(): TimeSource
     fun routerResolver(): RouterResolver
     fun nlpCore(): NLPCore
+    fun analytics(): Analytics
 }

@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.settings.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.WordFrequencyFileOpener
 import com.aglushkov.wordteacher.shared.features.settings.SettingsDecomposeComponent
@@ -29,6 +30,7 @@ class SettingsModule {
         fileSharer: FileSharer?,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         @WordFrequencyFileOpener wordFrequencyFileOpenController: FileOpenController,
+        analytics: Analytics,
     ) = SettingsDecomposeComponent(
         componentContext,
         state,
@@ -40,5 +42,6 @@ class SettingsModule {
         fileSharer,
         wordFrequencyGradationProvider,
         wordFrequencyFileOpenController,
+        analytics,
     )
 }

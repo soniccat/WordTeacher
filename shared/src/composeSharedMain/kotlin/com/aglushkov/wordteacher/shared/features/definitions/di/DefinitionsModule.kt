@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.definitions.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -23,6 +24,7 @@ class DefinitionsModule {
         cardSetsRepository: CardSetsRepository,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         idGenerator: IdGenerator,
+        analytics: Analytics,
     ) = DefinitionsDecomposeComponent(
         componentContext,
         configuration.word,
@@ -31,6 +33,7 @@ class DefinitionsModule {
         dictRepository,
         cardSetsRepository,
         wordFrequencyGradationProvider,
-        idGenerator
+        idGenerator,
+        analytics,
     )
 }

@@ -36,6 +36,7 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
+import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
@@ -231,12 +232,14 @@ class AppModule {
     @AppComp
     @Provides
     fun analyticEngines(
-        app: Application
+        app: Application,
+        spaceAuthRepository: SpaceAuthRepository,
     ): Array<AnalyticEngine> {
         return arrayOf(
             AppMetricaEngine(
                 app.getString(R.string.app_metrica_key),
-                app
+                app,
+                spaceAuthRepository
             )
         )
     }

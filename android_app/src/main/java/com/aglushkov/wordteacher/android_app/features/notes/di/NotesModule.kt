@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.android_app.features.notes.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -15,11 +16,13 @@ class NotesModule {
         componentContext: ComponentContext,
         notesRepository: NotesRepository,
         timeSource: TimeSource,
-        state: NotesVM.State
+        state: NotesVM.State,
+        analytics: Analytics,
     ) = NotesDecomposeComponent(
         componentContext,
         notesRepository,
         timeSource,
-        state
+        state,
+        analytics,
     )
 }

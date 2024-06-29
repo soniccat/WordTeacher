@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.learning
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -17,24 +19,24 @@ class LearningDecomposeComponent (
     database: AppDatabase,
     databaseCardWorker: DatabaseCardWorker,
     timeSource: TimeSource,
-    idGenerator: IdGenerator
+    idGenerator: IdGenerator,
+    analytics: Analytics,
 ) : LearningVMImpl(
     state,
     cardLoader,
     databaseCardWorker,
     timeSource,
     idGenerator
-), ComponentContext by componentContext {
+), ComponentContext by componentContext, BaseDecomposeComponent {
+    override val componentName: String = "Learning"
 
     private var instanceState: LearningVM.State = stateKeeper.consume(key = KEY_STATE, strategy = LearningVM.State.serializer()) ?: state
 
     init {
+        baseInit(analytics)
+
         stateKeeper.register(KEY_STATE, strategy = LearningVM.State.serializer()) {
             state
-        }
-
-        lifecycle.doOnDestroy {
-            onCleared()
         }
 
         restore(instanceState)

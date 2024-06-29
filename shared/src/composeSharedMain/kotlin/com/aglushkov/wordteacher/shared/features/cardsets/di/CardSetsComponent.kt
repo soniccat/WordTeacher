@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -35,4 +36,5 @@ interface CardSetsDependencies {
     fun timeSource(): TimeSource
     fun cardSetsFeatures(): CardSetsVM.Features
     fun appDatabase(): AppDatabase
+    fun analytics(): Analytics
 }

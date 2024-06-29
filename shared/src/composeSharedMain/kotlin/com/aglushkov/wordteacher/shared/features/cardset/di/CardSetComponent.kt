@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardset.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -37,4 +38,5 @@ interface CardSetDependencies {
     fun wordFrequencyGradationProvider(): WordFrequencyGradationProvider
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
+    fun analytics(): Analytics
 }

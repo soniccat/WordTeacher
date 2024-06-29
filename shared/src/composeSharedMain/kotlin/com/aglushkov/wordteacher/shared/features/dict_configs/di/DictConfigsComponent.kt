@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.dict_configs.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.DslFileOpener
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.features.dict_configs.DictConfigsDecomposeComponent
@@ -35,4 +36,5 @@ interface DictConfigsDependencies {
     @DslFileOpener
     fun dslDictOpenController(): FileOpenController
     fun dictRepository(): DictRepository
+    fun analytics(): Analytics
 }

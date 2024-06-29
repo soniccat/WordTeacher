@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.article.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies

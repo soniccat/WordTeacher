@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardset_info.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.di.ArticleModule
@@ -42,4 +43,5 @@ interface CardSetInfoDependencies {
     fun databaseCardWorker(): DatabaseCardWorker
     fun databaseWorker(): DatabaseWorker
     fun timeSource(): TimeSource
+    fun analytics(): Analytics
 }

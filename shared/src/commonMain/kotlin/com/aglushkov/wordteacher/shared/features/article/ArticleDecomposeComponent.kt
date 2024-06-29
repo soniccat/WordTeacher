@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.article
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVMImpl
@@ -23,7 +25,8 @@ class ArticleDecomposeComponent(
     cardsRepository: CardsRepository,
     dictRepository: DictRepository,
     idGenerator: IdGenerator,
-    settings: FlowSettings
+    settings: FlowSettings,
+    analytics: Analytics,
 ) : ArticleVMImpl (
     definitionsVM,
     articleRepository,
@@ -32,19 +35,18 @@ class ArticleDecomposeComponent(
     id,
     idGenerator,
     settings
-), ComponentContext by componentContext {
+), ComponentContext by componentContext, BaseDecomposeComponent {
+    override val componentName: String = "Article"
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: ArticleVM.State(id = id))
     }
 
     init {
+        baseInit(analytics)
+
         stateKeeper.register(KEY_STATE) {
             state.value.toState()
-        }
-
-        lifecycle.doOnDestroy {
-            onCleared()
         }
 
         restore(instanceState.state)

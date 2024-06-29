@@ -10,6 +10,10 @@ class Analytics(
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
+    fun sendScreen(name: String) {
+        send(AnalyticEvent.createScreenEvent(name))
+    }
+
     fun send(e: AnalyticEvent) {
         scope.launch {
             engines.firstOrNull { engine ->

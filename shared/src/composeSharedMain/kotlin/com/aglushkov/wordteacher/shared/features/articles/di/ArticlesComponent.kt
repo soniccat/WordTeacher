@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.articles.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -27,4 +28,5 @@ interface ArticlesDependencies {
     fun articlesRepository(): ArticlesRepository
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
+    fun analytics(): Analytics
 }

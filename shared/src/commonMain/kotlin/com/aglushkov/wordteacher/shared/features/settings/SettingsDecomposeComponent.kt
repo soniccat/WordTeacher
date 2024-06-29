@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.settings
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
@@ -34,7 +36,8 @@ class SettingsDecomposeComponent (
     isDebug: Boolean,
     fileSharer: FileSharer?,
     wordFrequencyGradationProvider: WordFrequencyGradationProvider,
-    wordFrequencyFileOpenController: FileOpenController
+    wordFrequencyFileOpenController: FileOpenController,
+    analytics: Analytics,
 ) : SettingsVMImpl(
     state,
     connectivityManager,
@@ -45,19 +48,18 @@ class SettingsDecomposeComponent (
     fileSharer,
     wordFrequencyGradationProvider,
     wordFrequencyFileOpenController
-), ComponentContext by componentContext {
+), ComponentContext by componentContext, BaseDecomposeComponent {
+    override val componentName: String = "Settings"
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: SettingsVM.State())
     }
 
     init {
+        baseInit(analytics)
+
         stateKeeper.register(KEY_STATE) {
             state
-        }
-
-        lifecycle.doOnDestroy {
-            onCleared()
         }
 
         restore(instanceState.state)

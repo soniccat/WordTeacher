@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.articles.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -16,9 +17,11 @@ class ArticlesModule {
         configuration: TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration,
         articlesRepository: ArticlesRepository,
         timeSource: TimeSource,
+        analytics: Analytics,
     ) = ArticlesDecomposeComponent(
         componentContext,
         articlesRepository,
         timeSource,
+        analytics,
     )
 }

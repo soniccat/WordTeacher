@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.android_app.features.learning_session_result.d
 
 import com.aglushkov.wordteacher.android_app.features.CardLoaderModule
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.learning_session_result.LearningSessionResultDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -36,4 +37,5 @@ interface LearningSessionResultDependencies {
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
     fun routerResolver(): RouterResolver
+    fun analytics(): Analytics
 }

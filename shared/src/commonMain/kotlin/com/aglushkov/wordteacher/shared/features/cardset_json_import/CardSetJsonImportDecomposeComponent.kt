@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.cardset_json_import
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJsonImportVMImpl
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -12,14 +14,15 @@ class CardSetJsonImportDecomposeComponent (
     configuration: MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration,
     cardSetsRepository: CardSetsRepository,
     timeSource: TimeSource,
+    analytics: Analytics,
 ) : CardSetJsonImportVMImpl(
     configuration,
     cardSetsRepository,
     timeSource,
-), ComponentContext by componentContext {
+), ComponentContext by componentContext, BaseDecomposeComponent {
+    override val componentName: String = "CardSetJsonImport"
+
     init {
-        lifecycle.doOnDestroy {
-            onCleared()
-        }
+        baseInit(analytics)
     }
 }

@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.articles
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVMImpl
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -10,14 +12,15 @@ import com.arkivanov.essenty.lifecycle.doOnDestroy
 class ArticlesDecomposeComponent (
     componentContext: ComponentContext,
     articlesRepository: ArticlesRepository,
-    timeSource: TimeSource
+    timeSource: TimeSource,
+    analytics: Analytics
 ) : ArticlesVMImpl(
     articlesRepository,
     timeSource
-), ComponentContext by componentContext {
+), ComponentContext by componentContext, BaseDecomposeComponent {
+    override val componentName: String = "Articles"
+
     init {
-        lifecycle.doOnDestroy {
-            onCleared()
-        }
+        baseInit(analytics)
     }
 }

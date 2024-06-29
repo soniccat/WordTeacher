@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardset_info.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
@@ -31,10 +32,12 @@ class CardSetInfoModule {
         initState: CardSetInfoVM.State,
         databaseCardWorker: DatabaseCardWorker,
         cardSetRepository: CardSetRepository,
+        analytics: Analytics,
     ) = CardSetInfoDecomposeComponent(
         componentContext,
         initState,
         databaseCardWorker,
         cardSetRepository,
+        analytics,
     )
 }

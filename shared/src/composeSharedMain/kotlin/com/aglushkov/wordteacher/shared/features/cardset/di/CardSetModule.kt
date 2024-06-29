@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardset.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -33,7 +34,8 @@ class CardSetModule {
         databaseCardWorker: DatabaseCardWorker,
         componentContext: ComponentContext,
         timeSource: TimeSource,
-        idGenerator: IdGenerator
+        idGenerator: IdGenerator,
+        analytics: Analytics,
     ) = CardSetDecomposeComponent(
         state,
         cardSetsRepository,
@@ -42,6 +44,7 @@ class CardSetModule {
         databaseCardWorker,
         componentContext,
         timeSource,
-        idGenerator
+        idGenerator,
+        analytics,
     )
 }

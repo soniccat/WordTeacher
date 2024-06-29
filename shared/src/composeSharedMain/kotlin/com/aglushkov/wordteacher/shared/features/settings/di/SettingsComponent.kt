@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.settings.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.WordFrequencyFileOpener
 import com.aglushkov.wordteacher.shared.features.settings.SettingsDecomposeComponent
@@ -39,4 +40,5 @@ interface SettingsDependencies {
     fun fileSharer(): FileSharer?
     fun wordFrequencyGradationProvider(): WordFrequencyGradationProvider
     @WordFrequencyFileOpener fun wordFrequencyFileOpenController(): FileOpenController
+    fun analytics(): Analytics
 }

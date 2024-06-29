@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.add_article.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
@@ -21,7 +22,8 @@ class AddArticleComposeModule {
         articlesRepository: ArticlesRepository,
         contentExtractors: Array<ArticleContentExtractor>,
         cardSetsRepository: CardSetsRepository,
-        timeSource: TimeSource
+        timeSource: TimeSource,
+        analytics: Analytics,
     ): AddArticleDecomposeComponent {
         return AddArticleDecomposeComponent(
             componentContext,
@@ -29,7 +31,8 @@ class AddArticleComposeModule {
             contentExtractors,
             cardSetsRepository,
             timeSource,
-            state
+            analytics,
+            state,
         )
     }
 }

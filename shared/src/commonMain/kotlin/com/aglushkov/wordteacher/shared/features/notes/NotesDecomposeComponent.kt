@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.notes
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVMImpl
@@ -16,23 +18,23 @@ class NotesDecomposeComponent (
     notesRepository: NotesRepository,
     timeSource: TimeSource,
     state: NotesVM.State,
+    analytics: Analytics,
 ) : NotesVMImpl(
     notesRepository,
     timeSource,
     state,
-), ComponentContext by componentContext {
+), ComponentContext by componentContext, BaseDecomposeComponent {
+    override val componentName: String = "Notes"
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: state)
     }
 
     init {
+        baseInit(analytics)
+
         stateKeeper.register(KEY_STATE) {
             state
-        }
-
-        lifecycle.doOnDestroy {
-            onCleared()
         }
 
         restore(instanceState.state)

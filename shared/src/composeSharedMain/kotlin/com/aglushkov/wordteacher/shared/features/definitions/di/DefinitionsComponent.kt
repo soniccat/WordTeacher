@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.definitions.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -34,4 +35,5 @@ interface DefinitionsDependencies {
     fun cardSetsRepository(): CardSetsRepository
     fun dictRepository(): DictRepository
     fun wordFrequencyGradationProvider(): WordFrequencyGradationProvider
+    fun analytics(): Analytics
 }

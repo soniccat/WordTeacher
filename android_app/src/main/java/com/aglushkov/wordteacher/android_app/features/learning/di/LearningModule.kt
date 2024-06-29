@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.android_app.features.learning.di
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -22,7 +23,8 @@ class LearningModule {
         database: AppDatabase,
         databaseCardWorker: DatabaseCardWorker,
         timeSource: TimeSource,
-        idGenerator: IdGenerator
+        idGenerator: IdGenerator,
+        analytics: Analytics,
     ) = LearningDecomposeComponent(
         state,
         componentContext,
@@ -30,6 +32,7 @@ class LearningModule {
         database,
         databaseCardWorker,
         timeSource,
-        idGenerator
+        idGenerator,
+        analytics,
     )
 }

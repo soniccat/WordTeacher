@@ -78,7 +78,7 @@ interface AppComponent:
     fun appInfo(): AppInfo
     fun deviceIdRepository(): DeviceIdRepository
     fun spaceAuthService(): SpaceAuthService
-    fun analytics(): Analytics
+    override fun analytics(): Analytics
 
     fun injectApplication(app: GApp)
 

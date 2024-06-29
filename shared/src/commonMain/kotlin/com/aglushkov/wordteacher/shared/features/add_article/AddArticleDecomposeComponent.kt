@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.add_article
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVMImpl
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
@@ -18,25 +20,25 @@ class AddArticleDecomposeComponent(
     contentExtractors: Array<ArticleContentExtractor>,
     cardSetsRepository: CardSetsRepository,
     timeSource: TimeSource,
-    private val initialState: AddArticleVM.State = AddArticleVM.State()
+    analytics: Analytics,
+    private val initialState: AddArticleVM.State = AddArticleVM.State(),
 ): AddArticleVMImpl(
     articlesRepository,
     contentExtractors,
     cardSetsRepository,
     timeSource,
-), ComponentContext by componentContext {
+), ComponentContext by componentContext, BaseDecomposeComponent {
+    override val componentName: String = "AddArticle"
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: initialState)
     }
 
     init {
+        baseInit(analytics)
+
         stateKeeper.register(KEY_STATE) {
             createState()
-        }
-
-        lifecycle.doOnDestroy {
-            onCleared()
         }
 
         restore(instanceState.state)
