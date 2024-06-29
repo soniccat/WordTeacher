@@ -32,6 +32,15 @@ if (vkPropFile.exists()) {
     }
 }
 
+// App Metrica props
+var yandexProps: Properties? = null
+val yandexPropFile = file("${project.rootDir}/android_app/yandex.properties")
+if (yandexPropFile.exists()) {
+    yandexProps = Properties().apply {
+        load(FileInputStream(yandexPropFile))
+    }
+}
+
 android {
     defaultConfig {
         applicationId = "com.aglushkov.wordteacher"
@@ -41,6 +50,9 @@ android {
         addManifestPlaceholders(
             buildMap {
                 vkProps?.onEach {
+                    put(it.key.toString(), it.value)
+                }
+                yandexProps?.onEach {
                     put(it.key.toString(), it.value)
                 }
             }

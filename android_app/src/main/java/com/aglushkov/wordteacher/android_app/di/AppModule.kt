@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.android_app.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
@@ -224,6 +225,13 @@ class AppModule {
             )
         )
     }
+
+    @AppComp
+    @Provides
+    fun analyticEngines(): List<AnalyticEngine> {
+        return
+    }
+
 
     // Features
 

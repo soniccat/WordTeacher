@@ -76,6 +76,7 @@ kotlin {
                 implementation(compose.uiTooling)
                 api(libs.decomposeJetbrains)
                 api(libs.mokoCompose)
+                api(libs.appmetrica)
             }
         }
         val androidMain by getting {
@@ -86,6 +87,7 @@ kotlin {
                 api(libs.androidComposeActivity)
                 implementation("org.apache.opennlp:opennlp-tools:1.9.4")
                 implementation("org.jsoup:jsoup:1.14.3")
+                api(libs.appmetrica)
             }
         }
         val androidUnitTest by getting {
@@ -116,6 +118,7 @@ kotlin {
             dependsOn(composeSharedMain)
             dependencies {
                 implementation(libs.ktorDesktop)
+                api(libs.appmetrica)
                 implementation("org.apache.opennlp:opennlp-tools:1.9.4")
                 implementation("org.jsoup:jsoup:1.14.3")
 

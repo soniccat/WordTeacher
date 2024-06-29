@@ -123,6 +123,8 @@ class ArticlesRepository(
 
                 val sentences = mutableListOf<NLPSentence>()
                 val splitSentences = resultText.split(sentenceSpans)
+
+                // TODO: process in parallel (split splitSentences by chunks and process wthem with await)
                 splitSentences.forEachIndexed { index, s ->
                     val nlpSentence = NLPSentence(articleId, index.toLong(), clearString(s.toString()))
                     nlpSentenceProcessor.process(nlpSentence, nlpCoreCopy)

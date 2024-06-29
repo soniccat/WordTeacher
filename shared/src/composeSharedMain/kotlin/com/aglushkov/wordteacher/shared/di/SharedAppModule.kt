@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.di
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
@@ -381,4 +383,13 @@ class SharedAppModule {
             fileSystem,
         )
     }
+
+    @AppComp
+    @Provides
+    fun analytics(
+        analyticEngines: List<AnalyticEngine>
+    ): Analytics {
+        return Analytics(engines = analyticEngines)
+    }
+
 }

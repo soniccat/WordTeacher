@@ -3,6 +3,8 @@
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowSplashScreenBackground">@color/background</item>
+        <item name="android:windowBackground">@color/background</item>
 
         <!-- To have the same status bar color here and in DialogStyle.
             When windowTranslucentStatus is true, the statusbar is a bit darker and

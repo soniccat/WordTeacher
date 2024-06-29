@@ -37,6 +37,7 @@ junit = "4.13.2"
 stately = "2.0.6"
 mockitoKotlin = "4.0.0"
 settings = "1.0.0"
+appmetrica = "7.0.0"
 
 #JVM
 bouncyCastle = "1.67"
@@ -121,6 +122,7 @@ mokoResourcesGenerator = { module = "dev.icerock.moko:resources-generator", vers
 mokoCompose = { module = "dev.icerock.moko:resources-compose", version.ref = "mokoResources"}
 
 vkId = { module = "com.vk.id:vkid", version.ref = "vkId" }
+appmetrica = { module = "io.appmetrica.analytics:analytics", version.ref = "appmetrica"}
 
 #JVM
 bouncyCastle = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bouncyCastle" }
