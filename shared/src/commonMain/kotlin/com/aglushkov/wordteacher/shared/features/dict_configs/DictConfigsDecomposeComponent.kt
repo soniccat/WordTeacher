@@ -23,7 +23,7 @@ class DictConfigsDecomposeComponent (
     dictRepository,
     idGenerator,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "DictConfigs"
+    override val componentName: String = "Screen_DictConfigs"
 
     init {
         baseInit(analytics)

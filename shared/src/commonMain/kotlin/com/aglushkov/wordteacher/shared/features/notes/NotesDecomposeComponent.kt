@@ -24,7 +24,7 @@ class NotesDecomposeComponent (
     timeSource,
     state,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "Notes"
+    override val componentName: String = "Screen_Notes"
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: state)

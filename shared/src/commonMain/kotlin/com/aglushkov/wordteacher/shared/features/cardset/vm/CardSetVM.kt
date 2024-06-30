@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.cardset.vm
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
@@ -73,7 +75,8 @@ open class CardSetVMImpl(
     wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
-    private val idGenerator: IdGenerator
+    private val idGenerator: IdGenerator,
+    private val analytics: Analytics,
 ): ViewModel(), CardSetVM {
 
     override var router: CardSetRouter? = null
@@ -284,6 +287,7 @@ open class CardSetVMImpl(
     }
 
     override fun onInfoPressed() {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.infoPressed"))
         val safeState = state.value
         when (safeState) {
             is CardSetVM.State.LocalCardSet -> CardSetInfoVM.State.LocalCardSet(
@@ -301,8 +305,10 @@ open class CardSetVMImpl(
 
     override fun onItemTextChanged(text: String, item: BaseViewItem<*>, cardId: Long) {
         editCard(cardId) { card ->
+            var itemType: ItemType? = null
             val newCard = when (item) {
-                is WordTitleViewItem ->
+                is WordTitleViewItem -> {
+                    itemType = ItemType.Title
                     card.copy(
                         term = if (card.term != text) {
                             text
@@ -310,7 +316,9 @@ open class CardSetVMImpl(
                             card.term
                         },
                     )
-                is WordTranscriptionViewItem ->
+                }
+                is WordTranscriptionViewItem -> {
+                    itemType = ItemType.Transcription
                     card.copy(
                         transcription = if (card.transcription != text) {
                             text
@@ -318,7 +326,9 @@ open class CardSetVMImpl(
                             card.transcription
                         },
                     )
+                }
                 is WordDefinitionViewItem -> {
+                    itemType = ItemType.Definition
                     card.copy(
                         definitions = if (card.definitions.isEmpty()) {
                             listOf(text)
@@ -334,7 +344,8 @@ open class CardSetVMImpl(
                         needToUpdateDefinitionSpans = true,
                     )
                 }
-                is WordExampleViewItem ->
+                is WordExampleViewItem -> {
+                    itemType = ItemType.Example
                     card.copy(
                         examples = card.examples.mapIndexed { index, s ->
                             if (item.index == index) {
@@ -345,7 +356,9 @@ open class CardSetVMImpl(
                         },
                         needToUpdateExampleSpans = true,
                     )
-                is WordSynonymViewItem ->
+                }
+                is WordSynonymViewItem -> {
+                    itemType = ItemType.Synonym
                     card.copy(
                         synonyms = card.synonyms.mapIndexed { index, s ->
                             if (item.index == index) {
@@ -355,9 +368,13 @@ open class CardSetVMImpl(
                             }
                         },
                     )
+                }
                 else -> card
             }
 
+            itemType?.let {
+                logEdit(it)
+            }
             if (newCard != card) {
                 updateCard(newCard)
             }
@@ -397,6 +414,7 @@ open class CardSetVMImpl(
     }
 
     override fun onAddDefinitionPressed(cardId: Long) {
+        logAdd(ItemType.Definition)
         pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Definition, cardId))
         return editCard(cardId) {
             it.copy(
@@ -409,7 +427,8 @@ open class CardSetVMImpl(
         }
     }
 
-    override fun onDefinitionRemoved(item: WordDefinitionViewItem, cardId: Long) =
+    override fun onDefinitionRemoved(item: WordDefinitionViewItem, cardId: Long) {
+        logRemove(ItemType.Definition)
         editCard(cardId) {
             it.copy(
                 definitions = if (it.definitions.size <= 1) {
@@ -422,8 +441,10 @@ open class CardSetVMImpl(
                 updateCard(this, delay = 0)
             }
         }
+    }
 
     override fun onAddExamplePressed(cardId: Long) {
+        logAdd(ItemType.Example)
         pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Example, cardId))
         return editCard(cardId) {
             it.copy(
@@ -436,7 +457,8 @@ open class CardSetVMImpl(
         }
     }
 
-    override fun onExampleRemoved(item: WordExampleViewItem, cardId: Long) =
+    override fun onExampleRemoved(item: WordExampleViewItem, cardId: Long) {
+        logRemove(ItemType.Example)
         editCard(cardId) {
             it.copy(
                 examples = it.examples.filterIndexed { i, _ -> i != item.index },
@@ -445,8 +467,10 @@ open class CardSetVMImpl(
                 updateCard(this, delay = 0)
             }
         }
+    }
 
     override fun onAddSynonymPressed(cardId: Long) {
+        logAdd(ItemType.Synonym)
         pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Synonym, cardId))
         editCard(cardId) {
             it.copy(
@@ -459,7 +483,8 @@ open class CardSetVMImpl(
         }
     }
 
-    override fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long) =
+    override fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long) {
+        logRemove(ItemType.Synonym)
         editCard(cardId) {
             it.copy(
                 synonyms = it.synonyms.filterIndexed { i, _ -> i != item.index },
@@ -467,14 +492,44 @@ open class CardSetVMImpl(
                 updateCard(this, delay = 0)
             }
         }
+    }
+
+    private fun logAdd(itemType: ItemType) {
+        analytics.send(
+            AnalyticEvent.createActionEvent(
+                "CardSetVM.addItemPressed",
+                mapOf("itemType" to itemType.value)
+            )
+        )
+    }
+
+    private fun logRemove(itemType: ItemType) {
+        analytics.send(
+            AnalyticEvent.createActionEvent(
+                "CardSetVM.removeItemPressed",
+                mapOf("itemType" to itemType.value)
+            )
+        )
+    }
+
+    private fun logEdit(itemType: ItemType) {
+        analytics.send(
+            AnalyticEvent.createActionEvent(
+                "CardSetVM.editItem",
+                mapOf("itemType" to itemType.value)
+            )
+        )
+    }
 
     override fun onCardCreatePressed() {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.cardCreatePressed"))
         viewModelScope.launch {
             cardSetRepository.createCard()
         }
     }
 
     override fun onCardDeleted(cardId: Long) {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.cardDeleted"))
         findCard(cardId)?.let { card ->
             viewModelScope.launch {
                 databaseCardWorker.deleteCard(card, timeSource.timeInMilliseconds())
@@ -482,7 +537,8 @@ open class CardSetVMImpl(
         }
     }
 
-    override fun onPartOfSpeechChanged(newPartOfSpeech: WordTeacherWord.PartOfSpeech, cardId: Long) =
+    override fun onPartOfSpeechChanged(newPartOfSpeech: WordTeacherWord.PartOfSpeech, cardId: Long) {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.partOfSpeechChanged"))
         editCard(cardId) {
             it.copy(
                 partOfSpeech = newPartOfSpeech,
@@ -490,6 +546,7 @@ open class CardSetVMImpl(
                 updateCard(this)
             }
         }
+    }
 
     private fun updateCard(card: Card, delay: Long = UPDATE_DELAY) {
         databaseCardWorker.updateCardCancellable(card, delay, timeSource.timeInMilliseconds())
@@ -523,6 +580,7 @@ open class CardSetVMImpl(
         inMemoryCardSet.value?.findCard(id) ?: cardSet.value.data()?.findCard(id)
 
     override fun onStartLearningClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.startLearningClicked"))
         viewModelScope.launch {
             try {
                 cardSet.value.data()?.let { set ->
@@ -538,6 +596,7 @@ open class CardSetVMImpl(
     }
 
     override fun onAddClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.addClicked"))
         viewModelScope.launch {
             cardSet.value.data()?.let {
                 launch(Dispatchers.Default) {
@@ -554,6 +613,14 @@ open class CardSetVMImpl(
         Definition,
         Example,
         Synonym
+    }
+
+    enum class ItemType(val value: String) {
+        Title("title"),
+        Transcription("transcription"),
+        Definition("definition"),
+        Example("example"),
+        Synonym("synonym"),
     }
 
     sealed class PendingEvent(var isHandled: Boolean = false) {

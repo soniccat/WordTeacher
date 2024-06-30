@@ -20,7 +20,7 @@ class CardSetJsonImportDecomposeComponent (
     cardSetsRepository,
     timeSource,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "CardSetJsonImport"
+    override val componentName: String = "Screen_CardSetJsonImport"
 
     init {
         baseInit(analytics)

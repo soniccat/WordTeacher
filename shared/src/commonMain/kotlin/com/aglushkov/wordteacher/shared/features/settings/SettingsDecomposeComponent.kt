@@ -49,7 +49,7 @@ class SettingsDecomposeComponent (
     wordFrequencyGradationProvider,
     wordFrequencyFileOpenController
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "Settings"
+    override val componentName: String = "Screen_Settings"
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: SettingsVM.State())

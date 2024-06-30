@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import androidx.compose.runtime.Stable
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -103,6 +105,7 @@ open class CardSetsVMImpl(
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator,
     override val availableFeatures: CardSetsVM.Features,
+    private val analytics: Analytics,
 ): ViewModel(), CardSetsVM {
     override var router: CardSetsRouter? = null
     final override val state: CardSetsVM.State
@@ -141,10 +144,12 @@ open class CardSetsVMImpl(
     }
 
     override fun onNewCardSetTextChange(text: String) {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.newCardSetTextChange"))
         uiStateFlow.update { it.copy(newCardSetText = text) }
     }
 
     override fun onCardSetAdded(name: String) {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.cardSetAdded"))
         uiStateFlow.update { it.copy(newCardSetText = null) }
 
         viewModelScope.launch {
@@ -161,6 +166,7 @@ open class CardSetsVMImpl(
     }
 
     override fun onCardSetRemoved(item: CardSetViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.cardSetRemoved"))
         viewModelScope.launch {
             cardSetsRepository.removeCardSet(item.cardSetId)
         }
@@ -249,6 +255,7 @@ open class CardSetsVMImpl(
     }
 
     override fun onSearch(query: String) {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.search"))
         startSearch(query)
     }
 
@@ -267,10 +274,12 @@ open class CardSetsVMImpl(
     }
 
     override fun onSearchCardSetClicked(item: RemoteCardSetViewItem) {
-        router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId))
+        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.searchCardSetClicked"))
+        router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId, mapOf("remoteId" to item.remoteCardSetId)))
     }
 
     override fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.searchCardSetAddClicked", mapOf("remoteId" to item.remoteCardSetId)))
         loadCardSetAndAdd(item.remoteCardSetId)
     }
 

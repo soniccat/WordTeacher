@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.cardset_info.vm
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.StringDescThrowable
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -82,6 +84,7 @@ open class CardSetInfoVMImpl(
     restoredState: CardSetInfoVM.State,
     private val databaseCardWorker: DatabaseCardWorker,
     private val cardSetRepository: CardSetRepository,
+    private val analytics: Analytics,
 ): ViewModel(), CardSetInfoVM {
 
     override var router: CardSetInfoRouter? = null
@@ -158,19 +161,27 @@ open class CardSetInfoVMImpl(
     }
 
     override fun onNameChanged(name: String) {
+        logChange("name")
         inputState.update { it.copy(name = name) }
     }
 
     override fun onDescriptionChanged(description: String) {
+        logChange("description")
         inputState.update { it.copy(description = description) }
     }
 
     override fun onSourceChanged(source: String) {
+        logChange("source")
         inputState.update { it.copy(source = source) }
     }
 
     override fun onIsAvailableInSearchChanged(isAvailableInSearch: Boolean) {
+        logChange("isAvailableInSearchChanged")
         inputState.update { it.copy(isAvailableInSearch = isAvailableInSearch) }
+    }
+
+    private fun logChange(fieldType: String) {
+        analytics.send(AnalyticEvent.createActionEvent("CardSetInfoVM.change", mapOf("fieldType" to fieldType)))
     }
 
     private fun loadCardSet() {

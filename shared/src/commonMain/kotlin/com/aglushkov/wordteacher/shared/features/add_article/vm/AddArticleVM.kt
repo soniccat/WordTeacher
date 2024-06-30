@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.add_article.vm
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.*
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
@@ -62,6 +64,7 @@ open class AddArticleVMImpl(
     private val contentExtractors: Array<ArticleContentExtractor>,
     private val cardSetsRepository: CardSetsRepository,
     private val timeSource: TimeSource,
+    private val analytics: Analytics,
 ): ViewModel(), AddArticleVM {
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED) // TODO: replace with a list of strings
@@ -155,12 +158,13 @@ open class AddArticleVMImpl(
                     }
 
                     createArticle(data.title, data.text).collect(addingStateFlow)
-//                    loadResource {
-//                        createArticle(data.title, data.text)
-//                        Unit
-//                    }.collect(addingStateFlow)
 
                     addingStateFlow.value.onData { article ->
+                        analytics.send(
+                            AnalyticEvent.createActionEvent(
+                                "AddArticleVM.AddArticle",
+                                mapOf("id" to article.name, "uri" to state.uri, "createSet" to state.needToCreateSet))
+                        )
                         eventChannel.trySend(
                             CompletionEvent(
                                 CompletionResult.COMPLETED,
@@ -170,7 +174,7 @@ open class AddArticleVMImpl(
                     }
 
                     addingStateFlow.value.onError { e ->
-                        Logger.exception(e, TAG)
+                        Logger.exception("AddArticleVM.createArticle", e, TAG)
                         val errorText = e.message?.let {
                             StringDesc.Raw(it)
                         } ?: StringDesc.Resource(MR.strings.error_default)

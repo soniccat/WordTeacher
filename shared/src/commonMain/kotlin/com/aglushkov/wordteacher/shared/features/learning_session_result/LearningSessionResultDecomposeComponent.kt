@@ -20,7 +20,7 @@ class LearningSessionResultDecomposeComponent (
     cardLoader,
     idGenerator
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "LearningSession"
+    override val componentName: String = "Screen_LearningSession"
 
     //    private val instanceState = instanceKeeper.getOrCreate(::Handler)
     private var instanceState: LearningSessionResultVM.State = stateKeeper.consume(key = KEY_STATE, strategy = LearningSessionResultVM.State.serializer()) ?: state

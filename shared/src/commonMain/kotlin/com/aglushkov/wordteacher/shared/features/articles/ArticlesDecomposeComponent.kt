@@ -18,7 +18,7 @@ class ArticlesDecomposeComponent (
     articlesRepository,
     timeSource
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "Articles"
+    override val componentName: String = "Screen_Articles"
 
     init {
         baseInit(analytics)

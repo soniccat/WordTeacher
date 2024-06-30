@@ -36,7 +36,7 @@ class ArticleDecomposeComponent(
     idGenerator,
     settings
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "Article"
+    override val componentName: String = "Screen_Article"
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: ArticleVM.State(id = id))

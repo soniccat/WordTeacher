@@ -39,7 +39,7 @@ class DefinitionsDecomposeComponent (
     wordFrequencyGradationProvider,
     idGenerator,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "Definitions"
+    override val componentName: String = "Screen_Definitions"
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: DefinitionsVM.State(word = word))

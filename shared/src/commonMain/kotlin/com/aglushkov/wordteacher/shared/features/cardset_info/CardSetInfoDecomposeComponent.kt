@@ -23,7 +23,7 @@ class CardSetInfoDecomposeComponent(
     databaseCardWorker,
     cardSetRepository,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "CardSetInfo"
+    override val componentName: String = "Screen_CardSetInfo"
 
     init {
         baseInit(analytics)

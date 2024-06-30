@@ -28,7 +28,7 @@ class LearningDecomposeComponent (
     timeSource,
     idGenerator
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "Learning"
+    override val componentName: String = "Screen_Learning"
 
     private var instanceState: LearningVM.State = stateKeeper.consume(key = KEY_STATE, strategy = LearningVM.State.serializer()) ?: state
 

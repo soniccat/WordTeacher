@@ -157,7 +157,7 @@ open class CardSetJsonImportVMImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Logger.exception(e, TAG)
+            Logger.exception("CardSetJsonImportVM.runSafely", e, TAG)
             val errorText = e.message?.let {
                 StringDesc.Raw(it)
             } ?: StringDesc.Resource(MR.strings.error_default)

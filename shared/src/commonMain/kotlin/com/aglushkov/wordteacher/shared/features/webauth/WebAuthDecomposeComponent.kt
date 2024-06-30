@@ -20,7 +20,7 @@ class WebAuthDecomposeComponent (
     timeSource,
     googleOAuth2Service,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "WebAuth"
+    override val componentName: String = "Screen_WebAuth"
 
     init {
         baseInit(analytics)

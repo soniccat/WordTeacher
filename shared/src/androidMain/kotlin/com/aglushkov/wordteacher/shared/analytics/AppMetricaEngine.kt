@@ -34,6 +34,10 @@ class AppMetricaEngine(
     }
 
     override fun send(e: AnalyticEvent) {
-        AppMetrica.reportEvent(e.name, e.params)
+        e.throwable?.let { throwable ->
+            AppMetrica.reportError(e.name, throwable)
+        } ?: run {
+            AppMetrica.reportEvent(e.name, e.params)
+        }
     }
 }

@@ -35,7 +35,7 @@ class CardSetDecomposeComponent (
     timeSource,
     idGenerator
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "CardSet"
+    override val componentName: String = "Screen_CardSet"
 
     init {
         baseInit(analytics)

@@ -27,8 +27,9 @@ class AddArticleDecomposeComponent(
     contentExtractors,
     cardSetsRepository,
     timeSource,
+    analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
-    override val componentName: String = "AddArticle"
+    override val componentName: String = "Screen_AddArticle"
 
     private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
         Handler(stateKeeper.consume(KEY_STATE) ?: initialState)

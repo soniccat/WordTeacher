@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.articles.vm
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.CompletionResult
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
@@ -8,6 +10,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.exception
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -42,6 +45,7 @@ interface ArticlesVM {
 open class ArticlesVMImpl(
     val articlesRepository: ArticlesRepository,
     private val timeSource: TimeSource,
+    private val analytics: Analytics,
 ): ViewModel(), ArticlesVM {
     override var router: ArticlesRouter? = null
 
@@ -51,6 +55,7 @@ open class ArticlesVMImpl(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override fun onCreateTextArticleClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("ArticlesVM.createTextArticleClicked"))
         router?.openAddArticle()
     }
 
@@ -59,12 +64,14 @@ open class ArticlesVMImpl(
     }
 
     override fun onArticleRemoved(item: ArticleViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("ArticlesVM.articleRemoved"))
         viewModelScope.launch {
             try {
                 articlesRepository.removeArticle(item.id)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
+                Logger.exception("ArticlesVM.onArticleRemoved", e)
                 val errorText = e.message?.let {
                     StringDesc.Raw(it)
                 } ?: StringDesc.Resource(MR.strings.error_default)
