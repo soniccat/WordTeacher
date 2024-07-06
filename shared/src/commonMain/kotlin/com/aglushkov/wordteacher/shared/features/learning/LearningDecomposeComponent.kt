@@ -26,7 +26,8 @@ class LearningDecomposeComponent (
     cardLoader,
     databaseCardWorker,
     timeSource,
-    idGenerator
+    idGenerator,
+    analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Learning"
 

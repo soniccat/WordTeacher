@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.analytics.AppMetricaEngine
 import com.aglushkov.wordteacher.shared.di.*
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
@@ -187,6 +188,7 @@ class AppModule {
         context: Context,
         wordFrequencyDB: WordFrequencyDatabase,
         mainDB: AppDatabase,
+        analytics: Analytics,
     ): FileOpenController {
         val tmpDestinationPath = context.getDatabasePath(FREQUENCY_DB_NAME_TMP).toOkioPath()
         val dstPath = context.getDatabasePath(FREQUENCY_DB_NAME).toOkioPath()
@@ -198,8 +200,8 @@ class AppModule {
             wordFrequencyDB.Validator(),
             FileOpenCompositeSuccessHandler(
                 listOf(
-                    wordFrequencyDB.UpdateHandler(),
-                    mainDB.WordFrequencyUpdateHandler()
+                    wordFrequencyDB.UpdateHandler(analytics),
+                    mainDB.WordFrequencyUpdateHandler(analytics)
                 )
             )
         )
@@ -212,7 +214,8 @@ class AppModule {
         @DictPath dictPath: Path,
         context: Context,
         fileSystem: FileSystem,
-        dictRepository: DictRepository
+        dictRepository: DictRepository,
+        analytics: Analytics,
     ): FileOpenController {
         val tmpDestinationPath = context.cacheDir.toOkioPath()
         return FileOpenControllerImpl(
@@ -223,7 +226,7 @@ class AppModule {
             DslDictValidator(fileSystem),
             FileOpenCompositeSuccessHandler(
                 listOf(
-                    OnNewDictAddedHandler(dictRepository)
+                    OnNewDictAddedHandler(dictRepository, analytics)
                 )
             )
         )

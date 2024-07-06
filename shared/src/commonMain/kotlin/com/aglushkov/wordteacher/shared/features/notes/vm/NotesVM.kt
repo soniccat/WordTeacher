@@ -17,6 +17,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+// TODO: remove this feature
 interface NotesVM: Clearable {
     val notes: StateFlow<Resource<List<BaseViewItem<*>>>>
     val stateFlow: StateFlow<State>

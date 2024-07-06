@@ -22,6 +22,7 @@ class DictConfigsDecomposeComponent (
     dslDictOpenController,
     dictRepository,
     idGenerator,
+    analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_DictConfigs"
 

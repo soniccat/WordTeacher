@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.settings.vm
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.FileOpenController
@@ -64,7 +66,8 @@ open class SettingsVMImpl (
     private val isDebug: Boolean,
     private val fileSharer: FileSharer?,
     private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
-    private val wordFrequencyFileOpenController: FileOpenController
+    private val wordFrequencyFileOpenController: FileOpenController,
+    private val analytics: Analytics,
 ): ViewModel(), SettingsVM {
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -153,30 +156,39 @@ open class SettingsVMImpl (
     }
 
     override fun onSignInClicked(networkType: SpaceAuthService.NetworkType) {
+        analytics.send(AnalyticEvent.createActionEvent("Settings.signInClicked",
+            mapOf("networkType" to networkType.name)))
         spaceAuthRepository.launchSignIn(networkType)
     }
 
     override fun onSignOutClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Settings.signOutClicked"))
         spaceAuthRepository.networkType?.let {
             spaceAuthRepository.signOut(it)
         }
     }
 
     override fun onAuthRefreshClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Settings.authRefreshClicked"))
         spaceAuthRepository.launchRefresh()
     }
 
     override fun onUploadWordFrequencyFileClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Settings.uploadWordFrequencyFileClicked"))
         mainScope.launch {
             wordFrequencyFileOpenController.chooseFile()
         }
     }
 
     override fun onLoggingIsEnabledChanged() {
-        logsRepository.setIsLoggingEnabled(!logsRepository.isLoggingEnabledState.value)
+        val newValue = !logsRepository.isLoggingEnabledState.value
+        analytics.send(AnalyticEvent.createActionEvent("Settings.loggingIsEnabledChanged",
+            mapOf("value" to newValue)))
+        logsRepository.setIsLoggingEnabled(newValue)
     }
 
     override fun onLogFileShareClicked(path: Path) {
+        analytics.send(AnalyticEvent.createActionEvent("Settings.logFileShareClicked"))
         mainScope.launch {
             fileSharer?.share(path)?.collect()
         }

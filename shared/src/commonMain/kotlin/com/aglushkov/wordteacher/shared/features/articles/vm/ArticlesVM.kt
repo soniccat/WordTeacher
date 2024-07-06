@@ -55,7 +55,7 @@ open class ArticlesVMImpl(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override fun onCreateTextArticleClicked() {
-        analytics.send(AnalyticEvent.createActionEvent("ArticlesVM.createTextArticleClicked"))
+        analytics.send(AnalyticEvent.createActionEvent("Articles.createTextArticleClicked"))
         router?.openAddArticle()
     }
 
@@ -64,7 +64,7 @@ open class ArticlesVMImpl(
     }
 
     override fun onArticleRemoved(item: ArticleViewItem) {
-        analytics.send(AnalyticEvent.createActionEvent("ArticlesVM.articleRemoved"))
+        analytics.send(AnalyticEvent.createActionEvent("Articles.articleRemoved"))
         viewModelScope.launch {
             try {
                 articlesRepository.removeArticle(item.id)

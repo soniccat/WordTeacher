@@ -6,6 +6,8 @@ import app.cash.sqldelight.TransactionWithoutReturn
 import com.aglushkov.wordteacher.db.DBCard
 import com.aglushkov.wordteacher.db.DBNLPSentence
 import com.aglushkov.wordteacher.maindb.MainDB
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
@@ -712,12 +714,16 @@ class AppDatabase(
     }
 
 
-    inner class WordFrequencyUpdateHandler: FileOpenController.SuccessHandler {
+    inner class WordFrequencyUpdateHandler(
+        private val analytics: Analytics,
+    ): FileOpenController.SuccessHandler {
         override fun prepare(path: Path): Boolean {
             return true
         }
 
         override fun handle(path: Path): Boolean {
+            analytics.send(AnalyticEvent.createActionEvent("FileOpenController.success.wordFrequencyDB",
+                mapOf("name" to path.name)))
             db.dBCardQueries.resetCardFrequencies()
             return true
         }

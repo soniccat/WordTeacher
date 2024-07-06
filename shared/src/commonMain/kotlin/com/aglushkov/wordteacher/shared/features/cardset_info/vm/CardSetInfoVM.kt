@@ -181,7 +181,7 @@ open class CardSetInfoVMImpl(
     }
 
     private fun logChange(fieldType: String) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetInfoVM.change", mapOf("fieldType" to fieldType)))
+        analytics.send(AnalyticEvent.createActionEvent("CardSetInfo.change", mapOf("fieldType" to fieldType)))
     }
 
     private fun loadCardSet() {

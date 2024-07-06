@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.repository.db
 
 import co.touchlab.kermit.Logger
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
@@ -218,7 +220,9 @@ class WordFrequencyDatabase(
         }
     }
 
-    inner class UpdateHandler: FileOpenController.SuccessHandler {
+    inner class UpdateHandler(
+        private val analytics: Analytics
+    ): FileOpenController.SuccessHandler {
         override fun prepare(path: Path): Boolean {
             driver.close()
             driver = driverFactory.createFrequencyDBDriver()
@@ -227,6 +231,8 @@ class WordFrequencyDatabase(
         }
 
         override fun handle(path: Path): Boolean {
+            analytics.send(AnalyticEvent.createActionEvent("FileOpenController.success.wordFrequencyDB",
+                mapOf("name" to path.name)))
             runBlocking {
                 updateGradation()
             }

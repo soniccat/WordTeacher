@@ -6,6 +6,8 @@ import com.aglushkov.wordteacher.desktopapp.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.desktopapp.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.desktopapp.helper.VKAuthControllerImpl
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.ApiBaseUrl
 import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.di.BasePath
@@ -37,6 +39,7 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
+import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.PreferencesSettings
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -191,6 +194,7 @@ class AppModule {
         @BasePath basePath: Path,
         wordFrequencyDB: WordFrequencyDatabase,
         mainDB: AppDatabase,
+        analytics: Analytics,
     ): FileOpenController {
         val tmpDestinationPath = basePath.div(FREQUENCY_DB_NAME_TMP)
         val dstPath = basePath.div(FREQUENCY_DB_NAME)
@@ -202,8 +206,8 @@ class AppModule {
             wordFrequencyDB.Validator(),
             FileOpenCompositeSuccessHandler(
                 listOf(
-                    wordFrequencyDB.UpdateHandler(),
-                    mainDB.WordFrequencyUpdateHandler()
+                    wordFrequencyDB.UpdateHandler(analytics),
+                    mainDB.WordFrequencyUpdateHandler(analytics)
                 )
             )
         )
@@ -222,7 +226,8 @@ class AppModule {
         @TmpPath tmpPath: Path,
         @DictPath dictPath: Path,
         fileSystem: FileSystem,
-        dictRepository: DictRepository
+        dictRepository: DictRepository,
+        analytics: Analytics,
     ): FileOpenController {
         return FileOpenControllerImpl(
             "DslFileOpener",
@@ -232,13 +237,18 @@ class AppModule {
             DslDictValidator(fileSystem),
             FileOpenCompositeSuccessHandler(
                 listOf(
-                    OnNewDictAddedHandler(dictRepository)
+                    OnNewDictAddedHandler(dictRepository, analytics)
                 )
             )
         )
     }
 
-
+    @AppComp
+    @Provides
+    fun analyticEngines(
+    ): Array<AnalyticEngine> {
+        return arrayOf()
+    }
 }
 
 @Qualifier

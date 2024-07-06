@@ -38,6 +38,7 @@ class DefinitionsDecomposeComponent (
     cardSetsRepository,
     wordFrequencyGradationProvider,
     idGenerator,
+    analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Definitions"
 

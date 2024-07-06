@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.learning.vm
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
@@ -111,7 +113,8 @@ open class LearningVMImpl(
     private val cardLoader: CardLoader,
     private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
-    private val idGenerator: IdGenerator
+    private val idGenerator: IdGenerator,
+    private val analytics: Analytics,
 ) : ViewModel(), LearningVM {
 
     override var router: LearningRouter? = null
@@ -169,41 +172,52 @@ open class LearningVMImpl(
         var sessionResults: List<SessionCardResult>? = null
         do {
             sessionResults = teacher.runSession { cardCount, matchPairs, testCards, sessionCards ->
+                analytics.send(AnalyticEvent.createActionEvent("Learning.startSession"))
+
                 // match session
-                matchPairs?.collect { pairs ->
-                    updateMatchColorMap(pairs)
-                    challengeState.update {
-                        Resource.Loaded(
-                            LearningVM.Challenge.Match(
-                                rows = pairs.mapIndexed { index, matchPair ->
-                                    LearningVM.Challenge.MatchRow(
-                                        index,
-                                        resolveColorForGroup(matchPair.termSelection.group),
-                                        resolveColorForGroup(matchPair.exampleSelection.group),
-                                        matchPair,
-                                    )
-                                },
+                if (matchPairs != null) {
+                    analytics.send(AnalyticEvent.createActionEvent("Learning.session.match.started"))
+                    matchPairs.collect { pairs ->
+                        updateMatchColorMap(pairs)
+                        challengeState.update {
+                            Resource.Loaded(
+                                LearningVM.Challenge.Match(
+                                    rows = pairs.mapIndexed { index, matchPair ->
+                                        LearningVM.Challenge.MatchRow(
+                                            index,
+                                            resolveColorForGroup(matchPair.termSelection.group),
+                                            resolveColorForGroup(matchPair.exampleSelection.group),
+                                            matchPair,
+                                        )
+                                    },
+                                )
                             )
-                        )
+                        }
                     }
+                    analytics.send(AnalyticEvent.createActionEvent("Learning.session.match.completed"))
                 }
 
                 // test session
-                testCards?.collectIndexed { index, testCard ->
-                    challengeState.update {
-                        Resource.Loaded(
-                            LearningVM.Challenge.Test(
-                                term = testCard.card.term,
-                                index = index,
-                                count = cardCount,
-                                testOptions = testCard.options,
-                                termViewItems = buildCardItem(testCard.card),
+                if (testCards != null) {
+                    analytics.send(AnalyticEvent.createActionEvent("Learning.session.test.started"))
+                    testCards.collectIndexed { index, testCard ->
+                        challengeState.update {
+                            Resource.Loaded(
+                                LearningVM.Challenge.Test(
+                                    term = testCard.card.term,
+                                    index = index,
+                                    count = cardCount,
+                                    testOptions = testCard.options,
+                                    termViewItems = buildCardItem(testCard.card),
+                                )
                             )
-                        )
+                        }
                     }
+                    analytics.send(AnalyticEvent.createActionEvent("Learning.session.test.completed"))
                 }
 
                 // type session
+                analytics.send(AnalyticEvent.createActionEvent("Learning.session.typing.started"))
                 sessionCards.collectIndexed { index, card ->
                     challengeState.update {
                         Resource.Loaded(
@@ -216,6 +230,8 @@ open class LearningVMImpl(
                         )
                     }
                 }
+                analytics.send(AnalyticEvent.createActionEvent("Learning.session.typing.completed"))
+                analytics.send(AnalyticEvent.createActionEvent("Learning.completeSession"))
             }
 
             if (sessionResults != null) {
@@ -352,6 +368,11 @@ open class LearningVMImpl(
         val teacher = teacher ?: return
 
         val isRight = teacher.onCheckInput(answer)
+        if (isRight) {
+            analytics.send(AnalyticEvent.createActionEvent("Learning.session.typing.check.isRight"))
+        } else {
+            analytics.send(AnalyticEvent.createActionEvent("Learning.session.typing.check.isWrong"))
+        }
         titleErrorFlow.value = if (isRight) {
             null
         } else {
@@ -372,12 +393,14 @@ open class LearningVMImpl(
     }
 
     override fun onHintAskedPressed() {
+        analytics.send(AnalyticEvent.createActionEvent("Learning.hintAskedPressed"))
         viewModelScope.launch {
             teacher?.onHintAsked()
         }
     }
 
     override fun onGiveUpPressed() {
+        analytics.send(AnalyticEvent.createActionEvent("Learning.giveUpPressed"))
         viewModelScope.launch {
             teacher?.onGiveUp()
         }
@@ -392,6 +415,7 @@ open class LearningVMImpl(
     }
 
     private fun onLearningCompleted() {
+        analytics.send(AnalyticEvent.createActionEvent("Learning.learningCompleted"))
         router?.onScreenFinished(this, SimpleRouter.Result(false))
     }
 

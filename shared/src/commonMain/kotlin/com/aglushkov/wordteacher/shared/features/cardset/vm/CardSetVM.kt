@@ -287,7 +287,7 @@ open class CardSetVMImpl(
     }
 
     override fun onInfoPressed() {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.infoPressed"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSet.infoPressed"))
         val safeState = state.value
         when (safeState) {
             is CardSetVM.State.LocalCardSet -> CardSetInfoVM.State.LocalCardSet(
@@ -497,7 +497,7 @@ open class CardSetVMImpl(
     private fun logAdd(itemType: ItemType) {
         analytics.send(
             AnalyticEvent.createActionEvent(
-                "CardSetVM.addItemPressed",
+                "CardSet.addItemPressed",
                 mapOf("itemType" to itemType.value)
             )
         )
@@ -506,7 +506,7 @@ open class CardSetVMImpl(
     private fun logRemove(itemType: ItemType) {
         analytics.send(
             AnalyticEvent.createActionEvent(
-                "CardSetVM.removeItemPressed",
+                "CardSet.removeItemPressed",
                 mapOf("itemType" to itemType.value)
             )
         )
@@ -515,21 +515,21 @@ open class CardSetVMImpl(
     private fun logEdit(itemType: ItemType) {
         analytics.send(
             AnalyticEvent.createActionEvent(
-                "CardSetVM.editItem",
+                "CardSet.editItem",
                 mapOf("itemType" to itemType.value)
             )
         )
     }
 
     override fun onCardCreatePressed() {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.cardCreatePressed"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSet.cardCreatePressed"))
         viewModelScope.launch {
             cardSetRepository.createCard()
         }
     }
 
     override fun onCardDeleted(cardId: Long) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.cardDeleted"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSet.cardDeleted"))
         findCard(cardId)?.let { card ->
             viewModelScope.launch {
                 databaseCardWorker.deleteCard(card, timeSource.timeInMilliseconds())
@@ -538,7 +538,7 @@ open class CardSetVMImpl(
     }
 
     override fun onPartOfSpeechChanged(newPartOfSpeech: WordTeacherWord.PartOfSpeech, cardId: Long) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.partOfSpeechChanged"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSet.partOfSpeechChanged"))
         editCard(cardId) {
             it.copy(
                 partOfSpeech = newPartOfSpeech,
@@ -580,7 +580,7 @@ open class CardSetVMImpl(
         inMemoryCardSet.value?.findCard(id) ?: cardSet.value.data()?.findCard(id)
 
     override fun onStartLearningClicked() {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.startLearningClicked"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSet.startLearningClicked"))
         viewModelScope.launch {
             try {
                 cardSet.value.data()?.let { set ->
@@ -596,7 +596,7 @@ open class CardSetVMImpl(
     }
 
     override fun onAddClicked() {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetVM.addClicked"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSet.addClicked"))
         viewModelScope.launch {
             cardSet.value.data()?.let {
                 launch(Dispatchers.Default) {

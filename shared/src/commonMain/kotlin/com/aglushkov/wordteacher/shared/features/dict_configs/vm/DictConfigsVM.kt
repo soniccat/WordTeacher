@@ -4,6 +4,8 @@ import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Compa
 import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.LookupFlags
 import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.LookupLang
 import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.LookupLangDefault
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.FileOpenController
@@ -74,6 +76,7 @@ open class DictConfigsVMImpl(
     private val dslDictOpenController: FileOpenController,
     private val dictRepository: DictRepository,
     private val idGenerator: IdGenerator,
+    private val analytics: Analytics,
 ): ViewModel(), DictConfigsVM {
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -86,6 +89,7 @@ open class DictConfigsVMImpl(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     override fun onConfigDeleteClicked(item: ConfigYandexViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("DictConfigs.configDeleteClicked"))
         yandexConfig(item)?.let {
             configRepository.removeConfig(it.id)
         }
@@ -142,6 +146,7 @@ open class DictConfigsVMImpl(
     }
 
     override fun onYandexConfigChanged(item: ConfigYandexViewItem, key: String?, lang: String?, settings: YandexSettings?) {
+        analytics.send(AnalyticEvent.createActionEvent("DictConfigs.yandexConfigChanged"))
         yandexConfig(item)?.let { config ->
             config.copy(
                 id = config.id,
@@ -168,6 +173,9 @@ open class DictConfigsVMImpl(
     }
 
     override fun onConfigAddClicked(type: ConfigCreateViewItem.Type) {
+        analytics.send(AnalyticEvent.createActionEvent("DictConfigs.configAddClicked",
+            mapOf("type" to type.name))
+        )
         when (type) {
             ConfigCreateViewItem.Type.Online -> onYandexConfigAddClicked()
             ConfigCreateViewItem.Type.Offline -> onDslDictAddClicked()
@@ -175,6 +183,7 @@ open class DictConfigsVMImpl(
     }
 
     private fun onYandexConfigAddClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("DictConfigs.yandexConfigAddClicked"))
         val yandexConfig = Config(
             id = configRepository.value.data()?.maxOfOrNull { it.id + 1 } ?: 1,
             type = Config.Type.Yandex,
@@ -189,12 +198,14 @@ open class DictConfigsVMImpl(
     }
 
     private fun onDslDictAddClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("DictConfigs.dslDictAddClicked"))
         mainScope.launch(Dispatchers.Default) {
             dslDictOpenController.chooseFile()
         }
     }
 
     override fun onDictDeleted(item: ConfigDictViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("DictConfigs.dictDeleted"))
         dictRepository.delete(item.path)
     }
 

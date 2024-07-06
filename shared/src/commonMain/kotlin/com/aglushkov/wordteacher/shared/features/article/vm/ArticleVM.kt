@@ -348,7 +348,7 @@ open class ArticleVMImpl(
     }
 
     override fun onTextClicked(sentence: NLPSentence, offset: Int) {
-        analytics.send(AnalyticEvent.createActionEvent("ArticleVM.textClicked"))
+        analytics.send(AnalyticEvent.createActionEvent("Article.textClicked"))
 
         val slice = sentence.sliceFromTextIndex(offset, true)
         if (slice != null && slice.tokenSpan.length > 1 && annotations.value.isNotEmpty()) {
@@ -371,7 +371,7 @@ open class ArticleVMImpl(
     }
 
     override fun onTextLongPressed(sentence: NLPSentence, offset: Int) {
-        analytics.send(AnalyticEvent.createActionEvent("ArticleVM.textLongPressed"))
+        analytics.send(AnalyticEvent.createActionEvent("Article.textLongPressed"))
 
         // get the direct word below
         val slice = sentence.sliceFromTextIndex(offset, true)
@@ -410,7 +410,7 @@ open class ArticleVMImpl(
     }
 
     override fun onAnnotationChooserClicked(index: Int?) {
-        analytics.send(AnalyticEvent.createActionEvent("ArticleVM.annotationChooserClicked"))
+        analytics.send(AnalyticEvent.createActionEvent("Article.annotationChooserClicked"))
 
         val chooserState = state.value.annotationChooserState ?: return
         val annotation = chooserState.annotations.getOrNull(index ?: -1)
@@ -422,14 +422,14 @@ open class ArticleVMImpl(
     }
 
     override fun onCardSetWordSelectionChanged() {
-        analytics.send(AnalyticEvent.createActionEvent("ArticleVM.cardSetWordSelectionChanged"))
+        analytics.send(AnalyticEvent.createActionEvent("Article.cardSetWordSelectionChanged"))
         stateController.updateSelectionState {
             it.copy(cardSetWords = !it.cardSetWords)
         }
     }
 
     override fun onPartOfSpeechSelectionChanged(partOfSpeech: WordTeacherWord.PartOfSpeech) {
-        analytics.send(AnalyticEvent.createActionEvent("ArticleVM.partOfSpeechSelectionChanged", mapOf("partOfSpeech" to partOfSpeech.name)))
+        analytics.send(AnalyticEvent.createActionEvent("Article.partOfSpeechSelectionChanged", mapOf("partOfSpeech" to partOfSpeech.name)))
         stateController.updateSelectionState {
             val needRemove = it.partsOfSpeech.contains(partOfSpeech)
             it.copy(
@@ -443,7 +443,7 @@ open class ArticleVMImpl(
     }
 
     override fun onPhraseSelectionChanged(phraseType: ChunkType) {
-        analytics.send(AnalyticEvent.createActionEvent("ArticleVM.phraseSelectionChanged", mapOf("phraseType" to phraseType.name)))
+        analytics.send(AnalyticEvent.createActionEvent("Article.phraseSelectionChanged", mapOf("phraseType" to phraseType.name)))
         stateController.updateSelectionState {
             val needRemove = it.phrases.contains(phraseType)
             it.copy(
@@ -457,7 +457,7 @@ open class ArticleVMImpl(
     }
 
     override fun onDictSelectionChanged(dictPath: String) {
-        analytics.send(AnalyticEvent.createActionEvent("ArticleVM.dictSelectionChanged"))
+        analytics.send(AnalyticEvent.createActionEvent("Article.dictSelectionChanged"))
         stateController.updateSelectionState {
             val needRemove = it.dicts.contains(dictPath)
             it.copy(
@@ -471,7 +471,7 @@ open class ArticleVMImpl(
     }
 
     override fun onFilterDictSingleWordEntriesChanged() {
-        analytics.send(AnalyticEvent.createActionEvent("ArticleVM.filterDictSingleWordEntriesChanged"))
+        analytics.send(AnalyticEvent.createActionEvent("Article.filterDictSingleWordEntriesChanged"))
         stateController.updateSelectionState {
             it.copy(filterDictSingleWordEntries = !it.filterDictSingleWordEntries)
         }

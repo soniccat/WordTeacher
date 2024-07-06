@@ -36,7 +36,7 @@ interface CardSetsVM: Clearable {
     val searchCardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
     val availableFeatures: Features
 
-    fun onCardSetAdded(text: String)
+    fun onCardSetAdded(name: String)
     fun onNewCardSetTextChange(text: String)
     fun onStartLearningClicked()
     fun onCardSetClicked(item: CardSetViewItem)
@@ -144,12 +144,13 @@ open class CardSetsVMImpl(
     }
 
     override fun onNewCardSetTextChange(text: String) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.newCardSetTextChange"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.newCardSetTextChange"))
         uiStateFlow.update { it.copy(newCardSetText = text) }
     }
 
     override fun onCardSetAdded(name: String) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.cardSetAdded"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.cardSetAdded",
+            mapOf("name" to name)))
         uiStateFlow.update { it.copy(newCardSetText = null) }
 
         viewModelScope.launch {
@@ -166,7 +167,8 @@ open class CardSetsVMImpl(
     }
 
     override fun onCardSetRemoved(item: CardSetViewItem) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.cardSetRemoved"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.cardSetRemoved",
+            mapOf("name" to item.name)))
         viewModelScope.launch {
             cardSetsRepository.removeCardSet(item.cardSetId)
         }
@@ -255,7 +257,8 @@ open class CardSetsVMImpl(
     }
 
     override fun onSearch(query: String) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.search"))
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.search",
+            mapOf("query" to query)))
         startSearch(query)
     }
 
@@ -274,12 +277,14 @@ open class CardSetsVMImpl(
     }
 
     override fun onSearchCardSetClicked(item: RemoteCardSetViewItem) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.searchCardSetClicked"))
-        router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId, mapOf("remoteId" to item.remoteCardSetId)))
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.searchCardSetClicked",
+            mapOf("remoteId" to item.remoteCardSetId, "name" to item.name)))
+        router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId))
     }
 
     override fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetsVM.searchCardSetAddClicked", mapOf("remoteId" to item.remoteCardSetId)))
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.searchCardSetAddClicked",
+            mapOf("remoteId" to item.remoteCardSetId, "name" to item.name)))
         loadCardSetAndAdd(item.remoteCardSetId)
     }
 

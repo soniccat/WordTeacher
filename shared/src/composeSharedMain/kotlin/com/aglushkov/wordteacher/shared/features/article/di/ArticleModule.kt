@@ -42,7 +42,8 @@ class ArticleModule {
         cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
-        nlpCore: NLPCore
+        nlpCore: NLPCore,
+        analytics: Analytics,
     ): DefinitionsVM = DefinitionsVMImpl(
         DefinitionsVM.State(),
         connectivityManager,
@@ -50,7 +51,8 @@ class ArticleModule {
         dictRepository,
         cardSetsRepository,
         wordFrequencyGradationProvider,
-        idGenerator
+        idGenerator,
+        analytics,
     )
 
     @Provides

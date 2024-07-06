@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
@@ -87,6 +89,7 @@ open class DefinitionsVMImpl(
     private val cardSetsRepository: CardSetsRepository,
     private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     private val idGenerator: IdGenerator,
+    private val analytics: Analytics,
 ): ViewModel(), DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
@@ -165,10 +168,12 @@ open class DefinitionsVMImpl(
     }
 
     override fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>) {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.partOfSpeechFilterUpdated"))
         selectedPartsOfSpeechStateFlow.value = filter
     }
 
     override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.partOfSpeechFilterClicked"))
         viewModelScope.launch {
             eventChannel.trySend(
                 ShowPartsOfSpeechFilterDialogEvent(
@@ -184,6 +189,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.displayModeChanged"))
         if (displayModeStateFlow.value == mode) return
         displayModeStateFlow.value = mode
     }
@@ -461,6 +467,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onOpenCardSets(item: OpenCardSetViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.openCardSets"))
         router?.openCardSets()
     }
 
@@ -468,6 +475,7 @@ open class DefinitionsVMImpl(
         wordDefinitionViewItem: WordDefinitionViewItem,
         cardSetViewItem: CardSetViewItem
     ) {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.addDefinitionInSet"))
         val viewData = wordDefinitionViewItem.data as WordDefinitionViewData
         val contextExamples = definitionsContext?.wordContexts?.get(viewData.partOfSpeech)?.examples ?:
         definitionsContext?.wordContexts?.values?.map { it.examples }?.flatten() ?: emptyList()

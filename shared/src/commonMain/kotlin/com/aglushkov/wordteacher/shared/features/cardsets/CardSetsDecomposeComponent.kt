@@ -32,7 +32,8 @@ class CardSetsDecomposeComponent (
     cardSetSearchRepository,
     timeSource,
     idGenerator,
-    features
+    features,
+    analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_CardSets"
 

@@ -47,7 +47,8 @@ class SettingsDecomposeComponent (
     isDebug,
     fileSharer,
     wordFrequencyGradationProvider,
-    wordFrequencyFileOpenController
+    wordFrequencyFileOpenController,
+    analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Settings"
 

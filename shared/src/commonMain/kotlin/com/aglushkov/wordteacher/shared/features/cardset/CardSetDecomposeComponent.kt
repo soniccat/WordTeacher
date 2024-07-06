@@ -33,7 +33,8 @@ class CardSetDecomposeComponent (
     wordFrequencyGradationProvider,
     databaseCardWorker,
     timeSource,
-    idGenerator
+    idGenerator,
+    analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_CardSet"
 
