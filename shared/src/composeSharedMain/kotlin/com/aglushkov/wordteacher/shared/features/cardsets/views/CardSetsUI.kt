@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.add_article.views.CustomSnackbar
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
@@ -49,6 +50,7 @@ fun CardSetsUI(
         }
     }
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { uiState.value.newCardSetText }) }
+    val focusManager = LocalFocusManager.current
 
     BackHandler(enabled = needShowSearchResult) {
         coroutineScope.launch {
@@ -85,7 +87,12 @@ fun CardSetsUI(
                         }
                     }
                 ) {
-                    vm.onSearch(searchText)
+                    if (searchText.isEmpty()) {
+                        //vm.onSearchClosed()
+                        focusManager.clearFocus()
+                    } else {
+                        vm.onSearch(searchText)
+                    }
                 }
                 if (vm.availableFeatures.canImportCardSetFromJson) {
                     AddIcon {

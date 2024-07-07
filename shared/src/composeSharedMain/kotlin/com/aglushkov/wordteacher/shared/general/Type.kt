@@ -44,6 +44,7 @@ data class AppTypography(
 
     var learningSessionTerm: TextStyle = wordDefinitionTitle,
     var learningSessionProgress: TextStyle = wordDefinitionTitle,
+    var learningHint: TextStyle = materialTypography.body2,
 
     var dictConfigTitle: TextStyle = materialTypography.h5,
     var dictParamText: TextStyle = materialTypography.body2,
@@ -59,6 +60,7 @@ data class AppTypography(
         articleDate = wordDefinitionProvidedBy
         noteDate = wordDefinitionProvidedBy
         notePlaceholder = noteText.copy(color = colors.secondary)
+        learningHint = materialTypography.body2.copy(color = colorResource(MR.colors.hintColor))
         return this
     }
 }

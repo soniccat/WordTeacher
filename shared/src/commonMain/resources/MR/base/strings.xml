@@ -55,7 +55,7 @@
     <string name="add_article_error_empty_title">Title is required</string>
     <string name="add_article_create_set_option">Create a new set</string>
 
-    <string name="cardset_info_title">CardSet Info</string>
+    <string name="cardset_info_title">Info</string>
     <string name="cardset_info_error_empty_name">Name is required</string>
     <string name="cardset_info_field_name_hint">Title</string>
     <string name="cardset_info_field_description_hint">Description</string>
@@ -73,6 +73,8 @@
     <string name="learning_term_title_hint">Term</string>
     <string name="learning_show_hint">Give me a clue</string>
     <string name="learning_give_up">Give up</string>
+    <string name="learning_instruction_challenge_match">Find what word or phrase on the left side fills the gap in the sentence on the right side. Tap on one of them then on the opposite</string>
+    <string name="learning_instruction_challenge_test">Choose the correct word or phrase matching the definition below</string>
 
     <string name="learning_session_result_title">Card Sets</string>
     <string name="learning_session_result_error">Something went wrong :(</string>

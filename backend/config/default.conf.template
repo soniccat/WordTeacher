@@ -65,6 +65,7 @@ server {
     # set DNS resolver as Docker internal DNS
     resolver 127.0.0.11 valid=10s;
     resolver_timeout 5s;
+    client_body_buffer_size 1M;
 
     access_log /var/log/nginx/access_log json_analytics;
 

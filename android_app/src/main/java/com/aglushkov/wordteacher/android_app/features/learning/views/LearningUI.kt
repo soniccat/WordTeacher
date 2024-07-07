@@ -41,10 +41,12 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.MatchSession
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.desc.StringDesc
 import java.util.*
 
@@ -235,8 +237,30 @@ private fun matchChallengeUI(
             bottom = 300.dp
         )
     ) {
-        items(data.rows, key = { it.id }) { item ->
-            matchRowUI(item, { vm.onMatchTermPressed(item) }, { vm.onMatchExamplePressed(item)})
+        items(
+            listOf(data.instruction) + data.rows,
+            key = {
+                if (it is LearningVM.Challenge.MatchRow) {
+                    it.id
+                } else it
+            }) { item ->
+            if (item is LearningVM.Challenge.MatchRow) {
+                matchRowUI(
+                    item,
+                    { vm.onMatchTermPressed(item) },
+                    { vm.onMatchExamplePressed(item)}
+                )
+            } else if (item is StringDesc) {
+                Text(
+                    text = item.localized(),
+                    modifier = Modifier.padding(
+                        start = LocalDimens.current.contentPadding,
+                        top = LocalDimens.current.contentPadding,
+                        end = LocalDimens.current.contentPadding
+                    ),
+                    style = LocalAppTypography.current.learningHint
+                )
+            }
         }
     }
 }
@@ -248,10 +272,12 @@ private fun matchRowUI(
     onExampleClicked: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().height(intrinsicSize = IntrinsicSize.Max)
     ) {
         Text(
-            modifier = Modifier.weight(1.0f)
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1.0f)
                 .run {
                     if (!matchRow.matchPair.termSelection.isChecked) {
                         clickable(onClick = onTermClicked)
@@ -282,7 +308,9 @@ private fun matchRowUI(
             text = matchRow.matchPair.term,
         )
         Text(
-            modifier = Modifier.weight(2.0f)
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(2.0f)
                 .run {
                     if (!matchRow.matchPair.exampleSelection.isChecked) {
                         clickable(onClick = onExampleClicked)
@@ -326,6 +354,20 @@ private fun testChallengeUI(
             .padding(dimensionResource(id = R.dimen.learning_testOption_margin))
     ) {
         Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = data.instruction.localized(),
+                    modifier = Modifier.padding(
+                        start = LocalDimens.current.contentPadding,
+                        top = LocalDimens.current.contentPadding,
+                        end = LocalDimens.current.contentPadding
+                    ),
+                    style = LocalAppTypography.current.learningHint
+                )
+            }
+
             val itemPerRow = 2
             var rowCount = data.testOptions.size / itemPerRow
             if (data.testOptions.size % itemPerRow != 0) {

@@ -57,6 +57,7 @@ interface LearningVM: Clearable {
 
     sealed interface Challenge {
         data class Match(
+            val instruction: StringDesc,
             val rows: List<MatchRow>
         ): Challenge
 
@@ -68,6 +69,7 @@ interface LearningVM: Clearable {
         )
 
         data class Test(
+            val instruction: StringDesc,
             val term: String,
             val index: Int,
             val count: Int,
@@ -182,6 +184,7 @@ open class LearningVMImpl(
                         challengeState.update {
                             Resource.Loaded(
                                 LearningVM.Challenge.Match(
+                                    instruction = StringDesc.Resource(MR.strings.learning_instruction_challenge_match),
                                     rows = pairs.mapIndexed { index, matchPair ->
                                         LearningVM.Challenge.MatchRow(
                                             index,
@@ -204,6 +207,7 @@ open class LearningVMImpl(
                         challengeState.update {
                             Resource.Loaded(
                                 LearningVM.Challenge.Test(
+                                    instruction = StringDesc.Resource(MR.strings.learning_instruction_challenge_test),
                                     term = testCard.card.term,
                                     index = index,
                                     count = cardCount,

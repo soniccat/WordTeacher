@@ -43,7 +43,7 @@ func (w *CardSetPullWorker) Start(ctx context.Context) error {
 		}
 	}
 
-	ticker := time.NewTicker(24 * time.Hour)
+	ticker := time.NewTicker(1 * time.Hour)
 	go func() {
 		for ; true; <-ticker.C { // run immediately and every tick
 			ch, outErr := w.cardsetsClient.GetCardSets(ctx, *lastModificationDate)
