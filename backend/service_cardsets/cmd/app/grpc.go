@@ -20,7 +20,7 @@ func NewCardSetServer(app *application) *CardSetsServer {
 	s := &CardSetsServer{
 		logger:             app.logger,
 		cardsetByIdHandler: *grpc_cardset_by_id.NewHandler(app.sessionValidator, app.cardSetRepository),
-		cardsetsHandler:    *grpc_cardsets.NewHandler(app.sessionValidator, app.cardSetRepository),
+		cardsetsHandler:    *grpc_cardsets.NewHandler(app.logger, app.sessionValidator, app.cardSetRepository),
 	}
 	return s
 }

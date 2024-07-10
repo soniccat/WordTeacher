@@ -43,7 +43,7 @@ func (w *CardSetPullWorker) Start(ctx context.Context) error {
 		}
 	}
 
-	ticker := time.NewTicker(1 * time.Hour)
+	ticker := time.NewTicker(5 * time.Minute)
 	go func() {
 		for ; true; <-ticker.C { // run immediately and every tick
 			ch, outErr := w.cardsetsClient.GetCardSets(ctx, *lastModificationDate)
@@ -61,7 +61,10 @@ func (w *CardSetPullWorker) Start(ctx context.Context) error {
 						w.logger.ErrorWithError(ctx, outErr, fmt.Sprintf("CardSetPullWorker GRPCCardSetToDb cardset %s %v", r.CardSet.Id, outErr))
 						continue
 					}
-					w.repository.UpsertCardSet(ctx, dbCardSet)
+					outErr = w.repository.UpsertCardSet(ctx, dbCardSet)
+					if outErr != nil {
+						w.logger.ErrorWithError(ctx, outErr, fmt.Sprintf("CardSetPullWorker UpsertCardSet cardset %s %v", dbCardSet.Id, outErr))
+					}
 				}
 			}
 

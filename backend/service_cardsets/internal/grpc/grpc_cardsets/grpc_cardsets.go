@@ -16,26 +16,30 @@ type storage interface {
 }
 
 type Handler struct {
+	logger           *logger.Logger
 	sessionValidator session_validator.SessionValidator
 	storage          storage
 }
 
 func NewHandler(
+	logger *logger.Logger,
 	sessionValidator session_validator.SessionValidator,
 	storage storage,
 ) *Handler {
 	return &Handler{
+		logger:           logger,
 		sessionValidator: sessionValidator,
 		storage:          storage,
 	}
 }
 
 func (s *Handler) GetCardSets(in *grpcapi.GetCardSetsIn, server grpcapi.CardSets_GetCardSetsServer) error {
+	s.logger.Info(server.Context(), "GetCardSets starts")
 	var sinceDate *time.Time
 	if in.SinceDate != nil {
 		d, err := tools.ParseApiDate(server.Context(), *in.SinceDate)
 		if err != nil {
-			return err
+			return logger.WrapError(server.Context(), err)
 		}
 
 		sinceDate = &d
@@ -43,15 +47,17 @@ func (s *Handler) GetCardSets(in *grpcapi.GetCardSetsIn, server grpcapi.CardSets
 
 	cardSets, err := s.storage.ModifiedCardSetsSince(server.Context(), sinceDate)
 	if err != nil {
-		return err
+		return logger.WrapError(server.Context(), err)
 	}
 
+	s.logger.Info(server.Context(), "GetCardSets got %d cardSets", len(cardSets))
 	for i := range cardSets {
 		err = server.Send(cardSets[i].ToGrpc())
 		if err != nil {
 			return logger.WrapError(server.Context(), err)
 		}
 	}
+	s.logger.Info(server.Context(), "GetCardSets finishes")
 
 	return nil
 }
