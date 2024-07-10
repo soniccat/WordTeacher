@@ -103,6 +103,11 @@ server {
 
     server_name aglushkov.ru;
 
+    # set DNS resolver as Docker internal DNS
+    resolver 127.0.0.11 valid=10s;
+    resolver_timeout 5s;
+    client_body_buffer_size 1M;
+
     location /cardsetsgrpc.CardSets {
         set $cardsetsPRPC grpc://cardsets:${CARDSETS_GRPC_PORT};
         grpc_pass $cardsetsPRPC;
