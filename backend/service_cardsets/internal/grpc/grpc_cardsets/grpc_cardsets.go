@@ -50,7 +50,7 @@ func (s *Handler) GetCardSets(in *grpcapi.GetCardSetsIn, server grpcapi.CardSets
 		return logger.WrapError(server.Context(), err)
 	}
 
-	s.logger.Info(server.Context(), "GetCardSets got %d cardSets", len(cardSets))
+	s.logger.Info(server.Context(), "GetCardSets got cardSets", "count", len(cardSets))
 	for i := range cardSets {
 		err = server.Send(cardSets[i].ToGrpc())
 		if err != nil {
