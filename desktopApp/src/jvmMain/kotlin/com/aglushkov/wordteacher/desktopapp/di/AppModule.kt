@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.di.BasePath
 import com.aglushkov.wordteacher.shared.di.DictPath
 import com.aglushkov.wordteacher.shared.di.DslFileOpener
+import com.aglushkov.wordteacher.shared.di.Email
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.di.Platform
 import com.aglushkov.wordteacher.shared.di.SharedAppModule
@@ -76,6 +77,11 @@ class AppModule {
     @Provides
     fun apiBaseUrl(): String = MR.strings.api_base_url.localized()
 
+    @Email
+    @AppComp
+    @Provides
+    fun email(): String = MR.strings.support_email.localized()
+
     @AppComp
     @Provides
     fun settings(): FlowSettings {
@@ -87,9 +93,11 @@ class AppModule {
     @Provides
     fun appInfo(
         @Platform platform: String,
+        @Email email: String,
     ): AppInfo = AppInfo(
         "1.0",
-        platform
+        platform,
+        email
     ) // TODO: figure out how to get version
 
     // TODO: replace with bind

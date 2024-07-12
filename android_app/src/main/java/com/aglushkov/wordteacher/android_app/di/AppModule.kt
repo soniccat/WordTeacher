@@ -1,7 +1,11 @@
 package com.aglushkov.wordteacher.android_app.di
 
-import android.content.Context
 import android.app.Application
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.aglushkov.wordteacher.android_app.BuildConfig
@@ -11,6 +15,7 @@ import com.aglushkov.wordteacher.android_app.features.add_article.toArticleConte
 import com.aglushkov.wordteacher.android_app.features.settings.FileSharerRepository
 import com.aglushkov.wordteacher.android_app.features.settings.toFileSharer
 import com.aglushkov.wordteacher.android_app.general.crypto.SecureCodecBuilder
+import com.aglushkov.wordteacher.android_app.helper.EmailOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
@@ -41,13 +46,14 @@ import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
-import okio.FileSystem
 import dagger.Module
 import dagger.Provides
+import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 import okio.source
+
 
 @Module(includes = [SharedAppModule::class])
 class AppModule {
@@ -76,6 +82,13 @@ class AppModule {
         context: Context
     ): String = context.getString(MR.strings.api_base_url.resourceId)
 
+    @Email
+    @AppComp
+    @Provides
+    fun email(
+        context: Context
+    ): String = context.getString(MR.strings.support_email.resourceId)
+
     @AppComp
     @Provides
     fun settings(
@@ -92,7 +105,8 @@ class AppModule {
     @Provides
     fun appInfo(
         @Platform platform: String,
-    ): AppInfo = AppInfo(BuildConfig.VERSION_NAME, platform)
+        @Email email: String,
+    ): AppInfo = AppInfo(BuildConfig.VERSION_NAME, platform, email)
 
     // TODO: replace with bind
     @AppComp
@@ -245,6 +259,12 @@ class AppModule {
                 spaceAuthRepository
             )
         )
+    }
+
+    @AppComp
+    @Provides
+    fun emailOpener(): EmailOpener {
+        return EmailOpenerImpl()
     }
 
 

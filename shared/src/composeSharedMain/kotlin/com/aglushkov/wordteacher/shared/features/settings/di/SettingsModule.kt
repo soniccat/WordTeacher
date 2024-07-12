@@ -6,6 +6,8 @@ import com.aglushkov.wordteacher.shared.di.WordFrequencyFileOpener
 import com.aglushkov.wordteacher.shared.features.settings.SettingsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
+import com.aglushkov.wordteacher.shared.general.AppInfo
+import com.aglushkov.wordteacher.shared.general.EmailOpener
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -31,6 +33,8 @@ class SettingsModule {
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         @WordFrequencyFileOpener wordFrequencyFileOpenController: FileOpenController,
         analytics: Analytics,
+        appInfo: AppInfo,
+        emailOpener: EmailOpener,
     ) = SettingsDecomposeComponent(
         componentContext,
         state,
@@ -43,5 +47,7 @@ class SettingsModule {
         wordFrequencyGradationProvider,
         wordFrequencyFileOpenController,
         analytics,
+        appInfo,
+        emailOpener,
     )
 }

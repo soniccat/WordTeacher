@@ -2,6 +2,7 @@
 <resources>
     <string name="api_base_url">https://aglushkov.ru:9090</string>
     <string name="app_name">WordTeacher</string>
+    <string name="support_email">soniccat2@gmail.com</string>
     <string name="tab_definitions">Words</string>
     <string name="tab_add_article">New Article</string>
     <string name="tab_articles">Articles</string>

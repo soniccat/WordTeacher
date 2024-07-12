@@ -75,7 +75,6 @@ interface AppComponent:
     fun cookieStorage(): CookiesStorage
     @SpaceHttpClient
     fun spaceHttpClient(): HttpClient
-    fun appInfo(): AppInfo
     fun deviceIdRepository(): DeviceIdRepository
     fun spaceAuthService(): SpaceAuthService
     override fun analytics(): Analytics

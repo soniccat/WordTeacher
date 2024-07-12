@@ -26,6 +26,9 @@ annotation class Platform
 annotation class ApiBaseUrl
 
 @Qualifier
+annotation class Email
+
+@Qualifier
 annotation class WordFrequencyPreparer
 
 @Qualifier

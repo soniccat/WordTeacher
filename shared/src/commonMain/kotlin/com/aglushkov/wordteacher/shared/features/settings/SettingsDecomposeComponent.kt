@@ -8,6 +8,8 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImp
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVMImpl
+import com.aglushkov.wordteacher.shared.general.AppInfo
+import com.aglushkov.wordteacher.shared.general.EmailOpener
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -38,6 +40,8 @@ class SettingsDecomposeComponent (
     wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     wordFrequencyFileOpenController: FileOpenController,
     analytics: Analytics,
+    appInfo: AppInfo,
+    emailOpener: EmailOpener,
 ) : SettingsVMImpl(
     state,
     connectivityManager,
@@ -49,6 +53,8 @@ class SettingsDecomposeComponent (
     wordFrequencyGradationProvider,
     wordFrequencyFileOpenController,
     analytics,
+    appInfo,
+    emailOpener,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Settings"
 

@@ -3,11 +3,14 @@ package com.aglushkov.wordteacher.shared.features.settings.vm
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.Clearable
+import com.aglushkov.wordteacher.shared.general.EmailOpener
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.getAppInfo
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -33,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import okio.Path
+import dev.icerock.moko.resources.compose.localized
 
 interface SettingsVM: Clearable {
     var router: SettingsRouter?
@@ -47,6 +51,7 @@ interface SettingsVM: Clearable {
     fun onUploadWordFrequencyFileClicked()
     fun onLoggingIsEnabledChanged()
     fun onLogFileShareClicked(path: Path)
+    fun onEmailClicked()
 
     // Created to use in future
     @Parcelize
@@ -68,6 +73,8 @@ open class SettingsVMImpl (
     private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     private val wordFrequencyFileOpenController: FileOpenController,
     private val analytics: Analytics,
+    private val appInfo: AppInfo,
+    private val emailOpener: EmailOpener,
 ): ViewModel(), SettingsVM {
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -141,6 +148,10 @@ open class SettingsVMImpl (
                 emptyList()
             }
         )
+        resultItems += SettingsWordFrequencyAbout(
+            appTitle = appInfo.getAppInfo(),
+            email = appInfo.email
+        )
 
         generateIds(resultItems)
         return resultItems
@@ -192,5 +203,9 @@ open class SettingsVMImpl (
         mainScope.launch {
             fileSharer?.share(path)?.collect()
         }
+    }
+
+    override fun onEmailClicked() {
+        emailOpener.open(appInfo.email)
     }
 }

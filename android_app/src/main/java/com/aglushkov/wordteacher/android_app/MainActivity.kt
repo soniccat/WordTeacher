@@ -35,6 +35,7 @@ import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
 import com.aglushkov.wordteacher.shared.general.WindowInsets
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
+import com.aglushkov.wordteacher.android_app.helper.EmailOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
@@ -110,6 +111,7 @@ class MainActivity : AppCompatActivity(), Router {
         (appComponent().dslDictOpenController() as FileOpenControllerImpl).bind(this)
         appComponent().googleAuthRepository().bind(this)
         appComponent().vkAuthController().bind(this)
+        (appComponent().emailOpener() as EmailOpenerImpl).bind(this)
         setupComposeLayout()
         handleIntent()
     }

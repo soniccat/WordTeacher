@@ -6,6 +6,8 @@ import com.aglushkov.wordteacher.shared.di.WordFrequencyFileOpener
 import com.aglushkov.wordteacher.shared.features.settings.SettingsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
+import com.aglushkov.wordteacher.shared.general.AppInfo
+import com.aglushkov.wordteacher.shared.general.EmailOpener
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -41,4 +43,6 @@ interface SettingsDependencies {
     fun wordFrequencyGradationProvider(): WordFrequencyGradationProvider
     @WordFrequencyFileOpener fun wordFrequencyFileOpenController(): FileOpenController
     fun analytics(): Analytics
+    fun appInfo(): AppInfo
+    fun emailOpener(): EmailOpener
 }

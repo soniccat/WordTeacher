@@ -85,3 +85,12 @@ class SettingsWordFrequencyUploadFileItem(
         const val Type = 1008
     }
 }
+
+class SettingsWordFrequencyAbout(
+    val appTitle: String,
+    val email: String,
+): BaseViewItem<Unit>(Unit, Type) {
+    companion object {
+        const val Type = 1009
+    }
+}

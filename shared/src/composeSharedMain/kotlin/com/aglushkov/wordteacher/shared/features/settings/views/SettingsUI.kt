@@ -43,7 +43,7 @@ fun SettingsUI(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(
-                    bottom = 300.dp
+                    bottom = 100.dp
                 )
             ) {
                 items(itemsState.value, key = { it.id }) { item ->
@@ -205,6 +205,16 @@ private fun showSettingsItem(
             }
         } else {
             Unit
+        }
+    }
+    is SettingsWordFrequencyAbout -> {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .padding(LocalDimens.current.contentPadding)
+                .clickable { vm.onEmailClicked() }
+        ) {
+            Text(item.appTitle)
+            Text(item.email)
         }
     }
     else -> {
