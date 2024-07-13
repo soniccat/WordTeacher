@@ -1,7 +1,7 @@
-package com.aglushkov.wordteacher.apiproviders.yandex.service
+package com.aglushkov.wordteacher.shared.apiproviders.yandex.service
 
-import com.aglushkov.wordteacher.apiproviders.yandex.model.YandexWords
-import com.aglushkov.wordteacher.apiproviders.yandex.model.asWordTeacherWord
+import com.aglushkov.wordteacher.shared.apiproviders.yandex.model.YandexWords
+import com.aglushkov.wordteacher.shared.apiproviders.yandex.model.asWordTeacherWord
 import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.ktor.CustomParameter

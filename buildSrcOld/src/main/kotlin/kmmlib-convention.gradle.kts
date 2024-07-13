@@ -30,7 +30,7 @@ android {
 //        create("testReleaseApi")
 //    }
 
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+//    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
     buildTypes {
         getByName("release") {
@@ -42,7 +42,7 @@ android {
 
 kotlin {
     jvm("desktop")
-    android()
+    androidTarget()
 
 //     Block from https://github.com/cashapp/sqldelight/issues/2044#issuecomment-721299517.
 //    val onPhone = System.getenv("SDK_NAME")?.startsWith("iphoneos") ?: false

@@ -1,9 +1,14 @@
 import java.io.FileInputStream
 import java.util.Properties
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("android-app-convention")
-    id("android-base-convention")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
 }
 
 group = "com.aglushkov.wordteacher"
@@ -12,152 +17,239 @@ version = "1.0-SNAPSHOT"
 val appVersionName = property("versionName")!!.toString()
 val appVersionCode = property("versionCode")!!.toString().toInt()
 
-repositories {
-    google()
-    mavenCentral()
-    gradlePluginPortal()
-    // to use SNAPSHOT versions of compose (https://androidx.dev/snapshots/builds)
-//    maven(url = "https://androidx.dev/snapshots/builds/8003490/artifacts/repository")
-
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-andorid/")
-}
-
-// VK props
-var vkProps: Properties? = null
-val vkPropFile = file("${project.rootDir}/android_app/vk.properties")
-if (vkPropFile.exists()) {
-    vkProps = Properties().apply {
-        load(FileInputStream(vkPropFile))
+kotlin {
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
-}
 
-// App Metrica props
-var yandexProps: Properties? = null
-val yandexPropFile = file("${project.rootDir}/android_app/yandex.properties")
-if (yandexPropFile.exists()) {
-    yandexProps = Properties().apply {
-        load(FileInputStream(yandexPropFile))
+    jvm("desktop")
+
+    sourceSets {
+        val desktopMain by getting
+
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(libs.androidx.activity.compose)
+        }
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material)
+            implementation(compose.ui)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
+            implementation(projects.shared)
+        }
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+        }
     }
 }
 
 android {
+    namespace = "org.example.project"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    sourceSets["main"].res.srcDirs("src/androidMain/res")
+    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+
     defaultConfig {
-        applicationId = "com.aglushkov.wordteacher"
-        versionCode = appVersionCode
-        versionName = appVersionName
-
-        addManifestPlaceholders(
-            buildMap {
-                vkProps?.onEach {
-                    put(it.key.toString(), it.value)
-                }
-            }
-        )
+        applicationId = "org.example.project"
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        versionCode = 1
+        versionName = "1.0"
     }
-
-    namespace = "com.aglushkov.wordteacher.android_app"
-
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
     buildFeatures {
-        viewBinding = true
         compose = true
     }
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-        //freeCompilerArgs = freeCompilerArgs + "-Xinline-classes" + "-P" + "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=/Users/aoglushkov/androidProjects/WordTeacher/composedebug"
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
-        }
-    }
-
-    composeOptions {
-        //kotlinCompilerVersion = libs.versions.kotlinVersion.get()
-        // for compose-jb - comment - start
-        kotlinCompilerExtensionVersion = libs.versions.composeJetpackCompiler.get()
-        // for compose-jb - comment - end
-    }
-
-    buildTypes {
-        defaultConfig {
-            yandexProps?.onEach {
-                resValue("string", it.key.toString(), it.value.toString())
-            }
-        }
-
-        getByName("debug") {
-
-        }
-        getByName("release") {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
+    dependencies {
+        debugImplementation(compose.uiTooling)
     }
 }
 
-dependencies {
-    implementation(project(":shared"))
+//compose.desktop {
+//    application {
+//        mainClass = "MainKt"
+//
+//        nativeDistributions {
+//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+//            packageName = "org.example.project"
+//            packageVersion = "1.0.0"
+//        }
+//    }
+//}
 
-    implementation(libs.sqlDelightRuntime)
-    implementation(libs.androidFragments)
-    implementation(libs.androidMaterial)
-    implementation(libs.androidAppCompat)
-    implementation(libs.androidConstraintLayout)
-    implementation(libs.androidCoreKts)
-    implementation(libs.androidViewModelKtx)
-    implementation(libs.androidLifecycleKtx)
-    implementation(libs.decompose)
-    implementation(libs.decomposeJetbrains)
-    implementation(libs.essentyParcelable)
-    implementation(libs.androidComposeUITooling)
-    implementation(libs.androidComposeUIToolingPreview)
-    runtimeOnly("androidx.compose.ui:ui:1.5.2")
-
-    implementation("com.google.accompanist:accompanist-insets:0.17.0")
-
-    // for compose-jb - comment - start
-//    implementation(libs.androidComposeFoundation)
-//    implementation(libs.androidComposeMaterial)
-//    implementation(libs.androidComposeCompiler)
-    // for compose-jb - comment - end
-    // for compose-jb - uncomment - start
-    implementation(compose.material)
-    // for compose-jb - uncomment - end
-
-    implementation(libs.coroutinesCommon)
-    implementation(libs.coroutinesAndroid)
-    implementation(libs.ktorAndroidClient)
-//    implementation(libs.okio)
-    implementation(libs.settingsDataStore)
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-
-    implementation(libs.dagger)
-    kapt(libs.daggerCompiler)
-
-    implementation(libs.playServicesAuth)
-    implementation(libs.vkId)
-    implementation(libs.appmetrica)
-
-    kapt(libs.daggerCompiler)
-}
-
-kotlin {
-    jvmToolchain(17)
-}
+// old
+//plugins {
+//    id("android-app-convention")
+//    id("android-base-convention")
+//}
+//
+//repositories {
+//    google()
+//    mavenCentral()
+//    gradlePluginPortal()
+//    // to use SNAPSHOT versions of compose (https://androidx.dev/snapshots/builds)
+////    maven(url = "https://androidx.dev/snapshots/builds/8003490/artifacts/repository")
+//
+//    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+//    maven("https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-andorid/")
+//}
+//
+//// VK props
+//var vkProps: Properties? = null
+//val vkPropFile = file("${project.rootDir}/android_app/vk.properties")
+//if (vkPropFile.exists()) {
+//    vkProps = Properties().apply {
+//        load(FileInputStream(vkPropFile))
+//    }
+//}
+//
+//// App Metrica props
+//var yandexProps: Properties? = null
+//val yandexPropFile = file("${project.rootDir}/android_app/yandex.properties")
+//if (yandexPropFile.exists()) {
+//    yandexProps = Properties().apply {
+//        load(FileInputStream(yandexPropFile))
+//    }
+//}
+//
+//android {
+//    defaultConfig {
+//        applicationId = "com.aglushkov.wordteacher"
+//        versionCode = appVersionCode
+//        versionName = appVersionName
+//
+////        addManifestPlaceholders(
+////            buildMap {
+////                vkProps?.onEach {
+////                    put(it.key.toString(), it.value)
+////                }
+////            }
+////        )
+//    }
+//
+//    namespace = "com.aglushkov.wordteacher.android_app"
+//
+//    buildFeatures {
+//        viewBinding = true
+//        compose = true
+//    }
+//
+//    java {
+//        sourceCompatibility = JavaVersion.VERSION_17
+//        targetCompatibility = JavaVersion.VERSION_17
+//    }
+//
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_17
+//        targetCompatibility = JavaVersion.VERSION_17
+//    }
+//
+//    kotlinOptions {
+//        jvmTarget = "17"
+//        //freeCompilerArgs = freeCompilerArgs + "-Xinline-classes" + "-P" + "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=/Users/aoglushkov/androidProjects/WordTeacher/composedebug"
+//        compileOptions {
+//            sourceCompatibility = JavaVersion.VERSION_17
+//            targetCompatibility = JavaVersion.VERSION_17
+//        }
+//    }
+//
+//    composeOptions {
+//        //kotlinCompilerVersion = libs.versions.kotlinVersion.get()
+//        // for compose-jb - comment - start
+//        kotlinCompilerExtensionVersion = libs.versions.composeJetpackCompiler.get()
+//        // for compose-jb - comment - end
+//    }
+//
+//    buildTypes {
+//        defaultConfig {
+//            yandexProps?.onEach {
+//                resValue("string", it.key.toString(), it.value.toString())
+//            }
+//        }
+//
+//        getByName("debug") {
+//
+//        }
+//        getByName("release") {
+//            isMinifyEnabled = true
+//            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+//        }
+//    }
+//
+//    testOptions {
+//        unitTests {
+//            isIncludeAndroidResources = true
+//        }
+//    }
+//}
+//
+//dependencies {
+//    implementation(project(":shared"))
+//
+//    implementation(libs.sqlDelightRuntime)
+//    implementation(libs.androidFragments)
+//    implementation(libs.androidMaterial)
+//    implementation(libs.androidAppCompat)
+//    implementation(libs.androidConstraintLayout)
+//    implementation(libs.androidCoreKts)
+//    implementation(libs.androidViewModelKtx)
+//    implementation(libs.androidLifecycleKtx)
+//    implementation(libs.decompose)
+//    implementation(libs.decomposeJetbrains)
+//    implementation(libs.essentyParcelable)
+//    implementation(libs.androidComposeUITooling)
+//    implementation(libs.androidComposeUIToolingPreview)
+//    runtimeOnly("androidx.compose.ui:ui:1.5.2")
+//
+//    implementation("com.google.accompanist:accompanist-insets:0.17.0")
+//
+//    // for compose-jb - comment - start
+////    implementation(libs.androidComposeFoundation)
+////    implementation(libs.androidComposeMaterial)
+////    implementation(libs.androidComposeCompiler)
+//    // for compose-jb - comment - end
+//    // for compose-jb - uncomment - start
+//    implementation(compose.material)
+//    // for compose-jb - uncomment - end
+//
+//    implementation(libs.coroutinesCommon)
+//    implementation(libs.coroutinesAndroid)
+//    implementation(libs.ktorAndroidClient)
+////    implementation(libs.okio)
+//    implementation(libs.settingsDataStore)
+//    implementation("androidx.datastore:datastore-preferences:1.0.0")
+//
+//    implementation(libs.dagger)
+//    kapt(libs.daggerCompiler)
+//
+//    implementation(libs.playServicesAuth)
+//    implementation(libs.vkId)
+//    implementation(libs.appmetrica)
+//
+//    kapt(libs.daggerCompiler)
+//}
+//
+//kotlin {
+//    jvmToolchain(17)
+//}

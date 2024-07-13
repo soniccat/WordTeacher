@@ -1,16 +1,12 @@
-package com.aglushkov.wordteacher.apiproviders.yandex.model
+package com.aglushkov.wordteacher.shared.apiproviders.yandex.model
 
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.fromString
 import com.aglushkov.wordteacher.shared.repository.config.Config
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
-@Parcelize
 @Serializable
 data class YandexWord(
     @SerialName("tr") val definitions: List<YandexDefinition>,
@@ -22,7 +18,7 @@ data class YandexWord(
     @SerialName("pos") val pos: String? = null,
     @SerialName("gen") val gender: String? = null,
     @SerialName("asp") val asp: String? = null
-) : Parcelable
+)
 
 fun YandexWord.asWordTeacherWord(): WordTeacherWord? {
     val map: MutableMap<WordTeacherWord.PartOfSpeech, List<WordTeacherDefinition>> = mutableMapOf()
