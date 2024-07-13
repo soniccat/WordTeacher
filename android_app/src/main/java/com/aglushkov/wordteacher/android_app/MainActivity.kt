@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(), Router {
 
     private var windowInsets by mutableStateOf(WindowInsets())
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         this.intent = intent
         handleIntent()

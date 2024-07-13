@@ -11,11 +11,37 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+repositories {
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+    maven("https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-andorid/")
+}
+
 group = "com.aglushkov.wordteacher"
 version = "1.0-SNAPSHOT"
 
 val appVersionName = property("versionName")!!.toString()
 val appVersionCode = property("versionCode")!!.toString().toInt()
+
+
+// VK props
+var vkProps: Properties? = null
+val vkPropFile = file("${project.rootDir}/android_app/vk.properties")
+if (vkPropFile.exists()) {
+    vkProps = Properties().apply {
+        load(FileInputStream(vkPropFile))
+    }
+}
+
+// App Metrica props
+var yandexProps: Properties? = null
+val yandexPropFile = file("${project.rootDir}/android_app/yandex.properties")
+if (yandexPropFile.exists()) {
+    yandexProps = Properties().apply {
+        load(FileInputStream(yandexPropFile))
+    }
+}
 
 kotlin {
     androidTarget {
@@ -33,36 +59,42 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-        }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.androidx.appcompat)
             implementation(projects.shared)
+            implementation(libs.dagger)
+            implementation(libs.settingsDataStore)
+            implementation("androidx.datastore:datastore-preferences:1.0.0")
+            implementation(libs.vkId)
+//
         }
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-        }
+//        desktopMain.dependencies {
+//            implementation(compose.desktop.currentOs)
+//        }
     }
 }
 
 android {
-    namespace = "com.aglushkov.wordteacher.shared"
+    namespace = "com.aglushkov.wordteacher.android_app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/main/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/main/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+    sourceSets["main"].resources.srcDirs("src/main/resources")
 
     defaultConfig {
-        applicationId = "org.example.project"
+        applicationId = "com.aglushkov.wordteacher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        addManifestPlaceholders(
+            buildMap {
+                vkProps?.onEach {
+                    put(it.key.toString(), it.value)
+                }
+            }
+        )
     }
     packaging {
         resources {
