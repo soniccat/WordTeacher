@@ -24,8 +24,6 @@ import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import com.russhwolf.settings.coroutines.FlowSettings
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
@@ -157,14 +155,13 @@ interface ArticleVM: Clearable {
             update { copy(lastFirstVisibleItemMap = lastFirstVisibleItemMap + (id to index)) }
     }
 
-    @Parcelize
+    @Serializable
     data class State(
         val id: Long,
         val selectionState: SelectionState = SelectionState(),
         val lastFirstVisibleItem: Int = 0,
-    ) : Parcelable
+    )
 
-    @Parcelize
     @Serializable
     data class SelectionState(
         val partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
@@ -172,7 +169,7 @@ interface ArticleVM: Clearable {
         val cardSetWords: Boolean = true,
         val dicts: List<String> = emptyList(),
         val filterDictSingleWordEntries: Boolean = false,
-    ) : Parcelable
+    )
 
     data class AnnotationChooserState(
         val sentenceIndex: Int,

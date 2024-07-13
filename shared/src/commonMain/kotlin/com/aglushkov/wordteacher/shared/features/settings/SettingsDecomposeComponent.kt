@@ -65,7 +65,10 @@ class SettingsDecomposeComponent (
     init {
         baseInit(analytics)
 
-        stateKeeper.register(KEY_STATE) {
+        stateKeeper.register(
+            key = KEY_STATE,
+            strategy = SettingsVM.State.serializer()
+        ) {
             state
         }
 

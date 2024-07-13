@@ -10,12 +10,11 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Note
 import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Raw
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 // TODO: remove this feature
 interface NotesVM: Clearable {
@@ -36,10 +35,10 @@ interface NotesVM: Clearable {
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onTryAgainClicked()
 
-    @Parcelize
+    @Serializable
     data class State(
         val newNoteText: String? = null
-    ): Parcelable
+    )
 
     data class EditingState(
         val item: NoteViewItem? = null

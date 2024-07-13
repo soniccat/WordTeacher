@@ -3,11 +3,10 @@ package com.aglushkov.wordteacher.shared.features.learning.vm
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.resolveStringWithHiddenSpans
 import com.aglushkov.wordteacher.shared.model.resolveStringsWithHiddenSpans
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
 class MatchSession(
@@ -208,10 +207,10 @@ class MatchSession(
         matchPairStateFlow.update { it?.mapIndexed(transform) }
     }
 
-    @Parcelize
+    @Serializable
     data class State(
         val cardIds: List<Long>,
-    ): Parcelable
+    )
 
     data class MatchPair(
         val term: String,

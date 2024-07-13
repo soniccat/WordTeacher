@@ -26,8 +26,6 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +37,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.serialization.Serializable
 
 interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
@@ -75,10 +74,10 @@ interface DefinitionsVM: Clearable {
     fun clearSuggests()
     fun requestSuggests(word: String)
 
-    @Parcelize
+    @Serializable
     class State(
         var word: String? = null
-    ): Parcelable
+    )
 }
 
 open class DefinitionsVMImpl(

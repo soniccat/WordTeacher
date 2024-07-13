@@ -1,9 +1,9 @@
 package com.aglushkov.wordteacher.shared.features.dict_configs.vm
 
-import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.Lookup
-import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.LookupFlags
-import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.LookupLang
-import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService.Companion.LookupLangDefault
+import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.YandexService.Companion.Lookup
+import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.YandexService.Companion.LookupFlags
+import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.YandexService.Companion.LookupLang
+import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.YandexService.Companion.LookupLangDefault
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict

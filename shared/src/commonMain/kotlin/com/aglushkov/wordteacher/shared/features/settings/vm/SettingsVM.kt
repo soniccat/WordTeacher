@@ -21,8 +21,6 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProv
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.SpaceAuthData
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.channels.Channel
@@ -37,6 +35,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import okio.Path
 import dev.icerock.moko.resources.compose.localized
+import kotlinx.serialization.Serializable
 
 interface SettingsVM: Clearable {
     var router: SettingsRouter?
@@ -54,8 +53,8 @@ interface SettingsVM: Clearable {
     fun onEmailClicked()
 
     // Created to use in future
-    @Parcelize
-    class State: Parcelable
+    @Serializable
+    class State
 }
 
 interface FileSharer {

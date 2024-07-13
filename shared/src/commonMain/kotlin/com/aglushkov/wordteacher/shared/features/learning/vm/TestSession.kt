@@ -2,8 +2,6 @@ package com.aglushkov.wordteacher.shared.features.learning.vm
 
 import com.aglushkov.wordteacher.shared.general.extensions.takeWhileNonNull
 import com.aglushkov.wordteacher.shared.model.Card
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable

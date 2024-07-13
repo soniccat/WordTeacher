@@ -15,8 +15,6 @@ import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 interface AddArticleVM: Clearable {
     val eventFlow: Flow<Event>
@@ -41,13 +40,13 @@ interface AddArticleVM: Clearable {
     fun onTryAgainPressed()
     fun getErrorText(): StringDesc?
 
-    @Parcelize
+    @Serializable
     data class State(
         val title: String? = null,
         val text: String? = null,
         val uri: String? = null,
         val needToCreateSet: Boolean = false
-    ): Parcelable
+    )
 
     data class UIState(
         val title: String,

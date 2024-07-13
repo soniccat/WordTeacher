@@ -33,7 +33,10 @@ class NotesDecomposeComponent (
     init {
         baseInit(analytics)
 
-        stateKeeper.register(KEY_STATE) {
+        stateKeeper.register(
+            key = KEY_STATE,
+            strategy = NotesVM.State.serializer()
+        ) {
             state
         }
 

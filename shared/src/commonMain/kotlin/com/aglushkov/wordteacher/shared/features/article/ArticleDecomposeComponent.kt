@@ -46,7 +46,10 @@ class ArticleDecomposeComponent(
     init {
         baseInit(analytics)
 
-        stateKeeper.register(KEY_STATE) {
+        stateKeeper.register(
+            key = KEY_STATE,
+            strategy = ArticleVM.State.serializer()
+        ) {
             state.value.toState()
         }
 

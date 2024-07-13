@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.service
 
-import com.aglushkov.wordteacher.apiproviders.yandex.service.YandexService
-import com.aglushkov.wordteacher.apiproviders.yandex.service.createWordTeacherWordService
+import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.YandexService
+import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.createWordTeacherWordService
 import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.createWordTeacherWordService
 import com.aglushkov.wordteacher.shared.general.AppInfo

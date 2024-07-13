@@ -1,8 +1,8 @@
 [versions]
 agp = "8.2.0"
-android-compileSdk = "34"
-android-minSdk = "24"
-android-targetSdk = "34"
+android-compileSdk = "35"
+android-minSdk = "23"
+android-targetSdk = "35"
 androidx-activityCompose = "1.9.0"
 androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.1.4"
@@ -14,6 +14,7 @@ compose-plugin = "1.6.11"
 junit = "4.13.2"
 kotlin = "2.0.0"
 kotlinxSerializationVersion = "1.7.1"
+kotlinxDateTime = "0.4.0"
 
 appmetrica = "7.0.0"
 kermit = "2.0.2"
@@ -23,6 +24,11 @@ opennlp = "1.9.4"
 sqlDelight = "2.0.2"
 ktor = "2.2.2"
 mokoResources = "0.24.1"
+decomposeVersion = "2.2.2"
+settings = "1.0.0"
+stately = "2.0.6"
+uuid = "0.3.0"
+dagger = "2.47"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -35,6 +41,10 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+kotlinxDateTime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
+
+dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+daggerCompiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
 
 appmetrica = { module = "io.appmetrica.analytics:analytics", version.ref = "appmetrica"}
 logger = { module = "co.touchlab:kermit", version.ref = "kermit" }
@@ -58,6 +68,18 @@ ktorContentEncoding = { module = "io.ktor:ktor-client-encoding", version.ref = "
 
 kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
 mokoResourcesLib = { module = "dev.icerock.moko:resources", version.ref = "mokoResources"}
+mokoCompose = { module = "dev.icerock.moko:resources-compose", version.ref = "mokoResources"}
+
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decomposeVersion" }
+#decomposeJetpack = { module = "com.arkivanov.decompose:extensions-compose-jetpack", version.ref = "decomposeVersion" }
+decomposeJetbrains = { module = "com.arkivanov.decompose:extensions-compose-jetbrains", version.ref = "decomposeVersion" }
+settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
+settingsCoroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "settings" }
+settingsDataStore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "settings" }
+statelyCommon = { module = "co.touchlab:stately-common", version.ref = "stately" }
+statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -69,7 +91,6 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 mokoResources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "mokoResources"}
-
 
 #[versions]
 #kotlinVersion = "1.9.21"

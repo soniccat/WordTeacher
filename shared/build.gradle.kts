@@ -44,13 +44,21 @@ kotlin {
             implementation(libs.ktorCommonCore)
             api(libs.ktorLogging)
             api(libs.ktorContentEncoding)
+            api(libs.mokoResourcesLib)
+            api(libs.settings)
+            api(libs.settingsCoroutines)
+            implementation(libs.decompose)
             implementation(libs.ktorAuth)
+            implementation(libs.kotlinxDateTime)
+            implementation(libs.statelyCommon)
+            implementation(libs.statelyConcurrency)
+            implementation(libs.uuid)
         }
 
         val composeSharedMain by creating {
             dependsOn(commonMain.get())
             dependencies {
-//                api(libs.dagger)
+                api(libs.dagger)
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -59,9 +67,9 @@ kotlin {
                 implementation(compose.components.uiToolingPreview)
                 implementation(libs.jsoup)
                 implementation(libs.opennlp)
-                api(libs.mokoResourcesLib)
+                api(libs.decomposeJetbrains)
 //                api(libs.decomposeJetbrains)
-//                api(libs.mokoCompose)
+                api(libs.mokoCompose)
             }
         }
         val androidMain by getting {
@@ -133,6 +141,12 @@ sqldelight {
 //        sourceFolders = listOf("sqldelight", "data")
 //    }
 }
+
+multiplatformResources {
+    resourcesPackage.set("com.aglushkov.wordteacher.shared.res") // required
+    iosBaseLocalizationRegion = "en" // optional, default "en"
+}
+
 
 //
 

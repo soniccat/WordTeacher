@@ -4,8 +4,6 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.takeWhileNonNull
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

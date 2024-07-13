@@ -19,12 +19,11 @@ import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.resources.desc.Raw
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 interface ArticlesVM {
     var router: ArticlesRouter?
@@ -37,8 +36,8 @@ interface ArticlesVM {
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onTryAgainClicked()
 
-    @Parcelize
-    class State: Parcelable {
+    @Serializable
+    class State {
     }
 }
 

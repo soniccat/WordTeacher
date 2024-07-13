@@ -21,10 +21,10 @@ actual class ConnectivityManager constructor(
     private val stateFlow = MutableStateFlow<Boolean>(false)
     actual val flow: StateFlow<Boolean> = stateFlow
 
-    @Volatile actual var isDeviceOnline = false
+    actual var isDeviceOnline = false
         private set
 
-    @Volatile actual var isWifiMode = false
+    actual var isWifiMode = false
         private set
 
     private var networkCallback = object : android.net.ConnectivityManager.NetworkCallback() {

@@ -49,7 +49,10 @@ class DefinitionsDecomposeComponent (
     init {
         baseInit(analytics)
 
-        stateKeeper.register(KEY_STATE) {
+        stateKeeper.register(
+            key = KEY_STATE,
+            strategy = DefinitionsVM.State.serializer()
+        ) {
             state
         }
 

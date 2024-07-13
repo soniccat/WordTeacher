@@ -23,8 +23,6 @@ import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import dev.icerock.moko.graphics.Color
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc

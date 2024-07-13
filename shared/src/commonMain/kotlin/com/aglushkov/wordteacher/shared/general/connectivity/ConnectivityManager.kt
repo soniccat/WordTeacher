@@ -7,10 +7,10 @@ expect class ConnectivityManager {
     var isRegistered: Boolean
     val flow: StateFlow<Boolean>
 
-    @Volatile var isDeviceOnline: Boolean
+    var isDeviceOnline: Boolean
         private set
 
-    @Volatile var isWifiMode: Boolean
+    var isWifiMode: Boolean
         private set
 
     fun register()

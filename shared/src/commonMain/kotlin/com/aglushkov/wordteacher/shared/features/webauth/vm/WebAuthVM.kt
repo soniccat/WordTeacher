@@ -5,8 +5,6 @@ import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthData
 import com.aglushkov.wordteacher.shared.general.oauth2.OAuth2Service
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
-import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 interface WebAuthVM: Clearable {
     var router: WebAuthRouter?
@@ -25,8 +24,8 @@ interface WebAuthVM: Clearable {
     fun onError(throwable: Throwable)
     fun onUrlChanged(url: String)
 
-    @Parcelize
-    class State: Parcelable {
+    @Serializable
+    class State {
     }
 
     data class InMemoryState(

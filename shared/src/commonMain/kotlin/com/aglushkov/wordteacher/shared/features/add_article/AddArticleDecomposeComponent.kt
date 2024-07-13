@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVMImpl
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -38,7 +39,10 @@ class AddArticleDecomposeComponent(
     init {
         baseInit(analytics)
 
-        stateKeeper.register(KEY_STATE) {
+        stateKeeper.register(
+            key = KEY_STATE,
+            strategy = AddArticleVM.State.serializer()
+        ) {
             createState()
         }
 
