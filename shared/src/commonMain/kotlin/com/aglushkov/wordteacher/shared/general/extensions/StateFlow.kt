@@ -4,7 +4,6 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
-import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.v
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
@@ -140,8 +139,8 @@ suspend fun <T> Flow<Resource<T>>.waitUntilDone(
     }
 }
 
-fun <T> MutableStateFlow<Resource<T>>.updateData(dataTransform: (T) -> T) {
-    this.update { it.map( loadedDataTransformer= dataTransform) }
+fun <T> MutableStateFlow<Resource<T>>.updateLoadedData(dataTransform: (T) -> T) {
+    this.update { it.mapLoadedData( loadedDataTransformer= dataTransform) }
 }
 
 class AbortFlowException constructor(

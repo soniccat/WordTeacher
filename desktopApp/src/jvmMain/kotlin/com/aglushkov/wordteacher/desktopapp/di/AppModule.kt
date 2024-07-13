@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.desktopapp.di
 
 import com.aglushkov.wordteacher.desktopapp.configs.GoogleConfig
 import com.aglushkov.wordteacher.desktopapp.general.crypto.SecureCodecBuilder
+import com.aglushkov.wordteacher.desktopapp.helper.EmailOpenerImpl
 import com.aglushkov.wordteacher.desktopapp.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.desktopapp.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.desktopapp.helper.VKAuthControllerImpl
@@ -24,6 +25,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.AppInfo
+import com.aglushkov.wordteacher.shared.general.EmailOpener
 import com.aglushkov.wordteacher.shared.general.FileOpenCompositeSuccessHandler
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
@@ -256,6 +258,12 @@ class AppModule {
     fun analyticEngines(
     ): Array<AnalyticEngine> {
         return arrayOf()
+    }
+
+    @AppComp
+    @Provides
+    fun emailOpener(): EmailOpener {
+        return EmailOpenerImpl()
     }
 }
 

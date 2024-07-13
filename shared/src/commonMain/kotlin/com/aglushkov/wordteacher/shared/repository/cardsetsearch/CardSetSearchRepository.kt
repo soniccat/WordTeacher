@@ -1,6 +1,6 @@
 package com.aglushkov.wordteacher.shared.repository.cardsetsearch
 
-import com.aglushkov.wordteacher.shared.general.extensions.updateData
+import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.CardSet
@@ -59,7 +59,7 @@ class CardSetSearchRepository(
             // check added cardsets to remove it from the list
             appDatabase.cardSets.cardSetInsertedFlow.collect { insertedCardSet ->
                 cardSets.update {
-                    it.map {
+                    it.mapLoadedData {
                         it.filterNot {
                             it.cardSet.name == insertedCardSet.name &&
                                     it.cardSet.terms == insertedCardSet.cards.map { it.term }
@@ -109,7 +109,7 @@ class CardSetSearchRepository(
         return loadResource {
             cardSetService.getById(remoteId).toOkResponse().cardSet
         }.onEach { res ->
-            cardSets.updateData {
+            cardSets.updateLoadedData {
                 it.map {
                     if (it.cardSet.remoteId == remoteId) {
                         it.copy(fullCardSetRes = res)

@@ -109,11 +109,11 @@ open class CardSetInfoVMImpl(
         },
         inputState,
     ) { cardSetRes, inputState ->
-        cardSetRes.map(
+        cardSetRes.mapLoadedData(
             errorTransformer = {
                 StringDescThrowable(ResourceStringDesc(MR.strings.cardset_info_error), it)
             }
-        ) { cardSet ->
+        ) { cardSet: CardSet ->
             CardSetInfoVM.UIState(
                 name = inputState.validatedName ?: cardSet.name,
                 nameError = if (inputState.isNameValid) {

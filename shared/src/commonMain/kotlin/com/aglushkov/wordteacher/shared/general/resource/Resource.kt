@@ -72,12 +72,30 @@ sealed interface Resource<T> {
         ) { data }
     }
 
+    // change resource data with default data value if it's null (in loading for example)
+    // if defaultData is null then transform won't be called for null data
+    fun <R> mapLoadedData(
+        canLoadNextPage: Boolean = this.canLoadNextPage,
+        errorTransformer: ((Throwable) -> Throwable)? = null,
+        version: Int = this.version,
+        defaultData: T? = null,
+        loadedDataTransformer: (T) -> R?,
+    ): Resource<R> = map(
+        canLoadNextPage = canLoadNextPage,
+        errorTransformer = errorTransformer,
+        version = version,
+    ) {
+        (it ?: defaultData)?.let { resultData ->
+            loadedDataTransformer(resultData)
+        }
+    }
+
     // change resource data with a block
     fun <R> map(
         canLoadNextPage: Boolean = this.canLoadNextPage,
         errorTransformer: ((Throwable) -> Throwable)? = null,
         version: Int = this.version,
-        loadedDataTransformer: (T) -> R?
+        loadedDataTransformer: (T?) -> R?
     ): Resource<R> = when (this) {
         is Loaded -> Loaded(
             data = loadedDataTransformer(data) ?: throw  RuntimeException("mapTo: nil data for Loaded resource isn't supported"),
@@ -85,7 +103,7 @@ sealed interface Resource<T> {
             version = version
         )
         is Loading -> Loading(
-            data = data?.let { loadedDataTransformer(it) },
+            data = loadedDataTransformer(data),
             progress = progress,
             canLoadNextPage = canLoadNextPage,
             version = version
@@ -93,7 +111,7 @@ sealed interface Resource<T> {
         is Error -> Error(
             throwable = errorTransformer?.invoke(throwable) ?: throwable,
             canTryAgain = canTryAgain,
-            data = data?.let { loadedDataTransformer(it) },
+            data = loadedDataTransformer(data),
             canLoadNextPage = canLoadNextPage,
             version = version
         )

@@ -239,7 +239,7 @@ open class DefinitionsVMImpl(
             }
 
             wordDefinitionRepository.define(word, false).map {
-                it.map { it.map { it.second }.flatten() }
+                it.mapLoadedData { it.map { it.second }.flatten() }
             }.collect(definitionWords)
             Logger.v("Finish Loading $word", tag)
         }

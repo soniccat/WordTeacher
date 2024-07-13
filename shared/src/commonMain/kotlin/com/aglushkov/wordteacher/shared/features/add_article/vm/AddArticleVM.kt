@@ -7,12 +7,10 @@ import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.*
-import com.aglushkov.wordteacher.shared.general.extensions.updateData
+import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.resource.onError
-import com.aglushkov.wordteacher.shared.general.resource.toLoading
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -111,8 +109,8 @@ open class AddArticleVMImpl(
             uiStateFlow.update { uiStateRes ->
                 res.map { articleContent ->
                     dataFromState.copy(
-                        title = articleContent.title.orEmpty(),
-                        text = articleContent.text.orEmpty(),
+                        title = articleContent?.title.orEmpty(),
+                        text = articleContent?.text.orEmpty(),
                     )
                 }
             }
@@ -127,12 +125,12 @@ open class AddArticleVMImpl(
     }
 
     override fun onTitleChanged(title: String) {
-        uiStateFlow.updateData { it.copy(title = title) }
+        uiStateFlow.updateLoadedData { it.copy(title = title) }
         updateTitleErrorFlow()
     }
 
     override fun onTextChanged(text: String) {
-        uiStateFlow.updateData { it.copy(text = text) }
+        uiStateFlow.updateLoadedData { it.copy(text = text) }
     }
 
     override fun onCancelPressed() = viewModelScope.launch {
@@ -187,7 +185,7 @@ open class AddArticleVMImpl(
     }
 
     override fun onNeedToCreateSetPressed() {
-        uiStateFlow.updateData { it.copy(needToCreateSet = !it.needToCreateSet) }
+        uiStateFlow.updateLoadedData { it.copy(needToCreateSet = !it.needToCreateSet) }
     }
 
     private suspend fun createCardSet() {
@@ -209,9 +207,9 @@ open class AddArticleVMImpl(
     private fun updateTitleErrorFlow() {
         val data = uiStateFlow.value.data()
         if (data != null && data.title.isBlank()) {
-            uiStateFlow.updateData { it.copy(titleError = StringDesc.Resource(MR.strings.add_article_error_empty_title)) }
+            uiStateFlow.updateLoadedData { it.copy(titleError = StringDesc.Resource(MR.strings.add_article_error_empty_title)) }
         } else {
-            uiStateFlow.updateData { it.copy(titleError = null) }
+            uiStateFlow.updateLoadedData { it.copy(titleError = null) }
         }
     }
 

@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
-import androidx.compose.runtime.Stable
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
@@ -13,9 +12,6 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
-import com.aglushkov.wordteacher.shared.general.resource.on
-import com.aglushkov.wordteacher.shared.general.resource.onError
-import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
@@ -119,13 +115,13 @@ open class CardSetsVMImpl(
     )
 
     override val cardSets = cardSetsRepository.cardSets.map {
-        it.map {
+        it.mapLoadedData {
             buildViewItems(it, uiStateFlow.value.newCardSetText)
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override val searchCardSets = cardSetSearchRepository.cardSets.map { cardSetsRes ->
-        cardSetsRes.map { cardSets ->
+        cardSetsRes.mapLoadedData { cardSets ->
            cardSets.map { searchCardSet ->
                RemoteCardSetViewItem(
                    searchCardSet.cardSet.remoteId,

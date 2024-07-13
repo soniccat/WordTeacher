@@ -98,7 +98,7 @@ class ConfigRepository(
 
     fun removeConfig(id: Int) {
         val configs = stateFlow.updateAndGet { configListRes ->
-            configListRes.map { configs ->
+            configListRes.mapLoadedData { configs ->
                 configs.filter { it.id != id }
             }
         }
@@ -107,7 +107,7 @@ class ConfigRepository(
 
     fun updateConfig(config: Config) {
         val configs = stateFlow.updateAndGet { configListRes ->
-            configListRes.map { configs ->
+            configListRes.mapLoadedData { configs ->
                 configs.map {
                     if (it.id == config.id) {
                         config
