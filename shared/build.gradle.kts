@@ -88,7 +88,7 @@ kotlin {
                 implementation(libs.kotlinTestJUnit)
                 implementation(libs.junit)
                 implementation(libs.mockitoKotlin)
-                implementation("org.robolectric:robolectric:4.11-beta-2")
+                implementation(libs.robolectric)
                 implementation(libs.coroutinesCommonTest)
             }
         }
@@ -111,6 +111,11 @@ android {
     }
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
 }
 

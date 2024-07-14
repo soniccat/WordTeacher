@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.UNDEFINED_FREQUENCY
 import com.aglushkov.wordteacher.shared.res.MR
+import com.benasher44.uuid.Uuid
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
@@ -37,7 +38,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import java.util.UUID
 
 interface CardSetJsonImportVM: Clearable {
     val jsonText: StateFlow<String>
@@ -126,12 +126,12 @@ open class CardSetJsonImportVMImpl(
                     ),
                     needToUpdateDefinitionSpans = true,
                     needToUpdateExampleSpans = true,
-                    creationId = UUID.randomUUID().toString(),
+                    creationId = Uuid.randomUUID().toString(),
                     termFrequency = UNDEFINED_FREQUENCY
                 )
             },
             terms = listOf(),
-            creationId = UUID.randomUUID().toString(),
+            creationId = Uuid.randomUUID().toString(),
             info = importCardSet.info,
             isAvailableInSearch = importCardSet.isAvailableInSearch,
         )

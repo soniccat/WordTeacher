@@ -22,6 +22,7 @@ kotlinxDateTime = "0.4.0"
 playServicesPlugin = "4.3.13"
 playServicesAuth = "20.4.0"
 
+robolectric = "4.13"
 vkId = "2.0.0"
 appmetrica = "7.0.0"
 kermit = "2.0.2"
@@ -71,6 +72,7 @@ jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okioFakeFileSystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 opennlp = {module = "org.apache.opennlp:opennlp-tools", version.ref = "opennlp" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 sqlDelightRuntime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }
 sqlDelightiOSDriver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
 sqlDelightAndroidDriver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }

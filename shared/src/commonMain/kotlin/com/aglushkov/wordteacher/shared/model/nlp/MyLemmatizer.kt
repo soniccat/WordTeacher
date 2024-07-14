@@ -3,8 +3,11 @@ package com.aglushkov.wordteacher.shared.model.nlp
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.okio.newLineSize
+import okio.BufferedSource
+import okio.FileHandle
 import okio.FileSystem
 import okio.Path
+import okio.Sink
 import okio.Source
 import okio.buffer
 import okio.utf8Size
@@ -30,7 +33,8 @@ class MyLemmatizer(
     // and its skip operation is very expensive
     private val unzippedLemmatizerPath = nlpPath.div("unzipped_lemmatizer")
     private val indexPath = nlpPath.div("unizppedlemmatizer_index")
-    private var randomAccessFile: RandomAccessFile? = null
+    private var randomAccessFile: FileHandle? = null//RandomAccessFile? = null
+    private var randomAccessFileSource: BufferedSource? = null
 
     private val elemRegexp = "\t".toRegex()
     private lateinit var index: MyLemmatizerIndex
@@ -49,7 +53,8 @@ class MyLemmatizer(
         }
 
         index = anIndex
-        randomAccessFile = RandomAccessFile(unzippedLemmatizerPath.toFile(), "r")
+        randomAccessFile = fileSystem.openReadOnly(unzippedLemmatizerPath) //RandomAccessFile(unzippedLemmatizerPath.toFile(), "r")
+        randomAccessFileSource = randomAccessFile?.source(0L)?.buffer()
     }
 
     private fun createUnzippedLemmatizerIfNeeded() {
@@ -116,13 +121,14 @@ class MyLemmatizer(
      */
     private fun lemmatize(word: String, postag: String): String {
         val safeRandomAccessFile = randomAccessFile ?: return NLPConstants.UNKNOWN_LEMMA
+        val safeSource = randomAccessFileSource ?: return NLPConstants.UNKNOWN_LEMMA
         var resultLemma: String = NLPConstants.UNKNOWN_LEMMA
         index.offset(word)?.let { offset ->
             synchronized(safeRandomAccessFile) { // TODO: consider using file pool not to wait here
-                safeRandomAccessFile.channel.position(offset.toLong())
+                safeRandomAccessFile.reposition(safeSource, offset.toLong())
 
                 while (true) {
-                    val line = safeRandomAccessFile.readLine() ?: break
+                    val line = safeSource.readUtf8Line() ?: break
                     val elems = line.split(elemRegexp).toTypedArray()
                     if (elems[0] != word) {
                         break
