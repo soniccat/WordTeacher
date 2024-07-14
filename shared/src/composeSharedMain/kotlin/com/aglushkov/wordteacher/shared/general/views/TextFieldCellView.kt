@@ -66,7 +66,7 @@ fun TextFieldCellView(
                 },
             placeholder = {
                 if (!focusState.isFocused) {
-                    Row {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painterResource(MR.images.create_note),
                             null,

@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.shared.general.setAnalytics
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.vk.id.VKID
 import io.ktor.client.plugins.cookies.CookiesStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,6 +60,7 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
                 listOf(CommonWriter(), fileLogger),
             )
         )
+        VKID.init(this)
 
         routerResolver.attach()
         activityVisibilityResolver.listener = this

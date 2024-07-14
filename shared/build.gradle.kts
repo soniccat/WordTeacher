@@ -83,6 +83,7 @@ kotlin {
                 implementation(libs.sqlDelightAndroidDriver)
                 api(libs.androidx.activity.compose)
                 api(libs.appmetrica)
+                api(libs.ktorAndroidClient)
             }
         }
         val androidUnitTest by getting {

@@ -76,6 +76,15 @@ kotlin {
     }
 }
 
+// Signing file
+var debugKeystoreProps: Properties? = null
+val debugKeystorePropFile = file("${project.rootDir}/android_app/keystore.properties")
+if (debugKeystorePropFile.exists()) {
+    debugKeystoreProps = Properties().apply {
+        load(FileInputStream(debugKeystorePropFile))
+    }
+}
+
 android {
     namespace = "com.aglushkov.wordteacher.android_app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -128,6 +137,16 @@ android {
     dependencies {
         debugImplementation(compose.uiTooling)
         coreLibraryDesugaring(libs.desugar.jdk.libs)
+    }
+    signingConfigs {
+        getByName("debug") {
+            debugKeystoreProps?.let { props ->
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+                storeFile = file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+            }
+        }
     }
 }
 

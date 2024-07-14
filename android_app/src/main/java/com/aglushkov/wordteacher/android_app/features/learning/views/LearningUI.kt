@@ -231,6 +231,7 @@ private fun matchChallengeUI(
     data: LearningVM.Challenge.Match,
     vm: LearningVM
 ) {
+    val instructionString = data.instruction.localized()
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(
@@ -238,7 +239,7 @@ private fun matchChallengeUI(
         )
     ) {
         items(
-            listOf(data.instruction) + data.rows,
+            listOf(instructionString) + data.rows,
             key = {
                 if (it is LearningVM.Challenge.MatchRow) {
                     it.id
@@ -250,9 +251,9 @@ private fun matchChallengeUI(
                     { vm.onMatchTermPressed(item) },
                     { vm.onMatchExamplePressed(item)}
                 )
-            } else if (item is StringDesc) {
+            } else if (item is String) {
                 Text(
-                    text = item.localized(),
+                    text = item,
                     modifier = Modifier.padding(
                         start = LocalDimens.current.contentPadding,
                         top = LocalDimens.current.contentPadding,

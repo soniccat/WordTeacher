@@ -52,7 +52,6 @@ class VKAuthControllerImpl : VKAuthController {
     }
 
     fun bind(activity: ComponentActivity) {
-        VKID.init(activity)
         vkid = VKID.instance
     }
 
