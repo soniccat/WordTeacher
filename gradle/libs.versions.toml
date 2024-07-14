@@ -12,7 +12,7 @@ androidx-material = "1.12.0"
 androidx-test-junit = "1.2.0"
 compose-plugin = "1.6.11"
 datastore-preferences = "1.0.0"
-coroutines = "1.7.3"
+coroutines = "1.9.0-RC"
 
 desugar_jdk_libs = "2.0.4"
 junit = "4.13.2"
@@ -36,6 +36,9 @@ settings = "1.0.0"
 stately = "2.0.6"
 uuid = "0.3.0"
 dagger = "2.47"
+
+# for android tests
+mockitoKotlin = "4.0.0"
 
 # for desktop
 bouncyCastle = "1.67"
@@ -95,6 +98,11 @@ statelyCommon = { module = "co.touchlab:stately-common", version.ref = "stately"
 statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 vkId = { module = "com.vk.id:vkid", version.ref = "vkId" }
+
+# for android tests
+kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+mockitoKotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
+coroutinesCommonTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 # for desktop
 coroutinesSwing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
@@ -165,7 +173,6 @@ kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 #kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
 #kotlinTest = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlinVersion" }
 #kotlinTestAnnotations = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlinVersion" }
-#kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlinVersion" }
 #kotlinxSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlinVersion" }
 #kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
 #kotlinxDateTime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }

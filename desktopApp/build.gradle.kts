@@ -57,7 +57,6 @@ kotlin {
                 implementation(compose.desktop.common)
                 implementation(compose.desktop.currentOs)
                 implementation(libs.decompose)
-//                api(compose.runtime)
                 implementation(compose.preview)
                 implementation(compose.uiTooling)
                 implementation(compose.ui)
