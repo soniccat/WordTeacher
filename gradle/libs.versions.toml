@@ -29,7 +29,7 @@ jsoup = "1.14.3"
 okio = "3.7.0"
 opennlp = "1.9.4"
 sqlDelight = "2.0.2"
-ktor = "2.2.2"
+ktor = "2.3.12"
 mokoResources = "0.24.1"
 decomposeVersion = "2.2.2"
 settings = "1.0.0"
@@ -78,7 +78,6 @@ ktorCommonCore = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktorAuth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktorAndroidClient = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktoriOSClient = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
-ktorDesktop = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktorLogging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktorContentEncoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
@@ -100,6 +99,7 @@ vkId = { module = "com.vk.id:vkid", version.ref = "vkId" }
 # for desktop
 coroutinesSwing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
 bouncyCastle = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bouncyCastle" }
+ktorDesktop = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 # for config-generator
 kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }

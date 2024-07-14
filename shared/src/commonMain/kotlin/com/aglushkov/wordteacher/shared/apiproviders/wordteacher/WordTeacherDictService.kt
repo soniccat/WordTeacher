@@ -17,6 +17,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import io.ktor.client.plugins.api.createClientPlugin
+import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
@@ -51,6 +52,9 @@ class WordTeacherDictService (
     private val logger = WordServiceLogger(Config.Type.WordTeacher.name)
     private val httpClient = HttpClient {
         installHeaders()
+        install(ContentEncoding) {
+            gzip(0.9F)
+        }
     }
 
     private val dictJson by lazy {
