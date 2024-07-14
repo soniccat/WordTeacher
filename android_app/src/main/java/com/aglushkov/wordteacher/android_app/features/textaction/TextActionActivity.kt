@@ -107,7 +107,7 @@ class TextActionActivity: AppCompatActivity() {
         textActionDecomposeComponent = DaggerTextActionComponent.builder()
             .setAppComponent(deps)
             .setComponentContext(context)
-            .setConfig(TextActionComponent.Config(text ?: "", urlString))
+            .setConfig(TextActionComponent.Config(text?.toString() ?: "", urlString))
             .build()
             .textActionDecomposeComponent()
 

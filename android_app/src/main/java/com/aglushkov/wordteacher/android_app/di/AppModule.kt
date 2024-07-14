@@ -188,7 +188,7 @@ class AppModule {
             val dbPath = context.getDatabasePath("word_frequency.db").toOkioPath()
             if (!fileSystem.exists(dbPath)) {
                 fileSystem.write(dbPath) {
-                    MR.assets.word_frequency.getInputStream(context).source().writeTo(this)
+                    MR.assets.word_frequency_db.getInputStream(context).source().writeTo(this)
                 }
             }
             "".toPath()

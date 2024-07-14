@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.vk.id.AccessToken
 import com.vk.id.VKID
 import com.vk.id.VKIDAuthFail
+import com.vk.id.auth.VKIDAuthCallback
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
@@ -23,8 +24,8 @@ class VKAuthControllerImpl : VKAuthController {
         MutableStateFlow(Resource.Uninitialized())
     override var authDataFlow: StateFlow<Resource<NetworkAuthData>> = vkAuthDataState
 
-    private val vkAuthCallback = object : VKID.AuthCallback {
-        override fun onSuccess(accessToken: AccessToken) {
+    private val vkAuthCallback = object : VKIDAuthCallback {
+        override fun onAuth(accessToken: AccessToken) {
             vkAuthDataState.update {
                 Resource.Loaded(
                     VKAuthData(
@@ -51,7 +52,8 @@ class VKAuthControllerImpl : VKAuthController {
     }
 
     fun bind(activity: ComponentActivity) {
-        vkid = VKID(activity)
+        VKID.init(activity)
+        vkid = VKID.instance
     }
 
     override suspend fun signIn(): Resource<NetworkAuthData> {
@@ -65,7 +67,7 @@ class VKAuthControllerImpl : VKAuthController {
             return
         }
         vkAuthDataState.value = Resource.Loading()
-        vkid!!.authorize(authCallback = vkAuthCallback)
+        vkid!!.authorize(callback = vkAuthCallback)
     }
 
     override fun launchSignOut() {

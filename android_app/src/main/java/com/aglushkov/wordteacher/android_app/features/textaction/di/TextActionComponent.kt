@@ -1,12 +1,11 @@
 package com.aglushkov.wordteacher.android_app.features.textaction.di
 
-import android.os.Parcelable
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponent
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Component(modules = [TextActionModule::class])
 interface TextActionComponent {
@@ -21,9 +20,9 @@ interface TextActionComponent {
         fun build(): TextActionComponent
     }
 
-    @Parcelize
+    @Serializable
     data class Config(
-        val text: CharSequence,
+        val text: String,
         val url: String?,
-    ): Parcelable
+    )
 }

@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.playServicesPlugin)
+    alias(libs.plugins.kapt)
 }
 
 repositories {
@@ -63,8 +65,9 @@ kotlin {
             implementation(projects.shared)
             implementation(libs.dagger)
             implementation(libs.settingsDataStore)
-            implementation("androidx.datastore:datastore-preferences:1.0.0")
+            implementation(libs.datastorePreference)
             implementation(libs.vkId)
+            implementation(libs.playServicesAuth)
 //
         }
 //        desktopMain.dependencies {
@@ -102,20 +105,34 @@ android {
         }
     }
     buildTypes {
+        defaultConfig {
+            yandexProps?.onEach {
+                resValue("string", it.key.toString(), it.value.toString())
+            }
+        }
+
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     dependencies {
         debugImplementation(compose.uiTooling)
+        coreLibraryDesugaring(libs.desugar.jdk.libs)
     }
+}
+
+dependencies {
+    configurations["kapt"](libs.daggerCompiler)
 }
 
 //compose.desktop {

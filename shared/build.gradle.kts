@@ -11,6 +11,8 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.mokoResources)
+
+    alias(libs.plugins.kapt)
 }
 
 kotlin {
@@ -53,6 +55,7 @@ kotlin {
             implementation(libs.statelyCommon)
             implementation(libs.statelyConcurrency)
             implementation(libs.uuid)
+//            configurations["kapt"](libs.ka)
         }
 
         val composeSharedMain by creating {
@@ -146,6 +149,10 @@ multiplatformResources {
     iosBaseLocalizationRegion = "en" // optional, default "en"
 }
 
+// For now you have to comment this to be able to build desktop... I'm investigating...
+dependencies {
+    configurations["kapt"](libs.daggerCompiler)
+}
 
 //
 
