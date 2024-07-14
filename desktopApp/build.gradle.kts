@@ -12,9 +12,10 @@ repositories {
 }
 
 plugins {
-    kotlin("multiplatform")
-    id("kotlin-kapt")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
     id("org.openjfx.javafxplugin") version "0.0.13"
     id("com.aglushkov.config-generator")
 }
@@ -56,7 +57,7 @@ kotlin {
                 implementation(compose.desktop.common)
                 implementation(compose.desktop.currentOs)
                 implementation(libs.decompose)
-                implementation(compose.runtime)
+                api(compose.runtime)
                 implementation(compose.preview)
                 implementation(compose.uiTooling)
                 implementation(compose.ui)

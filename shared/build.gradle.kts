@@ -103,6 +103,7 @@ kotlin {
 //                implementation("org.apache.opennlp:opennlp-tools:1.9.4")
 //                implementation("org.jsoup:jsoup:1.14.3")
 //
+                implementation(compose.runtime)
                 implementation(libs.sqlDelightJvmDriver)
 //                implementation("org.xerial:sqlite-jdbc:3.42.0.0")
             }
@@ -151,9 +152,9 @@ multiplatformResources {
 }
 
 // For now you have to comment this to be able to build desktop... I'm investigating...
-dependencies {
-    configurations["kapt"](libs.daggerCompiler)
-}
+//dependencies {
+//    configurations["kapt"](libs.daggerCompiler)
+//}
 
 //
 

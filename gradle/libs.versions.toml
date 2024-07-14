@@ -12,6 +12,7 @@ androidx-material = "1.12.0"
 androidx-test-junit = "1.2.0"
 compose-plugin = "1.6.11"
 datastore-preferences = "1.0.0"
+coroutines = "1.7.3"
 
 desugar_jdk_libs = "2.0.4"
 junit = "4.13.2"
@@ -35,6 +36,12 @@ settings = "1.0.0"
 stately = "2.0.6"
 uuid = "0.3.0"
 dagger = "2.47"
+
+# for desktop
+bouncyCastle = "1.67"
+
+# for config-generator
+kotlinPoet = "1.14.2"
 
 [libraries]
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
@@ -89,6 +96,14 @@ statelyCommon = { module = "co.touchlab:stately-common", version.ref = "stately"
 statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 vkId = { module = "com.vk.id:vkid", version.ref = "vkId" }
+
+# for desktop
+coroutinesSwing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
+bouncyCastle = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bouncyCastle" }
+
+# for config-generator
+kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
+kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
