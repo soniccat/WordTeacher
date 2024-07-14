@@ -31,6 +31,7 @@ import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.resource.RESOURCE_UNDEFINED_PROGRESS
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
@@ -106,11 +107,18 @@ fun AddArticleUI(
             ExtendedFloatingActionButton(
                 text = {
                     if (isAdding) {
-                        CircularProgressIndicator(
-                            progress = addingProgress,
-                            modifier = Modifier.then(Modifier.size(30.dp)),
-                            color = contentColorFor(MaterialTheme.colors.secondary)
-                        )
+                        if (addingProgress == RESOURCE_UNDEFINED_PROGRESS) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.then(Modifier.size(30.dp)),
+                                color = contentColorFor(MaterialTheme.colors.secondary)
+                            )
+                        } else {
+                            CircularProgressIndicator(
+                                progress = addingProgress,
+                                modifier = Modifier.then(Modifier.size(30.dp)),
+                                color = contentColorFor(MaterialTheme.colors.secondary)
+                            )
+                        }
                     } else {
                         Text(
                             text = stringResource(MR.strings.add_article_done),

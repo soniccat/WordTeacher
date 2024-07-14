@@ -413,3 +413,5 @@ fun <T> loadResourceWithProgress(
         emit(initialValue.toError(e, canTryAgain))
     }
 }
+
+const val RESOURCE_UNDEFINED_PROGRESS = -1.0f

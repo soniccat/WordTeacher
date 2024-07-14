@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.repository.article
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
+import com.aglushkov.wordteacher.shared.general.resource.RESOURCE_UNDEFINED_PROGRESS
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgress
 import com.aglushkov.wordteacher.shared.general.v
@@ -57,8 +58,10 @@ class ArticlesRepository(
         }
     }
 
-    suspend fun createArticle(title: String, text: String): Flow<Resource<Article>> /*supervisorScope*/ {
+    suspend fun createArticle(title: String, text: String): Flow<Resource<Article>> {
         return flow {
+            emit(Resource.Loading(progress = RESOURCE_UNDEFINED_PROGRESS))
+            nlpCore.waitUntilInitialized()
             createArticleInternal(title, text).collect {
                 emit(it)
             }
@@ -71,11 +74,10 @@ class ArticlesRepository(
         }.await()
     }
 
-    private suspend fun createArticleInternal(
+    private fun createArticleInternal(
         title: String,
         text: String
     ): Flow<Resource<Article>> {
-        nlpCore.waitUntilInitialized()
        return loadResourceWithProgress(
            loader = processTextIntoArticle(text, title)
        )

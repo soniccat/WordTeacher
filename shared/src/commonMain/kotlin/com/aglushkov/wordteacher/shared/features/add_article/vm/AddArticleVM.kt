@@ -9,6 +9,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.model.Article
@@ -143,6 +144,11 @@ open class AddArticleVMImpl(
     }
 
     override fun onCompletePressed() {
+        if (addingStateFlow.value.isLoading()) {
+            // TODO: support cancellation
+            return
+        }
+
         updateTitleErrorFlow()
         uiStateFlow.value.data()?.let { data ->
             viewModelScope.launch {
@@ -154,7 +160,7 @@ open class AddArticleVMImpl(
                         createCardSet()
                     }
 
-                    createArticle(data.title, data.text).collect(addingStateFlow)
+                    articlesRepository.createArticle(data.title, data.text).collect(addingStateFlow)
 
                     addingStateFlow.value.onData { article ->
                         analytics.send(
@@ -194,13 +200,6 @@ open class AddArticleVMImpl(
                 timeSource.timeInMilliseconds()
             )
         }
-    }
-
-    private suspend fun createArticle(title: String, text: String): Flow<Resource<Article>> {
-        return articlesRepository.createArticle(title, text)
-//        uiStateFlow.value.data()?.let { data ->
-//
-//        }
     }
 
     private fun updateTitleErrorFlow() {
