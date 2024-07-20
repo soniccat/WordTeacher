@@ -2,6 +2,9 @@ package com.aglushkov.wordteacher.shared.features.definitions
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent.Companion
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
@@ -22,7 +25,7 @@ import com.arkivanov.essenty.statekeeper.consume
 
 class DefinitionsDecomposeComponent (
     componentContext: ComponentContext,
-    word: String?, // TODO: replace with DefinitionsVM.State
+    initialState: DefinitionsVM.State,
     connectivityManager: ConnectivityManager,
     wordDefinitionRepository: WordDefinitionRepository,
     dictRepository: DictRepository,
@@ -31,7 +34,10 @@ class DefinitionsDecomposeComponent (
     idGenerator: IdGenerator,
     analytics: Analytics,
 ) : DefinitionsVMImpl(
-    DefinitionsVM.State(word = word),
+    componentContext.stateKeeper.consume(
+        key = KEY_STATE,
+        strategy = DefinitionsVM.State.serializer()
+    ) ?: initialState,
     connectivityManager,
     wordDefinitionRepository,
     dictRepository,
@@ -42,25 +48,13 @@ class DefinitionsDecomposeComponent (
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Definitions"
 
-    private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
-        Handler(stateKeeper.consume(KEY_STATE) ?: DefinitionsVM.State(word = word))
-    }
-
     init {
         baseInit(analytics)
 
         stateKeeper.register(
             key = KEY_STATE,
             strategy = DefinitionsVM.State.serializer()
-        ) {
-            state
-        }
-
-        restore(instanceState.state)
-    }
-
-    private class Handler(val state: DefinitionsVM.State) : InstanceKeeper.Instance {
-        override fun onDestroy() {}
+        ) { state }
     }
 
     private companion object {

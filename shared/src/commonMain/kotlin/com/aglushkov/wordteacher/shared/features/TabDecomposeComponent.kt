@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.settings.SettingsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.Clearable
@@ -45,7 +46,7 @@ interface TabDecomposeComponent: Clearable {
 
     @Serializable
     sealed class ChildConfiguration {
-        @Serializable data class DefinitionConfiguration(val word: String? = null) : ChildConfiguration()
+        @Serializable data class DefinitionConfiguration(val state: DefinitionsVM.State) : ChildConfiguration()
         @Serializable object CardSetsConfiguration : ChildConfiguration()
         @Serializable object ArticlesConfiguration : ChildConfiguration()
         @Serializable object SettingsConfiguration : ChildConfiguration()
@@ -64,7 +65,9 @@ class TabDecomposeComponentImpl(
         childStack(
             source = navigation,
             serializer = TabDecomposeComponent.ChildConfiguration.serializer(), // Or null to disable navigation state saving
-            initialConfiguration = TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration(),
+            initialConfiguration = TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration(
+                DefinitionsVM.State(word = "owl")
+            ),
             handleBackButton = true, // Pop the back stack on back button press
             childFactory = ::resolveChild,
         )

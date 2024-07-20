@@ -28,7 +28,8 @@
         <activity
             android:name="com.aglushkov.wordteacher.android_app.features.textaction.TextActionActivity"
             android:label="@string/android_text_selection_action"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.android_app.features.textaction
 
+import android.app.ComponentCaller
 import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
@@ -17,6 +18,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -44,6 +48,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 
@@ -56,14 +61,24 @@ class TextActionActivity: AppCompatActivity() {
     private val bottomBarTabs = listOf(
         ScreenTab.Definitions,
         ScreenTab.AddArticle,
-        ScreenTab.Notes
+//        ScreenTab.Notes // TODO: remove completely or repair
     )
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        recreate()
+    }
+
+    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
+        super.onNewIntent(intent, caller)
+        setIntent(intent)
+        recreate()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val context = defaultComponentContext()
-        val deps = (applicationContext as AppComponentOwner).appComponent
         val intentString = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT) // from action.PROCESS_TEXT
             ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT) // from action.ACTION_SEND
         ?: intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)?.toString() ?: ""
@@ -103,6 +118,9 @@ class TextActionActivity: AppCompatActivity() {
         if (urlString == null) {
             text = intentString
         }
+
+        val context = defaultComponentContext()
+        val deps = (applicationContext as AppComponentOwner).appComponent
 
         textActionDecomposeComponent = DaggerTextActionComponent.builder()
             .setAppComponent(deps)
@@ -194,17 +212,23 @@ class TextActionActivity: AppCompatActivity() {
 
     @Composable
     private fun BottomNavigationBarUI(component: TextActionDecomposeComponent) {
+        val childStack = component.childStack.subscribeAsState()
+        val activeChild by remember(childStack) {
+            derivedStateOf {
+                childStack.value.active
+            }
+        }
         BottomNavigation(
             modifier = Modifier.requiredHeight(56.dp)
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
                 BottomNavigationItem(
-                    selected = tab.decomposeChildConfigClass == component.childStack.value.active.configuration::class.java,
+                    selected = tab.decomposeChildConfigClass == activeChild.configuration::class.java,
                     onClick = {
                         when (tab) {
                             is ScreenTab.Definitions -> component.openDefinitions()
                             is ScreenTab.AddArticle -> component.openAddArticle()
-                            is ScreenTab.Notes -> component.openAddNote()
+//                            is ScreenTab.Notes -> component.openAddNote()
                         }
                     },
                     icon = {
@@ -225,6 +249,6 @@ class TextActionActivity: AppCompatActivity() {
     sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
         object Definitions : ScreenTab(MR.strings.tab_definitions.resourceId, MR.images.field_search_24.drawableResId, TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
         object AddArticle : ScreenTab(MR.strings.tab_add_article.resourceId, MR.images.create_note.drawableResId, TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration::class.java)
-        object Notes : ScreenTab(MR.strings.tab_notes.resourceId, R.drawable.ic_tab_notes, TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration::class.java)
+//        object Notes : ScreenTab(MR.strings.tab_notes.resourceId, R.drawable.ic_tab_notes, TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration::class.java)
     }
 }

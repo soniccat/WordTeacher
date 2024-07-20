@@ -27,11 +27,7 @@ class TabComposeModule {
                 is TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration ->
                     DaggerDefinitionsComposeComponent.builder()
                         .setComponentContext(context)
-                        .setConfiguration(
-                            DefinitionsComposeComponent.DefinitionConfiguration(
-                                word = configuration.word
-                            )
-                        )
+                        .setInitialState(configuration.state)
                         .setDeps(appComponent)
                         .build()
                         .definitionsDecomposeComponent()

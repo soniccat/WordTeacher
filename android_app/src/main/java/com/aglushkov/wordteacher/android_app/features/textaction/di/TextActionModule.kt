@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.di.DaggerAddArticle
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponentImpl
@@ -26,11 +27,7 @@ class TextActionModule {
                 is TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration ->
                     DaggerDefinitionsComposeComponent.builder()
                         .setComponentContext(context)
-                        .setConfiguration(
-                            DefinitionsComposeComponent.DefinitionConfiguration(
-                                word = config.text.toString()
-                            )
-                        )
+                        .setInitialState(DefinitionsVM.State(word = config.text))
                         .setDeps(appComponent)
                         .build()
                         .definitionsDecomposeComponent()
@@ -38,7 +35,7 @@ class TextActionModule {
                     DaggerAddArticleComposeComponent.builder()
                         .setComponentContext(context)
                         .setConfiguration(
-                            AddArticleVM.State(text = config.text.toString(), uri = config.url)
+                            AddArticleVM.State(text = config.text, uri = config.url)
                         )
                         .setDeps(appComponent)
                         .build()

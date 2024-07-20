@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -42,7 +43,6 @@ import kotlinx.serialization.Serializable
 interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
 
-    fun restore(newState: State)
     fun onWordSubmitted(
         word: String?,
         filter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
@@ -81,7 +81,7 @@ interface DefinitionsVM: Clearable {
 }
 
 open class DefinitionsVMImpl(
-    override var state: DefinitionsVM.State,
+    restoredState: DefinitionsVM.State,
     private val connectivityManager: ConnectivityManager,
     private val wordDefinitionRepository: WordDefinitionRepository,
     private val dictRepository: DictRepository,
@@ -92,6 +92,7 @@ open class DefinitionsVMImpl(
 ): ViewModel(), DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
+    final override var state: DefinitionsVM.State = restoredState
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
@@ -134,13 +135,9 @@ open class DefinitionsVMImpl(
             state.word = value
         }
 
-    override fun restore(newState: DefinitionsVM.State) {
-        state = newState
+    init {
         word?.let {
             loadIfNeeded(it)
-        } ?: run {
-            word = "owl"
-            loadIfNeeded("owl")
         }
     }
 
@@ -211,7 +208,7 @@ open class DefinitionsVMImpl(
             block = {
                 val flattenedValue = it.map { it.second }.flatten()
                 definitionWords.update {
-                    it.map { flattenedValue }.bumpVersion()
+                    it.toLoaded(flattenedValue).bumpVersion()
                 }
             },
             elseBlock = {

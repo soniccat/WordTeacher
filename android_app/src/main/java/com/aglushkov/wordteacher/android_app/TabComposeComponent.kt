@@ -14,7 +14,7 @@ interface TabComposeComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
-        @BindsInstance fun setWord(word: String?): Builder
+//        @BindsInstance fun setWord(word: String?): Builder
         @BindsInstance fun setAppComponent(appComponent: AppComponent): Builder
 
         fun build(): TabComposeComponent

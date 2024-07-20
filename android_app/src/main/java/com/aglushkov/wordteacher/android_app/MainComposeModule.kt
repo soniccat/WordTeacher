@@ -62,7 +62,7 @@ class MainComposeModule {
                     DaggerTabComposeComponent.builder()
                         .setComponentContext(context)
                         .setAppComponent(appComponent)
-                        .setWord("owl")
+//                        .setWord("owl")
                         .build()
                         .tabDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
