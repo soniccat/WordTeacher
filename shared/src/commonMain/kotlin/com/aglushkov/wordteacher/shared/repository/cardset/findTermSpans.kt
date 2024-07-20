@@ -12,7 +12,7 @@ fun findTermSpans(
     nlpCore: NLPCore,
     nlpSentenceProcessor: NLPSentenceProcessor
 ): List<CardSpan> {
-    val nlpSentence = nlpSentenceProcessor.processString(sentence, nlpCore)
+    val nlpSentence = nlpSentenceProcessor.processString(sentence.lowercase(), nlpCore)
     val words = term.split(' ')
     var tokenI = 0
     var wordI = 0

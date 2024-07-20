@@ -386,6 +386,7 @@ open class ArticleVMImpl(
         val resultPartOfSpeech = firstAnnotation?.entry?.partOfSpeech ?: slice.partOfSpeech()
         val resultPartOfSpeechList = when(resultPartOfSpeech) {
             // undefined to show dict results
+            WordTeacherWord.PartOfSpeech.Verb -> listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.PhrasalVerb, WordTeacherWord.PartOfSpeech.Undefined)
             WordTeacherWord.PartOfSpeech.PhrasalVerb -> listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.Verb, WordTeacherWord.PartOfSpeech.Undefined)
             WordTeacherWord.PartOfSpeech.Undefined -> listOf()
             else -> listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.Undefined)
