@@ -76,7 +76,7 @@ interface DefinitionsVM: Clearable {
 
     @Serializable
     class State(
-        var word: String? = null
+        var word: String? = null,
     )
 }
 

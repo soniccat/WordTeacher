@@ -119,6 +119,16 @@ class TextActionActivity: AppCompatActivity() {
             text = intentString
         }
 
+        // consume state not to restore it, treat TextActionComponent.Config as an actual state
+        // do it not to restore state after onNewIntent and just use data from intent
+        val storedBundle = Bundle()
+        savedStateRegistry.performSave(storedBundle)
+        storedBundle.keySet().firstOrNull()?.let {
+            storedBundle.getBundle(it)?.keySet()?.onEach { key ->
+                savedStateRegistry.consumeRestoredStateForKey(key)
+            }
+        }
+
         val context = defaultComponentContext()
         val deps = (applicationContext as AppComponentOwner).appComponent
 
