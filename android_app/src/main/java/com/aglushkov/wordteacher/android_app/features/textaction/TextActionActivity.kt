@@ -51,6 +51,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stac
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import java.util.regex.Pattern
 
 @ExperimentalUnitApi
 @ExperimentalMaterialApi
@@ -87,18 +88,18 @@ class TextActionActivity: AppCompatActivity() {
         var urlString: String? = null
 
         // TODO: move this login into VM layer
+        // try parse using WEB_URL
         val matcher = Patterns.WEB_URL.matcher(intentString)
         if (matcher.find()) {
             try {
-                if (matcher.start() == 0) {
-                    urlString = URL(
-                        intentString.subSequence(matcher.start(), matcher.end()).toString()
-                    ).toString()
-                }
+                urlString = URL(
+                    intentString.subSequence(matcher.start(), matcher.end()).toString()
+                ).toString()
             } catch (e: Throwable) {
             }
         }
 
+        // try parse the whole string
         if (urlString == null) {
             try {
                 val scheme = Uri.parse(intentString.toString()).scheme

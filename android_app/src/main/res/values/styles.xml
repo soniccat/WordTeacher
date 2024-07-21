@@ -10,7 +10,7 @@
             When windowTranslucentStatus is true, the statusbar is a bit darker and
             we can't use windowTranslucentStatus in dialogs as it breaks adjustResize -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@color/primaryDarkColor</item>
+        <item name="android:statusBarColor">@color/statusBarColor</item>
 
         <!-- Material Colors -->
         <item name="colorPrimary">@color/primaryColor</item>

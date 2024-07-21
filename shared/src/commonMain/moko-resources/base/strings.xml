@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <string name="api_base_url">https://aglushkov.ru:9090</string>
-    <string name="app_name">WordTeacher</string>
+    <string name="app_name">Word Teacher</string>
     <string name="support_email">soniccat2@gmail.com</string>
     <string name="tab_definitions">Words</string>
     <string name="tab_add_article">New Article</string>
@@ -77,7 +77,7 @@
     <string name="learning_instruction_challenge_match">Find what word or phrase on the left side fills the gap in the sentence on the right side. Tap on one of them then on the opposite</string>
     <string name="learning_instruction_challenge_test">Choose the correct word or phrase matching the definition below</string>
 
-    <string name="learning_session_result_title">Card Sets</string>
+    <string name="learning_session_result_title">Results</string>
     <string name="learning_session_result_error">Something went wrong :(</string>
 
     <string name="empty_search_result">Can\'t find anything :(</string>

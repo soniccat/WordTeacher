@@ -210,10 +210,13 @@ open class CardSetsVMImpl(
             text = newCardSetText.orEmpty()
         )
 
-        groups.onEach { e ->
-            if (e.value.isNotEmpty()) {
-                resultList += SectionViewItem(titles[e.key]!!)
-                resultList.addAll(e.value.map(::cardSetViewItem))
+        SectionType.entries.toTypedArray().onEach {
+            if (groups.containsKey(it)) {
+                val items = groups[it].orEmpty().map(::cardSetViewItem)
+                if (items.isNotEmpty()) {
+                    resultList += SectionViewItem(titles[it]!!)
+                    resultList.addAll(items)
+                }
             }
         }
 

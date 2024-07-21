@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.add_article.vm
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.*
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
@@ -58,6 +59,7 @@ interface AddArticleVM: Clearable {
 }
 
 open class AddArticleVMImpl(
+    restoredState: AddArticleVM.State,
     private val articlesRepository: ArticlesRepository,
     private val contentExtractors: Array<ArticleContentExtractor>,
     private val cardSetsRepository: CardSetsRepository,
@@ -68,20 +70,11 @@ open class AddArticleVMImpl(
     private val eventChannel = Channel<Event>(Channel.BUFFERED) // TODO: replace with a list of strings
     override val eventFlow = eventChannel.receiveAsFlow()
 
-    private var state = AddArticleVM.State()
+    private var state = restoredState
     override val uiStateFlow = MutableStateFlow<Resource<AddArticleVM.UIState>>(Resource.Uninitialized())
     override val addingStateFlow = MutableStateFlow<Resource<Article>>(Resource.Uninitialized())
 
-    override fun createState(): AddArticleVM.State {
-        val data = uiStateFlow.value.data()
-        return state.copy(
-            title = data?.title
-        )
-    }
-
-    fun restore(state: AddArticleVM.State) {
-        this.state = state
-
+    init {
         val dataFromState = AddArticleVM.UIState(
             title = state.title.orEmpty(),
             titleError = null,
@@ -94,6 +87,13 @@ open class AddArticleVMImpl(
         } ?: run {
             uiStateFlow.update { it.toLoaded(dataFromState) }
         }
+    }
+
+    override fun createState(): AddArticleVM.State {
+        val data = uiStateFlow.value.data()
+        return state.copy(
+            title = data?.title
+        )
     }
 
     private fun extractContent(uri: String, dataFromState: AddArticleVM.UIState) {
