@@ -23,6 +23,7 @@ class AppMetricaEngine(
         val config = AppMetricaConfig.newConfigBuilder(key).build()
         AppMetrica.activate(app, config)
         AppMetrica.enableActivityAutoTracking(app)
+        AppMetrica.setLocationTracking(true)
 
         scope.launch {
             spaceAuthRepository.authDataFlow.collect { authDataRes ->
