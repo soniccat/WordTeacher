@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.serialization.GZip
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import io.ktor.client.*
 import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.compression.*
@@ -15,12 +16,14 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.util.decodeBase64Bytes
 
 class SpaceHttpClientBuilder(
     private val deviceIdRepository: DeviceIdRepository,
     private val appInfo: AppInfo,
     private val cookieStorage: CookiesStorage,
     private val spaceAuthRepositoryProvider: () -> SpaceAuthRepository,
+    private val secureCodec: SecureCodec,
     private val isDebug: Boolean,
 ) {
     fun build() = HttpClient {
@@ -66,6 +69,12 @@ class SpaceHttpClientBuilder(
                     com.aglushkov.wordteacher.shared.general.Logger.v(message, "SpaceHttpClient")
                 }
             }
+            filter {
+                it.url.pathSegments.all { it != "auth" }
+            }
+            sanitizeHeader {
+                header -> header == HeaderAccessToken
+            }
             level = LogLevel.ALL
         }
     }
@@ -110,18 +119,12 @@ class SpaceHttpClientBuilder(
 
                         if(status == HttpStatusCode.Unauthorized) {
                             try {
-                                var result: Resource<SpaceAuthData> = Resource.Uninitialized()
+                                // try to refresh, if refresh token isn't expired a new access token and a new refresh token will be granted
+                                val refreshResult = spaceRepository.refresh()
+                                val newCall = if (refreshResult.isLoaded()) {
+                                    proceed(request.setAuthData(refreshResult.data()!!))
 
-                                // if we have valid cookies then we can call refresh
-                                val session = cookieStorage.get(this.request.url).firstOrNull { it.name == CookieSession }?.value
-                                if (session != null) {
-                                    result = spaceRepository.refresh()
-                                }
-
-                                val newCall = if (result.isLoaded()) {
-                                    proceed(request.setAuthData(result.data()!!))
-
-                                } else if (result.isUninitialized() || result.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
+                                } else if (refreshResult.isUninitialized() || refreshResult.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
                                     // wordteacher space token is outdated, need to sign-in again
                                     spaceRepository.networkType?.let { networkType ->
                                         spaceRepository.signIn(networkType)
@@ -156,7 +159,10 @@ class SpaceHttpClientBuilder(
 
     private fun HttpRequestBuilder.setAuthData(authData: SpaceAuthData): HttpRequestBuilder {
         headers {
-            set(HeaderAccessToken, authData.authToken.accessToken)
+            set(
+                HeaderAccessToken,
+                secureCodec.decrypt(authData.authToken.accessToken.decodeBase64Bytes())!!.decodeToString(),
+            )
         }
         return this
     }

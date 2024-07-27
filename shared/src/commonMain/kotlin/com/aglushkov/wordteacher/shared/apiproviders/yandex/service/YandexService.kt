@@ -14,13 +14,10 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.readBytes
 import io.ktor.http.encodeURLQueryComponent
 import io.ktor.util.decodeBase64Bytes
-import io.ktor.util.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class YandexService(
@@ -41,7 +38,7 @@ class YandexService(
         install(CustomParameter) {
             parameterName = "key"
             parameterProvider = {
-                secureCodec.decript(apiKey.decodeBase64Bytes())!!.decodeToString()
+                secureCodec.decrypt(apiKey.decodeBase64Bytes())!!.decodeToString()
             }
         }
     }

@@ -29,6 +29,14 @@ fun <T> Response<T>.toOkResponse(): T {
     }
 }
 
+fun <T, D> Response<T>.mapOkData(mapper: (T) -> D): Response<D> {
+    return when(this) {
+        is Response.Ok -> Response.Ok(mapper(value))
+        is Response.Err -> throw ErrorResponseException(value, statusCode)
+        else -> throw RuntimeException("Unknown response type $this")
+    }
+}
+
 fun <T> Response<T>.toResource(): Resource<T> {
     return when(this) {
         is Response.Ok -> Resource.Loaded(value)

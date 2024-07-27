@@ -1,11 +1,14 @@
 package com.aglushkov.wordteacher.shared.service
 
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.decodeBase64Bytes
+import io.ktor.util.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.*
@@ -40,7 +43,8 @@ data class SpaceAuthUser(
 
 class SpaceAuthService(
     private val baseUrl: String,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val secureCodec: SecureCodec,
 ) {
     @Serializable
     enum class NetworkType(val value: String) {
@@ -91,10 +95,17 @@ class SpaceAuthService(
         return withContext(Dispatchers.Default) {
             val res: HttpResponse =
                 httpClient.post(urlString = "${baseUrl}/api/auth/social/" + network.value) {
-                    this.setBody(authJson.encodeToString(AuthInput(token)))
+                    contentType(ContentType.Application.Json)
+                    setBody(authJson.encodeToString(AuthInput(token)))
                 }
             val stringResponse: String = res.body()
-            authJson.decodeFromString<Response<SpaceAuthData>>(stringResponse).setStatusCode(res.status.value)
+            authJson.decodeFromString<Response<SpaceAuthData>>(stringResponse)
+                .mapOkData {
+                    it.copy(
+                        authToken = it.authToken.encrypt(secureCodec),
+                    )
+                }
+                .setStatusCode(res.status.value)
         }
     }
 
@@ -102,10 +113,22 @@ class SpaceAuthService(
         return withContext(Dispatchers.Default) {
             val res: HttpResponse =
                 httpClient.post(urlString = "${baseUrl}/api/auth/refresh") {
-                    this.setBody(refreshJson.encodeToString(RefreshInput(token.accessToken, token.refreshToken)))
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                            refreshJson.encodeToString(
+                            RefreshInput(
+                                secureCodec.decrypt(token.accessToken.decodeBase64Bytes())!!.decodeToString(),
+                                secureCodec.decrypt(token.refreshToken.decodeBase64Bytes())!!.decodeToString(),
+                            )
+                        )
+                    )
                 }
             val stringResponse: String = res.body()
-            refreshJson.decodeFromString<Response<SpaceAuthToken>>(stringResponse).setStatusCode(res.status.value)
+            refreshJson.decodeFromString<Response<SpaceAuthToken>>(stringResponse)
+                .mapOkData {
+                    it.encrypt(secureCodec)
+                }
+                .setStatusCode(res.status.value)
         }
     }
 
@@ -121,3 +144,13 @@ class SpaceAuthService(
         return pathSegments.size >= 3 && pathSegments.subList(pathSegments.size - 3, pathSegments.size - 1) == listOf("auth", "social")
     }
 }
+
+private fun SpaceAuthToken.encrypt(secureCodec: SecureCodec) =
+    copy(
+        accessToken = secureCodec.encrypt(
+            accessToken.toByteArray()
+        ).encodeBase64(),
+        refreshToken = secureCodec.encrypt(
+            refreshToken.toByteArray()
+        ).encodeBase64(),
+    )

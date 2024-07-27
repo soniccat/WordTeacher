@@ -73,7 +73,7 @@ class ConfigRepository(
                 connectParams = if (it.connectParams.key.isNotEmpty()) {
                     it.connectParams.copy(
                         key = "",
-                        securedKey = secureCodec.encript(it.connectParams.key.toByteArray()).encodeBase64()
+                        securedKey = secureCodec.encrypt(it.connectParams.key.toByteArray()).encodeBase64()
                     )
                 } else {
                     it.connectParams

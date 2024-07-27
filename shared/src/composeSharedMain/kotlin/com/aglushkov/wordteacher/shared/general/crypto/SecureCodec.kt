@@ -14,7 +14,7 @@ actual class SecureCodec(
     private val keyAlias: String,
     private val protectionParameter: KeyStore.ProtectionParameter?
 ) {
-    actual fun encript(value: ByteArray): ByteArray {
+    actual fun encrypt(value: ByteArray): ByteArray {
         val key = getPublicKey()
         val encryptCypher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
         encryptCypher.init(Cipher.ENCRYPT_MODE, key)
@@ -27,7 +27,7 @@ actual class SecureCodec(
         return byteArrayStream.toByteArray()
     }
 
-    actual fun decript(value: ByteArray): ByteArray? {
+    actual fun decrypt(value: ByteArray): ByteArray? {
         val key = getPrivateKey()
         val encryptCypher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
         encryptCypher.init(Cipher.DECRYPT_MODE, key)

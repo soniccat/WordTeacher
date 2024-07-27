@@ -260,13 +260,15 @@ class SharedAppModule {
         deviceIdRepository: DeviceIdRepository,
         appInfo: AppInfo,
         cookieStorage: CookiesStorage,
-        spaceAuthRepository: dagger.Lazy<SpaceAuthRepository>,
+        spaceAuthRepository: Lazy<SpaceAuthRepository>,
+        secureCodec: SecureCodec,
         @IsDebug isDebug: Boolean,
     ): HttpClient = SpaceHttpClientBuilder(
         deviceIdRepository,
         appInfo,
         cookieStorage,
         { spaceAuthRepository.get() },
+        secureCodec,
         isDebug,
     ).build()
 
@@ -282,8 +284,9 @@ class SharedAppModule {
     fun spaceAuthService(
         @SpaceHttpClient httpClient: HttpClient,
         @ApiBaseUrl apiBaseUrl: String,
+        secureCodec: SecureCodec,
     ): SpaceAuthService =
-        SpaceAuthService(apiBaseUrl, httpClient)
+        SpaceAuthService(apiBaseUrl, httpClient, secureCodec)
 
     @AppComp
     @Provides
@@ -309,10 +312,17 @@ class SharedAppModule {
         googleAuthController: GoogleAuthController,
         vkAuthController: VKAuthController,
         fileSystem: FileSystem,
-        databaseCardWorker: Lazy<DatabaseCardWorker>
+        databaseCardWorker: Lazy<DatabaseCardWorker>,
     ): SpaceAuthRepository {
         val path = obtainSpaceDirPath(basePath,fileSystem).div("authData")
-        return SpaceAuthRepository(service, googleAuthController, vkAuthController, path, fileSystem, { databaseCardWorker.get() })
+        return SpaceAuthRepository(
+            service,
+            googleAuthController,
+            vkAuthController,
+            path,
+            fileSystem,
+            { databaseCardWorker.get() },
+        )
     }
 
     private fun obtainSpaceDirPath(basePath: Path, fileSystem: FileSystem): Path {

@@ -7,6 +7,8 @@ import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -102,7 +104,8 @@ class SpaceCardSetService(
         return withContext(Dispatchers.Default) {
             val res: HttpResponse =
                 httpClient.post(urlString = "${baseUrl}/api/cardsets/pull") {
-                    this.setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds, lastModificationDate)))
+                    contentType(ContentType.Application.Json)
+                    setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds, lastModificationDate)))
                 }
             val stringResponse: String = res.body()
             pullJson.decodeFromString<Response<CardSetPullResponse>>(stringResponse).setStatusCode(res.status.value)
@@ -113,7 +116,8 @@ class SpaceCardSetService(
         return withContext(Dispatchers.Default) {
             val res: HttpResponse =
                 httpClient.post(urlString = "${baseUrl}/api/cardsets/push") {
-                    this.setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds, lastModificationDate)))
+                    contentType(ContentType.Application.Json)
+                    setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds, lastModificationDate)))
                 }
             val stringResponse: String = res.body()
             pushJson.decodeFromString<Response<CardSetPushResponse>>(stringResponse).setStatusCode(res.status.value)

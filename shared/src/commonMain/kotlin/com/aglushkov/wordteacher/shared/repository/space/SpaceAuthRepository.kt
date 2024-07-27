@@ -8,7 +8,10 @@ import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.service.*
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import io.ktor.http.*
+import io.ktor.util.decodeBase64Bytes
+import io.ktor.util.encodeBase64
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
