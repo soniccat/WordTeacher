@@ -78,7 +78,8 @@ func generateUserAuthToken(
 func saveUserAuthTokenAsSession(sd *models.UserAuthToken, context context.Context, manager *scs.SessionManager) {
 	manager.Put(context, models.SessionAccessTokenKey, sd.AccessToken.Value)
 	manager.Put(context, models.SessionAccessTokenExpirationDateKey, sd.AccessToken.ExpirationDate)
-	manager.Put(context, models.SessionRefreshTokenKey, sd.RefreshToken)
+	manager.Put(context, models.SessionRefreshTokenKey, sd.RefreshToken.Value)
+	manager.Put(context, models.SessionRefreshTokenExpirationDateKey, sd.RefreshToken.ExpirationDate)
 	manager.Put(context, models.SessionNetworkTypeKey, int8(sd.NetworkType))
 	manager.Put(context, models.SessionUserDbIdKey, sd.UserDbId)
 	manager.Put(context, models.SessionUserDeviceType, sd.UserDeviceType)

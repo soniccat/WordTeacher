@@ -94,7 +94,12 @@ fun main() {
         Logger().setupDebug(
             StaticConfig(
                 Severity.Verbose,
-                listOf(CommonWriter(), appComponent.fileLogger()),
+                buildList {
+                    if (appComponent.isDebug()) {
+                        add(CommonWriter())
+                    }
+                    add(appComponent.fileLogger())
+                }
             )
         )
 

@@ -27,9 +27,7 @@ class SpaceHttpClientBuilder(
     private val isDebug: Boolean,
 ) {
     fun build() = HttpClient {
-        if (isDebug) {
-            installLogger()
-        }
+        installLogger()
         installGzipForResponse()
 //        installGzipForRequest()
         installCookies()
@@ -69,11 +67,13 @@ class SpaceHttpClientBuilder(
                     com.aglushkov.wordteacher.shared.general.Logger.v(message, "SpaceHttpClient")
                 }
             }
-            filter {
-                it.url.pathSegments.all { it != "auth" }
-            }
-            sanitizeHeader {
-                header -> header == HeaderAccessToken
+            if (!isDebug) {
+                filter {
+                    it.url.pathSegments.all { it != "auth" }
+                }
+                sanitizeHeader {
+                    header -> header == HeaderAccessToken
+                }
             }
             level = LogLevel.ALL
         }
