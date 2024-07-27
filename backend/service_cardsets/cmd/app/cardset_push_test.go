@@ -512,7 +512,10 @@ func createUserAuthToken(userId string) *models.UserAuthToken {
 			Value:          "testAccessToken",
 			ExpirationDate: time.Now(),
 		},
-		RefreshToken: "testRefreshToken",
+		RefreshToken: models.RefreshToken{
+			Value:          "testRefreshToken",
+			ExpirationDate: time.Now(),
+		},
 		UserDeviceId: "testDeviceId",
 	}
 }

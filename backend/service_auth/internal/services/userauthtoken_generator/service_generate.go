@@ -65,7 +65,10 @@ func generateUserAuthToken(
 			Value:          accessTokenValue.String(),
 			ExpirationDate: time.Now().Add(models.AccessTokenTimeout),
 		},
-		RefreshToken:   refreshTokenValue.String(),
+		RefreshToken: models.RefreshToken{
+			Value:          refreshTokenValue.String(),
+			ExpirationDate: time.Now().Add(models.RefreshTokenTimeout),
+		},
 		UserDeviceType: deviceType,
 		UserDeviceId:   deviceId,
 		AppVersion:     appVersion,

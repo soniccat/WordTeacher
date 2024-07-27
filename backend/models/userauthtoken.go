@@ -8,17 +8,19 @@ import (
 	"github.com/alexedwards/scs/v2"
 )
 
-const AccessTokenTimeout = time.Hour // TODO: change to several days
+const AccessTokenTimeout = time.Hour
+const RefreshTokenTimeout = 7 * 24 * time.Hour
 
 const (
-	SessionAccessTokenKey               = "accessToken"
-	SessionAccessTokenExpirationDateKey = "accessTokenExpirationDate"
-	SessionRefreshTokenKey              = "refreshToken"
-	SessionNetworkTypeKey               = "networkType"
-	SessionUserDbIdKey                  = "userDbId"
-	SessionUserDeviceType               = "deviceType"
-	SessionUserDeviceId                 = "deviceId"
-	SessionAppVersion                   = "appVersion"
+	SessionAccessTokenKey                = "accessToken"
+	SessionAccessTokenExpirationDateKey  = "accessTokenExpirationDate"
+	SessionRefreshTokenKey               = "refreshToken"
+	SessionRefreshTokenExpirationDateKey = "refreshTokenExpirationDate"
+	SessionNetworkTypeKey                = "networkType"
+	SessionUserDbIdKey                   = "userDbId"
+	SessionUserDeviceType                = "deviceType"
+	SessionUserDeviceId                  = "deviceId"
+	SessionAppVersion                    = "appVersion"
 )
 
 type UserAuthToken struct {
@@ -26,7 +28,7 @@ type UserAuthToken struct {
 	UserDbId       string          `bson:"userId,omitempty"`
 	NetworkType    UserNetworkType `bson:"networkType,omitempty"`
 	AccessToken    AccessToken     `bson:"accessToken,omitempty"`
-	RefreshToken   string          `bson:"refreshToken,omitempty"`
+	RefreshToken   RefreshToken    `bson:"refreshToken,omitempty"`
 	UserDeviceType string          `bson:"deviceType,omitempty"`
 	UserDeviceId   string          `bson:"deviceId,omitempty"`
 	AppVersion     string          `bson:"version,omitempty"`
@@ -35,7 +37,7 @@ type UserAuthToken struct {
 
 func New(
 	accessToken *AccessToken,
-	refreshToken *string,
+	refreshToken *RefreshToken,
 	networkType UserNetworkType,
 	userDeviceType string,
 	userDeviceId string,
@@ -70,6 +72,11 @@ func Load(ctx context.Context, manager *scs.SessionManager) (*UserAuthToken, err
 		return nil, logger.Error(ctx, "session refresh token is missing")
 	}
 
+	sessionRefreshTokenExpirationDate, ok := manager.Get(ctx, SessionRefreshTokenExpirationDateKey).(time.Time)
+	if !ok {
+		return nil, logger.Error(ctx, "session refresh token expiration date is missing")
+	}
+
 	networkType, ok := manager.Get(ctx, SessionNetworkTypeKey).(int8)
 	if !ok {
 		return nil, logger.Error(ctx, "session networkType is missing")
@@ -100,7 +107,10 @@ func Load(ctx context.Context, manager *scs.SessionManager) (*UserAuthToken, err
 			Value:          sessionAccessToken,
 			ExpirationDate: sessionAccessTokenExpirationDate,
 		},
-		RefreshToken:   sessionRefreshToken,
+		RefreshToken: RefreshToken{
+			Value:          sessionRefreshToken,
+			ExpirationDate: sessionRefreshTokenExpirationDate,
+		},
 		NetworkType:    UserNetworkType(networkType),
 		UserDeviceType: sessionDeviceType,
 		UserDeviceId:   sessionDeviceId,
@@ -109,8 +119,12 @@ func Load(ctx context.Context, manager *scs.SessionManager) (*UserAuthToken, err
 	}, nil
 }
 
-func (sd *UserAuthToken) IsValid() bool {
+func (sd *UserAuthToken) IsAccessTokenValid() bool {
 	return time.Now().Compare(sd.AccessToken.ExpirationDate) < 0
+}
+
+func (sd *UserAuthToken) IsRefreshTokenValid() bool {
+	return time.Now().Compare(sd.RefreshToken.ExpirationDate) < 0
 }
 
 func (sd *UserAuthToken) IsMatched(
@@ -120,7 +134,7 @@ func (sd *UserAuthToken) IsMatched(
 	userDeviceId string,
 ) bool {
 	return sd.AccessToken.Value == accessToken &&
-		(refreshToken == nil || sd.RefreshToken == *refreshToken) &&
+		(refreshToken == nil || sd.IsRefreshTokenValid() && sd.RefreshToken.Value == *refreshToken) &&
 		sd.UserDeviceType == userDeviceType &&
 		sd.UserDeviceId == userDeviceId
 }

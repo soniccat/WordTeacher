@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"io"
 	"log/slog"
@@ -65,7 +66,13 @@ type RawResponse struct {
 
 func TestReadResponse[T any](writer *httptest.ResponseRecorder) *T {
 	var rawResponse RawResponse
-	body, err := io.ReadAll(writer.Result().Body)
+
+	reader, err := gzip.NewReader(writer.Result().Body)
+	if err != nil {
+		panic(err)
+	}
+
+	body, err := io.ReadAll(reader)
 	if err != nil {
 		panic(err)
 	}

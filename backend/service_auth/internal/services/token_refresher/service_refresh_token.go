@@ -18,7 +18,7 @@ func (s *Service) RefreshToken(
 		return nil, err
 	}
 
-	if !userAuthToken.IsValid() {
+	if !userAuthToken.IsRefreshTokenValid() {
 		return nil, service_models.NewErrorInvalidToken(logger.Error(ctx, "token is invalid"))
 	}
 

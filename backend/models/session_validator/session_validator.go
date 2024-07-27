@@ -70,7 +70,7 @@ func validateSession(
 		return nil, NewValidateSessionError(http.StatusUnauthorized, err)
 	}
 
-	if !userAuthToken.IsValid() {
+	if !userAuthToken.IsAccessTokenValid() {
 		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
 	}
 

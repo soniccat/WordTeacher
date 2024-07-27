@@ -129,7 +129,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 	response := Response{
 		Token: ResponseToken{
 			AccessToken:  authorizedUser.Token.AccessToken.Value,
-			RefreshToken: authorizedUser.Token.RefreshToken,
+			RefreshToken: authorizedUser.Token.RefreshToken.Value,
 		},
 		User: ResponseUser{
 			Id:          authorizedUser.UserId,

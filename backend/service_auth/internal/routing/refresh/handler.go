@@ -116,7 +116,7 @@ func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
 	// Build response
 	response := Response{
 		AccessToken:  authorizedUser.Token.AccessToken.Value,
-		RefreshToken: authorizedUser.Token.RefreshToken,
+		RefreshToken: authorizedUser.Token.RefreshToken.Value,
 	}
 
 	h.WriteResponse(w, response)
