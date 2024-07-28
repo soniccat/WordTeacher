@@ -127,16 +127,36 @@ func (sd *UserAuthToken) IsRefreshTokenValid() bool {
 	return time.Now().Compare(sd.RefreshToken.ExpirationDate) < 0
 }
 
-func (sd *UserAuthToken) IsMatched(
+func (sd *UserAuthToken) Match(
+	ctx context.Context,
 	accessToken string,
 	refreshToken *string,
 	userDeviceType string,
 	userDeviceId string,
-) bool {
-	return sd.AccessToken.Value == accessToken &&
-		(refreshToken == nil || sd.IsRefreshTokenValid() && sd.RefreshToken.Value == *refreshToken) &&
-		sd.UserDeviceType == userDeviceType &&
-		sd.UserDeviceId == userDeviceId
+) error {
+	if sd.AccessToken.Value != accessToken {
+		return logger.Error(ctx, "accessToken doesn't match")
+	}
+
+	if refreshToken != nil {
+		if !sd.IsRefreshTokenValid() {
+			return logger.Error(ctx, "refreshToken isn't valid")
+		}
+
+		if sd.RefreshToken.Value != *refreshToken {
+			return logger.Error(ctx, "refreshToken doesn't match")
+		}
+	}
+
+	if sd.UserDeviceType != userDeviceType {
+		return logger.Error(ctx, "userDeviceType doesn't match")
+	}
+
+	if sd.UserDeviceId != userDeviceId {
+		return logger.Error(ctx, "userDeviceId doesn't match")
+	}
+
+	return nil
 }
 
 func (sd *UserAuthToken) LogParams() []any {

@@ -1,10 +1,11 @@
 package tools
 
 import (
+	"time"
+
 	"github.com/alexedwards/scs/redisstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/gomodule/redigo/redis"
-	"time"
 )
 
 func CreateSessionManager(redisAddress string) *scs.SessionManager {
@@ -17,6 +18,6 @@ func CreateSessionManager(redisAddress string) *scs.SessionManager {
 
 	sessionManager := scs.New()
 	sessionManager.Store = redisstore.New(pool)
-	sessionManager.Lifetime = 24 * time.Hour
+	sessionManager.Lifetime = 8 * 24 * time.Hour // a bit more than refresh token expiration lifetime
 	return sessionManager
 }

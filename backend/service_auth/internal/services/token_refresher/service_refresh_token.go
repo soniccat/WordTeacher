@@ -22,13 +22,16 @@ func (s *Service) RefreshToken(
 		return nil, service_models.NewErrorInvalidToken(logger.Error(ctx, "token is invalid"))
 	}
 
-	if !userAuthToken.IsMatched(
+	err = userAuthToken.Match(
+		ctx,
 		userTokens.AccessToken,
 		userTokens.RefreshToken,
 		userInfo.DeviceType,
 		userInfo.DeviceId,
-	) {
-		return nil, service_models.NewErrorInvalidToken(logger.Error(ctx, "token is invalid"))
+	)
+
+	if err != nil {
+		return nil, service_models.NewErrorInvalidToken(err)
 	}
 
 	token, err := s.authTokenGenerator.Generate(

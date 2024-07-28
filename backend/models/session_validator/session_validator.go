@@ -74,13 +74,16 @@ func validateSession(
 		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
 	}
 
-	if !userAuthToken.IsMatched(
+	err = userAuthToken.Match(
+		r.Context(),
 		r.Header.Get(tools.HeaderAccessToken),
 		nil,
 		deviceType,
 		deviceId,
-	) {
-		return nil, NewValidateSessionError(http.StatusUnauthorized, errors.New("invalid auth token"))
+	)
+
+	if err != nil {
+		return nil, NewValidateSessionError(http.StatusUnauthorized, err)
 	}
 
 	return userAuthToken, nil
