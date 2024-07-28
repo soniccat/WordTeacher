@@ -135,7 +135,10 @@ func (sd *UserAuthToken) Match(
 	userDeviceId string,
 ) error {
 	if sd.AccessToken.Value != accessToken {
-		return logger.Error(ctx, "accessToken doesn't match")
+		return logger.Error(
+			logger.WrapContext(ctx, "inAccessToken", accessToken, "sessionAccessToken", sd.AccessToken.Value),
+			"accessToken doesn't match",
+		)
 	}
 
 	if refreshToken != nil {
