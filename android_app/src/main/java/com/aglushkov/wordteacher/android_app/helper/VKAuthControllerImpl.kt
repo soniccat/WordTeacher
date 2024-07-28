@@ -11,6 +11,7 @@ import com.vk.id.AccessToken
 import com.vk.id.VKID
 import com.vk.id.VKIDAuthFail
 import com.vk.id.auth.VKIDAuthCallback
+import com.vk.id.auth.VKIDAuthParams
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
@@ -32,8 +33,6 @@ class VKAuthControllerImpl : VKAuthController {
                         token = accessToken.token,
                         userID = accessToken.userID,
                         expireTime = accessToken.expireTime,
-                        firstName = accessToken.userData.firstName,
-                        lastName = accessToken.userData.lastName,
                     )
                 )
             }
@@ -66,7 +65,7 @@ class VKAuthControllerImpl : VKAuthController {
             return
         }
         vkAuthDataState.value = Resource.Loading()
-        vkid!!.authorize(callback = vkAuthCallback)
+        vkid!!.authorize(callback = vkAuthCallback, params = VKIDAuthParams {})
     }
 
     override fun launchSignOut() {

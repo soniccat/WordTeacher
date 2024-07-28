@@ -9,8 +9,6 @@ data class VKAuthData(
     override val token: String,
     val userID: Long,
     val expireTime: Long,
-    val firstName: String,
-    val lastName: String,
 ) : NetworkAuthData
 
 interface VKAuthController: NetworkAuthController {

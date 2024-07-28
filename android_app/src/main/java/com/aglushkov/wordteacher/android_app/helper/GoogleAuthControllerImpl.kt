@@ -55,8 +55,7 @@ class GoogleAuthControllerImpl(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setServerClientId(serverClientId)
-                    // Only show accounts previously used to sign in.
-                    .setFilterByAuthorizedAccounts(true)
+                    .setFilterByAuthorizedAccounts(false)
                     .build()
             )
             // Automatically sign in when exactly one credential is retrieved.
@@ -89,7 +88,7 @@ class GoogleAuthControllerImpl(
 
     override suspend fun signIn(): Resource<NetworkAuthData> {
         launchSignIn()
-        googleAuthDataState.takeWhile { !it.isLoadedOrError() }.collect()
+        googleAuthDataState.takeWhile { it.isLoading() }.collect()
         return googleAuthDataState.value
     }
 
@@ -148,9 +147,7 @@ class GoogleAuthControllerImpl(
     }
 
     private fun createGoogleSignInOptions() =
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestProfile()
+        GoogleSignInOptions.Builder()
             .requestIdToken(serverClientId)
             .build()
 }

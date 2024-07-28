@@ -15,8 +15,6 @@ const (
 type UserNetwork struct {
 	NetworkType   UserNetworkType `bson:"type"`
 	NetworkUserId string          `bson:"networkUserId,omitempty"`
-	// Email         string          `bson:"email,omitempty"`
-	// Name          string          `bson:"name,omitempty"`
 }
 
 func UserNetworkTypeFromString(value string) (UserNetworkType, error) {
