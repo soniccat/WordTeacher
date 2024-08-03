@@ -61,7 +61,7 @@ interface ArticleVM: Clearable {
 
     // TODO: simplify
     class StateController(
-        id: Long,
+        restoredState: State,
         private val settings: FlowSettings,
     ) {
         private val SELECTION_STATE_KEY = "articleSelectionState"
@@ -74,7 +74,7 @@ interface ArticleVM: Clearable {
 
         private var inMemoryState = runBlocking {
             InMemoryState(
-                id = id,
+                id = restoredState.id,
                 selectionState =
                     settings.getString(SELECTION_STATE_KEY, "{}").let {
                         try {
@@ -150,7 +150,7 @@ interface ArticleVM: Clearable {
             get() = lastFirstVisibleItemMap[id] ?: 0
 
         fun update(block: InMemoryState.()->InMemoryState) = run { block(this).copy(version = version + 1) }
-        fun toState() = State(id = id, selectionState = selectionState, lastFirstVisibleItem = lastFirstVisibleItem)
+        fun toState() = State(id = id)
         fun updateWithLastFirstVisibleItem(index: Int) =
             update { copy(lastFirstVisibleItemMap = lastFirstVisibleItemMap + (id to index)) }
     }
@@ -158,8 +158,6 @@ interface ArticleVM: Clearable {
     @Serializable
     data class State(
         val id: Long,
-        val selectionState: SelectionState = SelectionState(),
-        val lastFirstVisibleItem: Int = 0,
     )
 
     @Serializable
@@ -181,11 +179,11 @@ interface ArticleVM: Clearable {
 }
 
 open class ArticleVMImpl(
+    restoredState: ArticleVM.State,
     override val definitionsVM: DefinitionsVM,
     private val articleRepository: ArticleRepository,
     private val cardsRepository: CardsRepository,
     private val dictRepository: DictRepository,
-    articleId: Long,
     private val idGenerator: IdGenerator,
     settings: FlowSettings,
     private val analytics: Analytics,
@@ -194,7 +192,7 @@ open class ArticleVMImpl(
     override val article: StateFlow<Resource<Article>> = articleRepository.article
 
     private val stateController = ArticleVM.StateController(
-        id = articleId,
+        restoredState = restoredState,
         settings = settings
     )
     override val state = stateController.stateFlow
@@ -215,6 +213,10 @@ open class ArticleVMImpl(
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     init {
+        viewModelScope.launch {
+            articleRepository.loadArticle(state.value.id)
+        }
+
         viewModelScope.launch(Dispatchers.Default) {
             cardsRepository.cards.map { res ->
                 res.copyWith(
@@ -301,12 +303,6 @@ open class ArticleVMImpl(
         }
 
         return progressAndPartOfSpeechAnnotations + phraseAnnotations + dictAnnotations
-    }
-
-    fun restore(newState: ArticleVM.State) {
-        viewModelScope.launch {
-            articleRepository.loadArticle(newState.id)
-        }
     }
 
     private fun buildViewItems(

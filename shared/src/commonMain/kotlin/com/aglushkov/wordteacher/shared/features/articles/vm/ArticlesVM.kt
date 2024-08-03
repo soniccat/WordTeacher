@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.CompletionResult
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.Logger
@@ -59,7 +60,7 @@ open class ArticlesVMImpl(
     }
 
     override fun onArticleClicked(item: ArticleViewItem) {
-        router?.openArticle(item.id)
+        router?.openArticle(ArticleVM.State(item.id))
     }
 
     override fun onArticleRemoved(item: ArticleViewItem) {

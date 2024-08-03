@@ -64,7 +64,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
     override fun openAddArticle()
 //    fun popDialog(inner: Any)
     fun popDialog(config: ChildConfiguration)
-    override fun openArticle(id: Long)
+    override fun openArticle(state: ArticleVM.State)
     override fun openCardSet(state: CardSetVM.State)
     fun openCardSetInfo(state: CardSetInfoVM.State)
     override fun openCardSets()
@@ -99,7 +99,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
     @Serializable
     sealed class ChildConfiguration {
         @Serializable data class CardSetInfoConfiguration(val state: CardSetInfoVM.State) : ChildConfiguration()
-        @Serializable data class ArticleConfiguration(val id: Long) : ChildConfiguration()
+        @Serializable data class ArticleConfiguration(val state: ArticleVM.State) : ChildConfiguration()
         @Serializable data class CardSetConfiguration(val state: CardSetVM.State) : ChildConfiguration()
         @Serializable data class LearningConfiguration(val ids: List<Long>) : ChildConfiguration()
         @Serializable data class LearningSessionResultConfiguration(val results: List<SessionCardResult>) : ChildConfiguration()
@@ -196,9 +196,9 @@ class MainDecomposeComponentImpl(
 
     }
 
-    override fun openArticle(id: Long) =
+    override fun openArticle(state: ArticleVM.State) =
         navigation.pushChildConfigurationIfNotAtTop(
-            MainDecomposeComponent.ChildConfiguration.ArticleConfiguration(id)
+            MainDecomposeComponent.ChildConfiguration.ArticleConfiguration(state)
         )
 
     override fun openCardSet(state: CardSetVM.State) {

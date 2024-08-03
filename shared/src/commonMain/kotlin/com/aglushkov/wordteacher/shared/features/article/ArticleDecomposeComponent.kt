@@ -5,6 +5,9 @@ import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVMImpl
+import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent.Companion
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
@@ -19,7 +22,7 @@ import com.russhwolf.settings.coroutines.FlowSettings
 
 class ArticleDecomposeComponent(
     componentContext: ComponentContext,
-    id: Long,
+    initialState: ArticleVM.State,
     definitionsVM: DefinitionsVM,
     articleRepository: ArticleRepository,
     cardsRepository: CardsRepository,
@@ -28,20 +31,19 @@ class ArticleDecomposeComponent(
     settings: FlowSettings,
     analytics: Analytics,
 ) : ArticleVMImpl (
+    componentContext.stateKeeper.consume(
+        key = KEY_STATE,
+        strategy = ArticleVM.State.serializer()
+    ) ?: initialState,
     definitionsVM,
     articleRepository,
     cardsRepository,
     dictRepository,
-    id,
     idGenerator,
     settings,
     analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Article"
-
-    private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
-        Handler(stateKeeper.consume(KEY_STATE) ?: ArticleVM.State(id = id))
-    }
 
     init {
         baseInit(analytics)
@@ -52,12 +54,6 @@ class ArticleDecomposeComponent(
         ) {
             state.value.toState()
         }
-
-        restore(instanceState.state)
-    }
-
-    private class Handler(val state: ArticleVM.State) : InstanceKeeper.Instance {
-        override fun onDestroy() {}
     }
 
     private companion object {

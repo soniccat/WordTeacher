@@ -44,7 +44,6 @@ interface SettingsVM: Clearable {
     val items: StateFlow<List<BaseViewItem<*>>>
     val eventFlow: Flow<Event>
 
-    fun restore(newState: State)
     fun onSignInClicked(networkType: SpaceAuthService.NetworkType)
     fun onSignOutClicked()
     fun onAuthRefreshClicked()
@@ -55,7 +54,9 @@ interface SettingsVM: Clearable {
 
     // Created to use in future
     @Serializable
-    class State
+    data class State(
+        val dummyValue: Boolean = false,
+    )
 }
 
 interface FileSharer {
@@ -63,7 +64,7 @@ interface FileSharer {
 }
 
 open class SettingsVMImpl (
-    override var state: SettingsVM.State,
+    restoredState: SettingsVM.State,
     private val connectivityManager: ConnectivityManager,
     private val spaceAuthRepository: SpaceAuthRepository,
     private val logsRepository: LogsRepository,
@@ -80,6 +81,7 @@ open class SettingsVMImpl (
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     override var router: SettingsRouter? = null
+    final override val state: SettingsVM.State = restoredState
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
@@ -96,10 +98,6 @@ open class SettingsVMImpl (
     ) { authRes, isLoggingEnabled, gradationState ->
         buildItems(authRes, gradationState, isLoggingEnabled, isDebug)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    override fun restore(newState: SettingsVM.State) {
-        state = newState
-    }
 
     private fun buildItems(
         authDataRes: Resource<SpaceAuthData>,

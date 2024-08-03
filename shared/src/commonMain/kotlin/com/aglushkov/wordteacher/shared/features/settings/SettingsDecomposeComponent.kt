@@ -2,6 +2,9 @@ package com.aglushkov.wordteacher.shared.features.settings
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent.Companion
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
@@ -31,7 +34,7 @@ import com.arkivanov.essenty.statekeeper.consume
 
 class SettingsDecomposeComponent (
     componentContext: ComponentContext,
-    state: SettingsVM.State,
+    initialState: SettingsVM.State,
     connectivityManager: ConnectivityManager,
     spaceAuthRepository: SpaceAuthRepository,
     logsRepository: LogsRepository,
@@ -45,7 +48,10 @@ class SettingsDecomposeComponent (
     emailOpener: EmailOpener,
     databaseCardWorker: DatabaseCardWorker,
 ) : SettingsVMImpl(
-    state,
+    componentContext.stateKeeper.consume(
+        key = KEY_STATE,
+        strategy = SettingsVM.State.serializer()
+    ) ?: initialState,
     connectivityManager,
     spaceAuthRepository,
     logsRepository,
@@ -61,25 +67,13 @@ class SettingsDecomposeComponent (
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Settings"
 
-    private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
-        Handler(stateKeeper.consume(KEY_STATE) ?: SettingsVM.State())
-    }
-
     init {
         baseInit(analytics)
 
         stateKeeper.register(
             key = KEY_STATE,
             strategy = SettingsVM.State.serializer()
-        ) {
-            state
-        }
-
-        restore(instanceState.state)
-    }
-
-    private class Handler(val state: SettingsVM.State) : InstanceKeeper.Instance {
-        override fun onDestroy() {}
+        ) { this.state }
     }
 
     private companion object {

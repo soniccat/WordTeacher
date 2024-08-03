@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.article.di
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsModule
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -22,8 +23,10 @@ interface ArticleComposeComponent {
 
     @Component.Builder
     interface Builder {
-        @BindsInstance fun setComponentContext(context: ComponentContext): Builder
-        @BindsInstance fun setConfiguration(configuration: MainDecomposeComponent.ChildConfiguration.ArticleConfiguration): Builder
+        @BindsInstance
+        fun setComponentContext(context: ComponentContext): Builder
+        @BindsInstance
+        fun setInitialState(state: ArticleVM.State): Builder
 
         fun setDeps(deps: ArticleDependencies): Builder
         fun setDefinitionsDeps(deps: DefinitionsDependencies): Builder

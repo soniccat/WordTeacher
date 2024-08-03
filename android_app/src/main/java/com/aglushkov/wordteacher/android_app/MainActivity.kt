@@ -41,6 +41,7 @@ import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.shared.features.article.views.ArticleUI
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
 import com.aglushkov.wordteacher.shared.features.cardset.views.CardSetUI
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
@@ -121,7 +122,9 @@ class MainActivity : AppCompatActivity(), Router {
             mainDecomposeComponent.popToRoot()
             (mainDecomposeComponent.childStack.value.active.instance as? MainDecomposeComponent.Child.Tabs)?.let { tabs ->
                 tabs.vm.openArticles()
-                mainDecomposeComponent.openArticle(articleId)
+                mainDecomposeComponent.openArticle(
+                    ArticleVM.State(articleId)
+                )
             }
 
         }
@@ -364,8 +367,8 @@ class MainActivity : AppCompatActivity(), Router {
         mainDecomposeComponent.openAddArticle()
     }
 
-    override fun openArticle(id: Long) {
-        mainDecomposeComponent.openArticle(id)
+    override fun openArticle(state: ArticleVM.State) {
+        mainDecomposeComponent.openArticle(state)
     }
 
     override fun closeArticle() {

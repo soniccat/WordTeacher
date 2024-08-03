@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.article.di
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -35,14 +36,12 @@ class ArticleModule {
 
     @Provides
     fun definitionsVM(
-        configuration: MainDecomposeComponent.ChildConfiguration.ArticleConfiguration,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
         idGenerator: IdGenerator,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
-        nlpCore: NLPCore,
         analytics: Analytics,
     ): DefinitionsVM = DefinitionsVMImpl(
         DefinitionsVM.State(),
@@ -57,8 +56,8 @@ class ArticleModule {
 
     @Provides
     fun articleDecomposeComponent(
+        initialState: ArticleVM.State,
         componentContext: ComponentContext,
-        configuration: MainDecomposeComponent.ChildConfiguration.ArticleConfiguration,
         definitionsVM: DefinitionsVM,
         articleRepository: ArticleRepository,
         cardsRepository: CardsRepository,
@@ -68,7 +67,7 @@ class ArticleModule {
         analytics: Analytics,
     ) = ArticleDecomposeComponent(
         componentContext,
-        configuration.id,
+        initialState,
         definitionsVM,
         articleRepository,
         cardsRepository,
