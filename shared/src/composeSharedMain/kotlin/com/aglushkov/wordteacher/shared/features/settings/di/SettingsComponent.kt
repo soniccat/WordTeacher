@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -45,4 +46,5 @@ interface SettingsDependencies {
     fun analytics(): Analytics
     fun appInfo(): AppInfo
     fun emailOpener(): EmailOpener
+    fun databaseCardWorker(): DatabaseCardWorker
 }

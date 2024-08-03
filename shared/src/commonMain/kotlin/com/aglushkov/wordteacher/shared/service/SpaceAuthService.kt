@@ -115,7 +115,7 @@ class SpaceAuthService(
                 httpClient.post(urlString = "${baseUrl}/api/auth/refresh") {
                     contentType(ContentType.Application.Json)
                     setBody(
-                            refreshJson.encodeToString(
+                        refreshJson.encodeToString(
                             RefreshInput(
                                 secureCodec.decrypt(token.accessToken.decodeBase64Bytes())!!.decodeToString(),
                                 secureCodec.decrypt(token.refreshToken.decodeBase64Bytes())!!.decodeToString(),
@@ -126,7 +126,7 @@ class SpaceAuthService(
             val stringResponse: String = res.body()
             refreshJson.decodeFromString<Response<SpaceAuthToken>>(stringResponse)
                 .mapOkData {
-                    it.encrypt(secureCodec)
+                   it.encrypt(secureCodec)
                 }
                 .setStatusCode(res.status.value)
         }

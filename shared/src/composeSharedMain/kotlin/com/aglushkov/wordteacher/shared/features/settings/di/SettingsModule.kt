@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides
@@ -35,6 +36,7 @@ class SettingsModule {
         analytics: Analytics,
         appInfo: AppInfo,
         emailOpener: EmailOpener,
+        databaseCardWorker: DatabaseCardWorker,
     ) = SettingsDecomposeComponent(
         componentContext,
         state,
@@ -49,5 +51,6 @@ class SettingsModule {
         analytics,
         appInfo,
         emailOpener,
+        databaseCardWorker,
     )
 }

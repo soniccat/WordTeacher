@@ -26,21 +26,20 @@ class SpaceAuthRepository(
     private val vkAuthController: VKAuthController,
     private val cachePath: Path,
     private val fileSystem: FileSystem,
-    private val databaseCardWorker: () -> DatabaseCardWorker,
 ) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val spaceAuthStateFlow = MutableStateFlow<Resource<SpaceAuthData>>(Resource.Uninitialized())
 
     val authDataFlow: Flow<Resource<SpaceAuthData>> = spaceAuthStateFlow
     val currentAuthData: Resource<SpaceAuthData>
-    get() {
-        return spaceAuthStateFlow.value
-    }
+        get() {
+            return spaceAuthStateFlow.value
+        }
 
     val networkType: SpaceAuthService.NetworkType?
-    get() {
-        return currentAuthData.data()?.user?.networkType
-    }
+        get() {
+            return currentAuthData.data()?.user?.networkType
+        }
 
     fun isAuthorized(): Boolean {
         return currentAuthData.asLoaded() != null
@@ -130,7 +129,6 @@ class SpaceAuthRepository(
 
     fun signOut(network: SpaceAuthService.NetworkType) {
         mainScope.launch {
-            databaseCardWorker().waitUntilSyncIsDone()
             if (spaceAuthStateFlow.value.data()?.user?.networkType == network) {
                 fileSystem.delete(cachePath)
                 spaceAuthStateFlow.value =

@@ -22,6 +22,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
@@ -42,6 +43,7 @@ class SettingsDecomposeComponent (
     analytics: Analytics,
     appInfo: AppInfo,
     emailOpener: EmailOpener,
+    databaseCardWorker: DatabaseCardWorker,
 ) : SettingsVMImpl(
     state,
     connectivityManager,
@@ -55,6 +57,7 @@ class SettingsDecomposeComponent (
     analytics,
     appInfo,
     emailOpener,
+    databaseCardWorker,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Settings"
 

@@ -1,11 +1,14 @@
 package com.aglushkov.wordteacher.shared.service
 
+import co.touchlab.stately.concurrency.AtomicBoolean
+import co.touchlab.stately.concurrency.synchronize
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.serialization.GZip
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilFalse
 import io.ktor.client.*
 import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.compression.*
@@ -17,6 +20,13 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.util.decodeBase64Bytes
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.internal.synchronized
 
 class SpaceHttpClientBuilder(
     private val deviceIdRepository: DeviceIdRepository,
@@ -103,6 +113,7 @@ class SpaceHttpClientBuilder(
         )
     }
 
+    private val unauthHandlingIsInProgress = MutableStateFlow(false)
     private fun HttpClientConfig<*>.install401Handler() {
         install(
             createClientPlugin("AuthInterceptor for 401 error") {
@@ -114,37 +125,54 @@ class SpaceHttpClientBuilder(
                         return@on originalCall // handle them SpaceAuthRepository
                     }
 
-                    return@on originalCall.response.run { // this: HttpResponse
+                    return@on originalCall.response.run {
                         val oldAutData = spaceRepository.currentAuthData.asLoaded()
 
                         if(status == HttpStatusCode.Unauthorized) {
                             try {
-                                // try to refresh, if refresh token isn't expired a new access token and a new refresh token will be granted
-                                val refreshResult = spaceRepository.refresh()
-                                val newCall = if (refreshResult.isLoaded()) {
-                                    proceed(request.setAuthData(refreshResult.data()!!))
+                                if (unauthHandlingIsInProgress.compareAndSet(false, true)) {
+                                    // try to refresh, if refresh token isn't expired a new access token and a new refresh token will be granted
+                                    val refreshResult = spaceRepository.refresh()
+                                    val newCall = if (refreshResult.isLoaded()) {
+                                        proceed(request.setAuthData(refreshResult.data()!!))
 
-                                } else if (refreshResult.isUninitialized() || refreshResult.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
-                                    // wordteacher space token is outdated, need to sign-in again
-                                    spaceRepository.networkType?.let { networkType ->
-                                        spaceRepository.signIn(networkType)
+                                    } else if (refreshResult.isUninitialized() || refreshResult.errorStatusCode() == HttpStatusCode.Unauthorized.value) {
+                                        // wordteacher space token is outdated, need to sign-in again
+                                        spaceRepository.networkType?.let { networkType ->
+                                            spaceRepository.signIn(networkType)
+                                        }
+
+                                        val newAutData = spaceRepository.currentAuthData.asLoaded()
+                                        if (newAutData?.data?.user == oldAutData?.data?.user) {
+                                            val newCookies = cookieStorage.get(this.request.url)
+                                            request.headers {
+                                                set(HttpHeaders.Cookie, renderClientCookies(newCookies))
+                                            }
+                                            proceed(request.setAuthData(newAutData?.data!!))
+                                        } else {
+                                            null
+                                        }
+                                    } else {
+                                        null
                                     }
 
+                                    unauthHandlingIsInProgress.compareAndSet(true, false)
+                                    newCall ?: originalCall
+                                } else {
+                                    unauthHandlingIsInProgress.waitUntilFalse()
+
                                     val newAutData = spaceRepository.currentAuthData.asLoaded()
-                                    if (newAutData?.data?.user == oldAutData?.data?.user) {
+                                    val newCall = if (newAutData?.data?.user == oldAutData?.data?.user) {
                                         val newCookies = cookieStorage.get(this.request.url)
                                         request.headers {
                                             set(HttpHeaders.Cookie, renderClientCookies(newCookies))
                                         }
-                                        com.aglushkov.wordteacher.shared.general.Logger.v("newAuthData ${newAutData?.data}", tag = "SpaceHttpClientBuilder")
                                         proceed(request.setAuthData(newAutData?.data!!))
                                     } else {
                                         null
                                     }
-                                } else {
-                                    null
+                                    newCall ?: originalCall
                                 }
-                                newCall ?: originalCall
                             } catch (e: Exception) {
                                 originalCall
                             }

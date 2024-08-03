@@ -29,10 +29,10 @@ fun <T> Response<T>.toOkResponse(): T {
     }
 }
 
-fun <T, D> Response<T>.mapOkData(mapper: (T) -> D): Response<D> {
+fun <T, D> Response<T>.mapOkData(okMapper: (T) -> D): Response<D> {
     return when(this) {
-        is Response.Ok -> Response.Ok(mapper(value))
-        is Response.Err -> throw ErrorResponseException(value, statusCode)
+        is Response.Ok -> Response.Ok(okMapper(value))
+        is Response.Err -> this as Response<D>
         else -> throw RuntimeException("Unknown response type $this")
     }
 }

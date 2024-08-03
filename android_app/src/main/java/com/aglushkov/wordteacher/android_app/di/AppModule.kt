@@ -253,11 +253,7 @@ class AppModule {
         spaceAuthRepository: SpaceAuthRepository,
     ): Array<AnalyticEngine> {
         return arrayOf(
-            AppMetricaEngine(
-                app.getString(R.string.app_metrica_key),
-                app,
-                spaceAuthRepository
-            )
+            createAppMetricaEngine(app, spaceAuthRepository)
         )
     }
 
@@ -278,3 +274,12 @@ class AppModule {
         )
     }
 }
+
+fun createAppMetricaEngine(
+    app: Application,
+    spaceAuthRepository: SpaceAuthRepository
+) = AppMetricaEngine(
+    app.getString(R.string.app_metrica_key),
+    app,
+    spaceAuthRepository
+)

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.*
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import dev.icerock.moko.resources.desc.ResourceFormatted
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +75,7 @@ open class SettingsVMImpl (
     private val analytics: Analytics,
     private val appInfo: AppInfo,
     private val emailOpener: EmailOpener,
+    private val databaseCardWorker: DatabaseCardWorker,
 ): ViewModel(), SettingsVM {
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -174,7 +176,12 @@ open class SettingsVMImpl (
     override fun onSignOutClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Settings.signOutClicked"))
         spaceAuthRepository.networkType?.let {
-            spaceAuthRepository.signOut(it)
+            mainScope.launch {
+                // TODO: consider extracting this logic in signOut usecase
+                databaseCardWorker.waitUntilEditingIsDone()
+                databaseCardWorker.waitUntilSyncIsDone()
+                spaceAuthRepository.signOut(it)
+            }
         }
     }
 

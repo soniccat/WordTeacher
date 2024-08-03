@@ -312,7 +312,6 @@ class SharedAppModule {
         googleAuthController: GoogleAuthController,
         vkAuthController: VKAuthController,
         fileSystem: FileSystem,
-        databaseCardWorker: Lazy<DatabaseCardWorker>,
     ): SpaceAuthRepository {
         val path = obtainSpaceDirPath(basePath,fileSystem).div("authData")
         return SpaceAuthRepository(
@@ -321,7 +320,6 @@ class SharedAppModule {
             vkAuthController,
             path,
             fileSystem,
-            { databaseCardWorker.get() },
         )
     }
 
