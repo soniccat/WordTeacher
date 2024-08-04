@@ -2,7 +2,9 @@ package models
 
 import (
 	"context"
+	"net/http"
 	"time"
+	"tools"
 	"tools/logger"
 
 	"github.com/alexedwards/scs/v2"
@@ -162,12 +164,29 @@ func (sd *UserAuthToken) Match(
 	return nil
 }
 
-func (sd *UserAuthToken) LogParams() []any {
-	return []any{
-		"networkType", int(sd.NetworkType),
-		"userId", sd.UserDbId,
-		"deviceId", sd.UserDeviceId,
-		"deviceType", sd.UserDeviceType,
-		"appVersion", sd.AppVersion,
+func LogParams(t *UserAuthToken, headers http.Header) []any {
+	if t != nil {
+		return []any{
+			"networkType", int(t.NetworkType),
+			"userId", t.UserDbId,
+			"deviceId", t.UserDeviceId,
+			"deviceType", t.UserDeviceType,
+			"appVersion", t.AppVersion,
+		}
+	} else {
+		var params []any
+		var deviceId = headers.Get(tools.HeaderDeviceId)
+		var deviceType = headers.Get(tools.HeaderDeviceType)
+		var appVersion = headers.Get(tools.HeaderAppVersion)
+		if len(deviceId) > 0 {
+			params = append(params, "deviceId", deviceId)
+		}
+		if len(deviceType) > 0 {
+			params = append(params, "deviceType", deviceType)
+		}
+		if len(appVersion) > 0 {
+			params = append(params, "appVersion", appVersion)
+		}
+		return params
 	}
 }

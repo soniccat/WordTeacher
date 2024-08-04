@@ -3,6 +3,8 @@ package routing
 import (
 	"api"
 	"errors"
+	"models"
+	"models/session_validator"
 	"net/http"
 	"strings"
 	"tools"
@@ -20,13 +22,15 @@ type WordResponse struct {
 
 type WordHandler struct {
 	tools.BaseHandler
-	logger     *logger.Logger
-	wiktionary wiktionary.Contract
+	logger           *logger.Logger
+	sessionValidator session_validator.SessionValidator
+	wiktionary       wiktionary.Contract
 }
 
 func NewWordHandler(
 	logger *logger.Logger,
 	timeProvider tools.TimeProvider,
+	sessionValidator session_validator.SessionValidator,
 	wiktionary wiktionary.Contract,
 ) *WordHandler {
 	return &WordHandler{
@@ -37,6 +41,8 @@ func NewWordHandler(
 }
 
 func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
+	authToken, _ := h.sessionValidator.Validate(r) // get authToken just for logging
+
 	params := mux.Vars(r)
 	term, ok := params["term"]
 	if !ok {
@@ -46,8 +52,13 @@ func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
 
 	ctx := logger.WrapContext(
 		r.Context(),
-		"logId", uuid.NewString(),
-		"term", term,
+		append(
+			[]any{
+				"logId", uuid.NewString(),
+				"term", term,
+			},
+			models.LogParams(authToken, r.Header)...,
+		),
 	)
 
 	words, err := h.wiktionary.Definitions(ctx, strings.ToLower(term))

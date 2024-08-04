@@ -3,6 +3,7 @@ package routing
 import (
 	"api"
 	"errors"
+	"models"
 	"models/session_validator"
 	"net/http"
 	"service_cardsetsearch/internal/storage"
@@ -68,11 +69,7 @@ func NewCardSetSearchHandler(
 }
 
 func (h *CardSetSearchHandler) CardSetSearch(w http.ResponseWriter, r *http.Request) {
-	authToken, validateSessionErr := h.sessionValidator.Validate(r)
-	if validateSessionErr != nil {
-		h.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
-		return
-	}
+	authToken, _ := h.sessionValidator.Validate(r) // get authToken just for logging
 
 	if r.Body == nil {
 		h.SetError(w, errors.New("body is empty"), http.StatusBadRequest)
@@ -92,7 +89,7 @@ func (h *CardSetSearchHandler) CardSetSearch(w http.ResponseWriter, r *http.Requ
 				"logId", uuid.NewString(),
 				"query", query,
 			},
-			authToken.LogParams()...,
+			models.LogParams(authToken, r.Header)...,
 		),
 	)
 

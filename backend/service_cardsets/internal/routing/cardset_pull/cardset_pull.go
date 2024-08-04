@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"models"
 	"net/http"
 	"time"
 	"tools"
@@ -89,7 +90,7 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		ctxParams = append(ctxParams, "body", string(inputBytes))
 	}
-	ctxParams = append(ctxParams, authToken.LogParams()...)
+	ctxParams = append(ctxParams, models.LogParams(authToken, r.Header)...)
 
 	ctx := logger.WrapContext(
 		r.Context(),

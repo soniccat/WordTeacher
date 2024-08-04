@@ -3,6 +3,7 @@ package cardset_by_id
 import (
 	"api"
 	"context"
+	"models"
 	"net/http"
 	"time"
 	"tools"
@@ -68,7 +69,7 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 				"logId", uuid.NewString(),
 				"cardSetId", cardSetId,
 			},
-			authToken.LogParams()...,
+			models.LogParams(authToken, r.Header)...,
 		),
 	)
 
