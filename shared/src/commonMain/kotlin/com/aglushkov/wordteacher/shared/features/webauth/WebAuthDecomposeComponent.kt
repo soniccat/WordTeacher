@@ -15,10 +15,12 @@ class WebAuthDecomposeComponent (
     timeSource: TimeSource,
     googleOAuth2Service: OAuth2Service,
     analytics: Analytics,
+    isDebug: Boolean,
 ) : WebAuthVMImpl(
     configuration.networkType,
     timeSource,
     googleOAuth2Service,
+    isDebug,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_WebAuth"
 

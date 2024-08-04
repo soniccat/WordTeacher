@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.webauth.di
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.webauth.WebAuthDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -27,4 +28,6 @@ interface WebAuthDependencies {
     fun timeSource(): TimeSource
     fun oAuth2Service(): OAuth2Service
     fun analytics(): Analytics
+    @IsDebug
+    fun isDebug(): Boolean
 }

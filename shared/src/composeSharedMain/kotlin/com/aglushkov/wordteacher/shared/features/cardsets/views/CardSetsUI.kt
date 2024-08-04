@@ -243,7 +243,7 @@ private fun CardSetsViewItem(
             .padding(
                 top = if (item.isTop) 0.dp else 16.dp
             )
-            .background(color = Color.LightGray)
+            .background(color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
             .padding(
                 start = LocalDimens.current.contentPadding,
                 end = LocalDimens.current.contentPadding

@@ -126,7 +126,7 @@
     <string name="notes_create_note">Create a note</string>
     <string name="cardsets_create_cardset">Create a card set</string>
     <string name="cardsets_section_ready_to_learn">Ready to learn:</string>
-    <string name="cardsets_section_not_ready_to_learn">Come tomorrow:</string>
+    <string name="cardsets_section_not_ready_to_learn">For tomorrow:</string>
     <string name="cardsets_section_done">Done:</string>
 
     <string name="card_title_placeholder">Enter name</string>

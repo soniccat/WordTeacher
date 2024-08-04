@@ -112,9 +112,13 @@ class AppModule {
     @AppComp
     @Provides
     fun googleAuthRepositoryImpl(
-        context: Context
+        context: Context,
+        @IsDebug isDebug: Boolean,
     ): GoogleAuthControllerImpl =
-        GoogleAuthControllerImpl(context.getString(R.string.default_web_client_id))
+        GoogleAuthControllerImpl(
+            context.getString(R.string.default_web_client_id),
+            isDebug
+        )
 
     @AppComp
     @Provides

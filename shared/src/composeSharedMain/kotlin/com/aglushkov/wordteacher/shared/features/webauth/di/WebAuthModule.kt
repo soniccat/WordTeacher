@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.webauth.di
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
@@ -24,6 +25,7 @@ class WebAuthModule {
         timeSource: TimeSource,
         googleOAuth2Service: OAuth2Service,
         analytics: Analytics,
+        @IsDebug isDebug: Boolean,
     ): WebAuthDecomposeComponent {
         return WebAuthDecomposeComponent(
             componentContext,
@@ -31,6 +33,7 @@ class WebAuthModule {
             timeSource,
             googleOAuth2Service,
             analytics,
+            isDebug
         )
     }
 }

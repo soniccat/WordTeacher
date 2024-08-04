@@ -35,8 +35,7 @@ open class FileLogger(
     init {
         scope.launch {
             val filePath = dirPath.div(fileName)
-            val f = messageSharedFlow.first()
-            Logger.v(f.message, "testlogg")
+            messageSharedFlow.first() // to avoid file creation when logging is disabled
             fileSystem.appendingSink(filePath, false).buffer().use { sink ->
                 messageSharedFlow.collect { message ->
                     sink.writeUtf8(message.format(formatter))

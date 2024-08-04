@@ -32,7 +32,7 @@ class MainComposeModule {
                         .setComponentContext(context)
                         .setDeps(appComponent)
                         .setDefinitionsDeps(appComponent)
-                        .setConfiguration(configuration)
+                        .setInitialState(configuration.state)
                         .build()
                         .articleDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.CardSetConfiguration ->

@@ -37,6 +37,7 @@ open class WebAuthVMImpl(
     private val networkType: SpaceAuthService.NetworkType,
     private val timeSource: TimeSource,
     private val googleOAuth2Service: OAuth2Service,
+    private val isDebug: Boolean,
 ): ViewModel(), WebAuthVM {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -52,7 +53,7 @@ open class WebAuthVMImpl(
                 mainScope.launch {
                     try {
                         val token = googleOAuth2Service.accessToken(result.code, authContext)
-                        Logger.v("token " + token.accessToken)
+                        Logger.v("token " + if (isDebug) token.accessToken else "")
                         onCompleted(
                             AuthOpener.AuthResult.GoogleResult(
                                 data = GoogleAuthData(
