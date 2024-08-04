@@ -14,6 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okio.FileSystem
 import okio.Path
@@ -29,11 +30,13 @@ open class FileLogger(
 ) : LogWriter() {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val fileName = timeSource.stringDate(timeSource.timeInstant())
-    private val messageSharedFlow = MutableSharedFlow<LogMessage>(0, 10)
+    private val messageSharedFlow = MutableSharedFlow<LogMessage>(10, 10)
 
     init {
         scope.launch {
             val filePath = dirPath.div(fileName)
+            val f = messageSharedFlow.first()
+            Logger.v(f.message, "testlogg")
             fileSystem.appendingSink(filePath, false).buffer().use { sink ->
                 messageSharedFlow.collect { message ->
                     sink.writeUtf8(message.format(formatter))

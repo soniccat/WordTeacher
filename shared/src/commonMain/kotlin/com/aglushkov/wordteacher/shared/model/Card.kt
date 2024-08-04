@@ -96,4 +96,4 @@ data class CardSpan(
     val end: Int
 )
 
-private const val TERM_REPLACEMENT = "___"
+private const val TERM_REPLACEMENT = "＿"

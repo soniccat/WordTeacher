@@ -8,7 +8,7 @@ import java.io.File
 
 actual class DatabaseDriverFactory(val path: String) {
     actual fun createMainDBDriver(): SqlDriver {
-        val databasePath = File(path, "test.db")
+        val databasePath = File(path, "wt.db")
         return JdbcSqliteDriver(
             url = "jdbc:sqlite:${databasePath.absolutePath}",
             schema = MainDB.Schema,

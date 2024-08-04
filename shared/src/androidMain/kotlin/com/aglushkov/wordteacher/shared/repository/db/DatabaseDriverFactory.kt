@@ -13,7 +13,7 @@ actual class DatabaseDriverFactory(private val context: Context) {
         return AndroidSqliteDriver(
             MainDB.Schema,
             context,
-            "test.db",
+            "wt.db",
             callback = AndroidSqliteDriver.Callback(
                 schema = MainDB.Schema,
 //                AfterVersionWithDriver(1) {

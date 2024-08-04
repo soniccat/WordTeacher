@@ -29,7 +29,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 
 class GoogleAuthControllerImpl(
-    private val serverClientId: String
+    private val serverClientId: String,
+    private val isDebug: Boolean,
 ): GoogleAuthController {
     private var oldClient: GoogleSignInClient? = null
     private var client: SignInClient? = null
@@ -69,7 +70,7 @@ class GoogleAuthControllerImpl(
         safeGoogleSignInClient.silentSignIn()
             .addOnSuccessListener { acc ->
                 acc.idToken?.let { idToken ->
-                    Logger.v("silentSignIn success ${acc.idToken}", TAG)
+                    Logger.v("silentSignIn success " + if (isDebug) acc.idToken else "", TAG)
                     googleAuthDataState.value = Resource.Loaded(GoogleAuthData(acc.displayName, idToken, true))
                 } ?: run {
                     Logger.e("idToken is null", TAG)

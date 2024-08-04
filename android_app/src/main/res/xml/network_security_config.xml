@@ -10,8 +10,4 @@
             <certificates src="user" />
         </trust-anchors>
     </debug-overrides>
-
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="false">5.35.112.90</domain>
-    </domain-config>
 </network-security-config>

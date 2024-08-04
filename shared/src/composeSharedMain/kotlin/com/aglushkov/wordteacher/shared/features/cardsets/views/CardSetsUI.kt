@@ -238,7 +238,16 @@ private fun CardSetsViewItem(
     )
     is SectionViewItem -> Text(
         item.name.localized(),
-        modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding, vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                top = if (item.isTop) 0.dp else 16.dp
+            )
+            .background(color = Color.LightGray)
+            .padding(
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding
+            ),
         style = LocalAppTypography.current.wordDefinitionSubHeader
     )
     is CardSetViewItem -> CardSetItemView(
@@ -378,7 +387,7 @@ private fun CardSetSearchItemView(
 //                }
 //            }
 //
-//            val dbPath = context.getDatabasePath("test.db").absolutePath.toPath()
+//            val dbPath = context.getDatabasePath("wt.db").absolutePath.toPath()
 //            FileSystem.SYSTEM.delete(dbPath)
 //            FileSystem.SYSTEM.atomicMove(importPath, dbPath)
 //        }

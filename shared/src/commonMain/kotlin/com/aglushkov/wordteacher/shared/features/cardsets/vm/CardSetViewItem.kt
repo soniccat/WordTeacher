@@ -41,7 +41,8 @@ class RemoteCardSetViewItem(
 }
 
 class SectionViewItem(
-    val name: StringDesc
+    val name: StringDesc,
+    val isTop: Boolean,
 ): BaseViewItem<StringDesc>(name, Type) {
     companion object {
         const val Type = 402

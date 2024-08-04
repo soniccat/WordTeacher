@@ -210,12 +210,14 @@ open class CardSetsVMImpl(
             text = newCardSetText.orEmpty()
         )
 
+        var isTopSection = true
         SectionType.entries.toTypedArray().onEach {
             if (groups.containsKey(it)) {
                 val items = groups[it].orEmpty().map(::cardSetViewItem)
                 if (items.isNotEmpty()) {
-                    resultList += SectionViewItem(titles[it]!!)
+                    resultList += SectionViewItem(titles[it]!!, isTopSection)
                     resultList.addAll(items)
+                    isTopSection = false
                 }
             }
         }

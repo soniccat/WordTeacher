@@ -130,7 +130,6 @@ fun LearningUI(
                     }
                     is LearningVM.Challenge.Type -> {
                         typeChallengeUI(data, errorString, focusRequester, vm)
-                        this@Box.typeBottomButtons(canShowHint, snackbarHostState, hintString, vm)
                     }
                     is LearningVM.Challenge.Match -> {
                         matchChallengeUI(data, vm)
@@ -145,6 +144,10 @@ fun LearningUI(
                     vm.onTryAgainClicked()
                 }
             }
+        }
+
+        if (data is LearningVM.Challenge.Type) {
+            typeBottomButtons(canShowHint, snackbarHostState, hintString, vm)
         }
     }
 }

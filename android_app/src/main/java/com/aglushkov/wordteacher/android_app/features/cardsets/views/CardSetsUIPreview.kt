@@ -49,7 +49,7 @@ package com.aglushkov.wordteacher.android_app.features.cardsets.views
 //                }
 //            }
 //
-//            val dbPath = context.getDatabasePath("test.db").absolutePath.toPath()
+//            val dbPath = context.getDatabasePath("wt.db").absolutePath.toPath()
 //            FileSystem.SYSTEM.delete(dbPath)
 //            FileSystem.SYSTEM.atomicMove(importPath, dbPath)
 //        }
