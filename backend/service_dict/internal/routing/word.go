@@ -34,9 +34,10 @@ func NewWordHandler(
 	wiktionary wiktionary.Contract,
 ) *WordHandler {
 	return &WordHandler{
-		BaseHandler: *tools.NewBaseHandler(logger, timeProvider),
-		logger:      logger,
-		wiktionary:  wiktionary,
+		BaseHandler:      *tools.NewBaseHandler(logger, timeProvider),
+		logger:           logger,
+		sessionValidator: sessionValidator,
+		wiktionary:       wiktionary,
 	}
 }
 
