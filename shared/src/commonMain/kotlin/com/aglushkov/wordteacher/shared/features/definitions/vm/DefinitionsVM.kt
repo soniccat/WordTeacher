@@ -336,6 +336,9 @@ open class DefinitionsVMImpl(
             for (def in word.definitions[partOfSpeech].orEmpty()) {
                 var isFirstDef = true
                 for (d in def.definitions) {
+                    def.labels.takeIf { it?.isNotEmpty() == true }?.let {
+                        items.add(WordLabelsViewItem(it))
+                    }
                     items.add(
                         WordDefinitionViewItem(
                             definition = d,

@@ -275,6 +275,7 @@ private fun showViewItem(
             }
         }
     )
+    is WordLabelsViewItem -> WordDefinitionLabels(item.items)
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
     is WordSynonymViewItem -> WordSynonymView(item, modifier)
     is WordExampleViewItem -> WordExampleView(item, modifier)
@@ -561,6 +562,28 @@ fun WordDefinitionView(
     ) {
         Text(" • ")
         textContent(viewItem.firstItem(), textStyle)
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun WordDefinitionLabels(labels: List<String>) {
+    FlowRow(
+        modifier = Modifier
+            .padding(
+                start = LocalDimensWord.current.wordHorizontalPadding + 10.dp,
+                end = LocalDimensWord.current.wordHorizontalPadding + 24.dp,
+            )
+    ) {
+        labels.map {
+            Badge(
+                modifier = Modifier.padding(2.dp),
+                backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
+                contentColor = MaterialTheme.colors.onSecondary,
+            ) {
+                Text(it)
+            }
+        }
     }
 }
 

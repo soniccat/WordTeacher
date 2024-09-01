@@ -53,6 +53,14 @@ class WordDefinitionViewItem(
     }
 }
 
+class WordLabelsViewItem(
+    labels: List<String>,
+): BaseViewItem<String>(labels, Type) {
+    companion object {
+        const val Type = 111
+    }
+}
+
 class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false, val cardId: Long = -1): BaseViewItem<String>(example, Type) {
     companion object {
         const val Type = 105
