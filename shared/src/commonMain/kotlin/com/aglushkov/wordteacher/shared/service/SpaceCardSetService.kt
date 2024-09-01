@@ -63,6 +63,7 @@ class SpaceCardSetService(
             explicitNulls = false
             ignoreUnknownKeys = true
             classDiscriminator = "status"
+            coerceInputValues = true
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
                     subclass(Response.Ok.serializer(CardSetPullResponse.serializer()))

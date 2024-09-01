@@ -17,7 +17,7 @@ type Card struct {
 	Transcription               *string       `json:"transcription,omitempty"`
 	PartOfSpeech                PartOfSpeech  `json:"partOfSpeech"`
 	Definitions                 []string      `json:"definitions"`
-	Labels                      []string      `json:labels`
+	Labels                      []string      `json:"labels"`
 	Synonyms                    []string      `json:"synonyms"`
 	Examples                    []string      `json:"examples"`
 	DefinitionTermSpans         [][]Span      `json:"definitionTermSpans"`
