@@ -64,7 +64,7 @@ data class WordTeacherDictWord(
 
     @Serializable
     data class Definition(
-        @SerialName("definition") val value: String,
+        @SerialName("value") val value: String,
         @SerialName("labels") val labels: List<String>?,
     )
 }
