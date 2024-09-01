@@ -17,6 +17,7 @@ type Card struct {
 	Transcription               *string       `json:"transcription,omitempty"`
 	PartOfSpeech                PartOfSpeech  `json:"partOfSpeech"`
 	Definitions                 []string      `json:"definitions"`
+	Labels                      []string      `json:labels`
 	Synonyms                    []string      `json:"synonyms"`
 	Examples                    []string      `json:"examples"`
 	DefinitionTermSpans         [][]Span      `json:"definitionTermSpans"`
@@ -37,6 +38,7 @@ func (c *Card) WithoutIds() *Card {
 		Transcription:               c.Transcription,
 		PartOfSpeech:                c.PartOfSpeech,
 		Definitions:                 c.Definitions,
+		Labels:                      c.Labels,
 		Synonyms:                    c.Synonyms,
 		Examples:                    c.Examples,
 		DefinitionTermSpans:         c.DefinitionTermSpans,

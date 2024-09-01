@@ -66,6 +66,7 @@ message Card {
 	string userId = 8;
 	string creationDate = 9;
 	string modificationDate = 10;
+	repeated string labels = 11;
 }
 
 enum PartOfSpeech {

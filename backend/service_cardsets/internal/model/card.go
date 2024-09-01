@@ -27,6 +27,7 @@ func ApiCardToDb(ctx context.Context, c *api.Card) (*DbCard, error) {
 		Transcription:               c.Transcription,
 		PartOfSpeech:                c.PartOfSpeech,
 		Definitions:                 c.Definitions,
+		Labels:                      c.Labels,
 		Synonyms:                    c.Synonyms,
 		Examples:                    c.Examples,
 		DefinitionTermSpans:         c.DefinitionTermSpans,
@@ -47,6 +48,7 @@ type DbCard struct {
 	Transcription               *string             `bson:"transcription,omitempty"`
 	PartOfSpeech                api.PartOfSpeech    `bson:"partOfSpeech"`
 	Definitions                 []string            `bson:"definitions"`
+	Labels                      []string            `bson:"labels"`
 	Synonyms                    []string            `bson:"synonyms"`
 	Examples                    []string            `bson:"examples"`
 	DefinitionTermSpans         [][]api.Span        `bson:"definitionTermSpans"`
@@ -66,6 +68,7 @@ func (c *DbCard) ToApi() *api.Card {
 		Transcription:               c.Transcription,
 		PartOfSpeech:                c.PartOfSpeech,
 		Definitions:                 c.Definitions,
+		Labels:                      c.Labels,
 		Synonyms:                    c.Synonyms,
 		Examples:                    c.Examples,
 		DefinitionTermSpans:         c.DefinitionTermSpans,
@@ -94,6 +97,7 @@ func (c *DbCard) ToGrpc() *cardsetsgrpc.Card {
 		Transcription:    c.Transcription,
 		PartOfSpeech:     cardsetsgrpc.PartOfSpeech(int32(c.PartOfSpeech)),
 		Definitions:      c.Definitions,
+		Labels:           c.Labels,
 		Synonyms:         c.Synonyms,
 		Examples:         c.Examples,
 		UserId:           c.UserId.Hex(),
