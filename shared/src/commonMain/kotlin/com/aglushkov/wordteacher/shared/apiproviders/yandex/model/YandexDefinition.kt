@@ -28,6 +28,7 @@ fun YandexDefinition.asWordTeacherDefinition(): WordTeacherDefinition? {
         resultExamples,
         resultSynonyms,
         emptyList(), // TODO: check if they are available
-        null
+        null,
+        emptyList(),  // TODO: check if they are available
     )
 }

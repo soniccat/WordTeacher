@@ -13,7 +13,7 @@ import kotlinx.serialization.Transient
 data class WordTeacherWord(
     @SerialName("term") val word: String,
     @SerialName("transcriptions") val transcriptions: List<String>?,
-    @SerialName("definitions") val definitions: Map<PartOfSpeech, List<WordTeacherDefinition>>,
+    @SerialName("definitions") val definitions: LinkedHashMap<PartOfSpeech, List<WordTeacherDefinition>>,
     @Transient val types: List<Config.Type> = emptyList()
 ) {
 
@@ -58,6 +58,7 @@ class WordTeacherWordBuilder {
     private var synonyms = mutableListOf<String>()
     private var antonyms = mutableListOf<String>()
     private var imageUrl: String? = null
+    private var labels = mutableListOf<String>()
 
     fun setWord(v: String): WordTeacherWordBuilder {
         word = v
@@ -120,7 +121,8 @@ class WordTeacherWordBuilder {
                 examples.toList(),
                 synonyms.toList(),
                 antonyms.toList(),
-                imageUrl
+                imageUrl,
+                labels.toList(),
             )
         )
 
@@ -134,6 +136,7 @@ class WordTeacherWordBuilder {
         synonyms.clear()
         antonyms.clear()
         imageUrl = null
+        labels.clear()
     }
 
     fun clear() {
@@ -154,7 +157,7 @@ class WordTeacherWordBuilder {
             WordTeacherWord(
                 word,
                 transcriptions,
-                wordDefinitions.toMap(),
+                LinkedHashMap(wordDefinitions),
                 types.toList()
             )
         } else {

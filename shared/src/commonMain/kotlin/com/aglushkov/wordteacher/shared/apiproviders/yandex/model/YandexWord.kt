@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.model.fromString
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.LinkedHashMap
 
 @Serializable
 data class YandexWord(
@@ -21,7 +22,7 @@ data class YandexWord(
 )
 
 fun YandexWord.asWordTeacherWord(): WordTeacherWord? {
-    val map: MutableMap<WordTeacherWord.PartOfSpeech, List<WordTeacherDefinition>> = mutableMapOf()
+    val map: LinkedHashMap<WordTeacherWord.PartOfSpeech, List<WordTeacherDefinition>> = LinkedHashMap()
     for (definition in definitions) {
         val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(definition.pos)
         definition.asWordTeacherDefinition()?.let {

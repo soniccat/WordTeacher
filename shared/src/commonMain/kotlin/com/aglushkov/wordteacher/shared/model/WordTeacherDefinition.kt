@@ -9,5 +9,6 @@ data class WordTeacherDefinition(
     @SerialName("examples") val examples: List<String>?,
     @SerialName("synonyms") val synonyms: List<String>?,
     @SerialName("antonyms") val antonyms: List<String>?,
-    @SerialName("imageUrl") val imageUrl: String?
+    @SerialName("imageUrl") val imageUrl: String?,
+    @SerialName("labels") val labels: List<String>?, // from wiktionary
 )

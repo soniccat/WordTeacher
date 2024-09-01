@@ -7,15 +7,15 @@ import (
 type Word struct {
 	Term           string    `json:"term"`
 	Transcriptions []string  `json:"transcriptions,omitempty"`
-	DefPairs       []DefPair `json:"defpairs"`
+	DefPairs       []DefPair `json:"defPairs"`
 }
 
 type DefPair struct {
 	PartOfSpeech api.PartOfSpeech `bson:"partOfSpeech,omitempty"`
-	Definitions  []Definitions    `bson:"definitions,omitempty"`
+	DefEntries   []DefEntry       `bson:"defEntries,omitempty"`
 }
 
-type Definitions struct {
+type DefEntry struct {
 	Definition Definition `json:"definition"`
 	Examples   []string   `json:"examples,omitempty"`
 	Synonyms   []string   `json:"synonyms,omitempty"`

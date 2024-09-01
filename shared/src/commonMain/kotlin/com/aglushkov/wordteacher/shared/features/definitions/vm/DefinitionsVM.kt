@@ -391,7 +391,7 @@ open class DefinitionsVMImpl(
 
         val allWords = mutableListOf<String>()
         val allTranscriptions = mutableListOf<String>()
-        val allDefinitions = mutableMapOf<WordTeacherWord.PartOfSpeech, List<WordTeacherDefinition>>()
+        val allDefinitions = LinkedHashMap<WordTeacherWord.PartOfSpeech, List<WordTeacherDefinition>>()
         val allTypes = mutableListOf<Config.Type>()
 
         words.forEach {

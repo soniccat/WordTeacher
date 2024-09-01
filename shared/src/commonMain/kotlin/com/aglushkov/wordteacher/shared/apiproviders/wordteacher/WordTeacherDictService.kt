@@ -6,7 +6,9 @@ import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.getUserAgent
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.toOkResponse
+import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord.PartOfSpeech
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.service.HeaderAppVersion
@@ -36,8 +38,35 @@ import kotlinx.serialization.modules.subclass
 
 @Serializable
 data class WordTeacherDictResponse(
-    @SerialName("words") val words: List<WordTeacherWord>?,
+    @SerialName("words") val words: List<WordTeacherDictWord>?,
 )
+
+@Serializable
+data class WordTeacherDictWord(
+    @SerialName("term") val word: String,
+    @SerialName("transcriptions") val transcriptions: List<String>?,
+    @SerialName("defPairs") val defPairs: List<DefPair>,
+) {
+    @Serializable
+    data class DefPair(
+        @SerialName("partOfSpeech") val partOfSpeech: WordTeacherWord.PartOfSpeech,
+        @SerialName("defEntries") val defEntries: List<DefEntry>,
+    )
+
+    @Serializable
+    data class DefEntry(
+        @SerialName("definition") val definition: Definition,
+        @SerialName("examples") val examples: List<String>?,
+        @SerialName("synonyms") val synonyms: List<String>?,
+        @SerialName("antonyms") val antonyms: List<String>?,
+    )
+
+    @Serializable
+    data class Definition(
+        @SerialName("definition") val value: String,
+        @SerialName("labels") val labels: List<String>?,
+    )
+}
 
 class WordTeacherDictService (
     private val baseUrl: String,
@@ -72,7 +101,7 @@ class WordTeacherDictService (
     suspend fun loadWords(word: String): Response<WordTeacherDictResponse> {
         return withContext(Dispatchers.Default) {
             logger.logLoadingStarted(word)
-            val res: HttpResponse = httpClient.get("${baseUrl}/api/dict/words/${word}")
+            val res: HttpResponse = httpClient.get("${baseUrl}/api/v2/dict/words/${word}")
             val responseString: String = res.body()
             logger.logLoadingCompleted(word, res, responseString)
             dictJson.decodeFromString(responseString)
@@ -105,7 +134,27 @@ fun WordTeacherDictService.Companion.createWordTeacherWordService(
         private val service = WordTeacherDictService(baseUrl, deviceIdRepository, appInfo)
 
         override suspend fun define(word: String): List<WordTeacherWord> {
-            return service.loadWords(word.encodeURLQueryComponent()).toOkResponse().words.orEmpty()
+            return service.loadWords(word.encodeURLQueryComponent()).toOkResponse().words.orEmpty().map {
+                WordTeacherWord(
+                    word = it.word,
+                    transcriptions = it.transcriptions,
+                    definitions = LinkedHashMap<PartOfSpeech, List<WordTeacherDefinition>>().apply {
+                        it.defPairs.onEach { pair ->
+                            put(pair.partOfSpeech, pair.defEntries.map { entry ->
+                                WordTeacherDefinition(
+                                    definitions = listOf(entry.definition.value),
+                                    examples = entry.examples,
+                                    synonyms = entry.synonyms,
+                                    antonyms = entry.antonyms,
+                                    imageUrl = null,
+                                    labels = entry.definition.labels,
+                                )
+                            })
+                        }
+                    },
+                    types = listOf(Config.Type.WordTeacher)
+                )
+            }
         }
     }
 }
