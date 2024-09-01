@@ -24,3 +24,6 @@ echo $out
 mongodump --uri="$uri" --out="$out" --db=wiktionary
 
 ncftpput -R -v -u $WT_FTP_USER -p $WT_FTP_PASS 192.168.0.1 usb1_1/mongo_backups "$out"
+
+# short for localhost
+# mongodump --uri="mongodb://localhost:27017" --out="/Users/Shared/WordTeacher/backups/mongo/wiktionaryAll" --db=wiktionary

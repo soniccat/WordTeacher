@@ -29,8 +29,9 @@ const (
 	MongoDatabaseCardSetSearch   = "cardSetSearch"
 	MongoCollectionCardSetSearch = "cardSets"
 
-	MongoDatabaseWiktionary        = "wiktionary"
-	MongoCollectionWiktionaryWords = "words"
+	MongoDatabaseWiktionary          = "wiktionary"
+	MongoCollectionWiktionaryWords   = "words"
+	MongoCollectionWiktionaryWordsV2 = "words2"
 )
 
 type MongoWrapper struct {

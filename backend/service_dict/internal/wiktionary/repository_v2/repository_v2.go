@@ -1,4 +1,4 @@
-package wiktionary
+package repository_v2
 
 import (
 	"context"
@@ -10,23 +10,29 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type Word struct {
-	Term           string                  `bson:"term,omitempty"`
-	Transcriptions []string                `bson:"transcriptions,omitempty"`
-	Etymology      int                     `bson:"etymology,omitempty"`
-	CatDefs        map[string][]Definition `bson:"definitions,omitempty"`
+type WordEntry struct {
+	// Order          int           //`bson:"order"`
+	Term           string        `bson:"term,omitempty"`
+	Transcriptions []string      `bson:"transcriptions,omitempty"`
+	Etymology      int           `bson:"etymology,omitempty"`
+	DefPairs       []WordDefPair `bson:"defs,omitempty"`
 }
 
-type Definition struct {
-	Def      string   `bson:"def,omitempty"`
+type WordDefPair struct {
+	PartOfSpeech string         `bson:"partofspeech,omitempty"`
+	DefEntries   []WordDefEntry `bson:"defentries,omitempty"`
+}
+
+type WordDefEntry struct {
+	Def      WordDef  `bson:"def,omitempty"`
 	Examples []string `bson:"examples,omitempty"`
 	Synonyms []string `bson:"synonyms,omitempty"`
 	Antonyms []string `bson:"antonyms,omitempty"`
 }
 
-type Contract interface {
-	Definitions(ctx context.Context, term string) ([]Word, error)
-	CreateIndexIfNeeded(ctx context.Context) error
+type WordDef struct {
+	Value  string   `bson:"def,omitempty"`
+	Labels []string `bson:"labels,omitempty"`
 }
 
 type Repository struct {
@@ -35,27 +41,27 @@ type Repository struct {
 	WordCollection *mongo.Collection
 }
 
-func New(logger *logger.Logger, mongoClient *mongo.Client) Contract {
-	model := &Repository{
+func New(logger *logger.Logger, mongoClient *mongo.Client) Repository {
+	model := Repository{
 		Logger:         logger,
 		MongoClient:    mongoClient,
-		WordCollection: mongoClient.Database(mongowrapper.MongoDatabaseWiktionary).Collection(mongowrapper.MongoCollectionWiktionaryWords),
+		WordCollection: mongoClient.Database(mongowrapper.MongoDatabaseWiktionary).Collection(mongowrapper.MongoCollectionWiktionaryWordsV2),
 	}
 
 	return model
 }
 
-func (r *Repository) Definitions(ctx context.Context, term string) ([]Word, error) {
+func (r *Repository) Definitions(ctx context.Context, term string) ([]WordEntry, error) {
 	cursor, err := r.WordCollection.Find(
 		ctx,
 		bson.M{"term": term},
-		options.Find().SetSort(bson.M{"order": 1}),
+		options.Find().SetSort(bson.M{"etymology": 1}),
 	)
 	if err != nil {
 		return nil, logger.WrapError(ctx, err)
 	}
 
-	var result []Word
+	var result []WordEntry
 	err = cursor.All(ctx, &result)
 	if err != nil {
 		return nil, logger.WrapError(ctx, err)

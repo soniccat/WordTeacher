@@ -2,23 +2,25 @@ package main
 
 import (
 	"context"
+	"service_dict/internal/wiktionary/repository"
+	"service_dict/internal/wiktionary/repository_v2"
 	"tools"
 
 	"github.com/alexedwards/scs/v2"
 
 	"models/session_validator"
-	"service_dict/internal/wiktionary"
 	"tools/logger"
 	"tools/mongowrapper"
 )
 
 type application struct {
 	mongowrapper.MongoEnv
-	logger               *logger.Logger
-	timeProvider         tools.TimeProvider
-	sessionManager       *scs.SessionManager
-	wiktionaryRepository wiktionary.Contract
-	sessionValidator     session_validator.SessionValidator
+	logger                 *logger.Logger
+	timeProvider           tools.TimeProvider
+	sessionManager         *scs.SessionManager
+	wiktionaryRepositoryV1 repository.Repository
+	wiktionaryRepositoryV2 repository_v2.Repository
+	sessionValidator       session_validator.SessionValidator
 }
 
 func createApplication(
@@ -49,8 +51,14 @@ func createApplication(
 		return nil, err
 	}
 
-	app.wiktionaryRepository = wiktionary.New(app.logger, app.MongoWrapper.Client)
-	err = app.wiktionaryRepository.CreateIndexIfNeeded(ctx)
+	app.wiktionaryRepositoryV1 = repository.New(app.logger, app.MongoWrapper.Client)
+	err = app.wiktionaryRepositoryV1.CreateIndexIfNeeded(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	app.wiktionaryRepositoryV2 = repository_v2.New(app.logger, app.MongoWrapper.Client)
+	err = app.wiktionaryRepositoryV2.CreateIndexIfNeeded(ctx)
 	if err != nil {
 		return nil, err
 	}

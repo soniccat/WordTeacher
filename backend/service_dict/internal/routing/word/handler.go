@@ -1,39 +1,45 @@
-package routing
+package word
 
 import (
 	"api"
+	api_dict_v1 "api/api_dict/v1"
+	"context"
 	"errors"
 	"models"
 	"models/session_validator"
 	"net/http"
+	rep "service_dict/internal/wiktionary/repository"
 	"strings"
 	"tools"
 	"tools/logger"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-
-	"service_dict/internal/wiktionary"
 )
 
-type WordResponse struct {
-	Words []api.Word `json:"words"`
+type response struct {
+	Words []api_dict_v1.Word `json:"words"`
 }
 
-type WordHandler struct {
+type repository interface {
+	Definitions(ctx context.Context, term string) ([]rep.Word, error)
+	CreateIndexIfNeeded(ctx context.Context) error
+}
+
+type Handler struct {
 	tools.BaseHandler
 	logger           *logger.Logger
 	sessionValidator session_validator.SessionValidator
-	wiktionary       wiktionary.Contract
+	wiktionary       repository
 }
 
-func NewWordHandler(
+func NewHandler(
 	logger *logger.Logger,
 	timeProvider tools.TimeProvider,
 	sessionValidator session_validator.SessionValidator,
-	wiktionary wiktionary.Contract,
-) *WordHandler {
-	return &WordHandler{
+	wiktionary repository,
+) *Handler {
+	return &Handler{
 		BaseHandler:      *tools.NewBaseHandler(logger, timeProvider),
 		logger:           logger,
 		sessionValidator: sessionValidator,
@@ -41,7 +47,7 @@ func NewWordHandler(
 	}
 }
 
-func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Word(w http.ResponseWriter, r *http.Request) {
 	authToken, _ := h.sessionValidator.Validate(r) // get authToken just for logging
 
 	params := mux.Vars(r)
@@ -67,17 +73,17 @@ func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
 		h.SetError(w, err, http.StatusInternalServerError)
 	}
 
-	apiWords := tools.Map(words, func(w wiktionary.Word) api.Word {
+	apiWords := tools.Map(words, func(w rep.Word) api_dict_v1.Word {
 		transcriptions := make([]string, 0, len(w.Transcriptions))
 		transcriptionCount := len(w.Transcriptions)
 		if transcriptionCount > 1 || transcriptionCount == 1 && w.Transcriptions[0] != "" {
 			transcriptions = w.Transcriptions
 		}
 
-		apiW := api.Word{
+		apiW := api_dict_v1.Word{
 			Term:           w.Term,
 			Transcriptions: transcriptions,
-			Definitions:    make(map[api.PartOfSpeech][]api.Definitions),
+			Definitions:    make(map[api.PartOfSpeech][]api_dict_v1.Definitions),
 		}
 
 		for k, v := range w.CatDefs {
@@ -85,11 +91,11 @@ func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
 
 			_, ok := apiW.Definitions[p]
 			if !ok {
-				apiW.Definitions[p] = make([]api.Definitions, 0, len(v))
+				apiW.Definitions[p] = make([]api_dict_v1.Definitions, 0, len(v))
 			}
 
 			for _, wiktionaryDef := range v {
-				apiW.Definitions[p] = append(apiW.Definitions[p], api.Definitions{
+				apiW.Definitions[p] = append(apiW.Definitions[p], api_dict_v1.Definitions{
 					Definitions: []string{wiktionaryDef.Def},
 					Examples:    removeTermSurroundings(wiktionaryDef.Examples),
 					Synonyms:    removeTermSurroundings(wiktionaryDef.Synonyms),
@@ -100,7 +106,7 @@ func (h *WordHandler) Word(w http.ResponseWriter, r *http.Request) {
 
 		return apiW
 	})
-	response := WordResponse{
+	response := response{
 		Words: apiWords,
 	}
 
