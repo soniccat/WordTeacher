@@ -1,0 +1,4 @@
+import kotlin.String;
+import kotlin.collections.List;
+
+ALTER TABLE DBCard ADD COLUMN labels TEXT AS List<String> NOT NULL DEFAULT "";

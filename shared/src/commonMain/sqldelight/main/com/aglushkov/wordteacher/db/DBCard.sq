@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS DBCard (
  -- frequency is stored locally and won't be synced with backend
  -- -2: frequency isn't set
  -- -1: frequency is undefined i.e. couldn't find it in db
-  termFrequency REAL NOT NULL DEFAULT -2.0
+  termFrequency REAL NOT NULL DEFAULT -2.0,
+  labels TEXT AS List<String> NOT NULL DEFAULT ""
 );
 
 selectAllCardIds:
@@ -51,16 +52,16 @@ FROM DBCard
 WHERE DBCard.needToUpdateDefinitionSpans OR DBCard.needToUpdateExampleDefinitionSpans;
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, termFrequency)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, termFrequency, labels)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, labels)
 VALUES ?;
 
 updateCard:
 UPDATE DBCard
-SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?, needToUpdateDefinitionSpans = ?, needToUpdateExampleDefinitionSpans = ?, modificationDate = ?, remoteId = ?
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?, needToUpdateDefinitionSpans = ?, needToUpdateExampleDefinitionSpans = ?, modificationDate = ?, remoteId = ?, labels = ?
 WHERE id = ?;
 
 lastInsertedRowId:

@@ -196,7 +196,13 @@ open class CardSetVMImpl(
                 cardViewItems += WordDefinitionViewItem("", index = 0, isLast = true, cardId = card.id)
             } else {
                 card.definitions.onEachIndexed { index, def ->
-                    cardViewItems += WordDefinitionViewItem(def, index = index, isLast = index == card.definitions.size - 1, cardId = card.id).also {
+                    cardViewItems += WordDefinitionViewItem(
+                        def,
+                        index = index,
+                        isLast = index == card.definitions.size - 1,
+                        cardId = card.id,
+                        labels = if (index == 0) card.labels else emptyList()
+                    ).also {
                         lastDefViewItem = it
                     }
                 }

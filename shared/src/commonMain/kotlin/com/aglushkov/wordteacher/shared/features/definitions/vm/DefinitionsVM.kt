@@ -345,7 +345,7 @@ open class DefinitionsVMImpl(
                                 partOfSpeech = partOfSpeech,
                                 def = def
                             ),
-                            labels = def.labels.orEmpty()
+                            labels = if (isFirstDef) def.labels.orEmpty() else emptyList()
                         )
                     )
                     isFirstDef = false
@@ -482,6 +482,7 @@ open class DefinitionsVMImpl(
                 setId = cardSetViewItem.cardSetId,
                 term = viewData.word.word,
                 definitions = viewData.def.definitions,
+                labels = viewData.def.labels.orEmpty(),
                 partOfSpeech = viewData.partOfSpeech,
                 transcription = viewData.word.transcriptions?.firstOrNull(),
                 synonyms = viewData.def.synonyms.orEmpty(),

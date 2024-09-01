@@ -62,6 +62,7 @@ data class ImportCardSet (
 data class ImportCard (
     val term: String,
     val definitions: List<String>?,
+    val labels: List<String>?,
     val transcription: String?,
     val synonyms: List<String>?,
     val examples: List<String>?,
@@ -113,6 +114,7 @@ open class CardSetJsonImportVMImpl(
                     modificationDate = nowTime,
                     term = it.term,
                     definitions = it.definitions.orEmpty(),
+                    labels = it.labels.orEmpty(),
                     definitionTermSpans = listOf(),
                     partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
                     transcription = it.transcription,

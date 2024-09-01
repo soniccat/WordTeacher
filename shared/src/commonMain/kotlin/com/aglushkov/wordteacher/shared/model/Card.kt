@@ -18,6 +18,7 @@ data class Card (
     val modificationDate: Instant,
     val term: String,
     val definitions: List<String>,
+    val labels: List<String>,
     val definitionTermSpans: List<List<CardSpan>>,
     val partOfSpeech: WordTeacherWord.PartOfSpeech,
     val transcription: String?,
