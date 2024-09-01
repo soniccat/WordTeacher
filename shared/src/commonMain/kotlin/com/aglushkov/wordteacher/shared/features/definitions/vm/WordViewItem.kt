@@ -47,17 +47,10 @@ class WordDefinitionViewItem(
     val isLast: Boolean = false,
     val cardId: Long = -1,
     val withAddButton: Boolean = false,
+    val labels: List<String> = emptyList(),
 ): BaseViewItem<String>(definition, Type) {
     companion object {
         const val Type = 104
-    }
-}
-
-class WordLabelsViewItem(
-    labels: List<String>,
-): BaseViewItem<String>(labels, Type) {
-    companion object {
-        const val Type = 111
     }
 }
 

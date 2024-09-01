@@ -275,7 +275,6 @@ private fun showViewItem(
             }
         }
     )
-    is WordLabelsViewItem -> WordDefinitionLabels(item.items)
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
     is WordSynonymViewItem -> WordSynonymView(item, modifier)
     is WordExampleViewItem -> WordExampleView(item, modifier)
@@ -551,30 +550,27 @@ fun WordDefinitionView(
         )
     }
 ) {
-    Row(
-        modifier = Modifier
-            .then(modifier)
-            .padding(
-                start = LocalDimensWord.current.wordHorizontalPadding,
-                end = LocalDimensWord.current.wordHorizontalPadding,
-                top = LocalDimensWord.current.wordHeaderTopMargin
-            ),
+    Column(
+        modifier = modifier.padding(
+            start = LocalDimensWord.current.wordHorizontalPadding,
+            end = LocalDimensWord.current.wordHorizontalPadding,
+            top = LocalDimensWord.current.wordHeaderTopMargin
+        )
     ) {
-        Text(" • ")
-        textContent(viewItem.firstItem(), textStyle)
+        if (viewItem.labels.isNotEmpty()) {
+            WordLabels(viewItem.labels, modifier = Modifier.padding(start = 10.dp, end = 24.dp))
+        }
+        Row {
+            Text(" • ")
+            textContent(viewItem.firstItem(), textStyle)
+        }
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun WordDefinitionLabels(labels: List<String>) {
-    FlowRow(
-        modifier = Modifier
-            .padding(
-                start = LocalDimensWord.current.wordHorizontalPadding + 10.dp,
-                end = LocalDimensWord.current.wordHorizontalPadding + 24.dp,
-            )
-    ) {
+fun WordLabels(labels: List<String>, modifier: Modifier = Modifier) {
+    FlowRow(modifier = modifier) {
         labels.map {
             Badge(
                 modifier = Modifier.padding(2.dp),
