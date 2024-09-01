@@ -84,10 +84,10 @@ func (h *Handler) Word(w http.ResponseWriter, r *http.Request) {
 			p := api.PartOfSpeechFromString(v.PartOfSpeech)
 			apiW.DefPairs = append(apiW.DefPairs, api_dict_v2.DefPair{
 				PartOfSpeech: p,
-				Definitions: tools.Map(
+				DefEntries: tools.Map(
 					v.DefEntries,
-					func(e repository_v2.WordDefEntry) api_dict_v2.Definitions {
-						return api_dict_v2.Definitions{
+					func(e repository_v2.WordDefEntry) api_dict_v2.DefEntry {
+						return api_dict_v2.DefEntry{
 							Definition: api_dict_v2.Definition{
 								Value:  e.Def.Value,
 								Labels: e.Def.Labels,
