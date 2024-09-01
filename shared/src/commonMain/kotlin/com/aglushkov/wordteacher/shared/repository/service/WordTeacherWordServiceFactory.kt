@@ -17,12 +17,13 @@ class WordTeacherWordServiceFactory(
     private val deviceIdRepository: DeviceIdRepository,
     private val appInfo: AppInfo,
     private val secureCodec: SecureCodec,
+    private val isDebug: Boolean,
 ) {
 
     fun createService(
         type: Config.Type,
         connectParams: ConfigConnectParams,
-        methodParams: ServiceMethodParams
+        methodParams: ServiceMethodParams,
     ): WordTeacherWordService? {
 
         val baseUrl = connectParams.baseUrl
@@ -30,7 +31,7 @@ class WordTeacherWordServiceFactory(
 
         return when (type) {
             Config.Type.Yandex -> YandexService.createWordTeacherWordService(baseUrl, key, methodParams, secureCodec)
-            Config.Type.WordTeacher -> WordTeacherDictService.createWordTeacherWordService(apiBaseUrl, deviceIdRepository, appInfo)
+            Config.Type.WordTeacher -> WordTeacherDictService.createWordTeacherWordService(apiBaseUrl, deviceIdRepository, appInfo, isDebug)
             else -> null
         }
     }

@@ -125,8 +125,9 @@ class SharedAppModule {
         deviceIdRepository: DeviceIdRepository,
         appInfo: AppInfo,
         secureCodec: SecureCodec,
+        @IsDebug isDebug: Boolean,
     ): WordTeacherWordServiceFactory {
-        return WordTeacherWordServiceFactory(apiBaseUrl, deviceIdRepository, appInfo, secureCodec)
+        return WordTeacherWordServiceFactory(apiBaseUrl, deviceIdRepository, appInfo, secureCodec, isDebug)
     }
 
     @AppComp

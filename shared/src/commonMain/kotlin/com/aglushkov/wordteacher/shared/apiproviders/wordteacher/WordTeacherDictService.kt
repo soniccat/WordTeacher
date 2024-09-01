@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.service.HeaderAppVersion
 import com.aglushkov.wordteacher.shared.service.HeaderDeviceId
 import com.aglushkov.wordteacher.shared.service.HeaderDeviceType
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
+import com.aglushkov.wordteacher.shared.service.installLogger
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
@@ -72,12 +73,14 @@ class WordTeacherDictService (
     private val baseUrl: String,
     private val deviceIdRepository: DeviceIdRepository,
     private val appInfo: AppInfo,
+    isDebug: Boolean,
 ) {
     companion object {}
 
     private val logger = WordServiceLogger(Config.Type.WordTeacher.name)
     private val httpClient = HttpClient {
         installHeaders()
+        installLogger(isDebug)
         install(ContentEncoding) {
             gzip(0.9F)
         }
@@ -128,10 +131,11 @@ fun WordTeacherDictService.Companion.createWordTeacherWordService(
     baseUrl: String,
     deviceIdRepository: DeviceIdRepository,
     appInfo: AppInfo,
+    isDebug: Boolean,
 ): WordTeacherWordService {
     return object : WordTeacherWordService {
         override var type: Config.Type = Config.Type.WordTeacher
-        private val service = WordTeacherDictService(baseUrl, deviceIdRepository, appInfo)
+        private val service = WordTeacherDictService(baseUrl, deviceIdRepository, appInfo, isDebug)
 
         override suspend fun define(word: String): List<WordTeacherWord> {
             return service.loadWords(word.encodeURLQueryComponent()).toOkResponse().words.orEmpty().map {

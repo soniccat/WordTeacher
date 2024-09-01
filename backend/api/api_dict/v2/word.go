@@ -11,8 +11,8 @@ type Word struct {
 }
 
 type DefPair struct {
-	PartOfSpeech api.PartOfSpeech `bson:"partOfSpeech,omitempty"`
-	DefEntries   []DefEntry       `bson:"defEntries,omitempty"`
+	PartOfSpeech api.PartOfSpeech `json:"partOfSpeech,omitempty"`
+	DefEntries   []DefEntry       `json:"defEntries,omitempty"`
 }
 
 type DefEntry struct {
