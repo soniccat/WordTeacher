@@ -9,6 +9,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -16,11 +17,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -186,7 +189,7 @@ fun CardSetViewItems(
                 WordTitleView(
                     viewItem = item,
                     textContent = { text, textStyle ->
-                        CardTextField(
+                        CardItemTextField(
                             Modifier.weight(1.0f),
                             text,
                             textStyle,
@@ -204,7 +207,7 @@ fun CardSetViewItems(
                 item,
                 modifier = Modifier.focusRequester(focusRequester),
                 textContent = { text, textStyle ->
-                    CardTextField(
+                    CardItemTextField(
                         Modifier,
                         text,
                         textStyle,
@@ -278,7 +281,7 @@ fun CardSetViewItems(
             WordSynonymView(
                 item,
                 textContent = { text, textStyle ->
-                    CardTextField(
+                    CardItemTextField(
                         modifier = Modifier
                             .weight(1.0f)
                             .focusRequester(focusRequester),
@@ -307,7 +310,7 @@ fun CardSetViewItems(
             WordExampleView(
                 item,
                 textContent = { text, textStyle ->
-                    CardTextField(
+                    CardItemTextField(
                         modifier = Modifier
                             .weight(1.0f)
                             .focusRequester(focusRequester),
@@ -378,7 +381,7 @@ private fun CardSetDefinitionView(
     WordDefinitionView(
         item,
         textContent = { text, textStyle ->
-            CardTextField(
+            CardItemTextField(
                 modifier = modifier
                     .weight(1.0f)
                     .focusRequester(focusRequester),
@@ -395,27 +398,77 @@ private fun CardSetDefinitionView(
                     vm.onAddDefinitionPressed(cardId)
                 }
             }
+        },
+        labelContent = { text, index ->
+            val isLastItem = index == item.labels.size
+            if (isLastItem) {
+                Text(text)
+            } else {
+                CardTextField(
+                    text = text,
+                    placeholder = "",
+                    readOnly = !isEditable,
+                    onValueChanged = { newText ->
+                        vm.onLabelTextChanged(newText, index, cardId)
+                    }
+                )
+                Icon(
+                    painter = painterResource(MR.images.close_18),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable {
+                            vm.onLabelDeleted(index, cardId)
+                        }
+                        .padding(4.dp),
+                    tint = MaterialTheme.colors.secondary
+                )
+            }
+        },
+        extraLabel = "Add",
+        extraLabelClick = {
+            vm.onAddLabelPressed(cardId)
         }
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun CardItemTextField(
+    modifier: Modifier = Modifier,
+    text: String,
+    textStyle: TextStyle = LocalTextStyle.current,
+    item: BaseViewItem<*>,
+    cardId: Long,
+    readOnly: Boolean,
+    vm: CardSetVM,
+) {
+    CardTextField(
+        modifier = modifier,
+        text = text,
+        textStyle = textStyle,
+        placeholder = vm.getPlaceholder(item)?.localized().orEmpty(),
+        readOnly = readOnly,
+        onValueChanged = {
+            vm.onItemTextChanged(it, item, cardId)
+        }
+    )
+}
+
 @Composable
 private fun CardTextField(
     modifier: Modifier = Modifier,
     text: String,
-    textStyle: androidx.compose.ui.text.TextStyle,
-    item: BaseViewItem<*>,
-    cardId: Long,
+    textStyle: TextStyle = LocalTextStyle.current,
+    placeholder: String = "",
     readOnly: Boolean,
-    vm: CardSetVM
+    onValueChanged: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     var textState by remember { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
     InlineTextField(
         modifier = modifier,
         value = textState,
-        placeholder = vm.getPlaceholder(item)?.localized().orEmpty(),
+        placeholder = placeholder,
         textStyle = textStyle.copy(
             color = LocalContentColor.current
         ),
@@ -425,7 +478,8 @@ private fun CardTextField(
         onValueChange = {
             if (!readOnly) { // filter cursor position change in readOnly mode
                 textState = it
-                vm.onItemTextChanged(it.text, item, cardId)
+                onValueChanged(it.text)
+//                vm.onItemTextChanged(it.text, item, cardId)
             }
         }
     )

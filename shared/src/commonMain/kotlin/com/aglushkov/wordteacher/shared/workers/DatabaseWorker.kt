@@ -35,4 +35,4 @@ class DatabaseWorker(
     }
 }
 
-const val UPDATE_DELAY = 200L
+const val UPDATE_DELAY = 400L

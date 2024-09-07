@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -38,6 +40,7 @@ import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.format
 import kotlinx.coroutines.launch
@@ -548,7 +551,12 @@ fun WordDefinitionView(
             text = text,
             style = ts
         )
-    }
+    },
+    labelContent: @Composable RowScope.(text: String, index: Int) -> Unit = { text, _ ->
+        Text(text = text)
+    },
+    extraLabel: String? = null,
+    extraLabelClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier.padding(
@@ -557,8 +565,14 @@ fun WordDefinitionView(
             top = LocalDimensWord.current.wordHeaderTopMargin
         )
     ) {
-        if (viewItem.labels.isNotEmpty()) {
-            WordLabels(viewItem.labels, modifier = Modifier.padding(start = 10.dp, end = 24.dp))
+        if (viewItem.labels.isNotEmpty() || ) {
+            WordLabels(
+                viewItem.labels,
+                modifier = Modifier.padding(start = 10.dp, end = 24.dp),
+                labelContent,
+                extraLabel,
+                extraLabelClick,
+            )
         }
         Row {
             Text(" • ")
@@ -569,16 +583,33 @@ fun WordDefinitionView(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun WordLabels(labels: List<String>, modifier: Modifier = Modifier) {
+fun WordLabels(
+    labels: List<String>,
+    modifier: Modifier = Modifier,
+    textContent: @Composable RowScope.(text: String, index: Int) -> Unit = { text, _ ->
+        Text(text = text)
+    },
+    extraLabel: String? = null,
+    extraLabelClick: () -> Unit = {}
+) {
+    val resultLabels = if (extraLabel != null) labels + extraLabel else labels
     FlowRow(modifier = modifier) {
-        labels.map {
+        resultLabels.mapIndexed { index, value ->
+            val isExtraLabel = extraLabel != null && index == resultLabels.size - 1
             Badge(
-                modifier = Modifier.padding(2.dp),
+                modifier = Modifier
+                    .clickable(onClick = {
+                        if (isExtraLabel) {
+                            extraLabelClick
+                        }
+                    })
+                    .padding(2.dp),
                 backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
                 contentColor = MaterialTheme.colors.onSecondary,
-            ) {
-                Text(it)
-            }
+                content = {
+                    textContent(value, index)
+                }
+            )
         }
     }
 }

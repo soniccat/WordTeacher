@@ -156,7 +156,7 @@ fun WordTeacherDictService.Companion.createWordTeacherWordService(
                             })
                         }
                     },
-                    types = listOf(Config.Type.WordTeacher)
+                    types = listOf(Config.Type.WordTeacher) // TODO: provide type from backend ("Wiktionary")
                 )
             }
         }

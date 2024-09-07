@@ -11,7 +11,7 @@ data class DimensWord(
     val wordDividerBottomMargin: Dp = 12.dp,
     val wordPartOfSpeechTopMargin: Dp = 20.dp,
     val wordHeaderTopMargin: Dp = 12.dp,
-    val wordSubHeaderTopMargin: Dp = 2.dp,
+    val wordSubHeaderTopMargin: Dp = 4.dp,
 
     val wordDividerHeight: Dp = 1.dp,
     val wordProvidedByMaxWidth: Dp = 150.dp,

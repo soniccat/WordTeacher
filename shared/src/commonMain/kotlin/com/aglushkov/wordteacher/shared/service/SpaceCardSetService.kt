@@ -62,8 +62,8 @@ class SpaceCardSetService(
         Json {
             explicitNulls = false
             ignoreUnknownKeys = true
-            classDiscriminator = "status"
             coerceInputValues = true
+            classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
                     subclass(Response.Ok.serializer(CardSetPullResponse.serializer()))
@@ -77,6 +77,7 @@ class SpaceCardSetService(
         Json {
             explicitNulls = false
             ignoreUnknownKeys = true
+            coerceInputValues = true
             classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
@@ -91,6 +92,7 @@ class SpaceCardSetService(
         Json {
             explicitNulls = false
             ignoreUnknownKeys = true
+            coerceInputValues = true
             classDiscriminator = "status"
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {

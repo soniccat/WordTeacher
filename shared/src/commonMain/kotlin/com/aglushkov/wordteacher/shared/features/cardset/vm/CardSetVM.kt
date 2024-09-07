@@ -36,6 +36,9 @@ interface CardSetVM: Clearable {
     fun onCardDeleted(cardId: Long)
     fun onPartOfSpeechChanged(newPartOfSpeech: WordTeacherWord.PartOfSpeech, cardId: Long)
     fun onItemTextChanged(text: String, item: BaseViewItem<*>, cardId: Long)
+    fun onLabelTextChanged(text: String, index: Int, cardId: Long)
+    fun onAddLabelPressed(cardId: Long)
+    fun onLabelDeleted(index: Int, cardId: Long)
     fun onAddDefinitionPressed(cardId: Long)
     fun onDefinitionRemoved(item: WordDefinitionViewItem, cardId: Long)
     fun onAddExamplePressed(cardId: Long)
@@ -279,7 +282,14 @@ open class CardSetVMImpl(
         val prevItems = viewItems.value.data().orEmpty()
         if (items.size == prevItems.size) { // keep ids not to recompose text fields being edited
             prevItems.onEachIndexed { index, baseViewItem ->
-                items[index].id = baseViewItem.id
+                val item = items[index]
+                if (baseViewItem is WordDefinitionViewItem &&
+                    item is WordDefinitionViewItem &&
+                    baseViewItem.labels.size != item.labels.size) {
+                    item.id = idGenerator.nextId()
+                } else {
+                    items[index].id = baseViewItem.id
+                }
             }
         } else { // regenerate not to mix up with current ids where swipeable cells are in hidden state
             items.onEach {
@@ -385,6 +395,40 @@ open class CardSetVMImpl(
                 updateCard(newCard)
             }
             newCard
+        }
+    }
+
+    override fun onLabelTextChanged(text: String, index: Int, cardId: Long) {
+        editCard(cardId) { card ->
+            val newCard = card.copy(
+                labels = card.labels.mapIndexed { cardIndex, cardText ->
+                    if (cardIndex == index) { text } else { cardText }
+                }
+            )
+
+            logEdit(ItemType.Label)
+            if (newCard != card) {
+                updateCard(newCard)
+            }
+            newCard
+        }
+    }
+
+    override fun onAddLabelPressed(cardId: Long) {
+        editCard(cardId) { card ->
+            logAdd(ItemType.Label)
+            card.copy(
+                labels = card.labels + "t"
+            )
+        }
+    }
+
+    override fun onLabelDeleted(index: Int, cardId: Long) {
+        editCard(cardId) { card ->
+            logRemove(ItemType.Label)
+            card.copy(
+                labels = card.labels.filterIndexed { cardIndex, _ -> cardIndex != index }
+            )
         }
     }
 
@@ -623,6 +667,7 @@ open class CardSetVMImpl(
 
     enum class ItemType(val value: String) {
         Title("title"),
+        Label("label"),
         Transcription("transcription"),
         Definition("definition"),
         Example("example"),
