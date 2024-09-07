@@ -50,6 +50,7 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevel
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.stringResource
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -369,6 +370,7 @@ fun CardSetViewItems(
 //    }
 //}
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CardSetDefinitionView(
     modifier: Modifier = Modifier,
@@ -425,9 +427,23 @@ private fun CardSetDefinitionView(
                 )
             }
         },
-        extraLabel = "Add",
-        extraLabelClick = {
-            vm.onAddLabelPressed(cardId)
+        lastLabel = {
+            if (item.labels.isEmpty()) {
+                Badge(
+                    modifier = Modifier.clickable {
+                        vm.onAddLabelPressed(cardId)
+                    }.align(Alignment.CenterVertically).padding(2.dp),
+                    backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
+                    contentColor = MaterialTheme.colors.onSecondary,
+                    content = {
+                        Text(text = stringResource(MR.strings.cardset_add_label))
+                    }
+                )
+            } else {
+                AddIcon(modifier = Modifier.align(Alignment.CenterVertically)) {
+                    vm.onAddLabelPressed(cardId)
+                }
+            }
         }
     )
 }

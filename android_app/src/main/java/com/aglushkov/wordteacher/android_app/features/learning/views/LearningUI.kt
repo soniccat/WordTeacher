@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.aglushkov.wordteacher.android_app.features.learning.views
 
 import androidx.compose.animation.animateContentSize

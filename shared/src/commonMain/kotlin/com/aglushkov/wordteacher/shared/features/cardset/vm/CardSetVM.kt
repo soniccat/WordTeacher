@@ -418,7 +418,7 @@ open class CardSetVMImpl(
         editCard(cardId) { card ->
             logAdd(ItemType.Label)
             card.copy(
-                labels = card.labels + "t"
+                labels = card.labels + ""
             )
         }
     }

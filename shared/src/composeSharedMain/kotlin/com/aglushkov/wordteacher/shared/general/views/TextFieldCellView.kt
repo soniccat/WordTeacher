@@ -41,57 +41,50 @@ fun TextFieldCellView(
         override val isCaptured: Boolean = false
         override val isFocused: Boolean = false
     }) }
-
-    Column(
+    TextField(
+        value = textFieldValue,
+        onValueChange = onTextChanged,
         modifier = modifier
-            .focusRequester(focusRequester)
             .fillMaxWidth()
-    ) {
-        TextField(
-            value = textFieldValue,
-            onValueChange = onTextChanged,
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester)
-                .onFocusChanged {
-                    focusState = it
-                }
-                .onPreviewKeyEvent {
-                    if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
-                        onCreated(textFieldValue.text)
-                        true
-                    } else {
-                        false
-                    }
-                },
-            placeholder = {
-                if (!focusState.isFocused) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painterResource(MR.images.create_note),
-                            null,
-                            Modifier.padding(end = 8.dp),
-                            LocalAppTypography.current.notePlaceholder.color
-                        )
-                        Text(
-                            text = placeholder,
-                            style = LocalAppTypography.current.notePlaceholder
-                        )
-                    }
+            .focusRequester(focusRequester)
+            .onFocusChanged {
+                focusState = it
+            }
+            .onPreviewKeyEvent {
+                if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
+                    onCreated(textFieldValue.text)
+                    true
+                } else {
+                    false
                 }
             },
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    onCreated(textFieldValue.text)
+        placeholder = {
+            if (!focusState.isFocused) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painterResource(MR.images.create_note),
+                        null,
+                        Modifier.padding(end = 8.dp),
+                        LocalAppTypography.current.notePlaceholder.color
+                    )
+                    Text(
+                        text = placeholder,
+                        style = LocalAppTypography.current.notePlaceholder
+                    )
                 }
-            ),
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent
-            )
+            }
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onCreated(textFieldValue.text)
+            }
+        ),
+        singleLine = true,
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.Transparent
         )
-    }
+    )
 }
 
 //@Composable

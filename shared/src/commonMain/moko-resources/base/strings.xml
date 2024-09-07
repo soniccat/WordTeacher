@@ -62,6 +62,7 @@
     <string name="cardset_info_field_description_hint">Description</string>
     <string name="cardset_info_enable_sharing">Share with other users in search</string>
     <string name="cardset_info_error">Can\'t load card set</string>
+    <string name="cardset_add_label">Add label</string>
 
     <string name="cardsets_search_added">"%s" added</string>
     <string name="cardsets_search_added_open">Open</string>

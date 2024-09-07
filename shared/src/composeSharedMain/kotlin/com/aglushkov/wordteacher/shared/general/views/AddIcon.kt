@@ -14,12 +14,13 @@ import dev.icerock.moko.resources.compose.painterResource
 
 @Composable
 fun AddIcon(
+    modifier: Modifier = Modifier,
     onClicked: () -> Unit
 ) {
     Icon(
         painter = painterResource(MR.images.plus_small),
         contentDescription = null,
-        modifier = Modifier
+        modifier = modifier
             .clip(CircleShape)
             .clickable {
                 onClicked()

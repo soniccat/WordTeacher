@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.aglushkov.wordteacher.shared.features.definitions.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -541,6 +543,7 @@ fun WordPartOfSpeechView(
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun WordDefinitionView(
     viewItem: WordDefinitionViewItem,
@@ -555,8 +558,7 @@ fun WordDefinitionView(
     labelContent: @Composable RowScope.(text: String, index: Int) -> Unit = { text, _ ->
         Text(text = text)
     },
-    extraLabel: String? = null,
-    extraLabelClick: () -> Unit = {},
+    lastLabel: (@Composable FlowRowScope.() -> Unit)? = null
 ) {
     Column(
         modifier = modifier.padding(
@@ -565,13 +567,12 @@ fun WordDefinitionView(
             top = LocalDimensWord.current.wordHeaderTopMargin
         )
     ) {
-        if (viewItem.labels.isNotEmpty() || ) {
+        if (viewItem.labels.isNotEmpty() || lastLabel != null) {
             WordLabels(
                 viewItem.labels,
                 modifier = Modifier.padding(start = 10.dp, end = 24.dp),
                 labelContent,
-                extraLabel,
-                extraLabelClick,
+                lastLabel,
             )
         }
         Row {
@@ -589,21 +590,12 @@ fun WordLabels(
     textContent: @Composable RowScope.(text: String, index: Int) -> Unit = { text, _ ->
         Text(text = text)
     },
-    extraLabel: String? = null,
-    extraLabelClick: () -> Unit = {}
+    lastItem: (@Composable FlowRowScope.() -> Unit)? = null
 ) {
-    val resultLabels = if (extraLabel != null) labels + extraLabel else labels
     FlowRow(modifier = modifier) {
-        resultLabels.mapIndexed { index, value ->
-            val isExtraLabel = extraLabel != null && index == resultLabels.size - 1
+        labels.mapIndexed { index, value ->
             Badge(
-                modifier = Modifier
-                    .clickable(onClick = {
-                        if (isExtraLabel) {
-                            extraLabelClick
-                        }
-                    })
-                    .padding(2.dp),
+                modifier = Modifier.align(Alignment.CenterVertically).padding(2.dp),
                 backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
                 contentColor = MaterialTheme.colors.onSecondary,
                 content = {
@@ -611,6 +603,7 @@ fun WordLabels(
                 }
             )
         }
+        lastItem?.let { it() }
     }
 }
 
