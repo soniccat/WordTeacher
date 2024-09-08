@@ -180,6 +180,7 @@ open class CardSetVMImpl(
         val result = mutableListOf<BaseViewItem<*>>()
 
         loadedCardSet.cards.onEach { card ->
+            var firstDefViewItem: BaseViewItem<*>? = null
             var lastDefViewItem: BaseViewItem<*>? = null
             var lastExViewItem: BaseViewItem<*>? = null
             var lastSynViewItem: BaseViewItem<*>? = null
@@ -204,8 +205,12 @@ open class CardSetVMImpl(
                         index = index,
                         isLast = index == card.definitions.size - 1,
                         cardId = card.id,
-                        labels = if (index == 0) card.labels else emptyList()
+                        labels = if (index == 0) card.labels else emptyList(),
+                        showAddLabel = index == 0
                     ).also {
+                        if (index == 0) {
+                            firstDefViewItem = it
+                        }
                         lastDefViewItem = it
                     }
                 }
@@ -244,7 +249,7 @@ open class CardSetVMImpl(
             result += cardViewItems
             result += WordDividerViewItem()
 
-            makeFocusEvents(card.id, lastDefViewItem, lastExViewItem, lastSynViewItem)
+            makeFocusEvents(card.id, firstDefViewItem, lastDefViewItem, lastExViewItem, lastSynViewItem)
         }
 
         result += CreateCardViewItem()
@@ -253,11 +258,22 @@ open class CardSetVMImpl(
         return result
     }
 
-    private fun makeFocusEvents(cardId: Long, lastDefViewItem: BaseViewItem<*>?, lastExViewItem: BaseViewItem<*>?, lastSynViewItem: BaseViewItem<*>?) {
+    private fun makeFocusEvents(
+        cardId: Long,
+        firstDefItemView: BaseViewItem<*>?,
+        lastDefViewItem: BaseViewItem<*>?,
+        lastExViewItem: BaseViewItem<*>?,
+        lastSynViewItem: BaseViewItem<*>?,
+    ) {
         val filteredEvents = this.events.value.filter { it !is FocusViewItemEvent }
         this.notHandledPendingEvents.onEach {
             when (val e = it) {
                 is PendingEvent.FocusLast -> {
+                    firstDefItemView?.let { safeItem ->
+                        if (e.type == FocusLastType.Label && e.cardId == cardId) {
+                            events.value = filteredEvents + e.makeEvent(safeItem, 1)
+                        }
+                    }
                     lastDefViewItem?.let { safeItem ->
                         if (e.type == FocusLastType.Definition && e.cardId == cardId) {
                             events.value = filteredEvents + e.makeEvent(safeItem)
@@ -417,6 +433,7 @@ open class CardSetVMImpl(
     override fun onAddLabelPressed(cardId: Long) {
         editCard(cardId) { card ->
             logAdd(ItemType.Label)
+            pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Label, cardId))
             card.copy(
                 labels = card.labels + ""
             )
@@ -428,7 +445,9 @@ open class CardSetVMImpl(
             logRemove(ItemType.Label)
             card.copy(
                 labels = card.labels.filterIndexed { cardIndex, _ -> cardIndex != index }
-            )
+            ).apply {
+                updateCard(this, delay = 0)
+            }
         }
     }
 
@@ -661,6 +680,7 @@ open class CardSetVMImpl(
 
     enum class FocusLastType {
         Definition,
+        Label,
         Example,
         Synonym
     }
@@ -678,9 +698,10 @@ open class CardSetVMImpl(
         data class FocusLast(val type: FocusLastType, val cardId: Long): PendingEvent() {
             var prevEvent: FocusViewItemEvent? = null
 
-            fun makeEvent(viewItem: BaseViewItem<*>): FocusViewItemEvent {
+            fun makeEvent(viewItem: BaseViewItem<*>, focusIndex: Int = 0): FocusViewItemEvent {
                 prevEvent?.markAsHandled()
-                val newEvent = object : FocusViewItemEvent(viewItem) {
+                // TODO: anon object looks an overhead here
+                val newEvent = object : FocusViewItemEvent(viewItem, focusIndex) {
                     override fun markAsHandled() {
                         super.markAsHandled()
                         this@FocusLast.isHandled = true

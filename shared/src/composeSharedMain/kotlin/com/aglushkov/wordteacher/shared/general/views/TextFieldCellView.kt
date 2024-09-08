@@ -126,9 +126,9 @@ fun InlineTextField(
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.apply {
+        modifier = modifier.let {
           if (focusManager != null) {
-              onPreviewKeyEvent {
+              it.onPreviewKeyEvent {
                   if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
                       focusManager.moveFocus(FocusDirection.Down)
                       true
@@ -136,6 +136,8 @@ fun InlineTextField(
                       false
                   }
               }
+          } else {
+              it
           }
         },
         textStyle = textStyle,

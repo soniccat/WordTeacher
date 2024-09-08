@@ -73,7 +73,11 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
     ) {
         TopAppBar(
             title = {
-                Text(text = cardSet.data()?.name.orEmpty(), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = cardSet.data()?.name.orEmpty(),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             },
             navigationIcon = {
                 IconButton(
@@ -116,9 +120,9 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                             vm,
                             if (item == focusEvent?.viewItem) {
                                 focusEvent?.markAsHandled()
-                                true
+                                focusEvent
                             } else {
-                                false
+                                null
                             },
                             isEditable = !state.isRemoteCardSet
                         )
@@ -174,12 +178,12 @@ fun CardSetViewItems(
     modifier: Modifier,
     itemView: BaseViewItem<*>,
     vm: CardSetVM,
-    needFocus: Boolean,
+    focusEvent: FocusViewItemEvent?,
     isEditable: Boolean,
 ) {
     val focusRequester = remember { FocusRequester() }
 
-    when(val item = itemView) {
+    when (val item = itemView) {
         is WordTitleViewItem -> {
             DeletableCell(
                 stateKey = item.id,
@@ -203,6 +207,7 @@ fun CardSetViewItems(
                 )
             }
         }
+
         is WordTranscriptionViewItem -> {
             WordTranscriptionView(
                 item,
@@ -220,6 +225,7 @@ fun CardSetViewItems(
                 }
             )
         }
+
         is WordPartOfSpeechViewItem -> PartOfSpeechSelectPopup(
             vm,
             item,
@@ -235,8 +241,17 @@ fun CardSetViewItems(
                     .focusable(false)
             )
         }
+
         is WordDefinitionViewItem -> if (item.isLast && item.index == 0) {
-            CardSetDefinitionView(Modifier, item, item.cardId, isEditable, vm, focusRequester)
+            CardSetDefinitionView(
+                Modifier,
+                item,
+                item.cardId,
+                isEditable,
+                vm,
+                focusRequester,
+                focusEvent?.elementIndex
+            )
         } else {
             DeletableCell(
                 stateKey = item.id,
@@ -244,9 +259,18 @@ fun CardSetViewItems(
                 onClick = { /*TODO*/ },
                 onDeleted = { vm.onDefinitionRemoved(item, item.cardId) }
             ) {
-                CardSetDefinitionView(Modifier, item, item.cardId, isEditable, vm, focusRequester)
+                CardSetDefinitionView(
+                    Modifier,
+                    item,
+                    item.cardId,
+                    isEditable,
+                    vm,
+                    focusRequester,
+                    focusEvent?.elementIndex
+                )
             }
         }
+
         is WordSubHeaderViewItem -> {
             WordSubHeaderView(
                 item,
@@ -263,9 +287,11 @@ fun CardSetViewItems(
                                 WordSubHeaderViewItem.ContentType.SYNONYMS -> vm.onAddSynonymPressed(
                                     item.cardId
                                 )
+
                                 WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(
                                     item.cardId
                                 )
+
                                 else -> {}
                             }
                         }
@@ -273,6 +299,7 @@ fun CardSetViewItems(
                 }
             )
         }
+
         is WordSynonymViewItem -> DeletableCell(
             stateKey = item.id,
             enabled = isEditable,
@@ -302,6 +329,7 @@ fun CardSetViewItems(
                 }
             )
         }
+
         is WordExampleViewItem -> DeletableCell(
             stateKey = item.id,
             enabled = isEditable,
@@ -331,6 +359,7 @@ fun CardSetViewItems(
                 }
             )
         }
+
         is CreateCardViewItem -> CreateCardView(
             item,
             modifier,
@@ -338,6 +367,7 @@ fun CardSetViewItems(
                 vm.onCardCreatePressed()
             }
         )
+
         is WordDividerViewItem -> WordDividerView()
         else -> {
             Text(
@@ -347,7 +377,7 @@ fun CardSetViewItems(
         }
     }
 
-    if (needFocus) {
+    if (focusEvent != null) {
         LaunchedEffect(key1 = "focus") {
             focusRequester.requestFocus()
         }
@@ -378,7 +408,8 @@ private fun CardSetDefinitionView(
     cardId: Long,
     isEditable: Boolean,
     vm: CardSetVM,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    focusIndex: Int? = null,
 ) {
     WordDefinitionView(
         item,
@@ -386,7 +417,13 @@ private fun CardSetDefinitionView(
             CardItemTextField(
                 modifier = modifier
                     .weight(1.0f)
-                    .focusRequester(focusRequester),
+                    .let {
+                        if (focusIndex == 0) {
+                            it.focusRequester(focusRequester)
+                        } else {
+                            it
+                        }
+                    },
                 text,
                 textStyle,
                 item,
@@ -402,48 +439,59 @@ private fun CardSetDefinitionView(
             }
         },
         labelContent = { text, index ->
-            val isLastItem = index == item.labels.size
-            if (isLastItem) {
-                Text(text)
-            } else {
-                CardTextField(
-                    text = text,
-                    placeholder = "",
-                    readOnly = !isEditable,
-                    onValueChanged = { newText ->
-                        vm.onLabelTextChanged(newText, index, cardId)
-                    }
-                )
-                Icon(
-                    painter = painterResource(MR.images.close_18),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable {
-                            vm.onLabelDeleted(index, cardId)
+            CardTextField(
+                modifier = Modifier.padding(start = 4.dp)
+                    .width(IntrinsicSize.Min)
+                    .let {
+                        if (index == item.labels.size - 1 && focusIndex == 1) {
+                            it.focusRequester(focusRequester)
+                        } else {
+                            it
                         }
-                        .padding(4.dp),
-                    tint = MaterialTheme.colors.secondary
-                )
-            }
+                    },
+                text = text,
+                placeholder = "",
+                readOnly = !isEditable,
+                onValueChanged = { newText ->
+                    vm.onLabelTextChanged(newText, index, cardId)
+                }
+            )
+            Icon(
+                painter = painterResource(MR.images.close_18),
+                contentDescription = null,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .padding(start = 4.dp)
+                    .clickable {
+                        vm.onLabelDeleted(index, cardId)
+                    },
+                tint = MaterialTheme.colors.secondary
+            )
         },
-        lastLabel = {
-            if (item.labels.isEmpty()) {
-                Badge(
-                    modifier = Modifier.clickable {
+        lastLabel = if (item.showAddLabel) {
+            {
+                if (item.labels.isEmpty()) {
+                    CustomBadge(
+                        modifier = Modifier.clickable {
+                            vm.onAddLabelPressed(cardId)
+                        }.align(Alignment.CenterVertically).padding(horizontal = 2.dp),
+                        backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
+                        contentColor = MaterialTheme.colors.onSecondary,
+                        content = {
+                            Text(
+                                text = stringResource(MR.strings.cardset_add_label),
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            )
+                        }
+                    )
+                } else {
+                    AddIcon(modifier = Modifier.align(Alignment.CenterVertically)) {
                         vm.onAddLabelPressed(cardId)
-                    }.align(Alignment.CenterVertically).padding(2.dp),
-                    backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
-                    contentColor = MaterialTheme.colors.onSecondary,
-                    content = {
-                        Text(text = stringResource(MR.strings.cardset_add_label))
                     }
-                )
-            } else {
-                AddIcon(modifier = Modifier.align(Alignment.CenterVertically)) {
-                    vm.onAddLabelPressed(cardId)
                 }
             }
+        } else {
+            null
         }
     )
 }

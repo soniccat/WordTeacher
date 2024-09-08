@@ -312,7 +312,7 @@ open class LearningVMImpl(
         val viewItems = mutableListOf(
             WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech),
             *card.resolveDefinitionsWithHiddenTerm().map { def ->
-                WordDefinitionViewItem(definition = def)
+                WordDefinitionViewItem(definition = def, labels = card.labels)
             }.toTypedArray(),
         )
 

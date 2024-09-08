@@ -25,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
@@ -556,7 +557,10 @@ fun WordDefinitionView(
         )
     },
     labelContent: @Composable RowScope.(text: String, index: Int) -> Unit = { text, _ ->
-        Text(text = text)
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
     },
     lastLabel: (@Composable FlowRowScope.() -> Unit)? = null
 ) {
@@ -587,15 +591,13 @@ fun WordDefinitionView(
 fun WordLabels(
     labels: List<String>,
     modifier: Modifier = Modifier,
-    textContent: @Composable RowScope.(text: String, index: Int) -> Unit = { text, _ ->
-        Text(text = text)
-    },
+    textContent: @Composable RowScope.(text: String, index: Int) -> Unit,
     lastItem: (@Composable FlowRowScope.() -> Unit)? = null
 ) {
     FlowRow(modifier = modifier) {
         labels.mapIndexed { index, value ->
-            Badge(
-                modifier = Modifier.align(Alignment.CenterVertically).padding(2.dp),
+            CustomBadge(
+                modifier = Modifier.align(Alignment.CenterVertically).padding(horizontal = 2.dp),
                 backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
                 contentColor = MaterialTheme.colors.onSecondary,
                 content = {
@@ -604,6 +606,36 @@ fun WordLabels(
             )
         }
         lastItem?.let { it() }
+    }
+}
+
+@Composable
+fun CustomBadge(
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colors.error,
+    contentColor: Color = contentColorFor(backgroundColor),
+    content: @Composable (RowScope.() -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier
+            .background(
+                color = backgroundColor,
+                shape = CircleShape
+            )
+            .clip(CircleShape),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (content != null) {
+            CompositionLocalProvider(
+                LocalContentColor provides contentColor
+            ) {
+                val style = MaterialTheme.typography.button.copy(fontSize = 10.sp)
+                ProvideTextStyle(
+                    value = style,
+                    content = { content() }
+                )
+            }
+        }
     }
 }
 
