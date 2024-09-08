@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
@@ -56,6 +57,7 @@ import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -75,6 +77,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
             events.firstOrNull { it is ScrollViewItemEvent } as? ScrollViewItemEvent
         }
     }
+    val scrollOffset = -50.dpToPx().toInt()
 
     Column(
         modifier = modifier
@@ -138,18 +141,25 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                             } else {
                                 null
                             },
-                            isEditable = !state.isRemoteCardSet
+                            isEditable = !state.isRemoteCardSet,
+                            onFocused = {
+                                coroutineScope.launch {
+                                    val index = data.indexOf(it)
+                                    if (index != -1) {
+                                        listState.animateScrollToItem(index, scrollOffset)
+                                    }
+                                }
+                            }
                         )
                     }
                 }
 
                 if (scrollEvent != null) {
-                    val offset = -50.dpToPx().toInt()
                     LaunchedEffect(key1 = "scroll") {
                         val index = data.indexOf(scrollEvent?.viewItem)
                         if (index != -1) {
                             scrollEvent?.markAsHandled()
-                            listState.animateScrollToItem(index, offset)
+                            listState.animateScrollToItem(index, scrollOffset)
                         }
                     }
                 }
@@ -197,7 +207,6 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun CardSetViewItems(
     modifier: Modifier,
@@ -205,6 +214,7 @@ fun CardSetViewItems(
     vm: CardSetVM,
     focusEvent: FocusViewItemEvent?,
     isEditable: Boolean,
+    onFocused: (itemView: BaseViewItem<*>) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -220,7 +230,12 @@ fun CardSetViewItems(
                     viewItem = item,
                     textContent = { text, textStyle ->
                         CardItemTextField(
-                            Modifier.weight(1.0f),
+                            Modifier.onFocusChanged {
+                                    if (it.isFocused) {
+                                        onFocused(item)
+                                    }
+                                }
+                                .weight(1.0f),
                             text,
                             textStyle,
                             item,
@@ -239,7 +254,11 @@ fun CardSetViewItems(
                 modifier = Modifier.focusRequester(focusRequester),
                 textContent = { text, textStyle ->
                     CardItemTextField(
-                        Modifier,
+                        Modifier.onFocusChanged {
+                            if (it.isFocused) {
+                                onFocused(item)
+                            }
+                        },
                         text,
                         textStyle,
                         item,
@@ -275,7 +294,8 @@ fun CardSetViewItems(
                 isEditable,
                 vm,
                 focusRequester,
-                focusEvent?.elementIndex
+                focusEvent?.elementIndex,
+                onFocused = { onFocused(item) }
             )
         } else {
             DeletableCell(
@@ -291,7 +311,8 @@ fun CardSetViewItems(
                     isEditable,
                     vm,
                     focusRequester,
-                    focusEvent?.elementIndex
+                    focusEvent?.elementIndex,
+                    onFocused = { onFocused(item) }
                 )
             }
         }
@@ -336,6 +357,11 @@ fun CardSetViewItems(
                 textContent = { text, textStyle ->
                     CardItemTextField(
                         modifier = Modifier
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    onFocused(item)
+                                }
+                            }
                             .weight(1.0f)
                             .focusRequester(focusRequester),
                         text,
@@ -366,6 +392,11 @@ fun CardSetViewItems(
                 textContent = { text, textStyle ->
                     CardItemTextField(
                         modifier = Modifier
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    onFocused(item)
+                                }
+                            }
                             .weight(1.0f)
                             .focusRequester(focusRequester),
                         text,
@@ -435,12 +466,18 @@ private fun CardSetDefinitionView(
     vm: CardSetVM,
     focusRequester: FocusRequester,
     focusIndex: Int? = null,
+    onFocused: (() -> Unit)? = null
 ) {
     WordDefinitionView(
         item,
         textContent = { text, textStyle ->
             CardItemTextField(
                 modifier = modifier
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            onFocused?.invoke()
+                        }
+                    }
                     .weight(1.0f)
                     .let {
                         if (focusIndex == 0) {
@@ -465,7 +502,13 @@ private fun CardSetDefinitionView(
         },
         labelContent = { text, index ->
             CardTextField(
-                modifier = Modifier.padding(start = 4.dp)
+                modifier = Modifier
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            onFocused?.invoke()
+                        }
+                    }
+                    .padding(start = 4.dp)
                     .width(IntrinsicSize.Min)
                     .let {
                         if (index == item.labels.size - 1 && focusIndex == 1) {
