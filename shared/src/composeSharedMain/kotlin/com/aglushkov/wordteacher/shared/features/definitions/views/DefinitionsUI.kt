@@ -597,7 +597,7 @@ fun WordLabels(
     FlowRow(modifier = modifier) {
         labels.mapIndexed { index, value ->
             CustomBadge(
-                modifier = Modifier.align(Alignment.CenterVertically).padding(horizontal = 2.dp),
+                modifier = Modifier.align(Alignment.CenterVertically).padding(start = 2.dp, bottom = 2.dp, end = 2.dp),
                 backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
                 contentColor = MaterialTheme.colors.onSecondary,
                 content = {
