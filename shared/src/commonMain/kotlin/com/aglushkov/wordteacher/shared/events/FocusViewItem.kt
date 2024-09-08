@@ -11,3 +11,12 @@ open class FocusViewItemEvent(
         isHandled = true
     }
 }
+
+open class ScrollViewItemEvent(
+    val viewItem: BaseViewItem<*>,
+    override var isHandled: Boolean = false
+): Event {
+    override fun markAsHandled() {
+        isHandled = true
+    }
+}

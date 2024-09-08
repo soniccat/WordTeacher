@@ -9,6 +9,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
+import com.aglushkov.wordteacher.shared.events.ScrollViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.views.*
@@ -43,6 +45,8 @@ import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.dpToPx
+import com.aglushkov.wordteacher.shared.general.views.pxToDp
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
@@ -51,6 +55,7 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -63,6 +68,11 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
     val focusEvent by remember {
         derivedStateOf {
             events.firstOrNull { it is FocusViewItemEvent } as? FocusViewItemEvent
+        }
+    }
+    val scrollEvent by remember {
+        derivedStateOf {
+            events.firstOrNull { it is ScrollViewItemEvent } as? ScrollViewItemEvent
         }
     }
 
@@ -107,7 +117,11 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
             modifier = modifier.fillMaxSize()
         ) {
             if (data != null) {
+                val listState = rememberLazyListState()
+                val coroutineScope = rememberCoroutineScope()
+
                 LazyColumn(
+                    state = listState,
                     contentPadding = PaddingValues(
                         top = LocalDimensWord.current.wordHorizontalPadding,
                         bottom = 300.dp
@@ -126,6 +140,17 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                             },
                             isEditable = !state.isRemoteCardSet
                         )
+                    }
+                }
+
+                if (scrollEvent != null) {
+                    val offset = -50.dpToPx().toInt()
+                    LaunchedEffect(key1 = "scroll") {
+                        val index = data.indexOf(scrollEvent?.viewItem)
+                        if (index != -1) {
+                            scrollEvent?.markAsHandled()
+                            listState.animateScrollToItem(index, offset)
+                        }
                     }
                 }
             } else {

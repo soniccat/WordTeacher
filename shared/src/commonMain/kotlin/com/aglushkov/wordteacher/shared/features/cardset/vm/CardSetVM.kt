@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
+import com.aglushkov.wordteacher.shared.events.ScrollViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
@@ -265,33 +266,57 @@ open class CardSetVMImpl(
         lastExViewItem: BaseViewItem<*>?,
         lastSynViewItem: BaseViewItem<*>?,
     ) {
-        val filteredEvents = this.events.value.filter { it !is FocusViewItemEvent }
+        val newEvents = this.events.value.filter { !it.isHandled }.toMutableList()
         this.notHandledPendingEvents.onEach {
             when (val e = it) {
                 is PendingEvent.FocusLast -> {
                     firstDefItemView?.let { safeItem ->
                         if (e.type == FocusLastType.Label && e.cardId == cardId) {
-                            events.value = filteredEvents + e.makeEvent(safeItem, 1)
+                            newEvents += e.makeEvent(safeItem, 1)
                         }
                     }
                     lastDefViewItem?.let { safeItem ->
                         if (e.type == FocusLastType.Definition && e.cardId == cardId) {
-                            events.value = filteredEvents + e.makeEvent(safeItem)
+                            newEvents += e.makeEvent(safeItem)
                         }
                     }
                     lastExViewItem?.let { safeItem ->
                         if (e.type == FocusLastType.Example && e.cardId == cardId) {
-                            events.value = filteredEvents + e.makeEvent(safeItem)
+                            newEvents += e.makeEvent(safeItem)
                         }
                     }
                     lastSynViewItem?.let { safeItem ->
                         if (e.type == FocusLastType.Synonym && e.cardId == cardId) {
-                            events.value = filteredEvents + e.makeEvent(safeItem)
+                            newEvents += e.makeEvent(safeItem)
+                        }
+                    }
+                }
+                is PendingEvent.ScrollToLast -> {
+                    firstDefItemView?.let { safeItem ->
+                        if (e.type == FocusLastType.Label && e.cardId == cardId) {
+                            newEvents += e.makeEvent(safeItem)
+                        }
+                    }
+                    lastDefViewItem?.let { safeItem ->
+                        if (e.type == FocusLastType.Definition && e.cardId == cardId) {
+                            newEvents += e.makeEvent(safeItem)
+                        }
+                    }
+                    lastExViewItem?.let { safeItem ->
+                        if (e.type == FocusLastType.Example && e.cardId == cardId) {
+                            newEvents += e.makeEvent(safeItem)
+                        }
+                    }
+                    lastSynViewItem?.let { safeItem ->
+                        if (e.type == FocusLastType.Synonym && e.cardId == cardId) {
+                            newEvents += e.makeEvent(safeItem)
                         }
                     }
                 }
             }
         }
+
+        events.value = newEvents
     }
 
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {
@@ -434,6 +459,7 @@ open class CardSetVMImpl(
         editCard(cardId) { card ->
             logAdd(ItemType.Label)
             pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Label, cardId))
+            pendingEvents.add(PendingEvent.ScrollToLast(FocusLastType.Label, cardId))
             card.copy(
                 labels = card.labels + ""
             )
@@ -485,6 +511,7 @@ open class CardSetVMImpl(
     override fun onAddDefinitionPressed(cardId: Long) {
         logAdd(ItemType.Definition)
         pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Definition, cardId))
+        pendingEvents.add(PendingEvent.ScrollToLast(FocusLastType.Definition, cardId))
         return editCard(cardId) {
             it.copy(
                 definitions = if (it.definitions.lastOrNull() != "") {
@@ -515,6 +542,7 @@ open class CardSetVMImpl(
     override fun onAddExamplePressed(cardId: Long) {
         logAdd(ItemType.Example)
         pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Example, cardId))
+        pendingEvents.add(PendingEvent.ScrollToLast(FocusLastType.Example, cardId))
         return editCard(cardId) {
             it.copy(
                 examples = if (it.examples.lastOrNull() != "") {
@@ -541,6 +569,7 @@ open class CardSetVMImpl(
     override fun onAddSynonymPressed(cardId: Long) {
         logAdd(ItemType.Synonym)
         pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Synonym, cardId))
+        pendingEvents.add(PendingEvent.ScrollToLast(FocusLastType.Synonym, cardId))
         editCard(cardId) {
             it.copy(
                 synonyms = if (it.synonyms.lastOrNull() != "") {
@@ -705,6 +734,23 @@ open class CardSetVMImpl(
                     override fun markAsHandled() {
                         super.markAsHandled()
                         this@FocusLast.isHandled = true
+                    }
+                }
+                prevEvent = newEvent
+                return newEvent
+            }
+        }
+
+        data class ScrollToLast(val type: FocusLastType, val cardId: Long): PendingEvent() {
+            var prevEvent: ScrollViewItemEvent? = null
+
+            fun makeEvent(viewItem: BaseViewItem<*>): ScrollViewItemEvent {
+                prevEvent?.markAsHandled()
+                // TODO: anon object looks an overhead here
+                val newEvent = object : ScrollViewItemEvent(viewItem) {
+                    override fun markAsHandled() {
+                        super.markAsHandled()
+                        this@ScrollToLast.isHandled = true
                     }
                 }
                 prevEvent = newEvent

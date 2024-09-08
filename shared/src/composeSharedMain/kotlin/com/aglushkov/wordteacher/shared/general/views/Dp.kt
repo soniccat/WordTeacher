@@ -12,3 +12,7 @@ fun Float.pxToDp(): Dp = Dp(this / LocalDensity.current.density)
 @Stable
 @Composable
 fun Int.pxToDp(): Dp = Dp(this / LocalDensity.current.density)
+
+@Stable
+@Composable
+fun Int.dpToPx(): Float = this * LocalDensity.current.density
