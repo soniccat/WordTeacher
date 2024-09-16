@@ -2,6 +2,7 @@ package repository_v2
 
 import (
 	"context"
+	"sort"
 	"tools/logger"
 	"tools/mongowrapper"
 
@@ -40,12 +41,31 @@ type WordExamples struct {
 	Word     WordEntry     `bson:"word"`
 }
 
+func (we *WordExamples) MaxTextScore() float64 {
+	r := 0.0
+	for i := range we.Examples {
+		if we.Examples[i].TextScore > r {
+			r = we.Examples[i].TextScore
+		}
+	}
+
+	return r
+}
+
 type WordExample struct {
 	Example       string  `bson:"example"`
 	DefPairIndex  int     `bson:"defPairIndex"`
 	DefEntryIndex int     `bson:"defEntryIndex"`
 	ExampleIndex  int     `bson:"exampleIndex"`
 	TextScore     float64 `bson:"textScore"`
+}
+
+type WordExampleSortByTextScore []WordExamples
+
+func (a WordExampleSortByTextScore) Len() int      { return len(a) }
+func (a WordExampleSortByTextScore) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a WordExampleSortByTextScore) Less(i, j int) bool {
+	return a[i].MaxTextScore() < a[j].MaxTextScore()
 }
 
 type Repository struct {
@@ -148,7 +168,6 @@ func (r *Repository) WordExamples(ctx context.Context, text string, limit int) (
 						Value: bson.D{
 							{Key: "$addToSet",
 								Value: bson.D{
-									{Key: "example", Value: "$example"},
 									{Key: "defPairIndex", Value: "$defPairIndex"},
 									{Key: "defEntryIndex", Value: "$defEntryIndex"},
 									{Key: "exampleIndex", Value: "$exampleIndex"},
@@ -189,6 +208,7 @@ func (r *Repository) WordExamples(ctx context.Context, text string, limit int) (
 		return nil, logger.WrapError(ctx, err)
 	}
 
+	sort.Sort(WordExampleSortByTextScore(result))
 	return result, nil
 }
 
