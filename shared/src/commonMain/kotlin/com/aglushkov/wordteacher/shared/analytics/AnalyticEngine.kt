@@ -21,7 +21,7 @@ data class AnalyticEvent(
         fun createActionEvent(name: String, params: Map<String, Any?> = mapOf()): AnalyticEvent {
             return AnalyticEvent(
                 name = name,
-                params = params.filterValues { it == null } as Map<String, Any>,
+                params = params.filterValues { it != null } as Map<String, Any>,
                 engineType = AnalyticEngineType.AppMetrica
             )
         }

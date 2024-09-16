@@ -103,8 +103,8 @@ func MapOrError[T, U any](data []T, f func(T) (U, error)) ([]U, error) {
 	return res, nil
 }
 
-func MapNotNilOrError[T, U any](data []T, f func(T) (*U, error)) ([]*U, error) {
-	res := make([]*U, 0, len(data))
+func MapNotNilOrError[T, U any](data []T, f func(T) (*U, error)) ([]U, error) {
+	res := make([]U, 0, len(data))
 
 	for i := range data {
 		v, err := f(data[i])
@@ -113,7 +113,7 @@ func MapNotNilOrError[T, U any](data []T, f func(T) (*U, error)) ([]*U, error) {
 		}
 
 		if v != nil {
-			res = append(res, v)
+			res = append(res, *v)
 		}
 	}
 

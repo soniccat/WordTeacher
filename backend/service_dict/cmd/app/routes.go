@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"service_dict/internal/routing/examples_v2"
 	"service_dict/internal/routing/word"
 	"service_dict/internal/routing/word_v2"
 )
@@ -22,6 +23,12 @@ func (app *application) routes() *mux.Router {
 		app.sessionValidator,
 		&app.wiktionaryRepositoryV2,
 	)
+	examplesHandlerV2 := examples_v2.NewHandler(
+		app.logger,
+		app.timeProvider,
+		app.sessionValidator,
+		&app.wiktionaryRepositoryV2,
+	)
 
 	// Register handler functions.
 	r := mux.NewRouter()
@@ -32,6 +39,10 @@ func (app *application) routes() *mux.Router {
 	r.Handle(
 		"/api/v2/dict/words/{term}",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(wordHandlerV2.Word)),
+	).Methods("GET")
+	r.Handle(
+		"/api/v2/dict/examples/{text}",
+		app.sessionManager.LoadAndSave(http.HandlerFunc(examplesHandlerV2.Examples)),
 	).Methods("GET")
 
 	return r

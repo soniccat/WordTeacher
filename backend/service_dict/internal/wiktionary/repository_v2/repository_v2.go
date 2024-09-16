@@ -31,21 +31,36 @@ type WordDefEntry struct {
 }
 
 type WordDef struct {
-	Value  string   `bson:"def,omitempty"`
+	Value  string   `bson:"value,omitempty"`
 	Labels []string `bson:"labels,omitempty"`
 }
 
+type WordExamples struct {
+	Examples []WordExample `bson:"examples,omitempty"`
+	Word     WordEntry     `bson:"word"`
+}
+
+type WordExample struct {
+	Example       string  `bson:"example"`
+	DefPairIndex  int     `bson:"defPairIndex"`
+	DefEntryIndex int     `bson:"defEntryIndex"`
+	ExampleIndex  int     `bson:"exampleIndex"`
+	TextScore     float64 `bson:"textScore"`
+}
+
 type Repository struct {
-	Logger         *logger.Logger
-	MongoClient    *mongo.Client
-	WordCollection *mongo.Collection
+	Logger                *logger.Logger
+	MongoClient           *mongo.Client
+	WordCollection        *mongo.Collection
+	WordExampleCollection *mongo.Collection
 }
 
 func New(logger *logger.Logger, mongoClient *mongo.Client) Repository {
 	model := Repository{
-		Logger:         logger,
-		MongoClient:    mongoClient,
-		WordCollection: mongoClient.Database(mongowrapper.MongoDatabaseWiktionary).Collection(mongowrapper.MongoCollectionWiktionaryWordsV2),
+		Logger:                logger,
+		MongoClient:           mongoClient,
+		WordCollection:        mongoClient.Database(mongowrapper.MongoDatabaseWiktionary).Collection(mongowrapper.MongoCollectionWiktionaryWordsV2),
+		WordExampleCollection: mongoClient.Database(mongowrapper.MongoDatabaseWiktionary).Collection(mongowrapper.MongoCollectionWiktionaryWordsV2Examples),
 	}
 
 	return model
@@ -99,6 +114,117 @@ func (m *Repository) CreateIndexIfNeeded(ctx context.Context) error {
 		},
 	}
 	_, err = m.WordCollection.Indexes().CreateOne(ctx, indexModel)
+	if err != nil {
+		return logger.WrapError(ctx, err)
+	}
+
+	return nil
+}
+
+func (r *Repository) WordExamples(ctx context.Context, text string, limit int) ([]WordExamples, error) {
+	cursor, err := r.WordExampleCollection.Aggregate(ctx, bson.A{
+		bson.D{
+			{Key: "$match",
+				Value: bson.D{
+					{Key: "$text",
+						Value: bson.D{
+							{Key: "$search", Value: "\"" + text + "\""},
+							{Key: "$diacriticSensitive", Value: true},
+						},
+					},
+				},
+			},
+		},
+		bson.D{{Key: "$addFields", Value: bson.D{
+			{Key: "textScore", Value: bson.D{{Key: "$meta", Value: "textScore"}}},
+		}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "textScore", Value: -1}}}},
+		bson.D{{Key: "$limit", Value: limit}},
+		bson.D{
+			{Key: "$group",
+				Value: bson.D{
+					{Key: "_id", Value: "$wordId"},
+					{Key: "examples",
+						Value: bson.D{
+							{Key: "$addToSet",
+								Value: bson.D{
+									{Key: "example", Value: "$example"},
+									{Key: "defPairIndex", Value: "$defPairIndex"},
+									{Key: "defEntryIndex", Value: "$defEntryIndex"},
+									{Key: "exampleIndex", Value: "$exampleIndex"},
+									{Key: "textScore", Value: "$textScore"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		bson.D{
+			{Key: "$lookup",
+				Value: bson.D{
+					{Key: "from", Value: "words2"},
+					{Key: "localField", Value: "_id"},
+					{Key: "foreignField", Value: "_id"},
+					{Key: "as", Value: "word"},
+				},
+			},
+		},
+		bson.D{
+			{Key: "$unwind",
+				Value: bson.D{
+					{Key: "path", Value: "$word"},
+					{Key: "preserveNullAndEmptyArrays", Value: false},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, logger.WrapError(ctx, err)
+	}
+
+	var result []WordExamples
+	err = cursor.All(ctx, &result)
+	if err != nil {
+		return nil, logger.WrapError(ctx, err)
+	}
+
+	return result, nil
+}
+
+func (m *Repository) CreateWordExamplesTextIndexIfNeeded(ctx context.Context) error {
+	cursor, err := m.WordExampleCollection.Indexes().List(ctx)
+
+	if err != nil {
+		return logger.WrapError(ctx, err)
+	}
+
+	var result []bson.M
+	if err = cursor.All(ctx, &result); err != nil {
+		return logger.WrapError(ctx, err)
+	}
+
+	var textIndexName = "search_index"
+	for i, _ := range result {
+		if name, ok := result[i]["name"]; ok {
+			if name == textIndexName {
+				return nil
+			}
+		}
+	}
+
+	indexModel := mongo.IndexModel{
+		Keys: bson.D{
+			{Key: "example", Value: "text"},
+		},
+		Options: &options.IndexOptions{
+			Name: &textIndexName,
+			Weights: bson.D{
+				{Key: "example", Value: 1},
+			},
+		},
+	}
+	_, err = m.WordExampleCollection.Indexes().CreateOne(ctx, indexModel)
 	if err != nil {
 		return logger.WrapError(ctx, err)
 	}

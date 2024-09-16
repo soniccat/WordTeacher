@@ -26,3 +26,8 @@ type Definition struct {
 	Value  string   `json:"value"`
 	Labels []string `json:"labels,omitempty"`
 }
+
+type WordExamplesEntry struct {
+	Examples []string `json:"examples"`
+	Word     Word     `json:"word"`
+}

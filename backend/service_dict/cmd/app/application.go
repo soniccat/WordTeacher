@@ -63,6 +63,11 @@ func createApplication(
 		return nil, err
 	}
 
+	err = app.wiktionaryRepositoryV2.CreateWordExamplesTextIndexIfNeeded(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	return app, nil
 }
 

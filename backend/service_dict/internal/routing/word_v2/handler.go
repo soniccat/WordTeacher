@@ -24,7 +24,6 @@ type response struct {
 
 type repository interface {
 	Definitions(ctx context.Context, term string) ([]repository_v2.WordEntry, error)
-	CreateIndexIfNeeded(ctx context.Context) error
 }
 
 type Handler struct {
