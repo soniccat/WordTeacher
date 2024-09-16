@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.di
 
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
@@ -121,13 +122,10 @@ class SharedAppModule {
     @AppComp
     @Provides
     fun wordTeacherWordServiceFactory(
-        @ApiBaseUrl apiBaseUrl: String,
-        deviceIdRepository: DeviceIdRepository,
-        appInfo: AppInfo,
+        wordTeacherDictService: WordTeacherDictService,
         secureCodec: SecureCodec,
-        @IsDebug isDebug: Boolean,
     ): WordTeacherWordServiceFactory {
-        return WordTeacherWordServiceFactory(apiBaseUrl, deviceIdRepository, appInfo, secureCodec, isDebug)
+        return WordTeacherWordServiceFactory(wordTeacherDictService, secureCodec)
     }
 
     @AppComp
@@ -321,6 +319,22 @@ class SharedAppModule {
             vkAuthController,
             path,
             fileSystem,
+        )
+    }
+
+    @AppComp
+    @Provides
+    fun wordTeacherDictService(
+        @ApiBaseUrl apiBaseUrl: String,
+        deviceIdRepository: DeviceIdRepository,
+        appInfo: AppInfo,
+        @IsDebug isDebug: Boolean,
+    ): WordTeacherDictService {
+        return WordTeacherDictService(
+            baseUrl = apiBaseUrl,
+            deviceIdRepository = deviceIdRepository,
+            appInfo = appInfo,
+            isDebug = isDebug
         )
     }
 

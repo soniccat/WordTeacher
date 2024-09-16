@@ -13,11 +13,8 @@ import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
 
 class WordTeacherWordServiceFactory(
-    private val apiBaseUrl: String,
-    private val deviceIdRepository: DeviceIdRepository,
-    private val appInfo: AppInfo,
+    private val wordTeacherDictService: WordTeacherDictService,
     private val secureCodec: SecureCodec,
-    private val isDebug: Boolean,
 ) {
 
     fun createService(
@@ -31,7 +28,7 @@ class WordTeacherWordServiceFactory(
 
         return when (type) {
             Config.Type.Yandex -> YandexService.createWordTeacherWordService(baseUrl, key, methodParams, secureCodec)
-            Config.Type.WordTeacher -> WordTeacherDictService.createWordTeacherWordService(apiBaseUrl, deviceIdRepository, appInfo, isDebug)
+            Config.Type.WordTeacher -> createWordTeacherWordService(wordTeacherDictService)
             else -> null
         }
     }
