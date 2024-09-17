@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.shared.general.resource
 
-import androidx.compose.runtime.collectAsState
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,4 +48,8 @@ abstract class SimpleResourceRepository<T, A>(
     }
 
     abstract suspend fun load(arg: A): T
+
+    fun clear() {
+        stateFlow.update { Resource.Uninitialized() }
+    }
 }

@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.article.di
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
@@ -15,6 +16,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.word_textsearch.WordTextSearchRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -40,6 +42,7 @@ class ArticleModule {
         wordDefinitionRepository: WordDefinitionRepository,
         dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
+        wordTextSearchRepository: WordTextSearchRepository,
         idGenerator: IdGenerator,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         analytics: Analytics,
@@ -50,6 +53,7 @@ class ArticleModule {
         dictRepository,
         cardSetsRepository,
         wordFrequencyGradationProvider,
+        wordTextSearchRepository,
         idGenerator,
         analytics,
     )

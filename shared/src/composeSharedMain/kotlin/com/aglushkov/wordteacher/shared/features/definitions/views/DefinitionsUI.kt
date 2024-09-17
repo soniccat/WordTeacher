@@ -30,7 +30,6 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
@@ -39,15 +38,12 @@ import com.aglushkov.wordteacher.shared.general.views.SearchView
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.localized
-import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.format
 import kotlinx.coroutines.launch
-import java.io.IOException
+import dev.icerock.moko.resources.compose.localized
 import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -183,7 +179,6 @@ private fun DefinitionsWordUI(
                         item,
                         vm,
                         onClicked = {
-                            vm.onWordSubmitted(it.firstItem())
                             focusManager.clearFocus()
                         }
                     )
@@ -229,12 +224,26 @@ private fun showSuggestItem(
     modifier: Modifier,
     item: BaseViewItem<*>,
     vm: DefinitionsVM,
-    onClicked: (item: WordSuggestViewItem) -> Unit
+    onClicked: () -> Unit
 ) = when (item) {
-    is WordSuggestViewItem -> {
+    is WordSuggestDictEntryViewItem -> {
         ListItem (
             modifier = modifier
-                .clickable { onClicked.invoke(item) },
+                .clickable {
+                    vm.onWordSubmitted(item.firstItem())
+                    onClicked.invoke()
+                },
+            secondaryText = { Text(item.source) },
+            text = { Text(item.firstItem()) }
+        )
+    }
+    is WordSuggestByTextViewItem -> {
+        ListItem (
+            modifier = modifier
+                .clickable {
+                    vm.onSuggestedSearchWordClicked(item)
+                    onClicked.invoke()
+                },
             secondaryText = { Text(item.source) },
             text = { Text(item.firstItem()) }
         )

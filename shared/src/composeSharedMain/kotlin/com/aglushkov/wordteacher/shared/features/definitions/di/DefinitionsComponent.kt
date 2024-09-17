@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.definitions.di
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -35,4 +36,5 @@ interface DefinitionsDependencies {
     fun dictRepository(): DictRepository
     fun wordFrequencyGradationProvider(): WordFrequencyGradationProvider
     fun analytics(): Analytics
+    fun wordTeacherDictService(): WordTeacherDictService
 }

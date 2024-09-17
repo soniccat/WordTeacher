@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.definitions
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent.Companion
@@ -16,6 +17,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.word_textsearch.WordTextSearchRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
@@ -31,6 +33,7 @@ class DefinitionsDecomposeComponent (
     dictRepository: DictRepository,
     cardSetsRepository: CardSetsRepository,
     wordFrequencyGradationProvider: WordFrequencyGradationProvider,
+    wordTextSearchRepository: WordTextSearchRepository,
     idGenerator: IdGenerator,
     analytics: Analytics,
 ) : DefinitionsVMImpl(
@@ -43,6 +46,7 @@ class DefinitionsDecomposeComponent (
     dictRepository,
     cardSetsRepository,
     wordFrequencyGradationProvider,
+    wordTextSearchRepository,
     idGenerator,
     analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {

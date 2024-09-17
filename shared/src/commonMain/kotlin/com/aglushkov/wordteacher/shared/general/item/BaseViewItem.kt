@@ -12,6 +12,7 @@ abstract class BaseViewItem<T> {
     constructor(item: T, type: Int, id: Long = 0L): this(listOf(item), type, id)
 
     constructor(items: List<T>, type: Int, id: Long = 0L) {
+        assert(items.isNotEmpty())
         this.items = items
         this.type = type
         this.id = id

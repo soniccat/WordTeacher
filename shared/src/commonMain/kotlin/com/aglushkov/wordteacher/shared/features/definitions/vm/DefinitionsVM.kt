@@ -2,19 +2,21 @@ package com.aglushkov.wordteacher.shared.features.definitions.vm
 
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.dicts.Dict
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
-import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
@@ -25,6 +27,7 @@ import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.word_textsearch.WordTextSearchRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import kotlinx.coroutines.*
@@ -33,8 +36,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -73,6 +78,7 @@ interface DefinitionsVM: Clearable {
 
     fun clearSuggests()
     fun requestSuggests(word: String)
+    fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem)
 
     @Serializable
     class State(
@@ -87,6 +93,7 @@ open class DefinitionsVMImpl(
     private val dictRepository: DictRepository,
     private val cardSetsRepository: CardSetsRepository,
     private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
+    private val wordTextSearchRepository: WordTextSearchRepository,
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
 ): ViewModel(), DefinitionsVM {
@@ -493,22 +500,73 @@ open class DefinitionsVMImpl(
     }
 
     // suggests
-    override val suggests = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
+    private val suggestedDictEntries = MutableStateFlow<Resource<List<Dict.Index.Entry>>>(Resource.Uninitialized())
+    override val suggests = combine(suggestedDictEntries, wordTextSearchRepository.stateFlow) { a, b ->
+        var i = 0L
+        suggestedDictEntries.value.merge(if (b.isUninitialized()){
+            b.toLoaded(emptyList())
+        } else {
+            b
+        }) { dictEntryList, dictTextSearchList ->
+            dictEntryList.orEmpty().map {
+                WordSuggestDictEntryViewItem(
+                    word = it.word,
+                    definition = "", // TODO: support first definition
+                    source = it.dict.name
+                ).apply { id = i++ }
+            }.distinctBy { it.firstItem() }  + // here we loose source to avoid duplications
+            dictTextSearchList.orEmpty().mapIndexed { wordIndex, word ->
+                word.defPairs.mapIndexed { defPairIndex, defPair ->
+                    defPair.defEntries.mapIndexed { defEntryIndex, defEntry ->
+                        defEntry.examples.orEmpty().mapIndexed { exampleIndex, example ->
+                            WordSuggestByTextViewItem(
+                                foundText = example,
+                                wordIndex = wordIndex,
+                                defPairIndex = defPairIndex,
+                                defEntryIndex = defEntryIndex,
+                                exampleIndex = exampleIndex,
+                                source = ""
+                            ).apply { id = i++ } as BaseViewItem<*>
+                        }
+                    }.flatten()
+                }.flatten()
+            }.flatten()
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override fun clearSuggests() {
-        suggests.value = Resource.Uninitialized()
+        suggestedDictEntries.update { Resource.Uninitialized() }
+        wordTextSearchRepository.clear()
     }
 
+    private var suggestJob: Job? = null
     override fun requestSuggests(word: String) {
-        var i = 0L
-        val entries = dictRepository.wordsStartWith(word, 40).map {
-            WordSuggestViewItem(
-                word = it.word,
-                definition = "", // TODO: support first definition
-                source = it.dict.name
-            ).apply { id = i++ }
-        }.distinctBy { it.firstItem() } // here we loose source to avoid duplications
-        suggests.value = Resource.Loaded(entries)
+        suggestJob?.cancel()
+        wordTextSearchRepository.clear()
+        suggestJob = viewModelScope.launch {
+            var loadedDictEntriesCount = -1
+            loadResource {
+                dictRepository.wordsStartWith(word, 40)
+            }.onEach {
+                it.onLoaded { dictEntries ->
+                    loadedDictEntriesCount = dictEntries.size
+                }
+            }.collect(suggestedDictEntries)
+            launch {
+                suggestedDictEntries.waitUntilDone(
+                    loaded = {
+                        if (loadedDictEntriesCount in 0..19) {
+                            wordTextSearchRepository.load(word, Resource.Uninitialized()).collect()
+                        }
+                    },
+                    error = {},
+                )
+            }
+        }
+    }
+
+    override fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem) {
+
     }
 }
 

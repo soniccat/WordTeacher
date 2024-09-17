@@ -98,7 +98,7 @@ sealed interface Resource<T> {
         loadedDataTransformer: (T?) -> R?
     ): Resource<R> = when (this) {
         is Loaded -> Loaded(
-            data = loadedDataTransformer(data) ?: throw  RuntimeException("mapTo: nil data for Loaded resource isn't supported"),
+            data = loadedDataTransformer(data) ?: throw  RuntimeException("map: nil data for Loaded resource isn't supported"),
             canLoadNextPage = canLoadNextPage,
             version = version
         )
