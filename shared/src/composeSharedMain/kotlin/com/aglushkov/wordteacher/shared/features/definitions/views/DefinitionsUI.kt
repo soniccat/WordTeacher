@@ -33,6 +33,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
+import com.aglushkov.wordteacher.shared.general.views.ListSectionCell
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.SearchView
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserUI
@@ -237,6 +238,26 @@ private fun showSuggestItem(
             text = { Text(item.firstItem()) }
         )
     }
+    is WordTextSearchHeaderViewItem -> ListSectionCell(
+        item.firstItem().localized(),
+        Modifier.padding(
+            top = if (item.isTop) 0.dp else 16.dp
+        ),
+        actionBlock = {
+            Text(
+                text = item.showAllWordsActionText.localized(),
+                modifier = Modifier.clickable {
+                        vm.onSuggestedShowAllSearchWordClicked()
+                        onClicked.invoke()
+                    }.padding(
+                        start = LocalDimens.current.contentPadding,
+                        end = LocalDimens.current.contentPadding
+                    ),
+                color = MaterialTheme.colors.secondary,
+                style = LocalAppTypography.current.wordDefinitionSubHeader
+            )
+        }
+    )
     is WordSuggestByTextViewItem -> {
         ListItem (
             modifier = modifier

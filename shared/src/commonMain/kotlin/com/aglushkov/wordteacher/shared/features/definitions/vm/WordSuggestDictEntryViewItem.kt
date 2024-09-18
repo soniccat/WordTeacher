@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import dev.icerock.moko.resources.desc.StringDesc
 
 class WordSuggestDictEntryViewItem(
     word: String,
@@ -37,5 +38,15 @@ class WordSuggestByTextViewItem(
                 defEntryIndex == other.defEntryIndex &&
                 exampleIndex == other.exampleIndex &&
                 source == other.source
+    }
+}
+
+class WordTextSearchHeaderViewItem(
+    titleText: StringDesc,
+    val showAllWordsActionText: StringDesc,
+    val isTop: Boolean,
+): BaseViewItem<StringDesc>(titleText, Type) {
+    companion object {
+        const val Type = 1003
     }
 }

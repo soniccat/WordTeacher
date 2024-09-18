@@ -236,20 +236,26 @@ private fun CardSetsViewItem(
             vm.onCardSetAdded(it)
         }
     )
-    is SectionViewItem -> Text(
+    is SectionViewItem -> ListSectionCell(
         item.name.localized(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                top = if (item.isTop) 0.dp else 16.dp
-            )
-            .background(color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
-            .padding(
-                start = LocalDimens.current.contentPadding,
-                end = LocalDimens.current.contentPadding
-            ),
-        style = LocalAppTypography.current.wordDefinitionSubHeader
+        Modifier.padding(
+            top = if (item.isTop) 0.dp else 16.dp
+        )
     )
+//        Text(
+//        item.name.localized(),
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(
+//                top = if (item.isTop) 0.dp else 16.dp
+//            )
+//            .background(color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
+//            .padding(
+//                start = LocalDimens.current.contentPadding,
+//                end = LocalDimens.current.contentPadding
+//            ),
+//        style = LocalAppTypography.current.wordDefinitionSubHeader
+//    )
     is CardSetViewItem -> CardSetItemView(
         item,
         onClick = { vm.onCardSetClicked(item) },

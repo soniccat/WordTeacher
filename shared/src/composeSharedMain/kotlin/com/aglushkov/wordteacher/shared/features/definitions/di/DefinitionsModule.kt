@@ -10,7 +10,6 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
-import com.aglushkov.wordteacher.shared.repository.word_textsearch.WordTextSearchRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
 import dagger.Provides

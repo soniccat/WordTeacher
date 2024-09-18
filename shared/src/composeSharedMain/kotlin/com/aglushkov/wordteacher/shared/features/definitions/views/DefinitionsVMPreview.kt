@@ -88,4 +88,6 @@ open class DefinitionsVMPreview(
     override fun onCleared() {}
 
     override fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem) {}
+
+    override fun onSuggestedShowAllSearchWordClicked() {}
 }

@@ -31,7 +31,6 @@ import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
-import com.aglushkov.wordteacher.shared.repository.word_textsearch.WordTextSearchRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import kotlinx.coroutines.*
@@ -84,6 +83,7 @@ interface DefinitionsVM: Clearable {
     fun clearSuggests()
     fun requestSuggests(word: String)
     fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem)
+    fun onSuggestedShowAllSearchWordClicked()
 
     @Serializable
     class State(
@@ -524,7 +524,8 @@ open class DefinitionsVMImpl(
                     definition = "", // TODO: support first definition
                     source = it.dict.name
                 ).apply { id = i++ }
-            }.distinctBy { it.firstItem() }  + // here we loose source to avoid duplications
+            }.distinctBy { it.firstItem() } + // here we loose source to avoid duplications
+
             dictTextSearchList.orEmpty().mapIndexed { wordIndex, word ->
                 word.defPairs.mapIndexed { defPairIndex, defPair ->
                     defPair.defEntries.mapIndexed { defEntryIndex, defEntry ->
@@ -541,6 +542,19 @@ open class DefinitionsVMImpl(
                     }.flatten()
                 }.flatten()
             }.flatten()
+                .let {
+                    if (it.isNotEmpty()) {
+                        listOf(
+                            WordTextSearchHeaderViewItem(
+                                StringDesc.Resource(MR.strings.definitions_textsearch_title),
+                                StringDesc.Resource(MR.strings.definitions_textsearch_showAllWords),
+                                isTop = dictEntryList.orEmpty().isEmpty(),
+                            ).apply { id = i++ }
+                        ) + it
+                    } else {
+                        it
+                    }
+                }
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
@@ -570,6 +584,16 @@ open class DefinitionsVMImpl(
                 definitionWords.update {
                     Resource.Loaded(listOf(word.toWordTeacherWord()))
                 }
+            }
+        }
+    }
+
+    override fun onSuggestedShowAllSearchWordClicked() {
+        wordTextSearchRepository.value.onData { textSearchItems ->
+            definitionWords.update {
+                Resource.Loaded(
+                    textSearchItems.map { it.toWordTeacherWord() }
+                )
             }
         }
     }

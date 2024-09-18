@@ -44,6 +44,8 @@
     <string name="definitions_displayMode_bySource">By Source</string>
     <string name="definitions_displayMode_merge">Combined</string>
     <string name="definitions_open_cardsets">Open card sets</string>
+    <string name="definitions_textsearch_title">Text Search Result</string>
+    <string name="definitions_textsearch_showAllWords">Show All</string>
 
     <string name="articles_title">Articles</string>
     <string name="articles_action_add_text">New Article</string>
