@@ -18,13 +18,6 @@ import dagger.Provides
 @Module
 class DefinitionsModule {
     @Provides
-    fun wordTextSearchRepository(
-        service: WordTeacherDictService
-    ): WordTextSearchRepository {
-        return WordTextSearchRepository(service)
-    }
-
-    @Provides
     fun definitionsDecomposeComponent(
         componentContext: ComponentContext,
         initialState: DefinitionsVM.State,
@@ -33,7 +26,7 @@ class DefinitionsModule {
         dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
-        wordTextSearchRepository: WordTextSearchRepository,
+        wordTeacherDictService: WordTeacherDictService,
         idGenerator: IdGenerator,
         analytics: Analytics,
     ) = DefinitionsDecomposeComponent(
@@ -44,7 +37,7 @@ class DefinitionsModule {
         dictRepository,
         cardSetsRepository,
         wordFrequencyGradationProvider,
-        wordTextSearchRepository,
+        wordTeacherDictService,
         idGenerator,
         analytics,
     )

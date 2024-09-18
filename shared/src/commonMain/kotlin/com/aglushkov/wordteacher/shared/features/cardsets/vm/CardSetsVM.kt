@@ -293,20 +293,20 @@ open class CardSetsVMImpl(
         viewModelScope.launch {
             cardSetSearchRepository.loadRemoteCardSet(remoteId)
                 .waitUntilDone(
+                    error = { _ ->
+                        val cardSet = cardSetSearchRepository.cardSetByRemoteId(remoteId) ?: return@waitUntilDone
+                        uiStateFlow.update {
+                            it.copy(
+                                loadCardSetErrorEvents = it.loadCardSetErrorEvents + createCardSetLoadingErrorEvent(remoteId, cardSet.name)
+                            )
+                        }
+                    },
                     loaded = { cardSet ->
                         val insertedCardSet = cardSetsRepository.insertCardSet(cardSet)
                         cardSetSearchRepository.removeCardSet(remoteId)
                         uiStateFlow.update {
                             it.copy(
                                 openCardSetEvents = it.openCardSetEvents + createOpenCardSetEvent(insertedCardSet.id, insertedCardSet.name)
-                            )
-                        }
-                    },
-                    error = { _ ->
-                        val cardSet = cardSetSearchRepository.cardSetByRemoteId(remoteId) ?: return@waitUntilDone
-                        uiStateFlow.update {
-                            it.copy(
-                                loadCardSetErrorEvents = it.loadCardSetErrorEvents + createCardSetLoadingErrorEvent(remoteId, cardSet.name)
                             )
                         }
                     },

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 interface ResourceRepository<T, A> {
+    val value: Resource<T>
     val stateFlow: StateFlow<Resource<T>>
 
     fun load(arg: A, initialValue: Resource<T> = stateFlow.value): Flow<Resource<T>>
@@ -22,6 +23,8 @@ abstract class SimpleResourceRepository<T, A>(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob()),
     private val canTryAgain: Boolean = true,
 ): ResourceRepository<T, A> {
+    override val value: Resource<T>
+        get() = stateFlow.value
     override val stateFlow = MutableStateFlow(initialValue)
     private var loadJob: Job? = null
 
@@ -47,9 +50,19 @@ abstract class SimpleResourceRepository<T, A>(
         return stateFlow.takeUntilLoadedOrErrorForVersion()
     }
 
-    abstract suspend fun load(arg: A): T
+    protected abstract suspend fun load(arg: A): T
 
     fun clear() {
         stateFlow.update { Resource.Uninitialized() }
+    }
+}
+
+fun <T, A> buildSimpleResourceRepository(
+    load: suspend (arg: A) -> T
+): SimpleResourceRepository<T, A> {
+    return object : SimpleResourceRepository<T,A>() {
+        override suspend fun load(arg: A): T {
+            return load(arg)
+        }
     }
 }

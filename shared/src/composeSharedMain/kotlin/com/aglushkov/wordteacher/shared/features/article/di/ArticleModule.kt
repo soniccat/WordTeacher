@@ -42,7 +42,7 @@ class ArticleModule {
         wordDefinitionRepository: WordDefinitionRepository,
         dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
-        wordTextSearchRepository: WordTextSearchRepository,
+        wordTeacherDictService: WordTeacherDictService,
         idGenerator: IdGenerator,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         analytics: Analytics,
@@ -53,7 +53,7 @@ class ArticleModule {
         dictRepository,
         cardSetsRepository,
         wordFrequencyGradationProvider,
-        wordTextSearchRepository,
+        wordTeacherDictService,
         idGenerator,
         analytics,
     )

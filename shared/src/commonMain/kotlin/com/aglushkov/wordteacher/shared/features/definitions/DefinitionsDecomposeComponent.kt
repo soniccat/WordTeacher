@@ -33,7 +33,7 @@ class DefinitionsDecomposeComponent (
     dictRepository: DictRepository,
     cardSetsRepository: CardSetsRepository,
     wordFrequencyGradationProvider: WordFrequencyGradationProvider,
-    wordTextSearchRepository: WordTextSearchRepository,
+    wordTeacherDictService: WordTeacherDictService,
     idGenerator: IdGenerator,
     analytics: Analytics,
 ) : DefinitionsVMImpl(
@@ -46,7 +46,7 @@ class DefinitionsDecomposeComponent (
     dictRepository,
     cardSetsRepository,
     wordFrequencyGradationProvider,
-    wordTextSearchRepository,
+    wordTeacherDictService,
     idGenerator,
     analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {

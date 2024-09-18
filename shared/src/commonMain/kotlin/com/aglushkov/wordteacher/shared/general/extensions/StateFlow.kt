@@ -124,8 +124,8 @@ suspend fun <T> Flow<Resource<T>>.waitUntilDone(): Resource<T> {
 }
 
 suspend fun <T> Flow<Resource<T>>.waitUntilDone(
+    error: suspend (Throwable) -> Unit = {},
     loaded: suspend (T) -> Unit,
-    error: suspend (Throwable) -> Unit
 ) {
     val res = waitUntilDone()
     if (res is Resource.Loaded) {

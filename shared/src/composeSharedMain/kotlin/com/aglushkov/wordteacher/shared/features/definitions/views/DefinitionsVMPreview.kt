@@ -86,4 +86,6 @@ open class DefinitionsVMPreview(
     override fun requestSuggests(word: String) {}
 
     override fun onCleared() {}
+
+    override fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem) {}
 }

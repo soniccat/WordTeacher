@@ -62,13 +62,42 @@ data class WordTeacherDictWord(
         @SerialName("examples") val examples: List<String>?,
         @SerialName("synonyms") val synonyms: List<String>?,
         @SerialName("antonyms") val antonyms: List<String>?,
-    )
+    ) {
+        fun toWordTeacherDefinition(): WordTeacherDefinition {
+            return WordTeacherDefinition(
+                definitions = listOf(definition.value),
+                examples = examples,
+                synonyms = synonyms,
+                antonyms = antonyms,
+                imageUrl = null,
+                labels = definition.labels,
+            )
+        }
+    }
 
     @Serializable
     data class Definition(
         @SerialName("value") val value: String,
         @SerialName("labels") val labels: List<String>?,
     )
+
+    fun toWordTeacherWord(): WordTeacherWord {
+        return WordTeacherWord(
+            word = word,
+            transcriptions = transcriptions,
+            definitions = LinkedHashMap<PartOfSpeech, List<WordTeacherDefinition>>().apply {
+                defPairs.map { defPair ->
+                    put(
+                        defPair.partOfSpeech,
+                        defPair.defEntries.map {
+                            it.toWordTeacherDefinition()
+                        }
+                    )
+                }
+            },
+            types = listOf(Config.Type.WordTeacher) // TODO: provide type from backend ("Wiktionary")
+        )
+    }
 }
 
 class WordTeacherDictService (
@@ -162,25 +191,7 @@ fun createWordTeacherWordService(
 
         override suspend fun define(word: String): List<WordTeacherWord> {
             return service.loadWords(word.encodeURLQueryComponent()).toOkResponse().words.orEmpty().map {
-                WordTeacherWord(
-                    word = it.word,
-                    transcriptions = it.transcriptions,
-                    definitions = LinkedHashMap<PartOfSpeech, List<WordTeacherDefinition>>().apply {
-                        it.defPairs.onEach { pair ->
-                            put(pair.partOfSpeech, pair.defEntries.map { entry ->
-                                WordTeacherDefinition(
-                                    definitions = listOf(entry.definition.value),
-                                    examples = entry.examples,
-                                    synonyms = entry.synonyms,
-                                    antonyms = entry.antonyms,
-                                    imageUrl = null,
-                                    labels = entry.definition.labels,
-                                )
-                            })
-                        }
-                    },
-                    types = listOf(Config.Type.WordTeacher) // TODO: provide type from backend ("Wiktionary")
-                )
+                it.toWordTeacherWord()
             }
         }
     }
