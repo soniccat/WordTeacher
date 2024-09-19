@@ -150,6 +150,7 @@ open class DefinitionsVMImpl(
     init {
         word?.let {
             loadIfNeeded(it)
+            requestSuggests(it)
         }
     }
 

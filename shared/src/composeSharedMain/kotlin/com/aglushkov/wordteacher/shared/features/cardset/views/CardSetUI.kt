@@ -543,7 +543,7 @@ private fun CardSetDefinitionView(
                         modifier = Modifier.clickable {
                             vm.onAddLabelPressed(cardId)
                         }.align(Alignment.CenterVertically).padding(horizontal = 2.dp),
-                        backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
+                        backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.8f),
                         contentColor = MaterialTheme.colors.onSecondary,
                         content = {
                             Text(

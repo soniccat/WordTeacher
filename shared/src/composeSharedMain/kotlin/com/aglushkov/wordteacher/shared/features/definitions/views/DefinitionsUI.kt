@@ -466,7 +466,9 @@ fun WordTitleView(
             )
     ) {
         textContent(viewItem.firstItem(), textStyle)
-        Column {
+        Column(
+            horizontalAlignment = Alignment.End,
+        ) {
             if (viewItem.providers.isNotEmpty()) {
                 Text(
                     text = MR.strings.word_providedBy_template.format(viewItem.providers.joinToString()).localized(),
@@ -477,7 +479,8 @@ fun WordTitleView(
                 )
             }
 
-            if (viewItem.frequencyLevelAndRatio != null) {
+            if (viewItem.frequencyLevelAndRatio != null &&
+                viewItem.frequencyLevelAndRatio.level != WordFrequencyGradation.UNKNOWN_LEVEL) {
                 Box(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 2.dp)
@@ -500,10 +503,7 @@ fun WordTitleView(
                     contentAlignment = Alignment.CenterStart
                 ) {
                     Text(
-                        text = if (viewItem.frequencyLevelAndRatio.level == WordFrequencyGradation.UNKNOWN_LEVEL)
-                            "?"
-                        else
-                            (viewItem.frequencyLevelAndRatio.level + 1).toString(),
+                        text = (viewItem.frequencyLevelAndRatio.level + 1).toString(),
                         modifier = Modifier.align(Alignment.Center).offset(y = (-1).dp),
                         textAlign = TextAlign.Center,
                         style = LocalAppTypography.current.wordFrequency
@@ -628,7 +628,7 @@ fun WordLabels(
         labels.mapIndexed { index, value ->
             CustomBadge(
                 modifier = Modifier.align(Alignment.CenterVertically).padding(start = 2.dp, bottom = 2.dp, end = 2.dp),
-                backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
+                backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.8f),
                 contentColor = MaterialTheme.colors.onSecondary,
                 content = {
                     textContent(value, index)
@@ -650,7 +650,7 @@ fun CustomBadge(
         modifier = modifier
             .background(
                 color = backgroundColor,
-                shape = CircleShape
+                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp)
             )
             .clip(CircleShape),
         verticalAlignment = Alignment.CenterVertically
