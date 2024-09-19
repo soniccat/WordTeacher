@@ -60,11 +60,15 @@ class ArticlesRepository(
 
     suspend fun createArticle(title: String, text: String): Flow<Resource<Article>> {
         return flow {
+            Logger.v("start", "tag_createArticle")
             emit(Resource.Loading(progress = RESOURCE_UNDEFINED_PROGRESS))
+            Logger.v("wait", "tag_createArticle")
             nlpCore.waitUntilInitialized()
+            Logger.v("createArticleInternal", "tag_createArticle")
             createArticleInternal(title, text).collect {
                 emit(it)
             }
+            Logger.v("done", "tag_createArticle")
         }
     }
 

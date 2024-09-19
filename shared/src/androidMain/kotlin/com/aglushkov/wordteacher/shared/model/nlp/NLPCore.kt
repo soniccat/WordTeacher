@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.general.measure
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.shared.general.v
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,7 +67,10 @@ actual class NLPCore(
     }
 
     actual suspend fun waitUntilInitialized(): NLPCore {
-        return state.first { it.isLoaded() }.data()!!
+        return state.first {
+            Logger.v(it.toString(), "NLPCore state")
+            it.isLoaded()
+        }.data()!!
     }
 
     fun isInitialized(): Boolean {

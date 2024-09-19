@@ -311,8 +311,11 @@ open class LearningVMImpl(
     private fun buildCardItem(card: Card): List<BaseViewItem<*>> {
         val viewItems = mutableListOf(
             WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech),
-            *card.resolveDefinitionsWithHiddenTerm().map { def ->
-                WordDefinitionViewItem(definition = def, labels = card.labels)
+            *card.resolveDefinitionsWithHiddenTerm().mapIndexed { index, def ->
+                WordDefinitionViewItem(
+                    definition = def,
+                    labels = if (index == 0) card.labels else emptyList()
+                )
             }.toTypedArray(),
         )
 

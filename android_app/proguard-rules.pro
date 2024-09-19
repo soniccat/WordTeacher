@@ -29,3 +29,12 @@
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn org.osgi.framework.BundleActivator
 -dontwarn org.slf4j.impl.StaticLoggerBinder
+
+-dontwarn org.osgi.framework.BundleContext
+-dontwarn org.osgi.framework.Filter
+-dontwarn org.osgi.framework.FrameworkUtil
+-dontwarn org.osgi.framework.InvalidSyntaxException
+-dontwarn org.osgi.util.tracker.ServiceTracker
+-dontwarn org.osgi.util.tracker.ServiceTrackerCustomizer
+
+-keep class opennlp.** { *; }

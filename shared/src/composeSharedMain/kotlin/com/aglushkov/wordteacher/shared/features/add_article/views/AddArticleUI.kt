@@ -239,10 +239,15 @@ private fun AddArticlesFieldsUI(
                 onValueChange = { vm.onTextChanged(it) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .sizeIn(minHeight = with(LocalDensity.current) {
-                        (42 * 2).sp.toDp()
-                    }),
-                label = { Text(stringResource(MR.strings.add_article_field_text_hint)) }
+                    .sizeIn(
+                        minHeight = with(LocalDensity.current) {
+                            (42 * 2).sp.toDp()
+                        },
+                        maxHeight = 300.dp
+                    ),
+                label = {
+                    Text(stringResource(MR.strings.add_article_field_text_hint))
+                }
             )
         }
 
