@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
@@ -353,13 +354,26 @@ private fun AddToSet(vm: DefinitionsVM, wordDefinitionViewItem: WordDefinitionVi
                         ) {
                             Text(it.name)
                         }
+                        is CardSetExpandOrCollapseViewItem -> DropdownMenuItem(
+                            onClick = {
+                                vm.onCardSetExpandCollapseClicked(it)
+                            }
+                        ) {
+                            Text(
+                                it.text.localized(),
+                                color = MaterialTheme.colors.secondary
+                            )
+                        }
                         is OpenCardSetViewItem -> DropdownMenuItem(
                             onClick = {
                                 vm.onOpenCardSets(it)
                                 expanded = false
                             }
                         ) {
-                            Text(it.text.localized())
+                            Text(
+                                it.text.localized(),
+                                color = MaterialTheme.colors.secondary
+                            )
                         }
                     }
                 }

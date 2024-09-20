@@ -24,6 +24,15 @@ class CardSetViewItem(
     }
 }
 
+class CardSetExpandOrCollapseViewItem(
+    val isExpanded: Boolean,
+    val text: StringDesc,
+): BaseViewItem<Boolean>(isExpanded, Type) {
+    companion object {
+        const val Type = 402
+    }
+}
+
 class RemoteCardSetViewItem(
     val remoteCardSetId: String,
     val name: String,

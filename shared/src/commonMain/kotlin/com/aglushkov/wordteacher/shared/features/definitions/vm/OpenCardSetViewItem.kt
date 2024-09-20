@@ -16,3 +16,4 @@ class OpenCardSetViewItem(
         return super.equalsByContent(other)
     }
 }
+

@@ -45,6 +45,7 @@ class ArticleModule {
         idGenerator: IdGenerator,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         analytics: Analytics,
+        settings: FlowSettings,
     ): DefinitionsVM = DefinitionsVMImpl(
         DefinitionsVM.State(),
         connectivityManager,
@@ -55,6 +56,7 @@ class ArticleModule {
         wordTeacherDictService,
         idGenerator,
         analytics,
+        settings
     )
 
     @Provides

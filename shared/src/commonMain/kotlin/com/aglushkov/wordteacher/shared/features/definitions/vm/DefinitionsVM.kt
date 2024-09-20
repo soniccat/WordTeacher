@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.dicts.Dict
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -33,6 +34,11 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
+import com.russhwolf.settings.boolean
+import com.russhwolf.settings.coroutines.FlowSettings
+import com.russhwolf.settings.coroutines.getBooleanStateFlow
+import com.russhwolf.settings.coroutines.toBlockingObservableSettings
+import com.russhwolf.settings.coroutines.toBlockingSettings
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -76,6 +82,7 @@ interface DefinitionsVM: Clearable {
 
     fun onOpenCardSets(item: OpenCardSetViewItem)
     fun onAddDefinitionInSet(wordDefinitionViewItem: WordDefinitionViewItem, cardSetViewItem: CardSetViewItem)
+    fun onCardSetExpandCollapseClicked(item: CardSetExpandOrCollapseViewItem)
 
     // Suggests
     val suggests: StateFlow<Resource<List<BaseViewItem<*>>>>
@@ -101,6 +108,7 @@ open class DefinitionsVMImpl(
     private val wordTeacherDictService: WordTeacherDictService,
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
+    private val settings: FlowSettings,
 ): ViewModel(), DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
@@ -455,17 +463,42 @@ open class DefinitionsVMImpl(
     }
 
     // card sets
+    private val blockingSettings = settings.toBlockingObservableSettings(viewModelScope)
+    private val isCardSetsExpanded = blockingSettings.getBooleanStateFlow(viewModelScope, SETTING_EXPAND_CARDSETS_POPUP, false)
 
-    override val cardSets = cardSetsRepository.cardSets.map {
+    override val cardSets = combine(cardSetsRepository.cardSets, isCardSetsExpanded) { cardsets, isExpanded ->
         //Logger.v("build view items")
-        it.copyWith(buildCardSetViewItems(it.data() ?: emptyList()))
+        cardsets.copyWith(buildCardSetViewItems(cardsets.data().orEmpty(), isExpanded))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    private fun buildCardSetViewItems(cardSets: List<ShortCardSet>): List<BaseViewItem<*>> {
+    private fun buildCardSetViewItems(cardSets: List<ShortCardSet>, isExpanded: Boolean): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
 
-        cardSets.forEach {
+        var sortedCardSets = cardSets.sortedByDescending { it.modificationDate }
+        var needExpandViewItem = false
+        var needCollapseViewItem = false
+        if (sortedCardSets.size > TOP_CARDSETS_IN_POUPUP_COUNT) {
+            if (isExpanded) {
+                needCollapseViewItem = true
+            } else {
+                needExpandViewItem = true
+                sortedCardSets = sortedCardSets.take(TOP_CARDSETS_IN_POUPUP_COUNT)
+            }
+        }
+
+        sortedCardSets.forEach {
             items.add(CardSetViewItem(it.id, it.name, ""))
+        }
+        if (needExpandViewItem) {
+            items += CardSetExpandOrCollapseViewItem(
+                isExpanded = false,
+                text = StringDesc.Resource(MR.strings.definitions_cardsets_expand)
+            )
+        } else if (needCollapseViewItem) {
+            items += CardSetExpandOrCollapseViewItem(
+                isExpanded = true,
+                text = StringDesc.Resource(MR.strings.definitions_cardsets_collapse)
+            )
         }
 
         return listOf(
@@ -503,6 +536,10 @@ open class DefinitionsVMImpl(
                 termFrequency = wordFrequency.value.data()
             )
         }
+    }
+
+    override fun onCardSetExpandCollapseClicked(item: CardSetExpandOrCollapseViewItem) {
+        blockingSettings.putBoolean(SETTING_EXPAND_CARDSETS_POPUP, !item.isExpanded)
     }
 
     // suggests
@@ -623,3 +660,6 @@ data class DefinitionsContext(
 data class DefinitionsWordContext(
     val examples: List<String>
 )
+
+private const val SETTING_EXPAND_CARDSETS_POPUP = "expandCardSetsPopup"
+private const val TOP_CARDSETS_IN_POUPUP_COUNT = 5

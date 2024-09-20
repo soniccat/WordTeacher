@@ -43,9 +43,11 @@
     <string name="definitions_add_filter">Add Filter</string>
     <string name="definitions_displayMode_bySource">By Source</string>
     <string name="definitions_displayMode_merge">Combined</string>
-    <string name="definitions_open_cardsets">Open card sets</string>
+    <string name="definitions_open_cardsets">Open Card Sets screen</string>
     <string name="definitions_textsearch_title">Text Search Result</string>
     <string name="definitions_textsearch_showAllWords">Show All</string>
+    <string name="definitions_cardsets_expand">Show all Card Sets</string>
+    <string name="definitions_cardsets_collapse">Hide old Card Sets</string>
 
     <string name="articles_title">Articles</string>
     <string name="articles_action_add_text">New Article</string>

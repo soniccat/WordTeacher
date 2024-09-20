@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.definitions.views
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -90,4 +91,6 @@ open class DefinitionsVMPreview(
     override fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem) {}
 
     override fun onSuggestedShowAllSearchWordClicked() {}
+
+    override fun onCardSetExpandCollapseClicked(item: CardSetExpandOrCollapseViewItem) {}
 }

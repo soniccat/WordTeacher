@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProv
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
+import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.BindsInstance
 import dagger.Component
 
@@ -37,4 +38,5 @@ interface DefinitionsDependencies {
     fun wordFrequencyGradationProvider(): WordFrequencyGradationProvider
     fun analytics(): Analytics
     fun wordTeacherDictService(): WordTeacherDictService
+    fun settings(): FlowSettings
 }

@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
+import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Module
 import dagger.Provides
 
@@ -28,6 +29,7 @@ class DefinitionsModule {
         wordTeacherDictService: WordTeacherDictService,
         idGenerator: IdGenerator,
         analytics: Analytics,
+        settings: FlowSettings,
     ) = DefinitionsDecomposeComponent(
         componentContext,
         initialState,
@@ -39,5 +41,6 @@ class DefinitionsModule {
         wordTeacherDictService,
         idGenerator,
         analytics,
+        settings,
     )
 }

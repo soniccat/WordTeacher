@@ -23,6 +23,7 @@ import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.essenty.statekeeper.consume
+import com.russhwolf.settings.coroutines.FlowSettings
 
 class DefinitionsDecomposeComponent (
     componentContext: ComponentContext,
@@ -35,6 +36,7 @@ class DefinitionsDecomposeComponent (
     wordTeacherDictService: WordTeacherDictService,
     idGenerator: IdGenerator,
     analytics: Analytics,
+    settings: FlowSettings,
 ) : DefinitionsVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -48,6 +50,7 @@ class DefinitionsDecomposeComponent (
     wordTeacherDictService,
     idGenerator,
     analytics,
+    settings,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Definitions"
 

@@ -38,5 +38,4 @@ interface ArticleComposeComponent {
 interface ArticleDependencies {
     fun database(): AppDatabase
     fun nlpCore(): NLPCore
-    fun settings(): FlowSettings
 }
