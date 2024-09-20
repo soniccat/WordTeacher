@@ -48,6 +48,8 @@
     <string name="definitions_textsearch_showAllWords">Show All</string>
     <string name="definitions_cardsets_expand">Show all Card Sets</string>
     <string name="definitions_cardsets_collapse">Hide old Card Sets</string>
+    <string name="definitions_cardsets_card_added">Card added</string>
+    <string name="definitions_cardsets_open">Open</string>
 
     <string name="articles_title">Articles</string>
     <string name="articles_action_add_text">New Article</string>

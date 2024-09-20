@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aglushkov.wordteacher.shared.features.add_article.views.CustomSnackbar
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
@@ -60,39 +61,71 @@ fun DefinitionsUI(
     val scope = rememberCoroutineScope()
     val partsOfSpeech by vm.partsOfSpeechFilterStateFlow.collectAsState()
     val selectedPartsOfSpeeches by vm.selectedPartsOfSpeechStateFlow.collectAsState()
-    val partOfSpeechFilterBottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val partOfSpeechFilterBottomSheetState =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val focusManager = LocalFocusManager.current
+    val events by vm.events.collectAsState()
+    val eventToShow by remember(events) {
+        derivedStateOf {
+            vm.events.value.cardSetUpdatedEvents.firstOrNull()
+        }
+    }
 
-    // TODO: consider moving chooser outside...
-    ChooserUI(
-        state = partOfSpeechFilterBottomSheetState,
-        items = partsOfSpeech.map { partOfSpeech ->
-            val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
-            ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
-        },
-        modifier = modalModifier,
-        onSelected = { items ->
-            vm.onPartOfSpeechFilterUpdated(
-                items.filter { option ->
-                    option.isSelected
-                }.map { option ->
-                    option.obj as WordTeacherWord.PartOfSpeech
+    Box(modifier = modalModifier.fillMaxSize()) {
+        // TODO: consider moving chooser outside...
+        ChooserUI(
+            state = partOfSpeechFilterBottomSheetState,
+            items = partsOfSpeech.map { partOfSpeech ->
+                val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
+                ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
+            },
+            onSelected = { items ->
+                vm.onPartOfSpeechFilterUpdated(
+                    items.filter { option ->
+                        option.isSelected
+                    }.map { option ->
+                        option.obj as WordTeacherWord.PartOfSpeech
+                    }
+                )
+            }
+        ) {
+            DefinitionsWordUI(
+                vm,
+                contentModifier,
+                withSearchBar,
+                contentHeader,
+                onPartOfSpeechFilterClicked = { items ->
+                    focusManager.clearFocus() // consider showing choose in a window popup
+                    scope.launch {
+                        partOfSpeechFilterBottomSheetState.show()
+                    }
                 }
             )
         }
-    ) {
-        DefinitionsWordUI(
-            vm,
-            contentModifier,
-            withSearchBar,
-            contentHeader,
-            onPartOfSpeechFilterClicked = { items ->
-                focusManager.clearFocus() // consider showing choose in a window popup
+
+        val snackbarHostState = remember { SnackbarHostState() }
+        val snackBarMessage = eventToShow?.text?.localized().orEmpty()
+        val snackBarActionText = eventToShow?.actionText?.localized().orEmpty()
+        LaunchedEffect(eventToShow) {
+            eventToShow?.let { event ->
                 scope.launch {
-                    partOfSpeechFilterBottomSheetState.show()
+                    val result = snackbarHostState.showSnackbar(
+                        snackBarMessage,
+                        snackBarActionText
+                    )
+                    vm.onEventHandled(event, result == SnackbarResult.ActionPerformed)
                 }
             }
-        )
+        }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.Companion.align(Alignment.BottomCenter)
+        ) {
+            CustomSnackbar(
+                message = null,
+                snackbarData = it,
+            )
+        }
     }
 }
 
@@ -113,10 +146,9 @@ private fun DefinitionsWordUI(
     val focusRequester = remember { FocusRequester() }
 
     if (withSearchBar) {
-// TODO:
-//        BackHandler(enabled = needShowSuggests) {
-//            focusManager.clearFocus()
-//        }
+        BackHandler(enabled = needShowSuggests) {
+            focusManager.clearFocus()
+        }
     }
 
     val isNotEmpty by remember(defs) {

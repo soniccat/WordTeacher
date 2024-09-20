@@ -533,7 +533,7 @@ private fun CardSetDefinitionView(
                     .clickable {
                         vm.onLabelDeleted(index, cardId)
                     },
-                tint = MaterialTheme.colors.secondary
+                tint = MaterialTheme.colors.onSecondary
             )
         },
         lastLabel = if (item.showAddLabel) {

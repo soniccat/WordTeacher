@@ -19,7 +19,7 @@ open class DefinitionsVMPreview(
     val displayMode: DefinitionsDisplayMode = DefinitionsDisplayMode.BySource,
     val partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
     val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech> = emptyList(),
-    val events: List<Event> = emptyList()
+    val previewEvents: DefinitionsVM.Events = DefinitionsVM.Events()
 ) : DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
@@ -50,6 +50,9 @@ open class DefinitionsVMPreview(
         return StringDesc.Raw("Error Text")
     }
 
+    override fun onEventHandled(event: DefinitionsVM.Event, withAction: Boolean) {
+    }
+
     override val state = DefinitionsVM.State(null)
     override val definitions: MutableStateFlow<Resource<List<BaseViewItem<*>>>>
         get() = MutableStateFlow(defs)
@@ -60,9 +63,8 @@ open class DefinitionsVMPreview(
         get() = MutableStateFlow(partsOfSpeechFilter)
     override val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
         get() = MutableStateFlow(selectedPartsOfSpeech)
-    override val eventFlow: Flow<Event>
-        get() = events.asFlow()
-
+    override val events: StateFlow<DefinitionsVM.Events>
+        get() = MutableStateFlow(previewEvents)
     // Card Sets
 
     override val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>

@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.textaction
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
@@ -35,6 +36,7 @@ interface TextActionDecomposeComponent
     fun back()
 
     fun openCardSets()
+    fun openCardSet(state: CardSetVM.State)
 
     sealed class Child(
         val inner: Clearable
@@ -105,6 +107,10 @@ class TextActionDecomposeComponentImpl(
 //        router.pushChildConfigurationIfNotAtTop(
 //            TextActionDecomposeComponent.ChildConfiguration.CardSetsConfiguration
 //        )
+    }
+
+    override fun openCardSet(state: CardSetVM.State) {
+        // TODO: support opening cardset
     }
 
     override fun back() = navigation.popIfNotEmpty()

@@ -8,8 +8,10 @@ import com.aglushkov.wordteacher.shared.dicts.Dict
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
@@ -69,13 +71,14 @@ interface DefinitionsVM: Clearable {
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
+    fun onEventHandled(event: DefinitionsVM.Event, withAction: Boolean)
 
     val state: State
+    val events: StateFlow<Events>
     val definitions: StateFlow<Resource<List<BaseViewItem<*>>>>
     val displayModeStateFlow: StateFlow<DefinitionsDisplayMode>
     val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
     val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
-    val eventFlow: Flow<Event>
 
     // Card Sets
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
@@ -96,6 +99,34 @@ interface DefinitionsVM: Clearable {
     class State(
         var word: String? = null,
     )
+
+    data class Events (
+        val cardSetUpdatedEvents: List<Event.CardSetUpdatedEvent> = listOf()
+    )
+
+    sealed interface Event {
+        val text: StringDesc
+        val actionText: StringDesc
+
+        data class CardSetUpdatedEvent(
+            override val text: StringDesc,
+            val openText: StringDesc,
+            val id: Long,
+        ): Event {
+            override val actionText: StringDesc
+                get() = openText
+        }
+
+//        data class ShowPartsOfSpeechFilterDialogEvent(
+//            val partsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
+//            val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
+//            override var isHandled: Boolean = false
+//        ): Event {
+//            override fun markAsHandled() {
+//                isHandled = true
+//            }
+//        }
+    }
 }
 
 open class DefinitionsVMImpl(
@@ -113,9 +144,7 @@ open class DefinitionsVMImpl(
 
     override var router: DefinitionsRouter? = null
     final override var state: DefinitionsVM.State = restoredState
-
-    private val eventChannel = Channel<Event>(Channel.BUFFERED)
-    override val eventFlow = eventChannel.receiveAsFlow()
+    override val events = MutableStateFlow(DefinitionsVM.Events())
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
@@ -164,7 +193,6 @@ open class DefinitionsVMImpl(
 
     override fun onCleared() {
         super.onCleared()
-        eventChannel.cancel()
     }
 
     // Events
@@ -191,14 +219,14 @@ open class DefinitionsVMImpl(
 
     override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.partOfSpeechFilterClicked"))
-        viewModelScope.launch {
-            eventChannel.trySend(
-                ShowPartsOfSpeechFilterDialogEvent(
-                    selectedPartsOfSpeechStateFlow.value,
-                    partsOfSpeechFilterStateFlow.value
-                )
-            )
-        }
+//        viewModelScope.launch {
+//            eventChannel.trySend(
+//                ShowPartsOfSpeechFilterDialogEvent(
+//                    selectedPartsOfSpeechStateFlow.value,
+//                    partsOfSpeechFilterStateFlow.value
+//                )
+//            )
+//        }
     }
 
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
@@ -462,6 +490,24 @@ open class DefinitionsVMImpl(
         return res.getErrorString(hasConnection, hasResponse)
     }
 
+    override fun onEventHandled(event: DefinitionsVM.Event, withAction: Boolean) {
+        when (event) {
+            is DefinitionsVM.Event.CardSetUpdatedEvent -> onCardSetUpdatedEvent(event, withAction)
+        }
+    }
+
+    private fun onCardSetUpdatedEvent(
+        event: DefinitionsVM.Event.CardSetUpdatedEvent,
+        needOpen: Boolean,
+    ) {
+        events.update {
+            it.copy(cardSetUpdatedEvents = it.cardSetUpdatedEvents.filter { it != event })
+        }
+        if (needOpen) {
+            router?.openCardSet(CardSetVM.State.LocalCardSet(event.id))
+        }
+    }
+
     // card sets
     private val blockingSettings = settings.toBlockingObservableSettings(viewModelScope)
     private val isCardSetsExpanded = blockingSettings.getBooleanStateFlow(viewModelScope, SETTING_EXPAND_CARDSETS_POPUP, false)
@@ -535,6 +581,16 @@ open class DefinitionsVMImpl(
                 examples = viewData.def.examples.orEmpty() + contextExamples,
                 termFrequency = wordFrequency.value.data()
             )
+            events.update {
+                it.copy(
+                    cardSetUpdatedEvents = it.cardSetUpdatedEvents +
+                        DefinitionsVM.Event.CardSetUpdatedEvent(
+                            text = StringDesc.Resource(MR.strings.definitions_cardsets_card_added),
+                            openText = StringDesc.Resource(MR.strings.definitions_cardsets_open),
+                            id = cardSetViewItem.cardSetId
+                        )
+                )
+            }
         }
     }
 
@@ -634,16 +690,6 @@ open class DefinitionsVMImpl(
                 )
             }
         }
-    }
-}
-
-data class ShowPartsOfSpeechFilterDialogEvent(
-    val partsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
-    val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
-    override var isHandled: Boolean = false
-): Event {
-    override fun markAsHandled() {
-        isHandled = true
     }
 }
 

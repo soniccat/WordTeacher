@@ -44,6 +44,7 @@ import kotlinx.coroutines.launch
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUI
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
@@ -184,6 +185,10 @@ class TextActionActivity: AppCompatActivity() {
                                 router = object : DefinitionsRouter {
                                     override fun openCardSets() {
                                         textActionDecomposeComponent.openCardSets()
+                                    }
+
+                                    override fun openCardSet(state: CardSetVM.State) {
+                                        textActionDecomposeComponent.openCardSet(state)
                                     }
                                 }
                             },
