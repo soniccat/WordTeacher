@@ -302,6 +302,11 @@ private fun showSuggestItem(
             text = { Text(item.firstItem()) }
         )
     }
+    is WordLoadingViewItem -> {
+        Box(Modifier.fillMaxWidth().padding(LocalDimens.current.contentPadding), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    }
     else -> {
         Text(
             text = "unknown item $item",

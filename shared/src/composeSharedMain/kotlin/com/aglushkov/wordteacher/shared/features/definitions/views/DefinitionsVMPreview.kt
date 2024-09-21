@@ -57,8 +57,6 @@ open class DefinitionsVMPreview(
     override val definitions: MutableStateFlow<Resource<List<BaseViewItem<*>>>>
         get() = MutableStateFlow(defs)
 
-    override val displayModeStateFlow: StateFlow<DefinitionsDisplayMode>
-        get() = MutableStateFlow(displayMode)
     override val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
         get() = MutableStateFlow(partsOfSpeechFilter)
     override val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>

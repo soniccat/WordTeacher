@@ -27,6 +27,8 @@
 
         <activity
             android:name="com.aglushkov.wordteacher.android_app.features.textaction.TextActionActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|locale|layoutDirection"
             android:label="@string/android_text_selection_action"
             android:exported="true"
             android:launchMode="singleInstance">

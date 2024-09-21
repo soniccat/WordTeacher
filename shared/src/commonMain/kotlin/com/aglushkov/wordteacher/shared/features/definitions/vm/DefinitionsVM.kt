@@ -76,7 +76,6 @@ interface DefinitionsVM: Clearable {
     val state: State
     val events: StateFlow<Events>
     val definitions: StateFlow<Resource<List<BaseViewItem<*>>>>
-    val displayModeStateFlow: StateFlow<DefinitionsDisplayMode>
     val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
     val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
 
@@ -148,20 +147,25 @@ open class DefinitionsVMImpl(
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
-    final override var displayModeStateFlow = MutableStateFlow(DefinitionsDisplayMode.BySource)
     final override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(emptyList())
 
     override val definitions = combine(
         definitionWords,
-        displayModeStateFlow,
+        settings.getIntFlow(SETTING_DEFINITION_DISPLAY_MODE, SETTING_DEFINITION_DISPLAY_MODE_BY_SOURCE),
         selectedPartsOfSpeechStateFlow,
         wordFrequencyGradationProvider.gradationState,
         wordFrequency,
-        transform = { wordDefinitions, displayMode, partOfSpeechFilter, wordFrequencyGradation, wordFrequency ->
+        transform = { wordDefinitions, displayModeIndex, partOfSpeechFilter, wordFrequencyGradation, wordFrequency ->
         //Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
             val wordFrequencyLevelAndRatio = wordFrequencyGradation.data()?.gradationLevelAndRatio(wordFrequency.data())
             wordDefinitions.copyWith(
-                buildViewItems(wordDefinitions.data().orEmpty(), displayMode, partOfSpeechFilter, wordDefinitions.isLoading(), wordFrequencyLevelAndRatio)
+                buildViewItems(
+                    wordDefinitions.data().orEmpty(),
+                    displayModes.getOrNull(displayModeIndex) ?: DefinitionsDisplayMode.BySource,
+                    partOfSpeechFilter,
+                    wordDefinitions.isLoading(),
+                    wordFrequencyLevelAndRatio
+                )
             )
     }).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
@@ -235,8 +239,9 @@ open class DefinitionsVMImpl(
 
     override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.displayModeChanged"))
-        if (displayModeStateFlow.value == mode) return
-        displayModeStateFlow.value = mode
+        viewModelScope.launch {
+            settings.putInt(SETTING_DEFINITION_DISPLAY_MODE, mode.ordinal)
+        }
     }
 
     override fun onTryAgainClicked() {
@@ -248,8 +253,7 @@ open class DefinitionsVMImpl(
 
     // Actions
 
-    private fun loadIfNeeded(aWord: String) {
-        val word = aWord.lowercase()
+    private fun loadIfNeeded(word: String) {
         this.word = word
 
         val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
@@ -266,8 +270,7 @@ open class DefinitionsVMImpl(
         )
     }
 
-    private fun load(aWord: String) {
-        val word = aWord.lowercase()
+    private fun load(word: String) {
         val tag = "DefinitionsVM.load"
         Logger.v("Start Loading $word", tag)
 
@@ -353,7 +356,9 @@ open class DefinitionsVMImpl(
         val word = mergeWords(words, partsOfSpeechFilter)
 
         addWordViewItems(word, partsOfSpeechFilter, items, wordFrequencyLevelAndRatio)
-        items.add(WordDividerViewItem())
+        if (items.isNotEmpty()) {
+            items.add(WordDividerViewItem())
+        }
     }
 
     private fun addWordsGroupedBySource(
@@ -509,10 +514,7 @@ open class DefinitionsVMImpl(
     }
 
     // card sets
-    private val blockingSettings = settings.toBlockingObservableSettings(viewModelScope)
-    private val isCardSetsExpanded = blockingSettings.getBooleanStateFlow(viewModelScope, SETTING_EXPAND_CARDSETS_POPUP, false)
-
-    override val cardSets = combine(cardSetsRepository.cardSets, isCardSetsExpanded) { cardsets, isExpanded ->
+    override val cardSets = combine(cardSetsRepository.cardSets, settings.getBooleanFlow(SETTING_EXPAND_CARDSETS_POPUP, false)) { cardsets, isExpanded ->
         //Logger.v("build view items")
         cardsets.copyWith(buildCardSetViewItems(cardsets.data().orEmpty(), isExpanded))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
@@ -595,7 +597,9 @@ open class DefinitionsVMImpl(
     }
 
     override fun onCardSetExpandCollapseClicked(item: CardSetExpandOrCollapseViewItem) {
-        blockingSettings.putBoolean(SETTING_EXPAND_CARDSETS_POPUP, !item.isExpanded)
+        viewModelScope.launch {
+            settings.putBoolean(SETTING_EXPAND_CARDSETS_POPUP, !item.isExpanded)
+        }
     }
 
     // suggests
@@ -606,36 +610,38 @@ open class DefinitionsVMImpl(
         wordTeacherDictService.textSearch(text).toOkResponse().words.orEmpty()
     }
     override val suggests = combine(suggestedDictEntryRepository.stateFlow, wordTextSearchRepository.stateFlow) { dictEntries, wordTextSearch ->
-        var i = 0L
         dictEntries.merge(if (wordTextSearch.isUninitialized()){
             wordTextSearch.toLoaded(emptyList()) // treat unitialized as loaded not to get unitialized during merge
         } else {
             wordTextSearch
         }) { dictEntryList, dictTextSearchList ->
-            dictEntryList.orEmpty().map {
+            val viewItems = dictEntryList.orEmpty().map {
                 WordSuggestDictEntryViewItem(
                     word = it.word,
                     definition = "", // TODO: support first definition
                     source = it.dict.name
-                ).apply { id = i++ }
+                )
             }.distinctBy { it.firstItem() } + // here we loose source to avoid duplications
-
-            dictTextSearchList.orEmpty().mapIndexed { wordIndex, word ->
-                word.defPairs.mapIndexed { defPairIndex, defPair ->
-                    defPair.defEntries.mapIndexed { defEntryIndex, defEntry ->
-                        defEntry.examples.orEmpty().mapIndexed { exampleIndex, example ->
-                            WordSuggestByTextViewItem(
-                                foundText = example,
-                                wordIndex = wordIndex,
-                                defPairIndex = defPairIndex,
-                                defEntryIndex = defEntryIndex,
-                                exampleIndex = exampleIndex,
-                                source = ""
-                            ).apply { id = i++ } as BaseViewItem<*>
-                        }
+            if (wordTextSearch.isLoading()) {
+                listOf(WordLoadingViewItem())
+            } else {
+                dictTextSearchList.orEmpty().mapIndexed { wordIndex, word ->
+                    word.defPairs.mapIndexed { defPairIndex, defPair ->
+                        defPair.defEntries.mapIndexed { defEntryIndex, defEntry ->
+                            defEntry.examples.orEmpty()
+                                .mapIndexed { exampleIndex, example ->
+                                    WordSuggestByTextViewItem(
+                                        foundText = example,
+                                        wordIndex = wordIndex,
+                                        defPairIndex = defPairIndex,
+                                        defEntryIndex = defEntryIndex,
+                                        exampleIndex = exampleIndex,
+                                        source = ""
+                                    ) as BaseViewItem<*>
+                                }
+                        }.flatten()
                     }.flatten()
                 }.flatten()
-            }.flatten()
                 .let {
                     if (it.isNotEmpty()) {
                         listOf(
@@ -643,12 +649,14 @@ open class DefinitionsVMImpl(
                                 StringDesc.Resource(MR.strings.definitions_textsearch_title),
                                 StringDesc.Resource(MR.strings.definitions_textsearch_showAllWords),
                                 isTop = dictEntryList.orEmpty().isEmpty(),
-                            ).apply { id = i++ }
+                            )
                         ) + it
                     } else {
                         it
                     }
                 }
+            }
+            viewItems.onEachIndexed { index, item -> item.id = index.toLong() }
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
@@ -661,6 +669,7 @@ open class DefinitionsVMImpl(
     override fun requestSuggests(word: String) {
         suggestJob?.cancel()
         suggestJob = viewModelScope.launch {
+            delay(100)
             suggestedDictEntryRepository.load(word)
                 .waitUntilDone {
                     if (it.size in 0..19) {
@@ -708,4 +717,7 @@ data class DefinitionsWordContext(
 )
 
 private const val SETTING_EXPAND_CARDSETS_POPUP = "expandCardSetsPopup"
+private const val SETTING_DEFINITION_DISPLAY_MODE = "definitionDisplayMode"
+private const val SETTING_DEFINITION_DISPLAY_MODE_BY_SOURCE = 0
+private const val SETTING_DEFINITION_DISPLAY_MODE_COMBINED = 1
 private const val TOP_CARDSETS_IN_POUPUP_COUNT = 5

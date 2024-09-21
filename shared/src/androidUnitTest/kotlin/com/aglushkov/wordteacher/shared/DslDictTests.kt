@@ -85,7 +85,8 @@ class DslDictTests {
                             examples = listOf("ex1 — ex1_1"),
                             synonyms = listOf(),
                             antonyms = listOf(),
-                            imageUrl = null
+                            imageUrl = null,
+                            labels = listOf(),
                         )
                     )
                 ),

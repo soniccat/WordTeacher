@@ -17,7 +17,7 @@ class DictAnnotationResolver {
             var i = 0
 
             while (i < sentence.lemmas.size) {
-                val firstWord = sentence.lemmaOrToken(i).toString().lowercase()
+                val firstWord = sentence.lemmaOrToken(i).toString()
                 val isVerb = sentence.tagEnum(i).isVerb()
                 var skippedNounPhrase = false
 
@@ -34,7 +34,7 @@ class DictAnnotationResolver {
                         takeLemma = false
                         r = sentence.token(index)
                     }
-                    r.toString().lowercase()
+                    r.toString()
                 }
 
                 val foundList = mutableListOf<Pair<Int, List<Dict.Index.Entry>>>()

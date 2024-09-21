@@ -329,7 +329,7 @@ open class TrieNode<T>(
             return MetaTrieNode(this, 1)
         }
 
-        return children.firstOrNull { it.prefix.first() == ch }
+        return children.firstOrNull { it.prefix.first().equals(ch, true) }
     }
 
     fun calcWord(): String {
