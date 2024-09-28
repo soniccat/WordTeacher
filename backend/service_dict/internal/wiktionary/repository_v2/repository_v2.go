@@ -140,7 +140,7 @@ func (r *Repository) WordExamples(ctx context.Context, text string, limit int) (
 					{Key: "$text",
 						Value: bson.D{
 							{Key: "$search", Value: "\"" + text + "\""},
-							{Key: "caseSensitive", Value: true},
+							{Key: "$caseSensitive", Value: true},
 							{Key: "$diacriticSensitive", Value: true},
 						},
 					},
