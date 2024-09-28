@@ -140,16 +140,17 @@ func (r *Repository) WordExamples(ctx context.Context, text string, limit int) (
 					{Key: "$text",
 						Value: bson.D{
 							{Key: "$search", Value: "\"" + text + "\""},
-							{Key: "$diacriticSensitive", Value: true},
+							// {Key: "$diacriticSensitive", Value: true},
+							{Key: "$caseSensitive", Value: false},
 						},
 					},
 				},
 			},
 		},
-		bson.D{{Key: "$addFields", Value: bson.D{
-			{Key: "textScore", Value: bson.D{{Key: "$meta", Value: "textScore"}}},
-		}}},
-		bson.D{{Key: "$sort", Value: bson.D{{Key: "textScore", Value: -1}}}},
+		// bson.D{{Key: "$addFields", Value: bson.D{
+		// 	{Key: "textScore", Value: bson.D{{Key: "$meta", Value: "textScore"}}},
+		// }}},
+		// bson.D{{Key: "$sort", Value: bson.D{{Key: "textScore", Value: -1}}}},
 		bson.D{{Key: "$limit", Value: limit}},
 		bson.D{
 			{Key: "$group",
@@ -162,7 +163,7 @@ func (r *Repository) WordExamples(ctx context.Context, text string, limit int) (
 									{Key: "defPairIndex", Value: "$defPairIndex"},
 									{Key: "defEntryIndex", Value: "$defEntryIndex"},
 									{Key: "exampleIndex", Value: "$exampleIndex"},
-									{Key: "textScore", Value: "$textScore"},
+									// {Key: "textScore", Value: "$textScore"},
 								},
 							},
 						},

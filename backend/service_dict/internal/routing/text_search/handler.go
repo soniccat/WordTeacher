@@ -69,10 +69,12 @@ func (h *Handler) WordTextSearch(w http.ResponseWriter, r *http.Request) {
 		),
 	)
 
+	// start := time.Now()
 	words, err := h.repository.WordExamples(ctx, strings.ToLower(text), 20)
 	if err != nil {
 		h.SetError(w, err, http.StatusInternalServerError)
 	}
+	// fmt.Printf("mongo took %v\n", time.Since(start))
 
 	textSearchEntries := tools.Map(words, func(w repository_v2.WordExamples) api_dict_v2.Word {
 		apiDefPairs := []api_dict_v2.DefPair{}
