@@ -353,12 +353,12 @@ open class DefinitionsVMImpl(
         items: MutableList<BaseViewItem<*>>,
         wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ) {
-        val word = mergeWords(words, partsOfSpeechFilter)
-
-        addWordViewItems(word, partsOfSpeechFilter, items, wordFrequencyLevelAndRatio)
-        if (items.isNotEmpty()) {
-            items.add(WordDividerViewItem())
-        }
+        words.groupBy { it.word }
+            .map {
+                val mergedWord = mergeWords(it.value, partsOfSpeechFilter)
+                addWordViewItems(mergedWord, partsOfSpeechFilter, items, wordFrequencyLevelAndRatio)
+                items.add(WordDividerViewItem())
+            }
     }
 
     private fun addWordsGroupedBySource(
