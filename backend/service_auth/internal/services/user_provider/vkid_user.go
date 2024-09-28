@@ -38,7 +38,7 @@ func (s *Service) VKUser(
 	}
 	values := url.Query()
 	values.Add("token", token)
-	values.Add("v", "5.131")
+	values.Add("v", "5.199")
 	values.Add("access_token", s.vkIdConfig.AccessToken)
 	url.RawQuery = values.Encode()
 
@@ -58,6 +58,7 @@ func (s *Service) VKUser(
 	}
 
 	if resposeBody.Response.Success != 1 {
+		ctx := logger.WrapContext(ctx, "token", token)
 		return nil, logger.Error(ctx, "can't validate user")
 	}
 

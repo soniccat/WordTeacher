@@ -92,7 +92,7 @@ server {
         set $dict http://dict:${DICT_PORT};
         proxy_pass $dict;
     }
-    location /api/v2/dict {
+    location ~ "/api/v[1-9]/dict" {
         set $dict http://dict:${DICT_PORT};
         proxy_pass $dict;
     }

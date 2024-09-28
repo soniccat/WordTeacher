@@ -8,6 +8,7 @@ import (
 	"service_dict/internal/routing/text_search"
 	"service_dict/internal/routing/word"
 	"service_dict/internal/routing/word_v2"
+	"service_dict/internal/routing/word_v3"
 )
 
 func (app *application) routes() *mux.Router {
@@ -18,6 +19,12 @@ func (app *application) routes() *mux.Router {
 		&app.wiktionaryRepositoryV1,
 	)
 	wordHandlerV2 := word_v2.NewHandler(
+		app.logger,
+		app.timeProvider,
+		app.sessionValidator,
+		&app.wiktionaryRepositoryV2,
+	)
+	wordHandlerV3 := word_v3.NewHandler(
 		app.logger,
 		app.timeProvider,
 		app.sessionValidator,
@@ -39,6 +46,10 @@ func (app *application) routes() *mux.Router {
 	r.Handle(
 		"/api/v2/dict/words/{term}",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(wordHandlerV2.Word)),
+	).Methods("GET")
+	r.Handle(
+		"/api/v3/dict/words",
+		app.sessionManager.LoadAndSave(http.HandlerFunc(wordHandlerV3.Word)),
 	).Methods("GET")
 	r.Handle(
 		"/api/v2/dict/words/textsearch/{text}",

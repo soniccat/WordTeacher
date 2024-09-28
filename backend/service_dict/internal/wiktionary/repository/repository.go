@@ -26,15 +26,15 @@ type Definition struct {
 
 type Repository struct {
 	Logger         *logger.Logger
-	MongoClient    *mongo.Client
+	MongoWrapper   *mongowrapper.MongoWrapper
 	WordCollection *mongo.Collection
 }
 
-func New(logger *logger.Logger, mongoClient *mongo.Client) Repository {
+func New(logger *logger.Logger, mongoWrapper *mongowrapper.MongoWrapper) Repository {
 	model := Repository{
 		Logger:         logger,
-		MongoClient:    mongoClient,
-		WordCollection: mongoClient.Database(mongowrapper.MongoDatabaseWiktionary).Collection(mongowrapper.MongoCollectionWiktionaryWords),
+		MongoWrapper:   mongoWrapper,
+		WordCollection: mongoWrapper.Client.Database(mongowrapper.MongoDatabaseWiktionary).Collection(mongowrapper.MongoCollectionWiktionaryWords),
 	}
 
 	return model
@@ -59,37 +59,10 @@ func (r *Repository) Definitions(ctx context.Context, term string) ([]Word, erro
 	return result, nil
 }
 
-func (m *Repository) CreateIndexIfNeeded(ctx context.Context) error {
-	cursor, err := m.WordCollection.Indexes().List(ctx)
+func (m *Repository) CreateIndexIfNeeded() error {
+	err := m.MongoWrapper.CreateIndexIfNeeded(m.WordCollection, "term")
 	if err != nil {
-		return logger.WrapError(ctx, err)
-	}
-
-	var result []bson.M
-	if err = cursor.All(ctx, &result); err != nil {
-		return logger.WrapError(ctx, err)
-	}
-
-	var termIndexName = "term_index"
-	for i := range result {
-		if name, ok := result[i]["name"]; ok {
-			if name == termIndexName {
-				return nil
-			}
-		}
-	}
-
-	indexModel := mongo.IndexModel{
-		Keys: bson.D{
-			{Key: "term", Value: -1},
-		},
-		Options: &options.IndexOptions{
-			Name: &termIndexName,
-		},
-	}
-	_, err = m.WordCollection.Indexes().CreateOne(ctx, indexModel)
-	if err != nil {
-		return logger.WrapError(ctx, err)
+		return logger.WrapError(m.MongoWrapper.Context, err)
 	}
 
 	return nil

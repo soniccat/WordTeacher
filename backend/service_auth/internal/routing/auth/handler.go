@@ -103,6 +103,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		"logId", uuid.NewString(),
 		"networkType", networkType,
+		"deviceId", deviceId,
 		"deviceType", deviceType,
 		"appVersion", appVersion,
 	)

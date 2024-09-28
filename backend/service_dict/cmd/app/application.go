@@ -51,14 +51,14 @@ func createApplication(
 		return nil, err
 	}
 
-	app.wiktionaryRepositoryV1 = repository.New(app.logger, app.MongoWrapper.Client)
-	err = app.wiktionaryRepositoryV1.CreateIndexIfNeeded(ctx)
+	app.wiktionaryRepositoryV1 = repository.New(app.logger, app.MongoWrapper)
+	err = app.wiktionaryRepositoryV1.CreateIndexIfNeeded()
 	if err != nil {
 		return nil, err
 	}
 
-	app.wiktionaryRepositoryV2 = repository_v2.New(app.logger, app.MongoWrapper.Client)
-	err = app.wiktionaryRepositoryV2.CreateIndexIfNeeded(ctx)
+	app.wiktionaryRepositoryV2 = repository_v2.New(app.logger, app.MongoWrapper)
+	err = app.wiktionaryRepositoryV2.CreateIndexIfNeeded()
 	if err != nil {
 		return nil, err
 	}

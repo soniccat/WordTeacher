@@ -129,7 +129,7 @@ class DslDict(
     override suspend fun define(word: String, indexEntry: Dict.Index.Entry): List<WordTeacherWord> {
         return withContext(Dispatchers.Default) {
             val builder = WordTeacherWordBuilder()
-            builder.setWord(word)
+            builder.setWord(indexEntry.word)
 
             val pos = indexEntry.indexValue as Int
             fileSystem.read(path) {

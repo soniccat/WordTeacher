@@ -7,6 +7,7 @@ import (
 	"time"
 	"tools/logger"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
@@ -37,8 +38,8 @@ const (
 
 type MongoWrapper struct {
 	Client     *mongo.Client
-	Context    *context.Context
-	cancelFunc *context.CancelFunc
+	Context    context.Context
+	cancelFunc context.CancelFunc
 }
 
 func New(mongoURI string, enableCredentials bool) (*MongoWrapper, error) {
@@ -59,26 +60,65 @@ func New(mongoURI string, enableCredentials bool) (*MongoWrapper, error) {
 
 	return &MongoWrapper{
 		Client:     client,
-		Context:    &ctx,
-		cancelFunc: &cancel,
+		Context:    ctx,
+		cancelFunc: cancel,
 	}, nil
 }
 
 func (mw *MongoWrapper) Connect() error {
-	return mw.Client.Connect(*mw.Context)
+	return mw.Client.Connect(mw.Context)
 }
 
 func (mw *MongoWrapper) Stop() error {
 	if mw.cancelFunc != nil {
-		(*mw.cancelFunc)()
+		(mw.cancelFunc)()
 		mw.cancelFunc = nil
 	}
 
 	if mw.Client != nil {
-		if err := mw.Client.Disconnect(*mw.Context); err != nil {
+		if err := mw.Client.Disconnect(mw.Context); err != nil {
 			return logger.WrapError(context.Background(), err)
 		}
 		mw.Client = nil
+	}
+
+	return nil
+}
+
+func (mw *MongoWrapper) CreateIndexIfNeeded(
+	collection *mongo.Collection,
+	fieldName string,
+) error {
+	cursor, err := collection.Indexes().List(mw.Context)
+	if err != nil {
+		return logger.WrapError(mw.Context, err)
+	}
+
+	var result []bson.M
+	if err = cursor.All(mw.Context, &result); err != nil {
+		return logger.WrapError(mw.Context, err)
+	}
+
+	var indexName = fieldName + "_index"
+	for i := range result {
+		if name, ok := result[i]["name"]; ok {
+			if name == indexName {
+				return nil
+			}
+		}
+	}
+
+	indexModel := mongo.IndexModel{
+		Keys: bson.D{
+			{Key: fieldName, Value: -1},
+		},
+		Options: &options.IndexOptions{
+			Name: &indexName,
+		},
+	}
+	_, err = collection.Indexes().CreateOne(mw.Context, indexModel)
+	if err != nil {
+		return logger.WrapError(mw.Context, err)
 	}
 
 	return nil
