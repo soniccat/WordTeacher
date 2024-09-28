@@ -7,5 +7,5 @@ import com.aglushkov.wordteacher.shared.repository.config.ServiceMethodParams
 interface WordTeacherWordService {
     var type: Config.Type
 
-    suspend fun define(word: String): List<WordTeacherWord>
+    suspend fun define(words: List<String>): List<WordTeacherWord>
 }

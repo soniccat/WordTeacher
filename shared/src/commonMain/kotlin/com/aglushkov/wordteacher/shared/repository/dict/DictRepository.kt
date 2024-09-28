@@ -123,7 +123,7 @@ class DictRepositoryImpl(
                 val job = launch(CoroutineExceptionHandler { _, throwable ->
                     Logger.e("define Exception: " + throwable.message, tag)
                 }) {
-                    words.addAll(dict.define(word))
+                    words.addAll(dict.define(listOf(word)))
                     send(Resource.Loading(words.toList()))
                 }
 

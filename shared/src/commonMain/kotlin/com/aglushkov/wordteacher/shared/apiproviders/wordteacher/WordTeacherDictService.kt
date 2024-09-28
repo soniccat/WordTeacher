@@ -22,6 +22,7 @@ import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 import io.ktor.http.encodeURLQueryComponent
@@ -132,12 +133,15 @@ class WordTeacherDictService (
         }
     }
 
-    suspend fun loadWords(word: String): Response<WordTeacherDictWordsResponse> {
+    suspend fun loadWords(words: List<String>): Response<WordTeacherDictWordsResponse> {
         return withContext(Dispatchers.Default) {
-            logger.logLoadingStarted(word)
-            val res: HttpResponse = httpClient.get("${baseUrl}/api/v2/dict/words/${word}")
+            val terms = words.joinToString(",")
+            logger.logLoadingStarted(terms)
+            val res: HttpResponse = httpClient.get("${baseUrl}/api/v3/dict/words", block = {
+                parameter("terms", terms)
+            })
             val responseString: String = res.body()
-            logger.logLoadingCompleted(word, res, responseString)
+            logger.logLoadingCompleted(terms.encodeURLQueryComponent(), res, responseString)
             dictWordsJson.decodeFromString(responseString)
         }
     }
@@ -189,8 +193,8 @@ fun createWordTeacherWordService(
     return object : WordTeacherWordService {
         override var type: Config.Type = Config.Type.WordTeacher
 
-        override suspend fun define(word: String): List<WordTeacherWord> {
-            return service.loadWords(word.encodeURLQueryComponent()).toOkResponse().words.orEmpty().map {
+        override suspend fun define(words: List<String>): List<WordTeacherWord> {
+            return service.loadWords(words).toOkResponse().words.orEmpty().map {
                 it.toWordTeacherWord()
             }
         }

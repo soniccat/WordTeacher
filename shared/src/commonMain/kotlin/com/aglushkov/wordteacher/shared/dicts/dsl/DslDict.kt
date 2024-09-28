@@ -120,10 +120,12 @@ class DslDict(
         }
     }
 
-    override suspend fun define(word: String): List<WordTeacherWord> {
-        return dslIndex.indexEntry(word)?.let { indexEntry ->
-            define(word, indexEntry)
-        } ?: emptyList()
+    override suspend fun define(words: List<String>): List<WordTeacherWord> {
+        return words.map { word ->
+            dslIndex.indexEntry(word)?.let { indexEntry ->
+                define(word, indexEntry)
+            } ?: emptyList()
+        }.flatten()
     }
 
     override suspend fun define(word: String, indexEntry: Dict.Index.Entry): List<WordTeacherWord> {
