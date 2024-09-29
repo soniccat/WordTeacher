@@ -139,7 +139,7 @@ private fun DefinitionsWordUI(
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
-    var searchText by remember { mutableStateOf(vm.state.word.orEmpty()) }
+    var searchText = vm.wordTextValue.collectAsState()
     var needShowSuggests by remember { mutableStateOf(false) }
     val suggests = vm.suggests.collectAsState()
     val focusManager = LocalFocusManager.current
@@ -175,10 +175,10 @@ private fun DefinitionsWordUI(
             CustomTopAppBar {
                 SearchView(
                     Modifier,
-                    searchText,
+                    searchText.value,
                     focusRequester = focusRequester,
                     onTextChanged = {
-                        searchText = it
+                        vm.onWordTextUpdated(it)
 
                         if (it.isEmpty()) {
                             vm.clearSuggests()
@@ -190,7 +190,7 @@ private fun DefinitionsWordUI(
                         needShowSuggests = it.isFocused
                     }
                 ) {
-                    vm.onWordSubmitted(searchText)
+                    vm.onWordSubmitted(searchText.value)
                     focusManager.clearFocus()
                 }
             }

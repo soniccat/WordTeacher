@@ -63,6 +63,7 @@ import kotlinx.serialization.Serializable
 interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
 
+    fun onWordTextUpdated(newText: String)
     fun onWordSubmitted(
         word: String?,
         filter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
@@ -76,6 +77,7 @@ interface DefinitionsVM: Clearable {
     fun getErrorText(res: Resource<*>): StringDesc?
     fun onEventHandled(event: Event, withAction: Boolean)
 
+    val wordTextValue: StateFlow<String>
     val state: State
     val events: StateFlow<Events>
     val definitions: StateFlow<Resource<List<BaseViewItem<*>>>>
@@ -98,7 +100,7 @@ interface DefinitionsVM: Clearable {
     fun onSuggestedShowAllSearchWordClicked()
 
     @Serializable
-    class State(
+    data class State(
         var word: String? = null,
     )
 
@@ -151,7 +153,14 @@ open class DefinitionsVMImpl(
 ): ViewModel(), DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
-    final override var state: DefinitionsVM.State = restoredState
+    final override var state: DefinitionsVM.State = restoredState.copy(
+        word = if (definitionsSettings.needStoreDefinedWordInSettings) {
+            settings.toBlockingSettings().getStringOrNull(SETTING_LAST_DEFINED_WORD) ?: restoredState.word
+        } else {
+            restoredState.word
+        }
+    )
+    override val wordTextValue = MutableStateFlow(state.word.orEmpty())
     override val events = MutableStateFlow(DefinitionsVM.Events())
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
@@ -234,7 +243,9 @@ open class DefinitionsVMImpl(
                 if (isEnabled && lastHandledClipData != clipData && !clipData.isEmpty) {
                     lastHandledClipData = clipData
                     word = clipData.text
-                    onWordSubmitted(clipData.text)
+                    wordTextValue.update { clipData.text }
+                    loadIfNeeded(clipData.text)
+                    requestSuggests(clipData.text)
                 }
             }.collect()
         }
@@ -245,6 +256,9 @@ open class DefinitionsVMImpl(
     }
 
     // Events
+    override fun onWordTextUpdated(newText: String) {
+        wordTextValue.update { newText }
+    }
 
     override fun onWordSubmitted(
         word: String?,

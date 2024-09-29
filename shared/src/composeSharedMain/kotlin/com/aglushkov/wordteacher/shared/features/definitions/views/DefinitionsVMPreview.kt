@@ -53,6 +53,11 @@ open class DefinitionsVMPreview(
     override fun onEventHandled(event: DefinitionsVM.Event, withAction: Boolean) {
     }
 
+    override fun onWordTextUpdated(newText: String) {
+    }
+
+    override val wordTextValue: StateFlow<String>
+        get() = MutableStateFlow("")
     override val state = DefinitionsVM.State(null)
     override val definitions: MutableStateFlow<Resource<List<BaseViewItem<*>>>>
         get() = MutableStateFlow(defs)
