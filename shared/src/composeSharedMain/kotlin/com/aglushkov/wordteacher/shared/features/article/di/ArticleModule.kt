@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
+import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
@@ -21,6 +22,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Module
 import dagger.Provides
+import javax.sound.sampled.Clip
 
 @Module
 class ArticleModule {
@@ -42,6 +44,7 @@ class ArticleModule {
         dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
         wordTeacherDictService: WordTeacherDictService,
+        clipboardRepository: ClipboardRepository,
         idGenerator: IdGenerator,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         analytics: Analytics,
@@ -54,6 +57,10 @@ class ArticleModule {
         cardSetsRepository,
         wordFrequencyGradationProvider,
         wordTeacherDictService,
+        DefinitionsVM.Settings(
+            needStoreDefinedWordInSettings = false
+        ),
+        clipboardRepository,
         idGenerator,
         analytics,
         settings

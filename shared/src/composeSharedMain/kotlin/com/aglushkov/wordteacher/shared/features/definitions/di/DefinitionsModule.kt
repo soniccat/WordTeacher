@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
@@ -27,6 +28,7 @@ class DefinitionsModule {
         cardSetsRepository: CardSetsRepository,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         wordTeacherDictService: WordTeacherDictService,
+        clipboardRepository: ClipboardRepository,
         idGenerator: IdGenerator,
         analytics: Analytics,
         settings: FlowSettings,
@@ -39,6 +41,7 @@ class DefinitionsModule {
         cardSetsRepository,
         wordFrequencyGradationProvider,
         wordTeacherDictService,
+        clipboardRepository,
         idGenerator,
         analytics,
         settings,

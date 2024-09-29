@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
+import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
@@ -415,4 +416,9 @@ class SharedAppModule {
         return Analytics(engines = analyticEngines.asList())
     }
 
+    @AppComp
+    @Provides
+    fun clipboardRepository(): ClipboardRepository {
+        return ClipboardRepository()
+    }
 }

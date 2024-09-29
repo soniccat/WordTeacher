@@ -31,6 +31,7 @@ import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.essenty.statekeeper.consume
+import com.russhwolf.settings.coroutines.FlowSettings
 
 class SettingsDecomposeComponent (
     componentContext: ComponentContext,
@@ -47,6 +48,7 @@ class SettingsDecomposeComponent (
     appInfo: AppInfo,
     emailOpener: EmailOpener,
     databaseCardWorker: DatabaseCardWorker,
+    settings: FlowSettings
 ) : SettingsVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -64,6 +66,7 @@ class SettingsDecomposeComponent (
     appInfo,
     emailOpener,
     databaseCardWorker,
+    settings,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Settings"
 

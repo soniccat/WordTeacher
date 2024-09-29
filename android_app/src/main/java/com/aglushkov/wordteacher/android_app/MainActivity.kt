@@ -1,5 +1,8 @@
 package com.aglushkov.wordteacher.android_app
 
+import android.content.ClipDescription
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -25,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUI
@@ -70,6 +74,9 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stac
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.value.Value
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @ExperimentalAnimationApi
@@ -115,6 +122,43 @@ class MainActivity : AppCompatActivity(), Router {
         (appComponent().emailOpener() as EmailOpenerImpl).bind(this)
         setupComposeLayout()
         handleIntent()
+    }
+
+    private var lastPrimaryClipDescription: ClipDescription? = null
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            delay(200)
+            handleClipboard()
+        }
+    }
+
+    private fun handleClipboard() {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        if (!clipboard.hasPrimaryClip()) return
+
+        val primaryDescription = clipboard.primaryClipDescription ?: return
+        if (!primaryDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) &&
+            !primaryDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_HTML)) {
+            return
+        }
+        if (lastPrimaryClipDescription != primaryDescription) {
+            lastPrimaryClipDescription = primaryDescription
+
+            val primaryClip = clipboard.primaryClip ?: return
+            if (primaryClip.itemCount == 0) {
+                return
+            }
+            val firstItem = primaryClip.getItemAt(0)
+
+            lifecycleScope.launch(Dispatchers.Default) {
+                val itemText = firstItem.coerceToText(this@MainActivity)
+                if (itemText.isNotEmpty()) {
+                    appComponent().clipboardRepository().setText(itemText.toString())
+                }
+            }
+        }
     }
 
     private fun handleIntent() {

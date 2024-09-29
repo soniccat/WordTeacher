@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
@@ -34,6 +35,7 @@ class DefinitionsDecomposeComponent (
     cardSetsRepository: CardSetsRepository,
     wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     wordTeacherDictService: WordTeacherDictService,
+    clipboardRepository: ClipboardRepository,
     idGenerator: IdGenerator,
     analytics: Analytics,
     settings: FlowSettings,
@@ -48,6 +50,10 @@ class DefinitionsDecomposeComponent (
     cardSetsRepository,
     wordFrequencyGradationProvider,
     wordTeacherDictService,
+    DefinitionsVM.Settings(
+        needStoreDefinedWordInSettings = true
+    ),
+    clipboardRepository,
     idGenerator,
     analytics,
     settings,

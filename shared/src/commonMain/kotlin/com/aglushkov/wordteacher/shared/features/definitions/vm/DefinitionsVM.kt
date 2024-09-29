@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.settings.vm.SETTING_GET_WORD_FROM_CLIPBOARD
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
@@ -30,6 +31,7 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
@@ -54,6 +56,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
 
@@ -71,7 +74,7 @@ interface DefinitionsVM: Clearable {
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
-    fun onEventHandled(event: DefinitionsVM.Event, withAction: Boolean)
+    fun onEventHandled(event: Event, withAction: Boolean)
 
     val state: State
     val events: StateFlow<Events>
@@ -126,6 +129,10 @@ interface DefinitionsVM: Clearable {
 //            }
 //        }
     }
+
+    data class Settings(
+        val needStoreDefinedWordInSettings: Boolean = false
+    )
 }
 
 open class DefinitionsVMImpl(
@@ -136,6 +143,8 @@ open class DefinitionsVMImpl(
     private val cardSetsRepository: CardSetsRepository,
     private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     private val wordTeacherDictService: WordTeacherDictService,
+    private val definitionsSettings: DefinitionsVM.Settings,
+    private val clipboardRepository: ClipboardRepository,
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
     private val settings: FlowSettings,
@@ -175,6 +184,13 @@ open class DefinitionsVMImpl(
         }.flatten().distinct()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
+    private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String> { word ->
+        dictRepository.wordsStartWith(word, 40)
+    }
+    private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String> { text ->
+        wordTeacherDictService.textSearch(text).toOkResponse().words.orEmpty()
+    }
+
     private val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     private var loadJob: Job? = null
     private var observeJob: Job? = null
@@ -188,10 +204,39 @@ open class DefinitionsVMImpl(
             state.word = value
         }
 
+    private var lastHandledClipData: ClipboardRepository.Data? = null
+
     init {
-        word?.let {
+        if (definitionsSettings.needStoreDefinedWordInSettings) {
+            settings.toBlockingSettings().getStringOrNull(SETTING_LAST_DEFINED_WORD) ?: word
+        } else {
+            word
+        }?.let {
             loadIfNeeded(it)
             requestSuggests(it)
+        }
+
+        if (definitionsSettings.needStoreDefinedWordInSettings) {
+            viewModelScope.launch {
+                definitionWords.collect {
+                    word?.let {
+                        settings.putString(SETTING_LAST_DEFINED_WORD, it)
+                    }
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            combine(
+                settings.getBooleanFlow(SETTING_GET_WORD_FROM_CLIPBOARD, false),
+                clipboardRepository.clipData,
+            ) { isEnabled, clipData ->
+                if (isEnabled && lastHandledClipData != clipData && !clipData.isEmpty) {
+                    lastHandledClipData = clipData
+                    word = clipData.text
+                    onWordSubmitted(clipData.text)
+                }
+            }.collect()
         }
     }
 
@@ -603,12 +648,6 @@ open class DefinitionsVMImpl(
     }
 
     // suggests
-    private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String> { word ->
-        dictRepository.wordsStartWith(word, 40)
-    }
-    private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String> { text ->
-        wordTeacherDictService.textSearch(text).toOkResponse().words.orEmpty()
-    }
     override val suggests = combine(suggestedDictEntryRepository.stateFlow, wordTextSearchRepository.stateFlow) { dictEntries, wordTextSearch ->
         dictEntries.merge(if (wordTextSearch.isUninitialized()){
             wordTextSearch.toLoaded(emptyList()) // treat unitialized as loaded not to get unitialized during merge
@@ -668,7 +707,7 @@ open class DefinitionsVMImpl(
     private var suggestJob: Job? = null
     override fun requestSuggests(word: String) {
         suggestJob?.cancel()
-        suggestJob = viewModelScope.launch {
+        suggestJob = viewModelScope.launch(Dispatchers.Default) {
             delay(100)
             suggestedDictEntryRepository.load(word)
                 .waitUntilDone {
@@ -717,6 +756,7 @@ data class DefinitionsWordContext(
 )
 
 private const val SETTING_EXPAND_CARDSETS_POPUP = "expandCardSetsPopup"
+private const val SETTING_LAST_DEFINED_WORD = "lastDefinedWord"
 private const val SETTING_DEFINITION_DISPLAY_MODE = "definitionDisplayMode"
 private const val SETTING_DEFINITION_DISPLAY_MODE_BY_SOURCE = 0
 private const val SETTING_DEFINITION_DISPLAY_MODE_COMBINED = 1

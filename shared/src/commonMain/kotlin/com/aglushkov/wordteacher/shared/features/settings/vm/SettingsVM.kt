@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.*
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.russhwolf.settings.coroutines.FlowSettings
+import com.russhwolf.settings.coroutines.toBlockingSettings
 import dev.icerock.moko.resources.desc.ResourceFormatted
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +50,7 @@ interface SettingsVM: Clearable {
     fun onSignOutClicked()
     fun onAuthRefreshClicked()
     fun onUploadWordFrequencyFileClicked()
+    fun onGetWordFromClipboardChanged(newValue: Boolean)
     fun onLoggingIsEnabledChanged()
     fun onLogFileShareClicked(path: Path)
     fun onEmailClicked()
@@ -77,6 +80,7 @@ open class SettingsVMImpl (
     private val appInfo: AppInfo,
     private val emailOpener: EmailOpener,
     private val databaseCardWorker: DatabaseCardWorker,
+    private val settings: FlowSettings,
 ): ViewModel(), SettingsVM {
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -90,18 +94,20 @@ open class SettingsVMImpl (
 
     override val items: StateFlow<List<BaseViewItem<*>>> = combine(
         spaceAuthRepository.authDataFlow,
+        settings.getBooleanFlow(SETTING_GET_WORD_FROM_CLIPBOARD, false),
         logsRepository.isLoggingEnabledState,
         combine(
             wordFrequencyGradationProvider.gradationState,
             wordFrequencyFileOpenController.state
         ) { a, b -> a.downgradeToErrorOrLoading(b) }
-    ) { authRes, isLoggingEnabled, gradationState ->
-        buildItems(authRes, gradationState, isLoggingEnabled, isDebug)
+    ) { authRes, isGetWordFromClipboardEnabled, isLoggingEnabled, gradationState ->
+        buildItems(authRes, gradationState, isGetWordFromClipboardEnabled, isLoggingEnabled, isDebug)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private fun buildItems(
         authDataRes: Resource<SpaceAuthData>,
         gradationState: Resource<WordFrequencyGradation>,
+        isGetWordFromClipboardEnabled: Boolean,
         isLoggingEnabled: Boolean,
         isDebug: Boolean
     ): List<BaseViewItem<*>> {
@@ -124,6 +130,9 @@ open class SettingsVMImpl (
             }
             is Resource.Loading -> resultItems += SettingsViewLoading()
         }
+
+        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_words_title))
+        resultItems += SettingsWordsUseClipboardItem(isGetWordFromClipboardEnabled)
 
         resultItems += SettingsOpenDictConfigsItem()
         resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_frequency_title))
@@ -195,6 +204,10 @@ open class SettingsVMImpl (
         }
     }
 
+    override fun onGetWordFromClipboardChanged(newValue: Boolean) {
+        settings.toBlockingSettings().putBoolean(SETTING_GET_WORD_FROM_CLIPBOARD, newValue)
+    }
+
     override fun onLoggingIsEnabledChanged() {
         val newValue = !logsRepository.isLoggingEnabledState.value
         analytics.send(AnalyticEvent.createActionEvent("Settings.loggingIsEnabledChanged",
@@ -213,3 +226,5 @@ open class SettingsVMImpl (
         emailOpener.open(appInfo.email)
     }
 }
+
+const val SETTING_GET_WORD_FROM_CLIPBOARD = "getWordFromClipboard"
