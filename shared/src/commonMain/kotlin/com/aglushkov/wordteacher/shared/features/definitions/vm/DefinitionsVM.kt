@@ -301,8 +301,11 @@ open class DefinitionsVMImpl(
     private fun loadIfNeeded(word: String) {
         this.word = word
 
-        val stateFlow = wordDefinitionRepository.obtainStateFlow(word)
-        stateFlow.value.onLoaded(
+        val wordRes = wordDefinitionRepository.obtainStateFlow(word).value
+        if (wordRes.isLoading()) {
+            return
+        }
+        wordRes.onLoaded(
             block = {
                 val flattenedValue = it.map { it.second }.flatten()
                 definitionWords.update {

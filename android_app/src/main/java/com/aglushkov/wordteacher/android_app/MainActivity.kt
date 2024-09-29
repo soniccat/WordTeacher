@@ -126,15 +126,14 @@ class MainActivity : AppCompatActivity(), Router {
 
     private var lastPrimaryClipDescription: ClipDescription? = null
 
-    override fun onResume() {
-        super.onResume()
-        lifecycleScope.launch {
-            delay(200)
-            handleClipboard()
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            updateClipboardRepository()
         }
     }
 
-    private fun handleClipboard() {
+    private fun updateClipboardRepository() {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         if (!clipboard.hasPrimaryClip()) return
 
@@ -143,7 +142,7 @@ class MainActivity : AppCompatActivity(), Router {
             !primaryDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_HTML)) {
             return
         }
-        if (lastPrimaryClipDescription != primaryDescription) {
+        if (lastPrimaryClipDescription?.toString() != primaryDescription.toString()) {
             lastPrimaryClipDescription = primaryDescription
 
             val primaryClip = clipboard.primaryClip ?: return
