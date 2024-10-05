@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -60,6 +61,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
+import com.aglushkov.wordteacher.shared.features.settings.vm.SETTING_GET_WORD_FROM_CLIPBOARD
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 import com.aglushkov.wordteacher.shared.general.LocalWindowInset
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
@@ -74,6 +76,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stac
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.value.Value
+import com.russhwolf.settings.coroutines.toBlockingSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -115,6 +118,8 @@ class MainActivity : AppCompatActivity(), Router {
             v.onApplyWindowInsets(insets)
         }
 
+        clipboardRepository().lastTextHash = flowSettings().toBlockingSettings().getInt(
+            STATE_CLIPBOARD_HASH, 0)
         (appComponent().wordFrequencyFileOpenController() as FileOpenControllerImpl).bind(this)
         (appComponent().dslDictOpenController() as FileOpenControllerImpl).bind(this)
         appComponent().googleAuthRepository().bind(this)
@@ -124,10 +129,17 @@ class MainActivity : AppCompatActivity(), Router {
         handleIntent()
     }
 
-    private var lastPrimaryClipDescription: ClipDescription? = null
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        flowSettings().toBlockingSettings().putInt(STATE_CLIPBOARD_HASH, clipboardRepository().lastTextHash)
+    }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        if (!flowSettings().toBlockingSettings().getBoolean(SETTING_GET_WORD_FROM_CLIPBOARD, false)) {
+            return
+        }
+
         if (hasFocus) {
             updateClipboardRepository()
         }
@@ -142,9 +154,8 @@ class MainActivity : AppCompatActivity(), Router {
             !primaryDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_HTML)) {
             return
         }
-        if (lastPrimaryClipDescription?.toString() != primaryDescription.toString()) {
-            lastPrimaryClipDescription = primaryDescription
-
+        val primaryClipDescriptionHash = primaryDescription.toString().hashCode()
+        if (primaryClipDescriptionHash != clipboardRepository().lastTextHash) {
             val primaryClip = clipboard.primaryClip ?: return
             if (primaryClip.itemCount == 0) {
                 return
@@ -154,7 +165,7 @@ class MainActivity : AppCompatActivity(), Router {
             lifecycleScope.launch(Dispatchers.Default) {
                 val itemText = firstItem.coerceToText(this@MainActivity)
                 if (itemText.isNotEmpty()) {
-                    appComponent().clipboardRepository().setText(itemText.toString())
+                    clipboardRepository().setText(itemText.toString(), primaryClipDescriptionHash)
                 }
             }
         }
@@ -192,6 +203,10 @@ class MainActivity : AppCompatActivity(), Router {
 
     private fun appComponent(): AppComponent =
         (applicationContext as AppComponentOwner).appComponent
+
+    private fun clipboardRepository() = appComponent().clipboardRepository()
+
+    private fun flowSettings() = appComponent().flowSettings()
 
     @Composable
     private fun ComposeUI() {
@@ -440,3 +455,4 @@ sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: In
 }
 
 const val EXTRA_ARTICLE_ID = "articleId"
+const val STATE_CLIPBOARD_HASH = "clipboard_hash"
