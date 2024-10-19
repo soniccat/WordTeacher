@@ -265,6 +265,7 @@ open class DefinitionsVMImpl(
         filter: List<WordTeacherWord.PartOfSpeech>,
         definitionsContext: DefinitionsContext?
     ) {
+        wordTextValue.update { word.orEmpty() }
         selectedPartsOfSpeechStateFlow.value = filter
         this.definitionsContext = definitionsContext
 

@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -46,8 +49,8 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.format
 import kotlinx.coroutines.launch
-import dev.icerock.moko.resources.compose.localized
 import java.util.*
+import dev.icerock.moko.resources.compose.localized
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -339,19 +342,33 @@ private fun showViewItem(
         item,
         modifier,
         textContent = { text, ts ->
-            Text(
-                modifier = Modifier.weight(1.0f),
-                text = text,
-                style = ts
-            )
+            TextWithWordClickHandler(text, ts) {
+                vm.onWordSubmitted(it)
+            }
             if (item.withAddButton) {
                 AddToSet(vm, item)
             }
         }
     )
     is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
-    is WordSynonymViewItem -> WordSynonymView(item, modifier)
-    is WordExampleViewItem -> WordExampleView(item, modifier)
+    is WordSynonymViewItem -> WordSynonymView(
+        item,
+        modifier,
+        textContent = { text, ts ->
+            TextWithWordClickHandler(text, ts) {
+                vm.onWordSubmitted(it)
+            }
+        }
+    )
+    is WordExampleViewItem -> WordExampleView(
+        item,
+        modifier,
+        textContent = { text, ts ->
+            TextWithWordClickHandler(text, ts) {
+                vm.onWordSubmitted(it)
+            }
+        },
+    )
     is WordLoadingViewItem -> {
         Box(Modifier.fillMaxWidth().padding(LocalDimens.current.contentPadding), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -793,3 +810,75 @@ fun WordExampleView(
     }
 }
 
+@Composable
+private fun RowScope.TextWithWordClickHandler(
+    text: String,
+    textStyle: TextStyle,
+    onWordClicked: (String) -> Unit
+) {
+    var textLayoutResult by remember {
+        mutableStateOf<TextLayoutResult?>(null)
+    }
+    Text(
+        modifier = Modifier.weight(1.0f)
+            .onWordClick(text, { textLayoutResult }) { word ->
+                onWordClicked(word)
+            },
+        text = text,
+        style = textStyle,
+        onTextLayout = {
+            textLayoutResult = it
+        }
+    )
+}
+
+private fun Modifier.onWordClick(
+    text: String,
+    textLayoutResult: () -> TextLayoutResult?,
+    onWordClicked: (String) -> Unit
+): Modifier = this then pointerInput("touchDetect") {
+    detectTapGestures { pos ->
+        textLayoutResult.invoke()?.let { layoutResult ->
+            val offset = layoutResult.getOffsetForPosition(pos)
+            findWordInString(text, offset)?.let { word ->
+                onWordClicked(word)
+            }
+        }
+    }
+}
+
+private fun findWordInString(str: String, index: Int): String? {
+    if (index < 0 || index >= str.length) {
+        return null
+    }
+
+    var i = index
+    // take word on the left if index points at ' '
+    while (str[i] == ' ' && i > 0) {
+        i -= 1
+    }
+
+    if (i < 0) {
+        return null
+    }
+
+    var startI = i
+    var endI = i
+    if (str.getOrNull(startI)?.isLetter() == true) {
+        while (startI > 0 && str[startI - 1].isLetter()) {
+            startI -= 1
+        }
+    }
+
+    if (str.getOrNull(endI)?.isLetter() == true) {
+        while (endI < str.length && str[endI].isLetter()) {
+            endI += 1
+        }
+    }
+
+    if (startI != endI && startI != endI - 1) {
+        return str.substring(startI, endI)
+    }
+
+    return null
+}
