@@ -191,7 +191,7 @@ private fun DefinitionsWordUI(
                         }
                     ) {
                         Icon(
-                            painter = painterResource(MR.images.article_filter_24),
+                            painter = painterResource(MR.images.word_history_menu),
                             contentDescription = null,
                             tint = if (needShowWordHistory) {
                                 MaterialTheme.colors.secondary

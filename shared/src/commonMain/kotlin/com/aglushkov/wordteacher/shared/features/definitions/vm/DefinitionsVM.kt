@@ -223,6 +223,7 @@ open class DefinitionsVMImpl(
         }
 
     private var lastHandledClipData: ClipboardRepository.Data? = null
+    override val isWordHistorySelected = MutableStateFlow(false)
 
     init {
         if (definitionsSettings.needStoreDefinedWordInSettings) {
@@ -330,13 +331,14 @@ open class DefinitionsVMImpl(
         if (wordRes.isLoading()) {
             return
         }
+
+        wordDefinitionHistoryRepository.put(word)
         wordRes.onLoaded(
             block = {
                 val flattenedValue = it.map { it.second }.flatten()
                 definitionWords.update {
                     it.toLoaded(flattenedValue).bumpVersion()
                 }
-                wordDefinitionHistoryRepository.put(word)
             },
             elseBlock = {
                 load(word)
@@ -777,7 +779,6 @@ open class DefinitionsVMImpl(
             }
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
-    override val isWordHistorySelected = MutableStateFlow<Boolean>(false)
 
     override fun toggleWordHistory() {
         isWordHistorySelected.update { !it }
