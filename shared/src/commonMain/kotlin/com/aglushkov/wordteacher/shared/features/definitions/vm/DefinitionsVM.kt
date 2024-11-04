@@ -101,10 +101,11 @@ interface DefinitionsVM: Clearable {
     fun onSuggestedShowAllSearchWordClicked()
 
     // Word history
-    val wordHistory: StateFlow<Resource<List<String>>>
+    val wordHistory: StateFlow<Resource<List<BaseViewItem<*>>>>
     val isWordHistorySelected: StateFlow<Boolean>
 
     fun toggleWordHistory()
+    fun onWordHistoryClicked(item: WordHistoryViewItem)
 
     @Serializable
     data class State(
@@ -323,6 +324,7 @@ open class DefinitionsVMImpl(
 
     private fun loadIfNeeded(word: String) {
         this.word = word
+        isWordHistorySelected.update { false }
 
         val wordRes = wordDefinitionRepository.obtainStateFlow(word).value
         if (wordRes.isLoading()) {
@@ -334,6 +336,7 @@ open class DefinitionsVMImpl(
                 definitionWords.update {
                     it.toLoaded(flattenedValue).bumpVersion()
                 }
+                wordDefinitionHistoryRepository.put(word)
             },
             elseBlock = {
                 load(word)
@@ -357,7 +360,6 @@ open class DefinitionsVMImpl(
                 }.collect(wordFrequency)
             }
 
-            wordDefinitionHistoryRepository.put(word)
             wordDefinitionRepository.define(word, false).map {
                 it.mapLoadedData { it.map { it.second }.flatten() }
             }.collect(definitionWords)
@@ -768,12 +770,21 @@ open class DefinitionsVMImpl(
     }
 
     // word history
-
-    override val wordHistory: MutableStateFlow<Resource<List<String>>> = wordDefinitionHistoryRepository.stateFlow
+    override val wordHistory: StateFlow<Resource<List<BaseViewItem<*>>>> = wordDefinitionHistoryRepository.stateFlow.map { res ->
+        res.mapLoadedData { words ->
+            words.mapIndexed { index, s ->
+                WordHistoryViewItem(index.toLong(), s) as BaseViewItem<*>
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
     override val isWordHistorySelected = MutableStateFlow<Boolean>(false)
 
     override fun toggleWordHistory() {
         isWordHistorySelected.update { !it }
+    }
+
+    override fun onWordHistoryClicked(item: WordHistoryViewItem) {
+        loadIfNeeded(item.firstItem())
     }
 }
 

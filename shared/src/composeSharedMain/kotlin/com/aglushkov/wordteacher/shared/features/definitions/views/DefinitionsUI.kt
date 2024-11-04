@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -35,6 +36,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
@@ -143,7 +145,7 @@ private fun DefinitionsWordUI(
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
-    var searchText = vm.wordTextValue.collectAsState()
+    val searchText = vm.wordTextValue.collectAsState()
     var needShowSuggests by remember { mutableStateOf(false) }
     val suggests = vm.suggests.collectAsState()
     val focusManager = LocalFocusManager.current
@@ -151,8 +153,12 @@ private fun DefinitionsWordUI(
     val needShowWordHistory by vm.isWordHistorySelected.collectAsState()
 
     if (withSearchBar) {
-        BackHandler(enabled = needShowSuggests) {
-            focusManager.clearFocus()
+        BackHandler(enabled = needShowSuggests || needShowWordHistory) {
+            if (needShowWordHistory) {
+                vm.toggleWordHistory()
+            } else {
+                focusManager.clearFocus()
+            }
         }
     }
 
@@ -222,24 +228,10 @@ private fun DefinitionsWordUI(
 
         val suggestsRes = suggests.value
         val suggestsData = suggestsRes.data()
-        if (needShowSuggests && suggestsData?.isNotEmpty() == true) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(
-                    bottom = 300.dp
-                )
-            ) {
-                items(suggestsData, key = { it.id }) { item ->
-                    showSuggestItem(
-                        Modifier.animateItemPlacement(),
-                        item,
-                        vm,
-                        onClicked = {
-                            focusManager.clearFocus()
-                        }
-                    )
-                }
-            }
+        if (needShowWordHistory) {
+            wordHistoryUI(vm)
+        } else if (needShowSuggests && suggestsData?.isNotEmpty() == true) {
+            suggestListUI(suggestsData, vm, focusManager)
         } else {
             if (isNotEmpty) {
                 LazyColumn(
@@ -271,6 +263,90 @@ private fun DefinitionsWordUI(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun wordHistoryUI(
+    vm: DefinitionsVM,
+) {
+    val words by vm.wordHistory.collectAsState()
+    if (words.isLoaded()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(
+                bottom = 300.dp
+            )
+        ) {
+            items(words.data().orEmpty(), key = { it.id }) { item ->
+                showWordHistoryItem(
+                    Modifier.animateItemPlacement(),
+                    item,
+                    vm,
+                )
+            }
+        }
+    } else {
+        LoadingStatusView(
+            resource = words,
+            loadingText = null,
+            errorText = vm.getErrorText(words)?.localized(),
+            tryAgainText = stringResource(MR.strings.error_try_again),
+            emptyText = stringResource(MR.strings.error_empty_wordhistory)
+        ) {
+            vm.onTryAgainClicked()
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun suggestListUI(
+    suggestsData: List<BaseViewItem<*>>,
+    vm: DefinitionsVM,
+    focusManager: FocusManager
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(
+            bottom = 300.dp
+        )
+    ) {
+        items(suggestsData, key = { it.id }) { item ->
+            showSuggestItem(
+                Modifier.animateItemPlacement(),
+                item,
+                vm,
+                onClicked = {
+                    focusManager.clearFocus()
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun showWordHistoryItem(
+    modifier: Modifier,
+    item: BaseViewItem<*>,
+    vm: DefinitionsVM,
+) = when (item) {
+    is WordHistoryViewItem -> {
+        ListItem (
+            modifier = modifier
+                .clickable {
+                    vm.onWordHistoryClicked(item)
+                },
+            text = { Text(item.firstItem()) }
+        )
+    }
+    else -> {
+        Text(
+            text = "unknown item $item",
+            modifier = modifier
+        )
     }
 }
 

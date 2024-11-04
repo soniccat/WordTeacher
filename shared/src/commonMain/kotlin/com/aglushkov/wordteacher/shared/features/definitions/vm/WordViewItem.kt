@@ -111,6 +111,15 @@ class WordLoadingViewItem: BaseViewItem<String>("", Type) {
     }
 }
 
+class WordHistoryViewItem(
+    id: Long,
+    word: String,
+): BaseViewItem<String>(word, Type, id) {
+    companion object {
+        const val Type = 111
+    }
+}
+
 enum class Indent {
     NONE,
     SMALL

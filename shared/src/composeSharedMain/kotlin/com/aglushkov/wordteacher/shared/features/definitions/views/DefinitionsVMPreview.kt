@@ -101,8 +101,9 @@ open class DefinitionsVMPreview(
 
     // word history
 
-    override val wordHistory = MutableStateFlow<Resource<List<String>>>(Resource.Uninitialized())
+    override val wordHistory = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
     override val isWordHistorySelected = MutableStateFlow<Boolean>(false)
 
     override fun toggleWordHistory() {}
+    override fun onWordHistoryClicked(item: WordHistoryViewItem) {}
 }
