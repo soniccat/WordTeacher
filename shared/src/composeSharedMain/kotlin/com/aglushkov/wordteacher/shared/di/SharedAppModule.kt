@@ -32,6 +32,7 @@ import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.service.*
 import com.aglushkov.wordteacher.shared.workers.CardFrequencyUpdateWorker
 import com.aglushkov.wordteacher.shared.workers.CardSetSyncWorker
@@ -420,5 +421,15 @@ class SharedAppModule {
     @Provides
     fun clipboardRepository(): ClipboardRepository {
         return ClipboardRepository()
+    }
+
+    @AppComp
+    @Provides
+    fun wordDefinitionHistoryRepository(
+        @BasePath basePath: Path,
+        fileSystem: FileSystem,
+    ): WordDefinitionHistoryRepository {
+        val filePath = basePath.div("wordhistory")
+        return WordDefinitionHistoryRepository(filePath, fileSystem)
     }
 }

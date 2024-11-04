@@ -1,10 +1,13 @@
 package com.aglushkov.wordteacher.shared.general.views
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -24,6 +27,7 @@ fun CustomTopAppBar(
     elevation: Dp = AppBarDefaults.TopAppBarElevation,
     contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
     shape: Shape = RectangleShape,
+    actions: @Composable RowScope.() -> Unit = {},
     content: @Composable RowScope.() -> Unit
 ) {
     Surface(
@@ -39,7 +43,10 @@ fun CustomTopAppBar(
                 .padding(contentPadding),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
-            content = content
+            content = {
+                content()
+                actions()
+            }
         )
     }
 }

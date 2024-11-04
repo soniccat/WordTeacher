@@ -45,7 +45,7 @@ fun SearchView(
         onValueChange = onTextChanged,
         modifier = modifier
             .padding(8.dp)
-            .fillMaxWidth()
+            //.fillMaxWidth()
             .background(
                 color = MaterialTheme.colors.surface,
                 shape = RoundedCornerShape(2.dp)

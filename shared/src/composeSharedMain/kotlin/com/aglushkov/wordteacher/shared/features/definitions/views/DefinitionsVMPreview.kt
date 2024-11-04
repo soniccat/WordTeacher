@@ -98,4 +98,11 @@ open class DefinitionsVMPreview(
     override fun onSuggestedShowAllSearchWordClicked() {}
 
     override fun onCardSetExpandCollapseClicked(item: CardSetExpandOrCollapseViewItem) {}
+
+    // word history
+
+    override val wordHistory = MutableStateFlow<Resource<List<String>>>(Resource.Uninitialized())
+    override val isWordHistorySelected = MutableStateFlow<Boolean>(false)
+
+    override fun toggleWordHistory() {}
 }

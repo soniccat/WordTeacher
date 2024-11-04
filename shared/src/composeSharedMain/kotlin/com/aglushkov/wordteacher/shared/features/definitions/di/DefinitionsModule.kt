@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.arkivanov.decompose.ComponentContext
 import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Module
@@ -32,6 +33,7 @@ class DefinitionsModule {
         idGenerator: IdGenerator,
         analytics: Analytics,
         settings: FlowSettings,
+        wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
     ) = DefinitionsDecomposeComponent(
         componentContext,
         initialState,
@@ -45,5 +47,6 @@ class DefinitionsModule {
         idGenerator,
         analytics,
         settings,
+        wordDefinitionHistoryRepository,
     )
 }

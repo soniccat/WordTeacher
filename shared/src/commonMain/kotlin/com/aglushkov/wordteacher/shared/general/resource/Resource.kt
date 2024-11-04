@@ -153,6 +153,7 @@ sealed interface Resource<T> {
 //        )
 //    }
 
+    // TODO: remove and replace with map
     fun updateData(
         block: (T?) -> T?
     ): Resource<T> = when (this) {

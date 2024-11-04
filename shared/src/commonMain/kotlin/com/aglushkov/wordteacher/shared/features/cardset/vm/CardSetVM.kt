@@ -207,7 +207,7 @@ open class CardSetVMImpl(
                         isLast = index == card.definitions.size - 1,
                         cardId = card.id,
                         labels = if (index == 0) card.labels else emptyList(),
-                        showAddLabel = index == 0
+                        showAddLabel = index == 0 && !state.value.isRemoteCardSet
                     ).also {
                         if (index == 0) {
                             firstDefViewItem = it

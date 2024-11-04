@@ -143,10 +143,12 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                             },
                             isEditable = !state.isRemoteCardSet,
                             onFocused = {
-                                coroutineScope.launch {
-                                    val index = data.indexOf(it)
-                                    if (index != -1) {
-                                        listState.animateScrollToItem(index, scrollOffset)
+                                if (!state.isRemoteCardSet) {
+                                    coroutineScope.launch {
+                                        val index = data.indexOf(it)
+                                        if (index != -1) {
+                                            listState.animateScrollToItem(index, scrollOffset)
+                                        }
                                     }
                                 }
                             }
@@ -333,11 +335,9 @@ fun CardSetViewItems(
                                 WordSubHeaderViewItem.ContentType.SYNONYMS -> vm.onAddSynonymPressed(
                                     item.cardId
                                 )
-
                                 WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(
                                     item.cardId
                                 )
-
                                 else -> {}
                             }
                         }
@@ -508,7 +508,7 @@ private fun CardSetDefinitionView(
                             onFocused?.invoke()
                         }
                     }
-                    .padding(start = 4.dp)
+                    .padding(start = 4.dp, end = if (isEditable) 0.dp else 4.dp)
                     .width(IntrinsicSize.Min)
                     .let {
                         if (index == item.labels.size - 1 && focusIndex == 1) {
@@ -524,17 +524,19 @@ private fun CardSetDefinitionView(
                     vm.onLabelTextChanged(newText, index, cardId)
                 }
             )
-            Icon(
-                painter = painterResource(MR.images.close_18),
-                contentDescription = null,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .padding(start = 4.dp)
-                    .clickable {
-                        vm.onLabelDeleted(index, cardId)
-                    },
-                tint = MaterialTheme.colors.onSecondary
-            )
+            if (isEditable) {
+                Icon(
+                    painter = painterResource(MR.images.close_18),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .padding(start = 4.dp)
+                        .clickable {
+                            vm.onLabelDeleted(index, cardId)
+                        },
+                    tint = MaterialTheme.colors.onSecondary
+                )
+            }
         },
         lastLabel = if (item.showAddLabel) {
             {

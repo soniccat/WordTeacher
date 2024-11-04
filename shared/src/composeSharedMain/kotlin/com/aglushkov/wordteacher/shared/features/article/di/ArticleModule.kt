@@ -17,6 +17,7 @@ import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -49,6 +50,7 @@ class ArticleModule {
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         analytics: Analytics,
         settings: FlowSettings,
+        wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
     ): DefinitionsVM = DefinitionsVMImpl(
         DefinitionsVM.State(),
         connectivityManager,
@@ -63,7 +65,8 @@ class ArticleModule {
         clipboardRepository,
         idGenerator,
         analytics,
-        settings
+        settings,
+        wordDefinitionHistoryRepository
     )
 
     @Provides

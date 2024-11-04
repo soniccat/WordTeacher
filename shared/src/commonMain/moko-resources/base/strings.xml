@@ -35,7 +35,7 @@
     <string name="word_phrase_adverb">Adverb phrase</string>
     <string name="word_phrase_unknown">Other</string>
 
-    <string name="word_providedBy_template">by %1$s</string>
+    <string name="word_providedBy_template">by\u00A0%1$s</string>
     <string name="word_section_definition">Definition</string>
     <string name="word_section_examples">Examples</string>
     <string name="word_section_synonyms">Synonyms</string>

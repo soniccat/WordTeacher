@@ -51,6 +51,7 @@ import dev.icerock.moko.resources.format
 import kotlinx.coroutines.launch
 import java.util.*
 import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.painterResource
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -147,6 +148,7 @@ private fun DefinitionsWordUI(
     val suggests = vm.suggests.collectAsState()
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
+    val needShowWordHistory by vm.isWordHistorySelected.collectAsState()
 
     if (withSearchBar) {
         BackHandler(enabled = needShowSuggests) {
@@ -175,14 +177,31 @@ private fun DefinitionsWordUI(
         modifier = modifier,
     ) {
         if (withSearchBar) {
-            CustomTopAppBar {
+            CustomTopAppBar(
+                actions = {
+                    IconButton(
+                        onClick = {
+                            vm.toggleWordHistory()
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(MR.images.article_filter_24),
+                            contentDescription = null,
+                            tint = if (needShowWordHistory) {
+                                MaterialTheme.colors.secondary
+                            } else {
+                                LocalContentColor.current
+                            }
+                        )
+                    }
+                }
+            ) {
                 SearchView(
                     Modifier,
                     searchText.value,
                     focusRequester = focusRequester,
                     onTextChanged = {
                         vm.onWordTextUpdated(it)
-
                         if (it.isEmpty()) {
                             vm.clearSuggests()
                         } else {
@@ -534,49 +553,49 @@ fun WordTitleView(
             )
     ) {
         textContent(viewItem.firstItem(), textStyle)
-        Column(
-            horizontalAlignment = Alignment.End,
-        ) {
-            if (viewItem.providers.isNotEmpty()) {
-                Text(
-                    text = MR.strings.word_providedBy_template.format(viewItem.providers.joinToString()).localized(),
-                    modifier = Modifier
-                        .widthIn(max = LocalDimensWord.current.wordProvidedByMaxWidth),
-                    textAlign = TextAlign.End,
-                    style = LocalAppTypography.current.wordDefinitionProvidedBy
-                )
-            }
+        if (viewItem.providers.isNotEmpty()) {
+            Text(
+                text = MR.strings.word_providedBy_template.format(viewItem.providers.joinToString()).localized(),
+                modifier = Modifier.width(IntrinsicSize.Min),
+                textAlign = TextAlign.End,
+                style = LocalAppTypography.current.wordDefinitionProvidedBy
+            )
+        }
 
-            if (viewItem.frequencyLevelAndRatio != null &&
-                viewItem.frequencyLevelAndRatio.level != WordFrequencyGradation.UNKNOWN_LEVEL) {
-                Box(
-                    Modifier
-                        .padding(vertical = 10.dp, horizontal = 2.dp)
-                        .size(20.dp)
-                        .run {
-                            if (viewItem.frequencyLevelAndRatio.level != WordFrequencyGradation.UNKNOWN_LEVEL) {
-                                background(
-                                    color = wordFrequencyColor(viewItem.frequencyLevelAndRatio.ratio),
-                                    shape = RoundedCornerShape(20.dp)
-                                )
-                            } else {
-                                this
-                            }
-                        }
-                        .border(
-                            1.dp,
-                            color = MaterialTheme.colors.secondary,
-                            shape = RoundedCornerShape(20.dp)
-                        ),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Text(
-                        text = (viewItem.frequencyLevelAndRatio.level + 1).toString(),
-                        modifier = Modifier.align(Alignment.Center).offset(y = (-1).dp),
-                        textAlign = TextAlign.Center,
-                        style = LocalAppTypography.current.wordFrequency
+        if (viewItem.frequencyLevelAndRatio != null &&
+            viewItem.frequencyLevelAndRatio.level != WordFrequencyGradation.UNKNOWN_LEVEL) {
+            Box(
+                Modifier
+                    .padding(
+                        start = 4.dp,
+                        top = 10.dp,
+                        end = 2.dp,
+                        bottom = 10.dp,
                     )
-                }
+                    .size(20.dp)
+                    .run {
+                        if (viewItem.frequencyLevelAndRatio.level != WordFrequencyGradation.UNKNOWN_LEVEL) {
+                            background(
+                                color = wordFrequencyColor(viewItem.frequencyLevelAndRatio.ratio),
+                                shape = RoundedCornerShape(20.dp)
+                            )
+                        } else {
+                            this
+                        }
+                    }
+                    .border(
+                        1.dp,
+                        color = MaterialTheme.colors.secondary,
+                        shape = RoundedCornerShape(20.dp)
+                    ),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = (viewItem.frequencyLevelAndRatio.level + 1).toString(),
+                    modifier = Modifier.align(Alignment.Center).offset(y = (-1).dp),
+                    textAlign = TextAlign.Center,
+                    style = LocalAppTypography.current.wordFrequency
+                )
             }
         }
     }

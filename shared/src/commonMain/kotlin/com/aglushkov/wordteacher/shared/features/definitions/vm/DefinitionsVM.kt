@@ -36,6 +36,7 @@ import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.russhwolf.settings.boolean
@@ -99,6 +100,12 @@ interface DefinitionsVM: Clearable {
     fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem)
     fun onSuggestedShowAllSearchWordClicked()
 
+    // Word history
+    val wordHistory: StateFlow<Resource<List<String>>>
+    val isWordHistorySelected: StateFlow<Boolean>
+
+    fun toggleWordHistory()
+
     @Serializable
     data class State(
         var word: String? = null,
@@ -150,6 +157,7 @@ open class DefinitionsVMImpl(
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
     private val settings: FlowSettings,
+    private val wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
 ): ViewModel(), DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
@@ -349,6 +357,7 @@ open class DefinitionsVMImpl(
                 }.collect(wordFrequency)
             }
 
+            wordDefinitionHistoryRepository.put(word)
             wordDefinitionRepository.define(word, false).map {
                 it.mapLoadedData { it.map { it.second }.flatten() }
             }.collect(definitionWords)
@@ -756,6 +765,15 @@ open class DefinitionsVMImpl(
                 )
             }
         }
+    }
+
+    // word history
+
+    override val wordHistory: MutableStateFlow<Resource<List<String>>> = wordDefinitionHistoryRepository.stateFlow
+    override val isWordHistorySelected = MutableStateFlow<Boolean>(false)
+
+    override fun toggleWordHistory() {
+        isWordHistorySelected.update { !it }
     }
 }
 
