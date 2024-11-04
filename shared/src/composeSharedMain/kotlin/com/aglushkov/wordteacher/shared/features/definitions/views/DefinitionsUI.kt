@@ -203,7 +203,7 @@ private fun DefinitionsWordUI(
                 }
             ) {
                 SearchView(
-                    Modifier,
+                    Modifier.weight(1.0f),
                     searchText.value,
                     focusRequester = focusRequester,
                     onTextChanged = {
