@@ -241,8 +241,11 @@ open class DefinitionsVMImpl(
         if (definitionsSettings.needStoreDefinedWordInSettings) {
             viewModelScope.launch {
                 definitionWords.collect {
-                    word?.let {
-                        settings.putString(SETTING_LAST_DEFINED_WORD, it)
+                    if (it.data()?.isNotEmpty() == true) {
+                        word?.let { w ->
+                            settings.putString(SETTING_LAST_DEFINED_WORD, w)
+                            wordDefinitionHistoryRepository.put(w)
+                        }
                     }
                 }
             }
@@ -349,7 +352,6 @@ open class DefinitionsVMImpl(
             return
         }
 
-        wordDefinitionHistoryRepository.put(word)
         wordRes.onLoaded(
             block = {
                 val flattenedValue = it.map { it.second }.flatten()

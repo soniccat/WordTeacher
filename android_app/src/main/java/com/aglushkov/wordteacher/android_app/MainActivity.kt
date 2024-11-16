@@ -117,7 +117,6 @@ class MainActivity : AppCompatActivity(), Router {
             // call default logic
             v.onApplyWindowInsets(insets)
         }
-
         clipboardRepository().lastTextHash = flowSettings().toBlockingSettings().getInt(
             STATE_CLIPBOARD_HASH, 0)
         (appComponent().wordFrequencyFileOpenController() as FileOpenControllerImpl).bind(this)
@@ -127,11 +126,6 @@ class MainActivity : AppCompatActivity(), Router {
         (appComponent().emailOpener() as EmailOpenerImpl).bind(this)
         setupComposeLayout()
         handleIntent()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        flowSettings().toBlockingSettings().putInt(STATE_CLIPBOARD_HASH, clipboardRepository().lastTextHash)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -166,6 +160,7 @@ class MainActivity : AppCompatActivity(), Router {
                 val itemText = firstItem.coerceToText(this@MainActivity)
                 if (itemText.isNotEmpty()) {
                     clipboardRepository().setText(itemText.toString(), primaryClipDescriptionHash)
+                    flowSettings().putInt(STATE_CLIPBOARD_HASH, clipboardRepository().lastTextHash)
                 }
             }
         }
