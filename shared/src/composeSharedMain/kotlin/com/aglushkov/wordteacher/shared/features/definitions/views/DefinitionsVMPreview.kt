@@ -106,4 +106,10 @@ open class DefinitionsVMPreview(
 
     override fun toggleWordHistory() {}
     override fun onWordHistoryClicked(item: WordHistoryViewItem) {}
+
+    override fun onSuggestsAppeared() {}
+    override fun onBackPressed(): Boolean {
+        return false
+    }
+    override val wordStack = MutableStateFlow<List<String>>(emptyList())
 }

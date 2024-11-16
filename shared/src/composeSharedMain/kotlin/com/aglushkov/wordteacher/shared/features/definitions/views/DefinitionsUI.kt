@@ -151,13 +151,16 @@ private fun DefinitionsWordUI(
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val needShowWordHistory by vm.isWordHistorySelected.collectAsState()
+    val wordStack by vm.wordStack.collectAsState()
 
     if (withSearchBar) {
-        BackHandler(enabled = needShowSuggests || needShowWordHistory) {
+        BackHandler(enabled = needShowSuggests || needShowWordHistory || wordStack.size > 1) {
             if (needShowWordHistory) {
                 vm.toggleWordHistory()
-            } else {
+            } else if (needShowSuggests) {
                 focusManager.clearFocus()
+            } else if (wordStack.size > 1) {
+                vm.onBackPressed()
             }
         }
     }
@@ -208,14 +211,12 @@ private fun DefinitionsWordUI(
                     focusRequester = focusRequester,
                     onTextChanged = {
                         vm.onWordTextUpdated(it)
-                        if (it.isEmpty()) {
-                            vm.clearSuggests()
-                        } else {
-                            vm.requestSuggests(it)
-                        }
                     },
                     onFocusChanged = {
                         needShowSuggests = it.isFocused
+                        if (it.isFocused) {
+                            vm.onSuggestsAppeared()
+                        }
                     }
                 ) {
                     vm.onWordSubmitted(searchText.value)

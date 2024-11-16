@@ -77,6 +77,8 @@ interface DefinitionsVM: Clearable {
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
     fun onEventHandled(event: Event, withAction: Boolean)
+    fun onSuggestsAppeared()
+    fun onBackPressed(): Boolean
 
     val wordTextValue: StateFlow<String>
     val state: State
@@ -84,6 +86,7 @@ interface DefinitionsVM: Clearable {
     val definitions: StateFlow<Resource<List<BaseViewItem<*>>>>
     val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
     val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
+    val wordStack: StateFlow<List<String>>
 
     // Card Sets
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
@@ -175,6 +178,7 @@ open class DefinitionsVMImpl(
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
     final override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(emptyList())
+    override val wordStack = MutableStateFlow<List<String>>(emptyList())
 
     override val definitions = combine(
         definitionWords,
@@ -231,8 +235,7 @@ open class DefinitionsVMImpl(
         } else {
             word
         }?.let {
-            loadIfNeeded(it)
-            requestSuggests(it)
+            updateCurrentWord(it)
         }
 
         if (definitionsSettings.needStoreDefinedWordInSettings) {
@@ -254,20 +257,20 @@ open class DefinitionsVMImpl(
                     lastHandledClipData = clipData
                     word = clipData.text
                     wordTextValue.update { clipData.text }
-                    loadIfNeeded(clipData.text)
-                    requestSuggests(clipData.text)
+                    updateCurrentWord(clipData.text)
                 }
             }.collect()
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-    }
-
     // Events
     override fun onWordTextUpdated(newText: String) {
         wordTextValue.update { newText }
+        if (newText.isEmpty()) {
+            clearSuggests()
+        } else {
+            requestSuggests(newText)
+        }
     }
 
     override fun onWordSubmitted(
@@ -275,14 +278,28 @@ open class DefinitionsVMImpl(
         filter: List<WordTeacherWord.PartOfSpeech>,
         definitionsContext: DefinitionsContext?
     ) {
-        wordTextValue.update { word.orEmpty() }
-        selectedPartsOfSpeechStateFlow.value = filter
-        this.definitionsContext = definitionsContext
-
         if (word == null) {
             this.word = null
-        } else if (word.isNotEmpty()) {
-            loadIfNeeded(word)
+            wordTextValue.update { "" }
+            selectedPartsOfSpeechStateFlow.value = emptyList()
+            this.definitionsContext = null
+        } else {
+            updateCurrentWord(word, filter, definitionsContext)
+        }
+    }
+
+    private fun updateCurrentWord(
+        word: String,
+        filter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
+        definitionsContext: DefinitionsContext? = null,
+        putInWordStack: Boolean = true
+    ) {
+        wordTextValue.update { word }
+        selectedPartsOfSpeechStateFlow.value = filter
+        this.definitionsContext = definitionsContext
+        loadIfNeeded(word)
+        if (putInWordStack) {
+            wordStack.update { it + word }
         }
     }
 
@@ -577,6 +594,21 @@ open class DefinitionsVMImpl(
         }
     }
 
+    override fun onSuggestsAppeared() {
+        if (wordTextValue.value.isNotEmpty()) {
+            requestSuggests(wordTextValue.value)
+        }
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (wordStack.value.size > 1) {
+            wordStack.update { it.take(it.size - 1) }
+            updateCurrentWord(wordStack.value.last(), putInWordStack = false)
+        }
+
+        return false
+    }
+
     private fun onCardSetUpdatedEvent(
         event: DefinitionsVM.Event.CardSetUpdatedEvent,
         needOpen: Boolean,
@@ -785,7 +817,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onWordHistoryClicked(item: WordHistoryViewItem) {
-        loadIfNeeded(item.firstItem())
+        updateCurrentWord(item.firstItem())
     }
 }
 
