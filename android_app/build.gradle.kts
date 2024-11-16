@@ -23,10 +23,6 @@ repositories {
 group = "com.aglushkov.wordteacher"
 version = "1.0-SNAPSHOT"
 
-val appVersionName = property("versionName")!!.toString()
-val appVersionCode = property("versionCode")!!.toString().toInt()
-
-
 // VK props
 var vkProps: Properties? = null
 val vkPropFile = file("${project.rootDir}/android_app/vk.properties")
@@ -93,7 +89,7 @@ android {
         applicationId = "com.aglushkov.wordteacher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 2
+        versionCode = 3
         versionName = "1.2"
 
         addManifestPlaceholders(
