@@ -10,7 +10,7 @@ abstract class Trie<T, D>: Iterable<T> {
     abstract fun setNodeForEntry(entry: T, node: TrieNode<T>) // TODO: try to move node in Entry type
 
     fun put(word: String, data: D): T {
-        val node = putWord(word, data)
+        val node = putWord(word)
         val entry = createEntry(node, data)
         node.dictIndexEntries.add(
             entry
@@ -18,7 +18,7 @@ abstract class Trie<T, D>: Iterable<T> {
         return entry
     }
 
-    private fun putWord(word: String, data: D): TrieNode<T> {
+    private fun putWord(word: String): TrieNode<T> {
         var node = root
         var innerNodeIndex = 0
 
@@ -329,7 +329,7 @@ open class TrieNode<T>(
             return MetaTrieNode(this, 1)
         }
 
-        return children.firstOrNull { it.prefix.first().equals(ch, true) }
+        return children.firstOrNull { it.prefix.first() == ch }
     }
 
     fun calcWord(): String {

@@ -13,6 +13,7 @@ import okio.BufferedSink
 import okio.BufferedSource
 import okio.FileSystem
 import okio.Path
+import java.util.Locale
 
 class DslIndex(
     private val dict: Dict,
@@ -39,8 +40,29 @@ class DslIndex(
         return index.word(word).firstOrNull()
     }
 
-    override fun entriesStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> =
-        index.wordsStartWith(prefix, limit)
+    override fun entriesStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {
+        if (prefix.isEmpty()) {
+            return emptyList()
+        }
+
+        // search for capitalized, lowercased and actual prefix
+        val capitalizedPrefix = prefix.replaceFirstChar {
+            if (it.isLowerCase()) {
+                it.uppercaseChar()
+            } else {
+                it.lowercaseChar()
+            }
+        }
+        val abbreviation = if (prefix[0].isLowerCase()) {
+            prefix.uppercase(Locale.getDefault())
+        } else {
+            prefix.lowercase(Locale.getDefault())
+        }
+
+        return index.wordsStartWith(prefix, limit) +
+                index.wordsStartWith(capitalizedPrefix, limit) +
+                index.wordsStartWith(abbreviation, limit)
+    }
 
     override fun entry(
         word: String,
