@@ -6,4 +6,5 @@ use (
 	./service_cardsetsearch
 	./service_dict
 	./tools
+	./scripts/wordlistfilter
 )
