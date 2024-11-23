@@ -83,7 +83,9 @@ func run() int {
 	dbTermSet := make(map[string]bool)
 	for _, r := range mongoResult {
 		if _, ok := dbTermSet[r.TermLowercased]; !ok {
-			dbTermSet[r.TermLowercased] = true
+			if !strings.Contains(r.TermLowercased, " ") {
+				dbTermSet[r.TermLowercased] = true
+			}
 		}
 	}
 

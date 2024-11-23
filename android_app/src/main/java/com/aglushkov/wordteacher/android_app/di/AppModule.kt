@@ -279,9 +279,9 @@ class AppModule {
     ): Array<Task> {
         return arrayOf(
                 CopyDictTask(
-                    context.resources.openRawResource(R.raw.phrases)
+                    context.resources.openRawResource(R.raw.words)
                         .buffered(100 * 1024).source(),
-                    dictPath.div("phrases.wordlist"),
+                    dictPath.div("words.wordlist"),
                     fileSystem,
                     dictRepository
                 )

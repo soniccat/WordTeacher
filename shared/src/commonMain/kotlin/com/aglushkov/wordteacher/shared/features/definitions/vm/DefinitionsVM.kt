@@ -207,7 +207,7 @@ open class DefinitionsVMImpl(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String> { word ->
-        dictRepository.wordsStartWith(word, 40)
+        dictRepository.wordsStartWith(word, 60)
     }
     private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String> { text ->
         wordTeacherDictService.textSearch(text).toOkResponse().words.orEmpty()
