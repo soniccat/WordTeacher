@@ -61,6 +61,16 @@
       "args": [
         "-mongoURI=mongodb://192.168.0.78:27017/?directConnection=true&replicaSet=rs0",
       ]
+    },
+    {
+      "name": "Script Phrase exporter",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/scripts/phrase_exporter/cmd",
+      "args": [
+        "-mongoURI=mongodb://192.168.0.78:27017/?directConnection=true&replicaSet=rs0",
+      ]
     }
   ]
 }

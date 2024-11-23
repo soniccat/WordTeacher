@@ -57,14 +57,6 @@ class DictRepositoryImpl(
         }
         importDictsInternal()
         isImporting.compareAndSet(true, false)
-
-        // TODO: delete
-//        val r = dicts.value.data()?.map { it.index.allEntries() }?.flatMap { it.map { it.word } }?.toSortedSet() ?: return
-//        fileSystem.write(path.div("tmp_wordlist")) {
-//            r.onEach {
-//                writeUtf8(it + "\n")
-//            }
-//        }
     }
 
     private suspend fun importDictsInternal() {

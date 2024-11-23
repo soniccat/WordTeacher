@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.model.nlp
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.okio.newLineSize
+import com.aglushkov.wordteacher.shared.general.okio.writeToWithLockFile
 import okio.BufferedSource
 import okio.FileHandle
 import okio.FileSystem
@@ -40,7 +41,7 @@ class MyLemmatizer(
     private lateinit var index: MyLemmatizerIndex
 
     fun load() {
-        createUnzippedLemmatizerIfNeeded()
+        fileSystem.writeToWithLockFile(source, unzippedLemmatizerPath)
 
         val anIndex = MyLemmatizerIndex(
             indexPath,
@@ -55,32 +56,6 @@ class MyLemmatizer(
         index = anIndex
         randomAccessFile = fileSystem.openReadOnly(unzippedLemmatizerPath) //RandomAccessFile(unzippedLemmatizerPath.toFile(), "r")
         randomAccessFileSource = randomAccessFile?.source(0L)?.buffer()
-    }
-
-    private fun createUnzippedLemmatizerIfNeeded() {
-        if (fileSystem.exists(unzippedLemmatizerPath)) {
-            return
-        }
-
-        val inProgressPath = nlpPath.div("unzipped_lemmatizer_in_progress")
-        if (fileSystem.exists(inProgressPath)) {
-            fileSystem.delete(inProgressPath)
-        }
-
-        val bufferedSource = source.buffer()
-        fileSystem.write(inProgressPath) {
-            val readByteArray = ByteArray(100 * 1024)
-            var readByteCount = 0
-            while (true) {
-                readByteCount = bufferedSource.read(readByteArray, 0, readByteArray.size)
-                if (readByteCount == -1) {
-                    break
-                }
-                write(readByteArray, 0, readByteCount)
-            }
-        }
-
-        fileSystem.atomicMove(inProgressPath, unzippedLemmatizerPath)
     }
 
     private fun fillIndex(anIndex: MyLemmatizerIndex) = fileSystem.read(unzippedLemmatizerPath) {

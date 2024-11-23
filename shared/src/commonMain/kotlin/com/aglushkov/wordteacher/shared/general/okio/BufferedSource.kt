@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.general.okio
 
-import co.touchlab.kermit.Logger
 import okio.BufferedSource
+import okio.FileSystem
 import okio.Path
 import okio.Sink
 import okio.Source
@@ -33,3 +33,22 @@ fun Source.writeTo(outputSink: Sink) {
     }
 }
 
+fun FileSystem.writeToWithLockFile(
+    src: Source,
+    outputPath: Path,
+    skipIfFileExists: Boolean = true
+) {
+    val parent = outputPath.parent ?: throw RuntimeException("Source: outputPath parent isn't found")
+    val lockPath = parent.div(outputPath.name + "_lock")
+
+    if (skipIfFileExists && !exists(lockPath) && exists(outputPath)) {
+        return
+    }
+
+    if (exists(lockPath)) {
+        delete(lockPath)
+    }
+    src.writeTo(sink(lockPath))
+    atomicMove(lockPath, outputPath)
+    delete(lockPath)
+}

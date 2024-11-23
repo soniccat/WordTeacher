@@ -44,6 +44,8 @@ import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.tasks.CopyDictTask
+import com.aglushkov.wordteacher.shared.tasks.Task
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
 import dagger.Module
@@ -267,6 +269,24 @@ class AppModule {
         return EmailOpenerImpl()
     }
 
+    @AppComp
+    @Provides
+    fun startupTasks(
+        context: Context,
+        @DictPath dictPath: Path,
+        dictRepository: DictRepository,
+        fileSystem: FileSystem
+    ): Array<Task> {
+        return arrayOf(
+                CopyDictTask(
+                    context.resources.openRawResource(R.raw.phrases)
+                        .buffered(100 * 1024).source(),
+                    dictPath.div("phrases.wordlist"),
+                    fileSystem,
+                    dictRepository
+                )
+        )
+    }
 
     // Features
 

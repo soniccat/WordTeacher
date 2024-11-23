@@ -19,6 +19,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.waitUntilFalse
 import com.aglushkov.wordteacher.shared.general.setAnalytics
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
+import com.aglushkov.wordteacher.shared.tasks.Task
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.vk.id.VKID
 import io.ktor.client.plugins.cookies.CookiesStorage
@@ -49,6 +50,7 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var freqDb: WordFrequencyDatabase
     @Inject lateinit var analytics: Analytics
     @Inject lateinit var fileLogger: FileLogger
+    @Inject lateinit var tasks: Array<Task>
 
     private var nonMainProcessDeps: GAppNonMainProccess? = null
 
@@ -89,7 +91,12 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         appComponent.connectivityManager().checkNetworkState()
 
         mainScope.launch(Dispatchers.Default) {
-            nlpCore.load()
+            launch { nlpCore.load() }
+            launch {
+                tasks.onEach {
+                    it.run()
+                }
+            }
         }
     }
 

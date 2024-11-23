@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.dicts.wordlist
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.Language
+import com.aglushkov.wordteacher.shared.general.okio.writeTo
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.dict.DictTrie
@@ -9,6 +10,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictWordData
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
+import okio.Source
 import java.util.Locale
 
 // WordListDict works just like an index holder to provide suggestions and word highlighting

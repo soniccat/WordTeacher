@@ -34,6 +34,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import java.util.Locale
 
 @Serializable
 data class WordTeacherDictWordsResponse(
@@ -53,7 +54,7 @@ data class WordTeacherDictWord(
 ) {
     @Serializable
     data class DefPair(
-        @SerialName("partOfSpeech") val partOfSpeech: WordTeacherWord.PartOfSpeech,
+        @SerialName("partOfSpeech") val partOfSpeech: WordTeacherWord.PartOfSpeech = PartOfSpeech.Undefined,
         @SerialName("defEntries") val defEntries: List<DefEntry>,
     )
 
@@ -135,7 +136,7 @@ class WordTeacherDictService (
 
     suspend fun loadWords(words: List<String>): Response<WordTeacherDictWordsResponse> {
         return withContext(Dispatchers.Default) {
-            val terms = words.joinToString(",")
+            val terms = words.joinToString(",") { it.lowercase(Locale.getDefault()) }
             logger.logLoadingStarted(terms)
             val res: HttpResponse = httpClient.get("${baseUrl}/api/v3/dict/words", block = {
                 parameter("terms", terms)

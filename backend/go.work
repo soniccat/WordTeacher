@@ -7,4 +7,5 @@ use (
 	./service_dict
 	./tools
 	./scripts/wordlistfilter
+	./scripts/phrase_exporter
 )

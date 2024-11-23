@@ -166,7 +166,7 @@ interface ArticleVM: Clearable {
         val phrases: Set<ChunkType> = emptySet(),
         val cardSetWords: Boolean = true,
         val dicts: List<String> = emptyList(),
-        val filterDictSingleWordEntries: Boolean = false,
+        val filterDictSingleWordEntries: Boolean = true,
     )
 
     data class AnnotationChooserState(
@@ -294,6 +294,7 @@ open class ArticleVMImpl(
         val dictAnnotationResolver = DictAnnotationResolver()
         val dictAnnotations = dictAnnotationResolver.resolve(actualDicts, sentence, phrases).run {
             if (selectionState.filterDictSingleWordEntries) {
+                // TODO: move that logic in dictAnnotationResolver instead of filtering here
                 filter {
                     it.entry.word.contains(' ') // contains word delimiter
                 }

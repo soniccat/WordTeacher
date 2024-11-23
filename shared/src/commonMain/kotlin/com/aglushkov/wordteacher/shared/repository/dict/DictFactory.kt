@@ -7,7 +7,7 @@ import okio.FileSystem
 import okio.Path
 
 class DictFactory(
-    private val fileSystem: FileSystem
+    private val fileSystem: FileSystem,
 ) {
     fun createDict(path: Path): Dict? {
         return when {
