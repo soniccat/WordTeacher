@@ -37,7 +37,7 @@ func (s *Service) YandexUser(
 	if err != nil {
 		return nil, logger.WrapError(ctx, err)
 	}
-	r.Header.Add("Authorization", token)
+	r.Header.Add("Authorization", "OAuth "+token)
 
 	requestResponse, err := s.httpClient.Do(r)
 	if err != nil {
