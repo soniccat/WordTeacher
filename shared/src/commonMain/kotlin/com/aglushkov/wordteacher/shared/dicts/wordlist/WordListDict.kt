@@ -109,3 +109,6 @@ class WordListDictIndex(
         return index.entry(word, nextWord, onFound)
     }
 }
+
+
+const val WORDLIST_EXTENSION = "wordlist"

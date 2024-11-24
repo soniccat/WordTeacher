@@ -110,6 +110,8 @@ android {
             yandexProps?.onEach {
                 resValue("string", it.key.toString(), it.value.toString())
             }
+
+            buildConfigField("int", "defaultWordlistVersion", "1")
         }
 
         getByName("release") {

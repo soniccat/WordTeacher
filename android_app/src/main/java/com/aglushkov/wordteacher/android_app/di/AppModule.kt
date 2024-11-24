@@ -23,6 +23,7 @@ import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.analytics.AppMetricaEngine
 import com.aglushkov.wordteacher.shared.di.*
+import com.aglushkov.wordteacher.shared.dicts.wordlist.WORDLIST_EXTENSION
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.add_article.vm.toArticleContentExtractor
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
@@ -275,16 +276,19 @@ class AppModule {
         context: Context,
         @DictPath dictPath: Path,
         dictRepository: DictRepository,
-        fileSystem: FileSystem
+        fileSystem: FileSystem,
+        flowSettings: FlowSettings,
     ): Array<Task> {
         return arrayOf(
-                CopyDictTask(
-                    context.resources.openRawResource(R.raw.words)
-                        .buffered(100 * 1024).source(),
-                    dictPath.div("words.wordlist"),
-                    fileSystem,
-                    dictRepository
-                )
+            CopyDictTask(
+                context.resources.openRawResource(R.raw.words)
+                    .buffered(100 * 1024).source(),
+                dictPath.div("words.$WORDLIST_EXTENSION"),
+                fileSystem,
+                dictRepository,
+                BuildConfig.defaultWordlistVersion,
+                flowSettings
+            )
         )
     }
 
