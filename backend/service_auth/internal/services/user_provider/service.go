@@ -6,23 +6,26 @@ import (
 )
 
 type Service struct {
-	googleConfig service_models.GoogleConfig
-	vkIdConfig   service_models.VKIDConfig
-	userStorage  userStorage
-	httpClient   http.Client
+	googleConfig   service_models.GoogleConfig
+	vkIdConfig     service_models.VKIDConfig
+	yandexIdConfig service_models.YandexIdConfig
+	userStorage    userStorage
+	httpClient     http.Client
 }
 
 func New(
 	googleConfig service_models.GoogleConfig,
 	vkIdConfig service_models.VKIDConfig,
+	yandexIdConfig service_models.YandexIdConfig,
 	userStorage userStorage,
 ) *Service {
 
 	httpClient := http.Client{}
 	return &Service{
-		googleConfig: googleConfig,
-		vkIdConfig:   vkIdConfig,
-		userStorage:  userStorage,
-		httpClient:   httpClient,
+		googleConfig:   googleConfig,
+		vkIdConfig:     vkIdConfig,
+		yandexIdConfig: yandexIdConfig,
+		userStorage:    userStorage,
+		httpClient:     httpClient,
 	}
 }

@@ -3,6 +3,8 @@ secrets:
     file: ./vkid
   google:
     file: ./google
+  yandexid:
+    file: ./yandexid
 
 services:
   nginx:
@@ -56,6 +58,7 @@ services:
     secrets:
       - vkid
       - google
+      - yandexid
     volumes:
       - ${VOLUME_AUTH_LOG_PATH}:/var/log
     networks:

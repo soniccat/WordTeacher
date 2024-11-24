@@ -40,17 +40,20 @@ func run() int {
 
 	var googleConfigPath string
 	var vkidConfigPath string
+	var yandexIdConfigPath string
 	var serviceLogWriter io.Writer
 	var err error
 
 	if *isDebug {
 		googleConfigPath = "./../../../google"
 		vkidConfigPath = "./../../../vkid"
+		yandexIdConfigPath = "./../../../yandexid"
 
 		serviceLogWriter = os.Stdout
 	} else {
 		googleConfigPath = "/run/secrets/google"
 		vkidConfigPath = "/run/secrets/vkid"
+		yandexIdConfigPath = "/run/secrets/yandexid"
 
 		serviceLW, err := logger.NewLogWriter(*serviceLogPath, "service_", os.Stderr)
 		if err != nil {
@@ -65,6 +68,7 @@ func run() int {
 	var cfg service_models.Configs
 	config.RequireJsonConfig(vkidConfigPath, &cfg.VKIDConfig)
 	config.RequireJsonConfig(googleConfigPath, &cfg.GoogleConfig)
+	config.RequireJsonConfig(yandexIdConfigPath, &cfg.YandexIdConfig)
 
 	logger := logger.New(serviceLogWriter, slog.Level(*minLogLevel))
 	timeProvider := time_provider.TimeProvider{}

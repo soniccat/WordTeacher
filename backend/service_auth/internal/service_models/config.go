@@ -1,8 +1,9 @@
 package service_models
 
 type Configs struct {
-	GoogleConfig GoogleConfig
-	VKIDConfig   VKIDConfig
+	GoogleConfig   GoogleConfig
+	VKIDConfig     VKIDConfig
+	YandexIdConfig YandexIdConfig
 }
 
 type GoogleConfig struct {
@@ -12,4 +13,8 @@ type GoogleConfig struct {
 
 type VKIDConfig struct {
 	AccessToken string `json:"accessToken"`
+}
+
+type YandexIdConfig struct {
+	ClientId string `json:"clientId"`
 }

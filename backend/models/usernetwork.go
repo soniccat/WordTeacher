@@ -7,9 +7,11 @@ type UserNetworkType int
 const (
 	Google UserNetworkType = iota
 	VKID
+	YandexId
 
-	GoogleString = "google"
-	VKIDString   = "vkid"
+	GoogleString   = "google"
+	VKIDString     = "vkid"
+	YandexIdString = "yandexid"
 )
 
 type UserNetwork struct {
@@ -21,13 +23,10 @@ func UserNetworkTypeFromString(value string) (UserNetworkType, error) {
 	switch value {
 	case GoogleString:
 		return Google, nil
-	}
-
-	if value == GoogleString {
-		return Google, nil
-	} else if value == VKIDString {
+	case VKIDString:
 		return VKID, nil
+	case YandexIdString:
+		return YandexId, nil
 	}
-
 	return Google, fmt.Errorf("invalid user network type (%s)", value)
 }

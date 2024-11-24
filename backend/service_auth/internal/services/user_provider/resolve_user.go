@@ -21,6 +21,8 @@ func (s *Service) ResolveUser(
 		userWithNetwork, err = s.GoogleUser(ctx, token, deviceType)
 	} else if networkType == models.VKID {
 		userWithNetwork, err = s.VKUser(ctx, token, deviceType)
+	} else if networkType == models.YandexId {
+		userWithNetwork, err = s.YandexUser(ctx, token, deviceType)
 	} else {
 		err = logger.WrapError(ctx, fmt.Errorf("unsupported networkType: %d", networkType))
 	}
