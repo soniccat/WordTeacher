@@ -39,18 +39,12 @@ class YandexAuthControllerImpl : YandexAuthController {
         signInLauncher = activity.registerForActivityResult(sdk.contract) { result ->
             when (result) {
                 is YandexAuthResult.Success -> {
-                    scope.launch(Dispatchers.Default) {
-                        try {
-                            yandexAuthDataState.value = Resource.Loaded(
-                                YandexAuthData(
-                                    token = sdk.getJwt(result.token),
-                                    expireTime = result.token.expiresIn,
-                                )
-                            )
-                        } catch (t: Throwable) {
-                            yandexAuthDataState.value = Resource.Error(t, canTryAgain = true)
-                        }
-                    }
+                    yandexAuthDataState.value = Resource.Loaded(
+                        YandexAuthData(
+                            token = result.token.value,
+                            expireTime = result.token.expiresIn,
+                        )
+                    )
                 }
                 is YandexAuthResult.Failure ->
                     yandexAuthDataState.value = Resource.Error(result.exception, canTryAgain = true)
