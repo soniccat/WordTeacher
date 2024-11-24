@@ -20,6 +20,7 @@ playServicesAuth = "20.4.0"
 
 robolectric = "4.13"
 vkId = "2.0.0"
+yandexId = "3.1.3"
 appmetrica = "7.0.0"
 kermit = "2.0.2"
 jsoup = "1.14.3"
@@ -89,6 +90,7 @@ statelyCommon = { module = "co.touchlab:stately-common", version.ref = "stately"
 statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 vkId = { module = "com.vk.id:vkid", version.ref = "vkId" }
+yandexId = { module = "com.yandex.android:authsdk", version.ref = "yandexId" }
 
 # for android tests
 kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

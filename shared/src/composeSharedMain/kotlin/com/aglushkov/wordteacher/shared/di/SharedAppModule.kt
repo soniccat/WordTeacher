@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDict
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
+import com.aglushkov.wordteacher.shared.general.auth.YandexAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.service.SpaceHttpClientBuilder
@@ -312,6 +313,7 @@ class SharedAppModule {
         service: SpaceAuthService,
         googleAuthController: GoogleAuthController,
         vkAuthController: VKAuthController,
+        yandexAuthController: YandexAuthController,
         fileSystem: FileSystem,
     ): SpaceAuthRepository {
         val path = obtainSpaceDirPath(basePath,fileSystem).div("authData")
@@ -319,6 +321,7 @@ class SharedAppModule {
             service,
             googleAuthController,
             vkAuthController,
+            yandexAuthController,
             path,
             fileSystem,
         )

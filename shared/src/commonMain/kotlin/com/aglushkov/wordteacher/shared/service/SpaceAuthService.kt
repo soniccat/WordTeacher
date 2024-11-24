@@ -52,6 +52,8 @@ class SpaceAuthService(
         Google("google"),
         @SerialName("vkid")
         VKID("vkid"),
+        @SerialName("yandexid")
+        YandexId("yandexid"),
     }
 
     @Serializable

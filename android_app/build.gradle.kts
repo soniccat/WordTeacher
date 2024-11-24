@@ -63,6 +63,7 @@ kotlin {
             implementation(libs.settingsDataStore)
             implementation(libs.datastorePreference)
             implementation(libs.vkId)
+            implementation(libs.yandexId)
             implementation(libs.playServicesAuth)
         }
     }
@@ -97,6 +98,7 @@ android {
                 vkProps?.onEach {
                     put(it.key.toString(), it.value)
                 }
+                put("YANDEX_CLIENT_ID", yandexProps!!["yandex_id_client_id"]!!)
             }
         )
     }

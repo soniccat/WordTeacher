@@ -56,7 +56,7 @@ class VKAuthControllerImpl : VKAuthController {
 
     override suspend fun signIn(): Resource<NetworkAuthData> {
         launchSignIn()
-        vkAuthDataState.takeWhile { !it.isLoadedOrError() }.collect()
+        vkAuthDataState.takeWhile { it.isLoading() }.collect()
         return vkAuthDataState.value
     }
 

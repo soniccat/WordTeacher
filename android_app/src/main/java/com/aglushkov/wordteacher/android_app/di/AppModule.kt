@@ -19,6 +19,7 @@ import com.aglushkov.wordteacher.android_app.helper.EmailOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
+import com.aglushkov.wordteacher.android_app.helper.YandexAuthControllerImpl
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.analytics.AppMetricaEngine
@@ -31,6 +32,7 @@ import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
+import com.aglushkov.wordteacher.shared.general.auth.YandexAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.okio.writeTo
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -133,12 +135,22 @@ class AppModule {
     @Provides
     fun vkAuthControllerImpl(): VKAuthControllerImpl = VKAuthControllerImpl()
 
+    @AppComp
+    @Provides
+    fun yandexAuthControllerImpl(): YandexAuthControllerImpl = YandexAuthControllerImpl()
+
     // TODO: replace with bind
     @AppComp
     @Provides
     fun vkAuthController(
         impl: VKAuthControllerImpl
     ): VKAuthController = impl
+
+    @AppComp
+    @Provides
+    fun yandexAuthController(
+        impl: YandexAuthControllerImpl
+    ): YandexAuthController = impl
 
     @AppComp
     @Provides

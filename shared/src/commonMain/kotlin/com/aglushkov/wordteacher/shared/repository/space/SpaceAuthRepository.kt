@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.ErrorResponseException
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthController
+import com.aglushkov.wordteacher.shared.general.auth.YandexAuthController
 import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.service.*
@@ -24,6 +25,7 @@ class SpaceAuthRepository(
     private val service: SpaceAuthService,
     private val googleAuthController: GoogleAuthController,
     private val vkAuthController: VKAuthController,
+    private val yandexAuthController: YandexAuthController,
     private val cachePath: Path,
     private val fileSystem: FileSystem,
 ) {
@@ -117,6 +119,7 @@ class SpaceAuthRepository(
         when (network) {
             SpaceAuthService.NetworkType.Google -> googleAuthController
             SpaceAuthService.NetworkType.VKID -> vkAuthController
+            SpaceAuthService.NetworkType.YandexId -> yandexAuthController
         }
 
     private suspend fun auth(network: SpaceAuthService.NetworkType, token: String): Resource<SpaceAuthData> {

@@ -99,6 +99,7 @@ private fun showSettingsItem(
                         when (networkType) {
                             SpaceAuthService.NetworkType.Google -> MR.images.google
                             SpaceAuthService.NetworkType.VKID -> MR.images.vk
+                            SpaceAuthService.NetworkType.YandexId -> MR.images.yandex
                         }
                     ),
                     contentDescription = null,

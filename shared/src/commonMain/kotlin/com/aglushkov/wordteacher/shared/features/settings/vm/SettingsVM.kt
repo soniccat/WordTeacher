@@ -119,7 +119,7 @@ open class SettingsVMImpl (
             is Resource.Uninitialized -> {
                 resultItems += SettingsViewTextItem(StringDesc.Resource(MR.strings.settings_auth_signin), withBottomPadding = false)
                 resultItems += SettingsSignInItem(
-                    listOf(SpaceAuthService.NetworkType.Google, SpaceAuthService.NetworkType.VKID)
+                    listOf(SpaceAuthService.NetworkType.YandexId, SpaceAuthService.NetworkType.VKID, SpaceAuthService.NetworkType.Google)
                 )
             }
             is Resource.Loaded -> {
