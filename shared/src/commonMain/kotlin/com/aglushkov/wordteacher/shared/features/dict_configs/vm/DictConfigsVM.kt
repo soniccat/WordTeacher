@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.YandexServic
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDict
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -124,13 +125,15 @@ open class DictConfigsVMImpl(
                 add(ConfigTextViewItem(it.toStringDesc()))
             }
         )
-        add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Online))
 
+        add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Online))
         add(ConfigHeaderViewItem(ResourceStringDesc(MR.strings.dictconfigs_offline_section_title)))
         dicts.on(
             loaded = {
                 it.onEach { dict ->
-                    add(ConfigDictViewItem(dict.name, dict.path))
+                    if (dict !is WordListDict) {
+                        add(ConfigDictViewItem(dict.name, dict.path))
+                    }
                 }
             },
             loading = {
