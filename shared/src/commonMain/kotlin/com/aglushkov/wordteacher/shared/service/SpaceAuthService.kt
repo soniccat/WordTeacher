@@ -38,7 +38,7 @@ data class SpaceAuthToken(
 @Serializable
 data class SpaceAuthUser(
     @SerialName("id") val id: String,
-    @SerialName("networkType") val networkType: SpaceAuthService.NetworkType?,
+    @SerialName("networkType") val networkType: SpaceAuthService.NetworkType,
 )
 
 class SpaceAuthService(
@@ -53,7 +53,13 @@ class SpaceAuthService(
         @SerialName("vkid")
         VKID("vkid"),
         @SerialName("yandexid")
-        YandexId("yandexid"),
+        YandexId("yandexid");
+
+        override fun toString(): String = when(this) {
+            Google -> "Google"
+            YandexId -> "Yandex ID"
+            VKID -> "VK ID"
+        }
     }
 
     @Serializable

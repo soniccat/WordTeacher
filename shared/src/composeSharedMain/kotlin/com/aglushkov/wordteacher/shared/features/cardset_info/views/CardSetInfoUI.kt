@@ -112,6 +112,7 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
     val focusManager = LocalFocusManager.current
         var nameState by remember { mutableStateOf(TextFieldValue(uiState.name, TextRange(uiState.name.length))) }
     var descriptionState by remember { mutableStateOf(TextFieldValue(uiState.description, TextRange(uiState.description.length))) }
+    var sourceState by remember { mutableStateOf(TextFieldValue(uiState.source.orEmpty(), TextRange(uiState.description.length))) }
 
     Column(
         modifier = Modifier
@@ -149,6 +150,19 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                     (42 * 2).sp.toDp()
                 }),
             label = { Text(stringResource(MR.strings.cardset_info_field_description_hint)) },
+            readOnly = !uiState.isEditable,
+        )
+
+        OutlinedTextField(
+            value = sourceState,
+            onValueChange = {
+                sourceState = it
+                vm.onSourceChanged(it.text)
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            label = { Text(stringResource(MR.strings.cardset_info_field_source_hint)) },
+            singleLine = true,
             readOnly = !uiState.isEditable,
         )
 

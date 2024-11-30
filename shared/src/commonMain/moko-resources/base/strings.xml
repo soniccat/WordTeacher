@@ -66,6 +66,7 @@
     <string name="cardset_info_error_empty_name">Name is required</string>
     <string name="cardset_info_field_name_hint">Title</string>
     <string name="cardset_info_field_description_hint">Description</string>
+    <string name="cardset_info_field_source_hint">Source</string>
     <string name="cardset_info_enable_sharing">Share with other users in search</string>
     <string name="cardset_info_error">Can\'t load card set</string>
     <string name="cardset_add_label">Add label</string>
@@ -109,7 +110,7 @@
     <string name="settings_title">Settings</string>
     <string name="settings_auth_title">Space</string>
     <string name="settings_auth_signin">Sign In</string>
-    <string name="settings_auth_signout">Sign Out</string>
+    <string name="settings_auth_signout">Sign Out from %s</string>
     <string name="settings_auth_refresh">Refresh</string>
     <string name="settings_dictconfigs">Dicts</string>
     <string name="settings_words_title">Words</string>

@@ -123,7 +123,7 @@ open class SettingsVMImpl (
                 )
             }
             is Resource.Loaded -> {
-                resultItems += SettingsSignOutItem(StringDesc.Resource(MR.strings.settings_auth_signout))
+                resultItems += SettingsSignOutItem(StringDesc.ResourceFormatted(MR.strings.settings_auth_signout, authDataRes.data.user.networkType.toString()))
                 if (isDebug) {
                     resultItems += SettingsViewAuthRefreshButtonItem(StringDesc.Resource(MR.strings.settings_auth_refresh))
                 }

@@ -16,7 +16,7 @@ const (
 
 type UserNetwork struct {
 	NetworkType   UserNetworkType `bson:"type"`
-	NetworkUserId string          `bson:"networkUserId,omitempty"`
+	NetworkUserId string          `bson:"networkUserId"`
 }
 
 func UserNetworkTypeFromString(value string) (UserNetworkType, error) {
