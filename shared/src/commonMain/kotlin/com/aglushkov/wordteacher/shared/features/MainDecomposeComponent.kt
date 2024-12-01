@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features
 
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
@@ -61,7 +62,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
     val childStack: Value<ChildStack<ChildConfiguration, Child>>
     val dialogsStateFlow: Value<ChildStack<ChildConfiguration, Child>>
 
-    override fun openAddArticle()
+    fun openAddArticle(url: String?)
 //    fun popDialog(inner: Any)
     fun popDialog(config: ChildConfiguration)
     override fun openArticle(state: ArticleVM.State)
@@ -108,7 +109,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
         @Serializable data object CardSetJsonImportConfiguration : ChildConfiguration()
         @Serializable data object CardSetsConfiguration : ChildConfiguration()
         @Serializable data object TabsConfiguration : ChildConfiguration()
-        @Serializable data object AddArticleConfiguration : ChildConfiguration()
+        @Serializable data class AddArticleConfiguration(val state: AddArticleVM.State = AddArticleVM.State()) : ChildConfiguration()
         @Serializable data object EmptyDialogConfiguration : ChildConfiguration() // TODO: it seems we can remove that
     }
 }
@@ -258,8 +259,14 @@ class MainDecomposeComponentImpl(
 
     // Dialogs
 
+    override fun openAddArticle(url: String?) {
+        addDialogConfigIfNotAtTop(MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration(
+            state = AddArticleVM.State(uri = url)
+        ))
+    }
+
     override fun openAddArticle() {
-        addDialogConfigIfNotAtTop(MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration)
+        openAddArticle(null)
     }
 
     private inline fun <reified C: MainDecomposeComponent.ChildConfiguration> addDialogConfigIfNotAtTop(config: C) {

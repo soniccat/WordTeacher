@@ -14,6 +14,7 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
@@ -59,9 +60,9 @@ class WebLinkOpenerImpl: WebLinkOpener {
                     ).also {
                         it?.setTint(
                             if ((activity.resources.configuration.uiMode and UI_MODE_NIGHT_MASK) == UI_MODE_NIGHT_YES) {
-                                DarkColorPalette.onBackground.toArgb()
+                                Color(0xFFFFFFFF).toArgb()
                             } else {
-                                LightColorPalette.onPrimary.toArgb()
+                                Color(0xFF1F1F1F).toArgb()
                             }
                         )
                     }!!.toBitmap(),

@@ -122,20 +122,6 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
     var sourceState by remember {
         mutableStateOf(TextFieldValue(uiState.source.orEmpty(),
             TextRange(uiState.source.orEmpty().length))) }
-//    val sourceStateWithLinks = sourceState.copy(
-//        annotatedString = buildAnnotatedString {
-//            append(sourceState.annotatedString)
-//            uiState.sourceLinks.onEach { linkSpan ->
-//                addLink(
-//                    LinkAnnotation.Clickable(LINK_ANNOTATION) { annotation ->
-//                        vm.onLinkClicked(sourceState.annotatedString.substring(linkSpan.start, linkSpan.end))
-//                    },
-//                    linkSpan.start,
-//                    linkSpan.end
-//                )
-//            }
-//        }
-//    )
 
     Column(
         modifier = Modifier
@@ -145,7 +131,7 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                 top = LocalDimens.current.contentPadding,
                 start = LocalDimens.current.contentPadding,
                 end = LocalDimens.current.contentPadding,
-                bottom = 88.dp,
+                bottom = 300.dp,
             )
     ) {
         OutlinedTextFieldWithError(
@@ -187,13 +173,12 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
             modifier = Modifier
                 .fillMaxWidth(),
             label = { Text(stringResource(MR.strings.cardset_info_field_source_hint)) },
-            singleLine = true,
             readOnly = !uiState.isEditable,
         )
 
         uiState.sourceLinks.onEach { link ->
             Row(
-                Modifier.padding(vertical = 6.dp)
+                Modifier.padding(top = 6.dp)
             ) {
                 val linkString = uiState.source.orEmpty().substring(link.span.start, link.span.end)
                 Text(
@@ -204,15 +189,16 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                     color = MaterialTheme.colors.secondary
                 )
                 if (link.canImport) {
-                    IconButton(
-                        onClick = { vm.onImportArticleClicked(linkString) }
-                    ) {
-                        Icon(
-                            painterResource(MR.images.download_for_offline),
-                            null,
-                            tint = MaterialTheme.colors.secondary
-                        )
-                    }
+                    Icon(
+                        painterResource(MR.images.download_for_offline),
+                        null,
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                            .clickable {
+                            vm.onImportArticleClicked(linkString)
+                        },
+                        tint = MaterialTheme.colors.secondary
+                    )
                 }
             }
         }

@@ -207,7 +207,7 @@ open class CardSetInfoVMImpl(
     }
 
     override fun onImportArticleClicked(link: String) {
-//        router.(link)
+        router?.openAddArticle(link)
     }
 
     private fun logChange(fieldType: String) {

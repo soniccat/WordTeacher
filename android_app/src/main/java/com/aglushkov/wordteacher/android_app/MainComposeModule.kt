@@ -68,7 +68,7 @@ class MainComposeModule {
                 is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration ->
                     DaggerAddArticleComposeComponent.builder()
                         .setComponentContext(context)
-                        .setConfiguration(AddArticleVM.State())
+                        .setConfiguration(configuration.state)
                         .setDeps(appComponent)
                         .build()
                         .addArticleDecomposeComponent()
