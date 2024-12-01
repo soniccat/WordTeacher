@@ -11,7 +11,7 @@ import com.aglushkov.wordteacher.shared.di.LocalIsDarkTheme
 import com.aglushkov.wordteacher.shared.di.LocalIsDebug
 import com.aglushkov.wordteacher.shared.general.*
 
-private val DarkColorPalette = darkColors(
+val DarkColorPalette = darkColors(
     primary = primaryDark,
     primaryVariant = primaryVariantDark,
     secondary = secondaryDark,
@@ -20,7 +20,7 @@ private val DarkColorPalette = darkColors(
     surface = Color(0xFF2F2F2F),
 )
 
-private val LightColorPalette = lightColors(
+val LightColorPalette = lightColors(
     primary = primaryLight,
     primaryVariant = primaryVariantLight,
     secondary = secondaryLight,

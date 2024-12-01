@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecompo
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
@@ -32,12 +33,14 @@ class CardSetInfoModule {
         initState: CardSetInfoVM.State,
         databaseCardWorker: DatabaseCardWorker,
         cardSetRepository: CardSetRepository,
+        webLinkOpener: WebLinkOpener,
         analytics: Analytics,
     ) = CardSetInfoDecomposeComponent(
         componentContext,
         initState,
         databaseCardWorker,
         cardSetRepository,
+        webLinkOpener,
         analytics,
     )
 }

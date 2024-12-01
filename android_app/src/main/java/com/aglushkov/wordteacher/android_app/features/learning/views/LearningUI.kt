@@ -52,8 +52,8 @@ import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.desc.StringDesc
 import java.util.*
 
-@ExperimentalUnitApi
-@ExperimentalComposeUiApi
+//@ExperimentalUnitApi
+//@ExperimentalComposeUiApi
 @Composable
 fun LearningUIDialog(
     vm: LearningVM,

@@ -54,10 +54,10 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import java.util.regex.Pattern
 
-@ExperimentalUnitApi
-@ExperimentalMaterialApi
-@ExperimentalAnimationApi
-@ExperimentalComposeUiApi
+//@ExperimentalUnitApi
+//@ExperimentalMaterialApi
+//@ExperimentalAnimationApi
+//@ExperimentalComposeUiApi
 class TextActionActivity: AppCompatActivity() {
     private lateinit var textActionDecomposeComponent: TextActionDecomposeComponent
     private val bottomBarTabs = listOf(
@@ -204,7 +204,10 @@ class TextActionActivity: AppCompatActivity() {
                                     coroutineScope.launch {
                                         if (showSnackbar(articleCreatedString, actionLabel = openActionText) == SnackbarResult.ActionPerformed) {
                                             this@TextActionActivity.startActivity(
-                                                Intent(this@TextActionActivity, MainActivity::class.java).apply {
+                                                Intent(
+                                                    this@TextActionActivity,
+                                                    MainActivity::class.java
+                                                ).apply {
                                                     articleId?.let {
                                                         putExtra(EXTRA_ARTICLE_ID, it)
                                                     }

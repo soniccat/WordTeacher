@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.StringDescThrowable
 import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.CardSetInfo
@@ -35,6 +36,8 @@ interface CardSetInfoVM: Clearable {
     fun onDescriptionChanged(description: String)
     fun onSourceChanged(source: String)
     fun onIsAvailableInSearchChanged(isAvailableInSearch: Boolean)
+    fun onLinkClicked(link: String)
+    fun onImportArticleClicked(link: String)
 
     @Serializable
     sealed interface State {
@@ -75,8 +78,19 @@ interface CardSetInfoVM: Clearable {
         val nameError: StringDesc?,
         val description: String,
         val source: String?,
+        val sourceLinks: List<Link>,
         val isAvailableInSearch: Boolean,
         val isEditable: Boolean,
+    )
+
+    data class Link(
+        val span: LinkSpan,
+        val canImport: Boolean,
+    )
+
+    data class LinkSpan(
+        val start: Int,
+        val end: Int
     )
 }
 
@@ -84,6 +98,7 @@ open class CardSetInfoVMImpl(
     restoredState: CardSetInfoVM.State,
     private val databaseCardWorker: DatabaseCardWorker,
     private val cardSetRepository: CardSetRepository,
+    private val webLinkOpener: WebLinkOpener,
     private val analytics: Analytics,
 ): ViewModel(), CardSetInfoVM {
 
@@ -114,6 +129,7 @@ open class CardSetInfoVMImpl(
                 StringDescThrowable(ResourceStringDesc(MR.strings.cardset_info_error), it)
             }
         ) { cardSet: CardSet ->
+            val source = inputState.source ?: cardSet.info.source
             CardSetInfoVM.UIState(
                 name = inputState.validatedName ?: cardSet.name,
                 nameError = if (inputState.isNameValid) {
@@ -122,7 +138,13 @@ open class CardSetInfoVMImpl(
                     StringDesc.Resource(MR.strings.cardset_info_error_empty_name)
                 },
                 description = inputState.description ?: cardSet.info.description,
-                source = inputState.source ?: cardSet.info.source,
+                source = source,
+                sourceLinks = findLinkSpans(source.orEmpty()).map {
+                    CardSetInfoVM.Link(
+                        span = it,
+                        canImport = !source.orEmpty().substring(it.start, it.end).isFileLink(),
+                    )
+                },
                 isAvailableInSearch = inputState.isAvailableInSearch ?: cardSet.isAvailableInSearch,
                 isEditable = !state.isRemoteCardSet
             )
@@ -180,6 +202,14 @@ open class CardSetInfoVMImpl(
         inputState.update { it.copy(isAvailableInSearch = isAvailableInSearch) }
     }
 
+    override fun onLinkClicked(link: String) {
+        webLinkOpener.open(link)
+    }
+
+    override fun onImportArticleClicked(link: String) {
+//        router.(link)
+    }
+
     private fun logChange(fieldType: String) {
         analytics.send(AnalyticEvent.createActionEvent("CardSetInfo.change", mapOf("fieldType" to fieldType)))
     }
@@ -211,5 +241,62 @@ open class CardSetInfoVMImpl(
                 }
             }
         }
+    }
+}
+
+val LinkDividerCharCategories = setOf(
+    CharCategory.SPACE_SEPARATOR,
+)
+
+private fun findLinkSpans(str: String): List<CardSetInfoVM.LinkSpan> {
+    if (str.isEmpty()) return emptyList()
+
+    var i = 0
+    val linkSpans = mutableListOf<CardSetInfoVM.LinkSpan>()
+    val prefix = "http"
+    while (i < str.length) {
+        val foundI = str.indexOf(prefix, i)
+        if (foundI == -1) {
+            break
+        }
+
+        val linkEnd = str.indexOfChar(foundI + prefix.length) {
+            LinkDividerCharCategories.contains(it.category)
+        }
+        if (linkEnd == -1) {
+            linkSpans.add(CardSetInfoVM.LinkSpan(foundI, str.length))
+            break
+        }
+
+        linkSpans.add(CardSetInfoVM.LinkSpan(foundI, linkEnd))
+        i = linkEnd
+    }
+
+    return linkSpans
+}
+
+fun String.indexOfChar(start: Int, checker: (Char) -> Boolean): Int {
+    var i = start
+    while (i < length) {
+        if (checker(get(i))) {
+            return i
+        }
+
+        ++i
+    }
+
+    return -1
+}
+
+fun String.isFileLink(): Boolean {
+    val i = indexOfLast { it == '.' }
+    if (i == -1) {
+        return false
+    }
+
+    val ext = substring(i)
+    return when (ext) {
+        "pdf", "doc", "xml" -> true
+        else -> false
     }
 }

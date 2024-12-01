@@ -65,6 +65,7 @@ kotlin {
             implementation(libs.vkId)
             implementation(libs.yandexId)
             implementation(libs.playServicesAuth)
+            implementation(libs.androidXBrowser)
         }
     }
 }

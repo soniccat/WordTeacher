@@ -19,6 +19,7 @@ import com.aglushkov.wordteacher.android_app.helper.EmailOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
+import com.aglushkov.wordteacher.android_app.helper.WebLinkOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.YandexAuthControllerImpl
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics
@@ -302,6 +303,18 @@ class AppModule {
                 flowSettings
             )
         )
+    }
+
+    @AppComp
+    @Provides
+    fun webLinkOpenerImpl(): WebLinkOpenerImpl {
+        return WebLinkOpenerImpl()
+    }
+
+    @AppComp
+    @Provides
+    fun webLinkOpener(impl: WebLinkOpenerImpl): WebLinkOpener {
+        return impl
     }
 
     // Features

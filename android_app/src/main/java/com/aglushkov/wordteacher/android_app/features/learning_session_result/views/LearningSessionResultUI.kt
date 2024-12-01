@@ -30,8 +30,8 @@ import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
 import java.util.*
 
-@ExperimentalUnitApi
-@ExperimentalComposeUiApi
+//@ExperimentalUnitApi
+//@ExperimentalComposeUiApi
 @Composable
 fun LearningSessionResultUIDialog(
     vm: LearningSessionResultVM,

@@ -33,9 +33,9 @@ import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
-@ExperimentalComposeUiApi
+//@ExperimentalAnimationApi
+//@ExperimentalMaterialApi
+//@ExperimentalComposeUiApi
 @Composable
 fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
@@ -86,8 +86,8 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
     }
 }
 
-@ExperimentalAnimationApi
-@ExperimentalMaterialApi
+//@ExperimentalAnimationApi
+//@ExperimentalMaterialApi
 @Composable
 private fun NoteViews(
     scope: CoroutineScope,
@@ -154,8 +154,8 @@ private fun NoteViews(
     }
 }
 
-@ExperimentalMaterialApi
-@ExperimentalAnimationApi
+//@ExperimentalMaterialApi
+//@ExperimentalAnimationApi
 @Composable
 private fun NoteView(
     noteViewItem: NoteViewItem,

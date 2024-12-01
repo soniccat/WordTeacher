@@ -81,10 +81,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@ExperimentalMaterialApi
-@ExperimentalAnimationApi
-@ExperimentalUnitApi
-@ExperimentalComposeUiApi
+//@ExperimentalMaterialApi
+//@ExperimentalAnimationApi
+//@ExperimentalUnitApi
+//@ExperimentalComposeUiApi
 class MainActivity : AppCompatActivity(), Router {
     private val bottomBarTabs = listOf(
         ScreenTab.Definitions,
@@ -124,6 +124,7 @@ class MainActivity : AppCompatActivity(), Router {
         appComponent().googleAuthRepository().bind(this)
         appComponent().vkAuthController().bind(this)
         appComponent().yandexAuthController().bind(this)
+        appComponent().webLinkOpenerImpl().bind(this)
         (appComponent().emailOpener() as EmailOpenerImpl).bind(this)
         setupComposeLayout()
         handleIntent()

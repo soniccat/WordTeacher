@@ -6,13 +6,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
@@ -39,8 +42,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.shared.events.CompletionData
@@ -112,7 +119,23 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
     val focusManager = LocalFocusManager.current
         var nameState by remember { mutableStateOf(TextFieldValue(uiState.name, TextRange(uiState.name.length))) }
     var descriptionState by remember { mutableStateOf(TextFieldValue(uiState.description, TextRange(uiState.description.length))) }
-    var sourceState by remember { mutableStateOf(TextFieldValue(uiState.source.orEmpty(), TextRange(uiState.description.length))) }
+    var sourceState by remember {
+        mutableStateOf(TextFieldValue(uiState.source.orEmpty(),
+            TextRange(uiState.source.orEmpty().length))) }
+//    val sourceStateWithLinks = sourceState.copy(
+//        annotatedString = buildAnnotatedString {
+//            append(sourceState.annotatedString)
+//            uiState.sourceLinks.onEach { linkSpan ->
+//                addLink(
+//                    LinkAnnotation.Clickable(LINK_ANNOTATION) { annotation ->
+//                        vm.onLinkClicked(sourceState.annotatedString.substring(linkSpan.start, linkSpan.end))
+//                    },
+//                    linkSpan.start,
+//                    linkSpan.end
+//                )
+//            }
+//        }
+//    )
 
     Column(
         modifier = Modifier
@@ -153,6 +176,8 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
             readOnly = !uiState.isEditable,
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+
         OutlinedTextField(
             value = sourceState,
             onValueChange = {
@@ -165,6 +190,32 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
             singleLine = true,
             readOnly = !uiState.isEditable,
         )
+
+        uiState.sourceLinks.onEach { link ->
+            Row(
+                Modifier.padding(vertical = 6.dp)
+            ) {
+                val linkString = uiState.source.orEmpty().substring(link.span.start, link.span.end)
+                Text(
+                    text = linkString,
+                    modifier = Modifier.weight(1.0f).clickable {
+                        vm.onLinkClicked(linkString)
+                    }.padding(6.dp),
+                    color = MaterialTheme.colors.secondary
+                )
+                if (link.canImport) {
+                    IconButton(
+                        onClick = { vm.onImportArticleClicked(linkString) }
+                    ) {
+                        Icon(
+                            painterResource(MR.images.download_for_offline),
+                            null,
+                            tint = MaterialTheme.colors.secondary
+                        )
+                    }
+                }
+            }
+        }
 
         if (uiState.isEditable) {
             Row(
@@ -191,3 +242,5 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
         focusRequester.requestFocus()
     }
 }
+
+private val LINK_ANNOTATION = "LINK_ANNOTATION"

@@ -69,6 +69,9 @@
     <string name="cardset_info_field_source_hint">Source</string>
     <string name="cardset_info_enable_sharing">Share with other users in search</string>
     <string name="cardset_info_error">Can\'t load card set</string>
+    <string name="cardset_info_open_link">Open %s</string>
+    <string name="cardset_info_import_article">Import</string>
+    <string name="cardset_info_import_action">Import</string>
     <string name="cardset_add_label">Add label</string>
 
     <string name="cardsets_search_added">"%s" added</string>
