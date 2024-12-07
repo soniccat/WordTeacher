@@ -629,9 +629,7 @@ open class CardSetVMImpl(
     override fun onCardDeleted(cardId: Long) {
         analytics.send(AnalyticEvent.createActionEvent("CardSet.cardDeleted"))
         findCard(cardId)?.let { card ->
-            viewModelScope.launch {
-                databaseCardWorker.deleteCard(card, timeSource.timeInMilliseconds())
-            }
+            databaseCardWorker.deleteCard(card, timeSource.timeInMilliseconds())
         }
     }
 

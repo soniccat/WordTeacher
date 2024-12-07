@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -390,12 +391,22 @@ class MainActivity : AppCompatActivity(), Router {
             }
         }
         BottomNavigation(
-            modifier = Modifier
-                .requiredHeight(56.dp)
+            modifier = Modifier.requiredHeight(56.dp),
+            backgroundColor = MaterialTheme.colors.surface,
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
+                val isSelected = tab.decomposeChildConfigClass == activeChild.configuration::class.java
+                val color = if (isSelected) {
+                    MaterialTheme.colors.secondary
+                } else {
+                    if (MaterialTheme.colors.isLight) {
+                        Color.Gray
+                    } else {
+                        LocalContentColor.current
+                    }
+                }
                 BottomNavigationItem(
-                    selected = tab.decomposeChildConfigClass == activeChild.configuration::class.java,
+                    selected = isSelected,
                     onClick = {
                         when (tab) {
                             is ScreenTab.Definitions -> component.openDefinitions()
@@ -409,11 +420,14 @@ class MainActivity : AppCompatActivity(), Router {
                         Icon(
                             painter = painterResource(tab.iconRes),
                             contentDescription = null,
-                            tint = LocalContentColor.current
+                            tint = color
                         )
                     },
                     label = {
-                        Text(stringResource(id = tab.nameRes))
+                        Text(
+                            stringResource(id = tab.nameRes),
+                            color = color
+                        )
                     }
                 )
             }

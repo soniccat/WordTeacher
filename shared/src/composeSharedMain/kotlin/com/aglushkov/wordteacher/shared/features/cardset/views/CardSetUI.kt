@@ -611,8 +611,11 @@ private fun CardTextField(
         readOnly = readOnly,
         onValueChange = {
             if (!readOnly) { // filter cursor position change in readOnly mode
+                val hasTextChanged = textState.text != it.text
                 textState = it
-                onValueChanged(it.text)
+                if (hasTextChanged) {
+                    onValueChanged(it.text)
+                }
 //                vm.onItemTextChanged(it.text, item, cardId)
             }
         }

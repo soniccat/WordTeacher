@@ -18,7 +18,7 @@ class DatabaseWorker(
         }
     }
 
-    suspend fun <T> run(task: (database: AppDatabase) -> T): T {
+    suspend fun <T> run(task: suspend (database: AppDatabase) -> T): T {
         return serialQueue.sendAndWait {
             task(database)
         }
@@ -27,9 +27,10 @@ class DatabaseWorker(
     suspend fun <T> runCancellable(
         id: String,
         delay: Long = UPDATE_DELAY,
-        task: (database: AppDatabase) -> T
+        onCancelled: (() -> Unit)? = null,
+        task: suspend (database: AppDatabase) -> T
     ): T {
-        return serialQueue.sendWithDelayAndWait(id, delay) {
+        return serialQueue.sendWithDelayAndWait(id, delay, onCancelled) {
             task(database)
         }
     }

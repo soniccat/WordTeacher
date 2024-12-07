@@ -47,23 +47,24 @@ class SerialQueue(
             }
         }
 
-    // sending tasks with the same id increase task time
-    fun <T> sendWithDelay(id: String, time: Long, task: suspend () -> T) {
-        (delayedTasks[id] as? DelayedTaskData<T>)?.delay(time, task) ?: run {
-            delayedTasks[id] = DelayedTaskData<T>(scope).delay(time, task)
+    // sending tasks with the same id replaces the task and increase task's time
+    // TODO: rework cancellation logic in more native way, probably somehow with suspendCancellableCoroutine
+    fun <T> sendWithDelay(id: String, time: Long, onCancelled: (() -> Unit)? = null, task: suspend () -> T) {
+        (delayedTasks[id] as? DelayedTaskData<T>)?.delay(time, task, onCancelled) ?: run {
+            val newTask = DelayedTaskData<T>(scope).delay(time, task, onCancelled)
+            delayedTasks[id] = newTask
+            channel.trySend(
+                TaskItem {
+                    newTask.runWhenReady()
+                    delayedTasks.remove(id)
+                }
+            ) // always succeed as the channel is UNLIMITED
         }
-
-        channel.trySend(
-            TaskItem {
-                delayedTasks[id]?.runWhenReady()
-                delayedTasks.remove(id)
-            }
-        ) // always succeed as the channel is UNLIMITED
     }
 
-    suspend fun <T> sendWithDelayAndWait(id: String, time: Long, task: suspend () -> T) =
+    suspend fun <T> sendWithDelayAndWait(id: String, time: Long, onCancelled: (() -> Unit)? = null, task: suspend () -> T) =
         suspendCoroutine {
-            sendWithDelay(id, time) {
+            sendWithDelay(id, time, onCancelled) {
                 val result = task()
                 it.resume(result as T)
             }
@@ -79,12 +80,19 @@ class SerialQueue(
         private val readyState: MutableStateFlow<Boolean> = MutableStateFlow(false)
         private var turnStateJob: Job? = null
         private var task: (suspend () -> T)? = null
+        private var cancellationHandler: (() -> Unit)? = null
 
-        fun delay(time: Long, aTask: suspend () -> T): DelayedTaskData<T> {
+        fun delay(
+            time: Long,
+            aTask: suspend () -> T,
+            onCancelled: (() -> Unit)?,
+        ): DelayedTaskData<T> {
+            cancellationHandler?.invoke()
             task = null
             turnStateJob?.cancel()
 
             task = aTask
+            cancellationHandler = onCancelled
             turnStateJob = scope.launch {
                 delay(time)
                 readyState.value = true

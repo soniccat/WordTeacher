@@ -30,12 +30,12 @@ class CardSetsRepository(
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     val cardSets = databaseWorker.database.cardSets.selectAll().stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
 
-    suspend fun createCardSet(name: String, date: Long) = supervisorScope {
+    suspend fun createCardSet(name: String, date: Long, infoSource: String? = null) = supervisorScope {
         // Async in the scope to avoid retaining the parent coroutine and to cancel immediately
         // when it cancels (when corresponding ViewModel is cleared for example)
         scope.async(Dispatchers.Default) {
             databaseWorker.run {
-                it.cardSets.insert(name, date)
+                it.cardSets.insert(name, date, infoSource)
             }
         }.await()
     }

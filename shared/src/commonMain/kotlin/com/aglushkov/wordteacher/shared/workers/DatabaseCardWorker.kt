@@ -7,10 +7,12 @@ import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.handleCoroutineException
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonPrimitive
@@ -31,7 +33,7 @@ class DatabaseCardWorker(
     private val cardFrequencyUpdateWorker: CardFrequencyUpdateWorker,
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val serialQueue = SerialQueue(Dispatchers.Main)
+    private val serialQueue = SerialQueue(Dispatchers.Main) // to sync state changes
     private val editOperationCount = MutableStateFlow(0)
     private var stateStack by Delegates.observable(listOf<State>()) { _, _, new ->
         currentStateFlow.value = currentState
@@ -245,47 +247,23 @@ class DatabaseCardWorker(
 
     // Editing State Operation
 
-    fun deleteCard(card: Card, modificationDate: Long) = serialQueue.send {
+    fun deleteCard(card: Card, modificationDate: Long) {
         deleteCardInternal(card, modificationDate)
     }
 
-    suspend fun deleteCardAndWait(card: Card, modificationDate: Long) = serialQueue.sendAndWait {
-        deleteCardInternal(card, modificationDate)
+    private fun deleteCardInternal(card: Card, modificationDate: Long) = launchEditOperation {
+        cards.removeCard(card.id, modificationDate)
     }
 
-    private suspend fun deleteCardInternal(card: Card, modificationDate: Long) = performEditOperation {
-        databaseWorker.run {
-            it.cards.removeCard(card.id, modificationDate)
-        }
-    }
-
-//    suspend fun updateCard(card: Card) = serialQueue.send {
-//        updateCardInternal(card)
-//    }
-
-    suspend fun updateCardAndWait(card: Card, modificationDate: Long?) = serialQueue.sendAndWait {
-        performEditOperation {
-            databaseWorker.run {
-                it.cards.updateCard(card, modificationDate)
-            }
-        }
+    suspend fun updateCardAndWait(card: Card, modificationDate: Long?) = runEditOperation {
+        cards.updateCard(card, modificationDate)
     }
 
     suspend fun updateCardSetInfo(cardSet: CardSet){
-        serialQueue.sendAndWait {
-            performEditOperation {
-                databaseWorker.runCancellable(cardSet.creationId) {
-                    it.cardSets.updateCardSetInfo(cardSet)
-                }
-            }
+        launchCancellableEditOperation(cardSet.creationId, UPDATE_DELAY) {
+            cardSets.updateCardSetInfo(cardSet)
         }
     }
-
-//    private suspend fun updateCardInternal(card: Card) = performEditOperation {
-//        databaseWorker.run {
-//            database.cards.updateCard(card)
-//        }
-//    }
 
     fun updateCardCancellable(card: Card, delay: Long, modificationDate: Long?) = serialQueue.send {
         updateCardCancellableInternal(card, delay, modificationDate)
@@ -295,16 +273,20 @@ class DatabaseCardWorker(
         card: Card,
         delay: Long,
         modificationDate: Long?
-    ) = performEditOperation {
-        databaseWorker.runCancellable(
-            id = "updateCard_" + card.id.toString(),
-            delay
-        ) {
-            it.cards.updateCard(card, modificationDate)
+    ) = launchCancellableEditOperation(
+        id = "updateCard_" + card.id.toString(),
+        delay,
+    ) {
+        cards.updateCard(card, modificationDate)
+    }
+
+    private fun <T> launchEditOperation(block: suspend AppDatabase.() -> T) {
+        scope.launch {
+            runEditOperation(block)
         }
     }
 
-    private suspend fun <T> performEditOperation(block: suspend () -> T): T {
+    private suspend fun <T> runEditOperation(block: suspend AppDatabase.() -> T): T {
         return try {
             validateEditingState()
             editOperationCount.update {
@@ -312,7 +294,49 @@ class DatabaseCardWorker(
                 Logger.v("editOperationCount: $v", TAG)
                 v
             }
-            block()
+            databaseWorker.run {
+                block.invoke(it)
+            }
+        } finally {
+            editOperationCount.update {
+                val v = it - 1
+                Logger.v("editOperationCount: $v", TAG)
+                v
+            }
+        }
+    }
+
+    private suspend fun <T> launchCancellableEditOperation(
+        id: String,
+        delay: Long,
+        block: suspend AppDatabase.() -> T,
+    ) {
+        scope.launch {
+            runCancellableEditOperation(id, delay, block)
+        }
+    }
+
+    private suspend fun <T> runCancellableEditOperation(
+        id: String,
+        delay: Long,
+        block: suspend AppDatabase.() -> T,
+    ): T {
+        return try {
+            validateEditingState()
+            editOperationCount.update {
+                val v = it + 1
+                Logger.v("editOperationCount: $v", TAG)
+                v
+            }
+            databaseWorker.runCancellable(id, delay, {
+                editOperationCount.update {
+                    val v = it - 1
+                    Logger.v("editOperationCount: $v", TAG)
+                    v
+                }
+            }) {
+                block.invoke(it)
+            }
         } finally {
             editOperationCount.update {
                 val v = it - 1

@@ -172,7 +172,7 @@ class AppDatabase(
     inner class CardSets {
         val cardSetInsertedFlow = MutableSharedFlow<CardSet>()
 
-        fun insert(name: String, date: Long) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString(), "", "", null, false)
+        fun insert(name: String, date: Long, infoSource: String? = null) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString(), "", "", infoSource, false)
 
         private fun insertedCardSetId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
 

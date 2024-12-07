@@ -47,7 +47,7 @@ interface AddArticleVM: Clearable {
         val title: String? = null,
         val text: String? = null,
         val uri: String? = null,
-        val needToCreateSet: Boolean = false
+        val needToCreateSet: Boolean = true
     )
 
     data class UIState(
@@ -199,7 +199,8 @@ open class AddArticleVMImpl(
         uiStateFlow.value.data()?.let { data ->
             cardSetsRepository.createCardSet(
                 data.title,
-                timeSource.timeInMilliseconds()
+                timeSource.timeInMilliseconds(),
+                contentUri
             )
         }
     }

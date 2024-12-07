@@ -197,7 +197,11 @@ private fun DefinitionsWordUI(
                             painter = painterResource(MR.images.word_history_menu),
                             contentDescription = null,
                             tint = if (needShowWordHistory) {
-                                MaterialTheme.colors.secondary
+                                if (MaterialTheme.colors.isLight){
+                                    Color.DarkGray
+                                } else {
+                                    MaterialTheme.colors.secondary
+                                }
                             } else {
                                 LocalContentColor.current
                             }
