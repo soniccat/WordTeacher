@@ -33,6 +33,16 @@ class DatabaseWorker(
             task(database)
         }
     }
+
+    fun launchCancellable(
+        id: String,
+        delay: Long = UPDATE_DELAY,
+        task: (database: AppDatabase) -> Unit
+    ) {
+        serialQueue.sendWithDelay(id, delay) {
+            task(database)
+        }
+    }
 }
 
 const val UPDATE_DELAY = 400L

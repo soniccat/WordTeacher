@@ -55,6 +55,7 @@ interface AddArticleVM: Clearable {
         val titleError: StringDesc?,
         val text: String,
         val needToCreateSet: Boolean,
+        val contentUri: String? = null
     )
 }
 
@@ -111,6 +112,7 @@ open class AddArticleVMImpl(
                     dataFromState.copy(
                         title = articleContent?.title.orEmpty(),
                         text = articleContent?.text.orEmpty(),
+                        contentUri = uri
                     )
                 }
             }
@@ -157,7 +159,7 @@ open class AddArticleVMImpl(
                         it.toLoading()
                     }
                     if (data.needToCreateSet) {
-                        createCardSet()
+                        createCardSet(data.contentUri)
                     }
 
                     articlesRepository.createArticle(data.title, data.text).collect(addingStateFlow)
@@ -193,7 +195,7 @@ open class AddArticleVMImpl(
         uiStateFlow.updateLoadedData { it.copy(needToCreateSet = !it.needToCreateSet) }
     }
 
-    private suspend fun createCardSet() {
+    private suspend fun createCardSet(contentUri: String?) {
         uiStateFlow.value.data()?.let { data ->
             cardSetsRepository.createCardSet(
                 data.title,

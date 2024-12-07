@@ -271,10 +271,12 @@ class DatabaseCardWorker(
         }
     }
 
-    suspend fun updateCardSetInfo(cardSet: CardSet) = serialQueue.sendAndWait {
-        performEditOperation {
-            databaseWorker.runCancellable(cardSet.creationId) {
-                it.cardSets.updateCardSetInfo(cardSet)
+    suspend fun updateCardSetInfo(cardSet: CardSet){
+        serialQueue.sendAndWait {
+            performEditOperation {
+                databaseWorker.runCancellable(cardSet.creationId) {
+                    it.cardSets.updateCardSetInfo(cardSet)
+                }
             }
         }
     }
@@ -323,8 +325,8 @@ class DatabaseCardWorker(
     private fun validateEditingState() {
         if (currentState != State.EDITING) {
             Logger.e("Editing operation was called when state is ${currentState.name}", TAG)
+            pushState(State.EDITING)
         }
-        pushState(State.EDITING)
     }
 
     enum class State {
