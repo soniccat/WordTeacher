@@ -16,6 +16,7 @@ services:
       - '${VOLUME_NGINX_PATH}:/var/log/nginx'
       - ${VOLUME_CERTBOT_PATH}/www:/var/www/certbot/:ro
       - ${VOLUME_CERTBOT_PATH}/conf:/etc/nginx/ssl/:ro
+      - ${VOLUME_WWW_PATH}:/www/:ro
     networks:
       mongo_net:
         ipv4_address: 172.16.0.12
