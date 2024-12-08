@@ -23,6 +23,7 @@ services:
     ports:
       - 80:80 # for certbot acme challenge
       - '${API_GATEWAY_PORT}:${API_GATEWAY_PORT}'
+      - 443:443 # for files
     environment:
       - AUTH_PORT=${AUTH_PORT}
       - CARDSETS_PORT=${CARDSETS_PORT}
