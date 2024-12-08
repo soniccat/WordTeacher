@@ -105,7 +105,7 @@ open class DefinitionsVMPreview(
     override val isWordHistorySelected = MutableStateFlow<Boolean>(false)
 
     override fun toggleWordHistory() {}
-    override fun onWordHistoryClicked(item: WordHistoryViewItem) {}
+    override fun onWordHistoryItemClicked(item: WordHistoryViewItem) {}
 
     override fun onSuggestsAppeared() {}
     override fun onBackPressed(): Boolean {

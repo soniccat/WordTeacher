@@ -13,6 +13,8 @@ interface BaseDecomposeComponent: ComponentContext, Clearable {
         doOnResume {
             analytics.sendScreen(componentName)
         }
-        doOnDestroy { onCleared() }
+        doOnDestroy {
+            onCleared()
+        }
     }
 }

@@ -7,11 +7,9 @@ import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDict
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
-import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SETTING_GET_WORD_FROM_CLIPBOARD
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -39,25 +37,16 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import com.russhwolf.settings.boolean
 import com.russhwolf.settings.coroutines.FlowSettings
-import com.russhwolf.settings.coroutines.getBooleanStateFlow
-import com.russhwolf.settings.coroutines.toBlockingObservableSettings
 import com.russhwolf.settings.coroutines.toBlockingSettings
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
 
@@ -108,7 +97,7 @@ interface DefinitionsVM: Clearable {
     val isWordHistorySelected: StateFlow<Boolean>
 
     fun toggleWordHistory()
-    fun onWordHistoryClicked(item: WordHistoryViewItem)
+    fun onWordHistoryItemClicked(item: WordHistoryViewItem)
 
     @Serializable
     data class State(
@@ -707,6 +696,15 @@ open class DefinitionsVMImpl(
     }
 
     override fun onCardSetExpandCollapseClicked(item: CardSetExpandOrCollapseViewItem) {
+        analytics.send(
+            AnalyticEvent.createActionEvent(
+                if (item.isExpanded) {
+                    "Definitions.onCardSetExpandCollapsed"
+                } else {
+                    "Definitions.onCardSetExpandExpanded"
+                }
+            )
+        )
         viewModelScope.launch {
             settings.putBoolean(SETTING_EXPAND_CARDSETS_POPUP, !item.isExpanded)
         }
@@ -786,6 +784,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.suggestedSearchWordClicked"))
         wordTextSearchRepository.value.onData { textSearchItems ->
             textSearchItems.getOrNull(item.wordIndex)?.let { word ->
                 definitionWords.update {
@@ -796,6 +795,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onSuggestedShowAllSearchWordClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.suggestedShowAllSearchWordClicked"))
         wordTextSearchRepository.value.onData { textSearchItems ->
             definitionWords.update {
                 Resource.Loaded(
@@ -815,10 +815,20 @@ open class DefinitionsVMImpl(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override fun toggleWordHistory() {
+        analytics.send(
+            AnalyticEvent.createActionEvent(
+                if (isWordHistorySelected.value) {
+                    "Definitions.hideWordHistory"
+                } else {
+                    "Definitions.showWordHistory"
+                }
+            )
+        )
         isWordHistorySelected.update { !it }
     }
 
-    override fun onWordHistoryClicked(item: WordHistoryViewItem) {
+    override fun onWordHistoryItemClicked(item: WordHistoryViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.wordHistoryItemClicked"))
         updateCurrentWord(item.firstItem())
     }
 }

@@ -52,8 +52,8 @@ import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.format
 import kotlinx.coroutines.launch
 import java.util.*
-import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
+import dev.icerock.moko.resources.compose.localized
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -342,7 +342,7 @@ private fun showWordHistoryItem(
         ListItem (
             modifier = modifier
                 .clickable {
-                    vm.onWordHistoryClicked(item)
+                    vm.onWordHistoryItemClicked(item)
                 },
             text = { Text(item.firstItem()) }
         )

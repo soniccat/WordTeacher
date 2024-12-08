@@ -241,8 +241,18 @@ class TextActionActivity: AppCompatActivity() {
             modifier = Modifier.requiredHeight(56.dp)
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
+                val isSelected = tab.decomposeChildConfigClass == activeChild.configuration::class.java
+                val color = if (isSelected) {
+                    if (MaterialTheme.colors.isLight) {
+                        LocalContentColor.current
+                    } else {
+                        MaterialTheme.colors.secondary
+                    }
+                } else {
+                    LocalContentColor.current.copy(alpha = 0.8f)
+                }
                 BottomNavigationItem(
-                    selected = tab.decomposeChildConfigClass == activeChild.configuration::class.java,
+                    selected = isSelected,
                     onClick = {
                         when (tab) {
                             is ScreenTab.Definitions -> component.openDefinitions()
@@ -254,11 +264,14 @@ class TextActionActivity: AppCompatActivity() {
                         Icon(
                             painter = painterResource(tab.iconRes),
                             contentDescription = null,
-                            tint = LocalContentColor.current
+                            tint = color
                         )
                     },
                     label = {
-                        Text(stringResource(id = tab.nameRes))
+                        Text(
+                            stringResource(id = tab.nameRes),
+                            color = color
+                        )
                     }
                 )
             }

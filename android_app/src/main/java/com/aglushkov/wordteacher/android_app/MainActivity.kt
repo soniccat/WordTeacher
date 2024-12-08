@@ -392,18 +392,17 @@ class MainActivity : AppCompatActivity(), Router {
         }
         BottomNavigation(
             modifier = Modifier.requiredHeight(56.dp),
-            backgroundColor = MaterialTheme.colors.surface,
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
                 val isSelected = tab.decomposeChildConfigClass == activeChild.configuration::class.java
                 val color = if (isSelected) {
-                    MaterialTheme.colors.secondary
-                } else {
                     if (MaterialTheme.colors.isLight) {
-                        Color.Gray
-                    } else {
                         LocalContentColor.current
+                    } else {
+                        MaterialTheme.colors.secondary
                     }
+                } else {
+                    LocalContentColor.current.copy(alpha = 0.8f)
                 }
                 BottomNavigationItem(
                     selected = isSelected,
