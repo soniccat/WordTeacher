@@ -117,3 +117,22 @@ server {
         grpc_pass $cardsetsPRPC;
     }
 }
+
+# for documents
+server {
+    http2 on;
+
+    listen 443 default_server ssl;
+    listen [::]:443 ssl;
+
+    server_name aglushkov.ru;
+
+    ssl_certificate /etc/nginx/ssl/live/aglushkov.ru/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/aglushkov.ru/privkey.pem;
+
+    root /www/data;
+
+    location /docs/ {
+        autoindex on;
+    }
+}
