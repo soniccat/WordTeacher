@@ -1,0 +1,250 @@
+{
+    "name": "Card Set Sample",
+    "tags": null,
+    "cards":
+    [
+        {
+            "term": "hurdle",
+            "transcription": "hûr'dəl",
+            "partOfSpeech": 1,
+            "definitions":
+            [
+                "An obstacle, real or perceived, physical or abstract."
+            ],
+            "labels":
+            [
+                "figuratively"
+            ],
+            "synonyms":
+            [],
+            "examples":
+            [
+                "And yeah, there was technical hurdles to overcome."
+            ]
+        },
+        {
+            "term": "out of",
+            "transcription": "/ˈaʊt əv/",
+            "partOfSpeech": 6,
+            "definitions":
+            [
+                "From the inside to the outside of."
+            ],
+            "labels": null,
+            "synonyms":
+            [],
+            "examples":
+            [
+                "The audience came out of the theater.",
+                "The cat jumped out of the basket.",
+                "Looked like something out of a movie."
+            ]
+        },
+        {
+            "term": "box up",
+            "partOfSpeech": 2,
+            "definitions":
+            [
+                "To pack into boxes."
+            ],
+            "labels":
+            [
+                "transitive"
+            ],
+            "synonyms":
+            [],
+            "examples":
+            [
+                "Adam: Once the game was finished, Mick’s latest disc was shipped off to the duplicators, who made copies of this disc, boxed it up, and released it."
+            ]
+        },
+        {
+            "term": "fly by",
+            "partOfSpeech": 2,
+            "definitions":
+            [
+                "To pass or go past quickly, often without much interaction"
+            ],
+            "labels":
+            [
+                "idiomatic"
+            ],
+            "synonyms":
+            [
+                "forthglide",
+                "go by",
+                "pass by",
+                "Thesaurus:pass by"
+            ],
+            "examples":
+            [
+                "I like to sit and watch the world fly by.",
+                "The rest of the day flew by quickly.",
+                "But for Mick, the work was fun, and he liked the artist he worked with, and with few other commitments, you know, he was young, time flew by until the deadline was getting close and the game was almost finished."
+            ]
+        },
+        {
+            "term": "back pay",
+            "partOfSpeech": 1,
+            "definitions":
+            [
+                "A withheld payment for work which has already been completed, or which could have been completed had the employee not been prevented from doing so."
+            ],
+            "labels": null,
+            "synonyms":
+            [],
+            "examples":
+            [
+                "Adam: The bankruptcy receiver told Mick he actually had a bunch of back pay."
+            ]
+        },
+        {
+            "term": "talk shop",
+            "partOfSpeech": 2,
+            "definitions":
+            [
+                "To discuss one's work, business or profession."
+            ],
+            "labels":
+            [
+                "intransitive",
+                "informal"
+            ],
+            "synonyms":
+            [],
+            "examples":
+            [
+                "Sometimes I feel like talking shop gets a bad rap, right?"
+            ]
+        },
+        {
+            "term": "plot",
+            "transcription": "/plɒt/",
+            "partOfSpeech": 2,
+            "definitions":
+            [
+                "To conceive (a crime, misdeed etc)."
+            ],
+            "labels":
+            [
+                "transitive",
+                "intransitive"
+            ],
+            "synonyms":
+            [],
+            "examples":
+            [
+                "Mick: And unfortunately, someone overheard us plotting and then they reported it to the management."
+            ]
+        },
+        {
+            "term": "steal the show",
+            "partOfSpeech": 2,
+            "definitions":
+            [
+                "To be the best performer during a performance."
+            ],
+            "labels":
+            [
+                "idiomatic",
+                "intransitive",
+                "entertainment"
+            ],
+            "synonyms":
+            [],
+            "examples":
+            [
+                "California  Adam: The game was a hit, right, thanks in part to the great conversion, but really the gameplay was what stole the show."
+            ]
+        },
+        {
+            "term": "tell off",
+            "partOfSpeech": 2,
+            "definitions":
+            [
+                "To rebuke, to reprimand, or to admonish, often in a harsh, angry, direct way."
+            ],
+            "labels":
+            [
+                "transitive"
+            ],
+            "synonyms":
+            [],
+            "examples":
+            [
+                "Joel's boss told him off for being late again.",
+                "Uh, so he would he would tell people off if they got into fights and things, which did actually happen occasionally."
+            ]
+        },
+        {
+            "term": "hone",
+            "transcription": "/hoʊn/",
+            "partOfSpeech": 2,
+            "definitions":
+            [
+                "To refine or master (a skill)."
+            ],
+            "labels":
+            [
+                "transitive"
+            ],
+            "synonyms":
+            [],
+            "examples":
+            [
+                "He also honed the procedure known as cut and fill - whereby the spoil from railway cuttings was used to build up embankments.",
+                "Huh? Training in your room under the torchlight / Hone that form to get you ready for the big fight",
+                "And it seemed like with their newly honed scheduling skills that this might just be doable."
+            ]
+        },
+        {
+            "term": "send off",
+            "partOfSpeech": 2,
+            "definitions":
+            [
+                "To send; to dispatch."
+            ],
+            "labels":
+            [
+                "transitive"
+            ],
+            "synonyms":
+            [],
+            "examples":
+            [
+                "Have you sent off your application yet?",
+                "After a medical procedure I will send off a sister ship to the sphere with the sickened savages.",
+                "While it's tempting to send off an email in response to something that has angered or disappointed you, resist the urge.",
+                "I'm going to send off for one of these fancy new wigs.",
+                "So it was crunch time, and the bugs got worked through, and they put it on a CD, and they sent it off to Sony to retest, just in time, if everything played out right, to hit that Christmas release."
+            ]
+        },
+        {
+            "term": "go up in smoke",
+            "partOfSpeech": 2,
+            "definitions":
+            [
+                "To be completely ruined, devastated, or reduced to nothingness."
+            ],
+            "labels":
+            [
+                "idiomatic",
+                "by extension"
+            ],
+            "synonyms":
+            [],
+            "examples":
+            [
+                "When the bank refused the credit, all our plans went up in smoke.",
+                "There's a gypsy down on Bleecker Street\nI went in to see her as a kind of joke\nAnd she lit a candle for my love luck\nAnd eighteen bucks went up in smoke",
+                "Mick: and we would have missed our ship date and we would have missed Christmas and the distribution deal would have been messed up and, hundreds of thousands of dollars would have gone up in smoke and no one will work with us ever again,  we, we called, like, the head of, of, of Sony Games and we basically begged him, Please let us, let us, uh, pass this thing."
+            ]
+        }
+    ],
+    "info":
+    {
+        "description": "CORECURSIVE #099: Code, Kickflips and Crunch Time",
+        "source": "https://corecursive.com/game-programming-with-mick-west/"
+    },
+    "isAvailableInSearch": false
+}

@@ -14,7 +14,7 @@ data class ArticleSample(
 class AddArticleSampleTask(
     private val articlesRepository: ArticlesRepository,
     private val settings: FlowSettings,
-    private val articleProvider: suspend () -> ArticleSample
+    private val articleProvider: () -> ArticleSample
 ): Task {
     override suspend fun run(nextTasksChannel: Channel<Task>) {
         val isImported = settings.getBoolean(IS_ARTICLE_SAMPLE_IMPORTED_KEY, false)

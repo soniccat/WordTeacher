@@ -39,6 +39,7 @@ import com.aglushkov.wordteacher.shared.general.okio.writeTo
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME
@@ -50,6 +51,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.tasks.AddArticleSampleTask
+import com.aglushkov.wordteacher.shared.tasks.AddCardSetSampleTask
 import com.aglushkov.wordteacher.shared.tasks.ArticleSample
 import com.aglushkov.wordteacher.shared.tasks.CopyDictTask
 import com.aglushkov.wordteacher.shared.tasks.LoadNLPCoreTask
@@ -297,6 +299,8 @@ class AppModule {
         nlpCore: NLPCore,
         dictRepository: DictRepository,
         articlesRepository: ArticlesRepository,
+        cardSetsRepository: CardSetsRepository,
+        timeSource: TimeSource,
         fileSystem: FileSystem,
         flowSettings: FlowSettings,
     ): Array<Task> {
@@ -315,16 +319,24 @@ class AppModule {
             ),
             AddArticleSampleTask(
                 articlesRepository,
+                flowSettings
+            ) {
+                ArticleSample(
+                    "Article Sample",
+                    context.resources.openRawResource(R.raw.article_sample).use {
+                        it.readBytes().commonToUtf8String()
+                    }
+                )
+            },
+            AddCardSetSampleTask(
                 flowSettings,
-                suspend {
-                    ArticleSample(
-                        "Article Sample",
-                        context.resources.openRawResource(R.raw.article_sample).use {
-                            it.readBytes().commonToUtf8String()
-                        }
-                    )
+                cardSetsRepository,
+                timeSource
+            ) {
+                context.resources.openRawResource(R.raw.cardset_sample).use {
+                    it.readBytes().commonToUtf8String()
                 }
-            )
+            }
         )
     }
 

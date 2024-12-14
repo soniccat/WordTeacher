@@ -56,7 +56,45 @@ data class ImportCardSet (
     var terms: List<String> = emptyList(), // for cardsets from search
     var info: CardSetInfo,
     var isAvailableInSearch: Boolean,
-)
+) {
+    fun toCardSet(nowTime: Instant) = CardSet(
+        id = 0,
+        remoteId = "",
+        name = name,
+        creationDate = nowTime,
+        modificationDate = nowTime,
+        cards = cards.map {
+            Card(
+                id = 0,
+                remoteId = "",
+                creationDate = nowTime,
+                modificationDate = nowTime,
+                term = it.term,
+                definitions = it.definitions.orEmpty(),
+                labels = it.labels.orEmpty(),
+                definitionTermSpans = listOf(),
+                partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
+                transcription = it.transcription,
+                synonyms = it.synonyms.orEmpty(),
+                examples = it.examples.orEmpty(),
+                exampleTermSpans = listOf(),
+                progress = CardProgress(
+                    currentLevel = 0,
+                    lastMistakeCount = 0,
+                    lastLessonDate = null
+                ),
+                needToUpdateDefinitionSpans = true,
+                needToUpdateExampleSpans = true,
+                creationId = Uuid.randomUUID().toString(),
+                termFrequency = UNDEFINED_FREQUENCY
+            )
+        },
+        terms = listOf(),
+        creationId = Uuid.randomUUID().toString(),
+        info = info,
+        isAvailableInSearch = isAvailableInSearch,
+    )
+}
 
 @Serializable
 data class ImportCard (
@@ -69,9 +107,9 @@ data class ImportCard (
 )
 
 open class CardSetJsonImportVMImpl(
-    val configuration: MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration,
-    val cardSetsRepository: CardSetsRepository,
-    val timeSource: TimeSource,
+    private val configuration: MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration,
+    private val cardSetsRepository: CardSetsRepository,
+    private val timeSource: TimeSource,
 ): ViewModel(), CardSetJsonImportVM {
     override val jsonText = MutableStateFlow("")
     override val jsonTextErrorFlow = MutableStateFlow<StringDesc?>(null)
@@ -100,45 +138,7 @@ open class CardSetJsonImportVMImpl(
         }
 
         val nowTime = timeSource.timeInstant()
-        val cardSet = CardSet(
-            id = 0,
-            remoteId = "",
-            name = importCardSet.name,
-            creationDate = nowTime,
-            modificationDate = nowTime,
-            cards = importCardSet.cards.map {
-                Card(
-                    id = 0,
-                    remoteId = "",
-                    creationDate = nowTime,
-                    modificationDate = nowTime,
-                    term = it.term,
-                    definitions = it.definitions.orEmpty(),
-                    labels = it.labels.orEmpty(),
-                    definitionTermSpans = listOf(),
-                    partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
-                    transcription = it.transcription,
-                    synonyms = it.synonyms.orEmpty(),
-                    examples = it.examples.orEmpty(),
-                    exampleTermSpans = listOf(),
-                    progress = CardProgress(
-                        currentLevel = 0,
-                        lastMistakeCount = 0,
-                        lastLessonDate = null
-                    ),
-                    needToUpdateDefinitionSpans = true,
-                    needToUpdateExampleSpans = true,
-                    creationId = Uuid.randomUUID().toString(),
-                    termFrequency = UNDEFINED_FREQUENCY
-                )
-            },
-            terms = listOf(),
-            creationId = Uuid.randomUUID().toString(),
-            info = importCardSet.info,
-            isAvailableInSearch = importCardSet.isAvailableInSearch,
-        )
-
-        createCardSet(cardSet)
+        createCardSet(importCardSet.toCardSet(nowTime))
     }
 
     override fun onCancelPressed() = viewModelScope.launch {
