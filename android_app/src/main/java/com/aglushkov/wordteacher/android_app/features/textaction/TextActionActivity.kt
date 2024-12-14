@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.*
+import androidx.compose.material.AppBarDefaults.TopAppBarElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -238,7 +239,8 @@ class TextActionActivity: AppCompatActivity() {
             }
         }
         BottomNavigation(
-            modifier = Modifier.requiredHeight(56.dp)
+            modifier = Modifier.requiredHeight(56.dp),
+            elevation = TopAppBarElevation
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
                 val isSelected = tab.decomposeChildConfigClass == activeChild.configuration::class.java

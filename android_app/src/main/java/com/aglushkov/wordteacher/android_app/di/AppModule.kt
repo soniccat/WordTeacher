@@ -38,6 +38,7 @@ import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.okio.writeTo
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME
@@ -48,7 +49,10 @@ import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.tasks.AddArticleSampleTask
+import com.aglushkov.wordteacher.shared.tasks.ArticleSample
 import com.aglushkov.wordteacher.shared.tasks.CopyDictTask
+import com.aglushkov.wordteacher.shared.tasks.LoadNLPCoreTask
 import com.aglushkov.wordteacher.shared.tasks.Task
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
@@ -58,7 +62,9 @@ import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
+import okio.internal.commonToUtf8String
 import okio.source
+import okio.use
 
 
 @Module(includes = [SharedAppModule::class])
@@ -288,7 +294,9 @@ class AppModule {
     fun startupTasks(
         context: Context,
         @DictPath dictPath: Path,
+        nlpCore: NLPCore,
         dictRepository: DictRepository,
+        articlesRepository: ArticlesRepository,
         fileSystem: FileSystem,
         flowSettings: FlowSettings,
     ): Array<Task> {
@@ -301,6 +309,21 @@ class AppModule {
                 dictRepository,
                 BuildConfig.defaultWordlistVersion,
                 flowSettings
+            ),
+            LoadNLPCoreTask(
+                nlpCore,
+            ),
+            AddArticleSampleTask(
+                articlesRepository,
+                flowSettings,
+                suspend {
+                    ArticleSample(
+                        "Article Sample",
+                        context.resources.openRawResource(R.raw.article_sample).use {
+                            it.readBytes().commonToUtf8String()
+                        }
+                    )
+                }
             )
         )
     }

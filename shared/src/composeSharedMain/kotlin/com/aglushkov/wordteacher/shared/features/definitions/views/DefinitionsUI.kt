@@ -37,7 +37,9 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.resource.isNotLoading
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
 import com.aglushkov.wordteacher.shared.general.views.ListSectionCell
@@ -277,7 +279,7 @@ private fun wordHistoryUI(
     vm: DefinitionsVM,
 ) {
     val words by vm.wordHistory.collectAsState()
-    if (words.isLoaded()) {
+    if (words.isLoadedAndNotEmpty()) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(
@@ -297,7 +299,7 @@ private fun wordHistoryUI(
             resource = words,
             loadingText = null,
             errorText = vm.getErrorText(words)?.localized(),
-            tryAgainText = stringResource(MR.strings.error_try_again),
+            tryAgainText = null,
             emptyText = stringResource(MR.strings.error_empty_wordhistory)
         ) {
             vm.onTryAgainClicked()

@@ -8,7 +8,7 @@
     <color name="secondaryDarkColor">#2668ba</color>
     <color name="primaryTextColor">#fff</color>
     <color name="secondaryTextColor">#fff</color>
-    <color name="background">#fff</color>
+    <color name="background">@color/primaryColor</color>
 
     <color name="statusBarColor">@color/primaryColor</color>
 

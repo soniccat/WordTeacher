@@ -108,7 +108,7 @@ actual class NLPCore(
     actual fun lemmatize(tokens: List<String>, tags: List<String>) = lemmatizer?.lemmatize(tokens, tags).orEmpty().asList()
     actual fun chunk(tokens: List<String>, tags: List<String>) = chunker?.chunk(tokens.toTypedArray(), tags.toTypedArray()).orEmpty().asList()
 
-    suspend fun load(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+    actual suspend fun load(dispatcher: CoroutineDispatcher) {
         loadResource {
             withContext(dispatcher) {
                 loadModels(this)

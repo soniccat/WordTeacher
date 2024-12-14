@@ -1,10 +1,14 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+
 interface NLPLemmatizer {
     fun lemmatize(tokens: List<String>, postags: List<String>): Array<String>
 }
 
 expect class NLPCore {
+    suspend fun load(dispatcher: CoroutineDispatcher = Dispatchers.Default)
     fun normalizeText(text: String): String
     fun sentenceSpans(text: String): List<SentenceSpan>
     fun tokenSpans(sentence: String): List<TokenSpan>

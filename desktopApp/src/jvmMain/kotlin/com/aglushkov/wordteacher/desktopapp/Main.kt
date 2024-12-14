@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.AppBarDefaults.TopAppBarElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -322,7 +323,8 @@ private fun BottomNavigationBarUI(component: TabDecomposeComponent) {
     }
     BottomNavigation(
         modifier = Modifier
-            .requiredHeight(56.dp)
+            .requiredHeight(56.dp),
+        elevation = TopAppBarElevation
     ) {
         bottomBarTabs.forEachIndexed { index, tab ->
             BottomNavigationItem(

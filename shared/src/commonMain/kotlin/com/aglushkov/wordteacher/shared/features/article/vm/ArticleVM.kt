@@ -97,7 +97,7 @@ interface ArticleVM: Clearable {
         private val mutableFlow = MutableStateFlow(inMemoryState)
         val stateFlow: StateFlow<InMemoryState> = mutableFlow
 
-        var selectionState: SelectionState
+        private var selectionState: SelectionState
             get() = inMemoryState.selectionState
             set(value) {
                 inMemoryState = inMemoryState.update { copy(selectionState = value) }
@@ -165,7 +165,7 @@ interface ArticleVM: Clearable {
         val partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
         val phrases: Set<ChunkType> = emptySet(),
         val cardSetWords: Boolean = true,
-        val dicts: List<String> = emptyList(),
+        val dicts: List<String> = listOf("words.wordlist"),
         val filterDictSingleWordEntries: Boolean = true,
     )
 

@@ -2,11 +2,13 @@ package com.aglushkov.wordteacher.shared.repository.worddefinition
 
 import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.workers.SerialQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okio.FileSystem
@@ -28,16 +30,20 @@ class WordDefinitionHistoryRepository(
 
     private fun load() {
         return queue.send {
-            fileSystem.read(historyPath) {
+            loadResource {
                 val words = mutableListOf<String>()
-                while(!exhausted()) {
-                    val word = readUtf8Line()
-                    if (word?.isNotEmpty() == true) {
-                        words.add(word)
+                if (fileSystem.exists(historyPath)) {
+                    fileSystem.read(historyPath) {
+                        while (!exhausted()) {
+                            val word = readUtf8Line()
+                            if (word?.isNotEmpty() == true) {
+                                words.add(word)
+                            }
+                        }
                     }
                 }
-                stateFlow.update { Resource.Loaded(words) }
-            }
+                words.toList()
+            }.collect(stateFlow)
         }
     }
 

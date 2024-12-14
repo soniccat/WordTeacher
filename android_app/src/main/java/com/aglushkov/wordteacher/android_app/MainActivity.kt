@@ -14,8 +14,10 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.AppBarDefaults.TopAppBarElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -66,6 +68,7 @@ import com.aglushkov.wordteacher.shared.features.settings.vm.SETTING_GET_WORD_FR
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 import com.aglushkov.wordteacher.shared.general.LocalWindowInset
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
+import com.aglushkov.wordteacher.shared.general.applyWindowInsetsAsPaddings
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
@@ -208,9 +211,12 @@ class MainActivity : AppCompatActivity(), Router {
 
     @Composable
     private fun ComposeUI() {
+        val initialInset = LocalWindowInset.current
+        var windowInsets by remember { mutableStateOf(initialInset) }
+
         ComposeAppTheme(isDebug = appComponent().isDebug()) {
             Surface(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().applyWindowInsetsAsPaddings(windowInsets),
                 color = MaterialTheme.colors.background
             ) {
                 mainUI()
@@ -220,6 +226,23 @@ class MainActivity : AppCompatActivity(), Router {
                 ) {
                     dialogUI()
                 }
+            }
+        }
+
+        DisposableEffect("ActivityInsets") {
+            window.decorView.setOnApplyWindowInsetsListener { v, insets ->
+                windowInsets = WindowInsets(
+                    top = insets.systemWindowInsetTop,
+                    bottom = insets.systemWindowInsetBottom,
+                    left = insets.systemWindowInsetLeft,
+                    right = insets.systemWindowInsetRight
+                )
+
+                insets.consumeSystemWindowInsets()
+            }
+
+            onDispose {
+                window.decorView.setOnApplyWindowInsetsListener(null)
             }
         }
     }
@@ -392,6 +415,7 @@ class MainActivity : AppCompatActivity(), Router {
         }
         BottomNavigation(
             modifier = Modifier.requiredHeight(56.dp),
+            elevation = TopAppBarElevation
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
                 val isSelected = tab.decomposeChildConfigClass == activeChild.configuration::class.java

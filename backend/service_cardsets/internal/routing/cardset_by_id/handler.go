@@ -48,11 +48,7 @@ func NewHandler(
 }
 
 func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
-	authToken, validateSessionErr := h.sessionValidator.Validate(r)
-	if validateSessionErr != nil {
-		h.SetError(w, validateSessionErr.InnerError, validateSessionErr.StatusCode)
-		return
-	}
+	authToken, _ := h.sessionValidator.Validate(r) // get authToken just for logging
 
 	// Path params
 	params := mux.Vars(r)
