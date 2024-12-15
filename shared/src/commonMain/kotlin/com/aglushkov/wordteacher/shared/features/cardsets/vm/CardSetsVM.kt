@@ -140,13 +140,16 @@ open class CardSetsVMImpl(
     }
 
     override fun onNewCardSetTextChange(text: String) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSets.newCardSetTextChange"))
         uiStateFlow.update { it.copy(newCardSetText = text) }
     }
 
     override fun onCardSetAdded(name: String) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSets.cardSetAdded",
-            mapOf("name" to name)))
+        analytics.send(
+            AnalyticEvent.createActionEvent(
+                "CardSets.cardSetAdded",
+                mapOf("name" to name)
+            )
+        )
         uiStateFlow.update { it.copy(newCardSetText = null) }
 
         viewModelScope.launch {

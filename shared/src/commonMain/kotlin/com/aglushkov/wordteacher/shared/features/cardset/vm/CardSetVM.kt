@@ -610,13 +610,18 @@ open class CardSetVMImpl(
         )
     }
 
+    private val loggedEditEvents = mutableSetOf<ItemType>()
+
     private fun logEdit(itemType: ItemType) {
-        analytics.send(
-            AnalyticEvent.createActionEvent(
-                "CardSet.editItem",
-                mapOf("itemType" to itemType.value)
+        if (!loggedEditEvents.contains(itemType)) {
+            loggedEditEvents.add(itemType)
+            analytics.send(
+                AnalyticEvent.createActionEvent(
+                    "CardSet.editItem",
+                    mapOf("itemType" to itemType.value)
+                )
             )
-        )
+        }
     }
 
     override fun onCardCreatePressed() {
