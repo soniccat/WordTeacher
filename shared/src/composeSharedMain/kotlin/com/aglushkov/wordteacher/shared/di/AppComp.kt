@@ -29,6 +29,9 @@ annotation class ApiBaseUrl
 annotation class Email
 
 @Qualifier
+annotation class PrivacyPolicyUrl
+
+@Qualifier
 annotation class WordFrequencyPreparer
 
 @Qualifier

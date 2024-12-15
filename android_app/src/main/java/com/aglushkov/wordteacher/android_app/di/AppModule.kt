@@ -103,6 +103,13 @@ class AppModule {
         context: Context
     ): String = context.getString(MR.strings.support_email.resourceId)
 
+    @PrivacyPolicyUrl
+    @AppComp
+    @Provides
+    fun privacyPolicy(
+        context: Context
+    ): String = context.getString(MR.strings.privacy_policy_url.resourceId)
+
     @AppComp
     @Provides
     fun settings(
@@ -120,7 +127,8 @@ class AppModule {
     fun appInfo(
         @Platform platform: String,
         @Email email: String,
-    ): AppInfo = AppInfo(BuildConfig.VERSION_NAME, platform, email)
+        @PrivacyPolicyUrl privacyPolicyUrl: String,
+    ): AppInfo = AppInfo(BuildConfig.VERSION_NAME, platform, email, privacyPolicyUrl)
 
     // TODO: replace with bind
     @AppComp

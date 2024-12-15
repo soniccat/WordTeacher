@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.EmailOpener
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
@@ -47,6 +48,7 @@ class SettingsDecomposeComponent (
     analytics: Analytics,
     appInfo: AppInfo,
     emailOpener: EmailOpener,
+    webLinkOpener: WebLinkOpener,
     databaseCardWorker: DatabaseCardWorker,
     settings: FlowSettings
 ) : SettingsVMImpl(
@@ -65,6 +67,7 @@ class SettingsDecomposeComponent (
     analytics,
     appInfo,
     emailOpener,
+    webLinkOpener,
     databaseCardWorker,
     settings,
 ), ComponentContext by componentContext, BaseDecomposeComponent {

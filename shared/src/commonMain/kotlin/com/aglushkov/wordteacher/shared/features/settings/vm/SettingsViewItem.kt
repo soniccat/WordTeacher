@@ -94,11 +94,18 @@ class SettingsWordFrequencyUploadFileItem(
     }
 }
 
-class SettingsWordFrequencyAbout(
+class SettingsAbout(
     val appTitle: String,
     val email: String,
 ): BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 1009
+    }
+}
+
+class SettingsPrivacyPolicyItem(
+): BaseViewItem<Unit>(Unit, Type) {
+    companion object {
+        const val Type = 1011
     }
 }

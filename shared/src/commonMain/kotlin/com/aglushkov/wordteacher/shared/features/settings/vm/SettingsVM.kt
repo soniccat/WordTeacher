@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.general.EmailOpener
 import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.getAppInfo
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -37,7 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import okio.Path
-import dev.icerock.moko.resources.compose.localized
 import kotlinx.serialization.Serializable
 
 interface SettingsVM: Clearable {
@@ -54,6 +54,7 @@ interface SettingsVM: Clearable {
     fun onLoggingIsEnabledChanged()
     fun onLogFileShareClicked(path: Path)
     fun onEmailClicked()
+    fun onPrivacyPolicyClicked()
 
     // Created to use in future
     @Serializable
@@ -79,6 +80,7 @@ open class SettingsVMImpl (
     private val analytics: Analytics,
     private val appInfo: AppInfo,
     private val emailOpener: EmailOpener,
+    private val webLinkOpener: WebLinkOpener,
     private val databaseCardWorker: DatabaseCardWorker,
     private val settings: FlowSettings,
 ): ViewModel(), SettingsVM {
@@ -156,7 +158,8 @@ open class SettingsVMImpl (
                 emptyList()
             }
         )
-        resultItems += SettingsWordFrequencyAbout(
+        resultItems += SettingsPrivacyPolicyItem()
+        resultItems += SettingsAbout(
             appTitle = appInfo.getAppInfo(),
             email = appInfo.email
         )
@@ -224,6 +227,10 @@ open class SettingsVMImpl (
 
     override fun onEmailClicked() {
         emailOpener.open(appInfo.email)
+    }
+
+    override fun onPrivacyPolicyClicked() {
+        webLinkOpener.open(appInfo.privacyPolicyUrl)
     }
 }
 

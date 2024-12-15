@@ -6,10 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.features.settings.vm.*
@@ -104,11 +105,12 @@ private fun showSettingsItem(
                     ),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(90.dp)
                         .padding(8.dp)
+                        .clip(CircleShape)
                         .clickable {
                             vm.onSignInClicked(networkType)
-                        },
+                        }
                 )
             }
         }
@@ -160,13 +162,14 @@ private fun showSettingsItem(
     }
     is SettingsWordsUseClipboardItem -> {
         CustomListItem(
-            modifier = Modifier.padding(
-                start = LocalDimens.current.contentPadding,
-                end = LocalDimens.current.contentPadding,
-                bottom = LocalDimens.current.contentPadding
-            ).clickable {
-                vm.onGetWordFromClipboardChanged(!item.isEnabled)
-            },
+            modifier = Modifier
+                .clickable {
+                    vm.onGetWordFromClipboardChanged(!item.isEnabled)
+                }.padding(
+                    start = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding,
+                    bottom = LocalDimens.current.contentPadding
+                ),
             trailing = {
                 Checkbox(
                     checked = item.isEnabled,
@@ -178,13 +181,14 @@ private fun showSettingsItem(
     }
     is SettingsLogsConfigsItem -> {
         CustomListItem(
-            modifier = Modifier.padding(
-                start = LocalDimens.current.contentPadding,
-                end = LocalDimens.current.contentPadding,
-                bottom = LocalDimens.current.contentPadding
-            ).clickable {
-                vm.onLoggingIsEnabledChanged()
-            },
+            modifier = Modifier
+                .clickable {
+                    vm.onLoggingIsEnabledChanged()
+                }.padding(
+                    start = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding,
+                    bottom = LocalDimens.current.contentPadding
+                ),
             trailing = {
                 Checkbox(
                     checked = item.isEnabled,
@@ -225,11 +229,26 @@ private fun showSettingsItem(
             Unit
         }
     }
-    is SettingsWordFrequencyAbout -> {
+    is SettingsPrivacyPolicyItem -> {
+        CustomListItem(
+            modifier = Modifier
+                .clickable {
+                    vm.onPrivacyPolicyClicked()
+                }.padding(
+                    start = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding,
+                    bottom = LocalDimens.current.contentPadding
+                ),
+            content = {
+                Text(stringResource(MR.strings.settings_open_privacy_policy))
+            },
+        )
+    }
+    is SettingsAbout -> {
         Column(
             modifier = Modifier.fillMaxWidth()
-                .padding(LocalDimens.current.contentPadding)
                 .clickable { vm.onEmailClicked() }
+                .padding(LocalDimens.current.contentPadding)
         ) {
             Text(item.appTitle)
             Text(item.email)

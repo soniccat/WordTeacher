@@ -3,6 +3,8 @@
     <string name="api_base_url">https://aglushkov.ru:9090</string>
     <string name="app_name">Word Teacher</string>
     <string name="support_email">soniccat2@gmail.com</string>
+    <string name="privacy_policy_url">https://aglushkov.ru/docs/privacy_policy.html</string>
+
     <string name="tab_definitions">Words</string>
     <string name="tab_add_article">New Article</string>
     <string name="tab_articles">Articles</string>
@@ -115,7 +117,7 @@
     <string name="settings_auth_signin">Sign In</string>
     <string name="settings_auth_signout">Sign Out from %s</string>
     <string name="settings_auth_refresh">Refresh</string>
-    <string name="settings_dictconfigs">Dicts</string>
+    <string name="settings_dictconfigs">Dictionaries</string>
     <string name="settings_words_title">Words</string>
     <string name="settings_words_take_from_clipboard">Paste instantly a word from your clipboard</string>
     <string name="settings_frequency_title">Word Frequency</string>
@@ -124,9 +126,10 @@
     <string name="settings_logging_title">Logging</string>
     <string name="settings_logging_enabled">Enable logging</string>
     <string name="settings_logging_share">Share log</string>
+    <string name="settings_open_privacy_policy">Open Privacy Policy</string>
 
-    <string name="dictconfigs_online_section_title">Online dicts</string>
-    <string name="dictconfigs_offline_section_title">Offline dicts</string>
+    <string name="dictconfigs_online_section_title">Online dictionaries</string>
+    <string name="dictconfigs_offline_section_title">Offline DSL dictionaries</string>
     <string name="dictconfigs_yandex_title">Yandex</string>
     <string name="dictconfigs_yandex_api_token_exists_placeholder">type to change api token</string>
     <string name="dictconfigs_yandex_api_token_doesnt_exist_placeholder">type your api token</string>
