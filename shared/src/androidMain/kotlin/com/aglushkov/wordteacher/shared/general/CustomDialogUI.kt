@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.aglushkov.wordteacher.shared.general.views.pxToDp
 
@@ -26,7 +27,10 @@ actual fun CustomDialogUI(
     content: @Composable BoxScope.() -> Unit
 ) {
     Dialog(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            decorFitsSystemWindows = false
+        )
     ) {
         val window = findDialogWindow() ?: throw Resources.NotFoundException("Window isn't found")
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
