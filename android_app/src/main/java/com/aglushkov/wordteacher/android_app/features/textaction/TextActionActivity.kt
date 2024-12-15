@@ -47,6 +47,8 @@ import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
+import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
@@ -154,11 +156,13 @@ class TextActionActivity: AppCompatActivity() {
     @Composable
     private fun ComposeUI() {
         ComposeAppTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                MainUI()
+            ProvideWindowInsets {
+                Surface(
+                    modifier = Modifier.fillMaxSize().withWindowInsetsPadding(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    MainUI()
+                }
             }
         }
     }

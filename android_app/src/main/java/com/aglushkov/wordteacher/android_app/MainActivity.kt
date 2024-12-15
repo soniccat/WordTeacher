@@ -5,42 +5,29 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.AppBarDefaults.TopAppBarElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUI
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUIDialog
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUI
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUIDialog
 import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
-import com.aglushkov.wordteacher.shared.general.WindowInsets
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.android_app.helper.EmailOpenerImpl
@@ -65,30 +52,20 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.features.settings.vm.SETTING_GET_WORD_FROM_CLIPBOARD
-import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
-import com.aglushkov.wordteacher.shared.general.LocalWindowInset
+import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
-import com.aglushkov.wordteacher.shared.general.applyWindowInsetsAsPaddings
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
+import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
 import com.aglushkov.wordteacher.shared.res.MR
-import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
-import com.arkivanov.decompose.router.stack.ChildStack
-import com.arkivanov.decompose.value.Value
 import com.russhwolf.settings.coroutines.toBlockingSettings
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-//@ExperimentalMaterialApi
-//@ExperimentalAnimationApi
-//@ExperimentalUnitApi
-//@ExperimentalComposeUiApi
 class MainActivity : AppCompatActivity(), Router {
     private val bottomBarTabs = listOf(
         ScreenTab.Definitions,
@@ -99,8 +76,6 @@ class MainActivity : AppCompatActivity(), Router {
 
     private lateinit var mainDecomposeComponent: MainDecomposeComponent
 
-    private var windowInsets by mutableStateOf(WindowInsets())
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         this.intent = intent
@@ -110,17 +85,6 @@ class MainActivity : AppCompatActivity(), Router {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.decorView.setOnApplyWindowInsetsListener { v, insets ->
-            windowInsets = WindowInsets(
-                top = insets.systemWindowInsetTop,
-                bottom = insets.systemWindowInsetBottom,
-                left = insets.systemWindowInsetLeft,
-                right = insets.systemWindowInsetRight
-            )
-
-            // call default logic
-            v.onApplyWindowInsets(insets)
-        }
         clipboardRepository().lastTextHash = flowSettings().toBlockingSettings().getInt(
             STATE_CLIPBOARD_HASH, 0)
         (appComponent().wordFrequencyFileOpenController() as FileOpenControllerImpl).bind(this)
@@ -211,38 +175,15 @@ class MainActivity : AppCompatActivity(), Router {
 
     @Composable
     private fun ComposeUI() {
-        val initialInset = LocalWindowInset.current
-        var windowInsets by remember { mutableStateOf(initialInset) }
-
         ComposeAppTheme(isDebug = appComponent().isDebug()) {
-            Surface(
-                modifier = Modifier.fillMaxSize().applyWindowInsetsAsPaddings(windowInsets),
-                color = MaterialTheme.colors.background
-            ) {
-                mainUI()
-
-                CompositionLocalProvider(
-                    LocalWindowInset provides windowInsets,
+            ProvideWindowInsets {
+                Surface(
+                    modifier = Modifier.fillMaxSize().withWindowInsetsPadding(),
+                    color = MaterialTheme.colors.background
                 ) {
+                    mainUI()
                     dialogUI()
                 }
-            }
-        }
-
-        DisposableEffect("ActivityInsets") {
-            window.decorView.setOnApplyWindowInsetsListener { v, insets ->
-                windowInsets = WindowInsets(
-                    top = insets.systemWindowInsetTop,
-                    bottom = insets.systemWindowInsetBottom,
-                    left = insets.systemWindowInsetLeft,
-                    right = insets.systemWindowInsetRight
-                )
-
-                insets.consumeSystemWindowInsets()
-            }
-
-            onDispose {
-                window.decorView.setOnApplyWindowInsetsListener(null)
             }
         }
     }

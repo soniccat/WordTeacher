@@ -26,14 +26,10 @@ class AddCardSetSampleTask(
             return
         }
 
-        try {
-            val jsonText = jsonProvider()
-            val importCardSet = json.decodeFromString<ImportCardSet>(jsonText)
-            val nowTime = timeSource.timeInstant()
-            cardSetsRepository.insertCardSet(importCardSet.toCardSet(nowTime))
-        } catch (e: Throwable) {
-            Logger.e("parse error", e)
-        }
+        val jsonText = jsonProvider()
+        val importCardSet = json.decodeFromString<ImportCardSet>(jsonText)
+        val nowTime = timeSource.timeInstant()
+        cardSetsRepository.insertCardSet(importCardSet.toCardSet(nowTime))
 
         settings.putBoolean(IS_CARDSET_SAMPLE_IMPORTED_KEY, true)
     }

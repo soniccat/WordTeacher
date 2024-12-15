@@ -1,13 +1,11 @@
 package com.aglushkov.wordteacher.shared.general
 
+import android.app.Activity
 import android.content.res.Resources
-import android.util.Log
 import android.view.View
 import android.view.ViewParent
 import android.view.Window
 import android.view.WindowManager
-import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.v
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalView
@@ -34,34 +31,14 @@ actual fun CustomDialogUI(
         val window = findDialogWindow() ?: throw Resources.NotFoundException("Window isn't found")
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
 
-        val initialInset = LocalWindowInset.current
-        var windowInsets by remember { mutableStateOf(initialInset) }
-
         Surface(
-            modifier = Modifier.fillMaxSize().applyWindowInsetsAsPaddings(windowInsets),
+            modifier = Modifier.fillMaxSize().withWindowInsetsPadding(),
             color = MaterialTheme.colors.background
         ) {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
                 content()
-            }
-        }
-
-        DisposableEffect("WindowInsets") {
-            window.decorView.setOnApplyWindowInsetsListener { v, insets ->
-                windowInsets = WindowInsets(
-                    top = insets.systemWindowInsetTop,
-                    bottom = insets.systemWindowInsetBottom,
-                    left = insets.systemWindowInsetLeft,
-                    right = insets.systemWindowInsetRight
-                )
-
-                insets.consumeSystemWindowInsets()
-            }
-
-            onDispose {
-                window.decorView.setOnApplyWindowInsetsListener(null)
             }
         }
     }
@@ -82,6 +59,13 @@ private fun findDialogWindow(): Window? {
     }
 }
 
+fun android.view.WindowInsets.toWindowInsets() = WindowInsets(
+    top = systemWindowInsetTop,
+    bottom = systemWindowInsetBottom,
+    left = systemWindowInsetLeft,
+    right = systemWindowInsetRight
+)
+
 data class WindowInsets(
     val left: Int = 0,
     val right: Int = 0,
@@ -96,15 +80,37 @@ data class WindowInsets(
     }
 }
 
-fun Modifier.applyWindowInsetsAsPaddings(
-    windowInsets: WindowInsets
-) = composed {
+fun Modifier.withWindowInsetsPadding() = composed {
     this.padding(
-        start = windowInsets.left.pxToDp(),
-        top = windowInsets.top.pxToDp(),
-        end = windowInsets.right.pxToDp(),
-        bottom = windowInsets.bottom.pxToDp()
+        start = LocalWindowInsets.current.left.pxToDp(),
+        top = LocalWindowInsets.current.top.pxToDp(),
+        end = LocalWindowInsets.current.right.pxToDp(),
+        bottom = LocalWindowInsets.current.bottom.pxToDp()
     )
 }
 
-val LocalWindowInset = staticCompositionLocalOf { WindowInsets() }
+@Composable
+fun Activity.ProvideWindowInsets(
+    content: @Composable () -> Unit
+) {
+    val initialInset = window.decorView.rootWindowInsets.toWindowInsets()
+    var windowInsets by remember { mutableStateOf(initialInset) }
+
+    CompositionLocalProvider(
+        LocalWindowInsets provides windowInsets,
+        content = content
+    )
+
+    DisposableEffect("ActivityInsets") {
+        window.decorView.setOnApplyWindowInsetsListener { v, insets ->
+            windowInsets = insets.toWindowInsets()
+            insets.consumeSystemWindowInsets()
+        }
+
+        onDispose {
+            window.decorView.setOnApplyWindowInsetsListener(null)
+        }
+    }
+}
+
+val LocalWindowInsets = staticCompositionLocalOf { WindowInsets() }
