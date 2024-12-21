@@ -160,11 +160,10 @@ abstract class Trie<T, D>: Iterable<T> {
         return true
     }
 
-    // TODO: refactor, simplify logic
-    // we can request all the word forms at once (lemma, term) and remove that misleading "needAnotherOne: Boolean"
-    fun entry(
+   fun entry(
         word: String,
-        nextWord: (needAnotherOne: Boolean) -> String?,
+        nextWordForms: () -> List<String>,
+        onWordRead: () -> Unit,
         onFound: (node: MutableList<T>) -> Unit
     ) {
         var node: TrieNode<T>? = root
@@ -186,36 +185,32 @@ abstract class Trie<T, D>: Iterable<T> {
             return
         }
 
-        // set to false when we ask for the next word in the sentence
-        // set to true when we ask for another similar word at the current position i.e. a token instead of a lemma
-        var needAnotherOne = false
-        var nw = nextWord(needAnotherOne)
-        while (nw != null) {
-            val nextNode = wordNode(nw, node)
-            if (nextNode == null) {
-                needAnotherOne = true
-            } else {
-                needAnotherOne = false
-
+        var nextForms = nextWordForms()
+        outerLoop@ while (nextForms.isNotEmpty()) {
+            for(formI in nextForms.indices) {
+                val nextNode = wordNode(nextForms[formI], node) ?: continue
                 if (nextNode.isEnd) {
                     onFound(nextNode.dictIndexEntries)
                 }
+                onWordRead()
 
                 val spaceNode2 = nextNode.findChild(' ')
                 if (spaceNode2 != null) {
                     node = spaceNode2
+                    break
+                    //continue@outerLoop
                 } else if (
                     nextNode.isEnd && nextNode.dictIndexEntries.isEmpty() ||
                     !nextNode.isEnd && nextNode.dictIndexEntries.isNotEmpty() // added for cases like "out of sorts" as lemma "sort" doesn't fit and we're in the middle of a metanode
                 ) {
-                    needAnotherOne = true
+                    break
                 } else {
                     node = nextNode
-                    break
+                    break@outerLoop
                 }
             }
 
-            nw = nextWord(needAnotherOne)
+            nextForms = nextWordForms()
         }
 
         if (initialWordNode != node) {

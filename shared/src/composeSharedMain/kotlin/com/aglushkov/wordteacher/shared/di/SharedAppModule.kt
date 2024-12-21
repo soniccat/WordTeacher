@@ -138,8 +138,9 @@ class SharedAppModule {
         nlpCore: NLPCore,
         processor: NLPSentenceProcessor,
         timeSource: TimeSource,
+        @IsDebug isDebug: Boolean,
     ): ArticlesRepository {
-        return ArticlesRepository(database, nlpCore, processor, timeSource)
+        return ArticlesRepository(database, nlpCore, processor, timeSource, isDebug)
     }
 
     @AppComp

@@ -103,10 +103,11 @@ class WordListDictIndex(
 
     override fun entry(
         word: String,
-        nextWord: (needAnotherOne: Boolean) -> String?,
+        nextWordForms: () -> List<String>,
+        onWordRead: () -> Unit,
         onFound: (node: MutableList<Dict.Index.Entry>) -> Unit
     ) {
-        return index.entry(word, nextWord, onFound)
+        return index.entry(word, nextWordForms, onWordRead, onFound)
     }
 }
 

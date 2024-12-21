@@ -41,7 +41,8 @@ class ArticlesRepository(
     private val database: AppDatabase,
     private val nlpCore: NLPCore,
     private val nlpSentenceProcessor: NLPSentenceProcessor,
-    private val timeSource: TimeSource
+    private val timeSource: TimeSource,
+    private val isDebug: Boolean,
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val stateFlow = MutableStateFlow<Resource<List<ShortArticle>>>(Resource.Loading())
@@ -91,7 +92,7 @@ class ArticlesRepository(
         text: String,
         title: String
     ): Flow<Pair<Float, Article?>> {
-        val resultText = clearText(text)//clearString(text)
+        val resultText = clearText(text)
         val nlpCoreCopy = nlpCore.clone()
         val sentenceSpans = nlpCoreCopy.sentenceSpans(resultText)
         val paragraphs = mutableListOf<Paragraph>()
@@ -109,7 +110,10 @@ class ArticlesRepository(
                         sentenceSpans[paragraphs.last().start].start,
                         sentenceSpans[paragraphs.last().end - 1].end
                     ).toString()
-                    Logger.v(ds)
+
+                    if (isDebug) {
+                        Logger.v(ds)
+                    }
                 }
             }
         }

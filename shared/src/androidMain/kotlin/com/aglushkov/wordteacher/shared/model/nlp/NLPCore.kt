@@ -87,16 +87,36 @@ actual class NLPCore(
 
     actual fun sentenceSpans(text: String): List<SentenceSpan> = sentenceDetector?.sentPosDetect(text).orEmpty().flatMap {
         val subSequence = text.subSequence(it.start, it.end)
+        // TODO: try to fix it at the model level
         // fixing span detecting for direct speech when a sentence ends with "\n
         /* Example:
         “All too true.” Clover nodded sadly. “And an inadequate response in affairs of state, I think it’s fair to say.”
         “In whats o’ what?” mumbled Downside, baffled.
          */
-        val splitIndex = subSequence.indexOf("\"\n")
-        if (splitIndex == -1) {
+
+        val resultSpans = mutableListOf<SentenceSpan>()
+        var i = 0
+        while (i < subSequence.length && i > -1) {
+            val newI = subSequence.indexOf('\n', i)
+            if (newI == -1) {
+                break
+            }
+
+            resultSpans.add(SentenceSpan(it.start + i, it.start + newI))
+            i = newI + 1
+            while (i < subSequence.length && subSequence[i] == '\n') {
+                ++i
+            }
+        }
+
+        if (i != 0) {
+            resultSpans.add(SentenceSpan(it.start + i, it.end))
+        }
+
+        if (resultSpans.isEmpty()) {
             listOf(SentenceSpan(it.start, it.end))
         } else {
-            listOf(SentenceSpan(it.start, it.start + splitIndex + 1), SentenceSpan(it.start + splitIndex + 2, it.end))
+            resultSpans
         }
     }
     actual fun tokenSpans(sentence: String) = tokenizer?.tokenizePos(

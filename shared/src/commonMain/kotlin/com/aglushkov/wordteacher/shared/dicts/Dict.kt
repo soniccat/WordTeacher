@@ -23,7 +23,8 @@ interface Dict: WordTeacherWordService {
         fun entriesStartWith(prefix: String, limit: Int): List<Entry>
         fun entry(
             word: String,
-            nextWord: (needAnotherOne: Boolean) -> String?,
+            nextWordForms: () -> List<String>,
+            onWordRead: () -> Unit,
             onFound: (node: MutableList<Entry>) -> Unit
         )
 

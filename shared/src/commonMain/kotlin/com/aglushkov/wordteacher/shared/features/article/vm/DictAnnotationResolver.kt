@@ -22,61 +22,59 @@ class DictAnnotationResolver {
                 var skippedNounPhrase = false
 
                 var ci = i
-                var takeLemma = true
-                val tokenLemmaGetter: (Int) -> String? = { index ->
-                    var r: CharSequence? = if (takeLemma) {
-                        sentence.lemma(index)
-                    } else {
-                        null
+                val wordFormsProvider: (Int) -> List<String> = { index ->
+                    val lemma = sentence.lemma(index).toString()
+                    val token = sentence.token(index).toString()
+                    buildList {
+                        add(lemma)
+                        if (lemma != token) {
+                            add(token)
+                        }
                     }
-
-                    if (r == null) {
-                        takeLemma = false
-                        r = sentence.token(index)
-                    }
-                    r.toString()
                 }
 
+                var nextCallCount = 0
                 val foundList = mutableListOf<Pair<Int, List<Dict.Index.Entry>>>()
                 dict.index.entry(
                     firstWord,
-                    nextWord = { needAnotherOne ->
-                        if (needAnotherOne) {
+                    nextWordForms = {
+                        if (nextCallCount > 0) {
                             val phrase = phrases.spanWithIndex(ci)
-                            if (takeLemma) {
-                                takeLemma = false
-                                tokenLemmaGetter.invoke(ci)
-                            } else if (phrase?.type?.isNounPhrase() == true && isVerb && firstWord != "be" && !skippedNounPhrase) {
+                            if (phrase?.type?.isNounPhrase() == true && isVerb && firstWord != "be" && !skippedNounPhrase) {
                                 if (ci + phrase.length < sentence.lemmas.size) {
                                     skippedNounPhrase = true
                                     ci += phrase.length
-                                    tokenLemmaGetter.invoke(ci)
+                                    wordFormsProvider(ci)
                                 } else {
-                                    null
+                                    emptyList()
                                 }
                             } else if (sentence.isAdverbNotPart(ci) || sentence.tagEnum(ci)
                                     .isPronoun() || sentence.tagEnum(ci).isNoun()
                             ) {
                                 if (ci + 1 < sentence.lemmas.size) {
                                     ++ci
-                                    tokenLemmaGetter.invoke(ci)
+                                    wordFormsProvider(ci)
                                 } else {
-                                    null
+                                    emptyList()
                                 }
                             } else {
-                                null
+                                emptyList()
                             }
                         } else {
-                            takeLemma = true
+                            ++nextCallCount
                             if (ci + 1 < sentence.lemmas.size) {
                                 ++ci
-                                tokenLemmaGetter.invoke(ci)
+                                wordFormsProvider(ci)
                             } else {
-                                null
+                                emptyList()
                             }
                         }
                     },
+                    onWordRead = {
+                        nextCallCount = 0
+                    },
                     onFound = {
+                        nextCallCount = 0
                         foundList.add(ci to it)
                     }
                 )
