@@ -23,12 +23,25 @@ class DictAnnotationResolver {
 
                 var ci = i
                 val wordFormsProvider: (Int) -> List<String> = { index ->
-                    val lemma = sentence.lemma(index).toString()
-                    val token = sentence.token(index).toString()
+                    val lemma = sentence.lemma(index)
+                    val token = sentence.token(index)
                     buildList {
-                        add(lemma)
-                        if (lemma != token) {
-                            add(token)
+                        var lowercasedLemma: String? = null
+                        if (lemma != null) {
+                            add(lemma)
+                            lowercasedLemma = lemma.lowercase()
+                            if (lowercasedLemma != lemma) {
+                                add(lowercasedLemma)
+                            }
+                        }
+
+                        val tokenStr = token.toString()
+                        if (tokenStr != lemma && tokenStr != lowercasedLemma) {
+                            add(tokenStr)
+                        }
+                        val lowercasedToken = tokenStr.lowercase()
+                        if (lowercasedToken != tokenStr && lowercasedToken != lemma && lowercasedToken != lowercasedLemma) {
+                            add(lowercasedToken)
                         }
                     }
                 }

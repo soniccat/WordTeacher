@@ -61,7 +61,11 @@ class DslIndex(
 
         return index.wordsStartWith(prefix, limit) +
                 index.wordsStartWith(capitalizedPrefix, limit) +
-                index.wordsStartWith(abbreviation, limit)
+                if (abbreviation != prefix && abbreviation != capitalizedPrefix) {
+                    index.wordsStartWith(abbreviation, limit)
+                } else {
+                    emptyList()
+                }
     }
 
     override fun entry(

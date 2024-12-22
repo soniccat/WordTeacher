@@ -98,7 +98,11 @@ class WordListDictIndex(
 
         return index.wordsStartWith(prefix, limit) +
                 index.wordsStartWith(capitalizedPrefix, limit) +
-                index.wordsStartWith(abbreviation, limit)
+                if (abbreviation != prefix && abbreviation != capitalizedPrefix) {
+                    index.wordsStartWith(abbreviation, limit)
+                } else {
+                    emptyList()
+                }
     }
 
     override fun entry(
@@ -107,7 +111,18 @@ class WordListDictIndex(
         onWordRead: () -> Unit,
         onFound: (node: MutableList<Dict.Index.Entry>) -> Unit
     ) {
-        return index.entry(word, nextWordForms, onWordRead, onFound)
+        var wasFound = false
+        index.entry(word, nextWordForms, onWordRead, {
+            wasFound = true
+            onFound(it)
+        })
+
+        if (!wasFound) {
+            val lowercasedWord = word.lowercase()
+            if (lowercasedWord != word) {
+                index.entry(lowercasedWord, nextWordForms, onWordRead, onFound)
+            }
+        }
     }
 }
 
