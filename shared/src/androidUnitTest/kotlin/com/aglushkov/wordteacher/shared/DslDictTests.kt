@@ -72,13 +72,13 @@ class DslDictTests {
         val dslDict = DslDict(dictPath, fakeFileSystem)
         dslDict.load()
 
-        val word = dslDict.define("term1").firstOrNull()
+        val word = dslDict.define(listOf("term1")).firstOrNull()
         assertNotNull(word)
         assertEquals(
             WordTeacherWord(
                 word = "term1",
                 transcriptions = emptyList(),
-                definitions = mapOf(
+                definitions = linkedMapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1", "def2", "def3 (comment3)", "def4"),
@@ -123,19 +123,20 @@ class DslDictTests {
         val dslDict = DslDict(dictPath, fakeFileSystem)
         dslDict.load()
 
-        val word = dslDict.define("another term").firstOrNull()
+        val word = dslDict.define(listOf("another term")).firstOrNull()
         assertNotNull(word)
         assertEquals(
             WordTeacherWord(
                 word = "another term",
                 transcriptions = listOf("transcription"),
-                definitions = mapOf(
+                definitions = linkedMapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1"),
                             examples = listOf("ex1 — ex1_1"),
                             synonyms = listOf(),
                             antonyms = listOf(),
+                            labels = listOf(),
                             imageUrl = null
                         ),
                         WordTeacherDefinition(
@@ -143,6 +144,7 @@ class DslDictTests {
                             examples = listOf("ex2 — ex2_1"),
                             synonyms = listOf(),
                             antonyms = listOf(),
+                            labels = listOf(),
                             imageUrl = null
                         )
                     )
@@ -184,21 +186,22 @@ class DslDictTests {
         val dslDict = DslDict(dictPath, fakeFileSystem)
         dslDict.load()
 
-        val word1 = dslDict.define("term1").firstOrNull()
-        val word2 = dslDict.define("term2").firstOrNull()
+        val word1 = dslDict.define(listOf("term1")).firstOrNull()
+        val word2 = dslDict.define(listOf("term2")).firstOrNull()
         assertNotNull(word1)
         assertNotNull(word2)
         assertEquals(
             WordTeacherWord(
                 word = "term1",
                 transcriptions = listOf("transcription"),
-                definitions = mapOf(
+                definitions = linkedMapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1"),
                             examples = listOf("ex1 — ex1_1"),
                             synonyms = listOf(),
                             antonyms = listOf(),
+                            labels = listOf(),
                             imageUrl = null
                         )
                     )
@@ -211,13 +214,14 @@ class DslDictTests {
             WordTeacherWord(
                 word = "term2",
                 transcriptions = listOf("transcription2"),
-                definitions = mapOf(
+                definitions = linkedMapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def2"),
                             examples = listOf("ex2 — ex2_2"),
                             synonyms = listOf(),
                             antonyms = listOf(),
+                            labels = listOf(),
                             imageUrl = null
                         )
                     )
@@ -266,20 +270,21 @@ class DslDictTests {
             dslDict.index.allEntries().first().toWordData()
         )
 
-        val word = dslDict.define("term1").firstOrNull()
+        val word = dslDict.define(listOf("term1")).firstOrNull()
         assertNotNull(word)
         assertEquals(1, word.definitions.keys.size)
         assertEquals(
             WordTeacherWord(
                 word = "term1",
                 transcriptions = emptyList(),
-                definitions = mapOf(
+                definitions = linkedMapOf(
                     WordTeacherWord.PartOfSpeech.PhrasalVerb to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1"),
                             examples = listOf("ex1"),
                             synonyms = listOf(),
                             antonyms = listOf(),
+                            labels = listOf(),
                             imageUrl = null
                         ),
                         WordTeacherDefinition(
@@ -287,6 +292,7 @@ class DslDictTests {
                             examples = listOf(),
                             synonyms = listOf(),
                             antonyms = listOf(),
+                            labels = listOf(),
                             imageUrl = null
                         )
                     )

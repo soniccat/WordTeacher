@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.dicts.dsl
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.dicts.DictTrieIndex
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.extensions.writeIntValue
 import com.aglushkov.wordteacher.shared.general.okio.skipNewLine
@@ -19,8 +20,8 @@ class DslIndex(
     private val dict: Dict,
     override val path: Path,
     private val fileSystem: FileSystem,
-) : Dict.Index {
-    private val index = DictTrie()
+) : DictTrieIndex {
+    override val index = DictTrie()
 
     init {
         if (fileSystem.exists(path)) {
@@ -30,51 +31,6 @@ class DslIndex(
                 fileSystem.delete(path)
             }
         }
-    }
-
-    override fun allEntries(): Sequence<Dict.Index.Entry> {
-        return index.asSequence()
-    }
-
-    override fun indexEntry(word: String): Dict.Index.Entry? {
-        return index.word(word).firstOrNull()
-    }
-
-    override fun entriesStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {
-        if (prefix.isEmpty()) {
-            return emptyList()
-        }
-
-        // search for capitalized, lowercased and actual prefix
-        val capitalizedPrefix = prefix.replaceFirstChar {
-            if (it.isLowerCase()) {
-                it.uppercaseChar()
-            } else {
-                it.lowercaseChar()
-            }
-        }
-        val abbreviation = if (prefix[0].isLowerCase()) {
-            prefix.uppercase(Locale.getDefault())
-        } else {
-            prefix.lowercase(Locale.getDefault())
-        }
-
-        return index.wordsStartWith(prefix, limit) +
-                index.wordsStartWith(capitalizedPrefix, limit) +
-                if (abbreviation != prefix && abbreviation != capitalizedPrefix) {
-                    index.wordsStartWith(abbreviation, limit)
-                } else {
-                    emptyList()
-                }
-    }
-
-    override fun entry(
-        word: String,
-        nextWordForms: () -> List<String>,
-        onWordRead: () -> Unit,
-        onFound: (node: MutableList<Dict.Index.Entry>) -> Unit
-    ) {
-        return index.entry(word, nextWordForms, onWordRead, onFound)
     }
 
     private fun loadIndex() {
