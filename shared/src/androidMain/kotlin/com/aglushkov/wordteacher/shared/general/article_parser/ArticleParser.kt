@@ -88,12 +88,29 @@ actual class ArticleParser actual constructor() {
         wholeText(articleElement.element)
     )
 
+    private val tagAsNewLine = setOf(
+        "title", "p", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "address", "li", "th", "td"
+    )
+
     fun wholeText(element: Element): String? {
         val accum = StringUtil.borrowBuilder()
+        var needAddNewLine = false
         NodeTraversor.traverse(object : NodeVisitor {
+
             override fun head(node: Node, depth: Int) {
-                if (node is TextNode) {
-                    accum.append(node.wholeText + "\n")
+                if (node is Element) {
+                    if (!needAddNewLine) {
+                        needAddNewLine = tagAsNewLine.contains(node.tag().name)
+                    }
+                } else if (node is TextNode) {
+                    val text = node.wholeText.replace('\n', ' ').trim()
+                    if (text.isNotEmpty()) {
+                        if (needAddNewLine) {
+                            needAddNewLine = false
+                            accum.append("\n")
+                        }
+                        accum.append(text)
+                    }
                 }
             }
 

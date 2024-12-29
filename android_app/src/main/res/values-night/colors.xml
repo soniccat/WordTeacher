@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background">#FF434343</color>
+    <color name="splashBackground">@color/background</color>
+
     <color name="statusBarColor">#FF434343</color>
 </resources>
