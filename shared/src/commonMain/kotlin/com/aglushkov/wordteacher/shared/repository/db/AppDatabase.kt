@@ -71,6 +71,7 @@ class AppDatabase(
 
     private val json = Json {
         ignoreUnknownKeys = true
+        explicitNulls = false
     }
 
     init {
@@ -119,10 +120,6 @@ class AppDatabase(
         fun selectAll() = db.dBNLPSentenceQueries.selectAll()
         fun selectForArticle(articleId: Long) = db.dBNLPSentenceQueries
             .selectForArticle(articleId)
-            //.executeAsList()
-//            .map {
-//                it.toNLPSentence()
-//            }
 
         fun removeAll() = db.dBNLPSentenceQueries.removeAll()
     }
@@ -131,15 +128,11 @@ class AppDatabase(
         fun insert(name: String, date: Long, style: ArticleStyle) =
             db.dBArticleQueries.insert(name, date, encodeStyle(style))
         fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong().value
-//        fun selectAll() = db.dBArticleQueries.selectAll { id, name, date, style ->
-//            Article(id,name, date, style = decodeStyle(style))
-//        }
+
         fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date ->
             ShortArticle(id, name, date)
         }
-//        fun selectArticle(anId: Long) = db.dBArticleQueries.selectArticle(anId) { id, name, date, style ->
-//            Article(id, name, date, emptyList(), decodeStyle(style))
-//        }
+
         fun selectArticle(anId: Long) = combine(
             db.dBArticleQueries.selectArticle(anId).asFlow(),
             sentencesNLP.selectForArticle(anId).asFlow(),
@@ -150,10 +143,7 @@ class AppDatabase(
                 Article(article.id, article.name, article.date, sentences, decodeStyle(article.style))
             }
         }
-            /*db.dBArticleQueries.selectArticle(anId) { id, name, date, style ->
-            val sentences = sentencesNLP.selectForArticle(anId)
-            Article(id, name, date, sentences, decodeStyle(style))
-        }*/
+
         fun removeArticle(anId: Long) {
             db.transaction {
                 db.dBNLPSentenceQueries.removeWithArticleId(anId)

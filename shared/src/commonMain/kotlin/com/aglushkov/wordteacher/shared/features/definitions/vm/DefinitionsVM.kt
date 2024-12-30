@@ -258,7 +258,7 @@ open class DefinitionsVMImpl(
     // Events
     override fun onWordTextUpdated(newText: String) {
         wordTextValue.update { newText }
-        if (newText.isEmpty()) {
+        if (newText.trim().isEmpty()) {
             clearSuggests()
         } else {
             requestSuggests(newText)
@@ -770,6 +770,8 @@ open class DefinitionsVMImpl(
     private var suggestJob: Job? = null
     override fun requestSuggests(word: String) {
         suggestJob?.cancel()
+        suggestJob = null
+
         suggestJob = viewModelScope.launch(Dispatchers.Default) {
             delay(100)
             suggestedDictEntryRepository.load(word)

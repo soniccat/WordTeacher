@@ -8,6 +8,7 @@ import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.jsoup.select.NodeTraversor
 import org.jsoup.select.NodeVisitor
+import java.util.Stack
 
 actual class ArticleParser actual constructor() {
     private var title: String? = null
@@ -92,29 +93,85 @@ actual class ArticleParser actual constructor() {
         "title", "p", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "address", "li", "th", "td"
     )
 
+    private val headerTag = setOf(
+        "h1", "h2", "h3", "h4", "h5", "h6"
+    )
+
+    sealed interface StyleTag {
+        val depth: Int
+        val name: String
+
+        data class Header(val size: Int, override val depth: Int): StyleTag {
+            companion object {
+                fun fromString(str: String, depth: Int) = Header(
+                    size = str.substring(1).toIntOrNull() ?: 6,
+                    depth = depth
+                )
+            }
+
+            override val name: String
+                get() = "h$size"
+        }
+//        data class NewLine(override val depth: Int): StyleTag {
+//            override val name: String
+//                get() = ""
+//        }
+
+        fun startTag(): String = "<$name>"
+        fun endTag(): String = "</$name>"
+    }
+
     fun wholeText(element: Element): String? {
         val accum = StringUtil.borrowBuilder()
         var needAddNewLine = false
+        var gotTextAfterNewLine = false
+        var newLineDepth = -1
         NodeTraversor.traverse(object : NodeVisitor {
+
+            private var styleTags = ArrayDeque<StyleTag>()
 
             override fun head(node: Node, depth: Int) {
                 if (node is Element) {
-                    if (!needAddNewLine) {
-                        needAddNewLine = tagAsNewLine.contains(node.tag().name)
+                    var newStyleTag: StyleTag? = null
+                    if (headerTag.contains(node.tag().name)) {
+                        newStyleTag = StyleTag.Header.fromString(node.tag().name, depth)
+                    }
+                    newStyleTag?.let {
+                        styleTags.addLast(it)
+                        accum.append(it.startTag())
+                    }
+
+                    needAddNewLine = tagAsNewLine.contains(node.tag().name)
+                    if (needAddNewLine) {
+                        gotTextAfterNewLine = false
+                        newLineDepth = depth
                     }
                 } else if (node is TextNode) {
-                    val text = node.wholeText.replace('\n', ' ').trim()
-                    if (text.isNotEmpty()) {
+                    val text = node.wholeText.replace('\n', ' ')
+                    if (text.trim().isNotEmpty()) {
                         if (needAddNewLine) {
-                            needAddNewLine = false
-                            accum.append("\n")
+                            gotTextAfterNewLine = true
                         }
                         accum.append(text)
                     }
                 }
             }
 
-            override fun tail(node: Node, depth: Int) {}
+            override fun tail(node: Node, depth: Int) {
+                if (node !is TextNode) {
+                    while (styleTags.lastOrNull()?.depth == depth) {
+                        val tag = styleTags.removeLast()
+                        accum.append(tag.endTag())
+                    }
+
+                    if (gotTextAfterNewLine && depth <= newLineDepth) {
+                        accum.append("\n")
+                        needAddNewLine = false
+                        gotTextAfterNewLine = false
+                        newLineDepth = -1
+                    }
+                }
+            }
         }, element)
         return StringUtil.releaseBuilder(accum)
     }

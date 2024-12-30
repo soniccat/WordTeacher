@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.article
 
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.StringReader
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.resource.RESOURCE_UNDEFINED_PROGRESS
@@ -9,6 +10,7 @@ import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgres
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.ArticleStyle
+import com.aglushkov.wordteacher.shared.model.Header
 import com.aglushkov.wordteacher.shared.model.Paragraph
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -88,11 +90,36 @@ class ArticlesRepository(
        )
     }
 
+    class TagInfo(val name: String) {
+        var start: Int = 0
+        var end: Int = 0
+    }
+
     private fun processTextIntoArticle(
         text: String,
         title: String
     ): Flow<Pair<Float, Article?>> {
-        val resultText = clearText(text)
+        var resultText = clearText(text)
+
+        // cut tags
+        var tags = ArrayDeque<TagInfo>()
+        var ti = 0
+        while (ti < resultText.length) {
+            val tagI = resultText.indexOf('<', ti)
+            if (tagI == -1 || tagI == resultText.length - 1) {
+                break
+            }
+
+            val isOpen = resultText[tagI+1] != '/'
+            val tagNameI = if (isOpen) {
+                tagI+1
+            } else {
+                tagI+2
+            }
+
+            StringReader
+        }
+
         val nlpCoreCopy = nlpCore.clone()
         val sentenceSpans = nlpCoreCopy.sentenceSpans(resultText)
         val paragraphs = mutableListOf<Paragraph>()
@@ -106,12 +133,11 @@ class ArticlesRepository(
                     paragraphs += Paragraph(startParagraphIndex, i + 1)
                     startParagraphIndex = i + 1
 
-                    val ds = text.subSequence(
-                        sentenceSpans[paragraphs.last().start].start,
-                        sentenceSpans[paragraphs.last().end - 1].end
-                    ).toString()
-
                     if (isDebug) {
+                        val ds = text.subSequence(
+                            sentenceSpans[paragraphs.last().start].start,
+                            sentenceSpans[paragraphs.last().end - 1].end
+                        ).toString()
                         Logger.v(ds)
                     }
                 }
