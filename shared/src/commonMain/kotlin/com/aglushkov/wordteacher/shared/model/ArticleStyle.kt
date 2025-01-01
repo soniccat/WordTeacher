@@ -12,13 +12,14 @@ data class ArticleStyle (
 
 @Serializable
 data class Paragraph (
-    @SerialName("start") override val start: Int,
+    @SerialName("start") override val start: Int, // first sentence index
     @SerialName("end") override val end: Int,
 ): NLPSpan
 
 @Serializable
 data class Header (
-    @SerialName("level") val level: Int,
-    @SerialName("start") override val start: Int,
-    @SerialName("end") override val end: Int,
+    @SerialName("size") val size: Int,
+    @SerialName("sentenceIndex") var sentenceIndex: Int,
+    @SerialName("start") override var start: Int, // first index in the sentence
+    @SerialName("end") override var end: Int,
 ): NLPSpan

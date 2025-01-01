@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.repository.article
 
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.StringReader
+import com.aglushkov.wordteacher.shared.general.StringsReader
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.resource.RESOURCE_UNDEFINED_PROGRESS
@@ -90,9 +91,118 @@ class ArticlesRepository(
        )
     }
 
-    class TagInfo(val name: String) {
-        var start: Int = 0
-        var end: Int = 0
+    class TagInfo(
+        val isClose: Boolean = false,
+        val name: String,
+        var start: Int = 0,
+        var end: Int = 0,
+    )
+
+    sealed interface ArticleTag {
+        val isClose: Boolean
+        var start: Int
+        var end: Int
+
+        data class Header(
+            val size: Int,
+            override val isClose: Boolean,
+            override var start: Int,
+            override var end: Int,
+        ): ArticleTag
+
+        companion object {
+            fun parse(tagInfo: TagInfo): ArticleTag? =
+                when (tagInfo.name[0]) {
+                    'h' -> {
+                        tagInfo.name.substring(1).toIntOrNull()?.let {
+                            Header(size = it, tagInfo.isClose, tagInfo.start, tagInfo.end)
+                        }
+                    }
+                    else -> null
+                }
+
+        }
+    }
+
+    fun StringsReader.readTag(): TagInfo? {
+        if (!readUntil('<')) return null
+        val startTagI = pos-1
+        val isClose = peek(1) == "/"
+        if (isClose) {
+            seek(1)
+        }
+        val startTagNameI = pos
+
+        if (!readUntil('>')) return null
+        val endTagNameI = pos-1
+        val endTagI = pos
+
+        return TagInfo(
+            isClose = isClose,
+            name = substring(startTagNameI, endTagNameI),
+            start = startTagI,
+            end = endTagI,
+        )
+    }
+
+    private fun cutStylesFromText(
+        text: String
+    ): Pair<String, ArticleStyle> {
+        val allTags = mutableListOf<TagInfo>()
+        val tagStack = ArrayDeque<TagInfo>()
+        val tagPairs = mutableListOf<Pair<TagInfo, TagInfo>>()
+        StringsReader(text).apply {
+            while (!atEnd()) {
+                val newTag = readTag() ?: break
+                allTags.add(newTag)
+                if (newTag.isClose) {
+                    val topTag = tagStack.lastOrNull() ?: continue
+                    if (topTag.name == newTag.name) {
+                        tagPairs.add(Pair(topTag, newTag))
+                        tagStack.removeLastOrNull()
+                    } else {
+                        Logger.v("invalid tag pair open:${topTag.name}, end:${newTag.name}", "cutStylesFromText")
+                    }
+                } else {
+                    tagStack.addLast(newTag)
+                }
+            }
+        }
+
+        // build text without tags, updating tag indexes
+        val newText = StringBuilder()
+        var deletedCharCount = 0
+        var newTextI = 0
+        for (i in 0 until allTags.size) {
+            val tag = allTags[i]
+            ArticleTag.parse(tag) ?: continue
+
+            newText.append(text.substring(newTextI, tag.start))
+            newTextI = tag.end
+
+            val tagLen = tag.end - tag.start
+            tag.start -= deletedCharCount
+            tag.end = tag.start
+            deletedCharCount += tagLen
+
+            if (i == allTags.size - 1) {
+                newText.append(text.substring(newTextI))
+            }
+        }
+
+        // build styles
+        val headers = mutableListOf<Header>()
+        tagPairs.onEach {
+            val openTag = ArticleTag.parse(it.first)
+            val closeTag = ArticleTag.parse(it.second)
+            if (openTag != null && closeTag != null) {
+                if (openTag is ArticleTag.Header) {
+                    headers.add(Header(openTag.size, -1, openTag.start, closeTag.end))
+                }
+            }
+        }
+
+        return newText.toString() to ArticleStyle(headers = headers)
     }
 
     private fun processTextIntoArticle(
@@ -100,41 +210,41 @@ class ArticlesRepository(
         title: String
     ): Flow<Pair<Float, Article?>> {
         var resultText = clearText(text)
-
-        // cut tags
-        var tags = ArrayDeque<TagInfo>()
-        var ti = 0
-        while (ti < resultText.length) {
-            val tagI = resultText.indexOf('<', ti)
-            if (tagI == -1 || tagI == resultText.length - 1) {
-                break
-            }
-
-            val isOpen = resultText[tagI+1] != '/'
-            val tagNameI = if (isOpen) {
-                tagI+1
-            } else {
-                tagI+2
-            }
-
-            StringReader
-        }
+        val cutResult = cutStylesFromText(resultText)
+        resultText = cutResult.first
 
         val nlpCoreCopy = nlpCore.clone()
         val sentenceSpans = nlpCoreCopy.sentenceSpans(resultText)
+
+        // update tag positions to be sentence relative
+        var lastHeaderIndex = 0
+        sentenceSpans.onEachIndexed { sI, sSpan ->
+            for (hI in lastHeaderIndex until cutResult.second.headers.size) {
+                val header = cutResult.second.headers[hI]
+                if (header.start >= sSpan.start && header.end <= sSpan.end) {
+                    header.sentenceIndex = sI
+                    header.start -= sSpan.start
+                    header.end -= sSpan.start
+                    ++lastHeaderIndex
+                } else {
+                    break
+                }
+            }
+        }
+
         val paragraphs = mutableListOf<Paragraph>()
         var startParagraphIndex = 0
 
         sentenceSpans.onEachIndexed { i, s ->
             if (i + 1 < sentenceSpans.size) {
                 val nextS = sentenceSpans[i + 1]
-                val sentenceGap = text.subSequence(s.end, nextS.start)
+                val sentenceGap = resultText.subSequence(s.end, nextS.start)
                 if (sentenceGap.contains('\n')) {
                     paragraphs += Paragraph(startParagraphIndex, i + 1)
                     startParagraphIndex = i + 1
 
                     if (isDebug) {
-                        val ds = text.subSequence(
+                        val ds = resultText.subSequence(
                             sentenceSpans[paragraphs.last().start].start,
                             sentenceSpans[paragraphs.last().end - 1].end
                         ).toString()
@@ -148,7 +258,10 @@ class ArticlesRepository(
             paragraphs += Paragraph(startParagraphIndex, sentenceSpans.size)
         }
 
-        val style = ArticleStyle(paragraphs = paragraphs)
+        val style = ArticleStyle(
+            paragraphs = paragraphs,
+            headers = cutResult.second.headers
+        )
         val progressChannel = Channel<Pair<Float, Article?>>(UNLIMITED)
         scope.launch(Dispatchers.Default) {
             val article = database.transactionWithResult {

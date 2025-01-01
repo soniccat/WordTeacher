@@ -34,6 +34,7 @@ import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,6 +57,7 @@ import com.aglushkov.wordteacher.shared.general.views.ModalSideSheet
 import com.aglushkov.wordteacher.shared.general.views.SideSheetValue
 import com.aglushkov.wordteacher.shared.general.views.pxToDp
 import com.aglushkov.wordteacher.shared.general.views.rememberSideSheetState
+import com.aglushkov.wordteacher.shared.model.Header
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
@@ -356,6 +358,20 @@ fun ParagraphViewItem(
     }
 }
 
+// http://zuga.net/articles/html-heading-elements/
+private val HeaderTagSizeToEmMap = mapOf(
+    1 to 2.0f,
+    2 to 1.5f,
+    3 to 1.17f,
+    4 to 1.0f,
+    5 to 0.83f,
+    6 to 0.67f,
+)
+private fun Header.toSpanStyle() = SpanStyle(
+    fontSize = TextUnit(HeaderTagSizeToEmMap[size] ?: 1.0f, TextUnitType.Em),
+    fontWeight = FontWeight.Bold,
+)
+
 @Composable
 private fun ArticleParagraphView(
     paragraphViewItem: ParagraphViewItem,
@@ -369,16 +385,19 @@ private fun ArticleParagraphView(
             style = ParagraphStyle()
         ) {
             paragraphViewItem.items.forEachIndexed { index, sentence ->
-                val annotationStartIndex = this.length
+                val strIndex = this.length
                 append(sentence.text)
                 addAnnotations(
-                    annotationStartIndex,
+                    strIndex,
                     if (paragraphViewItem.annotations.isNotEmpty()) {
                         paragraphViewItem.annotations[index]
                     } else {
                         emptyList()
                     }
                 )
+                paragraphViewItem.styles.headers.filter { it.sentenceIndex == index }.onEach { style ->
+                    addStyle(style.toSpanStyle(), strIndex + style.start, strIndex + style.end)
+                }
 
                 append(SENTENCE_CONNECTOR)
             }

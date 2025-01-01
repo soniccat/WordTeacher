@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.Article
+import com.aglushkov.wordteacher.shared.model.ArticleStyle
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
@@ -323,19 +324,33 @@ open class ArticleVMImpl(
         annotations: List<List<ArticleAnnotation>>
     ): MutableList<BaseViewItem<*>> {
         val paragraphList = mutableListOf<BaseViewItem<*>>()
+//        var paragraphTextIndexStart = 0
 
         article.data.style.paragraphs.onEach { paragraph ->
+            val sentences = article.data.sentences.split(paragraph)
+//            val paragraphTextIndexEnd = paragraphTextIndexStart + sentences.sumOf { it.text.length }
+
             paragraphList.add(
                 ParagraphViewItem(
                     idGenerator.nextId(),
-                    sentences = article.data.sentences.split(paragraph),
+                    sentences = sentences,
                     annotations = if (annotations.isNotEmpty()) {
                         annotations.split(paragraph)
                     } else {
                         emptyList()
-                    }
+                    },
+                    styles = ArticleStyle(
+                        headers = article.data.style.headers
+                            .filter { style ->
+                                paragraph.start <= style.sentenceIndex && paragraph.end >= style.sentenceIndex
+                            }.map {
+                                it.copy(sentenceIndex = it.sentenceIndex - paragraph.start)
+                            }
+                    )
                 )
             )
+
+//            paragraphTextIndexStart = paragraphTextIndexEnd
         }
 
         return paragraphList

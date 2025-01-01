@@ -112,10 +112,6 @@ actual class ArticleParser actual constructor() {
             override val name: String
                 get() = "h$size"
         }
-//        data class NewLine(override val depth: Int): StyleTag {
-//            override val name: String
-//                get() = ""
-//        }
 
         fun startTag(): String = "<$name>"
         fun endTag(): String = "</$name>"
