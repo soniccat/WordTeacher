@@ -412,10 +412,18 @@ private fun ArticleParagraphView(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                top = LocalDimensWord.current.articleHorizontalPadding,
+                top = if (paragraphViewItem.isBelowHeader) {
+                    5.dp
+                } else {
+                    if (paragraphViewItem.isHeader) {
+                        16.dp
+                    } else {
+                        8.dp
+                    }
+                },
                 start = LocalDimensWord.current.articleHorizontalPadding,
                 end = LocalDimensWord.current.articleHorizontalPadding,
-                bottom = 10.dp
+                bottom = if (paragraphViewItem.isHeader) { 0.dp } else { 10.dp }
             )
     ) {
         val colors = MaterialTheme.colors

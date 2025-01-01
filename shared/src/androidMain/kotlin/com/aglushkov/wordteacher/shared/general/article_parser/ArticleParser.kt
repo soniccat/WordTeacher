@@ -137,8 +137,8 @@ actual class ArticleParser actual constructor() {
                         accum.append(it.startTag())
                     }
 
-                    needAddNewLine = tagAsNewLine.contains(node.tag().name)
-                    if (needAddNewLine) {
+                    if (!needAddNewLine || tagAsNewLine.contains(node.tag().name)) {
+                        needAddNewLine = true
                         gotTextAfterNewLine = false
                         newLineDepth = depth
                     }

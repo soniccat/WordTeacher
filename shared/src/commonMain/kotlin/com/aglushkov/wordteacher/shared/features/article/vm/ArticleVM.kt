@@ -324,11 +324,22 @@ open class ArticleVMImpl(
         annotations: List<List<ArticleAnnotation>>
     ): MutableList<BaseViewItem<*>> {
         val paragraphList = mutableListOf<BaseViewItem<*>>()
-//        var paragraphTextIndexStart = 0
+        var isLastHeader = false
 
         article.data.style.paragraphs.onEach { paragraph ->
             val sentences = article.data.sentences.split(paragraph)
-//            val paragraphTextIndexEnd = paragraphTextIndexStart + sentences.sumOf { it.text.length }
+            val styles = ArticleStyle(
+                headers = article.data.style.headers
+                    .filter { style ->
+                        paragraph.start <= style.sentenceIndex && paragraph.end >= style.sentenceIndex
+                    }.map {
+                        it.copy(sentenceIndex = it.sentenceIndex - paragraph.start)
+                    }
+            )
+            val isHeader = sentences.size == 1 &&
+                    styles.headers.size == 1 &&
+                    styles.headers[0].start == 0 &&
+                    styles.headers[0].end == sentences[0].text.length
 
             paragraphList.add(
                 ParagraphViewItem(
@@ -339,18 +350,13 @@ open class ArticleVMImpl(
                     } else {
                         emptyList()
                     },
-                    styles = ArticleStyle(
-                        headers = article.data.style.headers
-                            .filter { style ->
-                                paragraph.start <= style.sentenceIndex && paragraph.end >= style.sentenceIndex
-                            }.map {
-                                it.copy(sentenceIndex = it.sentenceIndex - paragraph.start)
-                            }
-                    )
+                    styles = styles,
+                    isHeader = isHeader,
+                    isBelowHeader = isLastHeader,
                 )
             )
 
-//            paragraphTextIndexStart = paragraphTextIndexEnd
+            isLastHeader = isHeader
         }
 
         return paragraphList

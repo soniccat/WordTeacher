@@ -9,6 +9,8 @@ class ParagraphViewItem(
     sentences: List<NLPSentence>,
     val annotations: List<List<ArticleAnnotation>>,
     val styles: ArticleStyle,
+    val isHeader: Boolean = false,
+    val isBelowHeader: Boolean = false
 ): BaseViewItem<NLPSentence>(sentences, Type, paragraphId) {
     companion object {
         const val Type = 201
