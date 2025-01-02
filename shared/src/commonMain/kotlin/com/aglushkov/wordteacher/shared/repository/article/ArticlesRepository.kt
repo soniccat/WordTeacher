@@ -184,11 +184,9 @@ class ArticlesRepository(
             tag.start -= deletedCharCount
             tag.end = tag.start
             deletedCharCount += tagLen
-
-            if (i == allTags.size - 1) {
-                newText.append(text.substring(newTextI))
-            }
         }
+
+        newText.append(text.substring(newTextI))
 
         // build styles
         val headers = mutableListOf<Header>()
@@ -214,7 +212,7 @@ class ArticlesRepository(
         resultText = cutResult.first
 
         val nlpCoreCopy = nlpCore.clone()
-        val sentenceSpans = nlpCoreCopy.sentenceSpans(resultText)
+        var sentenceSpans = nlpCoreCopy.sentenceSpans(resultText)
 
         // update tag positions to be sentence relative
         var lastHeaderIndex = 0
@@ -232,9 +230,9 @@ class ArticlesRepository(
             }
         }
 
+        // build paragraphs
         val paragraphs = mutableListOf<Paragraph>()
         var startParagraphIndex = 0
-
         sentenceSpans.onEachIndexed { i, s ->
             if (i + 1 < sentenceSpans.size) {
                 val nextS = sentenceSpans[i + 1]
@@ -258,6 +256,42 @@ class ArticlesRepository(
             paragraphs += Paragraph(startParagraphIndex, sentenceSpans.size)
         }
 
+        // trim sentenceSpans
+        val headerMap = cutResult.second.headers.associateBy { it.sentenceIndex }
+        sentenceSpans = sentenceSpans.mapIndexed { i, span ->
+            var endI = span.end
+            while (endI > 0) {
+                if (!charsToTrim.contains(resultText[endI-1])) {
+                    break
+                }
+                if (endI == 1) {
+                    break
+                }
+                --endI
+            }
+
+            var startI = span.start
+            while (startI < span.end) {
+                if (!charsToTrim.contains(resultText[startI])) {
+                    break
+                }
+                if (startI == span.end-1) {
+                    break
+                }
+                ++startI
+            }
+
+            val startTrim = startI - span.start
+            val endTrim = span.end - endI
+
+            headerMap[i]?.apply {
+                start += startTrim
+                end -= endTrim + startTrim
+            }
+
+            span.copy(startI, endI)
+        }
+
         val style = ArticleStyle(
             paragraphs = paragraphs,
             headers = cutResult.second.headers
@@ -275,7 +309,7 @@ class ArticlesRepository(
 
                 // TODO: process in parallel (split splitSentences by chunks and process them with await)
                 splitSentences.forEachIndexed { index, s ->
-                    val nlpSentence = NLPSentence(articleId, index.toLong(), clearString(s.toString()))
+                    val nlpSentence = NLPSentence(articleId, index.toLong(), s.toString())
                     nlpSentenceProcessor.process(nlpSentence, nlpCoreCopy)
                     database.sentencesNLP.insert(nlpSentence)
                     sentences += nlpSentence
@@ -311,7 +345,17 @@ class ArticlesRepository(
         .replace(11.toChar(), ' ')
         .replace(13.toChar(), ' ')
         .replace(3.toChar(), ' ')
-        .trim()
+        //.trim()
+
+    private val charsToTrim = setOf(
+        13.toChar(),
+        10.toChar(),
+        9.toChar(),
+        11.toChar(),
+        13.toChar(),
+        3.toChar(),
+        ' '
+    )
 
     private fun clearText(s: String) = s.replace("``", "\"")
         .replace("''", "\"")
