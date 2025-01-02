@@ -90,7 +90,7 @@ actual class ArticleParser actual constructor() {
     )
 
     private val tagAsNewLine = setOf(
-        "title", "p", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "address", "li", "th", "td"
+        "title", "p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "address", "li", "th", "td"
     )
 
     private val headerTag = setOf(

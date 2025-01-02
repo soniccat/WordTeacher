@@ -215,15 +215,28 @@ class ArticlesRepository(
         var sentenceSpans = nlpCoreCopy.sentenceSpans(resultText)
 
         // update tag positions to be sentence relative
+        val headers = cutResult.second.headers.toMutableList()
         var lastHeaderIndex = 0
         sentenceSpans.onEachIndexed { sI, sSpan ->
-            for (hI in lastHeaderIndex until cutResult.second.headers.size) {
-                val header = cutResult.second.headers[hI]
+            for (hI in lastHeaderIndex until headers.size) {
+                val header = headers[hI]
                 if (header.start >= sSpan.start && header.end <= sSpan.end) {
+                    // tag is fully inside of a span
                     header.sentenceIndex = sI
                     header.start -= sSpan.start
                     header.end -= sSpan.start
                     ++lastHeaderIndex
+                } else if (header.start >= sSpan.start && header.start < sSpan.end) {
+                    // the beginning of the tag is inside of span -> split the tag
+                    headers.add(hI + 1, header.copy(start = sSpan.end + 1, end = header.end))
+
+                    header.sentenceIndex = sI
+                    header.start -= sSpan.start
+                    header.end = sSpan.end - sSpan.start
+                    ++lastHeaderIndex
+                } else if (header.end <= sSpan.start) {
+                    ++lastHeaderIndex
+                    continue
                 } else {
                     break
                 }
@@ -257,7 +270,7 @@ class ArticlesRepository(
         }
 
         // trim sentenceSpans
-        val headerMap = cutResult.second.headers.associateBy { it.sentenceIndex }
+        val headerMap = headers.associateBy { it.sentenceIndex }
         sentenceSpans = sentenceSpans.mapIndexed { i, span ->
             var endI = span.end
             while (endI > 0) {
@@ -294,7 +307,7 @@ class ArticlesRepository(
 
         val style = ArticleStyle(
             paragraphs = paragraphs,
-            headers = cutResult.second.headers
+            headers = headers
         )
         val progressChannel = Channel<Pair<Float, Article?>>(UNLIMITED)
         scope.launch(Dispatchers.Default) {
