@@ -39,6 +39,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
+import kotlin.math.max
+import kotlin.math.min
 
 class ArticlesRepository(
     private val database: AppDatabase,
@@ -220,19 +222,19 @@ class ArticlesRepository(
         sentenceSpans.onEachIndexed { sI, sSpan ->
             for (hI in lastHeaderIndex until headers.size) {
                 val header = headers[hI]
-                if (header.start >= sSpan.start && header.end <= sSpan.end) {
-                    // tag is fully inside of a span
-                    header.sentenceIndex = sI
-                    header.start -= sSpan.start
-                    header.end -= sSpan.start
-                    ++lastHeaderIndex
-                } else if (header.start >= sSpan.start && header.start < sSpan.end) {
-                    // the beginning of the tag is inside of span -> split the tag
-                    headers.add(hI + 1, header.copy(start = sSpan.end + 1, end = header.end))
+                if (header.end -1 >= sSpan.start && header.start < sSpan.end) {
+                    header.start = max(header.start, sSpan.start) - sSpan.start
+
+                    if (header.end > sSpan.end) {
+                        // split the tag
+                        headers.add(hI + 1, header.copy(start = sSpan.end, end = header.end))
+
+                        header.end = sSpan.end - sSpan.start
+                    } else {
+                        header.end -= sSpan.start
+                    }
 
                     header.sentenceIndex = sI
-                    header.start -= sSpan.start
-                    header.end = sSpan.end - sSpan.start
                     ++lastHeaderIndex
                 } else if (header.end <= sSpan.start) {
                     ++lastHeaderIndex
@@ -298,8 +300,8 @@ class ArticlesRepository(
             val endTrim = span.end - endI
 
             headerMap[i]?.apply {
-                start += startTrim
-                end -= endTrim + startTrim
+                start = max(0, start - startTrim)
+                end = max(0, min(end - startTrim, (span.end - span.start) - startTrim - endTrim))
             }
 
             span.copy(startI, endI)
