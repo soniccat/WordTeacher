@@ -190,8 +190,6 @@ private fun AddArticlesFieldsUI(
                 .verticalScroll(scrollableState)
                 .padding(
                     top = LocalDimens.current.contentPadding,
-                    start = LocalDimens.current.contentPadding,
-                    end = LocalDimens.current.contentPadding,
                     bottom = 88.dp,
                 )
         ) {
@@ -201,6 +199,10 @@ private fun AddArticlesFieldsUI(
                     titleState = it
                     vm.onTitleChanged(titleState.text)
                 },
+                modifier = Modifier.padding(
+                    start = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding,
+                ),
                 hint = stringResource(MR.strings.add_article_field_title_hint),
                 errorText = data.titleError,
                 onFocusChanged = {
@@ -220,7 +222,12 @@ private fun AddArticlesFieldsUI(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = { vm.onNeedToCreateSetPressed() })
-                    .padding(top = 16.dp, bottom = 16.dp)
+                    .padding(
+                        top = 16.dp,
+                        bottom = 16.dp,
+                        start = LocalDimens.current.contentPadding,
+                        end = LocalDimens.current.contentPadding
+                    )
             ) {
                 Text(
                     text = stringResource(MR.strings.add_article_create_set_option),
@@ -238,6 +245,10 @@ private fun AddArticlesFieldsUI(
                 value = data.text,
                 onValueChange = { vm.onTextChanged(it) },
                 modifier = Modifier
+                    .padding(
+                        start = LocalDimens.current.contentPadding,
+                        end = LocalDimens.current.contentPadding,
+                    )
                     .fillMaxWidth()
                     .sizeIn(
                         minHeight = with(LocalDensity.current) {

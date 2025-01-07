@@ -35,6 +35,7 @@ import dev.icerock.moko.resources.compose.localized
 fun OutlinedTextFieldWithError(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
     hint: String,
     errorText: StringDesc?,
     onFocusChanged: (FocusState) -> Unit = {},
@@ -44,7 +45,7 @@ fun OutlinedTextFieldWithError(
 ) {
     val hasTitleError = errorText != null
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
             value = value,
