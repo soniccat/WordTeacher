@@ -114,7 +114,7 @@
 
     <string name="settings_title">Settings</string>
     <string name="settings_auth_title">Space</string>
-    <string name="settings_auth_signin">Sign In</string>
+    <string name="settings_auth_signin">Sign In to keep your card sets in sync between devices</string>
     <string name="settings_auth_signout">Sign Out from %s</string>
     <string name="settings_auth_refresh">Refresh</string>
     <string name="settings_dictconfigs">Dictionaries</string>

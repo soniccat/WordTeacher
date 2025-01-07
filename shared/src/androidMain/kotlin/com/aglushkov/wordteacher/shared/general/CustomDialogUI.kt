@@ -28,15 +28,13 @@ actual fun CustomDialogUI(
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            decorFitsSystemWindows = false
-        )
     ) {
         val window = findDialogWindow() ?: throw Resources.NotFoundException("Window isn't found")
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+        window.setDimAmount(0.0f)
 
         Surface(
-            modifier = Modifier.fillMaxSize().withWindowInsetsPadding(),
+            modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colors.background
         ) {
             Box(

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -39,7 +39,7 @@
         <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView</item>
 
         <!-- Compose Dialog -->
-        <item name="android:dialogTheme">@style/DialogStyle</item>
+        <item name="android:dialogTheme">@style/DialogWindowTheme</item>
     </style>
 
     <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
@@ -58,7 +58,9 @@
         <item name="android:textColor">@color/word_provided_by</item>
     </style>
 
-    <style name="DialogStyle" parent="android:Theme.Material.Light.Dialog.Alert">
+    <style name="DialogWindowTheme"
+        parent="android:Theme.Material.Light.Dialog.Alert"
+        tools:override="true">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:layout_width">match_parent</item>
@@ -73,7 +75,8 @@
 
         <!-- The same part we have in AppTheme, check the comment there -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@color/primaryDarkColor</item>
+        <item name="android:statusBarColor">@color/primaryColor</item>
+        <item name="android:windowContentOverlay">@null</item>
 
         <!-- Styles -->
         <item name="toolbarStyle">@style/MyToolbarStyle</item>
