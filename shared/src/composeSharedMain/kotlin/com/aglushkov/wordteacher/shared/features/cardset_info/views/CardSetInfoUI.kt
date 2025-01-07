@@ -129,8 +129,6 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
             .verticalScroll(scrollableState)
             .padding(
                 top = LocalDimens.current.contentPadding,
-                start = LocalDimens.current.contentPadding,
-                end = LocalDimens.current.contentPadding,
                 bottom = 300.dp,
             )
     ) {
@@ -140,6 +138,10 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                 nameState = it
                 vm.onNameChanged(it.text)
             },
+            modifier = Modifier.padding(
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+            ),
             hint = stringResource(MR.strings.cardset_info_field_name_hint),
             errorText = uiState.nameError,
             focusRequester = focusRequester,
@@ -154,6 +156,10 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                 vm.onDescriptionChanged(it.text)
             },
             modifier = Modifier
+                .padding(
+                    start = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding,
+                )
                 .fillMaxWidth()
                 .sizeIn(minHeight = with(LocalDensity.current) {
                     (42 * 2).sp.toDp()
@@ -171,6 +177,10 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                 vm.onSourceChanged(it.text)
             },
             modifier = Modifier
+                .padding(
+                    start = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding,
+                )
                 .fillMaxWidth(),
             label = { Text(stringResource(MR.strings.cardset_info_field_source_hint)) },
             readOnly = !uiState.isEditable,
@@ -178,7 +188,11 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
 
         uiState.sourceLinks.onEach { link ->
             Row(
-                Modifier.padding(top = 6.dp)
+                Modifier.padding(
+                    top = 6.dp,
+                    start = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding
+                )
             ) {
                 val linkString = uiState.source.orEmpty().substring(link.span.start, link.span.end)
                 Text(
@@ -208,7 +222,12 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = { vm.onIsAvailableInSearchChanged(!uiState.isAvailableInSearch) })
-                    .padding(top = 16.dp, bottom = 16.dp)
+                    .padding(
+                        top = 16.dp,
+                        bottom = 16.dp,
+                        start = LocalDimens.current.contentPadding,
+                        end = LocalDimens.current.contentPadding,
+                    )
             ) {
                 Text(
                     text = stringResource(MR.strings.cardset_info_enable_sharing),
@@ -228,5 +247,3 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
         focusRequester.requestFocus()
     }
 }
-
-private val LINK_ANNOTATION = "LINK_ANNOTATION"

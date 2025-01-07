@@ -84,6 +84,7 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 	// * cut progress data
 	// * clear cardset id and its card ids
 	// * clear modification date
+	// * set isAvailableInSearch in false
 	defaultCardProgress := &api.CardProgress{
 		CurrentLevel:     0,
 		LastMistakeCount: 0,
@@ -102,6 +103,7 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 	apiCardSet.Id = ""
 	apiCardSet.CreationDate = date
 	apiCardSet.ModificationDate = date
+	apiCardSet.IsAvailableInSearch = false
 
 	response := response{
 		CardSet: apiCardSet,

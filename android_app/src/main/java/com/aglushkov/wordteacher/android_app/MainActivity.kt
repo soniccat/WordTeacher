@@ -224,8 +224,8 @@ class MainActivity : AppCompatActivity(), Router {
                     is MainDecomposeComponent.Child.CardSetInfo -> CardSetInfoUI(
                         vm = instance.vm.apply {
                             router = object : CardSetInfoRouter {
-                                override fun openAddArticle(url: String) {
-                                    mainDecomposeComponent.openAddArticle(url)
+                                override fun openAddArticle(url: String, showNeedToCreateCardSet: Boolean) {
+                                    mainDecomposeComponent.openAddArticle(url, showNeedToCreateCardSet)
                                 }
 
                                 override fun onClosed() {

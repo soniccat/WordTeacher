@@ -218,27 +218,29 @@ private fun AddArticlesFieldsUI(
                 focusManager = focusManager,
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = { vm.onNeedToCreateSetPressed() })
-                    .padding(
-                        top = 16.dp,
-                        bottom = 16.dp,
-                        start = LocalDimens.current.contentPadding,
-                        end = LocalDimens.current.contentPadding
-                    )
-            ) {
-                Text(
-                    text = stringResource(MR.strings.add_article_create_set_option),
+            if (data.showNeedToCreateCardSet) {
+                Row(
                     modifier = Modifier
-                        .padding(end = 16.dp)
-                        .weight(1.0f)
-                )
-                Checkbox(
-                    checked = data.needToCreateSet,
-                    onCheckedChange = null
-                )
+                        .fillMaxWidth()
+                        .clickable(onClick = { vm.onNeedToCreateSetPressed() })
+                        .padding(
+                            top = 16.dp,
+                            bottom = 16.dp,
+                            start = LocalDimens.current.contentPadding,
+                            end = LocalDimens.current.contentPadding
+                        )
+                ) {
+                    Text(
+                        text = stringResource(MR.strings.add_article_create_set_option),
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .weight(1.0f)
+                    )
+                    Checkbox(
+                        checked = data.needToCreateSet,
+                        onCheckedChange = null
+                    )
+                }
             }
 
             OutlinedTextField(

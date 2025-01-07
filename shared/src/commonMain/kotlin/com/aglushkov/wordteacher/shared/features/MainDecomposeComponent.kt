@@ -62,7 +62,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
     val childStack: Value<ChildStack<ChildConfiguration, Child>>
     val dialogsStateFlow: Value<ChildStack<ChildConfiguration, Child>>
 
-    fun openAddArticle(url: String?)
+    fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
 //    fun popDialog(inner: Any)
     fun popDialog(config: ChildConfiguration)
     override fun openArticle(state: ArticleVM.State)
@@ -259,14 +259,14 @@ class MainDecomposeComponentImpl(
 
     // Dialogs
 
-    override fun openAddArticle(url: String?) {
+    override fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean) {
         addDialogConfigIfNotAtTop(MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration(
-            state = AddArticleVM.State(uri = url)
+            state = AddArticleVM.State(uri = url, needToCreateSet = showNeedToCreateCardSet, showNeedToCreateCardSet = showNeedToCreateCardSet)
         ))
     }
 
     override fun openAddArticle() {
-        openAddArticle(null)
+        openAddArticle(null, true)
     }
 
     private inline fun <reified C: MainDecomposeComponent.ChildConfiguration> addDialogConfigIfNotAtTop(config: C) {

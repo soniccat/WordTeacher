@@ -47,7 +47,8 @@ interface AddArticleVM: Clearable {
         val title: String? = null,
         val text: String? = null,
         val uri: String? = null,
-        val needToCreateSet: Boolean = true
+        val needToCreateSet: Boolean = true,
+        val showNeedToCreateCardSet: Boolean = true,
     )
 
     data class UIState(
@@ -55,6 +56,7 @@ interface AddArticleVM: Clearable {
         val titleError: StringDesc?,
         val text: String,
         val needToCreateSet: Boolean,
+        val showNeedToCreateCardSet: Boolean = true,
         val contentUri: String? = null
     )
 }
@@ -81,6 +83,7 @@ open class AddArticleVMImpl(
             titleError = null,
             text = state.text.orEmpty(),
             needToCreateSet = state.needToCreateSet,
+            showNeedToCreateCardSet = state.showNeedToCreateCardSet,
         )
 
         state.uri?.let { uri ->
