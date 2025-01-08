@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.*
 import androidx.compose.material.AppBarDefaults.TopAppBarElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -44,10 +45,12 @@ import java.net.URL
 import kotlinx.coroutines.launch
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.android_app.R
+import com.aglushkov.wordteacher.android_app.SnackbarUI
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponentRouter
 import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
 import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
@@ -58,10 +61,6 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import java.util.regex.Pattern
 
-//@ExperimentalUnitApi
-//@ExperimentalMaterialApi
-//@ExperimentalAnimationApi
-//@ExperimentalComposeUiApi
 class TextActionActivity: AppCompatActivity() {
     private lateinit var textActionDecomposeComponent: TextActionDecomposeComponent
     private val bottomBarTabs = listOf(
@@ -144,6 +143,11 @@ class TextActionActivity: AppCompatActivity() {
             .setConfig(TextActionComponent.Config(text?.toString() ?: "", urlString))
             .build()
             .textActionDecomposeComponent()
+        textActionDecomposeComponent.router = object : TextActionDecomposeComponentRouter {
+            override fun openArticle(id: Long) {
+                this@TextActionActivity.openArticle(id)
+            }
+        }
 
         if (urlString != null || text?.length?.let { it >= 100 } == true) {
             textActionDecomposeComponent.openAddArticle()
@@ -158,17 +162,26 @@ class TextActionActivity: AppCompatActivity() {
     private fun ComposeUI() {
         ComposeAppTheme {
             ProvideWindowInsets {
-                Surface(
-                    modifier = Modifier.fillMaxSize().withWindowInsetsPadding(),
-                    color = MaterialTheme.colors.background
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .withWindowInsetsPadding(),
                 ) {
-                    MainUI()
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colors.background
+                    ) {
+                        MainUI()
+                    }
+
+                    SnackbarUI(textActionDecomposeComponent.events.collectAsState()) { event, withAction ->
+                        textActionDecomposeComponent.onEventHandled(event, withAction)
+                    }
                 }
             }
         }
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun MainUI() {
         val coroutineScope = rememberCoroutineScope()
@@ -201,26 +214,14 @@ class TextActionActivity: AppCompatActivity() {
                             modalModifier = Modifier.padding(innerPadding)
                         )
                         is TextActionDecomposeComponent.Child.AddArticle -> {
-                            val articleCreatedString = StringDesc.Resource(MR.strings.articles_action_article_created).toString(LocalContext.current)
-                            val openActionText = StringDesc.Resource(MR.strings.articles_action_open).toString(LocalContext.current)
                             AddArticleUI(
                                 vm = instance.vm.apply {
                                     router = object : AddArticleRouter {
                                         override fun onArticleCreated(createdArticleId: Long?) {
                                             coroutineScope.launch {
-//                                                if (showSnackbar(articleCreatedString, actionLabel = openActionText) == SnackbarResult.ActionPerformed) {
-//                                                    this@TextActionActivity.startActivity(
-//                                                        Intent(
-//                                                            this@TextActionActivity,
-//                                                            MainActivity::class.java
-//                                                        ).apply {
-//                                                            articleId?.let {
-//                                                                putExtra(EXTRA_ARTICLE_ID, it)
-//                                                            }
-//                                                        }
-//                                                    )
-//                                                    this@TextActionActivity.finish()
-//                                                }
+                                                if (createdArticleId != null) {
+                                                    textActionDecomposeComponent.onArticleCreated(createdArticleId)
+                                                }
                                             }
                                         }
                                     }
@@ -286,6 +287,18 @@ class TextActionActivity: AppCompatActivity() {
                 )
             }
         }
+    }
+
+    private fun openArticle(id: Long) {
+        this@TextActionActivity.startActivity(
+            Intent(
+                this@TextActionActivity,
+                MainActivity::class.java
+            ).apply {
+                putExtra(EXTRA_ARTICLE_ID, id)
+            }
+        )
+        this@TextActionActivity.finish()
     }
 
     sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {

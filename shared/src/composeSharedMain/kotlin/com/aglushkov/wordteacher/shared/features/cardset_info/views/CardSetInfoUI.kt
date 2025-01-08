@@ -110,16 +110,6 @@ fun CardSetInfoUI(
                 CardSetInfoFieldsUI(vm, uiStateData)
             }
         }
-
-        val snackbarHostState = remember { SnackbarHostState() }
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.Companion.align(Alignment.BottomCenter)
-        ) {
-            Snackbar(
-                snackbarData = it,
-            )
-        }
     }
 }
 

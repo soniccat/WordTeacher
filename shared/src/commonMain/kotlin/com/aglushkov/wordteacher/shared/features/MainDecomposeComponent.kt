@@ -7,7 +7,6 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
@@ -28,29 +27,16 @@ import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 import com.aglushkov.wordteacher.shared.features.webauth.WebAuthDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthRouter
 import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthVM
-import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthVMImpl
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
-import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
-import com.arkivanov.decompose.router.stack.navigate
-import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.decompose.value.operator.map
-import com.arkivanov.essenty.lifecycle.LifecycleRegistry
-import com.arkivanov.essenty.lifecycle.destroy
-import com.arkivanov.essenty.lifecycle.resume
-import com.arkivanov.essenty.parcelable.Parcelable
 import io.ktor.util.reflect.instanceOf
-import kotlin.properties.Delegates
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
 interface MainDecomposeComponent: DefinitionsRouter,
@@ -58,7 +44,8 @@ interface MainDecomposeComponent: DefinitionsRouter,
     ArticlesRouter,
     ArticleRouter,
     SettingsRouter,
-    AuthOpener {
+    AuthOpener,
+    SnackbarEventsHolder {
     val childStack: Value<ChildStack<ChildConfiguration, Child>>
     val dialogsStateFlow: Value<ChildStack<ChildConfiguration, Child>>
 
@@ -117,7 +104,19 @@ interface MainDecomposeComponent: DefinitionsRouter,
 class MainDecomposeComponentImpl(
     componentContext: ComponentContext,
     val childComponentFactory: (context: ComponentContext, configuration: MainDecomposeComponent.ChildConfiguration) -> Any
-) : MainDecomposeComponent, ComponentContext by componentContext {
+) : MainDecomposeComponent,
+    ComponentContext by componentContext,
+    SnackbarEventsHolder by SnackbarEventsHolderImpl() {
+
+    init {
+        snackbarEventRouter = object : SnackbarEventsHolderRouter {
+            override fun openArticle(id: Long) {
+                this@MainDecomposeComponentImpl.openArticle(
+                    ArticleVM.State(id = id)
+                )
+            }
+        }
+    }
 
     private val navigation = StackNavigation<MainDecomposeComponent.ChildConfiguration>()
 

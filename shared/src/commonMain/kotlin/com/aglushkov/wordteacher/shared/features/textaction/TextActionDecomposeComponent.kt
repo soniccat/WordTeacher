@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.textaction
 
-import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.SnackbarEventsHolder
+import com.aglushkov.wordteacher.shared.features.SnackbarEventsHolderImpl
+import com.aglushkov.wordteacher.shared.features.SnackbarEventsHolderRouter
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
@@ -10,23 +12,25 @@ import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.RouterDecomposeComponent
-import com.aglushkov.wordteacher.shared.general.RouterStateChangeHandler
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
 import com.aglushkov.wordteacher.shared.general.popToRoot
-import com.aglushkov.wordteacher.shared.general.pushChildConfigurationIfNotAtTop
 import com.aglushkov.wordteacher.shared.general.pushChildConfigurationOrPopIfExists
-import com.aglushkov.wordteacher.shared.general.toClearables
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
-import io.ktor.http.Url
 import kotlinx.serialization.Serializable
 
-interface TextActionDecomposeComponent
-    : RouterDecomposeComponent<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child> {
+interface TextActionDecomposeComponentRouter {
+    fun openArticle(id: Long)
+}
 
+interface TextActionDecomposeComponent
+    : RouterDecomposeComponent<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child>,
+    SnackbarEventsHolder {
+
+    var router: TextActionDecomposeComponentRouter?
     val text: CharSequence
     val childStack: Value<ChildStack<ChildConfiguration, Child>>
 
@@ -62,8 +66,11 @@ class TextActionDecomposeComponentImpl(
     override val text: CharSequence,
     componentContext: ComponentContext,
     val childComponentFactory: (context: ComponentContext, configuration: TextActionDecomposeComponent.ChildConfiguration) -> Any
-) : TextActionDecomposeComponent, ComponentContext by componentContext {
+) : TextActionDecomposeComponent,
+    ComponentContext by componentContext,
+    SnackbarEventsHolder by SnackbarEventsHolderImpl() {
 
+    override var router: TextActionDecomposeComponentRouter? = null
     private val navigation = StackNavigation<TextActionDecomposeComponent.ChildConfiguration>()
 
     override val childStack: Value<ChildStack<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child>> =
@@ -74,6 +81,14 @@ class TextActionDecomposeComponentImpl(
             handleBackButton = true, // Pop the back stack on back button press
             childFactory = ::resolveChild,
         )
+
+    init {
+        snackbarEventRouter = object : SnackbarEventsHolderRouter {
+            override fun openArticle(id: Long) {
+                router?.openArticle(id)
+            }
+        }
+    }
 
     private fun resolveChild(
         configuration: TextActionDecomposeComponent.ChildConfiguration,
