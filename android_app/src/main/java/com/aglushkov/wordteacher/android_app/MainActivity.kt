@@ -54,6 +54,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoRout
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
@@ -221,7 +222,15 @@ class MainActivity : AppCompatActivity(), Router {
                     is MainDecomposeComponent.Child.Article -> ArticleUI(
                         vm = instance.vm.apply {
                             router = mainDecomposeComponent
-                            definitionsVM.router = mainDecomposeComponent
+                            definitionsVM.router = object : DefinitionsRouter {
+                                override fun openCardSets() {
+                                    mainDecomposeComponent.openCardSets()
+                                }
+
+                                override fun onLocalCardSetUpdated(cardSetId: Long) {
+                                    mainDecomposeComponent.onCardSetUpdated(cardSetId)
+                                }
+                            }
                         }
                     )
                     is MainDecomposeComponent.Child.CardSet -> CardSetUI(
@@ -286,7 +295,15 @@ class MainActivity : AppCompatActivity(), Router {
                 when (val instance = it.instance) {
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
                         vm = instance.vm.apply {
-                            router = mainDecomposeComponent
+                            router = object : DefinitionsRouter {
+                                override fun openCardSets() {
+                                    mainDecomposeComponent.openCardSets()
+                                }
+
+                                override fun onLocalCardSetUpdated(cardSetId: Long) {
+                                    mainDecomposeComponent.onCardSetUpdated(cardSetId)
+                                }
+                            }
                         },
                         modalModifier = Modifier.padding(innerPadding)
                     )

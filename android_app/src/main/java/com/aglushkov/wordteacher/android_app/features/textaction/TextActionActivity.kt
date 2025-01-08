@@ -206,8 +206,8 @@ class TextActionActivity: AppCompatActivity() {
                                         textActionDecomposeComponent.openCardSets()
                                     }
 
-                                    override fun openCardSet(state: CardSetVM.State) {
-                                        textActionDecomposeComponent.openCardSet(state)
+                                    override fun onLocalCardSetUpdated(cardSetId: Long) {
+                                        textActionDecomposeComponent.onCardSetUpdated(cardSetId)
                                     }
                                 }
                             },

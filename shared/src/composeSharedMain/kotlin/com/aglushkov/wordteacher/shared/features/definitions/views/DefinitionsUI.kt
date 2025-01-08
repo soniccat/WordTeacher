@@ -72,12 +72,6 @@ fun DefinitionsUI(
     val partOfSpeechFilterBottomSheetState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val focusManager = LocalFocusManager.current
-    val events by vm.events.collectAsState()
-    val eventToShow by remember(events) {
-        derivedStateOf {
-            vm.events.value.cardSetUpdatedEvents.firstOrNull()
-        }
-    }
 
     Box(modifier = modalModifier.fillMaxSize()) {
         // TODO: consider moving chooser outside...
@@ -108,30 +102,6 @@ fun DefinitionsUI(
                         partOfSpeechFilterBottomSheetState.show()
                     }
                 }
-            )
-        }
-
-        val snackbarHostState = remember { SnackbarHostState() }
-        val snackBarMessage = eventToShow?.text?.localized().orEmpty()
-        val snackBarActionText = eventToShow?.actionText?.localized().orEmpty()
-        LaunchedEffect(eventToShow) {
-            eventToShow?.let { event ->
-                scope.launch {
-                    val result = snackbarHostState.showSnackbar(
-                        snackBarMessage,
-                        snackBarActionText
-                    )
-                    vm.onEventHandled(event, result == SnackbarResult.ActionPerformed)
-                }
-            }
-        }
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.Companion.align(Alignment.BottomCenter)
-        ) {
-            CustomSnackbar(
-                message = null,
-                snackbarData = it,
             )
         }
     }

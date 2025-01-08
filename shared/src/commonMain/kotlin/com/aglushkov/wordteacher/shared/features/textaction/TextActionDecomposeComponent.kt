@@ -87,6 +87,10 @@ class TextActionDecomposeComponentImpl(
             override fun openArticle(id: Long) {
                 router?.openArticle(id)
             }
+
+            override fun openLocalCardSet(cardSetId: Long) {
+                openCardSet(CardSetVM.State.LocalCardSet(id = cardSetId))
+            }
         }
     }
 

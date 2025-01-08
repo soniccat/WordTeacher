@@ -65,13 +65,11 @@ interface DefinitionsVM: Clearable {
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
-    fun onEventHandled(event: Event, withAction: Boolean)
     fun onSuggestsAppeared()
     fun onBackPressed(): Boolean
 
     val wordTextValue: StateFlow<String>
     val state: State
-    val events: StateFlow<Events>
     val definitions: StateFlow<Resource<List<BaseViewItem<*>>>>
     val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
     val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
@@ -104,34 +102,6 @@ interface DefinitionsVM: Clearable {
         var word: String? = null,
     )
 
-    data class Events (
-        val cardSetUpdatedEvents: List<Event.CardSetUpdatedEvent> = listOf()
-    )
-
-    sealed interface Event {
-        val text: StringDesc
-        val actionText: StringDesc
-
-        data class CardSetUpdatedEvent(
-            override val text: StringDesc,
-            val openText: StringDesc,
-            val id: Long,
-        ): Event {
-            override val actionText: StringDesc
-                get() = openText
-        }
-
-//        data class ShowPartsOfSpeechFilterDialogEvent(
-//            val partsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
-//            val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech>,
-//            override var isHandled: Boolean = false
-//        ): Event {
-//            override fun markAsHandled() {
-//                isHandled = true
-//            }
-//        }
-    }
-
     data class Settings(
         val needStoreDefinedWordInSettings: Boolean = false
     )
@@ -162,7 +132,6 @@ open class DefinitionsVMImpl(
         }
     )
     override val wordTextValue = MutableStateFlow(state.word.orEmpty())
-    override val events = MutableStateFlow(DefinitionsVM.Events())
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
@@ -579,12 +548,6 @@ open class DefinitionsVMImpl(
         return res.getErrorString(hasConnection, hasResponse)
     }
 
-    override fun onEventHandled(event: DefinitionsVM.Event, withAction: Boolean) {
-        when (event) {
-            is DefinitionsVM.Event.CardSetUpdatedEvent -> onCardSetUpdatedEvent(event, withAction)
-        }
-    }
-
     override fun onSuggestsAppeared() {
         if (wordTextValue.value.isNotEmpty()) {
             requestSuggests(wordTextValue.value)
@@ -598,18 +561,6 @@ open class DefinitionsVMImpl(
         }
 
         return false
-    }
-
-    private fun onCardSetUpdatedEvent(
-        event: DefinitionsVM.Event.CardSetUpdatedEvent,
-        needOpen: Boolean,
-    ) {
-        events.update {
-            it.copy(cardSetUpdatedEvents = it.cardSetUpdatedEvents.filter { it != event })
-        }
-        if (needOpen) {
-            router?.openCardSet(CardSetVM.State.LocalCardSet(event.id))
-        }
     }
 
     // card sets
@@ -682,16 +633,7 @@ open class DefinitionsVMImpl(
                 examples = viewData.def.examples.orEmpty() + contextExamples,
                 termFrequency = wordFrequency.value.data()
             )
-            events.update {
-                it.copy(
-                    cardSetUpdatedEvents = it.cardSetUpdatedEvents +
-                        DefinitionsVM.Event.CardSetUpdatedEvent(
-                            text = StringDesc.Resource(MR.strings.definitions_cardsets_card_added),
-                            openText = StringDesc.Resource(MR.strings.definitions_cardsets_open),
-                            id = cardSetViewItem.cardSetId
-                        )
-                )
-            }
+            router?.onLocalCardSetUpdated(cardSetViewItem.cardSetId)
         }
     }
 

@@ -39,7 +39,7 @@ import com.arkivanov.decompose.value.Value
 import io.ktor.util.reflect.instanceOf
 import kotlinx.serialization.Serializable
 
-interface MainDecomposeComponent: DefinitionsRouter,
+interface MainDecomposeComponent:
     CardSetsRouter,
     ArticlesRouter,
     ArticleRouter,
@@ -53,9 +53,9 @@ interface MainDecomposeComponent: DefinitionsRouter,
 //    fun popDialog(inner: Any)
     fun popDialog(config: ChildConfiguration, onComplete: (topChild: MainDecomposeComponent.Child) -> Unit = {})
     override fun openArticle(state: ArticleVM.State)
+    fun openCardSets()
     override fun openCardSet(state: CardSetVM.State)
     fun openCardSetInfo(state: CardSetInfoVM.State)
-    override fun openCardSets()
     override fun openLearning(ids: List<Long>)
     fun openLearningSessionResult(results: List<SessionCardResult>)
     fun back()
@@ -114,6 +114,10 @@ class MainDecomposeComponentImpl(
                 this@MainDecomposeComponentImpl.openArticle(
                     ArticleVM.State(id = id)
                 )
+            }
+
+            override fun openLocalCardSet(cardSetId: Long) {
+                this@MainDecomposeComponentImpl.openCardSet(CardSetVM.State.LocalCardSet(id = cardSetId))
             }
         }
     }

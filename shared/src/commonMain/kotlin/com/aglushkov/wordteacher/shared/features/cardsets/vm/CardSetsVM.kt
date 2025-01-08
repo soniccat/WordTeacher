@@ -70,7 +70,7 @@ interface CardSetsVM: Clearable {
         val text: StringDesc
         val actionText: StringDesc
 
-        data class OpenCardSetEvent(
+        data class OpenCardSetEvent( // TODO: consider to move into SnackbarEventHolder
             override val text: StringDesc,
             val openText: StringDesc,
             val id: Long,
