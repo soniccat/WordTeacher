@@ -47,6 +47,9 @@ class AddArticleDecomposeComponent(
         ) {
             createState()
         }
+        doOnDestroy {
+
+        }
     }
 
     private companion object {

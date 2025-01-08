@@ -24,6 +24,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
@@ -108,6 +109,16 @@ fun CardSetInfoUI(
             } else {
                 CardSetInfoFieldsUI(vm, uiStateData)
             }
+        }
+
+        val snackbarHostState = remember { SnackbarHostState() }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.Companion.align(Alignment.BottomCenter)
+        ) {
+            Snackbar(
+                snackbarData = it,
+            )
         }
     }
 }

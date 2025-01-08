@@ -64,7 +64,7 @@ interface MainDecomposeComponent: DefinitionsRouter,
 
     fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
 //    fun popDialog(inner: Any)
-    fun popDialog(config: ChildConfiguration)
+    fun popDialog(config: ChildConfiguration, onComplete: (topChild: MainDecomposeComponent.Child) -> Unit = {})
     override fun openArticle(state: ArticleVM.State)
     override fun openCardSet(state: CardSetVM.State)
     fun openCardSetInfo(state: CardSetInfoVM.State)
@@ -273,9 +273,17 @@ class MainDecomposeComponentImpl(
         dialogNavigation.pushNew(config)
     }
 
-    override fun popDialog(config: MainDecomposeComponent.ChildConfiguration) {
-        dialogNavigation.navigate { configs ->
+    override fun popDialog(config: MainDecomposeComponent.ChildConfiguration, onComplete: (topChild: MainDecomposeComponent.Child) -> Unit) {
+        dialogNavigation.navigate ({ configs ->
             configs.filter { !it.instanceOf(config::class) }
+        }) { n, o ->
+            val activeChild = if (dialogsStateFlow.active.instance !is MainDecomposeComponent.Child.EmptyDialog) {
+                dialogsStateFlow.active.instance
+            } else {
+                childStack.active.instance
+            }
+
+            onComplete(activeChild)
         }
     }
 

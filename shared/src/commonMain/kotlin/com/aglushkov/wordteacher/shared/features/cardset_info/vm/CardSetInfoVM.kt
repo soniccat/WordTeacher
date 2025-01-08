@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.features.cardset_info.vm
 
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.StringDescThrowable
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -13,6 +14,7 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.ResourceFormatted
 import dev.icerock.moko.resources.desc.ResourceStringDesc
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +40,8 @@ interface CardSetInfoVM: Clearable {
     fun onIsAvailableInSearchChanged(isAvailableInSearch: Boolean)
     fun onLinkClicked(link: String)
     fun onImportArticleClicked(link: String)
+    fun onArticleCreated(articleId: Long)
+    fun onEventHandled(event: Event, withAction: Boolean)
 
     @Serializable
     sealed interface State {
@@ -81,7 +85,22 @@ interface CardSetInfoVM: Clearable {
         val sourceLinks: List<Link>,
         val isAvailableInSearch: Boolean,
         val isEditable: Boolean,
+        var events: List<Event> = emptyList(),
     )
+
+    sealed interface Event {
+        val text: StringDesc
+        val actionText: StringDesc
+
+        data class OpenArticleEvent(
+            override val text: StringDesc,
+            val openText: StringDesc,
+            val id: Long,
+        ) : Event {
+            override val actionText: StringDesc
+                get() = openText
+        }
+    }
 
     data class Link(
         val span: LinkSpan,
@@ -107,6 +126,7 @@ open class CardSetInfoVMImpl(
 
     private val cardSetState = MutableStateFlow<Resource<CardSet>>(Resource.Uninitialized())
     private val inputState = MutableStateFlow(CardSetInfoVM.InputState())
+    private val events = MutableStateFlow(listOf<CardSetInfoVM.Event>())
     override val uiStateFlow: StateFlow<Resource<CardSetInfoVM.UIState>> = combine(
         if (state.isRemoteCardSet) {
             cardSetState
@@ -123,7 +143,8 @@ open class CardSetInfoVMImpl(
             }
         },
         inputState,
-    ) { cardSetRes, inputState ->
+        events,
+    ) { cardSetRes, inputState, events ->
         cardSetRes.mapLoadedData(
             errorTransformer = {
                 StringDescThrowable(ResourceStringDesc(MR.strings.cardset_info_error), it)
@@ -146,7 +167,8 @@ open class CardSetInfoVMImpl(
                     )
                 },
                 isAvailableInSearch = inputState.isAvailableInSearch ?: cardSet.isAvailableInSearch,
-                isEditable = !state.isRemoteCardSet
+                isEditable = !state.isRemoteCardSet,
+                events = events
             )
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
@@ -208,6 +230,36 @@ open class CardSetInfoVMImpl(
 
     override fun onImportArticleClicked(link: String) {
         router?.openAddArticle(link, showNeedToCreateCardSet = false)
+    }
+
+    override fun onArticleCreated(articleId: Long) {
+        events.update {
+            it + createOpenArticleEvent(articleId)
+        }
+    }
+
+    override fun onEventHandled(event: CardSetInfoVM.Event, withAction: Boolean) {
+        when (event) {
+            is CardSetInfoVM.Event.OpenArticleEvent -> onOpenArticleEventHandled(event, withAction)
+        }
+    }
+
+    private fun createOpenArticleEvent(id: Long) = CardSetInfoVM.Event.OpenArticleEvent(
+        text = StringDesc.Resource(MR.strings.articles_action_article_created),
+        openText = StringDesc.Resource(MR.strings.articles_action_open),
+        id = id,
+    )
+
+    private fun onOpenArticleEventHandled(
+        event: CardSetInfoVM.Event.OpenArticleEvent,
+        needOpen: Boolean,
+    ) {
+        events.update {
+            it.filter { e -> e != event })
+        }
+        if (needOpen) {
+            router?.openAddArticle()
+        }
     }
 
     private fun logChange(fieldType: String) {

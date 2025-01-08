@@ -45,6 +45,7 @@ import kotlinx.coroutines.launch
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUI
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
@@ -203,25 +204,28 @@ class TextActionActivity: AppCompatActivity() {
                             val articleCreatedString = StringDesc.Resource(MR.strings.articles_action_article_created).toString(LocalContext.current)
                             val openActionText = StringDesc.Resource(MR.strings.articles_action_open).toString(LocalContext.current)
                             AddArticleUI(
-                                vm = instance.vm,
-                                modifier = Modifier.padding(innerPadding),
-                                onArticleCreated = { articleId ->
-                                    coroutineScope.launch {
-                                        if (showSnackbar(articleCreatedString, actionLabel = openActionText) == SnackbarResult.ActionPerformed) {
-                                            this@TextActionActivity.startActivity(
-                                                Intent(
-                                                    this@TextActionActivity,
-                                                    MainActivity::class.java
-                                                ).apply {
-                                                    articleId?.let {
-                                                        putExtra(EXTRA_ARTICLE_ID, it)
-                                                    }
-                                                }
-                                            )
-                                            this@TextActionActivity.finish()
+                                vm = instance.vm.apply {
+                                    router = object : AddArticleRouter {
+                                        override fun onArticleCreated(createdArticleId: Long?) {
+                                            coroutineScope.launch {
+//                                                if (showSnackbar(articleCreatedString, actionLabel = openActionText) == SnackbarResult.ActionPerformed) {
+//                                                    this@TextActionActivity.startActivity(
+//                                                        Intent(
+//                                                            this@TextActionActivity,
+//                                                            MainActivity::class.java
+//                                                        ).apply {
+//                                                            articleId?.let {
+//                                                                putExtra(EXTRA_ARTICLE_ID, it)
+//                                                            }
+//                                                        }
+//                                                    )
+//                                                    this@TextActionActivity.finish()
+//                                                }
+                                            }
                                         }
                                     }
-                                }
+                                },
+                                modifier = Modifier.padding(innerPadding),
                             )
                         }
                         is TextActionDecomposeComponent.Child.AddNote -> NotesUI(

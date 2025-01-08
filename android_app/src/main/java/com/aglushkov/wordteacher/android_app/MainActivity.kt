@@ -35,6 +35,7 @@ import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUIDialog
+import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleRouter
 import com.aglushkov.wordteacher.shared.features.article.views.ArticleUI
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticlesUI
@@ -308,10 +309,19 @@ class MainActivity : AppCompatActivity(), Router {
             when (val instance = child.instance) {
                 is MainDecomposeComponent.Child.AddArticle ->
                     AddArticleUIDialog(
-                        vm = instance.vm,
-                        onArticleCreated = {
-                            mainDecomposeComponent.popDialog(child.configuration)
-                        }
+                        vm = instance.vm.apply {
+                            router = object : AddArticleRouter {
+                                override fun onArticleCreated(createdArticleId: Long?) {
+                                    mainDecomposeComponent.popDialog(child.configuration) {
+                                        if (createdArticleId != null) {
+                                            if (it is CardSetInfoVM) {
+                                                it.onArticleCreated(createdArticleId)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
                     )
                 is MainDecomposeComponent.Child.Learning ->
                     LearningUIDialog(

@@ -55,7 +55,7 @@
 
     <string name="articles_title">Articles</string>
     <string name="articles_action_add_text">New Article</string>
-    <string name="articles_action_article_created">Added!</string>
+    <string name="articles_action_article_created">Article has been added!</string>
     <string name="articles_action_open">Open</string>
     <string name="add_article_title">New Article</string>
     <string name="add_article_field_title_hint">Title</string>

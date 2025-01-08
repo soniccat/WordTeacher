@@ -47,10 +47,9 @@ import kotlinx.coroutines.launch
 fun AddArticleUIDialog(
     vm: AddArticleVM,
     modifier: Modifier = Modifier,
-    onArticleCreated: () -> Unit
 ) {
     CustomDialogUI(
-        onDismissRequest = { onArticleCreated() }
+        onDismissRequest = { vm.onClosed() }
     ) {
         AddArticleUI(
             vm = vm,
@@ -66,7 +65,6 @@ fun AddArticleUIDialog(
                     )
                 }
             },
-            { onArticleCreated() }
         )
     }
 }
@@ -76,7 +74,6 @@ fun AddArticleUI(
     vm: AddArticleVM,
     modifier: Modifier = Modifier,
     actions: @Composable RowScope.() -> Unit = {},
-    onArticleCreated: SnackbarHostState.(articleId: Long?) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarStringDesc = remember { mutableStateOf<dev.icerock.moko.resources.desc.StringDesc?>(null) }
@@ -147,13 +144,9 @@ fun AddArticleUI(
     LaunchedEffect("eventHandler") {
         vm.eventFlow.collect {
             when (it) {
-                is CompletionEvent -> with(snackbarHostState) {
-                // TODO: handle cancellation
-                    onArticleCreated((it.data as? CompletionData.Article)?.id)
-                }
                 is ErrorEvent -> {
                     launch {
-                        snackbarStringDesc.value = it.text
+                        snackbarStringDesc.value = it.text // TODO: clear it somehow or rewrite
                         snackbarHostState.showSnackbar("")
                     }
                 }

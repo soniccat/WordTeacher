@@ -3,7 +3,6 @@ package com.aglushkov.wordteacher.shared.features.add_article.vm
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.*
-import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
@@ -27,11 +26,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
+interface AddArticleRouter {
+    fun onArticleCreated(createdArticleId: Long?)
+}
+
 interface AddArticleVM: Clearable {
+    var router: AddArticleRouter?
     val eventFlow: Flow<Event>
     val uiStateFlow: StateFlow<Resource<UIState>>
     val addingStateFlow: StateFlow<Resource<Article>>
 
+    fun onClosed()
     fun createState(): State
     fun onTitleChanged(title: String)
     fun onTextChanged(text: String)
@@ -70,6 +75,7 @@ open class AddArticleVMImpl(
     private val analytics: Analytics,
 ): ViewModel(), AddArticleVM {
 
+    override var router: AddArticleRouter? = null
     private val eventChannel = Channel<Event>(Channel.BUFFERED) // TODO: replace with a list of strings
     override val eventFlow = eventChannel.receiveAsFlow()
 
@@ -91,6 +97,10 @@ open class AddArticleVMImpl(
         } ?: run {
             uiStateFlow.update { it.toLoaded(dataFromState) }
         }
+    }
+
+    override fun onClosed() {
+        router?.onArticleCreated(null)
     }
 
     override fun createState(): AddArticleVM.State {
@@ -139,7 +149,7 @@ open class AddArticleVMImpl(
     }
 
     override fun onCancelPressed() = viewModelScope.launch {
-        eventChannel.trySend(CompletionEvent(CompletionResult.CANCELLED))
+        router?.onArticleCreated(null)
     }
 
     override fun onTitleFocusChanged(hasFocus: Boolean) {
@@ -173,12 +183,7 @@ open class AddArticleVMImpl(
                                 "AddArticleVM.AddArticle",
                                 mapOf("id" to article.name, "uri" to state.uri, "createSet" to state.needToCreateSet))
                         )
-                        eventChannel.trySend(
-                            CompletionEvent(
-                                CompletionResult.COMPLETED,
-                                CompletionData.Article(article.id)
-                            )
-                        )
+                        router?.onArticleCreated(article.id)
                     }
 
                     addingStateFlow.value.onError { e ->
