@@ -53,7 +53,7 @@ kotlin {
             implementation(libs.kotlinxDateTime)
             implementation(libs.statelyCommon)
             implementation(libs.statelyConcurrency)
-            implementation(libs.uuid)
+            api(libs.uuid)
         }
 
         val composeSharedMain by creating {

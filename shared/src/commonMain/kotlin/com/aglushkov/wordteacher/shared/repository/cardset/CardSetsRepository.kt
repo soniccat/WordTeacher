@@ -73,15 +73,15 @@ class CardSetsRepository(
         examples: List<String>,
         termFrequency: Double?
     ): Card {
-        nlpCore.waitUntilInitialized()
-        val nlpCoreCopy = nlpCore.clone()
+//        nlpCore.waitUntilInitialized()
+//        val nlpCoreCopy = nlpCore.clone()
         return scope.async(Dispatchers.Default) {
-            val definitionSpans = definitions.map { sentence ->
-                findTermSpans(sentence, term, nlpCoreCopy)
-            }
-            val exampleSpans = examples.map { sentence ->
-                findTermSpans(sentence, term, nlpCoreCopy)
-            }
+//            val definitionSpans = definitions.map { sentence ->
+//                findTermSpans(sentence, term, nlpCoreCopy)
+//            }
+//            val exampleSpans = examples.map { sentence ->
+//                findTermSpans(sentence, term, nlpCoreCopy)
+//            }
 
             databaseWorker.run {
                 it.cards.insertCard(
@@ -90,12 +90,14 @@ class CardSetsRepository(
                     creationDate = timeSource.timeInstant(),
                     definitions = definitions,
                     labels = labels,
-                    definitionTermSpans = definitionSpans,
+//                    definitionTermSpans = definitionSpans,
                     partOfSpeech = partOfSpeech,
                     transcription = transcription,
                     synonyms = synonyms,
                     examples = examples,
-                    exampleTermSpans = exampleSpans,
+//                    exampleTermSpans = exampleSpans,
+                    needToUpdateExampleSpans = true,
+                    needToUpdateDefinitionSpans = true,
                     termFrequency = termFrequency
                 )
             }

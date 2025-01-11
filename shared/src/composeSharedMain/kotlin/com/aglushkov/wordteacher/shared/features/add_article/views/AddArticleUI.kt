@@ -75,8 +75,6 @@ fun AddArticleUI(
     modifier: Modifier = Modifier,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarStringDesc = remember { mutableStateOf<dev.icerock.moko.resources.desc.StringDesc?>(null) }
     val uiState by vm.uiStateFlow.collectAsState()
     val needShowFloatingActionButton by remember(uiState) { derivedStateOf { uiState.isLoaded() } }
     val addingState by vm.addingStateFlow.collectAsState()
@@ -128,29 +126,6 @@ fun AddArticleUI(
                     .align(Alignment.BottomEnd)
                     .padding(LocalDimens.current.contentPadding)
             )
-        }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.Companion.align(Alignment.BottomCenter)
-        ) {
-            CustomSnackbar(
-                message = snackbarStringDesc.value?.localized(),
-                snackbarData = it,
-            )
-        }
-    }
-
-    LaunchedEffect("eventHandler") {
-        vm.eventFlow.collect {
-            when (it) {
-                is ErrorEvent -> {
-                    launch {
-                        snackbarStringDesc.value = it.text // TODO: clear it somehow or rewrite
-                        snackbarHostState.showSnackbar("")
-                    }
-                }
-            }
         }
     }
 }

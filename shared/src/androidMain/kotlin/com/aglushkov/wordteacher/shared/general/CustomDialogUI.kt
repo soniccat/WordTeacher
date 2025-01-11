@@ -41,6 +41,7 @@ actual fun CustomDialogUI(
                 modifier = Modifier.fillMaxSize()
             ) {
                 content()
+                SnackbarUI()
             }
         }
     }

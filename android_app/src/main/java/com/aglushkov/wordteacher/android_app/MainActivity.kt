@@ -10,19 +10,13 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.AppBarDefaults.TopAppBarElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,7 +33,6 @@ import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.android_app.helper.EmailOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.SnackbarEventsHolder
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUIDialog
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleRouter
@@ -63,6 +56,8 @@ import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.features.settings.vm.SETTING_GET_WORD_FROM_CLIPBOARD
 import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
+import com.aglushkov.wordteacher.shared.general.SnackbarEventHolderUI
+import com.aglushkov.wordteacher.shared.general.SnackbarUI
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
 import com.aglushkov.wordteacher.shared.res.MR
@@ -74,7 +69,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.russhwolf.settings.coroutines.toBlockingSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.desc.StringDesc
 
 class MainActivity : AppCompatActivity(), Router {
     private val bottomBarTabs = listOf(
@@ -172,7 +167,9 @@ class MainActivity : AppCompatActivity(), Router {
             .mainDecomposeComponent()
 
         setContent {
-            ComposeUI()
+            SnackbarEventHolderUI(mainDecomposeComponent) {
+                ComposeUI()
+            }
         }
     }
 
@@ -199,9 +196,8 @@ class MainActivity : AppCompatActivity(), Router {
                         mainUI()
                         dialogUI()
                     }
-                    SnackbarUI(mainDecomposeComponent.events.collectAsState()) { event, withAction ->
-                        mainDecomposeComponent.onEventHandled(event, withAction)
-                    }
+
+                    SnackbarUI()
                 }
             }
         }
@@ -352,6 +348,10 @@ class MainActivity : AppCompatActivity(), Router {
                                         }
                                     }
                                 }
+
+                                override fun onError(text: StringDesc) {
+                                    mainDecomposeComponent.onError(text)
+                                }
                             }
                         },
                     )
@@ -464,38 +464,6 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun openJsonImport() {
         TODO("That's only desktop feature")
-    }
-}
-
-@Composable
-fun BoxScope.SnackbarUI(
-    events: State<List<SnackbarEventsHolder.Event>>,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    onEventHandled: (SnackbarEventsHolder.Event, withAction: Boolean) -> Unit
-) {
-    val coroutineScope = rememberCoroutineScope()
-    val eventToShow by remember(events) {
-        derivedStateOf { events.value.firstOrNull() }
-    }
-    SnackbarHost(
-        hostState = snackbarHostState,
-        modifier = Modifier.align(Alignment.BottomCenter)
-    ) {
-        Snackbar(snackbarData = it,)
-    }
-
-    val snackBarMessage = eventToShow?.text?.localized().orEmpty()
-    val snackBarActionText = eventToShow?.actionText?.localized().orEmpty()
-    LaunchedEffect(eventToShow) {
-        eventToShow?.let { event ->
-            coroutineScope.launch {
-                val result = snackbarHostState.showSnackbar(
-                    snackBarMessage,
-                    snackBarActionText
-                )
-                onEventHandled(event, result == SnackbarResult.ActionPerformed)
-            }
-        }
     }
 }
 

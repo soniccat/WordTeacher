@@ -45,13 +45,13 @@ import java.net.URL
 import kotlinx.coroutines.launch
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.SnackbarUI
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleRouter
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponentRouter
 import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
+import com.aglushkov.wordteacher.shared.general.SnackbarUI
 import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
@@ -174,9 +174,9 @@ class TextActionActivity: AppCompatActivity() {
                         MainUI()
                     }
 
-                    SnackbarUI(textActionDecomposeComponent.events.collectAsState()) { event, withAction ->
-                        textActionDecomposeComponent.onEventHandled(event, withAction)
-                    }
+//                    SnackbarUI(textActionDecomposeComponent.events.collectAsState()) { event, withAction ->
+//                        textActionDecomposeComponent.onEventHandled(event, withAction)
+//                    }
                 }
             }
         }
@@ -223,6 +223,10 @@ class TextActionActivity: AppCompatActivity() {
                                                     textActionDecomposeComponent.onArticleCreated(createdArticleId)
                                                 }
                                             }
+                                        }
+
+                                        override fun onError(text: StringDesc) {
+                                            textActionDecomposeComponent.onError(text)
                                         }
                                     }
                                 },

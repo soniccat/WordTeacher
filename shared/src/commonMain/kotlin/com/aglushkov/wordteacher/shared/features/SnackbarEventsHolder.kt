@@ -14,17 +14,36 @@ interface SnackbarEventsHolderRouter {
     fun openLocalCardSet(cardSetId: Long)
 }
 
+data class SnackbarEventHolderItem(
+    val flow: StateFlow<List<SnackbarEventsHolder.Event>>,
+    val handler: (SnackbarEventsHolder.Event, withAction: Boolean) -> Unit,
+)
+
 interface SnackbarEventsHolder {
+    companion object {
+        val map = mutableMapOf<String, SnackbarEventHolderItem>()
+
+        fun addSource(name: String, item: SnackbarEventHolderItem) {
+            map[name] = item
+        }
+
+        fun removeSource(name: String) {
+            map.remove(name)
+        }
+    }
+
     var snackbarEventRouter: SnackbarEventsHolderRouter?
     val events: StateFlow<List<Event>>
 
     fun onArticleCreated(articleId: Long)
     fun onCardSetUpdated(cardSetId: Long)
+    fun onError(text: StringDesc)
     fun onEventHandled(event: Event, withAction: Boolean)
 
     sealed interface Event {
         val text: StringDesc
-        val actionText: StringDesc
+        val actionText: StringDesc?
+            get() = null
 
         data class OpenArticleEvent(
             override val text: StringDesc,
@@ -43,6 +62,8 @@ interface SnackbarEventsHolder {
             override val actionText: StringDesc
                 get() = openText
         }
+
+        data class ErrorEvent(override val text: StringDesc): Event
     }
 }
 
@@ -62,10 +83,20 @@ class SnackbarEventsHolderImpl: SnackbarEventsHolder {
         }
     }
 
+    override fun onError(text: StringDesc) {
+        events.update {
+            it + SnackbarEventsHolder.Event.ErrorEvent(text)
+        }
+    }
+
     override fun onEventHandled(event: SnackbarEventsHolder.Event, withAction: Boolean) {
+        events.update {
+            it.filter { e -> e != event }
+        }
         when (event) {
             is SnackbarEventsHolder.Event.OpenArticleEvent -> onOpenArticleEventHandled(event, withAction)
             is SnackbarEventsHolder.Event.CardSetUpdatedEvent -> onCardSetUpdatedEvent(event, withAction)
+            is SnackbarEventsHolder.Event.ErrorEvent -> Unit
         }
     }
 
@@ -85,9 +116,6 @@ class SnackbarEventsHolderImpl: SnackbarEventsHolder {
         event: SnackbarEventsHolder.Event.OpenArticleEvent,
         needOpen: Boolean,
     ) {
-        events.update {
-            it.filter { e -> e != event }
-        }
         if (needOpen) {
             snackbarEventRouter?.openArticle(event.id)
         }
@@ -97,9 +125,6 @@ class SnackbarEventsHolderImpl: SnackbarEventsHolder {
         event: SnackbarEventsHolder.Event.CardSetUpdatedEvent,
         needOpen: Boolean,
     ) {
-        events.update {
-            it.filter { it != event }
-        }
         if (needOpen) {
             snackbarEventRouter?.openLocalCardSet(event.id)
         }

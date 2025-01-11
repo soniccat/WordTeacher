@@ -28,11 +28,11 @@ import kotlinx.serialization.Serializable
 
 interface AddArticleRouter {
     fun onArticleCreated(createdArticleId: Long?)
+    fun onError(text: StringDesc)
 }
 
 interface AddArticleVM: Clearable {
     var router: AddArticleRouter?
-    val eventFlow: Flow<Event>
     val uiStateFlow: StateFlow<Resource<UIState>>
     val addingStateFlow: StateFlow<Resource<Article>>
 
@@ -76,8 +76,6 @@ open class AddArticleVMImpl(
 ): ViewModel(), AddArticleVM {
 
     override var router: AddArticleRouter? = null
-    private val eventChannel = Channel<Event>(Channel.BUFFERED) // TODO: replace with a list of strings
-    override val eventFlow = eventChannel.receiveAsFlow()
 
     private var state = restoredState
     override val uiStateFlow = MutableStateFlow<Resource<AddArticleVM.UIState>>(Resource.Uninitialized())
@@ -176,6 +174,9 @@ open class AddArticleVMImpl(
                     }
 
                     articlesRepository.createArticle(data.title, data.text).collect(addingStateFlow)
+                    addingStateFlow.update {
+                        it.toError(RuntimeException("aaa"), canTryAgain = true)
+                    }
 
                     addingStateFlow.value.onData { article ->
                         analytics.send(
@@ -183,7 +184,7 @@ open class AddArticleVMImpl(
                                 "AddArticleVM.AddArticle",
                                 mapOf("id" to article.name, "uri" to state.uri, "createSet" to state.needToCreateSet))
                         )
-                        router?.onArticleCreated(article.id)
+//                        router?.onArticleCreated(article.id)
                     }
 
                     addingStateFlow.value.onError { e ->
@@ -192,7 +193,7 @@ open class AddArticleVMImpl(
                             StringDesc.Raw(it)
                         } ?: StringDesc.Resource(MR.strings.error_default)
 
-                        eventChannel.trySend(ErrorEvent(errorText))
+                        router?.onError(errorText)
                     }
                 }
             }
@@ -220,11 +221,6 @@ open class AddArticleVMImpl(
         } else {
             uiStateFlow.updateLoadedData { it.copy(titleError = null) }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        eventChannel.cancel()
     }
 
     override fun getErrorText(): StringDesc? {
