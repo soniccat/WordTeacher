@@ -29,8 +29,8 @@ class SpanUpdateWorker (
             val nlpCoreCopy = nlpCore.clone()
             database.cards.selectCardsWithOutdatedSpans().asFlow().collect { query ->
                 do {
-                    val cards = query.executeAsList() // execute or re-execute the query
-                    if (cards.isEmpty()) {
+                    val cardIds = query.executeAsList() // execute or re-execute the query
+                    if (cardIds.isEmpty()) {
                         break
                     } else if (state.value.isPaused()) {
                         state.update {
@@ -52,22 +52,20 @@ class SpanUpdateWorker (
                         }
                     }
 
-                    Logger.v("is in progress or pending pause (${cards.size}, ${state.value})", "SpanUpdateWorker")
+                    Logger.v("is in progress or pending pause (${cardIds.size}, ${state.value})", "SpanUpdateWorker")
 
 
-                    cards.forEach { card ->
+                    cardIds.forEach { cardId ->
                         if (state.tryPauseIfPendingPause()) {
                             Logger.v("paused", "SpanUpdateWorker")
                             return@forEach
                         }
 
+                        val card = database.cards.selectCards(listOf(cardId)).executeAsList().firstOrNull() ?: return@forEach
+
                         var defSpans = emptyList<List<CardSpan>>()
                         if (card.needToUpdateDefinitionSpans) {
                             defSpans = card.definitions.map {
-                                if (state.tryPauseIfPendingPause()) {
-                                    Logger.v("paused", "SpanUpdateWorker")
-                                    return@forEach
-                                }
                                 findTermSpans(it, card.term, nlpCoreCopy, nlpSentenceProcessor)
                             }
                         }
@@ -75,17 +73,8 @@ class SpanUpdateWorker (
                         var exampleSpans = emptyList<List<CardSpan>>()
                         if (card.needToUpdateExampleSpans) {
                             exampleSpans = card.examples.map {
-                                if (state.tryPauseIfPendingPause()) {
-                                    Logger.v("paused", "SpanUpdateWorker")
-                                    return@forEach
-                                }
                                 findTermSpans(it, card.term, nlpCoreCopy, nlpSentenceProcessor)
                             }
-                        }
-
-                        if (state.tryPauseIfPendingPause()) {
-                            Logger.v("paused", "SpanUpdateWorker")
-                            return@forEach
                         }
 
                         databaseWorker.run {

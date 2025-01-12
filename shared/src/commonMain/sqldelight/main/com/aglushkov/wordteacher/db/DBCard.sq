@@ -47,7 +47,7 @@ FROM DBCard
 WHERE DBCard.id IN ?;
 
 selectCardsWithOutdatedSpans:
-SELECT *
+SELECT id
 FROM DBCard
 WHERE DBCard.needToUpdateDefinitionSpans OR DBCard.needToUpdateExampleDefinitionSpans;
 

@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.maindb.MainDB
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.FileOpenController
+import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.extensions.firstLong
@@ -18,6 +19,7 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.tryInResource
 import com.aglushkov.wordteacher.shared.general.toLong
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
@@ -366,7 +368,7 @@ class AppDatabase(
         }
 
         fun selectCardsWithOutdatedSpans() =
-            db.dBCardQueries.selectCardsWithOutdatedSpans(mapper = cardMapper())
+            db.dBCardQueries.selectCardsWithOutdatedSpans()
 
         fun selectCardsWithUndefinedFrequency() =
             db.dBCardQueries.selectCardsWithUndefinedFrequency()
