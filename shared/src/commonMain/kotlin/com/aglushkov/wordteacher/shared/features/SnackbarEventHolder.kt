@@ -1,7 +1,5 @@
 package com.aglushkov.wordteacher.shared.features
 
-import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
@@ -9,17 +7,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-interface SnackbarEventsHolderRouter {
+interface SnackbarEventHolderRouter {
     fun openArticle(id: Long)
     fun openLocalCardSet(cardSetId: Long)
 }
 
 data class SnackbarEventHolderItem(
-    val flow: StateFlow<List<SnackbarEventsHolder.Event>>,
-    val handler: (SnackbarEventsHolder.Event, withAction: Boolean) -> Unit,
+    val flow: StateFlow<List<SnackbarEventHolder.Event>>,
+    val handler: (SnackbarEventHolder.Event, withAction: Boolean) -> Unit,
 )
 
-interface SnackbarEventsHolder {
+interface SnackbarEventHolder {
     companion object {
         val map = mutableMapOf<String, SnackbarEventHolderItem>()
 
@@ -32,7 +30,7 @@ interface SnackbarEventsHolder {
         }
     }
 
-    var snackbarEventRouter: SnackbarEventsHolderRouter?
+    var snackbarEventRouter: SnackbarEventHolderRouter?
     val events: StateFlow<List<Event>>
 
     fun onArticleCreated(articleId: Long)
@@ -67,9 +65,9 @@ interface SnackbarEventsHolder {
     }
 }
 
-class SnackbarEventsHolderImpl: SnackbarEventsHolder {
-    override var snackbarEventRouter: SnackbarEventsHolderRouter? = null
-    override val events = MutableStateFlow(listOf<SnackbarEventsHolder.Event>())
+class SnackbarEventHolderImpl: SnackbarEventHolder {
+    override var snackbarEventRouter: SnackbarEventHolderRouter? = null
+    override val events = MutableStateFlow(listOf<SnackbarEventHolder.Event>())
 
     override fun onArticleCreated(articleId: Long) {
         events.update {
@@ -85,35 +83,35 @@ class SnackbarEventsHolderImpl: SnackbarEventsHolder {
 
     override fun onError(text: StringDesc) {
         events.update {
-            it + SnackbarEventsHolder.Event.ErrorEvent(text)
+            it + SnackbarEventHolder.Event.ErrorEvent(text)
         }
     }
 
-    override fun onEventHandled(event: SnackbarEventsHolder.Event, withAction: Boolean) {
+    override fun onEventHandled(event: SnackbarEventHolder.Event, withAction: Boolean) {
         events.update {
             it.filter { e -> e != event }
         }
         when (event) {
-            is SnackbarEventsHolder.Event.OpenArticleEvent -> onOpenArticleEventHandled(event, withAction)
-            is SnackbarEventsHolder.Event.CardSetUpdatedEvent -> onCardSetUpdatedEvent(event, withAction)
-            is SnackbarEventsHolder.Event.ErrorEvent -> Unit
+            is SnackbarEventHolder.Event.OpenArticleEvent -> onOpenArticleEventHandled(event, withAction)
+            is SnackbarEventHolder.Event.CardSetUpdatedEvent -> onCardSetUpdatedEvent(event, withAction)
+            is SnackbarEventHolder.Event.ErrorEvent -> Unit
         }
     }
 
-    private fun createOpenArticleEvent(id: Long) = SnackbarEventsHolder.Event.OpenArticleEvent(
+    private fun createOpenArticleEvent(id: Long) = SnackbarEventHolder.Event.OpenArticleEvent(
         text = StringDesc.Resource(MR.strings.articles_action_article_created),
         openText = StringDesc.Resource(MR.strings.articles_action_open),
         id = id,
     )
 
-    private fun createCardSetUpdatedEvent(id: Long) = SnackbarEventsHolder.Event.CardSetUpdatedEvent(
+    private fun createCardSetUpdatedEvent(id: Long) = SnackbarEventHolder.Event.CardSetUpdatedEvent(
         text = StringDesc.Resource(MR.strings.definitions_cardsets_card_added),
         openText = StringDesc.Resource(MR.strings.definitions_cardsets_open),
         id = id
     )
 
     private fun onOpenArticleEventHandled(
-        event: SnackbarEventsHolder.Event.OpenArticleEvent,
+        event: SnackbarEventHolder.Event.OpenArticleEvent,
         needOpen: Boolean,
     ) {
         if (needOpen) {
@@ -122,7 +120,7 @@ class SnackbarEventsHolderImpl: SnackbarEventsHolder {
     }
 
     private fun onCardSetUpdatedEvent(
-        event: SnackbarEventsHolder.Event.CardSetUpdatedEvent,
+        event: SnackbarEventHolder.Event.CardSetUpdatedEvent,
         needOpen: Boolean,
     ) {
         if (needOpen) {

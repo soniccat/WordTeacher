@@ -10,8 +10,6 @@ import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,17 +17,13 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.*
 import androidx.compose.material.AppBarDefaults.TopAppBarElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.EXTRA_ARTICLE_ID
 import com.aglushkov.wordteacher.android_app.MainActivity
@@ -44,22 +38,19 @@ import com.arkivanov.decompose.defaultComponentContext
 import java.net.URL
 import kotlinx.coroutines.launch
 import com.aglushkov.wordteacher.shared.res.MR
-import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleRouter
-import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponentRouter
 import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
+import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
 import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
-import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import java.util.regex.Pattern
 
 class TextActionActivity: AppCompatActivity() {
     private lateinit var textActionDecomposeComponent: TextActionDecomposeComponent
@@ -154,7 +145,9 @@ class TextActionActivity: AppCompatActivity() {
         }
 
         setContent {
-            ComposeUI()
+            BindSnackbarEventHolder(textActionDecomposeComponent) {
+                ComposeUI()
+            }
         }
     }
 
@@ -174,9 +167,7 @@ class TextActionActivity: AppCompatActivity() {
                         MainUI()
                     }
 
-//                    SnackbarUI(textActionDecomposeComponent.events.collectAsState()) { event, withAction ->
-//                        textActionDecomposeComponent.onEventHandled(event, withAction)
-//                    }
+                    SnackbarUI()
                 }
             }
         }

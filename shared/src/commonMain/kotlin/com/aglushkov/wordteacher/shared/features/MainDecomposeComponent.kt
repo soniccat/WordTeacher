@@ -15,7 +15,6 @@ import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJ
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.dict_configs.DictConfigsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
@@ -45,7 +44,7 @@ interface MainDecomposeComponent:
     ArticleRouter,
     SettingsRouter,
     AuthOpener,
-    SnackbarEventsHolder {
+    SnackbarEventHolder {
     val childStack: Value<ChildStack<ChildConfiguration, Child>>
     val dialogsStateFlow: Value<ChildStack<ChildConfiguration, Child>>
 
@@ -106,10 +105,10 @@ class MainDecomposeComponentImpl(
     val childComponentFactory: (context: ComponentContext, configuration: MainDecomposeComponent.ChildConfiguration) -> Any
 ) : MainDecomposeComponent,
     ComponentContext by componentContext,
-    SnackbarEventsHolder by SnackbarEventsHolderImpl() {
+    SnackbarEventHolder by SnackbarEventHolderImpl() {
 
     init {
-        snackbarEventRouter = object : SnackbarEventsHolderRouter {
+        snackbarEventRouter = object : SnackbarEventHolderRouter {
             override fun openArticle(id: Long) {
                 this@MainDecomposeComponentImpl.openArticle(
                     ArticleVM.State(id = id)

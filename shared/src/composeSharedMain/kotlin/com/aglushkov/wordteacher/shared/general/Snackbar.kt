@@ -20,7 +20,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.aglushkov.wordteacher.shared.features.SnackbarEventHolderItem
-import com.aglushkov.wordteacher.shared.features.SnackbarEventsHolder
+import com.aglushkov.wordteacher.shared.features.SnackbarEventHolder
 import com.benasher44.uuid.uuid4
 import kotlinx.coroutines.launch
 import dev.icerock.moko.resources.compose.localized
@@ -32,8 +32,8 @@ val LocalSnackbarUUID = staticCompositionLocalOf {
 }
 
 @Composable
-fun SnackbarEventHolderUI(
-    eventsHolder: SnackbarEventsHolder,
+fun BindSnackbarEventHolder(
+    eventsHolder: SnackbarEventHolder,
     content: @Composable () -> Unit
 ) {
     val snackbarUUID = uuid4().toString()
@@ -41,7 +41,7 @@ fun SnackbarEventHolderUI(
         LocalSnackbarUUID provides snackbarUUID
     ) {
         DisposableEffect(key1 = "disposable") {
-            SnackbarEventsHolder.addSource(snackbarUUID, SnackbarEventHolderItem(
+            SnackbarEventHolder.addSource(snackbarUUID, SnackbarEventHolderItem(
                 flow = eventsHolder.events,
                 handler = { event, withAction ->
                     eventsHolder.onEventHandled(event, withAction)
@@ -49,7 +49,7 @@ fun SnackbarEventHolderUI(
             ))
 
             onDispose {
-                SnackbarEventsHolder.removeSource(snackbarUUID)
+                SnackbarEventHolder.removeSource(snackbarUUID)
             }
         }
 
@@ -70,7 +70,7 @@ fun BoxScope.SnackbarUI(
 
     val currentSnackbarUICount = remember { snackBarUICount + 1 }
     val coroutineScope = rememberCoroutineScope()
-    val eventHolderItem = SnackbarEventsHolder.map[LocalSnackbarUUID.current] ?: return
+    val eventHolderItem = SnackbarEventHolder.map[LocalSnackbarUUID.current] ?: return
     val events = eventHolderItem.flow.collectAsState()
     val eventToShow by remember(events) {
         derivedStateOf { events.value.firstOrNull() }

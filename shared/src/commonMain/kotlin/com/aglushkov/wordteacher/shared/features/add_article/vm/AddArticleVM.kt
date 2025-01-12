@@ -174,9 +174,6 @@ open class AddArticleVMImpl(
                     }
 
                     articlesRepository.createArticle(data.title, data.text).collect(addingStateFlow)
-                    addingStateFlow.update {
-                        it.toError(RuntimeException("aaa"), canTryAgain = true)
-                    }
 
                     addingStateFlow.value.onData { article ->
                         analytics.send(
@@ -184,7 +181,7 @@ open class AddArticleVMImpl(
                                 "AddArticleVM.AddArticle",
                                 mapOf("id" to article.name, "uri" to state.uri, "createSet" to state.needToCreateSet))
                         )
-//                        router?.onArticleCreated(article.id)
+                        router?.onArticleCreated(article.id)
                     }
 
                     addingStateFlow.value.onError { e ->

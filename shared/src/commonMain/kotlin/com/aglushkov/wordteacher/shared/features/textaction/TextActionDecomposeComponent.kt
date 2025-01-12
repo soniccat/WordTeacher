@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.textaction
 
-import com.aglushkov.wordteacher.shared.features.SnackbarEventsHolder
-import com.aglushkov.wordteacher.shared.features.SnackbarEventsHolderImpl
-import com.aglushkov.wordteacher.shared.features.SnackbarEventsHolderRouter
+import com.aglushkov.wordteacher.shared.features.SnackbarEventHolder
+import com.aglushkov.wordteacher.shared.features.SnackbarEventHolderImpl
+import com.aglushkov.wordteacher.shared.features.SnackbarEventHolderRouter
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
@@ -28,7 +28,7 @@ interface TextActionDecomposeComponentRouter {
 
 interface TextActionDecomposeComponent
     : RouterDecomposeComponent<TextActionDecomposeComponent.ChildConfiguration, TextActionDecomposeComponent.Child>,
-    SnackbarEventsHolder {
+    SnackbarEventHolder {
 
     var router: TextActionDecomposeComponentRouter?
     val text: CharSequence
@@ -68,7 +68,7 @@ class TextActionDecomposeComponentImpl(
     val childComponentFactory: (context: ComponentContext, configuration: TextActionDecomposeComponent.ChildConfiguration) -> Any
 ) : TextActionDecomposeComponent,
     ComponentContext by componentContext,
-    SnackbarEventsHolder by SnackbarEventsHolderImpl() {
+    SnackbarEventHolder by SnackbarEventHolderImpl() {
 
     override var router: TextActionDecomposeComponentRouter? = null
     private val navigation = StackNavigation<TextActionDecomposeComponent.ChildConfiguration>()
@@ -83,7 +83,7 @@ class TextActionDecomposeComponentImpl(
         )
 
     init {
-        snackbarEventRouter = object : SnackbarEventsHolderRouter {
+        snackbarEventRouter = object : SnackbarEventHolderRouter {
             override fun openArticle(id: Long) {
                 router?.openArticle(id)
             }

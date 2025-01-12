@@ -56,7 +56,7 @@ import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.features.settings.vm.SETTING_GET_WORD_FROM_CLIPBOARD
 import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
-import com.aglushkov.wordteacher.shared.general.SnackbarEventHolderUI
+import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity(), Router {
             .mainDecomposeComponent()
 
         setContent {
-            SnackbarEventHolderUI(mainDecomposeComponent) {
+            BindSnackbarEventHolder(mainDecomposeComponent) {
                 ComposeUI()
             }
         }
