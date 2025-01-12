@@ -48,9 +48,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aglushkov.wordteacher.shared.events.CompletionData
-import com.aglushkov.wordteacher.shared.events.CompletionEvent
-import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
