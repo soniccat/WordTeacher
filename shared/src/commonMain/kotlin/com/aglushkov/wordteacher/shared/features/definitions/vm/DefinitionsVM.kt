@@ -310,6 +310,12 @@ open class DefinitionsVMImpl(
             return
         }
 
+        viewModelScope.launch(Dispatchers.Default) {
+            loadResource {
+                wordFrequencyGradationProvider.resolveFrequencyForWord(word)
+            }.collect(wordFrequency)
+        }
+
         wordRes.onLoaded(
             block = {
                 val flattenedValue = it.map { it.second }.flatten()
@@ -333,12 +339,6 @@ open class DefinitionsVMImpl(
         loadJob = viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             Logger.e("Load Word exception for $word ${e.message}", tag)
         }) {
-            launch(Dispatchers.Default) {
-                loadResource {
-                    wordFrequencyGradationProvider.resolveFrequencyForWord(word)
-                }.collect(wordFrequency)
-            }
-
             wordDefinitionRepository.define(word, false).map {
                 it.mapLoadedData { it.map { it.second }.flatten() }
             }.collect(definitionWords)

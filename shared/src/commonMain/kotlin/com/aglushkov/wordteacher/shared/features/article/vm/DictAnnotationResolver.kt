@@ -49,7 +49,7 @@ class DictAnnotationResolver {
                 var nextCallCount = 0
                 val foundList = mutableListOf<Pair<Int, List<Dict.Index.Entry>>>()
                 dict.index.entry(
-                    firstWord,
+                    firstWord.replace("\"", ""), // TODO: try to train a better tokenizer model
                     nextWordForms = {
                         if (nextCallCount > 0) {
                             val phrase = phrases.spanWithIndex(ci)

@@ -76,6 +76,25 @@ class DictAnnotationResolverTest {
     }
 
     @Test
+    fun testPhrasalVerbWithQuote() {
+        val dict = createFakeDict(
+            buildDictContent {
+                addTerm("talk into", listOf("def1"))
+            }
+        )
+
+        val nlpSentence = nlpSentenceProcessor.processString("He told me \"Talk him into this\"", nlpCore)
+        val annotations = dictAnnotationResolver.resolve(
+            listOf(dict),
+            nlpSentence,
+            nlpSentence.phrases()
+        )
+
+        assertEquals(1, annotations.size)
+        assertEquals("talk into", annotations.first().entry.word)
+    }
+
+    @Test
     fun testPhrasalVerbWithNounPhrase() {
         val dict = createFakeDict(
             buildDictContent {
