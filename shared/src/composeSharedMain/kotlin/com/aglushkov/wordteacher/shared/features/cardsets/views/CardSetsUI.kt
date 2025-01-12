@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.shared.features.add_article.views.CustomSnackbar
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
@@ -44,11 +43,6 @@ fun CardSetsUI(
 
     val needShowSearchResult by remember(searchCardSets) { derivedStateOf { !searchCardSets.isUninitialized() } }
     val uiState = vm.uiStateFlow.collectAsState()
-    val eventToShow by remember(uiState) {
-        derivedStateOf {
-            (uiState.value.openCardSetEvents + uiState.value.loadCardSetErrorEvents).firstOrNull()
-        }
-    }
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { uiState.value.newCardSetText }) }
     val focusManager = LocalFocusManager.current
 
@@ -169,30 +163,6 @@ fun CardSetsUI(
                     contentDescription = null
                 )
             }
-        }
-
-        val snackbarHostState = remember { SnackbarHostState() }
-        val snackBarMessage = eventToShow?.text?.localized().orEmpty()
-        val snackBarActionText = eventToShow?.actionText?.localized().orEmpty()
-        LaunchedEffect(eventToShow) {
-            eventToShow?.let { event ->
-                coroutineScope.launch {
-                    val result = snackbarHostState.showSnackbar(
-                        snackBarMessage,
-                        snackBarActionText
-                    )
-                    vm.onEventHandled(event, result == SnackbarResult.ActionPerformed)
-                }
-            }
-        }
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.Companion.align(Alignment.BottomCenter)
-        ) {
-            CustomSnackbar(
-                message = null,
-                snackbarData = it,
-            )
         }
     }
 }

@@ -7,5 +7,4 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsRouter
 
 interface Router: ArticlesRouter,
-    ArticleRouter,
-    CardSetsRouter
+    ArticleRouter

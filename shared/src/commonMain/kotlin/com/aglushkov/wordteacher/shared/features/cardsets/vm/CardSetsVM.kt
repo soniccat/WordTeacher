@@ -46,7 +46,6 @@ interface CardSetsVM: Clearable {
     fun onSearchCardSetClicked(item: RemoteCardSetViewItem)
     fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem)
     fun onJsonImportClicked()
-    fun onEventHandled(event: Event, withAction: Boolean)
 
     @Serializable
     data class State(
@@ -57,36 +56,11 @@ interface CardSetsVM: Clearable {
     data class UIState(
         val searchQuery: String? = null,
         val newCardSetText: String? = null,
-        var openCardSetEvents: List<Event> = emptyList(),
-        var loadCardSetErrorEvents: List<Event> = emptyList()
     ) {
         fun toState() = State(
             searchQuery = searchQuery,
             newCardSetText = newCardSetText,
         )
-    }
-
-    sealed interface Event {
-        val text: StringDesc
-        val actionText: StringDesc
-
-        data class OpenCardSetEvent( // TODO: consider to move into SnackbarEventHolder
-            override val text: StringDesc,
-            val openText: StringDesc,
-            val id: Long,
-        ): Event {
-            override val actionText: StringDesc
-                get() = openText
-        }
-
-        data class CardSetLoadingError(
-            override val text: StringDesc,
-            val remoteId: String,
-            val reloadText: StringDesc,
-        ): Event {
-            override val actionText: StringDesc
-                get() = reloadText
-        }
     }
 
     data class Features(
@@ -256,8 +230,7 @@ open class CardSetsVMImpl(
             StringDesc.Raw(it)
         } ?: StringDesc.Resource(MR.strings.error_default)
 
-        // TODO: pass an error message
-        //eventChannel.offer(ErrorEvent(errorText))
+        router?.onError(errorText)
     }
 
     override fun onSearch(query: String) {
@@ -298,69 +271,20 @@ open class CardSetsVMImpl(
                 .waitUntilDone(
                     error = { _ ->
                         val cardSet = cardSetSearchRepository.cardSetByRemoteId(remoteId) ?: return@waitUntilDone
-                        uiStateFlow.update {
-                            it.copy(
-                                loadCardSetErrorEvents = it.loadCardSetErrorEvents + createCardSetLoadingErrorEvent(remoteId, cardSet.name)
-                            )
+                        router?.onCardSetLoadingError(remoteId, cardSet.name) {
+                            loadCardSetAndAdd(remoteId)
                         }
                     },
                     loaded = { cardSet ->
                         val insertedCardSet = cardSetsRepository.insertCardSet(cardSet)
                         cardSetSearchRepository.removeCardSet(remoteId)
-                        uiStateFlow.update {
-                            it.copy(
-                                openCardSetEvents = it.openCardSetEvents + createOpenCardSetEvent(insertedCardSet.id, insertedCardSet.name)
-                            )
-                        }
+                        router?.onCardSetCreated(insertedCardSet.id, insertedCardSet.name)
                     },
                 )
         }
     }
 
-    private fun createOpenCardSetEvent(id: Long, name: String) = CardSetsVM.Event.OpenCardSetEvent(
-        text = StringDesc.ResourceFormatted(MR.strings.cardsets_search_added, name),
-        openText = StringDesc.Resource(MR.strings.cardsets_search_added_open),
-        id = id,
-    )
-
-    private fun createCardSetLoadingErrorEvent(remoteId: String, name: String) = CardSetsVM.Event.CardSetLoadingError(
-        text = StringDesc.ResourceFormatted(MR.strings.cardsets_search_added, name),
-        remoteId = remoteId,
-        reloadText = StringDesc.Resource(MR.strings.cardsets_search_try_again),
-    )
-
     override fun onJsonImportClicked() {
         router?.openJsonImport()
-    }
-
-    override fun onEventHandled(event: CardSetsVM.Event, withAction: Boolean) {
-        when (event) {
-            is CardSetsVM.Event.OpenCardSetEvent -> onOpenCardSetEventHandled(event, withAction)
-            is CardSetsVM.Event.CardSetLoadingError -> onCardSetLoadingErrorEventHandled(event, withAction)
-        }
-    }
-
-    private fun onOpenCardSetEventHandled(
-        event: CardSetsVM.Event.OpenCardSetEvent,
-        needOpen: Boolean,
-    ) {
-        uiStateFlow.update {
-            it.copy(openCardSetEvents = it.openCardSetEvents.filter { it != event })
-        }
-        if (needOpen) {
-            router?.openCardSet(CardSetVM.State.LocalCardSet(event.id))
-        }
-    }
-
-    private fun onCardSetLoadingErrorEventHandled(
-        event: CardSetsVM.Event.CardSetLoadingError,
-        needRetry: Boolean
-    ) {
-        uiStateFlow.update {
-            it.copy(loadCardSetErrorEvents = it.loadCardSetErrorEvents.filter { it != event })
-        }
-        if (needRetry) {
-            loadCardSetAndAdd(event.remoteId)
-        }
     }
 }

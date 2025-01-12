@@ -46,6 +46,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.views.CardSetInfoU
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoRouter
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
@@ -257,11 +258,13 @@ class MainActivity : AppCompatActivity(), Router {
                             }
                         }
                     )
-                    is MainDecomposeComponent.Child.CardSets -> CardSetsUI(vm = instance.vm.apply {
-                        router = mainDecomposeComponent
-                    }, onBackHandler = {
-                        mainDecomposeComponent.back()
-                    })
+                    is MainDecomposeComponent.Child.CardSets -> CardSetsUI(
+                        vm = instance.vm.apply {
+                            router = mainDecomposeComponent
+                        }, onBackHandler = {
+                            mainDecomposeComponent.back()
+                        }
+                    )
                     is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.vm)
                     is MainDecomposeComponent.Child.LearningSessionResult -> LearningSessionResultUI(vm = instance.vm)
                     is MainDecomposeComponent.Child.DictConfigs -> DictConfigsUI(
@@ -452,18 +455,6 @@ class MainActivity : AppCompatActivity(), Router {
 
     override fun closeArticle() {
         mainDecomposeComponent.back()
-    }
-
-    override fun openCardSet(state: CardSetVM.State) {
-        mainDecomposeComponent.openCardSet(state)
-    }
-
-    override fun openLearning(ids: List<Long>) {
-        mainDecomposeComponent.openLearning(ids)
-    }
-
-    override fun openJsonImport() {
-        TODO("That's only desktop feature")
     }
 }
 

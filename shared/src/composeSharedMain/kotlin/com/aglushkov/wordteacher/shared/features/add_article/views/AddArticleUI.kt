@@ -25,9 +25,6 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.shared.res.MR
-import com.aglushkov.wordteacher.shared.events.CompletionData
-import com.aglushkov.wordteacher.shared.events.CompletionEvent
-import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalDimens
@@ -236,41 +233,4 @@ private fun AddArticlesFieldsUI(
             focusRequester.requestFocus()
         }
     }
-}
-
-// CustomSnackbar to be able to override text in snackbarData
-@Composable
-fun CustomSnackbar(
-    message: String?,
-    snackbarData: SnackbarData,
-    modifier: Modifier = Modifier,
-    actionOnNewLine: Boolean = false,
-    shape: Shape = MaterialTheme.shapes.small,
-    backgroundColor: Color = SnackbarDefaults.backgroundColor,
-    contentColor: Color = MaterialTheme.colors.surface,
-    actionColor: Color = SnackbarDefaults.primaryActionColor,
-    elevation: Dp = 6.dp
-) {
-    val actionLabel = snackbarData.actionLabel
-    val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
-        @Composable {
-            TextButton(
-                colors = ButtonDefaults.textButtonColors(contentColor = actionColor),
-                onClick = { snackbarData.performAction() },
-                content = { Text(actionLabel) }
-            )
-        }
-    } else {
-        null
-    }
-    Snackbar(
-        modifier = modifier.padding(12.dp),
-        content = { Text(message ?: snackbarData.message) },
-        action = actionComposable,
-        actionOnNewLine = actionOnNewLine,
-        shape = shape,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
-        elevation = elevation
-    )
 }

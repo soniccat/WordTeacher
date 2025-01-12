@@ -35,6 +35,7 @@ import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.value.Value
+import dev.icerock.moko.resources.desc.StringDesc
 import io.ktor.util.reflect.instanceOf
 import kotlinx.serialization.Serializable
 
@@ -60,6 +61,7 @@ interface MainDecomposeComponent:
     fun back()
     fun popToRoot()
     override fun openWebAuth(networkType: SpaceAuthService.NetworkType)
+    override fun onError(text: StringDesc)
 
     sealed class Child(
         val inner: Clearable?
@@ -232,6 +234,10 @@ class MainDecomposeComponentImpl(
         addDialogConfigIfNotAtTop(
             MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration(networkType)
         )
+    }
+
+    override fun onError(text: StringDesc) {
+        onError(text, null, null)
     }
 
     override fun openDictConfigs() {

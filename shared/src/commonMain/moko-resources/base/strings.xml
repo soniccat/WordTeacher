@@ -151,7 +151,7 @@
     <string name="card_title_placeholder_readonly">Name is missing</string>
     <string name="card_transcription_placeholder_readonly">Transcription is missing</string>
 
-    <string name="error_try_again">Try again</string>
+    <string name="error_try_again">Retry</string>
 
     <string name="sidesheet_navigation_menu">Navigation menu</string>
     <string name="sidesheet_side_sheet">Close navigation menu</string>

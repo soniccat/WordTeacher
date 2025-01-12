@@ -112,7 +112,6 @@ fun CardSetJsonImportUI(
         vm.eventFlow.collect {
             when (it) {
                 is CompletionEvent -> with(snackbarHostState) {
-                // TODO: handle cancellation
                     onCardSetCreated((it.data as? CompletionData.Article)?.id)
                 }
                 is ErrorEvent -> {

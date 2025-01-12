@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.features
 
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.ResourceFormatted
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,12 +36,17 @@ interface SnackbarEventHolder {
 
     fun onArticleCreated(articleId: Long)
     fun onCardSetUpdated(cardSetId: Long)
-    fun onError(text: StringDesc)
+    fun onError(text: StringDesc, actionText: StringDesc? = null, onActionCalled: (() -> Unit)? = null)
+    fun onCardSetCreated(cardSetId: Long, name: String)
+    fun onCardSetLoadingError(remoteId: String, name: String, onActionCalled: (() -> Unit)?)
+
     fun onEventHandled(event: Event, withAction: Boolean)
 
     sealed interface Event {
         val text: StringDesc
         val actionText: StringDesc?
+            get() = null
+        val onActionCalled: (() -> Unit)?
             get() = null
 
         data class OpenArticleEvent(
@@ -61,7 +67,30 @@ interface SnackbarEventHolder {
                 get() = openText
         }
 
-        data class ErrorEvent(override val text: StringDesc): Event
+        data class OpenCardSetEvent(
+            override val text: StringDesc,
+            val openText: StringDesc,
+            val id: Long,
+        ): Event {
+            override val actionText: StringDesc
+                get() = openText
+        }
+
+        data class CardSetLoadingError(
+            override val text: StringDesc,
+            val remoteId: String,
+            val reloadText: StringDesc,
+            override val onActionCalled: (() -> Unit)? = null,
+        ): Event {
+            override val actionText: StringDesc
+                get() = reloadText
+        }
+
+        data class ErrorEvent(
+            override val text: StringDesc,
+            override val actionText: StringDesc? = null,
+            override val onActionCalled: (() -> Unit)? = null,
+        ): Event
     }
 }
 
@@ -81,9 +110,30 @@ class SnackbarEventHolderImpl: SnackbarEventHolder {
         }
     }
 
-    override fun onError(text: StringDesc) {
+    override fun onError(text: StringDesc, actionText: StringDesc?, onActionCalled: (() -> Unit)?) {
         events.update {
-            it + SnackbarEventHolder.Event.ErrorEvent(text)
+            it + SnackbarEventHolder.Event.ErrorEvent(text, actionText, onActionCalled)
+        }
+    }
+
+    override fun onCardSetCreated(cardSetId: Long, name: String) {
+        events.update {
+            it + SnackbarEventHolder.Event.OpenCardSetEvent(
+                text = StringDesc.ResourceFormatted(MR.strings.cardsets_search_added, name),
+                openText = StringDesc.Resource(MR.strings.cardsets_search_added_open),
+                id = cardSetId,
+            )
+        }
+    }
+
+    override fun onCardSetLoadingError(remoteId: String, name: String, onActionCalled: (() -> Unit)?) {
+        events.update {
+            it + SnackbarEventHolder.Event.CardSetLoadingError(
+                text = StringDesc.ResourceFormatted(MR.strings.cardsets_search_added, name),
+                remoteId = remoteId,
+                reloadText = StringDesc.Resource(MR.strings.cardsets_search_try_again),
+                onActionCalled = onActionCalled
+             )
         }
     }
 
@@ -91,10 +141,14 @@ class SnackbarEventHolderImpl: SnackbarEventHolder {
         events.update {
             it.filter { e -> e != event }
         }
-        when (event) {
-            is SnackbarEventHolder.Event.OpenArticleEvent -> onOpenArticleEventHandled(event, withAction)
-            is SnackbarEventHolder.Event.CardSetUpdatedEvent -> onCardSetUpdatedEvent(event, withAction)
-            is SnackbarEventHolder.Event.ErrorEvent -> Unit
+        if (withAction) {
+            when (event) {
+                is SnackbarEventHolder.Event.OpenArticleEvent -> snackbarEventRouter?.openArticle(event.id)
+                is SnackbarEventHolder.Event.CardSetUpdatedEvent -> snackbarEventRouter?.openLocalCardSet(event.id)
+                is SnackbarEventHolder.Event.OpenCardSetEvent -> snackbarEventRouter?.openLocalCardSet(event.id)
+                else -> Unit
+            }
+            event.onActionCalled?.invoke()
         }
     }
 
@@ -109,22 +163,4 @@ class SnackbarEventHolderImpl: SnackbarEventHolder {
         openText = StringDesc.Resource(MR.strings.definitions_cardsets_open),
         id = id
     )
-
-    private fun onOpenArticleEventHandled(
-        event: SnackbarEventHolder.Event.OpenArticleEvent,
-        needOpen: Boolean,
-    ) {
-        if (needOpen) {
-            snackbarEventRouter?.openArticle(event.id)
-        }
-    }
-
-    private fun onCardSetUpdatedEvent(
-        event: SnackbarEventHolder.Event.CardSetUpdatedEvent,
-        needOpen: Boolean,
-    ) {
-        if (needOpen) {
-            snackbarEventRouter?.openLocalCardSet(event.id)
-        }
-    }
 }
