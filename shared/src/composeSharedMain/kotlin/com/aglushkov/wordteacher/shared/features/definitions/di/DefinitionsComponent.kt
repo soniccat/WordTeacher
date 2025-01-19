@@ -25,6 +25,7 @@ interface DefinitionsComposeComponent {
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
         @BindsInstance fun setInitialState(state: DefinitionsVM.State): Builder
+        @BindsInstance fun settings(settings: DefinitionsVM.Settings): Builder
 
         fun setDeps(deps: DefinitionsDependencies): Builder
         fun build(): DefinitionsComposeComponent

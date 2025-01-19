@@ -23,6 +23,7 @@ class DefinitionsModule {
     fun definitionsDecomposeComponent(
         componentContext: ComponentContext,
         initialState: DefinitionsVM.State,
+        definitionsSettings: DefinitionsVM.Settings,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         dictRepository: DictRepository,
@@ -37,6 +38,7 @@ class DefinitionsModule {
     ) = DefinitionsDecomposeComponent(
         componentContext,
         initialState,
+        definitionsSettings,
         connectivityManager,
         wordDefinitionRepository,
         dictRepository,

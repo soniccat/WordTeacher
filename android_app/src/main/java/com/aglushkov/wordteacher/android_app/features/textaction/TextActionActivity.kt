@@ -75,9 +75,16 @@ class TextActionActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val intentString = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT) // from action.PROCESS_TEXT
+        var intentString = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT) // from action.PROCESS_TEXT
             ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT) // from action.ACTION_SEND
         ?: intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)?.toString() ?: ""
+        val newLineIndex = intentString.indexOf('\n')
+        if (newLineIndex != -1) {
+            intentString = intentString.substring(0, newLineIndex)
+        }
+        if (intentString.isNotEmpty() && intentString.first() == '"' && intentString.last() == '"'){
+            intentString = intentString.substring(1, intentString.length-1)
+        }
 
         var text: CharSequence? = null
         var urlString: String? = null
@@ -141,7 +148,10 @@ class TextActionActivity: AppCompatActivity() {
         }
 
         if (urlString != null || text?.length?.let { it >= 100 } == true) {
-            textActionDecomposeComponent.openAddArticle()
+            val resultUrl = urlString ?: text?.toString().orEmpty()
+            textActionDecomposeComponent.setMode(TextActionDecomposeComponent.Mode.OnlyArticleTab(resultUrl))
+        } else {
+            textActionDecomposeComponent.setMode(TextActionDecomposeComponent.Mode.OnlyDefinitionTab)
         }
 
         setContent {
@@ -182,7 +192,9 @@ class TextActionActivity: AppCompatActivity() {
         ) {
             Scaffold(
                 bottomBar = {
-                    BottomNavigationBarUI(textActionDecomposeComponent)
+                    if (textActionDecomposeComponent.needShowTabs()) {
+                        BottomNavigationBarUI(textActionDecomposeComponent)
+                    }
                 }
             ) { innerPadding ->
                 Children(

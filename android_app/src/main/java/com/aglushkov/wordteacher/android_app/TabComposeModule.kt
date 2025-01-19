@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsCompo
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.features.settings.di.DaggerSettingsComponent
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
@@ -28,6 +29,12 @@ class TabComposeModule {
                     DaggerDefinitionsComposeComponent.builder()
                         .setComponentContext(context)
                         .setInitialState(configuration.state)
+                        .settings(
+                            DefinitionsVM.Settings(
+                                needStoreDefinedWordInSettings = true,
+                                allowInstantPasteFromClipboard = true,
+                            )
+                        )
                         .setDeps(appComponent)
                         .build()
                         .definitionsDecomposeComponent()

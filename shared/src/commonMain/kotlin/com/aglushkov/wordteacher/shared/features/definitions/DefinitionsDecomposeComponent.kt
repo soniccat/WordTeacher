@@ -30,6 +30,7 @@ import com.russhwolf.settings.coroutines.FlowSettings
 class DefinitionsDecomposeComponent (
     componentContext: ComponentContext,
     initialState: DefinitionsVM.State,
+    definitionsSettings: DefinitionsVM.Settings,
     connectivityManager: ConnectivityManager,
     wordDefinitionRepository: WordDefinitionRepository,
     dictRepository: DictRepository,
@@ -52,9 +53,7 @@ class DefinitionsDecomposeComponent (
     cardSetsRepository,
     wordFrequencyGradationProvider,
     wordTeacherDictService,
-    DefinitionsVM.Settings(
-        needStoreDefinedWordInSettings = true
-    ),
+    definitionsSettings,
     clipboardRepository,
     idGenerator,
     analytics,

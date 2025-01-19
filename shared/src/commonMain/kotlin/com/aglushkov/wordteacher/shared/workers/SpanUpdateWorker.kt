@@ -54,7 +54,6 @@ class SpanUpdateWorker (
 
                     Logger.v("is in progress or pending pause (${cardIds.size}, ${state.value})", "SpanUpdateWorker")
 
-
                     cardIds.forEach { cardId ->
                         if (state.tryPauseIfPendingPause()) {
                             Logger.v("paused", "SpanUpdateWorker")

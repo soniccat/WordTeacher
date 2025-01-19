@@ -45,6 +45,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -103,7 +105,8 @@ interface DefinitionsVM: Clearable {
     )
 
     data class Settings(
-        val needStoreDefinedWordInSettings: Boolean = false
+        val needStoreDefinedWordInSettings: Boolean = false,
+        val allowInstantPasteFromClipboard: Boolean = false,
     )
 }
 
@@ -212,7 +215,11 @@ open class DefinitionsVMImpl(
         viewModelScope.launch {
             combine(
                 settings.getBooleanFlow(SETTING_GET_WORD_FROM_CLIPBOARD, false),
-                clipboardRepository.clipData,
+                if (definitionsSettings.allowInstantPasteFromClipboard) {
+                    clipboardRepository.clipData
+                } else {
+                    flowOf(ClipboardRepository.Data(""))
+                },
             ) { isEnabled, clipData ->
                 if (isEnabled && lastHandledClipData != clipData && !clipData.isEmpty) {
                     lastHandledClipData = clipData

@@ -28,6 +28,12 @@ class TextActionModule {
                     DaggerDefinitionsComposeComponent.builder()
                         .setComponentContext(context)
                         .setInitialState(DefinitionsVM.State(word = config.text))
+                        .settings(
+                            DefinitionsVM.Settings(
+                                needStoreDefinedWordInSettings = false,
+                                allowInstantPasteFromClipboard = false,
+                            )
+                        )
                         .setDeps(appComponent)
                         .build()
                         .definitionsDecomposeComponent()

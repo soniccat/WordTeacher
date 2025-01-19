@@ -19,6 +19,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.value.Value
 import kotlinx.serialization.Serializable
 
@@ -38,9 +39,16 @@ interface TextActionDecomposeComponent
     fun openAddArticle(url: String? = null)
     fun openAddNote()
     fun back()
+    fun setMode(mode: Mode)
+    fun needShowTabs(): Boolean
 
     fun openCardSets()
     fun openCardSet(state: CardSetVM.State)
+
+    sealed interface Mode {
+        data object OnlyDefinitionTab: Mode
+        data class OnlyArticleTab(val url: String): Mode
+    }
 
     sealed class Child(
         val inner: Clearable
@@ -109,7 +117,29 @@ class TextActionDecomposeComponentImpl(
         )
     }
 
-    override fun openDefinitions() = navigation.popToRoot()
+    override fun setMode(mode: TextActionDecomposeComponent.Mode) {
+        navigation.navigate {
+            when (mode) {
+                is TextActionDecomposeComponent.Mode.OnlyDefinitionTab -> listOf(
+                    TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration,
+                )
+                is TextActionDecomposeComponent.Mode.OnlyArticleTab -> listOf(
+                    TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration(mode.url)
+                )
+            }
+        }
+    }
+
+    private fun isDefinitionSupported() =
+        childStack.value.items.firstOrNull()?.configuration is TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration
+
+    override fun needShowTabs() = false // disabled for now
+
+    override fun openDefinitions() {
+        if (isDefinitionSupported()) {
+            navigation.popToRoot()
+        }
+    }
 
     override fun openAddArticle(url: String?) =
         navigation.pushChildConfigurationOrPopIfExists(
