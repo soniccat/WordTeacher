@@ -2,9 +2,11 @@ package com.aglushkov.wordteacher.android_app.helper
 
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData
 import com.aglushkov.wordteacher.shared.general.auth.YandexAuthController
 import com.aglushkov.wordteacher.shared.general.auth.YandexAuthData
+import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -24,14 +26,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class YandexAuthControllerImpl : YandexAuthController {
+class YandexAuthControllerImpl(
+    val timeSource: TimeSource
+) : YandexAuthController {
     private var scope = CoroutineScope(Dispatchers.Main)
     private var yandexSdk: YandexAuthSdk? = null
     private var yandexAuthDataState: MutableStateFlow<Resource<NetworkAuthData>> =
         MutableStateFlow(Resource.Uninitialized())
     override var authDataFlow: StateFlow<Resource<NetworkAuthData>> = yandexAuthDataState
     private var signInLauncher: ActivityResultLauncher<YandexAuthLoginOptions>? = null
-
 
     fun bind(activity: ComponentActivity) {
         val sdk = YandexAuthSdk.create(YandexAuthOptions(activity))
@@ -64,7 +67,15 @@ class YandexAuthControllerImpl : YandexAuthController {
         if (yandexAuthDataState.value.isLoading()) {
             return
         }
+
+        val currentData = yandexAuthDataState.value.data()
         yandexAuthDataState.value = Resource.Loading()
+
+        if (currentData != null && !currentData.isExpired(timeSource.timeInMilliseconds())) {
+            yandexAuthDataState.updateLoadedData { currentData }
+            return
+        }
+
         signInLauncher?.launch(YandexAuthLoginOptions())
     }
 

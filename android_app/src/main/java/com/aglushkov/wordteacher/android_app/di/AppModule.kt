@@ -150,11 +150,15 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun vkAuthControllerImpl(): VKAuthControllerImpl = VKAuthControllerImpl()
+    fun vkAuthControllerImpl(
+        timeSource: TimeSource
+    ): VKAuthControllerImpl = VKAuthControllerImpl(timeSource)
 
     @AppComp
     @Provides
-    fun yandexAuthControllerImpl(): YandexAuthControllerImpl = YandexAuthControllerImpl()
+    fun yandexAuthControllerImpl(
+        timeSource: TimeSource
+    ): YandexAuthControllerImpl = YandexAuthControllerImpl(timeSource)
 
     // TODO: replace with bind
     @AppComp

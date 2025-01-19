@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface NetworkAuthData {
     val token: String
+
+    fun isExpired(time: Long): Boolean
 }
 
 interface NetworkAuthController {

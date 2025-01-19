@@ -9,9 +9,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthData
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData
+import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -97,6 +99,7 @@ class GoogleAuthControllerImpl(
         if (googleAuthDataState.value.isLoading()) {
             return
         }
+
         googleAuthDataState.value = Resource.Loading()
 
         val client = client ?: return
