@@ -372,6 +372,8 @@ open class CardSetVMImpl(
                         } else {
                             card.term
                         },
+                        needToUpdateDefinitionSpans = true,
+                        needToUpdateExampleSpans = true,
                     )
                 }
                 is WordTranscriptionViewItem -> {

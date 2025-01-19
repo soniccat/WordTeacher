@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSpan
 import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
+import java.util.Locale
 
 fun findTermSpans(
     sentence: String,
@@ -21,9 +22,9 @@ fun findTermSpans(
     val termTokenSpans: MutableList<NLPSpan> = mutableListOf()
 
     while (tokenI < nlpSentence.tokenSpans.size && wordI < words.size) {
-        val word = words[wordI]
-        val token = nlpSentence.token(tokenI)
-        val lemma = nlpSentence.lemma(tokenI)
+        val word = words[wordI].lowercase()
+        val token = nlpSentence.token(tokenI).toString().lowercase()
+        val lemma = nlpSentence.lemma(tokenI)?.lowercase()
         var foundSpan: NLPSpan? = null
 
         if (token == word || lemma == word) {
