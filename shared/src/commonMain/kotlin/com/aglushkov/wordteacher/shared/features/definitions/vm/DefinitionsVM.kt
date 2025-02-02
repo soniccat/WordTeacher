@@ -413,11 +413,14 @@ open class DefinitionsVMImpl(
         items: MutableList<BaseViewItem<*>>,
         wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ) {
+        val wordSet = mutableSetOf<String>()
         words.groupBy { it.word }
             .map {
                 val mergedWord = mergeWords(it.value, partsOfSpeechFilter)
-                addWordViewItems(mergedWord, partsOfSpeechFilter, items, wordFrequencyLevelAndRatio)
+                val lowercaseWord = mergedWord.word.lowercase()
+                addWordViewItems(mergedWord, partsOfSpeechFilter, items, if (!wordSet.contains(lowercaseWord)) {wordFrequencyLevelAndRatio} else {null})
                 items.add(WordDividerViewItem())
+                wordSet.add(lowercaseWord)
             }
     }
 
@@ -427,11 +430,14 @@ open class DefinitionsVMImpl(
         items: MutableList<BaseViewItem<*>>,
         wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ) {
+        val wordSet = mutableSetOf<String>()
         words.onEachIndexed { i, word ->
-            val isAdded = addWordViewItems(word, partsOfSpeechFilter, items, if (i == 0) wordFrequencyLevelAndRatio else null)
+            val lowercaseWord = word.word.lowercase()
+            val isAdded = addWordViewItems(word, partsOfSpeechFilter, items, if (!wordSet.contains(lowercaseWord)) wordFrequencyLevelAndRatio else null)
             if (isAdded) {
                 items.add(WordDividerViewItem())
             }
+            wordSet.add(lowercaseWord)
         }
     }
 
