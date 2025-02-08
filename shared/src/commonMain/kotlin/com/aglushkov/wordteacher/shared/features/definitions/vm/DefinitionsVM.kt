@@ -413,14 +413,18 @@ open class DefinitionsVMImpl(
         items: MutableList<BaseViewItem<*>>,
         wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ) {
-        val wordSet = mutableSetOf<String>()
+        var isFirst = true
         words.groupBy { it.word }
             .map {
                 val mergedWord = mergeWords(it.value, partsOfSpeechFilter)
-                val lowercaseWord = mergedWord.word.lowercase()
-                addWordViewItems(mergedWord, partsOfSpeechFilter, items, if (!wordSet.contains(lowercaseWord)) {wordFrequencyLevelAndRatio} else {null})
+                addWordViewItems(
+                    mergedWord,
+                    partsOfSpeechFilter,
+                    items,
+                    if (isFirst) wordFrequencyLevelAndRatio else null
+                )
                 items.add(WordDividerViewItem())
-                wordSet.add(lowercaseWord)
+                isFirst = false
             }
     }
 
@@ -430,14 +434,18 @@ open class DefinitionsVMImpl(
         items: MutableList<BaseViewItem<*>>,
         wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ) {
-        val wordSet = mutableSetOf<String>()
+        var isFirst = true
         words.onEachIndexed { i, word ->
-            val lowercaseWord = word.word.lowercase()
-            val isAdded = addWordViewItems(word, partsOfSpeechFilter, items, if (!wordSet.contains(lowercaseWord)) wordFrequencyLevelAndRatio else null)
+            val isAdded = addWordViewItems(
+                word,
+                partsOfSpeechFilter,
+                items,
+                if (isFirst) wordFrequencyLevelAndRatio else null
+            )
             if (isAdded) {
                 items.add(WordDividerViewItem())
             }
-            wordSet.add(lowercaseWord)
+            isFirst = false
         }
     }
 
@@ -754,6 +762,7 @@ open class DefinitionsVMImpl(
     override fun onSuggestedShowAllSearchWordClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.suggestedShowAllSearchWordClicked"))
         wordTextSearchRepository.value.onData { textSearchItems ->
+            wordFrequency.update { Resource.Uninitialized() }
             definitionWords.update {
                 Resource.Loaded(
                     textSearchItems.map { it.toWordTeacherWord() }

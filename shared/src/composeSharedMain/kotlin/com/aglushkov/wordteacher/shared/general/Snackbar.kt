@@ -24,6 +24,7 @@ import com.aglushkov.wordteacher.shared.features.SnackbarEventHolder
 import com.benasher44.uuid.uuid4
 import kotlinx.coroutines.launch
 import dev.icerock.moko.resources.compose.localized
+import kotlinx.coroutines.CoroutineExceptionHandler
 
 private var snackBarUICount by mutableStateOf(0)
 
@@ -63,12 +64,15 @@ fun BoxScope.SnackbarUI(
 ) {
     DisposableEffect("dispose") {
         snackBarUICount += 1
+        Logger.v("snackBarUICount = $snackBarUICount", TAG)
         onDispose {
             snackBarUICount -= 1
+            Logger.v("snackBarUICount = $snackBarUICount", TAG)
         }
     }
 
-    val currentSnackbarUICount = remember { snackBarUICount + 1 }
+    val currentSnackbarUICount = remember { Logger.v("currentSnackbarUICount = ${snackBarUICount+1}", TAG)
+        snackBarUICount + 1 }
     val coroutineScope = rememberCoroutineScope()
     val eventHolderItem = SnackbarEventHolder.map[LocalSnackbarUUID.current] ?: return
     val events = eventHolderItem.flow.collectAsState()
@@ -88,14 +92,20 @@ fun BoxScope.SnackbarUI(
         val snackBarActionText = eventToShow?.actionText?.localized().orEmpty()
         LaunchedEffect(eventToShow) {
             eventToShow?.let { event ->
-                coroutineScope.launch {
+                coroutineScope.launch(CoroutineExceptionHandler { coroutineContext, throwable ->
+                    Logger.v("exceptionHandler: " + throwable.message.orEmpty(), TAG)
+                }) {
+                    Logger.v("showSnackbar $snackBarMessage", TAG)
                     val result = snackbarHostState.showSnackbar(
                         snackBarMessage,
                         snackBarActionText
                     )
                     eventHolderItem.handler(event, result == SnackbarResult.ActionPerformed)
+                    Logger.v("handled $snackBarMessage", TAG)
                 }
             }
         }
     }
 }
+
+private const val TAG = "Snackbar"

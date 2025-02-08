@@ -330,6 +330,10 @@ class MainActivity : AppCompatActivity(), Router {
                     )
                 }
             }
+
+            Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+                SnackbarUI()
+            }
         }
     }
 

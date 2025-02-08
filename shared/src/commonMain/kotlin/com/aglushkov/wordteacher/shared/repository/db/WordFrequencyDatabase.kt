@@ -35,7 +35,7 @@ data class WordFrequencyGradation(
     }
 
     fun gradationLevelByFrequency(frequency: Double?): Int? {
-        if (frequency == null) {
+        if (frequency == null || frequency == UNDEFINED_FREQUENCY) {
             return null
         } else if (frequency == UNKNOWN_FREQUENCY) {
             return UNKNOWN_LEVEL
