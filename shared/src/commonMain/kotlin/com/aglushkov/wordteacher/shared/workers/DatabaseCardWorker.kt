@@ -68,7 +68,8 @@ class DatabaseCardWorker(
                             }
                         }
                     }
-                    is CardSetSyncWorker.State.Idle -> {
+                    is CardSetSyncWorker.State.Idle,
+                    is CardSetSyncWorker.State.AuthRequired -> {
                         cardSetSyncWorker.pause()
                         popState(State.SYNCING)
                     }
