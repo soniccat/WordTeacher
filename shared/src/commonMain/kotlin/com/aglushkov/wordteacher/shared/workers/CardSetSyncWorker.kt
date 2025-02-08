@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.workers
 
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.merge
@@ -77,12 +78,15 @@ class CardSetSyncWorker(
 
     // last push/pull date, stored in settings
     var lastSyncDate: Instant = Instant.fromEpochMilliseconds(0)
+    var lastSyncUserId: String = ""
 
     init {
         scope.launch {
             lastSyncDate = Instant.fromEpochMilliseconds(settings.getLong(LAST_SYNC_DATE_KEY, 0))
+            lastSyncUserId = settings.getString(LAST_SYNC_USER_ID, "")
 
-            if (spaceAuthRepository.isAuthorized()) {
+            val authData = spaceAuthRepository.currentAuthData.asLoaded()?.data
+            if (authData != null) {
                 toState(State.PullRequired())
             } else {
                 toAuthRequiredState()
@@ -91,7 +95,8 @@ class CardSetSyncWorker(
             // handle authorizing
             launch {
                 spaceAuthRepository.authDataFlow.collect {
-                    if (state.value.innerState() is State.AuthRequired && spaceAuthRepository.isAuthorized()) {
+                    val authData = spaceAuthRepository.currentAuthData.asLoaded()?.data
+                    if (state.value.innerState() is State.AuthRequired && authData != null) {
                         toState(State.PullRequired())
                     } else if (!it.isLoaded()) {
                         toAuthRequiredState()
@@ -171,11 +176,21 @@ class CardSetSyncWorker(
     }
 
     private suspend fun pullInternal() {
-        if (!canPull()) {
+        val authData = spaceAuthRepository.currentAuthData.asLoaded()?.data
+        if (!canPull() || authData == null) {
 //            waitUntilCanPull()
             return
         }
 
+        if (lastSyncUserId.isNotEmpty() && lastSyncUserId != authData.user.id) {
+            // last sync was with another user, so we need to delete the current remote cardsets
+            // that will lead into loosing the latest unsynced changes in the remote cardsets
+            // save new local cardsets in a new account
+            updateLastSyncDate(Instant.fromEpochMilliseconds(0))
+            database.cardSets.removeCardSets(database.cardSets.idsForRemoteCardSets())
+        }
+
+        updateLastSyncUserId(authData.user.id)
         toState(State.Pulling)
         lastPullDate = timeSource.timeInstant()
         val newSyncDate: Instant?
@@ -233,8 +248,7 @@ class CardSetSyncWorker(
                     }
                 }
 
-                settings.putLong(LAST_SYNC_DATE_KEY, newSyncDate.toEpochMilliseconds())
-                lastSyncDate = newSyncDate
+                updateLastSyncDate(newSyncDate)
             }
 
             if (state.value == State.Pulling) {
@@ -314,8 +328,7 @@ class CardSetSyncWorker(
                     }
                 }
 
-                settings.putLong(LAST_SYNC_DATE_KEY, newSyncDate.toEpochMilliseconds())
-                lastSyncDate = newSyncDate
+                updateLastSyncDate(newSyncDate)
             }
 
             if (state.value == State.Pushing) {
@@ -333,26 +346,24 @@ class CardSetSyncWorker(
     }
 
     private fun toAuthRequiredState() {
-        resetSyncDate()
         toState(State.AuthRequired)
     }
 
-    private fun resetSyncDate() {
-        runBlocking {
-            settings.remove(LAST_SYNC_DATE_KEY)
+    private suspend fun updateLastSyncDate(newSyncDate: Instant) {
+        settings.putLong(LAST_SYNC_DATE_KEY, newSyncDate.toEpochMilliseconds())
+        lastSyncDate = newSyncDate
+    }
+
+    private suspend fun updateLastSyncUserId(id: String) {
+        if (lastSyncUserId == id) {
+            return
         }
-        lastSyncDate = Instant.fromEpochMilliseconds(0)
+
+        settings.putString(LAST_SYNC_USER_ID, id)
+        lastSyncUserId = id
     }
 
     fun canPush() = spaceAuthRepository.isAuthorized() && (state.value.innerState() is State.PushRequired || state.value.innerState() == State.Idle)
-
-//    private suspend fun waitUntilCanPull() {
-//        state.takeWhile { !canPull() }.collect()
-//    }
-
-//    private suspend fun waitUntilNotPulling() {
-//        state.takeWhile { it is State.Pulling }.collect()
-//    }
 
     suspend fun waitUntilDone() {
         state.takeWhile { it is State.Pulling || it is State.Pushing }.collect()
@@ -365,6 +376,7 @@ class CardSetSyncWorker(
 }
 
 private const val LAST_SYNC_DATE_KEY = "LAST_SYNC_DATE_KEY"
+private const val LAST_SYNC_USER_ID = "LAST_SYNC_USER_ID"
 private const val PULL_RETRY_INTERVAL = 5000L
 private const val PUSH_RETRY_INTERVAL = 20000L
 private const val PULL_AUTO_TRY_AGAIN_INTERVAL = PULL_RETRY_INTERVAL * 10

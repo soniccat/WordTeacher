@@ -238,6 +238,14 @@ class AppDatabase(
             }
         }
 
+        fun removeCardSets(cardSetIds: List<Long>) {
+            db.transaction {
+                db.dBCardQueries.removeCardsBySetIds(cardSetIds)
+                db.dBCardSetToCardRelationQueries.removeCardSets(cardSetIds)
+                db.dBCardSetQueries.removeCardSets(cardSetIds)
+            }
+        }
+
         fun selectAllSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectAllSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels ->
             setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels)
         }
@@ -249,6 +257,8 @@ class AppDatabase(
         fun lastModificationDate() = db.dBCardSetQueries.lastModificationDate().executeAsList().firstOrNull()?.MAX ?: 0L
 
         fun remoteIds() = db.dBCardSetQueries.selectRemoteIds().executeAsList()
+
+        fun idsForRemoteCardSets() = db.dBCardSetQueries.selectIdsForRemoteCardSets().executeAsList()
 
         fun insert(cardSet: CardSet): CardSet {
             var insertedCarSetId: Long = 0

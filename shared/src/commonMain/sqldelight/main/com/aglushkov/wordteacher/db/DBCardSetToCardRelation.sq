@@ -50,6 +50,11 @@ DELETE
 FROM DBCardSetToCardRelation
 WHERE setId = ?;
 
+removeCardSets:
+DELETE
+FROM DBCardSetToCardRelation
+WHERE setId IN ?;
+
 removeCard:
 DELETE
 FROM DBCardSetToCardRelation

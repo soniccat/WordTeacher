@@ -82,6 +82,11 @@ DELETE
 FROM DBCard
 WHERE id IN (SELECT cardId FROM DBCardSetToCardRelation WHERE setId = ?);
 
+removeCardsBySetIds:
+DELETE
+FROM DBCard
+WHERE id IN (SELECT cardId FROM DBCardSetToCardRelation WHERE setId IN ?);
+
 removeAll:
 DELETE
 FROM DBCard;

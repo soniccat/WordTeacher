@@ -62,6 +62,11 @@ DELETE
 FROM DBCardSet
 WHERE id = ?;
 
+removeCardSets:
+DELETE
+FROM DBCardSet
+WHERE id IN ?;
+
 removeAll:
 DELETE
 FROM DBCardSet;
@@ -72,6 +77,11 @@ FROM DBCardSet;
 
 selectRemoteIds:
 SELECT remoteId
+FROM DBCardSet
+WHERE remoteId != "";
+
+selectIdsForRemoteCardSets:
+SELECT id
 FROM DBCardSet
 WHERE remoteId != "";
 
