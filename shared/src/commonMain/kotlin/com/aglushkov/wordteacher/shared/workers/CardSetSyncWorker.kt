@@ -187,7 +187,9 @@ class CardSetSyncWorker(
             // that will lead into loosing the latest unsynced changes in the remote cardsets
             // save new local cardsets in a new account
             updateLastSyncDate(Instant.fromEpochMilliseconds(0))
-            database.cardSets.removeCardSets(database.cardSets.idsForRemoteCardSets())
+            databaseWorker.run { database ->
+                database.cardSets.removeCardSets(database.cardSets.idsForRemoteCardSets())
+            }
         }
 
         updateLastSyncUserId(authData.user.id)
@@ -197,7 +199,7 @@ class CardSetSyncWorker(
 
         try {
             withContext(Dispatchers.Default) {
-                val cardSetRemoteIds = databaseWorker.run {
+                val cardSetRemoteIds = databaseWorker.run { database ->
                     database.cardSets.remoteIds()
                 }
 
@@ -299,7 +301,7 @@ class CardSetSyncWorker(
             withContext(Dispatchers.Default) {
                 var updatedCardSets: List<CardSet> = emptyList()
 
-                databaseWorker.run {
+                databaseWorker.run { database ->
                     // get updated and not pushed cardsets
                     updatedCardSets = database.cardSets.selectUpdatedCardSets(lastSyncDate.toEpochMilliseconds())
 
@@ -309,14 +311,14 @@ class CardSetSyncWorker(
                     updatedCardSets = updatedCardSets.map { it.copy(cards = setIdToCards[it.id].orEmpty()) }
                 }
 
-                val cardSetRemoteIds = databaseWorker.run {
+                val cardSetRemoteIds = databaseWorker.run { database ->
                     database.cardSets.remoteIds()
                 }
 
                 val pushResponse = spaceCardSetService.push(updatedCardSets, cardSetRemoteIds, lastSyncDate).toOkResponse()
                 newSyncDate = pushResponse.latestModificationDate
 
-                databaseWorker.run {
+                databaseWorker.run { database ->
                     database.transaction {
                         pushResponse.cardSetIds?.onEach { (creationId, remoteId) ->
                             database.cardSets.updateCardSetRemoteId(remoteId, creationId)
