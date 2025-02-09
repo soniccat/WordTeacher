@@ -55,7 +55,7 @@ data class ImportCardSet (
     val cards: List<ImportCard> = emptyList(),
     var terms: List<String> = emptyList(), // for cardsets from search
     var info: CardSetInfo,
-    var isAvailableInSearch: Boolean,
+    var isAvailableInSearch: Boolean = true,
 ) {
     fun toCardSet(nowTime: Instant) = CardSet(
         id = 0,

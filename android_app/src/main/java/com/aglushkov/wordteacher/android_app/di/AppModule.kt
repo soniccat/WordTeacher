@@ -368,9 +368,11 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun cardSetsFeatures(): CardSetsVM.Features {
+    fun cardSetsFeatures(
+        @IsDebug isDebug: Boolean,
+    ): CardSetsVM.Features {
         return CardSetsVM.Features(
-            canImportCardSetFromJson = false,
+            canImportCardSetFromJson = isDebug,
         )
     }
 }

@@ -102,7 +102,9 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 	apiCardSet := dbCardSet.ToApi()
 	apiCardSet.Id = ""
 	apiCardSet.CreationDate = date
+	apiCardSet.CreationId = ""
 	apiCardSet.ModificationDate = date
+	apiCardSet.UserId = ""
 	apiCardSet.IsAvailableInSearch = false
 
 	response := response{

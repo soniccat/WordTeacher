@@ -45,6 +45,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.views.CardSetInfoUI
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoRouter
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.views.CardSetJsonImportUIDialog
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
@@ -390,6 +391,13 @@ class MainActivity : AppCompatActivity(), Router {
                         }
                     )
                 }
+                is MainDecomposeComponent.Child.CardSetJsonImport ->
+                    CardSetJsonImportUIDialog(
+                        vm = instance.vm,
+                        onCardSetCreated = {
+                            mainDecomposeComponent.popDialog(child.configuration)
+                        }
+                    )
                 else -> {}
             }
         }

@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.features.article.di.ArticleDependencies
 import com.aglushkov.wordteacher.shared.features.articles.di.ArticlesDependencies
 import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardset_info.di.CardSetInfoDependencies
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.di.CardSetJsonImportDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.dict_configs.di.DictConfigsDependencies
@@ -68,6 +69,7 @@ interface AppComponent:
     NotesDependencies,
     LearningDependencies,
     LearningSessionResultDependencies,
+    CardSetJsonImportDependencies,
     SettingsDependencies {
 
     fun serviceRepository(): ServiceRepository

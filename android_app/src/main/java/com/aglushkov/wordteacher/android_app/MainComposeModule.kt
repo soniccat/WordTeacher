@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.di.DaggerDictConfigsComponent
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.di.DaggerCardSetJsonImportComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.di.DaggerCardSetInfoComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
@@ -94,8 +95,14 @@ class MainComposeModule {
                         .dictConfigsDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.EmptyDialogConfiguration ->
                     Any()
-                is MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration,
                 is MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration ->
+                    DaggerCardSetJsonImportComponent.builder()
+                        .setComponentContext(context)
+                        .setState(configuration)
+                        .setDeps(appComponent)
+                        .build()
+                        .cardSetsDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration ->
                     TODO("Not supported")
             }
 
