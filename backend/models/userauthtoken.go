@@ -11,7 +11,7 @@ import (
 )
 
 const AccessTokenTimeout = time.Hour
-const RefreshTokenTimeout = 7 * 24 * time.Hour
+const RefreshTokenTimeout = 3 * 24 * time.Hour
 
 const (
 	SessionAccessTokenKey                = "accessToken"

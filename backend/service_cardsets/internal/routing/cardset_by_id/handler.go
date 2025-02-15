@@ -102,7 +102,7 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 	apiCardSet := dbCardSet.ToApi()
 	apiCardSet.Id = ""
 	apiCardSet.CreationDate = date
-	apiCardSet.CreationId = ""
+	apiCardSet.CreationId = uuid.NewString()
 	apiCardSet.ModificationDate = date
 	apiCardSet.UserId = ""
 	apiCardSet.IsAvailableInSearch = false

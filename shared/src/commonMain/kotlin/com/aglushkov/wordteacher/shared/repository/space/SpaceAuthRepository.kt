@@ -96,14 +96,12 @@ class SpaceAuthRepository(
             authResult = auth(network, loadedAuthData.data.token)
             authResult.asError()?.let { errorAuthData ->
                 (errorAuthData.throwable as? ErrorResponseException)?.let {
-                    // id token is expired, need to resign-in
-                    if (it.statusCode == HttpStatusCode.Unauthorized.value) {
-                        val authData2 = authController.signIn()
-                        // on error just keep error in authController
-                        authData2.asLoaded()?.let { loadedAuthData2 ->
-                            // try second time
-                            authResult = auth(network, loadedAuthData2.data.token)
-                        }
+                    // id token is expired or invalid, need to resign-in
+                    val authData2 = authController.signIn()
+                    // on error just keep error in authController
+                    authData2.asLoaded()?.let { loadedAuthData2 ->
+                        // try second time
+                        authResult = auth(network, loadedAuthData2.data.token)
                     }
                 }
             }

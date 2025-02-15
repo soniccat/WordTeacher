@@ -3,9 +3,11 @@ package user_provider
 import (
 	"net/http"
 	"service_auth/internal/service_models"
+	"tools/logger"
 )
 
 type Service struct {
+	logger         *logger.Logger
 	googleConfig   service_models.GoogleConfig
 	vkIdConfig     service_models.VKIDConfig
 	yandexIdConfig service_models.YandexIdConfig
@@ -14,6 +16,7 @@ type Service struct {
 }
 
 func New(
+	logger *logger.Logger,
 	googleConfig service_models.GoogleConfig,
 	vkIdConfig service_models.VKIDConfig,
 	yandexIdConfig service_models.YandexIdConfig,
@@ -22,6 +25,7 @@ func New(
 
 	httpClient := http.Client{}
 	return &Service{
+		logger:         logger,
 		googleConfig:   googleConfig,
 		vkIdConfig:     vkIdConfig,
 		yandexIdConfig: yandexIdConfig,

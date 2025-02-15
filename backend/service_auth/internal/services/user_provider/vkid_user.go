@@ -72,6 +72,8 @@ func (s *Service) VKUser(
 		return nil, logger.WrapError(ctx, err)
 	}
 
+	s.logger.Info(ctx, "vk user found", "token", token)
+
 	return &service_models.UserWithNetwork{
 		User: vkIDUser,
 		Network: models.UserNetwork{

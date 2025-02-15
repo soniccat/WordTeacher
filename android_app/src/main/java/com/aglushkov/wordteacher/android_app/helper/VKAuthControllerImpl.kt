@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.general.auth.VKAuthData
 import com.aglushkov.wordteacher.shared.general.auth.NetworkAuthData
 import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.vk.id.AccessToken
@@ -88,7 +89,7 @@ class VKAuthControllerImpl(
             return
         }
 
-        val currentData = vkAuthDataState.value.data()
+        val currentData = vkAuthDataState.value.asLoaded()?.data()
         vkAuthDataState.value = Resource.Loading()
         if (currentData != null) {
             if (currentData.isExpired(timeSource.timeInMilliseconds())) {
