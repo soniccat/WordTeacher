@@ -91,15 +91,17 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 		LastLessonDate:   "",
 	}
 	date := tools.TimeToApiDate(time.Now())
-	dbCardSet.Cards = tools.Map(dbCardSet.Cards, func(c *model.DbCard) *model.DbCard {
-		c.Id = nil
+	apiCardSet := dbCardSet.ToApi()
+	apiCardSet.Cards = tools.Map(apiCardSet.Cards, func(c *api.Card) *api.Card {
+		c.Id = ""
 		c.Progress = defaultCardProgress
 		c.CreationDate = date
+		c.CreationId = uuid.NewString()
+		c.UserId = ""
 		c.ModificationDate = date
 		return c
 	})
 
-	apiCardSet := dbCardSet.ToApi()
 	apiCardSet.Id = ""
 	apiCardSet.CreationDate = date
 	apiCardSet.CreationId = uuid.NewString()
