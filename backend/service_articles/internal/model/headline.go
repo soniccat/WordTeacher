@@ -7,4 +7,7 @@ type DbHeadline struct {
 	Title       string              `bson:"title"`
 	Description *string             `bson:"description,omitempty"`
 	Link        string              `bson:"link"`
+	PubDate     *primitive.DateTime `bson:"pubDate,omitempty"`
+	UpdateDate  *primitive.DateTime `bson:"updateDate,omitempty"`
+	Creator     *primitive.DateTime `bson:"creator,omitempty"`
 }
