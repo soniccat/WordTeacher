@@ -122,13 +122,18 @@ server {
 server {
     http2 on;
 
-    listen 443 default_server ssl;
-    listen [::]:443 ssl;
+    listen 443 default_server;
+    listen [::]:443;
+
+    # enable after calling make cronsetup, make cronup
+    # listen 443 default_server ssl;
+    # listen [::]:443 ssl;
 
     server_name aglushkov.ru;
 
-    ssl_certificate /etc/nginx/ssl/live/aglushkov.ru/fullchain.pem;
-    ssl_certificate_key /etc/nginx/ssl/live/aglushkov.ru/privkey.pem;
+    # enable after calling make cronsetup, make cronup
+    # ssl_certificate /etc/nginx/ssl/live/aglushkov.ru/fullchain.pem;
+    # ssl_certificate_key /etc/nginx/ssl/live/aglushkov.ru/privkey.pem;
 
     root /www/data;
 

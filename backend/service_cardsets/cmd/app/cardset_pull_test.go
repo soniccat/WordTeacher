@@ -79,14 +79,14 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithoutLastModificationDate_R
 		"oldTestCardSet1",
 		suite.CreateUUID().String(),
 		creationTime1,
-		[]*api.Card{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String(), creationTime1)},
 	)
 	creationTime2 := creationTime1.Add(time.Hour * time.Duration(2))
 	oldCardSet2 := createApiCardSet(
 		"oldTestCardSet2",
 		suite.CreateUUID().String(),
 		creationTime2,
-		[]*api.Card{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String(), creationTime2)},
 	)
 
 	userId := primitive.NewObjectID().Hex()
@@ -132,7 +132,7 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_Retu
 		"oldTestCardSet1",
 		suite.CreateUUID().String(),
 		creationTime1,
-		[]*api.Card{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String(), creationTime1)},
 	)
 
 	creationTime2 := creationTime1.Add(time.Hour * time.Duration(10))
@@ -140,7 +140,7 @@ func (suite *CardSetPullTestSuite) TestCardSetPull_WithLastModificationDate_Retu
 		"oldTestCardSet2",
 		suite.CreateUUID().String(),
 		creationTime2,
-		[]*api.Card{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String(), creationTime2)},
 	)
 
 	userId := primitive.NewObjectID().Hex()
