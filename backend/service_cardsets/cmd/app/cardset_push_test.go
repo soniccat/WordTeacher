@@ -129,7 +129,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSet_ReturnsOk() {
 		"testCardSet",
 		cardSetCreationId,
 		createTime,
-		[]*api.Card{createApiCard(cardCreationId)},
+		[]*api.Card{createApiCard(cardCreationId, createTime)},
 	)
 
 	suite.setupPushValidator(primitive.NewObjectID().Hex())
@@ -176,7 +176,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 		"testCardSet",
 		cardSetCreationId,
 		createTime,
-		[]*api.Card{createApiCard(apiCardCreationId)},
+		[]*api.Card{createApiCard(apiCardCreationId, createTime)},
 	)
 
 	userId := primitive.NewObjectID().Hex()
@@ -190,7 +190,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithAlreadyCardedSet_ReturnsA
 		"testCardSet",
 		cardSetCreationId,
 		modificationTime,
-		[]*api.Card{createApiCard(apiCardCreationId)},
+		[]*api.Card{createApiCard(apiCardCreationId, createTime)},
 	)
 
 	suite.setupPushValidator(userId)
@@ -226,7 +226,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 		"oldTestCardSet",
 		suite.CreateUUID().String(),
 		creationTime,
-		[]*api.Card{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String(), creationTime)},
 	)
 
 	userId := primitive.NewObjectID().Hex()
@@ -242,7 +242,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 		"newTestCardSet",
 		cardSetCreationId,
 		newCreationTime,
-		[]*api.Card{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String(), newCreationTime)},
 	)
 
 	suite.setupPushValidator(userId)
@@ -276,11 +276,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNewCardSetAndOldOne_Retur
 }
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsStatusConflict() {
+	creationTime := time.Now()
 	newCardSet := createApiCardSet(
 		"newTestCardSet",
 		suite.CreateUUID().String(),
-		time.Now(),
-		[]*api.Card{createApiCard(suite.CreateUUID().String())},
+		creationTime,
+		[]*api.Card{createApiCard(suite.CreateUUID().String(), creationTime)},
 	)
 
 	userId := primitive.NewObjectID().Hex()
@@ -292,11 +293,12 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_WithNotPulledChanges_ReturnsS
 	cardSetCreationIdUUID := suite.CreateUUID()
 	cardSetCreationId := cardSetCreationIdUUID.String()
 	cardCreationId := suite.CreateUUID().String()
+	oldCreationTime := time.Now()
 	oldCardSet := createApiCardSet(
 		"oldTestCardSet",
 		cardSetCreationId,
-		time.Now(),
-		[]*api.Card{createApiCard(cardCreationId)},
+		oldCreationTime,
+		[]*api.Card{createApiCard(cardCreationId, oldCreationTime)},
 	)
 
 	suite.setupPushValidator(userId)
@@ -324,7 +326,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 		"oldTestCardSet",
 		suite.CreateUUID().String(),
 		creationTime,
-		[]*api.Card{createApiCard(suite.CreateUUID().String())},
+		[]*api.Card{createApiCard(suite.CreateUUID().String(), creationTime)},
 	)
 
 	userId := primitive.NewObjectID().Hex()
@@ -341,7 +343,7 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 		"newTestCardSet",
 		cardSetCreationId,
 		modificationTime,
-		[]*api.Card{createApiCard(cardCreationId)},
+		[]*api.Card{createApiCard(cardCreationId, modificationTime)},
 	)
 
 	suite.setupPushValidator(userId)
@@ -378,10 +380,10 @@ func (suite *CardSetPushTestSuite) TestCardSetPush_NewCardSetWithExistingCardSet
 
 func (suite *CardSetPushTestSuite) TestCardSetPush_PushEmptyChangesWithOldDate_ReturnsStatusConflict() {
 	t := time.Now()
-	card1 := createApiCard(suite.CreateUUID().String())
+	card1 := createApiCard(suite.CreateUUID().String(), t)
 	card1.Term = "my term"
 	card1.ModificationDate = tools.TimeToApiDate(t)
-	card2 := createApiCard(suite.CreateUUID().String())
+	card2 := createApiCard(suite.CreateUUID().String(), t)
 	newCardSet := createApiCardSet(
 		"newTestCardSet",
 		suite.CreateUUID().String(),
@@ -483,7 +485,7 @@ func createApiCardSet(name string, creationId string, creationDate time.Time, ca
 	}
 }
 
-func createApiCard(creationId string) *api.Card {
+func createApiCard(creationId string, creationDate time.Time) *api.Card {
 	return &api.Card{
 		Term:          "testTerm1",
 		Transcription: tools.Ptr("testTranscription"),
@@ -499,7 +501,9 @@ func createApiCard(creationId string) *api.Card {
 			{{Start: 9, End: 10}, {Start: 11, End: 12}},
 			{{Start: 13, End: 14}, {Start: 15, End: 16}},
 		},
-		CreationId: creationId,
+		CreationId:       creationId,
+		CreationDate:     tools.TimeToApiDate(creationDate),
+		ModificationDate: tools.TimeToApiDate(creationDate),
 	}
 }
 

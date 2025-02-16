@@ -21,6 +21,16 @@ func ApiCardToDb(ctx context.Context, c *api.Card) (*DbCard, error) {
 		return nil, err
 	}
 
+	creationDate, err := tools.ApiDateToDbDate(ctx, c.CreationDate)
+	if err != nil {
+		return nil, err
+	}
+
+	modificationDate, err := tools.ApiDateToDbDate(ctx, c.ModificationDate)
+	if err != nil {
+		return nil, err
+	}
+
 	return &DbCard{
 		Id:                          cardDbId,
 		Term:                        c.Term,
@@ -35,8 +45,8 @@ func ApiCardToDb(ctx context.Context, c *api.Card) (*DbCard, error) {
 		UserId:                      cardDbUserId,
 		CreationId:                  c.CreationId,
 		Progress:                    c.Progress,
-		CreationDate:                c.CreationDate,
-		ModificationDate:            c.ModificationDate,
+		CreationDate:                creationDate,
+		ModificationDate:            modificationDate,
 		NeedToUpdateDefinitionSpans: c.NeedToUpdateDefinitionSpans,
 		NeedToUpdateExampleSpans:    c.NeedToUpdateExampleSpans,
 	}, nil
@@ -56,8 +66,8 @@ type DbCard struct {
 	UserId                      *primitive.ObjectID `bson:"userId"`
 	CreationId                  string              `bson:"creationId"`
 	Progress                    *api.CardProgress   `bson:"progress"`
-	CreationDate                string              `bson:"creationDate"`
-	ModificationDate            string              `bson:"modificationDate"`
+	CreationDate                primitive.DateTime  `bson:"creationDate"`
+	ModificationDate            primitive.DateTime  `bson:"modificationDate"`
 	NeedToUpdateDefinitionSpans bool                `bson:"needToUpdateDefinitionSpans"`
 	NeedToUpdateExampleSpans    bool                `bson:"needToUpdateExampleSpans"`
 }
@@ -76,8 +86,8 @@ func (c *DbCard) ToApi() *api.Card {
 		UserId:                      c.UserId.Hex(),
 		CreationId:                  c.CreationId,
 		Progress:                    c.Progress,
-		CreationDate:                c.CreationDate,
-		ModificationDate:            c.ModificationDate,
+		CreationDate:                tools.DbDateToApiDate(c.CreationDate),
+		ModificationDate:            tools.DbDateToApiDate(c.ModificationDate),
 		NeedToUpdateDefinitionSpans: c.NeedToUpdateDefinitionSpans,
 		NeedToUpdateExampleSpans:    c.NeedToUpdateExampleSpans,
 	}
@@ -101,7 +111,7 @@ func (c *DbCard) ToGrpc() *cardsetsgrpc.Card {
 		Synonyms:         c.Synonyms,
 		Examples:         c.Examples,
 		UserId:           c.UserId.Hex(),
-		CreationDate:     c.CreationDate,
-		ModificationDate: c.ModificationDate,
+		CreationDate:     tools.DbDateToApiDate(c.CreationDate),
+		ModificationDate: tools.DbDateToApiDate(c.ModificationDate),
 	}
 }
