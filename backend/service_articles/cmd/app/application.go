@@ -1,7 +1,8 @@
 package main
 
 import (
-	"service_articles/internal/storage"
+	"service_articles/internal/storage/headline_sources"
+	"service_articles/internal/storage/headlines"
 	"tools"
 
 	"github.com/alexedwards/scs/v2"
@@ -11,11 +12,12 @@ import (
 )
 
 type application struct {
-	logger             *logger.Logger
-	timeProvider       tools.TimeProvider
-	sessionManager     *scs.SessionManager
-	headlineRepository *storage.Storage
-	sessionValidator   session_validator.SessionValidator
+	logger                   *logger.Logger
+	timeProvider             tools.TimeProvider
+	sessionManager           *scs.SessionManager
+	headlineRepository       *headlines.Storage
+	headlineSourceRepository *headline_sources.Storage
+	sessionValidator         session_validator.SessionValidator
 }
 
 func createApplication(
@@ -23,14 +25,16 @@ func createApplication(
 	timeProvider tools.TimeProvider,
 	sessionManager *scs.SessionManager,
 	sessionValidator session_validator.SessionValidator,
-	headlineRepository *storage.Storage,
+	headlineRepository *headlines.Storage,
+	headlineSourceRepository *headline_sources.Storage,
 ) (_ *application, err error) {
 	app := &application{
-		logger:             logger,
-		timeProvider:       timeProvider,
-		sessionManager:     sessionManager,
-		headlineRepository: headlineRepository,
-		sessionValidator:   sessionValidator,
+		logger:                   logger,
+		timeProvider:             timeProvider,
+		sessionManager:           sessionManager,
+		headlineRepository:       headlineRepository,
+		headlineSourceRepository: headlineSourceRepository,
+		sessionValidator:         sessionValidator,
 	}
 
 	defer func() {
@@ -43,4 +47,5 @@ func createApplication(
 }
 
 func (app *application) stop() {
+	app.headlineRepository.StopMongo()
 }

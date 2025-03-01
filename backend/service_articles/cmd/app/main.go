@@ -9,7 +9,8 @@ import (
 	"net/http"
 	"os"
 	"runtime/debug"
-	"service_articles/internal/storage"
+	"service_articles/internal/storage/headline_sources"
+	"service_articles/internal/storage/headlines"
 	"time"
 	"tools"
 	"tools/logger"
@@ -57,13 +58,23 @@ func run() int {
 	}
 
 	logger := logger.New(serviceLogWriter, slog.Level(*minLogLevel))
-	storage, err := storage.New(
+	headlineStorage, err := headlines.New(
 		logger,
 		*mongoURI,
 		*enableCredentials,
 	)
 	if err != nil {
-		logger.ErrorWithError(context.Background(), err, "storage creation error")
+		logger.ErrorWithError(context.Background(), err, "headline storage creation error")
+		return failCode
+	}
+
+	headlineSourceStorage, err := headline_sources.New(
+		logger,
+		*mongoURI,
+		*enableCredentials,
+	)
+	if err != nil {
+		logger.ErrorWithError(context.Background(), err, "headline source storage creation error")
 		return failCode
 	}
 
@@ -73,7 +84,8 @@ func run() int {
 		&time_provider.TimeProvider{},
 		sessionManager,
 		session_validator.NewSessionManagerValidator(sessionManager),
-		storage,
+		headlineStorage,
+		headlineSourceStorage,
 	)
 
 	if err != nil {

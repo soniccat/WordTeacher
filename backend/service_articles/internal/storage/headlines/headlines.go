@@ -1,4 +1,4 @@
-package storage
+package headlines
 
 import (
 	"context"
@@ -55,7 +55,6 @@ func (m *Storage) FindHeadlines(
 	since time.Time,
 	limit int64,
 ) ([]model.Headline, error) {
-	var result []model.Headline
 	cursor, err := m.HeadlineCollection.Find(
 		ctx,
 		bson.M{
@@ -69,6 +68,7 @@ func (m *Storage) FindHeadlines(
 		return nil, logger.WrapError(ctx, err)
 	}
 
+	var result []model.Headline
 	err = cursor.All(ctx, &result)
 	if err != nil {
 		return nil, err
