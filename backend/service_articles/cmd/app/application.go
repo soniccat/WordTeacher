@@ -1,21 +1,21 @@
 package main
 
 import (
+	"service_articles/internal/storage"
 	"tools"
 
 	"github.com/alexedwards/scs/v2"
 
 	"models/session_validator"
-	"service_cardsets/internal/storage"
 	"tools/logger"
 )
 
 type application struct {
-	logger            *logger.Logger
-	timeProvider      tools.TimeProvider
-	sessionManager    *scs.SessionManager
-	cardSetRepository *storage.Storage
-	sessionValidator  session_validator.SessionValidator
+	logger             *logger.Logger
+	timeProvider       tools.TimeProvider
+	sessionManager     *scs.SessionManager
+	headlineRepository *storage.Storage
+	sessionValidator   session_validator.SessionValidator
 }
 
 func createApplication(
@@ -23,14 +23,14 @@ func createApplication(
 	timeProvider tools.TimeProvider,
 	sessionManager *scs.SessionManager,
 	sessionValidator session_validator.SessionValidator,
-	cardSetRepository *storage.Storage,
+	headlineRepository *storage.Storage,
 ) (_ *application, err error) {
 	app := &application{
-		logger:            logger,
-		timeProvider:      timeProvider,
-		sessionManager:    sessionManager,
-		cardSetRepository: cardSetRepository,
-		sessionValidator:  sessionValidator,
+		logger:             logger,
+		timeProvider:       timeProvider,
+		sessionManager:     sessionManager,
+		headlineRepository: headlineRepository,
+		sessionValidator:   sessionValidator,
 	}
 
 	defer func() {

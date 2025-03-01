@@ -1,13 +1,15 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
+)
 
-type DbHeadline struct {
-	Id          *primitive.ObjectID `bson:"_id,omitempty"`
-	Title       string              `bson:"title"`
-	Description *string             `bson:"description,omitempty"`
-	Link        string              `bson:"link"`
-	PubDate     *primitive.DateTime `bson:"pubDate,omitempty"`
-	UpdateDate  *primitive.DateTime `bson:"updateDate,omitempty"`
-	Creator     *primitive.DateTime `bson:"creator,omitempty"`
+type Headline struct {
+	Id          string     `json:"id,omitempty" bson:"_id,omitempty"`
+	Title       string     `json:"title" bson:"title"`
+	Description string     `json:"description,omitempty" bson:"description,omitempty"`
+	Link        string     `json:"link" bson:"link"`
+	PubDate     *time.Time `json:"pubDate,omitempty" bson:"pubDate,omitempty"`
+	UpdateDate  *time.Time `json:"updateDate,omitempty" bson:"updateDate,omitempty"`
+	Creator     *string    `json:"creator,omitempty" bson:"creator,omitempty"`
 }

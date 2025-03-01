@@ -53,6 +53,14 @@
       ]
     },
     {
+      "name": "Articles Service",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/service_articles/cmd/app/",
+      "args": ["-debugMode=true"]
+    },
+    {
       "name": "Script WordList filter",
       "type": "go",
       "request": "launch",

@@ -132,7 +132,29 @@ dictrm: dictstop
 
 dictbuild:
 	docker build -t dict -f ./Dict.Dockerfile .
-	docker container create -p 4001:4001 --name dict dict
+	docker container create -p 4003:4003 --name dict dict
 
 dictrun:
 	docker start dict
+
+# service_articles
+
+articlesup:
+	docker stop articles || true
+	docker rm articles || true
+	docker rmi articles || true
+	make up
+
+articlesstop:
+	docker container stop articles
+
+articlesrm: articlestop
+	docker container rm articles
+	docker image rm articles
+
+articlesbuild:
+	docker build -t articles -f ./Articles.Dockerfile .
+	docker container create -p 4004:4004 --name articles articles
+
+articlesrun:
+	docker start articles

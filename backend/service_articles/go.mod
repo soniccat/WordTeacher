@@ -6,13 +6,12 @@ require tools v0.0.0
 
 replace tools => ../tools
 
-require api v0.0.0
+require models v0.0.0
 
-replace api => ../api
+replace models => ../models
 
 require (
 	go.mongodb.org/mongo-driver v1.17.2
 	models v0.0.0
 )
 
-replace models => ../models

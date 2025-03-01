@@ -155,6 +155,31 @@ services:
     #   - target: "${DICT_PORT}"
     #     published: "${DICT_PORT}"
 
+  articles:
+    container_name: "articles${TEST_SUFFIX}"
+    hostname: "articles"
+    build:
+      context: ./
+      args:
+        PORT: "${ARTICLES_PORT}"
+      dockerfile: ./Articles.Dockerfile
+    image: articles
+    command:
+      - "-serverPort"
+      - "${ARTICLES_PORT}"
+      - "-mongoURI"
+      - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
+    volumes:
+      - ${VOLUME_ARTICLES_LOG_PATH}:/var/log
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.21
+    depends_on:
+      - mongosetup
+    # ports:
+    #   - target: "${ARTICLES_PORT}"
+    #     published: "${ARTICLES_PORT}"
+
   redis:
     container_name: "redis${TEST_SUFFIX}"
     hostname: "redis"

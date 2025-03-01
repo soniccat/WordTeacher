@@ -20,6 +20,7 @@ const MongoTimeout = 20 * time.Second
 
 // collections
 const (
+	// TODO: move that in proper services
 	MongoDatabaseUsers   = "users"
 	MongoCollectionUsers = "users"
 
@@ -124,6 +125,7 @@ func (mw *MongoWrapper) CreateIndexIfNeeded(
 	return nil
 }
 
+// TODO: remove MongoEnv and just use MongoWrapper
 type MongoEnv struct {
 	MongoWrapper *MongoWrapper
 	Logger       *logger.Logger

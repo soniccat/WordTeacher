@@ -96,6 +96,12 @@ server {
         set $dict http://dict:${DICT_PORT};
         proxy_pass $dict;
     }
+
+    # Articles
+    location /api/v1/headlines {
+        set $articles http://articles:${ARTICLES_PORT};
+        proxy_pass $articles;
+    }
 }
 
 # for insecure grpc handlers
