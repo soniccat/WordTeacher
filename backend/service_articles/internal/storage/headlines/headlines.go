@@ -77,17 +77,28 @@ func (m *Storage) FindHeadlines(
 	return result, nil
 }
 
-func (m *Storage) InsertHeadline(
+func (m *Storage) InsertHeadlines(
 	ctx context.Context,
-	headline *model.Headline,
+	headlines []model.Headline,
 ) error {
-	res, err := m.HeadlineCollection.InsertOne(ctx, headline)
+	var headlinesAsInterfaces []interface{}
+	for i, _ := range headlines {
+		headlinesAsInterfaces = append(headlinesAsInterfaces, headlines[i])
+	}
+
+	res, err := m.HeadlineCollection.InsertMany(
+		ctx,
+		headlinesAsInterfaces,
+		&options.InsertManyOptions{},
+	)
 	if err != nil {
 		return logger.WrapError(ctx, err)
 	}
 
-	objId := res.InsertedID.(primitive.ObjectID)
-	headline.Id = objId.Hex()
+	for i, _ := range headlines {
+		objId := res.InsertedIDs[i].(primitive.ObjectID)
+		headlines[i].Id = objId.Hex()
+	}
 
 	return nil
 }

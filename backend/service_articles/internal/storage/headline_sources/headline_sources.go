@@ -76,6 +76,40 @@ func (m *Storage) FindSourcesReadyToCrawl(
 	return result, nil
 }
 
+func (m *Storage) FindNextCrawlDate(
+	ctx context.Context,
+) (*time.Time, error) {
+
+	cursor, err := m.HeadlineSourceCollection.Find(
+		ctx,
+		bson.M{},
+		options.Find().SetProjection(bson.M{"nextCrawlDate": 1}).SetLimit(int64(1)).SetSort(bson.M{"nextCrawlDate": -1}),
+	)
+
+	if err != nil {
+		return nil, logger.WrapError(ctx, err)
+	}
+
+	defer func() { cursor.Close(ctx) }()
+
+	var modificationDates nextCrawlDateDateWrapperList
+	err = cursor.All(ctx, &modificationDates)
+	if err != nil {
+		return nil, logger.WrapError(ctx, err)
+	}
+
+	if len(modificationDates) == 0 {
+		return nil, nil
+	}
+
+	return tools.Ptr(modificationDates[0].NextCrawlDate.Time().UTC()), nil
+}
+
+type nextCrawlDateDateWrapper struct {
+	NextCrawlDate primitive.DateTime `bson:"nextCrawlDate"`
+}
+type nextCrawlDateDateWrapperList []nextCrawlDateDateWrapper
+
 func (m *Storage) InsertHeadlineSource(
 	ctx context.Context,
 	headlineSource *model.HeadlineSource,
