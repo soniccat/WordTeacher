@@ -6,6 +6,7 @@ import (
 	"time"
 	"tools/logger"
 
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/nbio/xml"
 
 	"service_articles/internal/model"
@@ -73,6 +74,7 @@ func (c *rssTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 }
 
 type RssParser struct {
+	ugcPolicy *bluemonday.Policy
 }
 
 func (p *RssParser) Parse(ctx context.Context, r io.Reader) ([]model.Headline, error) {
@@ -94,8 +96,8 @@ func (p *RssParser) Parse(ctx context.Context, r io.Reader) ([]model.Headline, e
 			}
 
 			headlines = append(headlines, model.Headline{
-				Title:       item.Title,
-				Description: item.Description,
+				Title:       p.ugcPolicy.Sanitize(item.Title),
+				Description: p.ugcPolicy.Sanitize(item.Description),
 				Link:        item.Link,
 				PubDate:     item.GetPubDate(),
 				UpdateDate:  item.GetUpdateDate(),

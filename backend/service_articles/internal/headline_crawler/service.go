@@ -10,6 +10,8 @@ import (
 	"time"
 	"tools"
 	"tools/logger"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 const maxHeadlinePerSource = 1000
@@ -51,6 +53,7 @@ type Crawler struct {
 	headlineStorage       headlineStorage
 	headlineSourceStorage headlineSourceStorage
 	httpClient            http.Client
+	ugcPolicy             *bluemonday.Policy
 }
 
 func New(
@@ -66,6 +69,7 @@ func New(
 		headlineStorage:       headlineStorage,
 		headlineSourceStorage: headlineSourceStorage,
 		httpClient:            httpClient,
+		ugcPolicy:             bluemonday.NewPolicy(),
 	}
 }
 
@@ -106,7 +110,7 @@ func (c *Crawler) Start(ctx context.Context) {
 }
 
 func (c *Crawler) crawlSource(ctx context.Context, source model.HeadlineSource) error {
-	parser := resolveParser(source.Type)
+	parser := resolveParser(source.Type, c.ugcPolicy)
 	if parser == nil {
 		return fmt.Errorf("can't find parser for type %s", source.Type)
 	}
@@ -171,9 +175,11 @@ type sourceParser interface {
 	Parse(ctx context.Context, r io.Reader) ([]model.Headline, error)
 }
 
-func resolveParser(t string) sourceParser {
+func resolveParser(t string, ugcPolicy *bluemonday.Policy) sourceParser {
 	if t == model.HeadlineSourceTypeRss {
-		return &RssParser{}
+		return &RssParser{
+			ugcPolicy,
+		}
 	}
 
 	return nil

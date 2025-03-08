@@ -11,7 +11,6 @@ import (
 	"tools/logger"
 
 	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 )
 
 const (
@@ -64,8 +63,7 @@ func (h *Handler) Headlines(w http.ResponseWriter, r *http.Request) {
 	authToken, _ := h.sessionValidator.Validate(r) // get authToken just for logging
 
 	// Path params
-	params := mux.Vars(r)
-	categoryString, _ := params["category"]
+	categoryString := r.URL.Query().Get("category")
 	ctx := logger.WrapContext(
 		r.Context(),
 		append(
