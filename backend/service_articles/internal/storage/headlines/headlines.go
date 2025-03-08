@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"service_articles/internal/model"
-	"time"
 	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
@@ -16,8 +15,9 @@ import (
 )
 
 const (
-	MongoDatabaseHeadlines   = "headlines"
-	MongoCollectionHeadlines = "headlines"
+	MongoDatabaseHeadlines    = "headlines"
+	MongoCollectionHeadlines  = "headlines"
+	MaxHeadlineCountPerSource = 5000
 )
 
 type Storage struct {
@@ -52,15 +52,26 @@ func (m *Storage) DropAll(ctx context.Context) error {
 
 func (m *Storage) FindHeadlines(
 	ctx context.Context,
-	since time.Time,
+	sourceIds []string,
 	limit int64,
 ) ([]model.Headline, error) {
+	filter := bson.M{}
+	if len(sourceIds) > 0 {
+		filter = bson.M{
+			"sourceId": bson.M{"$in": sourceIds},
+		}
+	}
+
 	cursor, err := m.HeadlineCollection.Find(
 		ctx,
-		bson.M{
-			"updateDate": bson.M{"$gte": since},
-		},
-		options.Find().SetLimit(limit).SetSort(bson.M{"updateDate": -1}),
+		filter,
+		options.Find().SetLimit(limit).
+			SetSort(
+				bson.D{
+					{Key: "updateDate", Value: -1},
+					{Key: "pubDate", Value: -1},
+				},
+			),
 	)
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return nil, nil
@@ -85,7 +96,7 @@ func (m *Storage) InsertHeadlines(
 		return nil
 	}
 
-	var headlinesAsInterfaces []interface{}
+	var headlinesAsInterfaces []any
 	for i, _ := range headlines {
 		headlinesAsInterfaces = append(headlinesAsInterfaces, headlines[i])
 	}
@@ -117,9 +128,9 @@ func (m *Storage) KeepRecentHeadlines(
 		bson.M{
 			"sourceId": sourceId,
 		},
-		options.Find().SetSort(bson.M{
-			"updateDate": -1,
-			"pubDate":    -1,
+		options.Find().SetSort(bson.D{
+			{Key: "updateDate", Value: -1},
+			{Key: "pubDate", Value: -1},
 		}).SetProjection(bson.M{
 			"_id": 1,
 		}),
@@ -134,12 +145,14 @@ func (m *Storage) KeepRecentHeadlines(
 		return logger.WrapError(ctx, err)
 	}
 
-	headlineIdsToRemove := headlineIds[1000:]
-	err = m.DeleteHeadlinesByIds(ctx, tools.Map(headlineIdsToRemove, func(w mongowrapper.MongoStringIdWrapper) string {
-		return w.Id
-	}))
-	if err != nil {
-		return err
+	if len(headlineIds) > MaxHeadlineCountPerSource {
+		headlineIdsToRemove := headlineIds[MaxHeadlineCountPerSource:]
+		err = m.DeleteHeadlinesByIds(ctx, tools.Map(headlineIdsToRemove, func(w mongowrapper.MongoStringIdWrapper) string {
+			return w.Id
+		}))
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

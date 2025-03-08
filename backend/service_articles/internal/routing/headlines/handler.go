@@ -7,7 +7,6 @@ import (
 	"models/session_validator"
 	"net/http"
 	"service_articles/internal/model"
-	"time"
 	"tools"
 	"tools/logger"
 
@@ -19,10 +18,18 @@ const (
 	limit = 100
 )
 
-type storage interface {
+type headlineSourceStorage interface {
+	SourceIdsByCategory(
+		ctx context.Context,
+		category *string,
+		limit int64,
+	) ([]string, error)
+}
+
+type headlineStorage interface {
 	FindHeadlines(
 		ctx context.Context,
-		since time.Time,
+		sourceIds []string,
 		limit int64,
 	) ([]model.Headline, error)
 }
@@ -33,20 +40,23 @@ type response struct {
 
 type Handler struct {
 	tools.BaseHandler
-	sessionValidator session_validator.SessionValidator
-	innerStorage     storage
+	sessionValidator      session_validator.SessionValidator
+	headlineStorage       headlineStorage
+	headlineSourceStorage headlineSourceStorage
 }
 
 func NewHandler(
 	logger *logger.Logger,
 	timeProvider tools.TimeProvider,
 	sessionValidator session_validator.SessionValidator,
-	innerStorage storage,
+	headlineStorage headlineStorage,
+	headlineSourceStorage headlineSourceStorage,
 ) *Handler {
 	return &Handler{
-		BaseHandler:      *tools.NewBaseHandler(logger, timeProvider),
-		sessionValidator: sessionValidator,
-		innerStorage:     innerStorage,
+		BaseHandler:           *tools.NewBaseHandler(logger, timeProvider),
+		sessionValidator:      sessionValidator,
+		headlineStorage:       headlineStorage,
+		headlineSourceStorage: headlineSourceStorage,
 	}
 }
 
@@ -55,30 +65,25 @@ func (h *Handler) Headlines(w http.ResponseWriter, r *http.Request) {
 
 	// Path params
 	params := mux.Vars(r)
-	sinceString, ok := params["since"]
-	if !ok {
-		h.SetError(w, errors.New("since parameter is missing"), http.StatusBadRequest)
-		return
-	}
-
-	sinceDate, err := tools.ParseApiDate(r.Context(), sinceString)
-	if err != nil {
-		h.SetError(w, errors.New("since parameter is a wrong date"), http.StatusBadRequest)
-		return
-	}
-
+	categoryString, _ := params["category"]
 	ctx := logger.WrapContext(
 		r.Context(),
 		append(
 			[]any{
 				"logId", uuid.NewString(),
-				"since", sinceString,
+				"categoryString", categoryString,
 			},
 			models.LogParams(authToken, r.Header)...,
 		),
 	)
 
-	headlines, err := h.innerStorage.FindHeadlines(ctx, sinceDate, limit)
+	sourceIds, err := h.headlineSourceStorage.SourceIdsByCategory(ctx, &categoryString, limit)
+	if err != nil {
+		h.SetError(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	headlines, err := h.headlineStorage.FindHeadlines(ctx, sourceIds, limit)
 	if err != nil {
 		var invalidIdError tools.InvalidIdError
 		if errors.As(err, &invalidIdError) {

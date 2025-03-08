@@ -76,9 +76,35 @@ func (m *Storage) AllSources(
 	)
 }
 
+func (m *Storage) SourceIdsByCategory(
+	ctx context.Context,
+	category *string,
+	limit int64,
+) ([]string, error) {
+	filter := bson.M{}
+	if category != nil && *category != "" {
+		filter = bson.M{
+			"category": category,
+		}
+	}
+	sources, err := m.FindSources(
+		ctx,
+		filter,
+		options.Find().SetSort(bson.M{"nextCrawlDate": -1}).
+			SetLimit(limit),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return tools.Map(sources, func(s model.HeadlineSource) string {
+		return s.Id
+	}), nil
+}
+
 func (m *Storage) FindSources(
 	ctx context.Context,
-	filter interface{},
+	filter any,
 	opts ...*options.FindOptions,
 ) ([]model.HeadlineSource, error) {
 	cursor, err := m.HeadlineSourceCollection.Find(

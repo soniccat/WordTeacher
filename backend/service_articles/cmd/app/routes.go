@@ -14,12 +14,13 @@ func (app *application) routes() *mux.Router {
 		app.timeProvider,
 		app.sessionValidator,
 		app.headlineStorage,
+		app.headlineSourceStorage,
 	)
 
 	// Register handler functions.
 	r := mux.NewRouter()
 	r.Handle(
-		"/api/v1/hadlines",
+		"/api/v1/headlines",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(headlinesHandler.Headlines)),
 	).Methods("GET")
 
