@@ -99,7 +99,7 @@ func (c *Crawler) Start(ctx context.Context) {
 		}
 
 		if nextCrawlDate != nil {
-			d := nextCrawlDate.Sub(time.Now().UTC())
+			d := nextCrawlDate.Sub(c.timeProvider.Now())
 			time.Sleep(d)
 		}
 	}
@@ -147,10 +147,12 @@ func (c *Crawler) crawlSource(ctx context.Context, source model.HeadlineSource) 
 		if err != nil {
 			return err
 		}
+
+		c.logger.Info(ctx, fmt.Sprintf("Source %s: added %d headlines", source.Title, len(newHeadlines)))
 	}
 
 	nextCrawlDate := c.timeProvider.Now().Add(time.Duration(source.CrawlPeriod))
-	err = c.headlineSourceStorage.UpdateCrawlDate(ctx, source.Id, time.Now(), nextCrawlDate)
+	err = c.headlineSourceStorage.UpdateCrawlDate(ctx, source.Id, c.timeProvider.Now(), nextCrawlDate)
 	if err != nil {
 		return err
 	}

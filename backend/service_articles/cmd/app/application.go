@@ -25,6 +25,24 @@ var sources []model.HeadlineSource = []model.HeadlineSource{
 		CrawlPeriod: int64(time.Duration(30) * time.Minute),
 		Category:    model.HeadlineSourceCategoryNews,
 	},
+	{
+		IntId:       2,
+		Title:       "NBC News",
+		Description: "NBC News Top Stories",
+		Type:        model.HeadlineSourceTypeRss,
+		Link:        "https://feeds.nbcnews.com/nbcnews/public/news",
+		CrawlPeriod: int64(time.Duration(30) * time.Minute),
+		Category:    model.HeadlineSourceCategoryNews,
+	},
+	{
+		IntId:       3,
+		Title:       "Hacker News",
+		Description: "Links for the intellectually curious, ranked by readers.",
+		Type:        model.HeadlineSourceTypeRss,
+		Link:        "https://news.ycombinator.com/rss",
+		CrawlPeriod: int64(time.Duration(30) * time.Minute),
+		Category:    model.HeadlineSourceCategoryTech,
+	},
 }
 
 type application struct {
