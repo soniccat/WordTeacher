@@ -13,7 +13,7 @@ func (app *application) routes() *mux.Router {
 		app.logger,
 		app.timeProvider,
 		app.sessionValidator,
-		app.headlineRepository,
+		app.headlineStorage,
 	)
 
 	// Register handler functions.

@@ -81,6 +81,10 @@ func (m *Storage) InsertHeadlines(
 	ctx context.Context,
 	headlines []model.Headline,
 ) error {
+	if len(headlines) == 0 {
+		return nil
+	}
+
 	var headlinesAsInterfaces []interface{}
 	for i, _ := range headlines {
 		headlinesAsInterfaces = append(headlinesAsInterfaces, headlines[i])
@@ -103,10 +107,52 @@ func (m *Storage) InsertHeadlines(
 	return nil
 }
 
+func (m *Storage) KeepRecentHeadlines(
+	ctx context.Context,
+	sourceId string,
+	count int64,
+) error {
+	cursor, err := m.HeadlineCollection.Find(
+		ctx,
+		bson.M{
+			"sourceId": sourceId,
+		},
+		options.Find().SetSort(bson.M{
+			"updateDate": -1,
+			"pubDate":    -1,
+		}).SetProjection(bson.M{
+			"_id": 1,
+		}),
+	)
+	if err != nil {
+		return logger.WrapError(ctx, err)
+	}
+
+	var headlineIds mongowrapper.MongoStringIdWrapperList
+	err = cursor.All(ctx, &headlineIds)
+	if err != nil {
+		return logger.WrapError(ctx, err)
+	}
+
+	headlineIdsToRemove := headlineIds[1000:]
+	err = m.DeleteHeadlinesByIds(ctx, tools.Map(headlineIdsToRemove, func(w mongowrapper.MongoStringIdWrapper) string {
+		return w.Id
+	}))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Storage) DeleteHeadlinesByIds(
 	ctx context.Context,
 	ids []string,
 ) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
 	mongoIds, err := tools.IdsToMongoIds(ctx, ids)
 	if err != nil {
 		return err

@@ -352,13 +352,13 @@ func (m *Storage) IdsNotInList(
 		return []string{}, logger.WrapError(ctx, err)
 	}
 
-	var result MongoIdWrapperList
+	var result mongowrapper.MongoIdWrapperList
 	err = cursor.All(ctx, &result)
 	if err != nil {
 		return nil, logger.WrapError(ctx, err)
 	}
 
-	return tools.MongoIdsToStrings(result.toMongoIds()), nil
+	return tools.MongoIdsToStrings(result.ToMongoIds()), nil
 }
 
 func (m *Storage) CardSetsNotInList(
@@ -395,18 +395,6 @@ func (m *Storage) CardSetsNotInList(
 	return model.DbCardSetsToApi(cardSetDbs), nil
 }
 
-type MongoIdWrapper struct {
-	Id primitive.ObjectID `bson:"_id"`
-}
-
-type MongoIdWrapperList []MongoIdWrapper
-
-func (l *MongoIdWrapperList) toMongoIds() []primitive.ObjectID {
-	return tools.Map[MongoIdWrapper](*l, func(t MongoIdWrapper) primitive.ObjectID {
-		return t.Id
-	})
-}
-
 func (m *Storage) CardCardSetIds(
 	ctx context.Context,
 	userId string,
@@ -429,13 +417,13 @@ func (m *Storage) CardCardSetIds(
 
 	defer func() { cursor.Close(ctx) }()
 
-	var cardSetDbIds2 MongoIdWrapperList
+	var cardSetDbIds2 mongowrapper.MongoIdWrapperList
 	err = cursor.All(ctx, &cardSetDbIds2)
 	if err != nil {
 		return nil, logger.WrapError(ctx, err)
 	}
 
-	cardSetApiIds := tools.Map(cardSetDbIds2.toMongoIds(), func(cardSetDbId primitive.ObjectID) string {
+	cardSetApiIds := tools.Map(cardSetDbIds2.ToMongoIds(), func(cardSetDbId primitive.ObjectID) string {
 		return cardSetDbId.Hex()
 	})
 

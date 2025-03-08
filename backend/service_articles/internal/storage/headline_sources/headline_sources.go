@@ -54,12 +54,37 @@ func (m *Storage) FindSourcesReadyToCrawl(
 	ctx context.Context,
 	currentTime time.Time,
 ) ([]model.HeadlineSource, error) {
-	cursor, err := m.HeadlineSourceCollection.Find(
+	return m.FindSources(
 		ctx,
 		bson.M{
-			"nextCrawlDate": bson.M{"$lte": currentTime},
+			"$or": []any{
+				bson.M{"nextCrawlDate": bson.M{"$lte": currentTime}},
+				bson.M{"nextCrawlDate": nil},
+			},
 		},
 		options.Find().SetSort(bson.M{"nextCrawlDate": -1}),
+	)
+}
+
+func (m *Storage) AllSources(
+	ctx context.Context,
+) ([]model.HeadlineSource, error) {
+	return m.FindSources(
+		ctx,
+		bson.M{},
+		options.Find().SetSort(bson.M{"nextCrawlDate": -1}),
+	)
+}
+
+func (m *Storage) FindSources(
+	ctx context.Context,
+	filter interface{},
+	opts ...*options.FindOptions,
+) ([]model.HeadlineSource, error) {
+	cursor, err := m.HeadlineSourceCollection.Find(
+		ctx,
+		filter,
+		opts...,
 	)
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return nil, nil
@@ -79,13 +104,11 @@ func (m *Storage) FindSourcesReadyToCrawl(
 func (m *Storage) FindNextCrawlDate(
 	ctx context.Context,
 ) (*time.Time, error) {
-
 	cursor, err := m.HeadlineSourceCollection.Find(
 		ctx,
 		bson.M{},
 		options.Find().SetProjection(bson.M{"nextCrawlDate": 1}).SetLimit(int64(1)).SetSort(bson.M{"nextCrawlDate": -1}),
 	)
-
 	if err != nil {
 		return nil, logger.WrapError(ctx, err)
 	}
@@ -105,22 +128,64 @@ func (m *Storage) FindNextCrawlDate(
 	return tools.Ptr(modificationDates[0].NextCrawlDate.Time().UTC()), nil
 }
 
+func (m *Storage) UpdateCrawlDate(
+	ctx context.Context,
+	id string,
+	newLastCrawlDate time.Time,
+	newNextCrawDate time.Time,
+) error {
+	mongoId, err := tools.ParseObjectID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	_, err = m.HeadlineSourceCollection.UpdateOne(
+		ctx,
+		bson.M{
+			"_id": mongoId,
+		},
+		bson.M{
+			"$set": bson.M{
+				"lastCrawlDate": newLastCrawlDate,
+				"nextCrawlDate": newNextCrawDate,
+			},
+		},
+		&options.UpdateOptions{},
+	)
+	if err != nil {
+		return logger.WrapError(ctx, err)
+	}
+
+	return nil
+}
+
 type nextCrawlDateDateWrapper struct {
 	NextCrawlDate primitive.DateTime `bson:"nextCrawlDate"`
 }
 type nextCrawlDateDateWrapperList []nextCrawlDateDateWrapper
 
-func (m *Storage) InsertHeadlineSource(
+func (m *Storage) InsertHeadlineSources(
 	ctx context.Context,
-	headlineSource *model.HeadlineSource,
+	headlineSources []model.HeadlineSource,
 ) error {
-	res, err := m.HeadlineSourceCollection.InsertOne(ctx, headlineSource)
+	if len(headlineSources) == 0 {
+		return nil
+	}
+
+	var headlineSourcesAsInterfaces []any
+	for i, _ := range headlineSources {
+		headlineSourcesAsInterfaces = append(headlineSourcesAsInterfaces, headlineSources[i])
+	}
+
+	res, err := m.HeadlineSourceCollection.InsertMany(ctx, headlineSourcesAsInterfaces, &options.InsertManyOptions{})
 	if err != nil {
 		return logger.WrapError(ctx, err)
 	}
 
-	objId := res.InsertedID.(primitive.ObjectID)
-	headlineSource.Id = objId.Hex()
+	for i, _ := range headlineSources {
+		objId := res.InsertedIDs[i].(primitive.ObjectID)
+		headlineSources[i].Id = objId.Hex()
+	}
 
 	return nil
 }

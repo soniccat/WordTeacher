@@ -80,6 +80,7 @@ func run() int {
 
 	sessionManager := tools.CreateSessionManager(*redisAddress)
 	app, err := createApplication(
+		context.Background(),
 		logger,
 		&time_provider.TimeProvider{},
 		sessionManager,
@@ -110,11 +111,10 @@ func run() int {
 	}()
 
 	// crawler
+	crawler := app.createCrawler()
 
 	go func() {
-		// if err := grpcServer.Serve(grpcListener); err != nil {
-		// 	logger.ErrorWithError(context.Background(), err, "grpc: failed to serve")
-		// }
+		crawler.Start(context.Background())
 	}()
 
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)

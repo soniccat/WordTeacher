@@ -30,6 +30,7 @@ services:
       - CARDSETSEARCH_PORT=${CARDSETSEARCH_PORT}
       - CARDSETS_GRPC_PORT=${CARDSETS_GRPC_PORT}
       - DICT_PORT=${DICT_PORT}
+      - ARTICLES_PORT=${ARTICLES_PORT}
     restart: always
 
   certbot:
