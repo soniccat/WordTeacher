@@ -1,19 +1,19 @@
 {
   "meta": {
     "type": "db",
-    "canSave": false,
-    "canEdit": false,
-    "canAdmin": false,
+    "canSave": true,
+    "canEdit": true,
+    "canAdmin": true,
     "canStar": true,
-    "canDelete": false,
+    "canDelete": true,
     "slug": "services",
     "url": "/d/edipdzkb75logf/services",
     "expires": "0001-01-01T00:00:00Z",
-    "created": "2024-04-14T11:27:12Z",
-    "updated": "2024-04-28T18:38:57Z",
+    "created": "2024-04-28T14:30:15Z",
+    "updated": "2024-05-19T10:48:22Z",
     "updatedBy": "admin",
-    "createdBy": "admin",
-    "version": 40,
+    "createdBy": "Anonymous",
+    "version": 2,
     "hasAcl": false,
     "isFolder": false,
     "folderId": 0,
@@ -29,9 +29,9 @@
         "canDelete": true
       },
       "organization": {
-        "canAdd": false,
-        "canEdit": false,
-        "canDelete": false
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
       }
     }
   },
@@ -251,7 +251,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "label_replace(\n    quantile_over_time(\n        0.95,\n        {service_name=\"nginx\"} | status >= 300 and status < 500 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__auto]\n    ) by (request_uri), \n    \"request_uri\", \n    \"/api/dict/words/*\", \n    \"request_uri\", \n    \"/api/dict/words/.*\"\n)",
+            "expr": "label_replace(\n    quantile_over_time(\n        0.95,\n        {service_name=\"nginx\"} | status >= 300 and status < 500 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]\n    ) by (request_uri), \n    \"request_uri\", \n    \"/api/dict/words/*\", \n    \"request_uri\", \n    \"/api/dict/words/.*\"\n)",
             "hide": false,
             "queryType": "range",
             "refId": "B"
@@ -346,7 +346,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "quantile_over_time(0.95,{service_name=\"nginx\"} | status >= 500 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__auto]) by (request_uri)",
+            "expr": "quantile_over_time(0.95,{service_name=\"nginx\"} | status >= 500 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]) by (request_uri)",
             "hide": false,
             "queryType": "range",
             "refId": "B"
@@ -454,7 +454,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_auth\", level=\"INFO\"}[$__auto]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_auth\", level=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -612,7 +612,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsets\", level=\"INFO\"}[$__auto]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsets\", level=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -770,7 +770,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsetsearch\", level=\"INFO\"}[$__auto]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsetsearch\", level=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -928,7 +928,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dict\", level=\"INFO\"}[$__auto]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dict\", level=\"INFO\"}[1m]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -1081,7 +1081,7 @@
         },
         "gridPos": {
           "h": 8,
-          "w": 12,
+          "w": 24,
           "x": 0,
           "y": 62
         },
@@ -1370,8 +1370,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1469,8 +1468,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -1694,7 +1692,7 @@
                 "options": {
                   "mode": "exclude",
                   "names": [
-                    "{__name__=\"go_gc_duration_seconds\", instance=\"localhost:9191\", job=\"prometheus\", quantile=\"0.75\"}"
+                    "{__name__=\"go_gc_duration_seconds\", instance=\"localhost:9091\", job=\"prometheus\", quantile=\"0.75\"}"
                   ],
                   "prefix": "All except:",
                   "readOnly": true
@@ -1866,7 +1864,7 @@
     "timezone": "browser",
     "title": "Services",
     "uid": "edipdzkb75logf",
-    "version": 40,
+    "version": 2,
     "weekStart": ""
   }
 }

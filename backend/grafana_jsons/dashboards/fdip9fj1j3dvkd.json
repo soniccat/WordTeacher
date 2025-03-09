@@ -1,25 +1,25 @@
 {
   "meta": {
     "type": "db",
-    "canSave": false,
-    "canEdit": false,
-    "canAdmin": false,
+    "canSave": true,
+    "canEdit": true,
+    "canAdmin": true,
     "canStar": true,
-    "canDelete": false,
+    "canDelete": true,
     "slug": "mongodb-overview-hmx",
     "url": "/d/fdip9fj1j3dvkd/mongodb-overview-hmx",
     "expires": "0001-01-01T00:00:00Z",
-    "created": "2024-04-14T10:36:07Z",
-    "updated": "2024-04-14T10:42:33Z",
-    "updatedBy": "admin",
-    "createdBy": "admin",
-    "version": 5,
+    "created": "2024-04-28T14:30:16Z",
+    "updated": "2024-04-28T14:30:16Z",
+    "updatedBy": "Anonymous",
+    "createdBy": "Anonymous",
+    "version": 1,
     "hasAcl": false,
     "isFolder": false,
-    "folderId": 19,
-    "folderUid": "fdip6obfyvytcc",
-    "folderTitle": "Metrics",
-    "folderUrl": "/dashboards/f/fdip6obfyvytcc/metrics",
+    "folderId": 0,
+    "folderUid": "",
+    "folderTitle": "General",
+    "folderUrl": "",
     "provisioned": false,
     "provisionedExternalId": "",
     "annotationsPermissions": {
@@ -29,9 +29,9 @@
         "canDelete": true
       },
       "organization": {
-        "canAdd": false,
-        "canEdit": false,
-        "canDelete": false
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
       }
     }
   },
@@ -1457,7 +1457,7 @@
     "timezone": "browser",
     "title": "MongoDB Overview Hmx",
     "uid": "fdip9fj1j3dvkd",
-    "version": 5,
+    "version": 1,
     "weekStart": ""
   }
 }
