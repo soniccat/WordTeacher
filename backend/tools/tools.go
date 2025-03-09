@@ -265,7 +265,9 @@ func GetLatestDate(dates ...*time.Time) *time.Time {
 	latestDate := dates[0]
 	for i := range dates[1:] {
 		nextDate := dates[i]
-		if nextDate != nil && latestDate.Compare(*nextDate) == -1 {
+		if latestDate == nil {
+			latestDate = nextDate
+		} else if nextDate != nil && latestDate.Compare(*nextDate) == -1 {
 			latestDate = nextDate
 		}
 	}
