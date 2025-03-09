@@ -1,0 +1,44 @@
+/*
+// required tools
+$ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+$ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+
+// generate source
+protoc --go_out=service_articles/pkg/grpc --go_opt=paths=source_relative \
+--go-grpc_out=service_articles/pkg/grpc --go-grpc_opt=paths=source_relative \
+service_articles/api/headlines.proto
+*/
+
+
+syntax = "proto3";
+
+option go_package = "aglushkov.com/articlesgrpc";
+
+package articlesgrpc;
+
+service Headlines {
+  rpc GetHeadlines (GetHeadlinesIn) returns (stream Headline) {}
+}
+
+message GetHeadlinesIn {
+  Category category = 1;
+  optional int64 limit = 2;
+}
+
+message Headline {
+  string id = 1;
+  string sourceId = 2;
+  string sourceName = 3;
+  string title = 4;
+  string description = 5;
+  string link = 6;
+  optional string pubDate = 7;
+  optional string updateDate = 8;
+  optional string creator = 9;
+}
+
+enum Category {
+	ALL = 0;
+	NEWS = 1;
+  TECH = 2;
+}

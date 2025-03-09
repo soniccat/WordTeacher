@@ -122,6 +122,11 @@ server {
         set $cardsetsPRPC grpc://cardsets:${CARDSETS_GRPC_PORT};
         grpc_pass $cardsetsPRPC;
     }
+
+    location /articlesgrpc.Headlines {
+        set $articlesPRPC grpc://articles:${ARTICLES_GRPC_PORT};
+        grpc_pass $articlesPRPC;
+    }
 }
 
 # for documents

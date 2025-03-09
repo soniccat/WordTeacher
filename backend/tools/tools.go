@@ -12,6 +12,14 @@ func Ptr[T any](x T) *T {
 	return &x
 }
 
+func PtrInt64Value(x *int64) int64 {
+	if x == nil {
+		return int64(0)
+	}
+
+	return *x
+}
+
 func ParseApiDate(ctx context.Context, date string) (time.Time, error) {
 	t, err := time.Parse(time.RFC3339Nano, date)
 	return t, logger.WrapError(ctx, err)
@@ -19,6 +27,14 @@ func ParseApiDate(ctx context.Context, date string) (time.Time, error) {
 
 func TimeToApiDate(t time.Time) string {
 	return t.UTC().Truncate(time.Millisecond).Format(time.RFC3339Nano)
+}
+
+func OptTimeToOptApiDate(t *time.Time) *string {
+	if t == nil {
+		return nil
+	}
+
+	return Ptr((*t).UTC().Truncate(time.Millisecond).Format(time.RFC3339Nano))
 }
 
 func ApiDateToDbDate(ctx context.Context, date string) (primitive.DateTime, error) {

@@ -14,7 +14,6 @@ func (app *application) routes() *mux.Router {
 		app.timeProvider,
 		app.sessionValidator,
 		app.headlineStorage,
-		app.headlineSourceStorage,
 	)
 
 	// Register handler functions.

@@ -52,13 +52,13 @@ func (m *Storage) DropAll(ctx context.Context) error {
 
 func (m *Storage) FindHeadlines(
 	ctx context.Context,
-	sourceIds []string,
+	category string,
 	limit int64,
 ) ([]model.Headline, error) {
 	filter := bson.M{}
-	if len(sourceIds) > 0 {
+	if category != "" && category != model.HeadlineSourceCategoryAll {
 		filter = bson.M{
-			"sourceId": bson.M{"$in": sourceIds},
+			"sourceCategory": category,
 		}
 	}
 

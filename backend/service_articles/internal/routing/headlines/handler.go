@@ -17,18 +17,10 @@ const (
 	limit = 100
 )
 
-type headlineSourceStorage interface {
-	SourceIdsByCategory(
-		ctx context.Context,
-		category *string,
-		limit int64,
-	) ([]string, error)
-}
-
 type headlineStorage interface {
 	FindHeadlines(
 		ctx context.Context,
-		sourceIds []string,
+		category string,
 		limit int64,
 	) ([]model.Headline, error)
 }
@@ -39,9 +31,8 @@ type response struct {
 
 type Handler struct {
 	tools.BaseHandler
-	sessionValidator      session_validator.SessionValidator
-	headlineStorage       headlineStorage
-	headlineSourceStorage headlineSourceStorage
+	sessionValidator session_validator.SessionValidator
+	headlineStorage  headlineStorage
 }
 
 func NewHandler(
@@ -49,13 +40,11 @@ func NewHandler(
 	timeProvider tools.TimeProvider,
 	sessionValidator session_validator.SessionValidator,
 	headlineStorage headlineStorage,
-	headlineSourceStorage headlineSourceStorage,
 ) *Handler {
 	return &Handler{
-		BaseHandler:           *tools.NewBaseHandler(logger, timeProvider),
-		sessionValidator:      sessionValidator,
-		headlineStorage:       headlineStorage,
-		headlineSourceStorage: headlineSourceStorage,
+		BaseHandler:      *tools.NewBaseHandler(logger, timeProvider),
+		sessionValidator: sessionValidator,
+		headlineStorage:  headlineStorage,
 	}
 }
 
@@ -75,13 +64,7 @@ func (h *Handler) Headlines(w http.ResponseWriter, r *http.Request) {
 		),
 	)
 
-	sourceIds, err := h.headlineSourceStorage.SourceIdsByCategory(ctx, &categoryString, limit)
-	if err != nil {
-		h.SetError(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	headlines, err := h.headlineStorage.FindHeadlines(ctx, sourceIds, limit)
+	headlines, err := h.headlineStorage.FindHeadlines(ctx, categoryString, limit)
 	if err != nil {
 		var invalidIdError tools.InvalidIdError
 		if errors.As(err, &invalidIdError) {

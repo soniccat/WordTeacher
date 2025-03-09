@@ -9,6 +9,7 @@ const (
 )
 
 const (
+	HeadlineSourceCategoryAll  = "all"
 	HeadlineSourceCategoryTech = "tech"
 	HeadlineSourceCategoryNews = "news"
 )

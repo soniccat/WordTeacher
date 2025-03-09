@@ -135,6 +135,8 @@ func (c *Crawler) crawlSource(ctx context.Context, source model.HeadlineSource) 
 
 	for i := range headlines {
 		headlines[i].SourceId = source.Id
+		headlines[i].SourceName = source.Title
+		headlines[i].SourceCategory = source.Category
 	}
 
 	newHeadlines := tools.Filter(headlines, func(h model.Headline) bool {

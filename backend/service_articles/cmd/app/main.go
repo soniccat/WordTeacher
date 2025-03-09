@@ -6,17 +6,21 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"runtime/debug"
 	"service_articles/internal/storage/headline_sources"
 	"service_articles/internal/storage/headlines"
+	articlesgrpc "service_articles/pkg/grpc/service_articles/api"
 	"time"
 	"tools"
 	"tools/logger"
 	"tools/time_provider"
 
 	"models/session_validator"
+
+	"google.golang.org/grpc"
 )
 
 const (
@@ -38,6 +42,7 @@ func run() int {
 	serverPort := flag.Int("serverPort", 4004, "HTTP server network port")
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
+	grpcPort := flag.Int("grpcPort", 5004, "gRPC port")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
 	flag.Parse()
@@ -115,6 +120,22 @@ func run() int {
 
 	go func() {
 		crawler.Start(context.Background())
+	}()
+
+	// grpc
+	grpcServer := grpc.NewServer()
+	rpcHeadlinesServer := NewHeadlinesServer(app)
+	articlesgrpc.RegisterHeadlinesServer(grpcServer, rpcHeadlinesServer)
+
+	grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%d", *grpcPort))
+	if err != nil {
+		logger.ErrorWithError(context.Background(), err, "grpc: failed to listen")
+	}
+
+	go func() {
+		if err := grpcServer.Serve(grpcListener); err != nil {
+			logger.ErrorWithError(context.Background(), err, "grpc: failed to serve")
+		}
 	}()
 
 	serverURI := fmt.Sprintf("%s:%d", *serverAddr, *serverPort)
