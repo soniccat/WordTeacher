@@ -149,10 +149,10 @@ func (c *Crawler) crawlSource(ctx context.Context, source model.HeadlineSource) 
 		return h1.Link == h2.Link
 	})
 
-	for i := range headlines {
-		headlines[i].SourceId = source.Id
-		headlines[i].SourceName = source.Title
-		headlines[i].SourceCategory = source.Category
+	for i := range newHeadlines {
+		newHeadlines[i].SourceId = source.Id
+		newHeadlines[i].SourceName = source.Title
+		newHeadlines[i].SourceCategory = source.Category
 	}
 
 	if len(newHeadlines) > 0 {
