@@ -7,6 +7,7 @@ import (
 	"models/session_validator"
 	"net/http"
 	"service_articles/internal/model"
+	"time"
 	"tools"
 	"tools/logger"
 
@@ -22,6 +23,7 @@ type headlineStorage interface {
 		ctx context.Context,
 		category string,
 		limit int64,
+		since *time.Time,
 	) ([]model.Headline, error)
 }
 
@@ -64,7 +66,7 @@ func (h *Handler) Headlines(w http.ResponseWriter, r *http.Request) {
 		),
 	)
 
-	headlines, err := h.headlineStorage.FindHeadlines(ctx, categoryString, limit)
+	headlines, err := h.headlineStorage.FindHeadlines(ctx, categoryString, limit, nil)
 	if err != nil {
 		var invalidIdError tools.InvalidIdError
 		if errors.As(err, &invalidIdError) {

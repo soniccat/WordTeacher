@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"time"
+	"tools"
 	"tools/logger"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -34,28 +35,8 @@ type item struct {
 	Author      *string    `xml:"dc:creator"`
 }
 
-func (i *item) GetPubDate() *time.Time {
-	if i.PubDate != nil {
-		return &i.PubDate.Time
-	}
-
-	if i.Date != nil {
-		return i.Date
-	}
-
-	return &i.UpdateDate.Time
-}
-
-func (i *item) GetUpdateDate() *time.Time {
-	if i.UpdateDate != nil {
-		return &i.UpdateDate.Time
-	}
-
-	if i.Date != nil {
-		return i.Date
-	}
-
-	return &i.PubDate.Time
+func (i *item) GetLateDate() *time.Time {
+	return tools.GetLatestDate(i.Date, &i.UpdateDate.Time, &i.PubDate.Time)
 }
 
 type rssTime struct {
@@ -91,7 +72,8 @@ func (p *RssParser) Parse(ctx context.Context, r io.Reader) ([]model.Headline, e
 		for ci := range rss.Channels[i].Items {
 			item := rss.Channels[i].Items[ci]
 
-			if item.GetPubDate() == nil && item.GetUpdateDate() == nil {
+			lateDate := item.GetLateDate()
+			if lateDate == nil {
 				continue
 			}
 
@@ -99,8 +81,7 @@ func (p *RssParser) Parse(ctx context.Context, r io.Reader) ([]model.Headline, e
 				Title:       p.ugcPolicy.Sanitize(item.Title),
 				Description: p.ugcPolicy.Sanitize(item.Description),
 				Link:        item.Link,
-				PubDate:     item.GetPubDate(),
-				UpdateDate:  item.GetUpdateDate(),
+				Date:        *lateDate,
 				Creator:     item.Author,
 			})
 		}

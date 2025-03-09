@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"service_articles/internal/model"
+	"slices"
+	"sort"
 	"sync"
 	"time"
 	"tools"
@@ -133,20 +135,25 @@ func (c *Crawler) crawlSource(ctx context.Context, source model.HeadlineSource) 
 		return logger.WrapError(ctx, err)
 	}
 
-	for i := range headlines {
-		headlines[i].SourceId = source.Id
-		headlines[i].SourceName = source.Title
-		headlines[i].SourceCategory = source.Category
-	}
-
 	newHeadlines := tools.Filter(headlines, func(h model.Headline) bool {
-		lateDate := h.LateDate()
-		if lateDate != nil && source.LastCrawlDate.Compare(*lateDate) == -1 {
+		if source.LastCrawlDate.Compare(h.Date) == -1 {
 			return true
 		}
 
 		return false
 	})
+
+	// deduplicate
+	sort.Sort(model.HeadlineSortByLink(newHeadlines))
+	newHeadlines = slices.CompactFunc(newHeadlines, func(h1 model.Headline, h2 model.Headline) bool {
+		return h1.Link == h2.Link
+	})
+
+	for i := range headlines {
+		headlines[i].SourceId = source.Id
+		headlines[i].SourceName = source.Title
+		headlines[i].SourceCategory = source.Category
+	}
 
 	if len(newHeadlines) > 0 {
 		err = c.headlineStorage.InsertHeadlines(ctx, newHeadlines)

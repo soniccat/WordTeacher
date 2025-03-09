@@ -251,3 +251,24 @@ func CompareSlices[T comparable](a []T, b []T) bool {
 
 	return true
 }
+
+func GetLatestDate(dates ...*time.Time) *time.Time {
+	dateCount := len(dates)
+	if dateCount == 0 {
+		return nil
+	}
+
+	if dateCount == 1 {
+		return dates[0]
+	}
+
+	latestDate := dates[0]
+	for i := range dates[1:] {
+		nextDate := dates[i]
+		if nextDate != nil && latestDate.Compare(*nextDate) == -1 {
+			latestDate = nextDate
+		}
+	}
+
+	return latestDate
+}

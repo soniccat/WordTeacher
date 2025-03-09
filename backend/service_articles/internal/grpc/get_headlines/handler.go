@@ -2,6 +2,7 @@ package get_headlines
 
 import (
 	"context"
+	"time"
 	"tools"
 	"tools/logger"
 
@@ -14,6 +15,7 @@ type storage interface {
 		ctx context.Context,
 		category string,
 		limit int64,
+		since *time.Time,
 	) ([]model.Headline, error)
 }
 
@@ -33,10 +35,24 @@ func NewHandler(
 }
 
 func (s *Handler) GetHeadlines(in *grpcapi.GetHeadlinesIn, server grpcapi.Headlines_GetHeadlinesServer) error {
+	var since *time.Time
+	if in.Since != nil {
+		parsedSince, err := tools.ParseApiDate(server.Context(), *in.Since)
+		if err != nil {
+			return logger.WrapError(
+				server.Context(),
+				tools.NewInvalidArgumentError("since", in.Since, "wrong format", err),
+			)
+		}
+
+		since = &parsedSince
+	}
+
 	headlines, err := s.storage.FindHeadlines(
 		server.Context(),
 		in.Category.String(),
 		tools.PtrInt64Value(in.Limit),
+		since,
 	)
 	if err != nil {
 		return logger.WrapError(server.Context(), err)

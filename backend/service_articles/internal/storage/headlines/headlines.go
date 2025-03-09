@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"service_articles/internal/model"
+	"time"
 	"tools"
 	"tools/logger"
 	"tools/mongowrapper"
@@ -41,7 +42,7 @@ func New(
 	}
 
 	r.HeadlineCollection = r.Collection(MongoDatabaseHeadlines, MongoCollectionHeadlines)
-	r.MongoWrapper.CreateIndexIfNeeded(r.HeadlineCollection, "updateDate")
+	r.MongoWrapper.CreateIndexIfNeeded(r.HeadlineCollection, "date")
 
 	return r, nil
 }
@@ -54,12 +55,14 @@ func (m *Storage) FindHeadlines(
 	ctx context.Context,
 	category string,
 	limit int64,
+	since *time.Time,
 ) ([]model.Headline, error) {
 	filter := bson.M{}
 	if category != "" && category != model.HeadlineSourceCategoryAll {
-		filter = bson.M{
-			"sourceCategory": category,
-		}
+		filter["sourceCategory"] = category
+	}
+	if since != nil {
+		filter["date"] = bson.M{"$gte": since}
 	}
 
 	cursor, err := m.HeadlineCollection.Find(
@@ -68,8 +71,7 @@ func (m *Storage) FindHeadlines(
 		options.Find().SetLimit(limit).
 			SetSort(
 				bson.D{
-					{Key: "updateDate", Value: -1},
-					{Key: "pubDate", Value: -1},
+					{Key: "date", Value: -1},
 				},
 			),
 	)
@@ -129,8 +131,7 @@ func (m *Storage) KeepRecentHeadlines(
 			"sourceId": sourceId,
 		},
 		options.Find().SetSort(bson.D{
-			{Key: "updateDate", Value: -1},
-			{Key: "pubDate", Value: -1},
+			{Key: "date", Value: -1},
 		}).SetProjection(bson.M{
 			"_id": 1,
 		}),
