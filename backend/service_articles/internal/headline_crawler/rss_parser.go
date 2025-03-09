@@ -36,11 +36,19 @@ type item struct {
 }
 
 func (i *item) GetLateDate() *time.Time {
-	return tools.GetLatestDate(i.Date, &i.UpdateDate.Time, &i.PubDate.Time)
+	return tools.GetLatestDate(i.Date, i.UpdateDate.GetTime(), i.PubDate.GetTime())
 }
 
 type rssTime struct {
 	time.Time
+}
+
+func (c *rssTime) GetTime() *time.Time {
+	if c == nil {
+		return nil
+	}
+
+	return &c.Time
 }
 
 func (c *rssTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
