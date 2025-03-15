@@ -6,6 +6,7 @@ use (
 	./service_cardsetsearch
 	./service_dict
 	./service_articles
+	./service_dashboard
 	./tools
 	./scripts/wordlistfilter
 	./scripts/phrase_exporter
