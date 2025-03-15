@@ -1,21 +1,21 @@
 {
   "meta": {
     "type": "db",
-    "canSave": false,
-    "canEdit": false,
-    "canAdmin": false,
+    "canSave": true,
+    "canEdit": true,
+    "canAdmin": true,
     "canStar": true,
-    "canDelete": false,
+    "canDelete": true,
     "slug": "metrics",
-    "url": "/dashboards/f/fdip6obfyvytcc/metrics",
+    "url": "/d/fdip6obfyvytcc/metrics",
     "expires": "0001-01-01T00:00:00Z",
-    "created": "2024-04-14T10:05:13Z",
-    "updated": "2024-04-14T10:05:13Z",
-    "updatedBy": "admin",
-    "createdBy": "admin",
+    "created": "2024-04-28T14:30:16Z",
+    "updated": "2024-04-28T14:30:16Z",
+    "updatedBy": "Anonymous",
+    "createdBy": "Anonymous",
     "version": 1,
     "hasAcl": false,
-    "isFolder": true,
+    "isFolder": false,
     "folderId": 0,
     "folderUid": "",
     "folderTitle": "General",
@@ -29,9 +29,9 @@
         "canDelete": true
       },
       "organization": {
-        "canAdd": false,
-        "canEdit": false,
-        "canDelete": false
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
       }
     }
   },

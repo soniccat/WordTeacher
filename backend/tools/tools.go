@@ -12,6 +12,14 @@ func Ptr[T any](x T) *T {
 	return &x
 }
 
+func PtrInt64Value(x *int64) int64 {
+	if x == nil {
+		return int64(0)
+	}
+
+	return *x
+}
+
 func ParseApiDate(ctx context.Context, date string) (time.Time, error) {
 	t, err := time.Parse(time.RFC3339Nano, date)
 	return t, logger.WrapError(ctx, err)
@@ -19,6 +27,14 @@ func ParseApiDate(ctx context.Context, date string) (time.Time, error) {
 
 func TimeToApiDate(t time.Time) string {
 	return t.UTC().Truncate(time.Millisecond).Format(time.RFC3339Nano)
+}
+
+func OptTimeToOptApiDate(t *time.Time) *string {
+	if t == nil {
+		return nil
+	}
+
+	return Ptr((*t).UTC().Truncate(time.Millisecond).Format(time.RFC3339Nano))
 }
 
 func ApiDateToDbDate(ctx context.Context, date string) (primitive.DateTime, error) {
@@ -234,4 +250,27 @@ func CompareSlices[T comparable](a []T, b []T) bool {
 	}
 
 	return true
+}
+
+func GetLatestDate(dates ...*time.Time) *time.Time {
+	dateCount := len(dates)
+	if dateCount == 0 {
+		return nil
+	}
+
+	if dateCount == 1 {
+		return dates[0]
+	}
+
+	latestDate := dates[0]
+	for _, v := range dates[1:] {
+		nextDate := v
+		if latestDate == nil {
+			latestDate = nextDate
+		} else if nextDate != nil && latestDate.Compare(*nextDate) == -1 {
+			latestDate = nextDate
+		}
+	}
+
+	return latestDate
 }

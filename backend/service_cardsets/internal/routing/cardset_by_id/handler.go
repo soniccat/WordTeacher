@@ -75,7 +75,7 @@ func (h *Handler) CardSetById(w http.ResponseWriter, r *http.Request) {
 		if errors.As(err, &invalidIdError) {
 			h.SetError(w, err, http.StatusBadRequest)
 		} else {
-			h.SetError(w, err, http.StatusServiceUnavailable)
+			h.SetError(w, err, http.StatusInternalServerError)
 		}
 		return
 	}

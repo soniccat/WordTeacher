@@ -1,25 +1,25 @@
 {
   "meta": {
     "type": "db",
-    "canSave": false,
-    "canEdit": false,
-    "canAdmin": false,
+    "canSave": true,
+    "canEdit": true,
+    "canAdmin": true,
     "canStar": true,
-    "canDelete": false,
+    "canDelete": true,
     "slug": "mongodb",
     "url": "/d/AyWQt9jWk/mongodb",
     "expires": "0001-01-01T00:00:00Z",
-    "created": "2024-04-06T16:36:48Z",
-    "updated": "2024-04-14T10:47:56Z",
-    "updatedBy": "admin",
-    "createdBy": "admin",
-    "version": 10,
+    "created": "2024-04-28T14:30:12Z",
+    "updated": "2024-04-28T14:30:12Z",
+    "updatedBy": "Anonymous",
+    "createdBy": "Anonymous",
+    "version": 1,
     "hasAcl": false,
     "isFolder": false,
-    "folderId": 19,
-    "folderUid": "fdip6obfyvytcc",
-    "folderTitle": "Metrics",
-    "folderUrl": "/dashboards/f/fdip6obfyvytcc/metrics",
+    "folderId": 0,
+    "folderUid": "",
+    "folderTitle": "General",
+    "folderUrl": "",
     "provisioned": false,
     "provisionedExternalId": "",
     "annotationsPermissions": {
@@ -29,9 +29,9 @@
         "canDelete": true
       },
       "organization": {
-        "canAdd": false,
-        "canEdit": false,
-        "canDelete": false
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
       }
     }
   },
@@ -1885,7 +1885,7 @@
     "timezone": "browser",
     "title": "MongoDB",
     "uid": "AyWQt9jWk",
-    "version": 10,
+    "version": 1,
     "weekStart": ""
   }
 }

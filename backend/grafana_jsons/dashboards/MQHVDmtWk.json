@@ -1,25 +1,25 @@
 {
   "meta": {
     "type": "db",
-    "canSave": false,
-    "canEdit": false,
-    "canAdmin": false,
+    "canSave": true,
+    "canEdit": true,
+    "canAdmin": true,
     "canStar": true,
-    "canDelete": false,
+    "canDelete": true,
     "slug": "loki2-0-global-metrics",
     "url": "/d/MQHVDmtWk/loki2-0-global-metrics",
     "expires": "0001-01-01T00:00:00Z",
-    "created": "2024-04-14T10:14:03Z",
-    "updated": "2024-04-14T10:27:20Z",
-    "updatedBy": "admin",
-    "createdBy": "admin",
-    "version": 5,
+    "created": "2024-04-28T14:30:13Z",
+    "updated": "2024-04-28T14:30:13Z",
+    "updatedBy": "Anonymous",
+    "createdBy": "Anonymous",
+    "version": 1,
     "hasAcl": false,
     "isFolder": false,
-    "folderId": 23,
-    "folderUid": "adip7t93sv18ge",
-    "folderTitle": "Logs",
-    "folderUrl": "/dashboards/f/adip7t93sv18ge/logs",
+    "folderId": 0,
+    "folderUid": "",
+    "folderTitle": "General",
+    "folderUrl": "",
     "provisioned": false,
     "provisionedExternalId": "",
     "annotationsPermissions": {
@@ -29,9 +29,9 @@
         "canDelete": true
       },
       "organization": {
-        "canAdd": false,
-        "canEdit": false,
-        "canDelete": false
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
       }
     }
   },
@@ -3674,7 +3674,7 @@
     "timezone": "",
     "title": "Loki2.0 Global Metrics",
     "uid": "MQHVDmtWk",
-    "version": 5,
+    "version": 1,
     "weekStart": ""
   }
 }
