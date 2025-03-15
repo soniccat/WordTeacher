@@ -29,6 +29,11 @@ type headlineStorage interface {
 		sourceId string,
 		count int64,
 	) error
+
+	FindLatestHeadline(
+		ctx context.Context,
+		sourceId string,
+	) (*model.Headline, error)
 }
 
 type headlineSourceStorage interface {
@@ -65,13 +70,17 @@ func New(
 	headlineSourceStorage headlineSourceStorage,
 ) *Crawler {
 	httpClient := http.Client{}
+
+	policy := bluemonday.StrictPolicy()
+	policy.AllowAttrs("href").OnElements("a")
+
 	return &Crawler{
 		logger:                logger,
 		timeProvider:          timeProvider,
 		headlineStorage:       headlineStorage,
 		headlineSourceStorage: headlineSourceStorage,
 		httpClient:            httpClient,
-		ugcPolicy:             bluemonday.NewPolicy(),
+		ugcPolicy:             policy,
 	}
 }
 
@@ -112,6 +121,11 @@ func (c *Crawler) Start(ctx context.Context) {
 }
 
 func (c *Crawler) crawlSource(ctx context.Context, source model.HeadlineSource) error {
+	lastHeadline, err := c.headlineStorage.FindLatestHeadline(ctx, source.Id)
+	if err != nil {
+		return err
+	}
+
 	parser := resolveParser(source.Type, c.ugcPolicy)
 	if parser == nil {
 		return fmt.Errorf("can't find parser for type %s", source.Type)
@@ -135,13 +149,16 @@ func (c *Crawler) crawlSource(ctx context.Context, source model.HeadlineSource) 
 		return logger.WrapError(ctx, err)
 	}
 
-	newHeadlines := tools.Filter(headlines, func(h model.Headline) bool {
-		if source.LastCrawlDate.Compare(h.Date) == -1 {
-			return true
-		}
+	newHeadlines := headlines
+	if lastHeadline != nil {
+		newHeadlines = tools.Filter(headlines, func(h model.Headline) bool {
+			if lastHeadline.Date.Compare(h.Date) != 1 && lastHeadline.Link != h.Link {
+				return true
+			}
 
-		return false
-	})
+			return false
+		})
+	}
 
 	// deduplicate
 	sort.Sort(model.HeadlineSortByLink(newHeadlines))

@@ -8,6 +8,7 @@ import (
 	"time"
 	"tools"
 
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +20,7 @@ var testRss1 = `<?xml version="1.0" encoding="utf-8"?>
     <description>Latest news, sport, business, comment, analysis and reviews from the Guardian, the world's leading liberal voice</description>
     <language>en-gb</language>
     <copyright>Guardian News and Media Limited or its affiliated companies. All rights reserved. 2025</copyright>
-    <pubDate>Sat, 01 Mar 2025 17:12:56 GMT</pubDate>
+    <pubDate>Sat, 14 Mar 2025 16:52:09 GMT</pubDate>
     <dc:date>2025-03-01T17:12:56Z</dc:date>
     <dc:language>en-gb</dc:language>
     <dc:rights>Guardian News and Media Limited or its affiliated companies. All rights reserved. 2025</dc:rights>
@@ -40,7 +41,7 @@ var testRss1 = `<?xml version="1.0" encoding="utf-8"?>
       <category domain="https://www.theguardian.com/us-news/us-news">US news</category>
       <category domain="https://www.theguardian.com/world/world">World news</category>
       <category domain="https://www.theguardian.com/us-news/jd-vance">JD Vance</category>
-      <pubDate>Sat, 08 Mar 2025 12:00:24 GMT</pubDate>
+      <pubDate>Sat, 14 Mar 2025 16:52:09 GMT</pubDate>
       <guid>https://www.theguardian.com/world/live/2025/mar/01/live-european-leaders-rally-behind-zelenskyy-after-trump-vance-clash-updates</guid>
       <media:content width="140" url="https://i.guim.co.uk/img/media/762c41c53d0bef46ae2f32744fbe359f74be911e/0_206_7451_4473/master/7451.jpg?width=140&amp;quality=85&amp;auto=format&amp;fit=max&amp;s=55082309b73a0b76e0c6bb09d8cdf42a">
         <media:credit scheme="urn:ebu">Photograph: ABACA/REX/Shutterstock</media:credit>
@@ -97,15 +98,16 @@ func unwrapTime(t time.Time, e error) *time.Time {
 func TestRssParser1(t *testing.T) {
 	expected := model.Headline{
 		Title:       "Zelenskyy says ‘crucial’ for Ukraine to have Trump’s support in lengthy statement following Oval Office argument – live",
-		Description: "<p>Ukrainian president has landed in the UK and will hold talks with PM Keir Starmer later</p><ul><li><a href=\"https://www.theguardian.com/world/2025/mar/01/ukraine-reacts-zelenskyy-clash-trump\">‘He defended our honour’: Ukrainians react to Zelenskyy’s clash with Trump</a></li></ul><p>Ukraine has destroyed 103 drones launched by Russia during an overnight strike, its air force has said.</p><p>In full: Zelenskyy and Trump meeting descends into heated argument in front of the press – video</p> <a href=\"https://www.theguardian.com/world/live/2025/mar/01/live-european-leaders-rally-behind-zelenskyy-after-trump-vance-clash-updates\">Continue reading...</a>",
+		Description: "Ukrainian president has landed in the UK and will hold talks with PM Keir Starmer later<a href=\"https://www.theguardian.com/world/2025/mar/01/ukraine-reacts-zelenskyy-clash-trump\">‘He defended our honour’: Ukrainians react to Zelenskyy’s clash with Trump</a>Ukraine has destroyed 103 drones launched by Russia during an overnight strike, its air force has said.In full: Zelenskyy and Trump meeting descends into heated argument in front of the press – video <a href=\"https://www.theguardian.com/world/live/2025/mar/01/live-european-leaders-rally-behind-zelenskyy-after-trump-vance-clash-updates\">Continue reading...</a>",
 		Link:        "https://www.theguardian.com/world/live/2025/mar/01/live-european-leaders-rally-behind-zelenskyy-after-trump-vance-clash-updates",
-		PubDate:     unwrapTime(time.Parse(time.RFC1123, "Sat, 01 Mar 2025 16:52:09 GMT")),
-		UpdateDate:  unwrapTime(time.Parse(time.RFC3339, "2025-03-01T16:52:09Z")),
+		Date:        *unwrapTime(time.Parse(time.RFC1123, "Sat, 14 Mar 2025 16:52:09 GMT")),
 		Creator:     tools.Ptr("Nadeem Badshah (now); Daniel Lavelle, Hayden Vernon and Adam Fulton (earlier)"),
 	}
 
 	reader := strings.NewReader(testRss1)
-	p := RssParser{}
+	policy := bluemonday.StrictPolicy()
+	policy.AllowAttrs("href").OnElements("a")
+	p := NewRssParser(policy)
 	headlines, err := p.Parse(context.Background(), reader)
 
 	assert.NoError(t, err)
@@ -117,14 +119,15 @@ func TestRssParser2(t *testing.T) {
 		Title:       "Trump tells Zelenskyy he's 'gambling with World War III' in tense exchange",
 		Description: "President Trump, Ukrainian President Zelenskyy and Vice President Vance had a tense exchange about the ongoing war with Russia. Vance asked Zelenskyy if he has ever said \"thank you\" for U.S. aid and Trump clashed with him over what has been provided.",
 		Link:        "https://www.nbcnews.com/video/watch-full-video-trump-zelenskyy-and-vance-meeting-ends-in-heated-argument-233195589679",
-		PubDate:     unwrapTime(time.Parse(time.RFC1123, "Fri, 28 Feb 2025 17:57:12 GMT")),
-		UpdateDate:  unwrapTime(time.Parse(time.RFC1123, "Fri, 28 Feb 2025 20:33:10 GMT")),
+		Date:        *unwrapTime(time.Parse(time.RFC1123, "Fri, 28 Feb 2025 20:33:10 GMT")),
 		Creator:     nil,
 	}
 
 	reader := strings.NewReader(testRss2)
 
-	p := RssParser{}
+	policy := bluemonday.StrictPolicy()
+	policy.AllowAttrs("href").OnElements("a")
+	p := NewRssParser(policy)
 	headlines, e := p.Parse(context.Background(), reader)
 
 	assert.NoError(t, e)
@@ -136,14 +139,15 @@ func TestRssParser3(t *testing.T) {
 		Title:       "NIH.gov DNS servers down, making PubMed, BLAST, etc. unreachable",
 		Description: "<a href=\"https://news.ycombinator.com/item?id=43229201\">Comments</a>",
 		Link:        "https://www.nslookup.io/domains/www.nih.gov/dns-records/#authoritative",
-		PubDate:     unwrapTime(time.Parse(time.RFC1123, "Sun, 02 Mar 2025 10:50:52 +0000")),
-		UpdateDate:  unwrapTime(time.Parse(time.RFC1123, "Sun, 02 Mar 2025 10:50:52 +0000")),
+		Date:        *unwrapTime(time.Parse(time.RFC1123, "Sun, 02 Mar 2025 10:50:52 +0000")),
 		Creator:     nil,
 	}
 
 	reader := strings.NewReader(testRss3)
 
-	p := RssParser{}
+	policy := bluemonday.StrictPolicy()
+	policy.AllowAttrs("href").OnElements("a")
+	p := NewRssParser(policy)
 	headlines, e := p.Parse(context.Background(), reader)
 
 	assert.NoError(t, e)

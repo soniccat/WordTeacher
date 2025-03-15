@@ -90,6 +90,41 @@ func (m *Storage) FindHeadlines(
 	return result, nil
 }
 
+func (m *Storage) FindLatestHeadline(
+	ctx context.Context,
+	sourceId string,
+) (*model.Headline, error) {
+	cursor, err := m.HeadlineCollection.Find(
+		ctx,
+		bson.M{
+			"sourceId": sourceId,
+		},
+		options.Find().SetLimit(1).
+			SetSort(
+				bson.D{
+					{Key: "date", Value: -1},
+				},
+			),
+	)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
+	} else if err != nil {
+		return nil, logger.WrapError(ctx, err)
+	}
+
+	var result []model.Headline
+	err = cursor.All(ctx, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result) == 0 {
+		return nil, nil
+	}
+
+	return &result[0], nil
+}
+
 func (m *Storage) InsertHeadlines(
 	ctx context.Context,
 	headlines []model.Headline,

@@ -2,6 +2,7 @@ package headline_crawler
 
 import (
 	"context"
+	"html"
 	"io"
 	"time"
 	"tools"
@@ -66,6 +67,12 @@ type RssParser struct {
 	ugcPolicy *bluemonday.Policy
 }
 
+func NewRssParser(ugcPolicy *bluemonday.Policy) RssParser {
+	return RssParser{
+		ugcPolicy: ugcPolicy,
+	}
+}
+
 func (p *RssParser) Parse(ctx context.Context, r io.Reader) ([]model.Headline, error) {
 	rss := rss{}
 
@@ -86,8 +93,8 @@ func (p *RssParser) Parse(ctx context.Context, r io.Reader) ([]model.Headline, e
 			}
 
 			headlines = append(headlines, model.Headline{
-				Title:       p.ugcPolicy.Sanitize(item.Title),
-				Description: p.ugcPolicy.Sanitize(item.Description),
+				Title:       html.UnescapeString(p.ugcPolicy.Sanitize(item.Title)),
+				Description: html.UnescapeString(p.ugcPolicy.Sanitize(item.Description)),
 				Link:        item.Link,
 				Date:        *lateDate,
 				Creator:     item.Author,
