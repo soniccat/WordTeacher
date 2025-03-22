@@ -54,6 +54,7 @@ func (c *Client) GetHeadlines(
 			h, err := grpcHeadlineStream.Recv()
 			if err != nil {
 				headlineChan <- HeadlinesResult{Error: logger.WrapError(ctx, err)}
+				close(headlineChan)
 				break
 			} else {
 				headlineChan <- HeadlinesResult{Headline: h}

@@ -49,6 +49,7 @@ func (c *client) GetCardSets(ctx context.Context, since time.Time) (chan CardSet
 			cs, err := grpcCardSetStream.Recv()
 			if err != nil {
 				cardSetChan <- CardSetResult{Error: logger.WrapError(ctx, err)}
+				close(cardSetChan)
 				break
 			} else {
 				cardSetChan <- CardSetResult{CardSet: cs}
