@@ -35,6 +35,7 @@ func NewHandler(
 }
 
 func (s *Handler) GetHeadlines(in *grpcapi.GetHeadlinesIn, server grpcapi.Headlines_GetHeadlinesServer) error {
+	s.logger.Info(server.Context(), "start GetHeadlines")
 	var since *time.Time
 	if in.Since != nil {
 		parsedSince, err := tools.ParseApiDate(server.Context(), *in.Since)
@@ -58,12 +59,15 @@ func (s *Handler) GetHeadlines(in *grpcapi.GetHeadlinesIn, server grpcapi.Headli
 		return logger.WrapError(server.Context(), err)
 	}
 
+	s.logger.Info(server.Context(), "GetHeadlines got headlines", "count", len(headlines))
 	for i := range headlines {
 		err = server.Send(headlines[i].ToGrpc())
 		if err != nil {
 			return logger.WrapError(server.Context(), err)
 		}
 	}
+
+	s.logger.Info(server.Context(), "GetHeadlines finishes")
 
 	return nil
 }

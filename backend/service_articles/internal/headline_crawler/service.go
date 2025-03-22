@@ -181,7 +181,7 @@ func (c *Crawler) crawlSource(ctx context.Context, source model.HeadlineSource) 
 	}
 
 	nextCrawlDate := c.timeProvider.Now().Add(time.Duration(source.CrawlPeriod))
-	err = c.headlineSourceStorage.UpdateCrawlDate(ctx, source.Id, c.timeProvider.Now(), nextCrawlDate)
+	err = c.headlineSourceStorage.UpdateCrawlDate(ctx, source.Id, nextCrawlDate)
 	if err != nil {
 		return err
 	}

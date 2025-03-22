@@ -208,6 +208,7 @@ services:
         ipv4_address: 172.16.0.22
     depends_on:
       - mongosetup
+      - articles
     # ports:
       # - target: "${DASHBOARD_PORT}"
         # published: "${DASHBOARD_PORT}"

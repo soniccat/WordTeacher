@@ -2,6 +2,8 @@ package headlines
 
 import (
 	"context"
+	"fmt"
+	"runtime/debug"
 	"time"
 	"tools"
 	"tools/logger"
@@ -50,9 +52,26 @@ func (s *Storage) HeadlineCategories() []model.DashboardHeadlineCategory {
 func (s *Storage) StartPulling(ctx context.Context) {
 	go func() {
 		tools.StartTicker(ctx, 30*time.Minute, func() {
+			defer func() {
+				msg := "panic"
+				if r := recover(); r != nil {
+					msg = fmt.Sprintf("panic: %v\n%s\n", r, string(debug.Stack()))
+				}
+				logger.Error(context.Background(), msg)
+			}()
+
+			var newCategories []model.DashboardHeadlineCategory
+			s.logger.Info(ctx, "Start pulling")
 			for _, c := range categoriesToPull {
-				s.pullCategory(ctx, c)
+				cd, err := s.pullCategory(ctx, c)
+				if err != nil {
+					continue
+				}
+
+				newCategories = append(newCategories, cd)
 			}
+			s.logger.Info(ctx, "Ends pulling")
+			s.categories = newCategories
 		})
 	}()
 }
@@ -67,8 +86,10 @@ func (s *Storage) pullCategory(ctx context.Context, category int32) (model.Dashb
 	categoryName := categoryNameById(category)
 	var dashboardHeadlines []model.DashboardHeadline
 	for r := range headlines {
-		h := r.Headline
-		if r.Error == nil && h != nil {
+		if r.Error != nil {
+			break
+		} else if r.Headline != nil {
+			h := r.Headline
 			date, err := tools.ParseApiDate(ctx, h.Date)
 			s.logger.ErrorWithError(ctx, err, "pullCategory.ParseApiDate")
 
