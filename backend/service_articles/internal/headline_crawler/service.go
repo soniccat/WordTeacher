@@ -49,7 +49,6 @@ type headlineSourceStorage interface {
 	UpdateCrawlDate(
 		ctx context.Context,
 		id string,
-		newLastCrawlDate time.Time,
 		newNextCrawDate time.Time,
 	) error
 }

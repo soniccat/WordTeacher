@@ -22,7 +22,7 @@ var sources []model.HeadlineSource = []model.HeadlineSource{
 		Description: "Latest news, sport, business, comment, analysis and reviews from the Guardian, the world's leading liberal voice",
 		Type:        model.HeadlineSourceTypeRss,
 		Link:        "https://www.theguardian.com/uk/rss",
-		CrawlPeriod: int64(time.Duration(30) * time.Minute),
+		CrawlPeriod: int64(time.Duration(60) * time.Minute),
 		Category:    model.HeadlineSourceCategoryNews,
 	},
 	{
@@ -31,7 +31,7 @@ var sources []model.HeadlineSource = []model.HeadlineSource{
 		Description: "NBC News Top Stories",
 		Type:        model.HeadlineSourceTypeRss,
 		Link:        "https://feeds.nbcnews.com/nbcnews/public/news",
-		CrawlPeriod: int64(time.Duration(30) * time.Minute),
+		CrawlPeriod: int64(time.Duration(60) * time.Minute),
 		Category:    model.HeadlineSourceCategoryNews,
 	},
 	{
@@ -40,7 +40,7 @@ var sources []model.HeadlineSource = []model.HeadlineSource{
 		Description: "Links for the intellectually curious, ranked by readers.",
 		Type:        model.HeadlineSourceTypeRss,
 		Link:        "https://news.ycombinator.com/rss",
-		CrawlPeriod: int64(time.Duration(30) * time.Minute),
+		CrawlPeriod: int64(time.Duration(60) * time.Minute),
 		Category:    model.HeadlineSourceCategoryTech,
 	},
 }

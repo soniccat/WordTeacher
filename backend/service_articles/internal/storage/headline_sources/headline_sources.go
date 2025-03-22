@@ -157,7 +157,6 @@ func (m *Storage) FindNextCrawlDate(
 func (m *Storage) UpdateCrawlDate(
 	ctx context.Context,
 	id string,
-	newLastCrawlDate time.Time,
 	newNextCrawDate time.Time,
 ) error {
 	mongoId, err := tools.ParseObjectID(ctx, id)
@@ -172,7 +171,6 @@ func (m *Storage) UpdateCrawlDate(
 		},
 		bson.M{
 			"$set": bson.M{
-				"lastCrawlDate": newLastCrawlDate,
 				"nextCrawlDate": newNextCrawDate,
 			},
 		},

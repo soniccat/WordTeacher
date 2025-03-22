@@ -2,9 +2,9 @@ package model
 
 import "time"
 
-type Dashboard struct {
-	HeadlineBlock DashboardHeadlineBlock `json:"headlineBlock"`
-}
+// type Dashboard struct {
+// 	HeadlineBlock DashboardHeadlineBlock `json:"headlineBlock"`
+// }
 
 type DashboardHeadlineBlock struct {
 	Categories []DashboardHeadlineCategory `json:"categories,omitempty" bson:"categories,omitempty"`

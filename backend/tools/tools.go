@@ -274,3 +274,17 @@ func GetLatestDate(dates ...*time.Time) *time.Time {
 
 	return latestDate
 }
+
+func StartTicker(ctx context.Context, d time.Duration, work func()) {
+	ticker := time.NewTicker(d)
+	work()
+	for {
+		select {
+		case <-ctx.Done():
+			ticker.Stop()
+			return
+		case <-ticker.C:
+			work()
+		}
+	}
+}
