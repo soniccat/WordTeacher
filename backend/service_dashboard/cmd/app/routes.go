@@ -8,7 +8,7 @@ import (
 )
 
 func (app *application) routes() *mux.Router {
-	cardSetSearchHandler := dashboard.NewHandler(
+	dashboardHandler := dashboard.NewHandler(
 		app.logger,
 		app.timeProvider,
 		app.sessionValidator,
@@ -17,8 +17,8 @@ func (app *application) routes() *mux.Router {
 
 	r := mux.NewRouter()
 	r.Handle(
-		"/api/v1/dashboard/",
-		app.sessionManager.LoadAndSave(http.HandlerFunc(cardSetSearchHandler.CardSetSearch)),
+		"/api/v1/dashboard/test",
+		app.sessionManager.LoadAndSave(http.HandlerFunc(dashboardHandler.Handle)),
 	).Methods("GET")
 
 	return r

@@ -102,6 +102,12 @@ server {
         set $articles http://articles:${ARTICLES_PORT};
         proxy_pass $articles;
     }
+
+    # Dashboard
+    location /api/v1/dashboard {
+        set $dashboard http://dashboard:${DASHBOARD_PORT};
+        proxy_pass $dashboard;
+    }
 }
 
 # for insecure grpc handlers

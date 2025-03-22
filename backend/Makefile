@@ -158,3 +158,25 @@ articlesbuild:
 
 articlesrun:
 	docker start articles
+
+# service_dashboard
+
+dashboardup:
+	docker stop dashboard || true
+	docker rm dashboard || true
+	docker rmi dashboard || true
+	make up
+
+dashboardstop:
+	docker container stop dashboard
+
+dashboardrm: articlestop
+	docker container rm dashboard
+	docker image rm dashboard
+
+dashboardbuild:
+	docker build -t dashboard -f ./Dashboard.Dockerfile .
+	docker container create -p 4005:4005 --name dashboard dashboard
+
+dashboardrun:
+	docker start dashboard

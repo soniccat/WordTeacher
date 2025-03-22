@@ -32,6 +32,7 @@ services:
       - DICT_PORT=${DICT_PORT}
       - ARTICLES_PORT=${ARTICLES_PORT}
       - ARTICLES_GRPC_PORT=${ARTICLES_GRPC_PORT}
+      - DASHBOARD_PORT=${DASHBOARD_PORT}
     restart: always
 
   certbot:
@@ -146,6 +147,8 @@ services:
       - "${DICT_PORT}"
       - "-mongoURI"
       - "mongodb://mongo:${MONGODB_PORT}/?replicaSet=rs0"
+      - "-redisAddress"
+      - "redis:${REDIS_PORT}"
     volumes:
       - ${VOLUME_DICT_LOG_PATH}:/var/log
     networks:
@@ -181,6 +184,33 @@ services:
     # ports:
     #   - target: "${ARTICLES_PORT}"
     #     published: "${ARTICLES_PORT}"
+
+  dashboard:
+    container_name: "dashboard${TEST_SUFFIX}"
+    hostname: "dashboard"
+    build:
+      context: ./
+      args:
+        PORT: "${DASHBOARD_PORT}"
+      dockerfile: ./Dashboard.Dockerfile
+    image: dashboard
+    command:
+      - "-serverPort"
+      - "${DASHBOARD_PORT}"
+      - "-redisAddress"
+      - "redis:${REDIS_PORT}"
+      - "-articlesGRPCAddress"
+      - "apigateway:9091"
+    volumes:
+      - ${VOLUME_DASHBOARD_LOG_PATH}:/var/log
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.22
+    depends_on:
+      - mongosetup
+    # ports:
+      # - target: "${DASHBOARD_PORT}"
+        # published: "${DASHBOARD_PORT}"
 
   redis:
     container_name: "redis${TEST_SUFFIX}"

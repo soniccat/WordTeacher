@@ -168,3 +168,29 @@ scrape_configs:
   - timestamp:
       source: time
       format: RFC3339Nano
+
+- job_name: service_dashboard
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      service_name: service_dashboard
+      __path__: /var/log/dashboard/service*
+  pipeline_stages:
+  - json:
+      expressions:
+        time:
+        level:
+        networkType:
+        deviceType:
+        userId:
+        appVersion:
+  - labels:
+      level:
+      networkType:
+      deviceType:
+      userId:
+      appVersion:
+  - timestamp:
+      source: time
+      format: RFC3339Nano

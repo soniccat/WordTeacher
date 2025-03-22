@@ -35,7 +35,7 @@ func NewHandler(
 	}
 }
 
-func (h *Handler) Headlines(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 	// authToken, _ := h.sessionValidator.Validate(r) // get authToken just for logging
 
 	// // Path params
