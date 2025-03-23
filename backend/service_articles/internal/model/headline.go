@@ -21,14 +21,15 @@ type Headline struct {
 
 func (h *Headline) ToGrpc() *articlesgrpc.Headline {
 	return &articlesgrpc.Headline{
-		Id:          h.Id,
-		SourceId:    h.SourceId,
-		SourceName:  h.SourceName,
-		Title:       h.Title,
-		Description: h.Description,
-		Link:        h.Link,
-		Date:        tools.TimeToApiDate(h.Date),
-		Creator:     h.Creator,
+		Id:             h.Id,
+		SourceId:       h.SourceId,
+		SourceName:     h.SourceName,
+		SourceCategory: h.SourceCategory,
+		Title:          h.Title,
+		Description:    h.Description,
+		Link:           h.Link,
+		Date:           tools.TimeToApiDate(h.Date),
+		Creator:        h.Creator,
 	}
 }
 

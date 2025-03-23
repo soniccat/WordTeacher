@@ -17,7 +17,7 @@ func (app *application) routes() *mux.Router {
 
 	r := mux.NewRouter()
 	r.Handle(
-		"/api/v1/dashboard/test",
+		"/api/v1/dashboard",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(dashboardHandler.Handle)),
 	).Methods("GET")
 

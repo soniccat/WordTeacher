@@ -83,7 +83,6 @@ func (s *Storage) pullCategory(ctx context.Context, category int32) (model.Dashb
 		return model.DashboardHeadlineCategory{}, err
 	}
 
-	categoryName := categoryNameById(category)
 	var dashboardHeadlines []model.DashboardHeadline
 	for r := range headlines {
 		if r.Error != nil {
@@ -96,7 +95,7 @@ func (s *Storage) pullCategory(ctx context.Context, category int32) (model.Dashb
 			dashboardHeadlines = append(dashboardHeadlines, model.DashboardHeadline{
 				Id:             h.Id,
 				SourceName:     h.SourceName,
-				SourceCategory: categoryName,
+				SourceCategory: h.SourceCategory,
 				Title:          h.Title,
 				Description:    h.Description,
 				Link:           h.Link,
@@ -107,7 +106,7 @@ func (s *Storage) pullCategory(ctx context.Context, category int32) (model.Dashb
 	}
 
 	return model.DashboardHeadlineCategory{
-		CategoryName: categoryName,
+		CategoryName: categoryNameById(category),
 		Headlines:    dashboardHeadlines,
 	}, nil
 }
