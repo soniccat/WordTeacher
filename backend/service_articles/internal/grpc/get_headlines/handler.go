@@ -50,7 +50,7 @@ func (s *Handler) GetHeadlines(in *grpcapi.GetHeadlinesIn, server grpcapi.Headli
 
 	headlines, err := s.storage.FindHeadlines(
 		server.Context(),
-		in.Category.String(),
+		categoryNameById(int32(in.Category)),
 		tools.PtrInt64Value(in.Limit),
 		since,
 	)
@@ -67,4 +67,15 @@ func (s *Handler) GetHeadlines(in *grpcapi.GetHeadlinesIn, server grpcapi.Headli
 	}
 
 	return nil
+}
+
+func categoryNameById(category int32) string {
+	switch category {
+	case int32(grpcapi.Category_NEWS):
+		return model.HeadlineSourceCategoryNews
+	case int32(grpcapi.Category_TECH):
+		return model.HeadlineSourceCategoryTech
+	}
+
+	return model.HeadlineSourceCategoryAll
 }

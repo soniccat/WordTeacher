@@ -43,6 +43,7 @@ func New(
 
 	r.HeadlineCollection = r.Collection(MongoDatabaseHeadlines, MongoCollectionHeadlines)
 	r.MongoWrapper.CreateIndexIfNeeded(r.HeadlineCollection, "date")
+	r.MongoWrapper.CreateIndexIfNeeded(r.HeadlineCollection, "sourceCategory")
 
 	return r, nil
 }
