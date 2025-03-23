@@ -12,7 +12,7 @@ import (
 )
 
 type storage interface {
-	ModifiedCardSetsSince(ctx context.Context, lastModificationDate *time.Time) ([]*model.DbCardSet, error)
+	ModifiedCardSetsSince(ctx context.Context, lastModificationDate *time.Time, limit int64) ([]*model.DbCardSet, error)
 }
 
 type Handler struct {
@@ -45,7 +45,11 @@ func (s *Handler) GetCardSets(in *grpcapi.GetCardSetsIn, server grpcapi.CardSets
 		sinceDate = &d
 	}
 
-	cardSets, err := s.storage.ModifiedCardSetsSince(server.Context(), sinceDate)
+	cardSets, err := s.storage.ModifiedCardSetsSince(
+		server.Context(),
+		sinceDate,
+		tools.PtrInt64Value(in.Limit),
+	)
 	if err != nil {
 		return logger.WrapError(server.Context(), err)
 	}

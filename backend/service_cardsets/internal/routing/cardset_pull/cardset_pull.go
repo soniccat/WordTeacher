@@ -21,7 +21,7 @@ import (
 
 type storage interface {
 	CardCardSetIds(ctx context.Context, userId string) ([]string, error)
-	ModifiedCardSetsSinceByUserId(ctx context.Context, userId string, lastModificationDate *time.Time) ([]*model.DbCardSet, error)
+	ModifiedCardSetsSinceByUserId(ctx context.Context, userId string, lastModificationDate *time.Time, limit int64) ([]*model.DbCardSet, error)
 	LastModificationDate(ctx context.Context, userId string) (*time.Time, error)
 }
 
@@ -97,7 +97,7 @@ func (h *Handler) CardSetPull(w http.ResponseWriter, r *http.Request) {
 		ctxParams...,
 	)
 
-	dbCardSets, err := h.storage.ModifiedCardSetsSinceByUserId(ctx, authToken.UserDbId, lastModificationDate)
+	dbCardSets, err := h.storage.ModifiedCardSetsSinceByUserId(ctx, authToken.UserDbId, lastModificationDate, 0)
 	if err != nil {
 		h.SetError(w, err, http.StatusInternalServerError)
 		return

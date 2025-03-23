@@ -231,21 +231,24 @@ func (m *Storage) ModifiedCardSetsSinceByUserId(
 	ctx context.Context,
 	userId string,
 	lastModificationDate *time.Time,
+	limit int64,
 ) ([]*model.DbCardSet, error) {
-	return m.modifiedCardSetsSince(ctx, &userId, lastModificationDate)
+	return m.modifiedCardSetsSince(ctx, &userId, lastModificationDate, limit)
 }
 
 func (m *Storage) ModifiedCardSetsSince(
 	ctx context.Context,
 	lastModificationDate *time.Time,
+	limit int64,
 ) ([]*model.DbCardSet, error) {
-	return m.modifiedCardSetsSince(ctx, nil, lastModificationDate)
+	return m.modifiedCardSetsSince(ctx, nil, lastModificationDate, limit)
 }
 
 func (m *Storage) modifiedCardSetsSince(
 	ctx context.Context,
 	userId *string,
 	lastModificationDate *time.Time,
+	limit int64,
 ) ([]*model.DbCardSet, error) {
 	var mongoUserId *primitive.ObjectID
 
@@ -258,24 +261,25 @@ func (m *Storage) modifiedCardSetsSince(
 		mongoUserId = muid
 	}
 
-	var date time.Time
-	if lastModificationDate != nil {
-		date = *lastModificationDate
-	} else {
-		date = zeroTime
+	filter := bson.M{
+		"isDeleted": bson.M{"$not": bson.M{"$eq": true}},
 	}
 
-	dbTime := primitive.NewDateTimeFromTime(date)
-	filter := bson.M{
-		"modificationDate": bson.M{"$gt": dbTime},
-		"isDeleted":        bson.M{"$not": bson.M{"$eq": true}},
+	if lastModificationDate != nil {
+		dbTime := primitive.NewDateTimeFromTime(*lastModificationDate)
+		filter["modificationDate"] = bson.M{"$gt": dbTime}
 	}
+
 	if mongoUserId != nil {
 		filter["userId"] = mongoUserId
 	}
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
 		filter,
+		options.Find().SetLimit(limit).
+			SetSort(bson.D{
+				{Key: "modificationDate", Value: -1},
+			}),
 	)
 	if err != nil {
 		return nil, logger.WrapError(ctx, err)
