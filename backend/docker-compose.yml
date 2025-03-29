@@ -340,6 +340,7 @@ services:
       - ${VOLUME_CARDSETSEARCH_LOG_PATH}:/var/log/cardsetsearch
       - ${VOLUME_DICT_LOG_PATH}:/var/log/dict
       - ${VOLUME_ARTICLES_LOG_PATH}:/var/log/articles
+      - ${VOLUME_DASHBOARD_LOG_PATH}:/var/log/dashboard
     environment:
       - PROMTAIL_PORT=${PROMTAIL_PORT}
     entrypoint:

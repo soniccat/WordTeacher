@@ -10,6 +10,8 @@ RUN mkdir /opt/tools
 COPY ../tools/go.mod ../tools/go.sum ../tools
 RUN mkdir /opt/service_articles
 COPY ../service_articles/go.mod ../service_articles/go.sum ../service_articles
+RUN mkdir /opt/service_cardsets
+COPY ../service_cardsets/go.mod ../service_cardsets/go.sum ../service_cardsets
 # fetch dependancies
 RUN go mod download # add verify after resolving issue with local models module
 # copy the source code as the last step

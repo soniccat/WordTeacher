@@ -8,6 +8,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 
 	"models/session_validator"
+	"service_dashboard/internal/storage/cardsets"
 	"service_dashboard/internal/storage/headlines"
 )
 
@@ -19,6 +20,7 @@ type application struct {
 	sessionManager   *scs.SessionManager
 	headlineStorage  *headlines.Storage
 	sessionValidator session_validator.SessionValidator
+	cardsetStorage   *cardsets.Storage
 }
 
 func createApplication(
@@ -28,6 +30,7 @@ func createApplication(
 	sessionManager *scs.SessionManager,
 	sessionValidator session_validator.SessionValidator,
 	headlineStorage *headlines.Storage,
+	cardsetStorage *cardsets.Storage,
 ) (_ *application, err error) {
 	appCtx, cancelF := context.WithCancel(ctx)
 	app := &application{
@@ -38,6 +41,7 @@ func createApplication(
 		sessionManager:   sessionManager,
 		headlineStorage:  headlineStorage,
 		sessionValidator: sessionValidator,
+		cardsetStorage:   cardsetStorage,
 	}
 
 	defer func() {
@@ -55,4 +59,8 @@ func (app *application) stop() {
 
 func (app *application) StartPullingArticles() {
 	app.headlineStorage.StartPulling(app.Context)
+}
+
+func (app *application) StartPullingCardSets() {
+	app.cardsetStorage.StartPulling(app.Context)
 }

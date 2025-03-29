@@ -9,8 +9,8 @@ type CardSet struct {
 	Name                string      `json:"name"`
 	Tags                []string    `json:"tags"`
 	Cards               []*Card     `json:"cards"`
-	Terms               []string    `json:"terms,omitempty"`
-	UserId              string      `json:"userId"` // TODO: consider several owners via a permission filed
+	Terms               []string    `json:"terms,omitempty"` // for short version without cards
+	UserId              string      `json:"userId"`          // TODO: consider several owners via a permission filed
 	CreationDate        string      `json:"creationDate"`
 	ModificationDate    string      `json:"modificationDate"`
 	CreationId          string      `json:"creationId"`

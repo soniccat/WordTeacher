@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"api"
 	"models/session_validator"
 	"net/http"
 	"service_dashboard/internal/model"
@@ -12,14 +13,20 @@ type headlineStorage interface {
 	HeadlineCategories() []model.DashboardHeadlineCategory
 }
 
+type cardSetsStorage interface {
+	CardSets() []api.CardSet
+}
+
 type response struct {
-	HeadlineBlock model.DashboardHeadlineBlock `json:"headlineBlock"`
+	HeadlineBlock    model.DashboardHeadlineBlock    `json:"headlineBlock"`
+	NewCardSetsBlock model.DashboardNewCardsSetBlock `json:"newCardSetsBlock"`
 }
 
 type Handler struct {
 	tools.BaseHandler
 	sessionValidator session_validator.SessionValidator
 	headlineStorage  headlineStorage
+	cardSetsStorage  cardSetsStorage
 }
 
 func NewHandler(
@@ -51,10 +58,14 @@ func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 	// )
 
 	headlineCategories := h.headlineStorage.HeadlineCategories()
+	newCardSets := h.cardSetsStorage.CardSets()
 
 	response := response{
 		HeadlineBlock: model.DashboardHeadlineBlock{
 			Categories: headlineCategories,
+		},
+		NewCardSetsBlock: model.DashboardNewCardsSetBlock{
+			CardSets: newCardSets,
 		},
 	}
 	h.WriteResponse(w, response)

@@ -11,7 +11,10 @@ import (
 	"os"
 	"runtime/debug"
 	articlesgrpc "service_articles/pkg/grpc/service_articles/api"
+	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
 	"service_dashboard/internal/client/articles"
+	"service_dashboard/internal/client/cardsets"
+	cardsetStorage "service_dashboard/internal/storage/cardsets"
 	"service_dashboard/internal/storage/headlines"
 	"time"
 	"tools"
@@ -44,6 +47,7 @@ func run() int {
 	// mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	redisAddress := flag.String("redisAddress", "localhost:6379", "redisAddress")
 	articlesGRPCAddress := flag.String("articlesGRPCAddress", "localhost:5004", "get headlines")
+	cardSetsGRPCAddress := flag.String("cardSetsGRPCAddress", "localhost:5001", "get new cardsets")
 	// enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 
 	flag.Parse()
@@ -72,8 +76,17 @@ func run() int {
 	}
 	defer articlesGRPCConnection.Close()
 	articlesGrpcClient := articlesgrpc.NewHeadlinesClient(articlesGRPCConnection)
-
 	ariclesClient := articles.New(logger, articlesGrpcClient)
+
+	cardSetsGRPCConnection, err := grpc.Dial(*cardSetsGRPCAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("cardSetGRPCConnection did not connect: %v", err)
+	}
+	defer cardSetsGRPCConnection.Close()
+	cardSetsGrpcClient := cardsetsgrpc.NewCardSetsClient(cardSetsGRPCConnection)
+	cardSetsClient := cardsets.New(logger, cardSetsGrpcClient)
+
+	// storages
 	headlineStorage := headlines.New(
 		logger,
 		&ariclesClient,
@@ -83,6 +96,8 @@ func run() int {
 		return failCode
 	}
 
+	cardSetsStorage := cardsetStorage.New(logger, &cardSetsClient)
+
 	sessionManager := tools.CreateSessionManager(*redisAddress)
 	app, err := createApplication(
 		context.Background(),
@@ -91,12 +106,14 @@ func run() int {
 		sessionManager,
 		session_validator.NewSessionManagerValidator(sessionManager),
 		&headlineStorage,
+		&cardSetsStorage,
 	)
 	if err != nil {
 		logger.ErrorWithError(context.Background(), err, "app creation error")
 		return failCode
 	}
 	app.StartPullingArticles()
+	app.StartPullingCardSets()
 
 	defer func() {
 		app.stop()

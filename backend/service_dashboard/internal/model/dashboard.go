@@ -1,10 +1,14 @@
 package model
 
-import "time"
+import (
+	"api"
+	"context"
+	"slices"
+	"time"
+	"tools"
 
-// type Dashboard struct {
-// 	HeadlineBlock DashboardHeadlineBlock `json:"headlineBlock"`
-// }
+	cardsetsgrpc "service_cardsets/pkg/grpc/service_cardsets/api"
+)
 
 type DashboardHeadlineBlock struct {
 	Categories []DashboardHeadlineCategory `json:"categories,omitempty" bson:"categories,omitempty"`
@@ -24,4 +28,30 @@ type DashboardHeadline struct {
 	Link           string    `json:"link" bson:"link"`
 	Date           time.Time `json:"date,omitempty" bson:"date,omitempty"`
 	Creator        *string   `json:"creator,omitempty" bson:"creator,omitempty"`
+}
+
+type DashboardNewCardsSetBlock struct {
+	CardSets []api.CardSet `json:"cardsets,omitempty" bson:"cardsets,omitempty"`
+}
+
+func GRPCCardSetToApi(ctx context.Context, cs *cardsetsgrpc.CardSet) api.CardSet {
+	terms := tools.Map(cs.Cards, func(c *cardsetsgrpc.Card) string {
+		return c.Term
+	})
+	slices.Sort(terms) // to work in the same way it works in search
+
+	cardSetDb := api.CardSet{
+		Id:               cs.Id,
+		Name:             cs.Name,
+		Tags:             cs.Tags,
+		UserId:           cs.UserId,
+		CreationDate:     cs.CreationDate,
+		ModificationDate: cs.ModificationDate,
+		Terms:            terms,
+		Info: api.CardSetInfo{
+			Description: cs.Info.Description,
+			Source:      cs.Info.Source,
+		},
+	}
+	return cardSetDb
 }

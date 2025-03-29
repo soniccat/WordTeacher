@@ -10,6 +10,10 @@ require models v0.0.0
 
 replace models => ../models
 
+require service_cardsets v0.0.0
+
+replace service_cardsets => ../service_cardsets
+
 require (
 	github.com/alexedwards/scs/v2 v2.5.1
 	github.com/gorilla/mux v1.8.1

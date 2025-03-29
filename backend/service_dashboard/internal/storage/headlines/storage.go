@@ -86,11 +86,14 @@ func (s *Storage) pullCategory(ctx context.Context, category int32) (model.Dashb
 	var dashboardHeadlines []model.DashboardHeadline
 	for r := range headlines {
 		if r.Error != nil {
-			break
+			continue
 		} else if r.Headline != nil {
 			h := r.Headline
 			date, err := tools.ParseApiDate(ctx, h.Date)
-			s.logger.ErrorWithError(ctx, err, "pullCategory.ParseApiDate")
+			if err != nil {
+				s.logger.ErrorWithError(ctx, err, "pullCategory.ParseApiDate")
+				continue
+			}
 
 			dashboardHeadlines = append(dashboardHeadlines, model.DashboardHeadline{
 				Id:             h.Id,

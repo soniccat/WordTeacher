@@ -233,7 +233,7 @@ func (m *Storage) ModifiedCardSetsSinceByUserId(
 	lastModificationDate *time.Time,
 	limit int64,
 ) ([]*model.DbCardSet, error) {
-	return m.modifiedCardSetsSince(ctx, &userId, lastModificationDate, limit)
+	return m.getCardSets(ctx, &userId, lastModificationDate, limit)
 }
 
 func (m *Storage) ModifiedCardSetsSince(
@@ -241,10 +241,10 @@ func (m *Storage) ModifiedCardSetsSince(
 	lastModificationDate *time.Time,
 	limit int64,
 ) ([]*model.DbCardSet, error) {
-	return m.modifiedCardSetsSince(ctx, nil, lastModificationDate, limit)
+	return m.getCardSets(ctx, nil, lastModificationDate, limit)
 }
 
-func (m *Storage) modifiedCardSetsSince(
+func (m *Storage) getCardSets(
 	ctx context.Context,
 	userId *string,
 	lastModificationDate *time.Time,
