@@ -4,6 +4,7 @@ import (
 	"api"
 	"context"
 	"fmt"
+	"io"
 	"runtime/debug"
 	"service_dashboard/internal/client/cardsets"
 	"service_dashboard/internal/model"
@@ -59,6 +60,9 @@ func (s *Storage) StartPulling(ctx context.Context) {
 
 			for c := range cardSets {
 				if c.Error != nil {
+					if c.Error != io.EOF {
+						s.logger.ErrorWithError(ctx, c.Error, "StartPulling.broken cardSet")
+					}
 					continue
 				}
 

@@ -199,6 +199,8 @@ services:
       - "${DASHBOARD_PORT}"
       - "-redisAddress"
       - "redis:${REDIS_PORT}"
+      - "-cardSetsGRPCAddress"
+      - "apigateway:9091"
       - "-articlesGRPCAddress"
       - "apigateway:9091"
     volumes:
@@ -209,6 +211,7 @@ services:
     depends_on:
       - mongosetup
       - articles
+      - cardsets
     # ports:
       # - target: "${DASHBOARD_PORT}"
         # published: "${DASHBOARD_PORT}"

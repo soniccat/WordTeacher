@@ -9,7 +9,7 @@ removetestvolumes:
 	docker volume rm backend_mongodb_test backend_mongoconfig_test backend_redis_test || true
 
 clean:
-	docker rmi cardsets auth cardsetsearch dict
+	docker rmi cardsets auth cardsetsearch dict articles dashboard
 
 up:
 	docker compose --env-file ./prod.env up -d

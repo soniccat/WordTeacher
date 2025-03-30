@@ -29,16 +29,18 @@ type Handler struct {
 	cardSetsStorage  cardSetsStorage
 }
 
-func NewHandler(
+func New(
 	logger *logger.Logger,
 	timeProvider tools.TimeProvider,
 	sessionValidator session_validator.SessionValidator,
 	headlineStorage headlineStorage,
+	cardSetsStorage cardSetsStorage,
 ) *Handler {
 	return &Handler{
 		BaseHandler:      *tools.NewBaseHandler(logger, timeProvider),
 		sessionValidator: sessionValidator,
 		headlineStorage:  headlineStorage,
+		cardSetsStorage:  cardSetsStorage,
 	}
 }
 

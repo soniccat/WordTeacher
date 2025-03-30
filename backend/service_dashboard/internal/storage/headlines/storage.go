@@ -3,6 +3,7 @@ package headlines
 import (
 	"context"
 	"fmt"
+	"io"
 	"runtime/debug"
 	"time"
 	"tools"
@@ -86,6 +87,9 @@ func (s *Storage) pullCategory(ctx context.Context, category int32) (model.Dashb
 	var dashboardHeadlines []model.DashboardHeadline
 	for r := range headlines {
 		if r.Error != nil {
+			if r.Error != io.EOF {
+				s.logger.ErrorWithError(ctx, r.Error, "pullCategory.broken headline")
+			}
 			continue
 		} else if r.Headline != nil {
 			h := r.Headline

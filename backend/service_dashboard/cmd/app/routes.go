@@ -8,11 +8,12 @@ import (
 )
 
 func (app *application) routes() *mux.Router {
-	dashboardHandler := dashboard.NewHandler(
+	dashboardHandler := dashboard.New(
 		app.logger,
 		app.timeProvider,
 		app.sessionValidator,
 		app.headlineStorage,
+		app.cardsetStorage,
 	)
 
 	r := mux.NewRouter()
