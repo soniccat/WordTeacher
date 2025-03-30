@@ -3,6 +3,7 @@ package cardsets
 import (
 	"api"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"runtime/debug"
@@ -58,9 +59,10 @@ func (s *Storage) StartPulling(ctx context.Context) {
 				return
 			}
 
+			s.logger.Info(ctx, "Starts pulling cardsets")
 			for c := range cardSets {
 				if c.Error != nil {
-					if c.Error != io.EOF {
+					if errors.Is(c.Error, io.EOF) {
 						s.logger.ErrorWithError(ctx, c.Error, "StartPulling.broken cardSet")
 					}
 					continue
@@ -68,6 +70,7 @@ func (s *Storage) StartPulling(ctx context.Context) {
 
 				newCardSets = append(newCardSets, model.GRPCCardSetToApi(ctx, c.CardSet))
 			}
+			s.logger.Info(ctx, "Ends pulling cardsets")
 			s.cardSets = newCardSets
 		})
 	}()

@@ -2,6 +2,7 @@ package headlines
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"runtime/debug"
@@ -62,7 +63,7 @@ func (s *Storage) StartPulling(ctx context.Context) {
 			}()
 
 			var newCategories []model.DashboardHeadlineCategory
-			s.logger.Info(ctx, "Start pulling")
+			s.logger.Info(ctx, "Starts pulling headlines")
 			for _, c := range categoriesToPull {
 				cd, err := s.pullCategory(ctx, c)
 				if err != nil {
@@ -71,7 +72,7 @@ func (s *Storage) StartPulling(ctx context.Context) {
 
 				newCategories = append(newCategories, cd)
 			}
-			s.logger.Info(ctx, "Ends pulling")
+			s.logger.Info(ctx, "Ends pulling headlines")
 			s.categories = newCategories
 		})
 	}()
@@ -87,7 +88,7 @@ func (s *Storage) pullCategory(ctx context.Context, category int32) (model.Dashb
 	var dashboardHeadlines []model.DashboardHeadline
 	for r := range headlines {
 		if r.Error != nil {
-			if r.Error != io.EOF {
+			if errors.Is(r.Error, io.EOF) {
 				s.logger.ErrorWithError(ctx, r.Error, "pullCategory.broken headline")
 			}
 			continue
