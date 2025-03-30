@@ -62,7 +62,7 @@ func (s *Storage) StartPulling(ctx context.Context) {
 			s.logger.Info(ctx, "Starts pulling cardsets")
 			for c := range cardSets {
 				if c.Error != nil {
-					if errors.Is(c.Error, io.EOF) {
+					if !errors.Is(c.Error, io.EOF) {
 						s.logger.ErrorWithError(ctx, c.Error, "StartPulling.broken cardSet")
 					}
 					continue

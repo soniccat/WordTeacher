@@ -88,7 +88,7 @@ func (s *Storage) pullCategory(ctx context.Context, category int32) (model.Dashb
 	var dashboardHeadlines []model.DashboardHeadline
 	for r := range headlines {
 		if r.Error != nil {
-			if errors.Is(r.Error, io.EOF) {
+			if !errors.Is(r.Error, io.EOF) {
 				s.logger.ErrorWithError(ctx, r.Error, "pullCategory.broken headline")
 			}
 			continue
