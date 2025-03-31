@@ -1,0 +1,1 @@
+ALTER TABLE DBArticle ADD COLUMN link TEXT;
