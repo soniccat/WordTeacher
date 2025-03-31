@@ -28,7 +28,7 @@ import kotlinx.serialization.Serializable
 
 interface CardSetInfoVM: Clearable {
     var router: CardSetInfoRouter?
-    val state: State
+//    val state: State
     val uiStateFlow: StateFlow<Resource<UIState>>
 
     fun onTryAgainPressed()
@@ -103,7 +103,7 @@ open class CardSetInfoVMImpl(
 ): ViewModel(), CardSetInfoVM {
 
     override var router: CardSetInfoRouter? = null
-    final override val state: CardSetInfoVM.State = restoredState
+    val state: CardSetInfoVM.State = restoredState
 
     private val cardSetState = MutableStateFlow<Resource<CardSet>>(Resource.Uninitialized())
     private val inputState = MutableStateFlow(CardSetInfoVM.InputState())

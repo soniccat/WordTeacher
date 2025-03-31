@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS DBArticle (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT NOT NULL,
   date INTEGER NOT NULL,
-  style TEXT NOT NULL
+  style TEXT NOT NULL,
+  link TEXT
 );
 
 /**
@@ -15,7 +16,7 @@ SELECT *
 FROM DBArticle;
 
 selectShort:
-SELECT id, name, date
+SELECT id, name, date, link
 FROM DBArticle
 ORDER BY date DESC;
 
@@ -25,11 +26,11 @@ FROM DBArticle
 WHERE id = ?;
 
 insert:
-INSERT INTO DBArticle(name, date, style)
-VALUES (?, ?, ?);
+INSERT INTO DBArticle(name, date, style, link)
+VALUES (?, ?, ?, ?);
 
 insertArticle:
-INSERT INTO DBArticle(name, date, style)
+INSERT INTO DBArticle(name, date, style, link)
 VALUES ?;
 
 lastInsertedRowId:

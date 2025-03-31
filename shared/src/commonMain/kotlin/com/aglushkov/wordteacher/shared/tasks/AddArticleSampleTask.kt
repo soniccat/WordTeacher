@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.collect
 data class ArticleSample(
     val title: String,
     val text: String,
+    val link: String?,
 )
 
 class AddArticleSampleTask(
@@ -25,7 +26,8 @@ class AddArticleSampleTask(
         val article = articleProvider()
         articlesRepository.createArticle(
             article.title,
-            article.text
+            article.text,
+            article.link,
         ).collect()
 
         settings.putBoolean(IS_ARTICLE_SAMPLE_IMPORTED_KEY, true)

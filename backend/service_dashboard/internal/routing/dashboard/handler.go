@@ -18,8 +18,8 @@ type cardSetsStorage interface {
 }
 
 type response struct {
-	HeadlineBlock    model.DashboardHeadlineBlock    `json:"headlineBlock"`
-	NewCardSetsBlock model.DashboardNewCardsSetBlock `json:"newCardSetsBlock"`
+	HeadlineBlock   model.DashboardHeadlineBlock    `json:"headlineBlock"`
+	NewCardSetBlock model.DashboardNewCardsSetBlock `json:"newCardSetBlock"`
 }
 
 type Handler struct {
@@ -66,7 +66,7 @@ func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 		HeadlineBlock: model.DashboardHeadlineBlock{
 			Categories: headlineCategories,
 		},
-		NewCardSetsBlock: model.DashboardNewCardsSetBlock{
+		NewCardSetBlock: model.DashboardNewCardsSetBlock{
 			CardSets: newCardSets,
 		},
 	}

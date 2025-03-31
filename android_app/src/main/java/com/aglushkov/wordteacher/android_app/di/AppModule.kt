@@ -337,7 +337,8 @@ class AppModule {
                     "Article Sample",
                     context.resources.openRawResource(R.raw.article_sample).use {
                         it.readBytes().commonToUtf8String()
-                    }
+                    },
+                    context.getString(MR.strings.sample_article_url.resourceId)
                 )
             },
             AddCardSetSampleTask(

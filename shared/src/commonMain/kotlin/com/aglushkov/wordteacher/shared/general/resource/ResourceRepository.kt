@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,7 @@ abstract class SimpleResourceRepository<T, A>(
     initialValue: Resource<T> = Resource.Uninitialized(),
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob()),
     private val canTryAgain: Boolean = true,
+    private val loadDelay: Long = 0
 ): ResourceRepository<T, A> {
     override val value: Resource<T>
         get() = stateFlow.value
@@ -40,6 +42,9 @@ abstract class SimpleResourceRepository<T, A>(
 
         stateFlow.update { bumpedValue.toLoading() }
         loadJob = scope.launch {
+            if (loadDelay != 0L) {
+                delay(loadDelay)
+            }
             loadResource(
                 initialValue = stateFlow.value,
                 canTryAgain = canTryAgain,
@@ -58,9 +63,10 @@ abstract class SimpleResourceRepository<T, A>(
 }
 
 fun <T, A> buildSimpleResourceRepository(
+    loadDelay: Long = 0L,
     load: suspend (arg: A) -> T
 ): SimpleResourceRepository<T, A> {
-    return object : SimpleResourceRepository<T,A>() {
+    return object : SimpleResourceRepository<T,A>(loadDelay = loadDelay) {
         override suspend fun load(arg: A): T {
             return load(arg)
         }

@@ -127,12 +127,12 @@ class AppDatabase(
     }
 
     inner class Articles {
-        fun insert(name: String, date: Long, style: ArticleStyle) =
-            db.dBArticleQueries.insert(name, date, encodeStyle(style))
+        fun insert(name: String, date: Long, link: String?, style: ArticleStyle) =
+            db.dBArticleQueries.insert(name, date, encodeStyle(style), link)
         fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong().value
 
-        fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date ->
-            ShortArticle(id, name, date)
+        fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date, link ->
+            ShortArticle(id, name, date, link)
         }
 
         fun selectArticle(anId: Long) = combine(
@@ -142,7 +142,7 @@ class AppDatabase(
             val article = f1.executeAsOneOrNull()
             val sentences = f2.executeAsList().map { it.toNLPSentence() }
             article?.let {
-                Article(article.id, article.name, article.date, sentences, decodeStyle(article.style))
+                Article(article.id, article.name, article.date, article.link, sentences, decodeStyle(article.style))
             }
         }
 

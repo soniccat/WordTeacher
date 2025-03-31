@@ -64,14 +64,14 @@ class ArticlesRepository(
         }
     }
 
-    suspend fun createArticle(title: String, text: String): Flow<Resource<Article>> {
+    suspend fun createArticle(title: String, text: String, link: String?): Flow<Resource<Article>> {
         return flow {
             Logger.v("start", "tag_createArticle")
             emit(Resource.Loading(progress = RESOURCE_UNDEFINED_PROGRESS))
             Logger.v("wait", "tag_createArticle")
             nlpCore.waitUntilInitialized()
             Logger.v("createArticleInternal", "tag_createArticle")
-            createArticleInternal(title, text).collect {
+            createArticleInternal(title, text, link).collect {
                 emit(it)
             }
             Logger.v("done", "tag_createArticle")
@@ -86,10 +86,11 @@ class ArticlesRepository(
 
     private fun createArticleInternal(
         title: String,
-        text: String
+        text: String,
+        link: String?,
     ): Flow<Resource<Article>> {
        return loadResourceWithProgress(
-           loader = processTextIntoArticle(text, title)
+           loader = processTextIntoArticle(text, title, link)
        )
     }
 
@@ -207,7 +208,8 @@ class ArticlesRepository(
 
     private fun processTextIntoArticle(
         text: String,
-        title: String
+        title: String,
+        link: String?,
     ): Flow<Pair<Float, Article?>> {
         var resultText = clearText(text)
         val cutResult = cutStylesFromText(resultText)
@@ -315,7 +317,7 @@ class ArticlesRepository(
         scope.launch(Dispatchers.Default) {
             val article = database.transactionWithResult {
                 val articleId = database.articles.run {
-                    insert(title, timeSource.timeInMilliseconds(), style)
+                    insert(title, timeSource.timeInMilliseconds(), link, style)
                     insertedArticleId()
                 } ?: 0L
 
@@ -336,6 +338,7 @@ class ArticlesRepository(
                     articleId,
                     title,
                     timeSource.timeInMilliseconds(),
+                    link = link,
                     sentences = sentences,
                     style = style
                 )

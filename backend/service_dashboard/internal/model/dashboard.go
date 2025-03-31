@@ -11,27 +11,27 @@ import (
 )
 
 type DashboardHeadlineBlock struct {
-	Categories []DashboardHeadlineCategory `json:"categories,omitempty" bson:"categories,omitempty"`
+	Categories []DashboardHeadlineCategory `json:"categories" bson:"categories"`
 }
 
 type DashboardHeadlineCategory struct {
-	CategoryName string              `json:"categoryName,omitempty" bson:"categoryName,omitempty"`
-	Headlines    []DashboardHeadline `json:"headlines,omitempty" bson:"headlines,omitempty"`
+	CategoryName string              `json:"categoryName" bson:"categoryName"`
+	Headlines    []DashboardHeadline `json:"headlines" bson:"headlines"`
 }
 
 type DashboardHeadline struct {
 	Id             string    `json:"id,omitempty" bson:"_id,omitempty"`
-	SourceName     string    `json:"sourceName,omitempty" bson:"sourceName,omitempty"`
-	SourceCategory string    `json:"sourceCategory,omitempty" bson:"sourceCategory,omitempty"`
+	SourceName     string    `json:"sourceName" bson:"sourceName"`
+	SourceCategory string    `json:"sourceCategory" bson:"sourceCategory"`
 	Title          string    `json:"title" bson:"title"`
 	Description    string    `json:"description,omitempty" bson:"description,omitempty"`
 	Link           string    `json:"link" bson:"link"`
-	Date           time.Time `json:"date,omitempty" bson:"date,omitempty"`
+	Date           time.Time `json:"date" bson:"date"`
 	Creator        *string   `json:"creator,omitempty" bson:"creator,omitempty"`
 }
 
 type DashboardNewCardsSetBlock struct {
-	CardSets []api.CardSet `json:"cardsets,omitempty" bson:"cardsets,omitempty"`
+	CardSets []api.CardSet `json:"cardSets" bson:"cardSets"`
 }
 
 func GRPCCardSetToApi(ctx context.Context, cs *cardsetsgrpc.CardSet) api.CardSet {

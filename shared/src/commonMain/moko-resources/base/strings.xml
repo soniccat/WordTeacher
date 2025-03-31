@@ -139,6 +139,9 @@
     <string name="dictconfigs_yandex_param_require_matching_parts">Enable a filter that requires matching parts of speech for the search word and translation</string>
     <string name="dictconfigs_settings_dsl_title">Dsl file</string>
 
+    <string name="dashboard_headline_title">Articles for you:</string>
+    <string name="dashboard_cardsets_title">New CardSets:</string>
+
     <string name="notes_error">Something went wrong :(</string>
     <string name="notes_create_note">Create a note</string>
     <string name="cardsets_create_cardset">Create a card set</string>
@@ -151,7 +154,10 @@
     <string name="card_title_placeholder_readonly">Name is missing</string>
     <string name="card_transcription_placeholder_readonly">Transcription is missing</string>
 
+    <string name="sample_article_url">https://corecursive.com/game-programming-with-mick-west/</string>
+
     <string name="error_try_again">Retry</string>
+    <string name="error_default_loading_error">Something went wrong :(</string>
 
     <string name="sidesheet_navigation_menu">Navigation menu</string>
     <string name="sidesheet_side_sheet">Close navigation menu</string>

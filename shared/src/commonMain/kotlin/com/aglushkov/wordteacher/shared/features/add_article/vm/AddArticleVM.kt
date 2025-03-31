@@ -173,7 +173,7 @@ open class AddArticleVMImpl(
                         createCardSet(data.contentUri)
                     }
 
-                    articlesRepository.createArticle(data.title, data.text).collect(addingStateFlow)
+                    articlesRepository.createArticle(data.title, data.text, data.contentUri).collect(addingStateFlow)
 
                     addingStateFlow.value.onData { article ->
                         analytics.send(

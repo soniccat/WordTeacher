@@ -167,10 +167,10 @@ open class DefinitionsVMImpl(
         }.flatten().distinct()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String> { word ->
+    private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String>(100) { word ->
         dictRepository.wordsStartWith(word, 60)
     }
-    private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String> { text ->
+    private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String>(100L) { text ->
         wordTeacherDictService.textSearch(text).toOkResponse().words.orEmpty()
     }
 
@@ -674,7 +674,10 @@ open class DefinitionsVMImpl(
     }
 
     // suggests
-    override val suggests = combine(suggestedDictEntryRepository.stateFlow, wordTextSearchRepository.stateFlow) { dictEntries, wordTextSearch ->
+    override val suggests = combine(
+        suggestedDictEntryRepository.stateFlow,
+        wordTextSearchRepository.stateFlow,
+    ) { dictEntries, wordTextSearch ->
         dictEntries.merge(if (wordTextSearch.isUninitialized()){
             wordTextSearch.toLoaded(emptyList()) // treat unitialized as loaded not to get unitialized during merge
         } else {
@@ -736,7 +739,6 @@ open class DefinitionsVMImpl(
         suggestJob = null
 
         suggestJob = viewModelScope.launch(Dispatchers.Default) {
-            delay(100)
             suggestedDictEntryRepository.load(word)
                 .waitUntilDone {
                     if (it.size in 0..19) {
