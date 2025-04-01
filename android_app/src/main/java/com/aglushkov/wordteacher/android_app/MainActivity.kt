@@ -298,7 +298,8 @@ class MainActivity : AppCompatActivity(), Router {
                     is TabDecomposeComponent.Child.Dashboard -> DashboardUI(
                         vm = instance.vm.apply {
                             router = mainDecomposeComponent
-                        }
+                        },
+                        modifier = Modifier.padding(innerPadding)
                     )
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
                         vm = instance.vm.apply {

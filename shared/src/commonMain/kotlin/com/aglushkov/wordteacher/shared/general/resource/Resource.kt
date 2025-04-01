@@ -284,12 +284,14 @@ fun <T> Resource<T>.on(
     if (!onDataCalled) {
         loaded?.let { onLoaded(block = it) }
 
-        val onLoadingOrErrorCalled = if (isLoading() || isError()) {
-            loadingOrError?.invoke(this.asError()?.throwable)
-            true
-        } else {
-            false
-        }
+        val onLoadingOrErrorCalled = loadingOrError?.let {
+            if (isLoading() || isError()) {
+                loadingOrError(this.asError()?.throwable)
+                true
+            } else {
+                false
+            }
+        } ?: false
 
         if (!onLoadingOrErrorCalled) {
             loading?.let { onLoading(it) }

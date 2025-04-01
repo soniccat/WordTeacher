@@ -298,7 +298,7 @@ fun CardSetSearchItemView(
     ) {
         ListItem(
             text = { Text(item.name) },
-            secondaryText = { Text(item.terms.joinToString()) },
+            secondaryText = { Text(item.terms.joinToString(), maxLines = 2) },
             trailing = onAdded?.let { onAdded ->
                 {
                     Box(modifier = Modifier.size(24.dp)) {

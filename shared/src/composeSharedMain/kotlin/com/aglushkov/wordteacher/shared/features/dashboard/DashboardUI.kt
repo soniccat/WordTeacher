@@ -135,17 +135,12 @@ fun dashboardItem(
         }
     }
     is DashboardHeadlineViewItem -> {
-        val horizontalPadding = LocalDimens.current.definitionsDisplayModeHorizontalPadding
         ListItem(
             modifier = Modifier
-                .then(modifier)
-                .padding(
-                    start = horizontalPadding,
-                    end = horizontalPadding,
-                ),
+                .then(modifier),
             secondaryText = {
                 item.description?.let {
-                    Text(text = it)
+                    Text(text = it, maxLines = 2)
                 }
             }
         ) {
