@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.articles.di.DaggerArticlesCompo
 import com.aglushkov.wordteacher.shared.features.cardsets.di.DaggerCardSetsComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
+import com.aglushkov.wordteacher.shared.features.dashboard.di.DaggerDashboardComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
@@ -25,6 +26,13 @@ class TabComposeModule {
     ): (context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration) -> Any =
         { context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration ->
             when (configuration) {
+                is TabDecomposeComponent.ChildConfiguration.DashboardConfiguration ->
+                    DaggerDashboardComponent.builder()
+                        .setComponentContext(context)
+                        .setInitialState(configuration.state)
+                        .setDeps(appComponent)
+                        .build()
+                        .dashboardDecomposeComponent()
                 is TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration ->
                     DaggerDefinitionsComposeComponent.builder()
                         .setComponentContext(context)

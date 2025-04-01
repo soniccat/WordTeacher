@@ -23,6 +23,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.di.CardSetDependencies
 import com.aglushkov.wordteacher.shared.features.cardset_info.di.CardSetInfoDependencies
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.di.CardSetJsonImportDependencies
 import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencies
+import com.aglushkov.wordteacher.shared.features.dashboard.di.DashboardDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.dict_configs.di.DictConfigsDependencies
 import com.aglushkov.wordteacher.shared.features.settings.di.SettingsDependencies
@@ -58,6 +59,7 @@ import io.ktor.client.plugins.cookies.*
 @AppComp
 @Component(modules = [AppModule::class, GeneralModule::class] )
 interface AppComponent:
+    DashboardDependencies,
     DefinitionsDependencies,
     ArticlesDependencies,
     AddArticleDependencies,

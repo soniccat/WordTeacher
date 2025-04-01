@@ -167,10 +167,10 @@ open class DefinitionsVMImpl(
         }.flatten().distinct()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String>(100) { word ->
+    private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String> { word ->
         dictRepository.wordsStartWith(word, 60)
     }
-    private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String>(100L) { text ->
+    private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String> { text ->
         wordTeacherDictService.textSearch(text).toOkResponse().words.orEmpty()
     }
 
@@ -739,6 +739,7 @@ open class DefinitionsVMImpl(
         suggestJob = null
 
         suggestJob = viewModelScope.launch(Dispatchers.Default) {
+            delay(200)
             suggestedDictEntryRepository.load(word)
                 .waitUntilDone {
                     if (it.size in 0..19) {

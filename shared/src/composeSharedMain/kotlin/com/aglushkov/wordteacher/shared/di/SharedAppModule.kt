@@ -284,6 +284,14 @@ class SharedAppModule {
 
     @AppComp
     @Provides
+    fun spaceDashboardService(
+        @SpaceHttpClient httpClient: HttpClient,
+        @ApiBaseUrl apiBaseUrl: String,
+    ): SpaceDashboardService =
+        SpaceDashboardService(apiBaseUrl, httpClient)
+
+    @AppComp
+    @Provides
     fun spaceAuthService(
         @SpaceHttpClient httpClient: HttpClient,
         @ApiBaseUrl apiBaseUrl: String,

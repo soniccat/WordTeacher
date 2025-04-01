@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJ
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.DictConfigsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
@@ -44,6 +45,7 @@ interface MainDecomposeComponent:
     ArticlesRouter,
     ArticleRouter,
     SettingsRouter,
+    DashboardVM.Router,
     AuthOpener,
     SnackbarEventHolder {
     val childStack: Value<ChildStack<ChildConfiguration, Child>>

@@ -35,10 +35,20 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import com.aglushkov.wordteacher.shared.res.MR
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 interface DashboardVM: Clearable {
     var router: Router?
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
+    val state: State
+
+    fun refresh()
+    fun onHeadlineCategoryChanged(index: Int)
+    fun onCardSetClicked(item: RemoteCardSetViewItem)
+    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
     interface Router {
     }
@@ -53,16 +63,19 @@ interface DashboardVM: Clearable {
 open class DashboardVMIMpl(
     restoredState: DashboardVM.State,
     spaceDashboardService: SpaceDashboardService,
-    private val dashboardRepository: SimpleResourceRepository<SpaceDashboardResponse, Unit> =
-        buildSimpleResourceRepository<SpaceDashboardResponse, Unit> {
-            spaceDashboardService.load().toOkResponse()
-        },
     private val cardSetsRepository: CardSetsRepository,
     private val articlesRepository: ArticlesRepository,
     private val analytics: Analytics,
 ): ViewModel(), DashboardVM {
     override var router: DashboardVM.Router? = null
     private val stateFlow = MutableStateFlow<DashboardVM.State>(restoredState)
+    override val state: DashboardVM.State
+        get() = stateFlow.value
+
+    private val dashboardRepository: SimpleResourceRepository<SpaceDashboardResponse, Unit> =
+        buildSimpleResourceRepository<SpaceDashboardResponse, Unit>(viewModelScope) {
+            spaceDashboardService.load().toOkResponse()
+        }
 
     override val viewItems = combine(
         stateFlow,
@@ -72,7 +85,29 @@ open class DashboardVMIMpl(
         ::buildViewItems,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Loading())
 
-    fun buildViewItems(
+    init {
+        viewModelScope.launch {
+            dashboardRepository.load(Unit)
+        }
+    }
+
+    override fun refresh() {
+        dashboardRepository.load(Unit)
+    }
+
+    override fun onHeadlineCategoryChanged(index: Int) {
+        stateFlow.update { it.copy(selectedCategoryIndex = index) }
+    }
+
+    override fun onCardSetClicked(item: RemoteCardSetViewItem) {
+
+    }
+
+    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
+        return StringDesc.Resource(MR.strings.error_default_loading_error)
+    }
+
+    private fun buildViewItems(
         state: DashboardVM.State,
         dashboardRes: Resource<SpaceDashboardResponse>,
         cardSetsRes: Resource<List<ShortCardSet>>,

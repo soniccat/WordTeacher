@@ -2,6 +2,8 @@ package com.aglushkov.wordteacher.shared.features
 
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.dashboard.DashboardDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
@@ -23,6 +25,7 @@ import kotlinx.serialization.Serializable
 interface TabDecomposeComponent: Clearable {
     val childStack: Value<ChildStack<*, Child>>
 
+    fun openDashboard()
     fun openDefinitions()
     fun openCardSets()
     fun openArticles()
@@ -33,6 +36,7 @@ interface TabDecomposeComponent: Clearable {
     sealed class Child(
         val inner: Clearable
     ): Clearable {
+        data class Dashboard(val vm: DashboardDecomposeComponent): Child(vm)
         data class Definitions(val vm: DefinitionsDecomposeComponent): Child(vm)
         data class CardSets(val vm: CardSetsDecomposeComponent): Child(vm)
         data class Articles(val vm: ArticlesDecomposeComponent): Child(vm)
@@ -46,11 +50,12 @@ interface TabDecomposeComponent: Clearable {
 
     @Serializable
     sealed class ChildConfiguration {
+        @Serializable data class DashboardConfiguration(val state: DashboardVM.State = DashboardVM.State()) : ChildConfiguration()
         @Serializable data class DefinitionConfiguration(val state: DefinitionsVM.State) : ChildConfiguration()
-        @Serializable object CardSetsConfiguration : ChildConfiguration()
-        @Serializable object ArticlesConfiguration : ChildConfiguration()
-        @Serializable object SettingsConfiguration : ChildConfiguration()
-        @Serializable object NotesConfiguration : ChildConfiguration()
+        @Serializable data object CardSetsConfiguration : ChildConfiguration()
+        @Serializable data object ArticlesConfiguration : ChildConfiguration()
+        @Serializable data object SettingsConfiguration : ChildConfiguration()
+        @Serializable data object NotesConfiguration : ChildConfiguration()
     }
 }
 
@@ -65,9 +70,7 @@ class TabDecomposeComponentImpl(
         childStack(
             source = navigation,
             serializer = TabDecomposeComponent.ChildConfiguration.serializer(), // Or null to disable navigation state saving
-            initialConfiguration = TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration(
-                DefinitionsVM.State(word = "owl")
-            ),
+            initialConfiguration = TabDecomposeComponent.ChildConfiguration.DashboardConfiguration(),
             handleBackButton = true, // Pop the back stack on back button press
             childFactory = ::resolveChild,
         )
@@ -77,6 +80,9 @@ class TabDecomposeComponentImpl(
         componentContext: ComponentContext
     ): TabDecomposeComponent.Child = when (configuration) {
         // TODO: refactor
+        is TabDecomposeComponent.ChildConfiguration.DashboardConfiguration -> TabDecomposeComponent.Child.Dashboard(
+            vm = childComponentFactory(componentContext, configuration) as DashboardDecomposeComponent
+        )
         is TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> TabDecomposeComponent.Child.Definitions(
             vm = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
         )
@@ -94,7 +100,12 @@ class TabDecomposeComponentImpl(
         )
     }
 
-    override fun openDefinitions() = navigation.popToRoot()
+    override fun openDashboard() = navigation.popToRoot()
+
+    override fun openDefinitions() =
+        navigation.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration(
+            DefinitionsVM.State(word = "owl")
+        ))
 
     override fun openCardSets() =
         navigation.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration)

@@ -19,6 +19,8 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 
 @Composable
 fun <T> LoadingStatusView(
@@ -55,7 +57,7 @@ fun <T> LoadingStatusView(
     modifier: Modifier = Modifier,
     resource: Resource<T>,
     loadingText: String? = null,
-    errorText: String? = null,
+    errorText: String? = StringDesc.Resource(MR.strings.error_default_loading_error).localized(),
     tryAgainBlock: (() -> Unit)? = null
 ) {
     val data = resource.data()

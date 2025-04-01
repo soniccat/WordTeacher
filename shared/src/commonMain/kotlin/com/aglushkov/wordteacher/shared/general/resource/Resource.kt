@@ -274,6 +274,7 @@ fun Resource<*>?.isLoadedOrLoading(): Boolean {
 fun <T> Resource<T>.on(
     uninitialized: (() -> Unit)? = null,
     data: ((T) -> Unit)? = null,
+    loadingOrError: ((Throwable?) -> Unit)? = null,
     loaded: ((T) -> Unit)? = null,
     loading: ((T?) -> Unit)? = null,
     error: ((Throwable) -> Unit)? = null
@@ -282,8 +283,18 @@ fun <T> Resource<T>.on(
     val onDataCalled = data?.let { onData(data) } ?: false
     if (!onDataCalled) {
         loaded?.let { onLoaded(block = it) }
-        loading?.let { onLoading(it) }
-        error?.let { onError(it) }
+
+        val onLoadingOrErrorCalled = if (isLoading() || isError()) {
+            loadingOrError?.invoke(this.asError()?.throwable)
+            true
+        } else {
+            false
+        }
+
+        if (!onLoadingOrErrorCalled) {
+            loading?.let { onLoading(it) }
+            error?.let { onError(it) }
+        }
     }
 }
 

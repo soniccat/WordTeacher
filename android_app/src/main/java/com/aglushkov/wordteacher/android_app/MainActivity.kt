@@ -48,6 +48,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.views.CardSetJsonImportUIDialog
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
+import com.aglushkov.wordteacher.shared.features.dashboard.DashboardUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
@@ -75,9 +76,10 @@ import dev.icerock.moko.resources.desc.StringDesc
 
 class MainActivity : AppCompatActivity(), Router {
     private val bottomBarTabs = listOf(
-        ScreenTab.Definitions,
+        ScreenTab.Dashboard,
         ScreenTab.CardSets,
         ScreenTab.Articles,
+        ScreenTab.Definitions,
         ScreenTab.Settings
     )
 
@@ -293,6 +295,11 @@ class MainActivity : AppCompatActivity(), Router {
                 animation = stackAnimation(slide())
             ) {
                 when (val instance = it.instance) {
+                    is TabDecomposeComponent.Child.Dashboard -> DashboardUI(
+                        vm = instance.vm.apply {
+                            router = mainDecomposeComponent
+                        }
+                    )
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
                         vm = instance.vm.apply {
                             router = object : DefinitionsRouter {
@@ -430,6 +437,7 @@ class MainActivity : AppCompatActivity(), Router {
                     selected = isSelected,
                     onClick = {
                         when (tab) {
+                            is ScreenTab.Dashboard -> component.openDashboard()
                             is ScreenTab.Definitions -> component.openDefinitions()
                             is ScreenTab.CardSets -> component.openCardSets()
                             is ScreenTab.Articles -> component.openArticles()
@@ -471,11 +479,12 @@ class MainActivity : AppCompatActivity(), Router {
 }
 
 sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
-    object Definitions : ScreenTab(MR.strings.tab_definitions.resourceId, R.drawable.ic_field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
-    object CardSets : ScreenTab(MR.strings.tab_learning.resourceId, R.drawable.ic_learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
-    object Articles : ScreenTab(MR.strings.tab_articles.resourceId, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
-    object Settings : ScreenTab(MR.strings.tab_settings.resourceId, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
-    object Notes : ScreenTab(MR.strings.tab_notes.resourceId, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
+    data object Dashboard : ScreenTab(MR.strings.dashboard_title.resourceId, MR.images.tab_dashboard_24.drawableResId, TabDecomposeComponent.ChildConfiguration.DashboardConfiguration::class.java)
+    data object Definitions : ScreenTab(MR.strings.tab_definitions.resourceId, R.drawable.ic_field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+    data object CardSets : ScreenTab(MR.strings.tab_learning.resourceId, R.drawable.ic_learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
+    data object Articles : ScreenTab(MR.strings.tab_articles.resourceId, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
+    data object Settings : ScreenTab(MR.strings.tab_settings.resourceId, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
+    data object Notes : ScreenTab(MR.strings.tab_notes.resourceId, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }
 
 const val EXTRA_ARTICLE_ID = "articleId"
