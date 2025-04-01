@@ -32,6 +32,7 @@ class DashboardModule {
         spaceDashboardService: SpaceDashboardService,
         cardSetsRepository: CardSetsRepository,
         articlesRepository: ArticlesRepository,
+        idGenerator: IdGenerator,
         analytics: Analytics,
     ) = DashboardDecomposeComponent(
         componentContext,
@@ -39,6 +40,7 @@ class DashboardModule {
         spaceDashboardService,
         cardSetsRepository,
         articlesRepository,
+        idGenerator,
         analytics,
     )
 }

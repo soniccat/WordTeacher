@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.features.dashboard.DashboardDecomposeCom
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsModule
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -48,5 +49,6 @@ interface DashboardDependencies {
     fun spaceDashboardService(): SpaceDashboardService
     fun cardSetsRepository(): CardSetsRepository
     fun articlesRepository(): ArticlesRepository
+    fun idGenerator(): IdGenerator
     fun analytics(): Analytics
 }

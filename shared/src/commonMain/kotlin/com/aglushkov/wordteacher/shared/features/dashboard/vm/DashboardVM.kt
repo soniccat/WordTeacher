@@ -8,8 +8,10 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRoute
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewItem
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.Clearable
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
 import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepository
@@ -65,6 +67,7 @@ open class DashboardVMIMpl(
     spaceDashboardService: SpaceDashboardService,
     private val cardSetsRepository: CardSetsRepository,
     private val articlesRepository: ArticlesRepository,
+    private val idGenerator: IdGenerator,
     private val analytics: Analytics,
 ): ViewModel(), DashboardVM {
     override var router: DashboardVM.Router? = null
@@ -183,6 +186,11 @@ open class DashboardVMIMpl(
             }
         )
 
+        generateIds(resultList)
         return Resource.Loaded(resultList)
+    }
+
+    private fun generateIds(items: MutableList<BaseViewItem<*>>) {
+        generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator)
     }
 }

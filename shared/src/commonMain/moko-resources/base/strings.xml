@@ -139,7 +139,7 @@
     <string name="dictconfigs_yandex_param_require_matching_parts">Enable a filter that requires matching parts of speech for the search word and translation</string>
     <string name="dictconfigs_settings_dsl_title">Dsl file</string>
 
-    <string name="dashboard_title">Dashboard</string>
+    <string name="dashboard_title">Home</string>
     <string name="dashboard_headline_title">Articles for you:</string>
     <string name="dashboard_cardsets_title">New CardSets:</string>
 
