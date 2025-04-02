@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.features.dashboard.vm
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
@@ -59,6 +60,7 @@ interface DashboardVM: Clearable {
 
     interface Router {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
+        fun openCardSet(state: CardSetVM.State)
     }
 
     @Serializable
@@ -126,7 +128,7 @@ open class DashboardVMIMpl(
     }
 
     override fun onCardSetClicked(item: RemoteCardSetViewItem) {
-
+        router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId))
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {

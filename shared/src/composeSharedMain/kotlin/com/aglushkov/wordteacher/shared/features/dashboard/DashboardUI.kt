@@ -37,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetSearchItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
@@ -141,7 +142,7 @@ fun dashboardItem(
                 },
             secondaryText = {
                 item.description?.let {
-                    Text(text = it, maxLines = 2)
+                    Text(text = it, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 }
             }
         ) {
