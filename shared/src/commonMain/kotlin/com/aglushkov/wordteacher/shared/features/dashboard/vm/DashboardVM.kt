@@ -9,7 +9,10 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewI
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.WebLinkOpener
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -49,16 +52,21 @@ interface DashboardVM: Clearable {
 
     fun refresh()
     fun onHeadlineCategoryChanged(index: Int)
+    fun onHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onCardSetClicked(item: RemoteCardSetViewItem)
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+    fun onExpandClicked(item: DashboardExpandViewItem)
 
     interface Router {
+        fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
     }
 
     @Serializable
     data class State (
         val lastLoadDate: Instant? = null,
-        val selectedCategoryIndex: Int = 0
+        val selectedCategoryIndex: Int = 0,
+        val isHeadlineBlockExpanded: Boolean = false,
+        val isCardSetBlockExpanded: Boolean = false,
     )
 }
 
@@ -67,7 +75,9 @@ open class DashboardVMIMpl(
     spaceDashboardService: SpaceDashboardService,
     private val cardSetsRepository: CardSetsRepository,
     private val articlesRepository: ArticlesRepository,
+    private val webLinkOpener: WebLinkOpener,
     private val idGenerator: IdGenerator,
+    private val timeSource: TimeSource,
     private val analytics: Analytics,
 ): ViewModel(), DashboardVM {
     override var router: DashboardVM.Router? = null
@@ -89,17 +99,30 @@ open class DashboardVMIMpl(
     ).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Loading())
 
     init {
-        viewModelScope.launch {
-            dashboardRepository.load(Unit)
-        }
+        loadDashboard()
     }
 
     override fun refresh() {
-        dashboardRepository.load(Unit)
+        loadDashboard()
+    }
+
+    private fun loadDashboard() {
+        viewModelScope.launch {
+            dashboardRepository.load(Unit).waitUntilDone().onData {
+                stateFlow.update {
+                    it.copy(lastLoadDate = timeSource.timeInstant())
+                }
+            }
+        }
     }
 
     override fun onHeadlineCategoryChanged(index: Int) {
         stateFlow.update { it.copy(selectedCategoryIndex = index) }
+    }
+
+    override fun onHeadlineClicked(item: DashboardHeadlineViewItem) {
+//        router?.openAddArticle(item.link, true)
+        webLinkOpener.open(item.link)
     }
 
     override fun onCardSetClicked(item: RemoteCardSetViewItem) {
@@ -108,6 +131,23 @@ open class DashboardVMIMpl(
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
         return StringDesc.Resource(MR.strings.error_default_loading_error)
+    }
+
+    override fun onExpandClicked(item: DashboardExpandViewItem) {
+        stateFlow.update {
+            it.copy(
+                isHeadlineBlockExpanded = if (item.firstItem() == DashboardExpandViewItem.ExpandType.Headline) {
+                    !it.isHeadlineBlockExpanded
+                } else {
+                    it.isHeadlineBlockExpanded
+                },
+                isCardSetBlockExpanded = if (item.firstItem() == DashboardExpandViewItem.ExpandType.CardSets) {
+                    !it.isCardSetBlockExpanded
+                } else {
+                    it.isCardSetBlockExpanded
+                },
+            )
+        }
     }
 
     private fun buildViewItems(
@@ -141,7 +181,13 @@ open class DashboardVMIMpl(
                             selectedIndex = state.selectedCategoryIndex,
                         )
                     )
-                    selectedCategory.headlines.onEach { headline ->
+
+                    val resultHeadlines = if (state.isHeadlineBlockExpanded) {
+                        selectedCategory.headlines
+                    } else {
+                        selectedCategory.headlines.take(3)
+                    }
+                    resultHeadlines.onEach { headline ->
                         // TODO: filter by already added articles by link
                         resultList.add(
                             DashboardHeadlineViewItem(
@@ -151,9 +197,16 @@ open class DashboardVMIMpl(
                                 sourceName = headline.sourceName,
                                 sourceCategory = headline.sourceCategory,
                                 date = headline.date,
+                                link = headline.link,
                             )
                         )
                     }
+                    resultList.add(
+                        DashboardExpandViewItem(
+                            expandType = DashboardExpandViewItem.ExpandType.Headline,
+                            isExpanded = state.isHeadlineBlockExpanded,
+                        )
+                    )
                 }
 
                 if (it.newCardSetBlock.cardSets.isNotEmpty()) {
@@ -162,7 +215,12 @@ open class DashboardVMIMpl(
                             ResourceStringDesc(MR.strings.dashboard_cardsets_title)
                         )
                     )
-                    it.newCardSetBlock.cardSets.onEach { cardSet ->
+                    val resultCardSets = if (state.isCardSetBlockExpanded) {
+                        it.newCardSetBlock.cardSets
+                    } else {
+                        it.newCardSetBlock.cardSets.take(3)
+                    }
+                    resultCardSets.onEach { cardSet ->
                         // TODO: filter by already added articles by terms
                         resultList.add(
                             RemoteCardSetViewItem(
@@ -173,6 +231,12 @@ open class DashboardVMIMpl(
                             )
                         )
                     }
+                    resultList.add(
+                        DashboardExpandViewItem(
+                            expandType = DashboardExpandViewItem.ExpandType.CardSets,
+                            isExpanded = state.isCardSetBlockExpanded,
+                        )
+                    )
                 }
             },
             loading = {

@@ -51,7 +51,7 @@ interface MainDecomposeComponent:
     val childStack: Value<ChildStack<ChildConfiguration, Child>>
     val dialogsStateFlow: Value<ChildStack<ChildConfiguration, Child>>
 
-    fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
+    override fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
 //    fun popDialog(inner: Any)
     fun popDialog(config: ChildConfiguration, onComplete: (topChild: MainDecomposeComponent.Child) -> Unit = {})
     override fun openArticle(state: ArticleVM.State)

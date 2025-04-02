@@ -49,6 +49,8 @@ interface DashboardDependencies {
     fun spaceDashboardService(): SpaceDashboardService
     fun cardSetsRepository(): CardSetsRepository
     fun articlesRepository(): ArticlesRepository
+    fun webLinkOpener(): WebLinkOpener
     fun idGenerator(): IdGenerator
+    fun timeSource(): TimeSource
     fun analytics(): Analytics
 }
