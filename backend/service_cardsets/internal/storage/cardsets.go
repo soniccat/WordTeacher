@@ -231,23 +231,24 @@ func (m *Storage) ModifiedCardSetsSinceByUserId(
 	ctx context.Context,
 	userId string,
 	lastModificationDate *time.Time,
-	limit int64,
 ) ([]*model.DbCardSet, error) {
-	return m.getCardSets(ctx, &userId, lastModificationDate, limit)
+	return m.getCardSets(ctx, &userId, lastModificationDate, false, 0)
 }
 
 func (m *Storage) ModifiedCardSetsSince(
 	ctx context.Context,
 	lastModificationDate *time.Time,
+	onlyAvailableInSearch bool,
 	limit int64,
 ) ([]*model.DbCardSet, error) {
-	return m.getCardSets(ctx, nil, lastModificationDate, limit)
+	return m.getCardSets(ctx, nil, lastModificationDate, onlyAvailableInSearch, limit)
 }
 
 func (m *Storage) getCardSets(
 	ctx context.Context,
 	userId *string,
 	lastModificationDate *time.Time,
+	onlyAvailableInSearch bool,
 	limit int64,
 ) ([]*model.DbCardSet, error) {
 	var mongoUserId *primitive.ObjectID
@@ -268,6 +269,10 @@ func (m *Storage) getCardSets(
 	if lastModificationDate != nil {
 		dbTime := primitive.NewDateTimeFromTime(*lastModificationDate)
 		filter["modificationDate"] = bson.M{"$gt": dbTime}
+	}
+
+	if onlyAvailableInSearch {
+		filter["isAvailableInSearch"] = true
 	}
 
 	if mongoUserId != nil {

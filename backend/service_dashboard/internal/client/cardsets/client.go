@@ -30,7 +30,10 @@ func New(logger *logger.Logger, grpcClient cardsetsgrpc.CardSetsClient) Client {
 func (c *Client) GetCardSets(ctx context.Context, limit int64) (chan CardSetResult, error) {
 	grpcCardSetStream, err := c.grpcClient.GetCardSets(
 		ctx,
-		&cardsetsgrpc.GetCardSetsIn{Limit: tools.Ptr(limit)},
+		&cardsetsgrpc.GetCardSetsIn{
+			Limit:                 tools.Ptr(limit),
+			OnlyAvailableInSearch: tools.Ptr(true),
+		},
 		grpc.EmptyCallOption{},
 	)
 

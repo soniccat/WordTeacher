@@ -20,6 +20,14 @@ func PtrInt64Value(x *int64) int64 {
 	return *x
 }
 
+func PtrBoolValue(x *bool) bool {
+	if x == nil {
+		return false
+	}
+
+	return *x
+}
+
 func ParseApiDate(ctx context.Context, date string) (time.Time, error) {
 	t, err := time.Parse(time.RFC3339Nano, date)
 	return t, logger.WrapError(ctx, err)

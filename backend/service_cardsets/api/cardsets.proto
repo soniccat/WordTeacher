@@ -29,6 +29,7 @@ service CardSets {
 message GetCardSetsIn {
   optional string sinceDate = 1;
 	optional int64 limit = 2;
+	optional bool onlyAvailableInSearch = 3;
 }
 
 message GetCardSetIn {
