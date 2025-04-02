@@ -10,10 +10,10 @@
     "url": "/d/edipdzkb75logf/services",
     "expires": "0001-01-01T00:00:00Z",
     "created": "2024-04-28T14:30:15Z",
-    "updated": "2025-03-23T10:38:54Z",
+    "updated": "2025-04-02T18:32:28Z",
     "updatedBy": "admin",
     "createdBy": "Anonymous",
-    "version": 9,
+    "version": 11,
     "hasAcl": false,
     "isFolder": false,
     "folderId": 0,
@@ -156,7 +156,7 @@
               "uid": "cdi1al0jre0aoc"
             },
             "editorMode": "code",
-            "expr": "label_replace(\n    label_replace(\n        label_replace(\n            quantile_over_time(\n                0.95,\n                {service_name=\"nginx\", filename = \"/var/log/nginx/access_log\"} | status >= 200 and status < 300 | json | unwrap request_time [$__auto]\n            ) by (request_uri), \n            \"request_uri\", \n            \"/api/v3/dict/words*\", \n            \"request_uri\", \n            \"/api/v3/dict/words.*\"\n        ),\n        \"request_uri\", \n        \"/api/cardsets/search*\", \n        \"request_uri\", \n        \"/api/cardsets/search.*\"\n    ),\n\"request_uri\", \n\"/api/v2/dict/words/textsearch/*\", \n\"request_uri\", \n\"/api/v2/dict/words/textsearch/.*\"  \n)",
+            "expr": "label_replace(\n    label_replace(\n        label_replace(\n            label_replace(\n                quantile_over_time(\n                    0.95,\n                    {service_name=\"nginx\", filename = \"/var/log/nginx/access_log\"} | status >= 200 and status < 300 | json | unwrap request_time [$__auto]\n                ) by (request_uri), \n                \"request_uri\", \n                \"/api/v3/dict/words*\", \n                \"request_uri\", \n                \"/api/v3/dict/words.*\"\n            ),\n            \"request_uri\", \n            \"/api/cardsets/search*\", \n            \"request_uri\", \n            \"/api/cardsets/search.*\"\n        ),\n        \"request_uri\", \n        \"/api/v2/dict/words/textsearch/*\", \n        \"request_uri\", \n        \"/api/v2/dict/words/textsearch/.*\"  \n    ),\n    \"request_uri\", \n    \"/api/cardsets/*\", \n    \"request_uri\", \n    \"/api/cardsets/.*\"  \n)",
             "hide": false,
             "queryType": "range",
             "refId": "B"
@@ -1275,7 +1275,7 @@
             "refId": "A"
           }
         ],
-        "title": "cardsets service log",
+        "title": "dashboard service log",
         "type": "timeseries"
       },
       {
@@ -1314,7 +1314,7 @@
             "refId": "A"
           }
         ],
-        "title": "cardsetsearch service log",
+        "title": "dashboard service log",
         "type": "logs"
       },
       {
@@ -2199,7 +2199,7 @@
     "timezone": "browser",
     "title": "Services",
     "uid": "edipdzkb75logf",
-    "version": 9,
+    "version": 11,
     "weekStart": ""
   }
 }
