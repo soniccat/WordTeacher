@@ -72,8 +72,8 @@ private fun showSettingsItem(
         )
     }
     is SettingsViewTextItem -> {
-        CustomListItem (
-            Modifier.padding(
+        CustomListItem(
+            contentPadding = PaddingValues(
                 start = LocalDimens.current.contentPadding,
                 end = LocalDimens.current.contentPadding,
                 bottom = if (item.withBottomPadding) {
@@ -132,7 +132,7 @@ private fun showSettingsItem(
         }
     }
     is SettingsOpenDictConfigsItem -> {
-        ListItem(
+        CustomListItem(
             modifier = Modifier
                 .clickable {
                     vm.router?.openDictConfigs()
@@ -144,13 +144,12 @@ private fun showSettingsItem(
                     tint = LocalContentColor.current
                 )
             },
-            text = {
-                Text(
-                    stringResource(MR.strings.settings_dictconfigs),
-                    style = LocalAppTypography.current.settingsTitle
-                )
-            },
-        )
+        ){
+            Text(
+                stringResource(MR.strings.settings_dictconfigs),
+                style = LocalAppTypography.current.settingsTitle
+            )
+        }
     }
     is SettingsWordFrequencyUploadFileItem -> {
         Button(
@@ -165,7 +164,8 @@ private fun showSettingsItem(
             modifier = Modifier
                 .clickable {
                     vm.onGetWordFromClipboardChanged(!item.isEnabled)
-                }.padding(
+                },
+            contentPadding = PaddingValues(
                     start = LocalDimens.current.contentPadding,
                     end = LocalDimens.current.contentPadding,
                     bottom = LocalDimens.current.contentPadding
@@ -184,11 +184,12 @@ private fun showSettingsItem(
             modifier = Modifier
                 .clickable {
                     vm.onLoggingIsEnabledChanged()
-                }.padding(
-                    start = LocalDimens.current.contentPadding,
-                    end = LocalDimens.current.contentPadding,
-                    bottom = LocalDimens.current.contentPadding
-                ),
+                },
+            contentPadding = PaddingValues(
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+                bottom = LocalDimens.current.contentPadding
+            ),
             trailing = {
                 Checkbox(
                     checked = item.isEnabled,
@@ -234,11 +235,12 @@ private fun showSettingsItem(
             modifier = Modifier
                 .clickable {
                     vm.onPrivacyPolicyClicked()
-                }.padding(
-                    start = LocalDimens.current.contentPadding,
-                    end = LocalDimens.current.contentPadding,
-                    bottom = LocalDimens.current.contentPadding
-                ),
+                },
+            contentPadding = PaddingValues(
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+                bottom = LocalDimens.current.contentPadding
+            ),
             content = {
                 Text(stringResource(MR.strings.settings_open_privacy_policy))
             },

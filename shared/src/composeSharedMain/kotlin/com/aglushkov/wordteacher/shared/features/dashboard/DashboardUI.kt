@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FilterChip
@@ -30,8 +31,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,6 +57,8 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.hasData
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.views.CustomListItem
+import com.aglushkov.wordteacher.shared.general.views.CustomTextListItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.stringResource
@@ -134,20 +139,13 @@ fun dashboardItem(
         }
     }
     is DashboardHeadlineViewItem -> {
-        ListItem(
-            modifier = Modifier
-                .then(modifier)
-                .clickable {
+        CustomTextListItem(
+            modifier = modifier.clickable {
                     vm.onHeadlineClicked(item)
                 },
-            secondaryText = {
-                item.description?.let {
-                    Text(text = it, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                }
-            }
-        ) {
-            Text(text = item.title)
-        }
+            title = item.title,
+            subtitle = item.description,
+        )
     }
     is DashboardExpandViewItem -> {
         Button(
@@ -163,13 +161,17 @@ fun dashboardItem(
                 end = 8.dp,
                 bottom = 4.dp
             ),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.primarySurface
+            )
         ) {
             Text(
                 if (item.isExpanded) {
                     ResourceStringDesc(MR.strings.default_collapse).localized()
                 } else {
                     ResourceStringDesc(MR.strings.default_expand).localized()
-                }
+                },
+                color = contentColorFor(MaterialTheme.colors.primarySurface)
             )
         }
 

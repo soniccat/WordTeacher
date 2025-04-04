@@ -194,7 +194,12 @@ open class CardSetVMImpl(
                 cardId = card.id,
                 frequencyLevelAndRatio = gradationLevelAndRatio,
             )
-            cardViewItems += WordTranscriptionViewItem(card.transcription.orEmpty(), cardId = card.id)
+            if (!state.value.isRemoteCardSet || !card.transcription.isNullOrEmpty()) {
+                cardViewItems += WordTranscriptionViewItem(
+                    card.transcription.orEmpty(),
+                    cardId = card.id
+                )
+            }
             cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech, cardId = card.id)
 
             if (card.definitions.isEmpty()) {

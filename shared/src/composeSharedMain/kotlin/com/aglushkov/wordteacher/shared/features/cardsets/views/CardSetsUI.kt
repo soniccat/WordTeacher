@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
@@ -255,9 +256,9 @@ private fun CardSetItemView(
 //        Box(
 //            modifier = Modifier.fillMaxWidth()
 //        ) {
-            ListItem(
-                text = { Text(item.name) },
-                secondaryText = { Text(item.date) },
+            CustomTextListItem(
+                title = item.name,
+                subtitle = item.date,
                 trailing = {
                     val side = 30.dp
                     Box(
@@ -289,31 +290,28 @@ fun CardSetSearchItemView(
     onClick: () -> Unit = {},
     onAdded: (() -> Unit)? = null,
 ) {
-    Box(
+    CustomTextListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
                 onClick()
-            }
-    ) {
-        ListItem(
-            text = { Text(item.name) },
-            secondaryText = { Text(item.terms.joinToString(), maxLines = 2) },
-            trailing = onAdded?.let { onAdded ->
-                {
-                    Box(modifier = Modifier.size(24.dp)) {
-                        if (item.isLoading) {
-                            CircularProgressIndicator()
-                        } else {
-                            AddIcon {
-                                onAdded()
-                            }
+            },
+        title = item.name,
+        subtitle = item.terms.joinToString().takeIf { it.isNotEmpty() },
+        trailing = onAdded?.let { onAdded ->
+            {
+                Box(modifier = Modifier.size(24.dp)) {
+                    if (item.isLoading) {
+                        CircularProgressIndicator()
+                    } else {
+                        AddIcon {
+                            onAdded()
                         }
                     }
                 }
             }
-        )
-    }
+        }
+    )
 }
 
 //@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)

@@ -23,6 +23,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -245,7 +246,7 @@ fun CardSetViewItems(
                             !isEditable,
                             vm,
                         )
-                    }
+                    },
                 )
             }
         }
@@ -603,9 +604,13 @@ private fun CardTextField(
         modifier = modifier,
         value = textState,
         placeholder = placeholder,
-        textStyle = textStyle.copy(
-            color = LocalContentColor.current
-        ),
+        textStyle = if (!textStyle.color.isSpecified) {
+            textStyle.copy(
+                color = LocalContentColor.current
+            )
+        } else {
+            textStyle
+        },
         focusManager = focusManager,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         readOnly = readOnly,

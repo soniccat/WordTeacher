@@ -142,9 +142,10 @@ private fun showDictConfigsItem(
                 vm.onDictDeleted(item)
             }
         ) {
-            ListItem(
-                text = { Text(item.firstItem(), style = LocalAppTypography.current.settingsText) }
-            )
+            CustomListItem {
+                Text(item.firstItem(), style = LocalAppTypography.current.settingsText)
+            }
+
         }
     }
     is ConfigLoadingViewItem -> {
@@ -204,14 +205,14 @@ private fun YandexConfigViewItemUI(
                 vm.onYandexConfigChanged(item, null, it, null)
             }
             CustomListItem(
-                modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding)
-                    .clickable {
+                modifier = Modifier.clickable {
                         vm.onYandexConfigChanged(
                             item, null, null, item.settings.copy(
                                 applyFamilySearchFilter = !item.settings.applyFamilySearchFilter
                             )
                         )
                     },
+                contentPadding = PaddingValues(bottom = LocalDimens.current.contentPadding),
                 trailing = {
                     Checkbox(
                         checked = item.settings.applyFamilySearchFilter,
@@ -221,14 +222,14 @@ private fun YandexConfigViewItemUI(
                 content = { Text(stringResource(MR.strings.dictconfigs_yandex_param_family_search_filter)) },
             )
             CustomListItem(
-                modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding)
-                    .clickable {
-                        vm.onYandexConfigChanged(
-                            item, null, null, item.settings.copy(
-                                enableSearchingByWordForm = !item.settings.enableSearchingByWordForm
-                            )
+                modifier = Modifier.clickable {
+                    vm.onYandexConfigChanged(
+                        item, null, null, item.settings.copy(
+                            enableSearchingByWordForm = !item.settings.enableSearchingByWordForm
                         )
-                    },
+                    )
+                },
+                contentPadding = PaddingValues(bottom = LocalDimens.current.contentPadding),
                 trailing = {
                     Checkbox(
                         checked = item.settings.enableSearchingByWordForm,
@@ -238,7 +239,7 @@ private fun YandexConfigViewItemUI(
                 content = { Text(stringResource(MR.strings.dictconfigs_yandex_param_search_by_word_form)) },
             )
             CustomListItem(
-                modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding)
+                modifier = Modifier
                     .clickable {
                         vm.onYandexConfigChanged(
                             item, null, null, item.settings.copy(
@@ -246,6 +247,7 @@ private fun YandexConfigViewItemUI(
                             )
                         )
                     },
+                contentPadding = PaddingValues(bottom = LocalDimens.current.contentPadding),
                 trailing = {
                     Checkbox(
                         checked = item.settings.enableFilterThatRequiresMatchingPartsOfSpeechForSearchWordAndTranslation,

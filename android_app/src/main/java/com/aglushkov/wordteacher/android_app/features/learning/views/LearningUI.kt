@@ -415,17 +415,20 @@ fun RowScope.OptionButton(
     vm: LearningVM,
     option: String
 ) {
-    OutlinedButton(
+    Button(
         modifier = Modifier
             .weight(1.0f)
             .padding(dimensionResource(id = R.dimen.learning_testOption_margin)),
         onClick = {
             vm.onTestOptionPressed(option)
-        }
+        },
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.primarySurface
+        )
     ) {
         Text(
             text = option,
-            color = MaterialTheme.colors.secondary
+            color = contentColorFor(MaterialTheme.colors.primarySurface)
         )
     }
 }

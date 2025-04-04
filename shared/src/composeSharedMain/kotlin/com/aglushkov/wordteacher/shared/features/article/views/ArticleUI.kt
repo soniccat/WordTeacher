@@ -470,7 +470,7 @@ private fun ArticleParagraphView(
                     }
                 },
             fontSize = ArticleFontSize,
-            lineHeight = 2.em,
+            lineHeight = 1.5.em,
             style = LocalAppTypography.current.wordDefinition.copy(
                 lineHeightStyle = LineHeightStyle(
                     alignment = LineHeightStyle.Alignment.Bottom, // align bottom to simplify annotation frame calculation

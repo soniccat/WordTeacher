@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.general
 
 import androidx.compose.material.Colors
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
@@ -22,7 +24,10 @@ val materialTypography = Typography(
 )
 
 data class AppTypography(
-    var wordDefinitionTitle: TextStyle = materialTypography.h5,
+    var listItemTitle: TextStyle = materialTypography.subtitle1,
+    var listItemSubtitle: TextStyle = TextStyle.Default,
+
+    var wordDefinitionTitle: TextStyle = TextStyle.Default,
     var wordDefinitionTranscripton: TextStyle = materialTypography.body2,
     var wordDefinitionProvidedBy: TextStyle = TextStyle.Default,
     var wordDefinitionPartOfSpeech: TextStyle = TextStyle.Default,
@@ -32,7 +37,7 @@ data class AppTypography(
     var wordExample: TextStyle = materialTypography.body2,
     var wordDefinitionSubHeader: TextStyle = materialTypography.subtitle2,
 
-    var articleTitle: TextStyle = wordDefinitionTitle,
+    var articleTitle: TextStyle = materialTypography.h5,
     var articleDate: TextStyle = TextStyle.Default,
     var articleText: TextStyle = materialTypography.body1,
     var articleSideSheetSection: TextStyle = materialTypography.h5,
@@ -42,8 +47,8 @@ data class AppTypography(
     var noteDate: TextStyle = TextStyle.Default,
     var notePlaceholder: TextStyle = TextStyle.Default,
 
-    var learningSessionTerm: TextStyle = wordDefinitionTitle,
-    var learningSessionProgress: TextStyle = wordDefinitionTitle,
+    var learningSessionTerm: TextStyle = materialTypography.h5,
+    var learningSessionProgress: TextStyle = materialTypography.h5,
     var learningHint: TextStyle = materialTypography.body2,
 
     var dictConfigTitle: TextStyle = materialTypography.h5,
@@ -55,8 +60,11 @@ data class AppTypography(
 ) {
     @Composable
     fun initStylesFromResources(colors: Colors): AppTypography {
+        listItemSubtitle = materialTypography.body2.copy(color = colors.onBackground.copy(alpha = ContentAlpha.medium))
+
+        wordDefinitionTitle = materialTypography.h5.copy(color = colors.secondary)
         wordDefinitionProvidedBy = materialTypography.body2.copy(color = colorResource(MR.colors.word_provided_by))
-        wordDefinitionPartOfSpeech = materialTypography.subtitle2.copy(color = colorResource(MR.colors.word_partOfSpeech))
+        wordDefinitionPartOfSpeech = materialTypography.subtitle2//.copy(color = colorResource(MR.colors.word_partOfSpeech))
         articleDate = wordDefinitionProvidedBy
         noteDate = wordDefinitionProvidedBy
         notePlaceholder = noteText.copy(color = colors.secondary)
