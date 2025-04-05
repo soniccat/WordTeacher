@@ -300,13 +300,13 @@ fun CardSetSearchItemView(
         subtitle = item.terms.joinToString().takeIf { it.isNotEmpty() },
         trailing = onAdded?.let { onAdded ->
             {
-                Box(modifier = Modifier.size(24.dp)) {
-                    if (item.isLoading) {
+                if (item.isLoading) {
+                    Box(modifier = Modifier.padding(LocalDimens.current.halfOfContentPadding).size(24.dp)) {
                         CircularProgressIndicator()
-                    } else {
-                        AddIcon {
-                            onAdded()
-                        }
+                    }
+                } else {
+                    AddIcon(style = AddIconStyle.Medium) {
+                        onAdded()
                     }
                 }
             }

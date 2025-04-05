@@ -54,8 +54,14 @@ fun CustomListItem(
     trailing: @Composable (BoxScope.() -> Unit)? = null,
     secondaryContent: (@Composable () -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(
-        horizontal = LocalDimens.current.contentPadding,
-        vertical = 8.dp,
+        start = LocalDimens.current.contentPadding,
+        top = LocalDimens.current.halfOfContentPadding,
+        end = if (trailing == null) {
+            LocalDimens.current.contentPadding
+        } else {
+            LocalDimens.current.halfOfContentPadding
+        },
+        bottom = LocalDimens.current.halfOfContentPadding
     ),
     content: @Composable () -> Unit
 ) {
@@ -80,9 +86,7 @@ fun CustomListItem(
         }
         if (trailing != null) {
             Box(
-                Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(start = LocalDimens.current.contentPadding)
+                Modifier.align(Alignment.Top)
             ) { trailing() }
         }
     }

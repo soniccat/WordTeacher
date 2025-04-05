@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.dp
 
 data class Dimens(
     val contentPadding: Dp = 16.dp,
+    val halfOfContentPadding: Dp = 8.dp,
     val indentSmall: Dp = contentPadding,
 
     val definitionsSearchHorizontalMargin: Dp = contentPadding,

@@ -53,6 +53,7 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
+import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.OutlinedTextFieldWithError
 import com.aglushkov.wordteacher.shared.res.MR
@@ -197,16 +198,21 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                     color = MaterialTheme.colors.secondary
                 )
                 if (link.canImport) {
-                    Icon(
-                        painterResource(MR.images.download_for_offline),
-                        null,
-                        modifier = Modifier
-                            .padding(top = 6.dp)
-                            .clickable {
+                    DownloadForOfflineButton(
+                        modifier = Modifier.clickable {
                             vm.onImportArticleClicked(linkString)
-                        },
-                        tint = MaterialTheme.colors.secondary
+                        }
                     )
+//                    Icon(
+//                        painterResource(MR.images.download_for_offline),
+//                        null,
+//                        modifier = Modifier
+//                            .padding(top = 6.dp)
+//                            .clickable {
+//                            vm.onImportArticleClicked(linkString)
+//                        },
+//                        tint = MaterialTheme.colors.secondary
+//                    )
                 }
             }
         }

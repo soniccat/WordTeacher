@@ -54,6 +54,7 @@ interface DashboardVM: Clearable {
     fun refresh()
     fun onHeadlineCategoryChanged(index: Int)
     fun onHeadlineClicked(item: DashboardHeadlineViewItem)
+    fun onAddHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onCardSetClicked(item: RemoteCardSetViewItem)
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onExpandClicked(item: DashboardExpandViewItem)
@@ -123,8 +124,11 @@ open class DashboardVMIMpl(
     }
 
     override fun onHeadlineClicked(item: DashboardHeadlineViewItem) {
-//        router?.openAddArticle(item.link, true)
         webLinkOpener.open(item.link)
+    }
+
+    override fun onAddHeadlineClicked(item: DashboardHeadlineViewItem) {
+        router?.openAddArticle(item.link, true)
     }
 
     override fun onCardSetClicked(item: RemoteCardSetViewItem) {

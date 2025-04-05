@@ -9,44 +9,21 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 
-enum class AddIconStyle{
-    Small,
-    Medium
-}
-
 @Composable
-fun AddIcon(
+fun DownloadForOfflineButton(
     modifier: Modifier = Modifier,
-    style: AddIconStyle = AddIconStyle.Small,
     contentPadding: PaddingValues = PaddingValues(
-        if (style == AddIconStyle.Small) {
-            4.dp
-        } else {
-            LocalDimens.current.halfOfContentPadding
-        }
-    ),
-    onClicked: () -> Unit
+        LocalDimens.current.halfOfContentPadding
+    )
 ) {
     Icon(
-        painter = painterResource(
-            if (style == AddIconStyle.Small) {
-                MR.images.plus_small
-            } else {
-                MR.images.plus_medium
-            }
-        ),
-        contentDescription = null,
-        modifier = modifier
-            .clip(CircleShape)
-            .clickable {
-                onClicked()
-            }
-            .padding(contentPadding),
+        painterResource(MR.images.download_for_offline),
+        null,
+        modifier = Modifier.clip(CircleShape).then(modifier).padding(contentPadding),
         tint = MaterialTheme.colors.secondary
     )
 }

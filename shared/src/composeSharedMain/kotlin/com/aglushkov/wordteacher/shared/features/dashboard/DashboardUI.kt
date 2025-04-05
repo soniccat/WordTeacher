@@ -59,6 +59,7 @@ import com.aglushkov.wordteacher.shared.general.resource.hasData
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.CustomTextListItem
+import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.stringResource
@@ -143,6 +144,13 @@ fun dashboardItem(
             modifier = modifier.clickable {
                     vm.onHeadlineClicked(item)
                 },
+            trailing = {
+                DownloadForOfflineButton(
+                    modifier = Modifier.clickable {
+                        vm.onAddHeadlineClicked(item)
+                    }
+                )
+            },
             title = item.title,
             subtitle = item.description,
         )
