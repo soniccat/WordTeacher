@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
+import com.aglushkov.wordteacher.shared.general.extensions.combine6
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
@@ -30,19 +31,22 @@ import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardResponse
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
 import dev.icerock.moko.resources.desc.ResourceStringDesc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -78,6 +82,8 @@ open class DashboardVMIMpl(
     spaceDashboardService: SpaceDashboardService,
     private val cardSetsRepository: CardSetsRepository,
     private val articlesRepository: ArticlesRepository,
+    private val readHeadlineRepository: ReadHeadlineRepository,
+    private val readCardSetRepository: ReadCardSetRepository,
     private val webLinkOpener: WebLinkOpener,
     private val idGenerator: IdGenerator,
     private val timeSource: TimeSource,
@@ -93,11 +99,13 @@ open class DashboardVMIMpl(
             spaceDashboardService.load().toOkResponse()
         }
 
-    override val viewItems = combine(
+    override val viewItems = combine6(
         stateFlow,
         dashboardRepository.stateFlow,
         cardSetsRepository.cardSets,
         articlesRepository.shortArticles,
+        readHeadlineRepository.stateFlow.map { it.data().orEmpty() },
+        readCardSetRepository.stateFlow.map { it.data().orEmpty() },
         ::buildViewItems,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Loading())
 
@@ -124,14 +132,17 @@ open class DashboardVMIMpl(
     }
 
     override fun onHeadlineClicked(item: DashboardHeadlineViewItem) {
+        readHeadlineRepository.put(item.link)
         webLinkOpener.open(item.link)
     }
 
     override fun onAddHeadlineClicked(item: DashboardHeadlineViewItem) {
+        readHeadlineRepository.put(item.link)
         router?.openAddArticle(item.link, true)
     }
 
     override fun onCardSetClicked(item: RemoteCardSetViewItem) {
+        readCardSetRepository.put(item.remoteCardSetId)
         router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId))
     }
 
@@ -161,6 +172,8 @@ open class DashboardVMIMpl(
         dashboardRes: Resource<SpaceDashboardResponse>,
         cardSetsRes: Resource<List<ShortCardSet>>,
         articlesRes: Resource<List<ShortArticle>>,
+        readHeadlineRepository: Set<String>,
+        readCardSetRepository: Set<String>,
     ): Resource<List<BaseViewItem<*>>> {
         if (cardSetsRes.isLoading() && cardSetsRes.data() == null) {
             return Resource.Loading()
@@ -204,6 +217,7 @@ open class DashboardVMIMpl(
                                 sourceCategory = headline.sourceCategory,
                                 date = headline.date,
                                 link = headline.link,
+                                isRead = readHeadlineRepository.contains(headline.link)
                             )
                         )
                     }
@@ -234,6 +248,7 @@ open class DashboardVMIMpl(
                                 cardSet.name,
                                 cardSet.terms,
                                 false,
+                                isRead = readCardSetRepository.contains(cardSet.remoteId)
                             )
                         )
                     }

@@ -16,6 +16,8 @@ import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
@@ -49,6 +51,8 @@ interface DashboardDependencies {
     fun spaceDashboardService(): SpaceDashboardService
     fun cardSetsRepository(): CardSetsRepository
     fun articlesRepository(): ArticlesRepository
+    fun readHeadlineRepository(): ReadHeadlineRepository
+    fun readCardSetRepository(): ReadCardSetRepository
     fun webLinkOpener(): WebLinkOpener
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource

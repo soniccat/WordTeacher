@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextOverflow
@@ -293,6 +294,7 @@ fun CardSetSearchItemView(
     CustomTextListItem(
         modifier = Modifier
             .fillMaxWidth()
+            .alpha(if (item.isRead) {0.5f} else {1.0f})
             .clickable {
                 onClick()
             },

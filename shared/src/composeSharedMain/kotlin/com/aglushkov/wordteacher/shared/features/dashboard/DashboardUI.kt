@@ -40,6 +40,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetSearchItemView
@@ -141,7 +142,9 @@ fun dashboardItem(
     }
     is DashboardHeadlineViewItem -> {
         CustomTextListItem(
-            modifier = modifier.clickable {
+            modifier = modifier
+                .alpha(if (item.isRead) {0.5f} else {1.0f})
+                .clickable {
                     vm.onHeadlineClicked(item)
                 },
             trailing = {

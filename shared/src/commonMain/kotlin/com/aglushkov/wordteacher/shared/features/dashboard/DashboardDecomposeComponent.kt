@@ -12,6 +12,8 @@ import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
@@ -23,6 +25,8 @@ class DashboardDecomposeComponent(
     spaceDashboardService: SpaceDashboardService,
     cardSetsRepository: CardSetsRepository,
     articlesRepository: ArticlesRepository,
+    readHeadlineRepository: ReadHeadlineRepository,
+    readCardSetRepository: ReadCardSetRepository,
     webLinkOpener: WebLinkOpener,
     idGenerator: IdGenerator,
     timeSource: TimeSource,
@@ -35,6 +39,8 @@ class DashboardDecomposeComponent(
     spaceDashboardService,
     cardSetsRepository,
     articlesRepository,
+    readHeadlineRepository,
+    readCardSetRepository,
     webLinkOpener,
     idGenerator,
     timeSource,

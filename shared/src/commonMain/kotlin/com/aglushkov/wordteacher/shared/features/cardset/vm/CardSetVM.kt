@@ -258,7 +258,9 @@ open class CardSetVMImpl(
             makeFocusEvents(card.id, firstDefViewItem, lastDefViewItem, lastExViewItem, lastSynViewItem)
         }
 
-        result += CreateCardViewItem()
+        if (!state.value.isRemoteCardSet) {
+            result += CreateCardViewItem()
+        }
         generateIds(result)
 
         return result

@@ -1,11 +1,11 @@
-package com.aglushkov.wordteacher.shared.repository.worddefinition
+package com.aglushkov.wordteacher.shared.repository.dashboard
 
 import com.aglushkov.wordteacher.shared.repository.history.HistoryRepository
 import okio.FileSystem
 import okio.Path
 
-class WordDefinitionHistoryRepository(
+class ReadHeadlineRepository(
     historyPath: Path,
     fileSystem: FileSystem,
-): HistoryRepository(historyPath, fileSystem, 300) {
+): HistoryRepository(historyPath, fileSystem, 50) {
 }

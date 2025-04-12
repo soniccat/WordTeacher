@@ -21,6 +21,7 @@ class DashboardHeadlineViewItem(
     val sourceCategory: String,
     val date: Instant,
     val link: String,
+    val isRead: Boolean,
 ): BaseViewItem<String>(id, Type) {
     companion object {
         const val Type = 1201

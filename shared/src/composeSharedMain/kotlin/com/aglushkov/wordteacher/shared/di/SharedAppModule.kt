@@ -19,6 +19,8 @@ import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
@@ -443,5 +445,25 @@ class SharedAppModule {
     ): WordDefinitionHistoryRepository {
         val filePath = basePath.div("wordhistory")
         return WordDefinitionHistoryRepository(filePath, fileSystem)
+    }
+
+    @AppComp
+    @Provides
+    fun readHeadlineHistoryRepository(
+        @BasePath basePath: Path,
+        fileSystem: FileSystem,
+    ): ReadHeadlineRepository {
+        val filePath = basePath.div("readHeadlineHistory")
+        return ReadHeadlineRepository(filePath, fileSystem)
+    }
+
+    @AppComp
+    @Provides
+    fun readCardSetHistoryRepository(
+        @BasePath basePath: Path,
+        fileSystem: FileSystem,
+    ): ReadCardSetRepository {
+        val filePath = basePath.div("readCardSetHistory")
+        return ReadCardSetRepository(filePath, fileSystem)
     }
 }

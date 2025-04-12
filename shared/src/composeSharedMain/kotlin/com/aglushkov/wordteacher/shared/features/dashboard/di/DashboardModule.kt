@@ -13,6 +13,8 @@ import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
@@ -32,6 +34,8 @@ class DashboardModule {
         spaceDashboardService: SpaceDashboardService,
         cardSetsRepository: CardSetsRepository,
         articlesRepository: ArticlesRepository,
+        readHeadlineRepository: ReadHeadlineRepository,
+        readCardSetRepository: ReadCardSetRepository,
         webLinkOpener: WebLinkOpener,
         idGenerator: IdGenerator,
         timeSource: TimeSource,
@@ -42,6 +46,8 @@ class DashboardModule {
         spaceDashboardService,
         cardSetsRepository,
         articlesRepository,
+        readHeadlineRepository,
+        readCardSetRepository,
         webLinkOpener,
         idGenerator,
         timeSource,
