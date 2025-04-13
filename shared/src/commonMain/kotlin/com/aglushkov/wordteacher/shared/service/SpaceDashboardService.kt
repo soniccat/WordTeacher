@@ -1,8 +1,15 @@
 package com.aglushkov.wordteacher.shared.service
 
+import co.touchlab.kermit.Logger
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.LinkDividerCharCategories
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.indexOfChar
+import com.aglushkov.wordteacher.shared.general.HtmlString
 import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.setStatusCode
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
 import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.request.*
@@ -17,6 +24,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import java.util.Stack
 
 @Serializable
 data class SpaceDashboardResponse(
@@ -46,7 +54,7 @@ data class SpaceDashboardHeadline(
     @SerialName("sourceName") val sourceName: String,
     @SerialName("sourceCategory") val sourceCategory: String,
     @SerialName("title") val title: String,
-    @SerialName("description") val description: String?,
+    @SerialName("description") val description: HtmlString?,
     @SerialName("link") val link: String,
     @SerialName("date") val date: Instant,
     @SerialName("creator") val creator: String?,

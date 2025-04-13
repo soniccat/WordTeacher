@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.dashboard.vm
 
+import com.aglushkov.wordteacher.shared.general.HtmlString
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.datetime.Instant
@@ -16,7 +17,7 @@ class DashboardCategoriesViewItem(
 class DashboardHeadlineViewItem(
     id: String,
     val title: String,
-    val description: String?,
+    val description: HtmlString?,
     val sourceName: String,
     val sourceCategory: String,
     val date: Instant,

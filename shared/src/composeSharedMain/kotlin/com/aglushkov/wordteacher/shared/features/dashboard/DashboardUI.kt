@@ -155,7 +155,7 @@ fun dashboardItem(
                 )
             },
             title = item.title,
-            subtitle = item.description,
+            subtitle = item.description?.text,
         )
     }
     is DashboardExpandViewItem -> {

@@ -53,6 +53,13 @@ kotlin {
             implementation(libs.kotlinxDateTime)
             implementation(libs.statelyCommon)
             implementation(libs.statelyConcurrency)
+            val version = "0.5.0"
+
+            // For parsing HTML
+            implementation("com.mohamedrejeb.ksoup:ksoup-html:$version")
+
+            // Only for encoding and decoding HTML entities
+            implementation("com.mohamedrejeb.ksoup:ksoup-entities:$version")
             api(libs.uuid)
         }
 
