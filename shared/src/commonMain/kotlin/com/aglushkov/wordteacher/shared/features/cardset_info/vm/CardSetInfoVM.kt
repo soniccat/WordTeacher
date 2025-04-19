@@ -248,6 +248,7 @@ val LinkDividerCharCategories = setOf(
     CharCategory.SPACE_SEPARATOR,
 )
 
+// TODO: check how it works in Linkify.addLinks, probably can copy their solution
 private fun findLinkSpans(str: String): List<CardSetInfoVM.LinkSpan> {
     if (str.isEmpty()) return emptyList()
 

@@ -62,6 +62,7 @@ interface DashboardVM: Clearable {
     fun onCardSetClicked(item: RemoteCardSetViewItem)
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onExpandClicked(item: DashboardExpandViewItem)
+    fun onLinkClicked(link: String)
 
     interface Router {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
@@ -165,6 +166,10 @@ open class DashboardVMIMpl(
                 },
             )
         }
+    }
+
+    override fun onLinkClicked(link: String) {
+        webLinkOpener.open(link)
     }
 
     private fun buildViewItems(

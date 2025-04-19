@@ -58,6 +58,7 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.hasData
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.toAnnotatedString
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.CustomTextListItem
 import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
@@ -146,7 +147,8 @@ fun dashboardItem(
                 .alpha(if (item.isRead) {0.5f} else {1.0f})
                 .clickable {
                     vm.onHeadlineClicked(item)
-                },
+                }
+                    ,
             trailing = {
                 DownloadForOfflineButton(
                     modifier = Modifier.clickable {
@@ -155,7 +157,12 @@ fun dashboardItem(
                 )
             },
             title = item.title,
-            subtitle = item.description?.text,
+            subtitle = item.description?.toAnnotatedString(
+                linkColor = MaterialTheme.colors.secondary,
+                onLinkClicked = { link ->
+                    vm.onLinkClicked(link)
+                }
+            ),
         )
     }
     is DashboardExpandViewItem -> {
