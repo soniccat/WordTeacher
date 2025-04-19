@@ -11,6 +11,7 @@ data class ShortCardSet (
     val totalProgress: Float,
     val creationId: String,
     val remoteId: String,
+    val cardCount: Int = -1,
 ) {
 
 }

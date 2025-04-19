@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -25,15 +24,11 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FilterChip
-import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.contentColorFor
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,9 +36,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetSearchItemView
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardCategoriesViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardExpandViewItem
@@ -51,22 +47,19 @@ import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardHeadlineV
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardTryAgainViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewItem
-import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.resource.hasData
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.toAnnotatedString
-import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.CustomTextListItem
 import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.desc.ResourceStringDesc
+import dev.icerock.moko.resources.compose.localized
 
 @Composable
 fun DashboardUI(
@@ -117,6 +110,12 @@ fun dashboardItem(
     item: BaseViewItem<*>,
     vm: DashboardVM,
 ) = when(item) {
+    is CardSetViewItem -> CardSetItemView(
+        Modifier.clickable {
+            vm.onCardSetClicked(item)
+        },
+        item,
+    )
     is DashboardCategoriesViewItem -> {
         val horizontalPadding = LocalDimens.current.contentPadding
         Row(
@@ -200,7 +199,7 @@ fun dashboardItem(
     is RemoteCardSetViewItem -> {
         CardSetSearchItemView(
             item,
-            onClick = { vm.onCardSetClicked(item) },
+            onClick = { vm.onRemoteCardSetClicked(item) },
         )
     }
     is SettingsViewTitleItem -> {

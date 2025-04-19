@@ -242,7 +242,7 @@ private fun CardSetsViewItem(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun CardSetItemView(
+fun CardSetItemView(
     item: CardSetViewItem,
     onClick: () -> Unit = {},
     onDeleted: () -> Unit = {}
@@ -254,25 +254,38 @@ private fun CardSetItemView(
         onClick,
         onDeleted
     ) {
+        CardSetItemView(
+            Modifier,
+            item
+        )
+    }
+}
+
+@Composable
+fun CardSetItemView(
+    modifier: Modifier = Modifier,
+    item: CardSetViewItem,
+) {
 //        Box(
 //            modifier = Modifier.fillMaxWidth()
 //        ) {
-            CustomTextListItem(
-                title = item.name,
-                subtitle = item.date,
-                trailing = {
-                    val side = 30.dp
-                    Box(
-                        modifier = Modifier.size(side, side)
-                    ) {
-                        CircularProgressIndicator(
-                            progress = 1.0f,
-                            color = Color.LightGray.copy(alpha = 0.2f)
-                        )
-                        CircularProgressIndicator(progress = item.totalProgress)
-                    }
-                }
-            )
+    CustomTextListItem(
+        modifier = modifier,
+        title = item.name,
+        subtitle = item.date,
+        trailing = {
+            val side = 30.dp
+            Box(
+                modifier = Modifier.size(side, side)
+            ) {
+                CircularProgressIndicator(
+                    progress = 1.0f,
+                    color = Color.LightGray.copy(alpha = 0.2f)
+                )
+                CircularProgressIndicator(progress = item.totalProgress)
+            }
+        }
+    )
 //            LinearProgressIndicator(
 //                modifier = Modifier
 //                    .fillMaxWidth()
@@ -281,7 +294,6 @@ private fun CardSetItemView(
 //                color = MaterialTheme.colors.secondary
 //            )
 //        }
-    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)

@@ -140,8 +140,9 @@
     <string name="dictconfigs_settings_dsl_title">Dsl file</string>
 
     <string name="dashboard_title">Home</string>
-    <string name="dashboard_headline_title">Articles for you:</string>
+    <string name="dashboard_headline_title">New Articles:</string>
     <string name="dashboard_cardsets_title">New Card Sets:</string>
+    <string name="dashboard_ready_to_learn_cardsets_title">Ready to learn Card Sets:</string>
 
     <string name="notes_error">Something went wrong :(</string>
     <string name="notes_create_note">Create a note</string>

@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewItem
@@ -59,7 +60,8 @@ interface DashboardVM: Clearable {
     fun onHeadlineCategoryChanged(index: Int)
     fun onHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onAddHeadlineClicked(item: DashboardHeadlineViewItem)
-    fun onCardSetClicked(item: RemoteCardSetViewItem)
+    fun onCardSetClicked(item: CardSetViewItem)
+    fun onRemoteCardSetClicked(item: RemoteCardSetViewItem)
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onExpandClicked(item: DashboardExpandViewItem)
     fun onLinkClicked(link: String)
@@ -142,7 +144,11 @@ open class DashboardVMIMpl(
         router?.openAddArticle(item.link, true)
     }
 
-    override fun onCardSetClicked(item: RemoteCardSetViewItem) {
+    override fun onCardSetClicked(item: CardSetViewItem) {
+        router?.openCardSet(CardSetVM.State.LocalCardSet(item.cardSetId))
+    }
+
+    override fun onRemoteCardSetClicked(item: RemoteCardSetViewItem) {
         readCardSetRepository.put(item.remoteCardSetId)
         router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId))
     }
@@ -188,9 +194,26 @@ open class DashboardVMIMpl(
             return Resource.Loading()
         }
 
-        // TODO: handle data from cardSetsRes articlesRes
-
         val resultList = mutableListOf<BaseViewItem<*>>()
+
+        cardSetsRes.data()?.filter {
+                it.cardCount > 0 && it.readyToLearnProgress < 1.0
+            }?.sortedByDescending { it.modificationDate }
+            ?.take(3)
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { cardSets ->
+                resultList.add(
+                    SettingsViewTitleItem(
+                        ResourceStringDesc(MR.strings.dashboard_ready_to_learn_cardsets_title)
+                    )
+                )
+                cardSets.onEach { cardSet ->
+                    resultList.add(
+                        cardSetViewItem(cardSet)
+                    )
+                }
+            }
+
         dashboardRes.on(
             data = {
                 it.headlineBlock.categories.getOrNull(state.selectedCategoryIndex)?.let { selectedCategory ->
@@ -278,6 +301,16 @@ open class DashboardVMIMpl(
 
         generateIds(resultList)
         return Resource.Loaded(resultList)
+    }
+
+    private fun cardSetViewItem(shortCardSet: ShortCardSet): CardSetViewItem {
+        return CardSetViewItem(
+            shortCardSet.id,
+            shortCardSet.name,
+            timeSource.stringDate(shortCardSet.creationDate),
+            shortCardSet.readyToLearnProgress,
+            shortCardSet.totalProgress
+        )
     }
 
     private fun generateIds(items: MutableList<BaseViewItem<*>>) {

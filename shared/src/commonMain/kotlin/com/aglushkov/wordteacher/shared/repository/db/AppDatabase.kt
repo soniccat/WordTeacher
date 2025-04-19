@@ -212,7 +212,8 @@ class AppDatabase(
                             val cards = setsWithCards?.get(set.id)
                             set.copy(
                                 readyToLearnProgress = cards?.readyToLearnProgress(timeSource) ?: 0f,
-                                totalProgress = cards?.totalProgress() ?: 0f
+                                totalProgress = cards?.totalProgress() ?: 0f,
+                                cardCount = cards?.size ?: 0,
                             )
                         }
                     }
