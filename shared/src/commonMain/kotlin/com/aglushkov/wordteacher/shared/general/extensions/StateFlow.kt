@@ -139,8 +139,16 @@ suspend fun <T> Flow<Resource<T>>.waitUntilDone(
     }
 }
 
-fun <T> MutableStateFlow<Resource<T>>.updateLoadedData(dataTransform: (T) -> T) {
-    this.update { it.mapLoadedData( loadedDataTransformer= dataTransform) }
+fun <T> MutableStateFlow<Resource<T>>.updateLoadedData(
+    defaultData: T? = null,
+    dataTransform: (T) -> T
+) {
+    this.update {
+        it.mapLoadedData(
+            defaultData = defaultData,
+            loadedDataTransformer = dataTransform
+        )
+    }
 }
 
 class AbortFlowException constructor(

@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.repository.article
 
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +30,14 @@ class ArticleRepository(
                 } else {
                     Resource.Error(ArticleNotFound(), true)
                 }
+            }
+        }
+    }
+
+    fun markAsRead(isRead: Boolean) {
+        scope.launch(Dispatchers.Default) {
+            stateFlow.value.onData {
+                database.articles.setIsRead(it.id, isRead)
             }
         }
     }

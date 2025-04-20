@@ -1,18 +1,21 @@
 package com.aglushkov.wordteacher.shared.features.article.views
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -24,19 +27,13 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.PointerType
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import com.aglushkov.wordteacher.shared.di.LocalIsDarkTheme
@@ -68,10 +65,11 @@ import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.desc.ResourceStringDesc
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
+import dev.icerock.moko.resources.compose.localized
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -86,15 +84,25 @@ fun ArticleUI(
     val data = paragraphs.data()
 
     val sideSheetState = rememberSideSheetState(SideSheetValue.Closed)
-    val restoredLastFirstVisibleItem = remember { state.lastFirstVisibleItem }
+    val restoredLastFirstVisibleItem = remember { vm.lastFirstVisibleItem }
     val lazyColumnState = rememberLazyListState(restoredLastFirstVisibleItem)
 
     LaunchedEffect(lazyColumnState) {
         snapshotFlow { lazyColumnState.firstVisibleItemIndex }
-            .filter { it != state.lastFirstVisibleItem }
+            .filter { it != vm.lastFirstVisibleItem }
             .collect {
                 vm.onFirstItemIndexChanged(it)
             }
+    }
+
+    val isLastItemVisible by remember {
+        derivedStateOf {
+            lazyColumnState.layoutInfo
+                .visibleItemsInfo
+                .lastOrNull()?.let { lastItem ->
+                    lastItem.index == lazyColumnState.layoutInfo.totalItemsCount - 1
+                }
+        }
     }
 
     var lastDownPoint: Offset by remember { mutableStateOf(Offset.Zero) }
@@ -170,6 +178,37 @@ fun ArticleUI(
                         emptyText = stringResource(MR.strings.article_empty)
                     ) {
                         vm.onTryAgainClicked()
+                    }
+                }
+            }
+
+            // mark as read button
+            AnimatedVisibility(
+                visible = isLastItemVisible ?: false,
+                modifier = Modifier.align(Alignment.BottomStart),
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                ),
+                exit = slideOutVertically(
+                    targetOffsetY = { it }
+                ),
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(LocalDimens.current.contentPadding)
+                ) {
+                    Button(onClick = {
+                        vm.onMarkAsReadUnreadClicked()
+                    }) {
+                        Text(
+                            text = ResourceStringDesc(if (state.isRead) {
+                                MR.strings.article_mark_as_unread
+                            } else {
+                                MR.strings.article_mark_as_read
+                            }).localized(),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

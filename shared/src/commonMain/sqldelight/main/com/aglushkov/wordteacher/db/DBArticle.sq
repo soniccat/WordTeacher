@@ -1,9 +1,12 @@
+import kotlin.Boolean;
+
 CREATE TABLE IF NOT EXISTS DBArticle (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT NOT NULL,
   date INTEGER NOT NULL,
   style TEXT NOT NULL,
-  link TEXT
+  link TEXT,
+  isRead INTEGER AS Boolean NOT NULL DEFAULT 0
 );
 
 /**
@@ -16,7 +19,7 @@ SELECT *
 FROM DBArticle;
 
 selectShort:
-SELECT id, name, date, link
+SELECT id, name, date, link, isRead
 FROM DBArticle
 ORDER BY date DESC;
 
@@ -26,8 +29,8 @@ FROM DBArticle
 WHERE id = ?;
 
 insert:
-INSERT INTO DBArticle(name, date, style, link)
-VALUES (?, ?, ?, ?);
+INSERT INTO DBArticle(name, date, style, link, isRead)
+VALUES (?, ?, ?, ?, ?);
 
 insertArticle:
 INSERT INTO DBArticle(name, date, style, link)
@@ -43,4 +46,9 @@ FROM DBArticle;
 removeArticle:
 DELETE
 FROM DBArticle
+WHERE id = ?;
+
+setIsRead:
+UPDATE DBArticle
+SET isRead = ?
 WHERE id = ?;

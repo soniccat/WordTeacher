@@ -128,11 +128,11 @@ class AppDatabase(
 
     inner class Articles {
         fun insert(name: String, date: Long, link: String?, style: ArticleStyle) =
-            db.dBArticleQueries.insert(name, date, encodeStyle(style), link)
+            db.dBArticleQueries.insert(name, date, encodeStyle(style), link, false)
         fun insertedArticleId() = db.dBArticleQueries.lastInsertedRowId().firstLong().value
 
-        fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date, link ->
-            ShortArticle(id, name, date, link)
+        fun selectAllShortArticles() = db.dBArticleQueries.selectShort { id, name, date, link, isRead ->
+            ShortArticle(id, name, date, link, isRead)
         }
 
         fun selectArticle(anId: Long) = combine(
@@ -142,7 +142,7 @@ class AppDatabase(
             val article = f1.executeAsOneOrNull()
             val sentences = f2.executeAsList().map { it.toNLPSentence() }
             article?.let {
-                Article(article.id, article.name, article.date, article.link, sentences, decodeStyle(article.style))
+                Article(article.id, article.name, article.date, article.link, article.isRead, sentences, decodeStyle(article.style))
             }
         }
 
@@ -159,6 +159,10 @@ class AppDatabase(
 
         private fun encodeStyle(style: ArticleStyle): String =
             json.encodeToString(style)
+
+        fun setIsRead(id: Long, isRead: Boolean) {
+            db.dBArticleQueries.setIsRead(isRead, id)
+        }
     }
 
     inner class CardSets {

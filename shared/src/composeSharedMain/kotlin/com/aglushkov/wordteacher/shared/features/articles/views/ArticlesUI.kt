@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
@@ -119,6 +120,9 @@ private fun ArticleTitleView(
         onDeleted
     ) {
         CustomTextListItem(
+            modifier = Modifier.alpha(
+                if (articleViewItem.isRead) 0.5f else 1.0f
+            ),
             title = articleViewItem.name,
             subtitle = articleViewItem.date
         )

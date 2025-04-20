@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsModule
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.arkivanov.decompose.ComponentContext
@@ -38,4 +39,5 @@ interface ArticleComposeComponent {
 interface ArticleDependencies {
     fun database(): AppDatabase
     fun nlpCore(): NLPCore
+    fun articlesRepository(): ArticlesRepository
 }

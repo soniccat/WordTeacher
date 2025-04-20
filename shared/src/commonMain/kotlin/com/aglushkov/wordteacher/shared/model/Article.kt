@@ -7,6 +7,7 @@ class Article(
     name: String,
     date: Long,
     link: String?,
+    isRead: Boolean,
     var sentences: List<NLPSentence> = emptyList(),
     var style: ArticleStyle = ArticleStyle()
-): ShortArticle(id, name, date, link)
+): ShortArticle(id, name, date, link, isRead)

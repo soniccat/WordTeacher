@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.arkivanov.decompose.ComponentContext
@@ -25,6 +26,7 @@ class ArticleDecomposeComponent(
     initialState: ArticleVM.State,
     definitionsVM: DefinitionsVM,
     articleRepository: ArticleRepository,
+    articlesRepository: ArticlesRepository,
     cardsRepository: CardsRepository,
     dictRepository: DictRepository,
     idGenerator: IdGenerator,
@@ -37,6 +39,7 @@ class ArticleDecomposeComponent(
     ) ?: initialState,
     definitionsVM,
     articleRepository,
+    articlesRepository,
     cardsRepository,
     dictRepository,
     idGenerator,

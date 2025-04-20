@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.articles.vm
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.Logger
@@ -11,6 +12,7 @@ import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.exception
 import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.v
@@ -41,6 +43,7 @@ interface ArticlesVM {
 
 open class ArticlesVMImpl(
     val articlesRepository: ArticlesRepository,
+    private val idGenerator: IdGenerator,
     private val timeSource: TimeSource,
     private val analytics: Analytics,
 ): ViewModel(), ArticlesVM {
@@ -57,7 +60,7 @@ open class ArticlesVMImpl(
     }
 
     override fun onArticleClicked(item: ArticleViewItem) {
-        router?.openArticle(ArticleVM.State(item.id))
+        router?.openArticle(ArticleVM.State(item.articleId))
     }
 
     override fun onArticleRemoved(item: ArticleViewItem) {
@@ -82,10 +85,15 @@ open class ArticlesVMImpl(
     private fun buildViewItems(articles: List<ShortArticle>): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         articles.forEach {
-            items.add(ArticleViewItem(it.id, it.name, timeSource.stringDate(it.date)))
+            items.add(ArticleViewItem(it.id, it.name, timeSource.stringDate(it.date), it.isRead))
         }
 
+        generateIds(items)
         return items
+    }
+
+    private fun generateIds(items: MutableList<BaseViewItem<*>>) {
+        generateViewItemIds(items, articles.value.data().orEmpty(), idGenerator)
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {

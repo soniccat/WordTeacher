@@ -5,4 +5,5 @@ open class ShortArticle(
     val name: String,
     val date: Long,
     val link: String?,
+    val isRead: Boolean
 )

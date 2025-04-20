@@ -5,9 +5,13 @@ import com.aglushkov.wordteacher.shared.general.StringReader
 import com.aglushkov.wordteacher.shared.general.StringsReader
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
+import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoaded
 import com.aglushkov.wordteacher.shared.general.resource.RESOURCE_UNDEFINED_PROGRESS
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgress
+import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.ArticleStyle
@@ -19,12 +23,15 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.model.nlp.split
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.russhwolf.settings.coroutines.FlowSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,9 +43,12 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import kotlin.math.max
 import kotlin.math.min
 
@@ -46,6 +56,7 @@ class ArticlesRepository(
     private val database: AppDatabase,
     private val nlpCore: NLPCore,
     private val nlpSentenceProcessor: NLPSentenceProcessor,
+    private val settings: FlowSettings,
     private val timeSource: TimeSource,
     private val isDebug: Boolean,
 ) {
@@ -54,12 +65,54 @@ class ArticlesRepository(
 
     val shortArticles: StateFlow<Resource<List<ShortArticle>>> = stateFlow
 
+    // reading progress map
+    private val jsonCoder = Json {
+        ignoreUnknownKeys = true
+    }
+    val lastFirstVisibleItemMap: MutableStateFlow<Resource<Map<Long, Int>>> = MutableStateFlow(Resource.Loading())
+    private var updateFirstVisibleItemMapJob: Job? = null
+
     init {
+        scope.launch(Dispatchers.Default) {
+            loadResource {
+                settings.getString(FIRSTITEMINDEX_STATE_KEY, "{}").let { loadedMapJson ->
+                    try {
+                        (jsonCoder.decodeFromString(loadedMapJson) as Map<Long, Int>)
+                    } catch (e: Exception) {
+                        emptyMap()
+                    }
+                }
+            }.collect(lastFirstVisibleItemMap)
+
+            // listen changes to store
+
+            lastFirstVisibleItemMap.collect {
+                updateFirstVisibleItemMapJob?.cancel()
+                updateFirstVisibleItemMapJob = launch {
+
+                }
+            }
+        }
+
+
         scope.launch(Dispatchers.Default) {
             database.articles.selectAllShortArticles().asFlow().collect {
                 val result = it.executeAsList()
                 Logger.v("ArticleRepository loaded ${result.size} articles")
                 stateFlow.value = Resource.Loaded(result)
+            }
+        }
+    }
+
+    fun updateLastFirstVisibleItem(id: Long, itemIndex: Int) {
+        scope.launch(Dispatchers.Default) {
+            lastFirstVisibleItemMap.waitUntilLoaded()
+            lastFirstVisibleItemMap.value.onData { data ->
+                if (data[id] != itemIndex) {
+                    lastFirstVisibleItemMap.updateLoadedData(defaultData = emptyMap()) {
+                        it + (id to itemIndex)
+                    }
+                }
             }
         }
     }
@@ -339,6 +392,7 @@ class ArticlesRepository(
                     title,
                     timeSource.timeInMilliseconds(),
                     link = link,
+                    isRead = false,
                     sentences = sentences,
                     style = style
                 )
@@ -384,3 +438,5 @@ class ArticlesRepository(
 }
 
 class ArticleInsertException(message: String): RuntimeException(message)
+
+private val FIRSTITEMINDEX_STATE_KEY = "articleFirstItemState"

@@ -22,7 +22,7 @@ fun ArticlesUIPreviewWithArticles() {
             vm = ArticlesVMPreview(
                 articles = Resource.Loaded(
                     data = listOf(
-                        ArticleViewItem(1, "Article Name", "Today")
+                        ArticleViewItem(1, "Article Name", "Today", false)
                     )
                 )
             )

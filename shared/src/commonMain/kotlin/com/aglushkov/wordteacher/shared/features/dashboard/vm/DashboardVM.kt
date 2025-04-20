@@ -196,6 +196,7 @@ open class DashboardVMIMpl(
 
         val resultList = mutableListOf<BaseViewItem<*>>()
 
+        // ready to learn card sets
         cardSetsRes.data()?.filter {
                 it.cardCount > 0 && it.readyToLearnProgress < 1.0
             }?.sortedByDescending { it.modificationDate }
@@ -214,6 +215,12 @@ open class DashboardVMIMpl(
                 }
             }
 
+        // recently started articles
+//        articlesRes.data()?.filter {
+//            it.
+//        }
+
+        // dashboard content
         dashboardRes.on(
             data = {
                 it.headlineBlock.categories.getOrNull(state.selectedCategoryIndex)?.let { selectedCategory ->

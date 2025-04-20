@@ -111,6 +111,8 @@
     <string name="article_side_sheet_selection_phrasal_verbs">Phrasal verbs</string>
     <string name="article_side_sheet_selection_cardset_words">Learning progress</string>
     <string name="article_side_sheet_part_of_speech_title">Parts of speech</string>
+    <string name="article_mark_as_read">Mark as read</string>
+    <string name="article_mark_as_unread">Mark as unread</string>
 
     <string name="settings_title">Settings</string>
     <string name="settings_auth_title">Space</string>

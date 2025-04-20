@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.general.Quadruple
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.ArticleStyle
 import com.aglushkov.wordteacher.shared.model.Card
@@ -22,6 +23,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceSlice
 import com.aglushkov.wordteacher.shared.model.nlp.split
 import com.aglushkov.wordteacher.shared.model.nlp.toPartOfSpeech
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -31,7 +33,6 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -41,6 +42,7 @@ interface ArticleVM: Clearable {
     val paragraphs: StateFlow<Resource<List<BaseViewItem<*>>>>
     val dictPaths: StateFlow<Resource<List<String>>>
     val definitionsVM: DefinitionsVM
+    val lastFirstVisibleItem: Int
 
     var router: ArticleRouter?
 
@@ -57,6 +59,7 @@ interface ArticleVM: Clearable {
     fun onFilterDictSingleWordEntriesChanged()
     fun onFirstItemIndexChanged(index: Int)
     fun onWordDefinitionShown()
+    fun onMarkAsReadUnreadClicked()
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
@@ -66,7 +69,6 @@ interface ArticleVM: Clearable {
         private val settings: FlowSettings,
     ) {
         private val SELECTION_STATE_KEY = "articleSelectionState"
-        private val FIRSTITEMINDEX_STATE_KEY = "articleFirstItemState"
         private val jsonCoder = Json {
             ignoreUnknownKeys = true
         }
@@ -76,6 +78,8 @@ interface ArticleVM: Clearable {
         private var inMemoryState = runBlocking {
             InMemoryState(
                 id = restoredState.id,
+                isRead = false,
+                // TODO: move that into ArticlesRepository
                 selectionState =
                     settings.getString(SELECTION_STATE_KEY, "{}").let {
                         try {
@@ -83,18 +87,11 @@ interface ArticleVM: Clearable {
                         } catch (e: Exception) {
                             SelectionState()
                         }
-                    }
-                ,
-                lastFirstVisibleItemMap = settings.getString(FIRSTITEMINDEX_STATE_KEY, "{}").let {
-                    try {
-                        (jsonCoder.decodeFromString(it) as Map<Long, Int>)
-                    } catch (e: Exception) {
-                        emptyMap()
-                    }
-                }
+                    },
             )
         }
 
+        val articleId = restoredState.id
         private val mutableFlow = MutableStateFlow(inMemoryState)
         val stateFlow: StateFlow<InMemoryState> = mutableFlow
 
@@ -106,21 +103,6 @@ interface ArticleVM: Clearable {
                 scope.launch {
                     val stringValue = jsonCoder.encodeToString(value)
                     settings.putString(SELECTION_STATE_KEY, stringValue)
-                }
-            }
-
-        var lastFirstVisibleItem: Int
-            get() = inMemoryState.lastFirstVisibleItem
-            set(value) {
-                if (value != inMemoryState.lastFirstVisibleItem) {
-                    inMemoryState = inMemoryState.updateWithLastFirstVisibleItem(value)
-                    mutableFlow.update { inMemoryState }
-
-                    val mapToStore = inMemoryState.lastFirstVisibleItemMap
-                    scope.launch {
-                        val stringValue = jsonCoder.encodeToString(mapToStore)
-                        settings.putString(FIRSTITEMINDEX_STATE_KEY, stringValue)
-                    }
                 }
             }
 
@@ -137,23 +119,23 @@ interface ArticleVM: Clearable {
             inMemoryState = inMemoryState.update { copy(needShowWordDefinition = needShowWordDefinition) }
             mutableFlow.update { inMemoryState }
         }
+
+        fun updateIsReadState(isRead: Boolean) {
+            inMemoryState = inMemoryState.update { copy(isRead = isRead) }
+            mutableFlow.update { inMemoryState }
+        }
     }
 
     data class InMemoryState(
         val version: Int = 0,
         val id: Long,
+        val isRead: Boolean,
         val selectionState: SelectionState = SelectionState(),
         val needShowWordDefinition: Boolean = false,
-        val lastFirstVisibleItemMap: Map<Long, Int> = emptyMap(), // keep the whole map not to reload it repeatedly
         val annotationChooserState: AnnotationChooserState? = null,
     ) {
-        val lastFirstVisibleItem: Int
-            get() = lastFirstVisibleItemMap[id] ?: 0
-
         fun update(block: InMemoryState.()->InMemoryState) = run { block(this).copy(version = version + 1) }
         fun toState() = State(id = id)
-        fun updateWithLastFirstVisibleItem(index: Int) =
-            update { copy(lastFirstVisibleItemMap = lastFirstVisibleItemMap + (id to index)) }
     }
 
     @Serializable
@@ -183,6 +165,7 @@ open class ArticleVMImpl(
     restoredState: ArticleVM.State,
     override val definitionsVM: DefinitionsVM,
     private val articleRepository: ArticleRepository,
+    private val articlesRepository: ArticlesRepository,
     private val cardsRepository: CardsRepository,
     private val dictRepository: DictRepository,
     private val idGenerator: IdGenerator,
@@ -194,7 +177,7 @@ open class ArticleVMImpl(
 
     private val stateController = ArticleVM.StateController(
         restoredState = restoredState,
-        settings = settings
+        settings = settings,
     )
     override val state = stateController.stateFlow
 
@@ -213,9 +196,21 @@ open class ArticleVMImpl(
             it.copyWith(it.data()?.map { dict -> dict.path.name })
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
+    override val lastFirstVisibleItem: Int
+        get() = articlesRepository.lastFirstVisibleItemMap.value.data()?.get(stateController.articleId) ?: 0
+
     init {
         viewModelScope.launch {
+            // TODO: handle loading error
             articleRepository.loadArticle(state.value.id)
+        }
+        // handle markIsRead changes
+        viewModelScope.launch {
+            articleRepository.article.count {
+                it.onData {
+                    stateController.updateIsReadState(it.isRead)
+                }
+            }
         }
 
         viewModelScope.launch(Dispatchers.Default) {
@@ -494,7 +489,7 @@ open class ArticleVMImpl(
     }
 
     override fun onFirstItemIndexChanged(index: Int) {
-        stateController.lastFirstVisibleItem = index
+        articlesRepository.updateLastFirstVisibleItem(stateController.articleId, index)
     }
 
     override fun onWordDefinitionShown() {
@@ -511,6 +506,12 @@ open class ArticleVMImpl(
 
     override fun onWordDefinitionHidden() {
         definitionsVM.onWordSubmitted(null)
+    }
+
+    override fun onMarkAsReadUnreadClicked() {
+        val newState = !stateController.stateFlow.value.isRead
+        stateController.updateIsReadState(newState)
+        articleRepository.markAsRead(newState)
     }
 
     override fun onBackPressed() {

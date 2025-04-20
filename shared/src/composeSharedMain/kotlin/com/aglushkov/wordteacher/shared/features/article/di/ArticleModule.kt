@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
@@ -76,6 +77,7 @@ class ArticleModule {
         componentContext: ComponentContext,
         definitionsVM: DefinitionsVM,
         articleRepository: ArticleRepository,
+        articlesRepository: ArticlesRepository,
         cardsRepository: CardsRepository,
         dictRepository: DictRepository,
         idGenerator: IdGenerator,
@@ -86,6 +88,7 @@ class ArticleModule {
         initialState,
         definitionsVM,
         articleRepository,
+        articlesRepository,
         cardsRepository,
         dictRepository,
         idGenerator,
