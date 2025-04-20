@@ -105,9 +105,8 @@ private fun ArticlesViewItem(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun ArticleTitleView(
+fun ArticleTitleView(
     articleViewItem: ArticleViewItem,
     onClick: () -> Unit,
     onDeleted: () -> Unit
@@ -119,14 +118,22 @@ private fun ArticleTitleView(
         onClick,
         onDeleted
     ) {
-        CustomTextListItem(
-            modifier = Modifier.alpha(
-                if (articleViewItem.isRead) 0.5f else 1.0f
-            ),
-            title = articleViewItem.name,
-            subtitle = articleViewItem.date
-        )
+        ArticleTitleView(Modifier, articleViewItem)
     }
+}
+
+@Composable
+fun ArticleTitleView(
+    modifier: Modifier,
+    articleViewItem: ArticleViewItem
+) {
+    CustomTextListItem(
+        modifier = modifier.alpha(
+            if (articleViewItem.isRead) 0.5f else 1.0f
+        ),
+        title = articleViewItem.name,
+        subtitle = articleViewItem.date
+    )
 }
 
 // TODO: replace with coerceIn

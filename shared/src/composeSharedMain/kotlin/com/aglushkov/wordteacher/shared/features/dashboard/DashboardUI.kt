@@ -37,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.shared.features.articles.views.ArticleTitleView
+import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetSearchItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
@@ -113,6 +115,12 @@ fun dashboardItem(
     is CardSetViewItem -> CardSetItemView(
         Modifier.clickable {
             vm.onCardSetClicked(item)
+        },
+        item,
+    )
+    is ArticleViewItem -> ArticleTitleView(
+        Modifier.clickable {
+            vm.onArticleClicked(item)
         },
         item,
     )

@@ -2,6 +2,8 @@ package com.aglushkov.wordteacher.shared.features.dashboard.vm
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
+import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
@@ -61,6 +63,7 @@ interface DashboardVM: Clearable {
     fun onHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onAddHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onCardSetClicked(item: CardSetViewItem)
+    fun onArticleClicked(item: ArticleViewItem)
     fun onRemoteCardSetClicked(item: RemoteCardSetViewItem)
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onExpandClicked(item: DashboardExpandViewItem)
@@ -69,6 +72,7 @@ interface DashboardVM: Clearable {
     interface Router {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
         fun openCardSet(state: CardSetVM.State)
+        fun openArticle(state: ArticleVM.State)
     }
 
     @Serializable
@@ -148,6 +152,10 @@ open class DashboardVMIMpl(
         router?.openCardSet(CardSetVM.State.LocalCardSet(item.cardSetId))
     }
 
+    override fun onArticleClicked(item: ArticleViewItem) {
+        router?.openArticle(ArticleVM.State(item.articleId))
+    }
+
     override fun onRemoteCardSetClicked(item: RemoteCardSetViewItem) {
         readCardSetRepository.put(item.remoteCardSetId)
         router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId))
@@ -216,9 +224,23 @@ open class DashboardVMIMpl(
             }
 
         // recently started articles
-//        articlesRes.data()?.filter {
-//            it.
-//        }
+        articlesRes.data()?.filter {
+            !it.isRead
+        }?.sortedByDescending { it.date }
+        ?.take(3)
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { articles ->
+            resultList.add(
+                SettingsViewTitleItem(
+                    ResourceStringDesc(MR.strings.dashboard_reading_articles)
+                )
+            )
+            articles.onEach { article ->
+                resultList.add(
+                    ArticleViewItem(article.id, article.name, timeSource.stringDate(article.date), article.isRead)
+                )
+            }
+        }
 
         // dashboard content
         dashboardRes.on(
