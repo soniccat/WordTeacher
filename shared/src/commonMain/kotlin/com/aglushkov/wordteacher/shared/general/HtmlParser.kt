@@ -26,7 +26,7 @@ data class HtmlLinkData(
 class HtmlParser {
     fun parse(html: String): HtmlString {
         val resultText = StringBuilder()
-        val linkStack = mutableListOf<HtmlLinkData>()
+        val linkStack = ArrayDeque<HtmlLinkData>()
         val links = mutableListOf<HtmlLinkData>()
 
         val ksoupHtmlParser = KsoupHtmlParser(
