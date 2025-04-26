@@ -40,7 +40,6 @@ class TabComposeModule {
                         .settings(
                             DefinitionsVM.Settings(
                                 needStoreDefinedWordInSettings = true,
-                                allowInstantPasteFromClipboard = true,
                             )
                         )
                         .setDeps(appComponent)

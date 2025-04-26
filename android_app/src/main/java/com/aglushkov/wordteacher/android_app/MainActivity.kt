@@ -57,7 +57,6 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
-import com.aglushkov.wordteacher.shared.features.settings.vm.SETTING_GET_WORD_FROM_CLIPBOARD
 import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
@@ -106,44 +105,6 @@ class MainActivity : AppCompatActivity(), Router {
         (appComponent().emailOpener() as EmailOpenerImpl).bind(this)
         setupComposeLayout()
         handleIntent()
-    }
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (!flowSettings().toBlockingSettings().getBoolean(SETTING_GET_WORD_FROM_CLIPBOARD, false)) {
-            return
-        }
-
-        if (hasFocus) {
-            updateClipboardRepository()
-        }
-    }
-
-    private fun updateClipboardRepository() {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        if (!clipboard.hasPrimaryClip()) return
-
-        val primaryDescription = clipboard.primaryClipDescription ?: return
-        if (!primaryDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) &&
-            !primaryDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_HTML)) {
-            return
-        }
-        val primaryClipDescriptionHash = primaryDescription.toString().hashCode()
-        if (primaryClipDescriptionHash != clipboardRepository().lastTextHash) {
-            val primaryClip = clipboard.primaryClip ?: return
-            if (primaryClip.itemCount == 0) {
-                return
-            }
-            val firstItem = primaryClip.getItemAt(0)
-
-            lifecycleScope.launch(Dispatchers.Default) {
-                val itemText = firstItem.coerceToText(this@MainActivity)
-                if (itemText.isNotEmpty()) {
-                    clipboardRepository().setText(itemText.toString(), primaryClipDescriptionHash)
-                    flowSettings().putInt(STATE_CLIPBOARD_HASH, clipboardRepository().lastTextHash)
-                }
-            }
-        }
     }
 
     private fun handleIntent() {

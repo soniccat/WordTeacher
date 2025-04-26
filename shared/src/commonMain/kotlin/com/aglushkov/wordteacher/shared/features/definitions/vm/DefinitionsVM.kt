@@ -10,7 +10,6 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
-import com.aglushkov.wordteacher.shared.features.settings.vm.SETTING_GET_WORD_FROM_CLIPBOARD
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
@@ -106,7 +105,6 @@ interface DefinitionsVM: Clearable {
 
     data class Settings(
         val needStoreDefinedWordInSettings: Boolean = false,
-        val allowInstantPasteFromClipboard: Boolean = false,
     )
 }
 
@@ -187,7 +185,6 @@ open class DefinitionsVMImpl(
             state.word = value
         }
 
-    private var lastHandledClipData: ClipboardRepository.Data? = null
     override val isWordHistorySelected = MutableStateFlow(false)
 
     init {
@@ -210,24 +207,6 @@ open class DefinitionsVMImpl(
                     }
                 }
             }
-        }
-
-        viewModelScope.launch {
-            combine(
-                settings.getBooleanFlow(SETTING_GET_WORD_FROM_CLIPBOARD, false),
-                if (definitionsSettings.allowInstantPasteFromClipboard) {
-                    clipboardRepository.clipData
-                } else {
-                    flowOf(ClipboardRepository.Data(""))
-                },
-            ) { isEnabled, clipData ->
-                if (isEnabled && lastHandledClipData != clipData && !clipData.isEmpty) {
-                    lastHandledClipData = clipData
-                    word = clipData.text
-                    wordTextValue.update { clipData.text }
-                    updateCurrentWord(clipData.text)
-                }
-            }.collect()
         }
     }
 

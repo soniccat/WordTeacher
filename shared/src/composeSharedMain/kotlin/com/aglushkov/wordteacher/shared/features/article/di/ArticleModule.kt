@@ -62,7 +62,6 @@ class ArticleModule {
         wordTeacherDictService,
         DefinitionsVM.Settings(
             needStoreDefinedWordInSettings = false,
-            allowInstantPasteFromClipboard = false,
         ),
         clipboardRepository,
         idGenerator,

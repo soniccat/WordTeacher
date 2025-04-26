@@ -31,7 +31,6 @@ class TextActionModule {
                         .settings(
                             DefinitionsVM.Settings(
                                 needStoreDefinedWordInSettings = false,
-                                allowInstantPasteFromClipboard = false,
                             )
                         )
                         .setDeps(appComponent)

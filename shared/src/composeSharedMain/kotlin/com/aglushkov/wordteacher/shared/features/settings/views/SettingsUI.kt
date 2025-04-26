@@ -159,26 +159,6 @@ private fun showSettingsItem(
             Text(text = item.firstItem().localized())
         }
     }
-    is SettingsWordsUseClipboardItem -> {
-        CustomListItem(
-            modifier = Modifier
-                .clickable {
-                    vm.onGetWordFromClipboardChanged(!item.isEnabled)
-                },
-            contentPadding = PaddingValues(
-                    start = LocalDimens.current.contentPadding,
-                    end = LocalDimens.current.contentPadding,
-                    bottom = LocalDimens.current.contentPadding
-                ),
-            trailing = {
-                Checkbox(
-                    checked = item.isEnabled,
-                    onCheckedChange = null
-                )
-            },
-            content = { Text(stringResource(MR.strings.settings_words_take_from_clipboard)) },
-        )
-    }
     is SettingsLogsConfigsItem -> {
         CustomListItem(
             modifier = Modifier

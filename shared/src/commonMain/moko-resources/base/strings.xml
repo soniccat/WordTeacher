@@ -121,7 +121,6 @@
     <string name="settings_auth_refresh">Refresh</string>
     <string name="settings_dictconfigs">Dictionaries</string>
     <string name="settings_words_title">Words</string>
-    <string name="settings_words_take_from_clipboard">Paste instantly a word from your clipboard</string>
     <string name="settings_frequency_title">Word Frequency</string>
     <string name="settings_frequency_gradation_info_format">There\'re %d levels</string>
     <string name="settings_frequency_upload_file">Choose db file</string>

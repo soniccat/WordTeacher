@@ -70,14 +70,6 @@ class SettingsLogsConfigsItem(
     data class LogFileItem(val path: Path)
 }
 
-class SettingsWordsUseClipboardItem(
-    val isEnabled: Boolean
-): BaseViewItem<Boolean>(isEnabled, Type) {
-    companion object {
-        const val Type = 1010
-    }
-}
-
 class SettingsWordFrequencyGradationItem(
     val gradation: WordFrequencyGradation,
 ): BaseViewItem<WordFrequencyGradation>(gradation, Type) {

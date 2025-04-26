@@ -50,7 +50,6 @@ interface SettingsVM: Clearable {
     fun onSignOutClicked()
     fun onAuthRefreshClicked()
     fun onUploadWordFrequencyFileClicked()
-    fun onGetWordFromClipboardChanged(newValue: Boolean)
     fun onLoggingIsEnabledChanged()
     fun onLogFileShareClicked(path: Path)
     fun onEmailClicked()
@@ -96,20 +95,18 @@ open class SettingsVMImpl (
 
     override val items: StateFlow<List<BaseViewItem<*>>> = combine(
         spaceAuthRepository.authDataFlow,
-        settings.getBooleanFlow(SETTING_GET_WORD_FROM_CLIPBOARD, false),
         logsRepository.isLoggingEnabledState,
         combine(
             wordFrequencyGradationProvider.gradationState,
             wordFrequencyFileOpenController.state
         ) { a, b -> a.downgradeToErrorOrLoading(b) }
-    ) { authRes, isGetWordFromClipboardEnabled, isLoggingEnabled, gradationState ->
-        buildItems(authRes, gradationState, isGetWordFromClipboardEnabled, isLoggingEnabled, isDebug)
+    ) { authRes, isLoggingEnabled, gradationState ->
+        buildItems(authRes, gradationState, isLoggingEnabled, isDebug)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private fun buildItems(
         authDataRes: Resource<SpaceAuthData>,
         gradationState: Resource<WordFrequencyGradation>,
-        isGetWordFromClipboardEnabled: Boolean,
         isLoggingEnabled: Boolean,
         isDebug: Boolean
     ): List<BaseViewItem<*>> {
@@ -132,9 +129,6 @@ open class SettingsVMImpl (
             }
             is Resource.Loading -> resultItems += SettingsViewLoading()
         }
-
-        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_words_title))
-        resultItems += SettingsWordsUseClipboardItem(isGetWordFromClipboardEnabled)
 
         resultItems += SettingsOpenDictConfigsItem()
         resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_frequency_title))
@@ -207,10 +201,6 @@ open class SettingsVMImpl (
         }
     }
 
-    override fun onGetWordFromClipboardChanged(newValue: Boolean) {
-        settings.toBlockingSettings().putBoolean(SETTING_GET_WORD_FROM_CLIPBOARD, newValue)
-    }
-
     override fun onLoggingIsEnabledChanged() {
         val newValue = !logsRepository.isLoggingEnabledState.value
         analytics.send(AnalyticEvent.createActionEvent("Settings.loggingIsEnabledChanged",
@@ -233,5 +223,3 @@ open class SettingsVMImpl (
         webLinkOpener.open(appInfo.privacyPolicyUrl)
     }
 }
-
-const val SETTING_GET_WORD_FROM_CLIPBOARD = "getWordFromClipboard"
