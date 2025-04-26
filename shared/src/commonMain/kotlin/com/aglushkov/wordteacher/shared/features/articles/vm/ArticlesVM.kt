@@ -67,7 +67,7 @@ open class ArticlesVMImpl(
         analytics.send(AnalyticEvent.createActionEvent("Articles.articleRemoved"))
         viewModelScope.launch {
             try {
-                articlesRepository.removeArticle(item.id)
+                articlesRepository.removeArticle(item.articleId)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
