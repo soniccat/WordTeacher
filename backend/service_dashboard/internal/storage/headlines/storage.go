@@ -21,7 +21,7 @@ var categoriesToPull = []int32{
 	int32(articlesgrpc.Category_NEWS),
 	int32(articlesgrpc.Category_TECH),
 }
-var pullLimit = 30
+var pullLimit = 15
 
 type client interface {
 	GetHeadlines(

@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.dashboard.vm
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
@@ -133,24 +134,29 @@ open class DashboardVMIMpl(
     }
 
     override fun onHeadlineCategoryChanged(index: Int) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onHeadlineCategoryChanged"))
         stateFlow.update { it.copy(selectedCategoryIndex = index) }
     }
 
     override fun onHeadlineClicked(item: DashboardHeadlineViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onHeadlineClicked"))
         readHeadlineRepository.put(item.link)
         webLinkOpener.open(item.link)
     }
 
     override fun onAddHeadlineClicked(item: DashboardHeadlineViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onAddHeadlineClicked"))
         readHeadlineRepository.put(item.link)
         router?.openAddArticle(item.link, true)
     }
 
     override fun onCardSetClicked(item: CardSetViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onCardSetClicked"))
         router?.openCardSet(CardSetVM.State.LocalCardSet(item.cardSetId))
     }
 
     override fun onCardSetStartLearningClicked(item: CardSetViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onCardSetStartLearningClicked"))
         viewModelScope.launch {
             try {
                 // TODO: move that loading into learning screen
@@ -163,10 +169,12 @@ open class DashboardVMIMpl(
     }
 
     override fun onArticleClicked(item: ArticleViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onArticleClicked"))
         router?.openArticle(ArticleVM.State(item.articleId))
     }
 
     override fun onRemoteCardSetClicked(item: RemoteCardSetViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onRemoteCardSetClicked"))
         readCardSetRepository.put(item.remoteCardSetId)
         router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId))
     }
@@ -176,6 +184,13 @@ open class DashboardVMIMpl(
     }
 
     override fun onExpandClicked(item: DashboardExpandViewItem) {
+        when (item.firstItem()) {
+            DashboardExpandViewItem.ExpandType.CardSets ->
+                analytics.send(AnalyticEvent.createActionEvent("Dashboard.onCardSetExpandClicked"))
+            DashboardExpandViewItem.ExpandType.Headline ->
+                analytics.send(AnalyticEvent.createActionEvent("Dashboard.onHeadlineExpandClicked"))
+        }
+
         stateFlow.update {
             it.copy(
                 isHeadlineBlockExpanded = if (item.firstItem() == DashboardExpandViewItem.ExpandType.Headline) {
@@ -193,10 +208,12 @@ open class DashboardVMIMpl(
     }
 
     override fun onLinkClicked(link: String) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onLinkClicked"))
         webLinkOpener.open(link)
     }
 
     override fun onDashboardTryAgainClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onDashboardTryAgainClicked"))
         loadDashboard()
     }
 

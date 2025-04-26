@@ -53,7 +53,7 @@ func (s *Storage) StartPulling(ctx context.Context) {
 			}()
 
 			var newCardSets []api.CardSet
-			cardSets, err := s.client.GetCardSets(ctx, 30)
+			cardSets, err := s.client.GetCardSets(ctx, 15)
 			if err != nil {
 				s.logger.ErrorWithError(ctx, err, "cardsets.StartPulling")
 				return
