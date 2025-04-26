@@ -47,7 +47,7 @@ fun CustomTextListItem(
 }
 
 @Composable
-fun CustomTextListItem(
+fun CustomAnnotatedTextListItem(
     modifier: Modifier = Modifier,
     trailing: @Composable (BoxScope.() -> Unit)? = null,
     title: String,

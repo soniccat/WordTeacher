@@ -55,7 +55,7 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.toAnnotatedString
-import com.aglushkov.wordteacher.shared.general.views.CustomTextListItem
+import com.aglushkov.wordteacher.shared.general.views.CustomAnnotatedTextListItem
 import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
@@ -149,7 +149,7 @@ fun dashboardItem(
         }
     }
     is DashboardHeadlineViewItem -> {
-        CustomTextListItem(
+        CustomAnnotatedTextListItem(
             modifier = modifier
                 .alpha(if (item.isRead) {0.5f} else {1.0f})
                 .clickable {
@@ -212,7 +212,11 @@ fun dashboardItem(
     }
     is SettingsViewTitleItem -> {
         ListItem (
-            text = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsTitle) }
+            modifier = Modifier.padding(top = 8.dp),
+            text = {
+                Text(item.firstItem().localized(),
+                style = LocalAppTypography.current.settingsTitle)
+            }
         )
     }
     is WordLoadingViewItem -> {

@@ -8,7 +8,8 @@ class CardSetViewItem(
     val name: String,
     val date: String,
     val readyToLearnProgress: Float = 0f,
-    val totalProgress: Float = 0f
+    val totalProgress: Float = 0f,
+    val terms: List<String> = emptyList()
 ): BaseViewItem<Long>(cardSetId, Type) {
     companion object {
         const val Type = 400

@@ -272,7 +272,7 @@ fun CardSetItemView(
     CustomTextListItem(
         modifier = modifier,
         title = item.name,
-        subtitle = item.date,
+        subtitle = item.terms.joinToString(),
         trailing = {
             val side = 30.dp
             Box(

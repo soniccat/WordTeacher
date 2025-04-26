@@ -206,7 +206,7 @@ open class DashboardVMIMpl(
 
         // ready to learn card sets
         cardSetsRes.data()?.filter {
-                it.cardCount > 0 && it.readyToLearnProgress < 1.0
+                it.terms.size > 0 && it.readyToLearnProgress < 1.0
             }?.sortedByDescending { it.modificationDate }
             ?.take(3)
             ?.takeIf { it.isNotEmpty() }
@@ -338,7 +338,8 @@ open class DashboardVMIMpl(
             shortCardSet.name,
             timeSource.stringDate(shortCardSet.creationDate),
             shortCardSet.readyToLearnProgress,
-            shortCardSet.totalProgress
+            shortCardSet.totalProgress,
+            shortCardSet.terms
         )
     }
 

@@ -174,7 +174,7 @@ class AppDatabase(
 
         fun selectShortCardSets(): List<ShortCardSet> {
             return db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
-                ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId)
+                ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId, terms = emptyList())
             }).executeAsList()
         }
 
@@ -197,7 +197,7 @@ class AppDatabase(
         fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
             // TODO: reorganize db to pull progress from it instead of loading all the cards
             val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
-                ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId)
+                ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId, emptyList())
             }).asFlow()
             val setsWithCardsFlow = selectAllSetIdsWithCards().asFlow()
 
@@ -217,7 +217,7 @@ class AppDatabase(
                             set.copy(
                                 readyToLearnProgress = cards?.readyToLearnProgress(timeSource) ?: 0f,
                                 totalProgress = cards?.totalProgress() ?: 0f,
-                                cardCount = cards?.size ?: 0,
+                                terms = cards.orEmpty().filter { it.progress.isReadyToLearn(timeSource) }.take(15).map { it.term }
                             )
                         }
                     }

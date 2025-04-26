@@ -209,7 +209,8 @@ open class CardSetsVMImpl(
             shortCardSet.name,
             timeSource.stringDate(shortCardSet.creationDate),
             shortCardSet.readyToLearnProgress,
-            shortCardSet.totalProgress
+            shortCardSet.totalProgress,
+            shortCardSet.terms
         )
     }
 
