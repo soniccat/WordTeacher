@@ -36,9 +36,6 @@ open class DefinitionsVMPreview(
     override fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>) {
     }
 
-    override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
-    }
-
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
     }
 

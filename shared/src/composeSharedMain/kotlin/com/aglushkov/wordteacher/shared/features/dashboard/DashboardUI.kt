@@ -209,7 +209,17 @@ fun dashboardItem(
 
     }
     is DashboardTryAgainViewItem -> {
-        TODO("DashboardTryAgainViewItem")
+        Column(
+            modifier = Modifier.padding(LocalDimens.current.contentPadding).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(item.errorText.localized(), style = LocalAppTypography.current.settingsText)
+            Button(
+                onClick = { vm.onDashboardTryAgainClicked() },
+            ) {
+                Text(text = item.tryAgainActionText.localized())
+            }
+        }
     }
     is RemoteCardSetViewItem -> {
         CardSetSearchItemView(

@@ -62,7 +62,6 @@ interface DefinitionsVM: Clearable {
     )
     fun onTryAgainClicked()
     fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
-    fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem)
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringDesc?
@@ -253,18 +252,6 @@ open class DefinitionsVMImpl(
     override fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>) {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.partOfSpeechFilterUpdated"))
         selectedPartsOfSpeechStateFlow.value = filter
-    }
-
-    override fun onPartOfSpeechFilterClicked(item: DefinitionsDisplayModeViewItem) {
-        analytics.send(AnalyticEvent.createActionEvent("Definitions.partOfSpeechFilterClicked"))
-//        viewModelScope.launch {
-//            eventChannel.trySend(
-//                ShowPartsOfSpeechFilterDialogEvent(
-//                    selectedPartsOfSpeechStateFlow.value,
-//                    partsOfSpeechFilterStateFlow.value
-//                )
-//            )
-//        }
     }
 
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {

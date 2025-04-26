@@ -58,7 +58,6 @@ interface DashboardVM: Clearable {
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val state: State
 
-    fun refresh()
     fun onHeadlineCategoryChanged(index: Int)
     fun onHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onAddHeadlineClicked(item: DashboardHeadlineViewItem)
@@ -69,6 +68,7 @@ interface DashboardVM: Clearable {
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onExpandClicked(item: DashboardExpandViewItem)
     fun onLinkClicked(link: String)
+    fun onDashboardTryAgainClicked()
 
     interface Router {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
@@ -122,10 +122,6 @@ open class DashboardVMIMpl(
         loadDashboard()
     }
 
-    override fun refresh() {
-        loadDashboard()
-    }
-
     private fun loadDashboard() {
         viewModelScope.launch {
             dashboardRepository.load(Unit).waitUntilDone().onData {
@@ -157,6 +153,7 @@ open class DashboardVMIMpl(
     override fun onCardSetStartLearningClicked(item: CardSetViewItem) {
         viewModelScope.launch {
             try {
+                // TODO: move that loading into learning screen
                 val allCardIds = cardSetsRepository.allReadyToLearnCardIds()
                 router?.openLearning(allCardIds)
             } catch (e: Throwable) {
@@ -197,6 +194,10 @@ open class DashboardVMIMpl(
 
     override fun onLinkClicked(link: String) {
         webLinkOpener.open(link)
+    }
+
+    override fun onDashboardTryAgainClicked() {
+        loadDashboard()
     }
 
     private fun buildViewItems(
@@ -277,7 +278,6 @@ open class DashboardVMIMpl(
                         selectedCategory.headlines.take(3)
                     }
                     resultHeadlines.onEach { headline ->
-                        // TODO: filter by already added articles by link
                         resultList.add(
                             DashboardHeadlineViewItem(
                                 id = headline.id,
@@ -311,7 +311,6 @@ open class DashboardVMIMpl(
                         it.newCardSetBlock.cardSets.take(3)
                     }
                     resultCardSets.onEach { cardSet ->
-                        // TODO: filter by already added articles by terms
                         resultList.add(
                             RemoteCardSetViewItem(
                                 cardSet.remoteId,

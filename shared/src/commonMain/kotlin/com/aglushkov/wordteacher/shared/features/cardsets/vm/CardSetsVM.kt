@@ -150,6 +150,7 @@ open class CardSetsVMImpl(
     override fun onStartLearningClicked() {
         viewModelScope.launch {
             try {
+                // TODO: move that loading into learning screen
                 val allCardIds = cardSetsRepository.allReadyToLearnCardIds()
                 router?.openLearning(allCardIds)
             } catch (e: Throwable) {
