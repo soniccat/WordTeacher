@@ -1,10 +1,8 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
-    ExperimentalFoundationApi::class, ExperimentalMaterialApi::class
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class
 )
 
 package com.aglushkov.wordteacher.shared.features.dashboard
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticleTitleView
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetItemView
+import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetWithTotalProgressItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetSearchItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
@@ -58,6 +57,7 @@ import com.aglushkov.wordteacher.shared.general.toAnnotatedString
 import com.aglushkov.wordteacher.shared.general.views.CustomAnnotatedTextListItem
 import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.StartLearningButton
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.desc.ResourceStringDesc
@@ -117,6 +117,13 @@ fun dashboardItem(
             vm.onCardSetClicked(item)
         },
         item,
+        trailing = {
+            StartLearningButton(
+                modifier = Modifier.clickable {
+                    vm.onCardSetStartLearningClicked(item)
+                }
+            )
+        }
     )
     is ArticleViewItem -> ArticleTitleView(
         Modifier.clickable {

@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.math.max
 import kotlin.math.min
@@ -85,11 +86,12 @@ class ArticlesRepository(
             }.collect(lastFirstVisibleItemMap)
 
             // listen changes to store
-
             lastFirstVisibleItemMap.collect {
                 updateFirstVisibleItemMapJob?.cancel()
                 updateFirstVisibleItemMapJob = launch {
-
+                    delay(200)
+                    val stringValue = jsonCoder.encodeToString(lastFirstVisibleItemMap.value.data().orEmpty())
+                    settings.putString(FIRSTITEMINDEX_STATE_KEY, stringValue)
                 }
             }
         }

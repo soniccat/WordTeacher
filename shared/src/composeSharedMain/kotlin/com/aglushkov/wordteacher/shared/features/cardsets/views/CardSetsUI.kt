@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
@@ -20,7 +19,6 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewIt
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.SectionViewItem
 import com.aglushkov.wordteacher.shared.general.BackHandler
-import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -228,7 +226,7 @@ private fun CardSetsViewItem(
 //            ),
 //        style = LocalAppTypography.current.wordDefinitionSubHeader
 //    )
-    is CardSetViewItem -> CardSetItemView(
+    is CardSetViewItem -> CardSetWithTotalProgressItemView(
         item,
         onClick = { vm.onCardSetClicked(item) },
         onDeleted = { vm.onCardSetRemoved(item) }
@@ -242,7 +240,7 @@ private fun CardSetsViewItem(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CardSetItemView(
+fun CardSetWithTotalProgressItemView(
     item: CardSetViewItem,
     onClick: () -> Unit = {},
     onDeleted: () -> Unit = {}
@@ -254,7 +252,7 @@ fun CardSetItemView(
         onClick,
         onDeleted
     ) {
-        CardSetItemView(
+        CardSetWithTotalProgressItemView(
             Modifier,
             item
         )
@@ -262,17 +260,13 @@ fun CardSetItemView(
 }
 
 @Composable
-fun CardSetItemView(
+fun CardSetWithTotalProgressItemView(
     modifier: Modifier = Modifier,
     item: CardSetViewItem,
 ) {
-//        Box(
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-    CustomTextListItem(
+    CardSetItemView(
         modifier = modifier,
-        title = item.name,
-        subtitle = item.terms.joinToString(),
+        item = item,
         trailing = {
             val side = 30.dp
             Box(
@@ -286,14 +280,22 @@ fun CardSetItemView(
             }
         }
     )
-//            LinearProgressIndicator(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .align(Alignment.BottomStart),
-//                progress = item.readyToLearnProgress,
-//                color = MaterialTheme.colors.secondary
-//            )
-//        }
+}
+
+@Composable
+fun CardSetItemView(
+    modifier: Modifier = Modifier,
+    item: CardSetViewItem,
+    trailing: @Composable (CardSetViewItem) -> Unit
+) {
+    CustomTextListItem(
+        modifier = modifier,
+        title = item.name,
+        subtitle = item.terms.joinToString(),
+        trailing = {
+            trailing(item)
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)

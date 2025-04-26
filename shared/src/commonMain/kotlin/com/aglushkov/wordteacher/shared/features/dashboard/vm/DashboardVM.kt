@@ -63,6 +63,7 @@ interface DashboardVM: Clearable {
     fun onHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onAddHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onCardSetClicked(item: CardSetViewItem)
+    fun onCardSetStartLearningClicked(item: CardSetViewItem)
     fun onArticleClicked(item: ArticleViewItem)
     fun onRemoteCardSetClicked(item: RemoteCardSetViewItem)
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
@@ -73,6 +74,7 @@ interface DashboardVM: Clearable {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
         fun openCardSet(state: CardSetVM.State)
         fun openArticle(state: ArticleVM.State)
+        fun openLearning(ids: List<Long>)
     }
 
     @Serializable
@@ -150,6 +152,17 @@ open class DashboardVMIMpl(
 
     override fun onCardSetClicked(item: CardSetViewItem) {
         router?.openCardSet(CardSetVM.State.LocalCardSet(item.cardSetId))
+    }
+
+    override fun onCardSetStartLearningClicked(item: CardSetViewItem) {
+        viewModelScope.launch {
+            try {
+                val allCardIds = cardSetsRepository.allReadyToLearnCardIds()
+                router?.openLearning(allCardIds)
+            } catch (e: Throwable) {
+                // TODO: handle error
+            }
+        }
     }
 
     override fun onArticleClicked(item: ArticleViewItem) {

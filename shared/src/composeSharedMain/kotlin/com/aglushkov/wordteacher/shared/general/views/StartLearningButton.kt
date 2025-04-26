@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.shared.general.views
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -14,14 +13,14 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 
 @Composable
-fun DownloadForOfflineButton(
+fun StartLearningButton(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(
         LocalDimens.current.halfOfContentPadding
     )
 ) {
     Icon(
-        painterResource(MR.images.download_for_offline),
+        painterResource(MR.images.start_learning_rounded_24),
         null,
         modifier = Modifier.clip(CircleShape).then(modifier).padding(contentPadding),
         tint = MaterialTheme.colors.secondary
