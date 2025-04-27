@@ -77,8 +77,8 @@ import dev.icerock.moko.resources.desc.StringDesc
 class MainActivity : AppCompatActivity(), Router {
     private val bottomBarTabs = listOf(
         ScreenTab.Dashboard,
-        ScreenTab.CardSets,
         ScreenTab.Articles,
+        ScreenTab.CardSets,
         ScreenTab.Definitions,
         ScreenTab.Settings
     )

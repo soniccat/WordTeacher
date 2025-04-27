@@ -78,10 +78,10 @@ class TextActionActivity: AppCompatActivity() {
         var intentString = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT) // from action.PROCESS_TEXT
             ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT) // from action.ACTION_SEND
         ?: intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)?.toString() ?: ""
-        val newLineIndex = intentString.indexOf('\n')
-        if (newLineIndex != -1) {
-            intentString = intentString.substring(0, newLineIndex)
-        }
+//        val newLineIndex = intentString.indexOf('\n')
+//        if (newLineIndex != -1) {
+//            intentString = intentString.substring(0, newLineIndex)
+//        }
         if (intentString.isNotEmpty() && intentString.first() == '"' && intentString.last() == '"'){
             intentString = intentString.substring(1, intentString.length-1)
         }

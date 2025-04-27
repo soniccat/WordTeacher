@@ -8,8 +8,7 @@
     <string name="tab_definitions">Words</string>
     <string name="tab_add_article">New Article</string>
     <string name="tab_articles">Articles</string>
-    <string name="tab_learning">Card Sets</string>
-    <string name="tab_cardsets">Card Sets</string>
+    <string name="tab_learning">Sets</string>
     <string name="tab_notes">Notes</string>
     <string name="tab_settings">Settings</string>
     <string name="search">Search</string>
