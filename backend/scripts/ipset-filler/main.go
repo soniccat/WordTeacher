@@ -8,6 +8,9 @@ package main
 // invoke the tool
 //
 // sudo ipset save > ./ipset.conf
+//
+// to run in background
+// nohup ./ipset-filler > foo.log 2> foo.err < /dev/null &
 
 import (
 	"encoding/json"

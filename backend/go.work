@@ -1,13 +1,14 @@
 go 1.22.2
 
 use (
+	./scripts/ipset-filler
+	./scripts/phrase_exporter
+	./scripts/wordlistfilter
+	./service_articles
 	./service_auth
 	./service_cardsets
 	./service_cardsetsearch
-	./service_dict
-	./service_articles
 	./service_dashboard
+	./service_dict
 	./tools
-	./scripts/wordlistfilter
-	./scripts/phrase_exporter
 )
