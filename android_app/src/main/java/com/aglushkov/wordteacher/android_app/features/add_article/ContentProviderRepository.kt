@@ -10,8 +10,8 @@ import java.lang.RuntimeException
 class ContentProviderRepository(
     private val context: Context,
 ): SimpleResourceRepository<String, String>() {
-    override suspend fun load(arg: String): String = withContext(Dispatchers.Default) {
-        context.contentResolver.openInputStream(Uri.parse(arg))?.buffered()?.use {
+    override suspend fun load(arg: String): String {
+        return context.contentResolver.openInputStream(Uri.parse(arg))?.buffered()?.use {
             it.readBytes().decodeToString()
         } ?: run { throw RuntimeException("wrong argument $arg") }
     }

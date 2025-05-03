@@ -19,7 +19,7 @@ import java.io.File
 class FileSharerRepository(
     private val context: Context,
 ): SimpleResourceRepository<Unit, Path>() {
-    override suspend fun load(arg: Path): Unit = withContext(Dispatchers.Default) {
+    override suspend fun load(arg: Path) {
         val imagePath = File(context.filesDir, arg.parent?.name.orEmpty())
         val newFile = File(imagePath, arg.name)
         val contentUri: Uri = FileProvider.getUriForFile(context, "com.aglushkov.fileprovider", newFile)

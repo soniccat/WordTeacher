@@ -312,7 +312,7 @@ class MainActivity : AppCompatActivity(), Router {
     @Composable
     private fun dialogUI() {
         val dialogs = mainDecomposeComponent.dialogsStateFlow.subscribeAsState()
-        val children = listOf(dialogs.value.active) + dialogs.value.backStack
+        val children = dialogs.value.backStack + dialogs.value.active
 
         children.onEach { child ->
             when (val instance = child.instance) {

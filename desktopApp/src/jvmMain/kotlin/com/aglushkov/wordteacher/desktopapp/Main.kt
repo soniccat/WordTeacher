@@ -256,7 +256,7 @@ private fun TabsUI(component: TabDecomposeComponent) {
 @Composable
 private fun dialogUI() {
     val dialogs = mainDecomposeComponent.dialogsStateFlow.subscribeAsState()
-    val children = listOf(dialogs.value.active) + dialogs.value.backStack
+    val children = dialogs.value.backStack + dialogs.value.active
 
     children.onEach { ins ->
         when (val instance = ins.instance) {

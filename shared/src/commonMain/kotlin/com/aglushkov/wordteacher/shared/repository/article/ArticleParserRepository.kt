@@ -16,10 +16,10 @@ class ArticleParserRepository: SimpleResourceRepository<ParsedArticle, String>()
     private val httpClient = HttpClient {
     }
 
-    override suspend fun load(arg: String): ParsedArticle = withContext(Dispatchers.Default) {
+    override suspend fun load(arg: String): ParsedArticle {
         val res: HttpResponse = httpClient.get(arg)
         val responseString: String = res.body()
-        parser.parse(responseString)
+        return parser.parse(responseString)
     }
 
     suspend fun requestLargerArticle() {
