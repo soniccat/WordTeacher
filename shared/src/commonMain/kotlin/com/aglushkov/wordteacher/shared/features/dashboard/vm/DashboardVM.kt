@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewItem
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -75,7 +76,7 @@ interface DashboardVM: Clearable {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
         fun openCardSet(state: CardSetVM.State)
         fun openArticle(state: ArticleVM.State)
-        fun openLearning(ids: List<Long>)
+        fun openLearning(state: LearningVM.State)
     }
 
     @Serializable
@@ -157,15 +158,7 @@ open class DashboardVMIMpl(
 
     override fun onCardSetStartLearningClicked(item: CardSetViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("Dashboard.onCardSetStartLearningClicked"))
-        viewModelScope.launch {
-            try {
-                // TODO: move that loading into learning screen
-                val allCardIds = cardSetsRepository.allReadyToLearnCardIds()
-                router?.openLearning(allCardIds)
-            } catch (e: Throwable) {
-                // TODO: handle error
-            }
-        }
+        router?.openLearning(LearningVM.State(cardSetId = item.cardSetId))
     }
 
     override fun onArticleClicked(item: ArticleViewItem) {

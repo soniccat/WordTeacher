@@ -7,9 +7,11 @@ import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.events.ScrollViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -691,17 +693,8 @@ open class CardSetVMImpl(
 
     override fun onStartLearningClicked() {
         analytics.send(AnalyticEvent.createActionEvent("CardSet.startLearningClicked"))
-        viewModelScope.launch {
-            try {
-                cardSet.value.data()?.let { set ->
-                    val allCardIds = set.cards.filter {
-                        it.progress.isReadyToLearn(timeSource)
-                    }.map { it.id }
-                    router?.openLearning(allCardIds)
-                }
-            } catch (e: Throwable) {
-                // TODO: handle error
-            }
+        cardSet.value.onData {
+            router?.openLearning(LearningVM.State(cardSetId = it.id))
         }
     }
 

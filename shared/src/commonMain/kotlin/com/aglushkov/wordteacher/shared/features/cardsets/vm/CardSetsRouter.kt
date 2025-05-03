@@ -1,11 +1,12 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import dev.icerock.moko.resources.desc.StringDesc
 
 interface CardSetsRouter {
     fun openCardSet(state: CardSetVM.State)
-    fun openLearning(ids: List<Long>)
+    fun openLearning(state: LearningVM.State)
     fun openJsonImport()
 
     fun onError(text: StringDesc)

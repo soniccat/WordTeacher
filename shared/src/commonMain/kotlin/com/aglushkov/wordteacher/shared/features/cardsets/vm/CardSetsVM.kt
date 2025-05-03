@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.cardsets.vm
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
@@ -148,15 +149,8 @@ open class CardSetsVMImpl(
     }
 
     override fun onStartLearningClicked() {
-        viewModelScope.launch {
-            try {
-                // TODO: move that loading into learning screen
-                val allCardIds = cardSetsRepository.allReadyToLearnCardIds()
-                router?.openLearning(allCardIds)
-            } catch (e: Throwable) {
-                // TODO: handle error
-            }
-        }
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.onStartLearningClicked"))
+        router?.openLearning(LearningVM.State(cardSetId = LearningVM.State.AllCards))
     }
 
     enum class SectionType{

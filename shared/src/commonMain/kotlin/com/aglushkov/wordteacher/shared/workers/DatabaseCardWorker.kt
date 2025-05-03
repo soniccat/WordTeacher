@@ -27,7 +27,7 @@ import kotlin.properties.Delegates
 // Card updating queries shouldn't intersect to avoid data loss. Therefore, we need to be sure that they arent'
 // executed in parallel. So, this class provides a state switching interface
 class DatabaseCardWorker(
-    private val databaseWorker: DatabaseWorker,
+    val databaseWorker: DatabaseWorker,
     private val spanUpdateWorker: SpanUpdateWorker,
     private val cardSetSyncWorker: CardSetSyncWorker,
     private val cardFrequencyUpdateWorker: CardFrequencyUpdateWorker,

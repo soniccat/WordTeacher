@@ -58,7 +58,7 @@ interface MainDecomposeComponent:
     fun openCardSets()
     override fun openCardSet(state: CardSetVM.State)
     fun openCardSetInfo(state: CardSetInfoVM.State)
-    override fun openLearning(ids: List<Long>)
+    override fun openLearning(state: LearningVM.State)
     fun openLearningSessionResult(results: List<SessionCardResult>)
     fun back()
     fun popToRoot()
@@ -92,7 +92,7 @@ interface MainDecomposeComponent:
         @Serializable data class CardSetInfoConfiguration(val state: CardSetInfoVM.State) : ChildConfiguration()
         @Serializable data class ArticleConfiguration(val state: ArticleVM.State) : ChildConfiguration()
         @Serializable data class CardSetConfiguration(val state: CardSetVM.State) : ChildConfiguration()
-        @Serializable data class LearningConfiguration(val ids: List<Long>) : ChildConfiguration()
+        @Serializable data class LearningConfiguration(val state: LearningVM.State) : ChildConfiguration()
         @Serializable data class LearningSessionResultConfiguration(val results: List<SessionCardResult>) : ChildConfiguration()
         @Serializable data class WebAuthConfiguration(val networkType: SpaceAuthService.NetworkType) : ChildConfiguration()
         @Serializable data object DictConfigs : ChildConfiguration()
@@ -226,9 +226,9 @@ class MainDecomposeComponentImpl(
         )
     }
 
-    override fun openLearning(ids: List<Long>) {
+    override fun openLearning(state: LearningVM.State) {
         addDialogConfigIfNotAtTop(
-            MainDecomposeComponent.ChildConfiguration.LearningConfiguration(ids)
+            MainDecomposeComponent.ChildConfiguration.LearningConfiguration(state)
         )
     }
 

@@ -107,8 +107,16 @@ suspend fun Flow<Boolean>.waitUntilTrue() {
     takeWhile { !it }.collect()
 }
 
-suspend fun <T> Flow<Resource<T>>.waitUntilLoaded() {
-    takeWhile { !it.isLoaded() }.collect()
+suspend fun <T> Flow<Resource<T>>.waitUntilLoaded(): Resource<T> {
+    var res: Resource<T> = Resource.Uninitialized()
+    takeWhile {
+        val needTake = !it.isLoaded()
+        if (!needTake) {
+            res = it
+        }
+        needTake
+    }.collect()
+    return res
 }
 
 suspend fun <T> Flow<Resource<T>>.waitUntilDone(): Resource<T> {

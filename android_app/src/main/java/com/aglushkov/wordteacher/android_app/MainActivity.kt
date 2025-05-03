@@ -54,6 +54,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
@@ -198,8 +199,8 @@ class MainActivity : AppCompatActivity(), Router {
                     is MainDecomposeComponent.Child.CardSet -> CardSetUI(
                         vm = instance.vm.apply {
                             router = object : CardSetRouter {
-                                override fun openLearning(ids: List<Long>) {
-                                    mainDecomposeComponent.openLearning(ids)
+                                override fun openLearning(state: LearningVM.State) {
+                                    mainDecomposeComponent.openLearning(state)
                                 }
                                 override fun closeCardSet() {
                                     mainDecomposeComponent.back()

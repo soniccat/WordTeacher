@@ -8,15 +8,23 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewI
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM.State.Companion.AllCards
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.extensions.addElements
+import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoaded
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepository
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
@@ -29,6 +37,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.internal.NamedCompanion
 
 interface LearningVM: Clearable {
     var router: LearningRouter?
@@ -103,14 +112,18 @@ interface LearningVM: Clearable {
 
     @Serializable
     data class State (
-        val cardIds: List<Long>,
-        val teacherState: CardTeacher.State?
-    )
+        val cardSetId: Long,
+        val cardIds: List<Long> = emptyList(),
+        val teacherState: CardTeacher.State? = null
+    ) {
+        companion object {
+            val AllCards = -1L
+        }
+    }
 }
 
 open class LearningVMImpl(
-    private var state: LearningVM.State,
-    private val cardLoader: CardLoader,
+    restoredState: LearningVM.State,
     private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator,
@@ -118,6 +131,7 @@ open class LearningVMImpl(
 ) : ViewModel(), LearningVM {
 
     override var router: LearningRouter? = null
+    var state: LearningVM.State = restoredState
 
     override val challengeState = MutableStateFlow<Resource<LearningVM.Challenge>>(Resource.Uninitialized())
     override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
@@ -127,10 +141,26 @@ open class LearningVMImpl(
 
     private var teacher: CardTeacher? = null
 
-    fun restore(newState: LearningVM.State) {
-        state = newState
+    private var cardRepository = buildSimpleResourceRepository<List<Card>, LearningVM.State> { state ->
+        databaseCardWorker.databaseWorker.run {
+            (
+                if (state.cardIds.isNotEmpty()) {
+                    it.cards.selectCards(state.cardIds)
+                } else {
+                    when (state.cardSetId) {
+                        AllCards -> it.cards.selectAllCards()
+                        else -> it.cards.selectCards(state.cardSetId)
+                    }
+                }
+            ).executeAsList().filter {
+                it.progress.isReadyToLearn(timeSource)
+            }
+        }
+    }
 
-        startLearning(state.cardIds, state.teacherState)
+    init {
+        cardRepository.load(state)
+        startLearning(state)
     }
 
     override fun save(): LearningVM.State {
@@ -144,24 +174,16 @@ open class LearningVMImpl(
     }
 
     // Screen state flow
-    private fun startLearning(cardIds: List<Long>, teacherState: CardTeacher.State?) = viewModelScope.launch {
+    private fun startLearning(aState: LearningVM.State) = viewModelScope.launch {
         challengeState.update { Resource.Loading() }
 
         // TODO: consider updating span priority to calculate required card spans first and skip not required for now
         databaseCardWorker.updateSpansAndStartEditing()
 
-        // Need to load cards first
-        val cards = cardLoader.loadCardsUntilLoaded(
-            cardIds = cardIds,
-            onLoading = {
-                //viewItems.value = Resource.Loading()
-            },
-            onError = { throwable ->
-                challengeState.update { Resource.Error(throwable, canTryAgain = true) }
-            }
-        )
+        val cards = cardRepository.stateFlow.waitUntilLoaded().data().orEmpty()
+        state = state.copy(cardIds = cards.map { it.id })
 
-        val teacher = createTeacher(cards, teacherState)
+        val teacher = createTeacher(cards, aState.teacherState)
         launch { // start observing hint string
             teacher.hintString.collect(hintString)
         }
@@ -412,7 +434,7 @@ open class LearningVMImpl(
     }
 
     override fun onTryAgainClicked() {
-        cardLoader.tryLoadCardsAgain()
+        cardRepository.load(state)
     }
 
     override fun onClosePressed() {

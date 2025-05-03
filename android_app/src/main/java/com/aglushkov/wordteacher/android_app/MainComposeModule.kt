@@ -75,7 +75,7 @@ class MainComposeModule {
                         .addArticleDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.LearningConfiguration ->
                     DaggerLearningComponent.builder()
-                        .setState(LearningVM.State(configuration.ids, teacherState = null))
+                        .setState(configuration.state)
                         .setComponentContext(context)
                         .setDeps(appComponent)
                         .build()

@@ -19,8 +19,6 @@ class LearningModule {
     fun learningDecomposeComponent(
         state: LearningVM.State,
         componentContext: ComponentContext,
-        cardLoader: CardLoader,
-        database: AppDatabase,
         databaseCardWorker: DatabaseCardWorker,
         timeSource: TimeSource,
         idGenerator: IdGenerator,
@@ -28,8 +26,6 @@ class LearningModule {
     ) = LearningDecomposeComponent(
         state,
         componentContext,
-        cardLoader,
-        database,
         databaseCardWorker,
         timeSource,
         idGenerator,
