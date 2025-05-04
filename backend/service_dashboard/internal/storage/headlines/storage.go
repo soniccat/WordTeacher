@@ -126,6 +126,8 @@ func categoryNameById(category int32) string {
 		return "News"
 	case int32(articlesgrpc.Category_TECH):
 		return "Tech"
+	case int32(articlesgrpc.Category_SCIENCE):
+		return "Science"
 	}
 
 	return "All"
