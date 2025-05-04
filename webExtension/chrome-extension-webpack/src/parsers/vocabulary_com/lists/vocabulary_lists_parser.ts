@@ -11,12 +11,22 @@ export function vocabularyListParser(document: Document): ParserResult {
   .pushState()
   .goToTopNodeWithMatcher(new dwlib.ClassNodeMatcher("title-actions-stats"))
   .goToTopNodeWithMatcher(new dwlib.ClassNodeMatcher("title"))
+  .pushState()
   .childNode((node) => {
     titleNode = node
   })
   .textContent((t) => {
     console.log("title: " + t.trim()) 
     cardSetBuilder.setName(t.trim().replace("\n", " ").replace("  ", " "))
+  })
+  .popState()
+  .goToTopNodeWithMatcher(new dwlib.NodeNameMatcher("BLOCKQUOTE"))
+  .childNode((node) => {
+    console.log("debug: " + node.nodeName + " " + node.nodeType) 
+  })
+  .textContent((t) => {
+    console.log("description: " + t.trim()) 
+    cardSetBuilder.setInfoDescription(t.trim().replace("\n", " ").replace("  ", " "))
   })
   .popState()
   .goToTopNodeWithMatcher(new dwlib.ClassNodeMatcher("entry", dwlib.ClassNodeMatcherType.StartsWith))

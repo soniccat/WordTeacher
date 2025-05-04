@@ -499,6 +499,19 @@ export class ClassNodeMatcher extends NodeMatcher {
   }
 }
 
+export class NodeNameMatcher extends NodeMatcher {
+  private name: string
+
+  constructor(name: string) {
+    super()
+    this.name = name
+  }
+
+  match(n: Node): boolean {
+    return n.nodeName == this.name
+  }
+}
+
 export enum TextNodeMatcherType {
   Equal,
   StartsWith,

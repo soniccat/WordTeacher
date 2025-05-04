@@ -32,7 +32,7 @@ export class CardSetBuilder {
 
     this.cardSetObj = this.jsonBuilder.cursor
     this.setName(name)
-    this.jsonBuilder.set("source", source)
+    this.setInfoSource(source)
     this.jsonBuilder.set("id", "")
     this.jsonBuilder.set("creationId", uuidv4())
     this.jsonBuilder.set("creationDate", this.creationDate)
@@ -42,6 +42,23 @@ export class CardSetBuilder {
 
   setName(value: string) {
     this.cardSetObj["name"] = value
+  }
+
+  setInfoDescription(value: string) {
+    this.obtainInfo()["description"] = value
+  }
+
+  setInfoSource(value: string) {
+    this.obtainInfo()["source"] = value
+  }
+
+  obtainInfo(): any {
+    let infoObj = this.cardSetObj["info"]
+    if (infoObj == null) {
+      infoObj = {}
+      this.cardSetObj["info"] = infoObj
+    }
+    return infoObj
   }
 
   json(): any {

@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.exception
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardProgress
@@ -133,6 +134,7 @@ open class CardSetJsonImportVMImpl(
         try {
             importCardSet = json.decodeFromString<ImportCardSet>(jsonText.value)
         } catch (e: Exception) {
+            Logger.e(e.message.orEmpty(), TAG)
             jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
             return
         }
