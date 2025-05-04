@@ -399,7 +399,7 @@ fun ParagraphViewItem(
 
 // http://zuga.net/articles/html-heading-elements/
 private val HeaderTagSizeToEmMap = mapOf(
-    1 to 2.0f,
+    1 to 1.8f, // 2.0f leads to text overlapping
     2 to 1.5f,
     3 to 1.17f,
     4 to 1.0f,

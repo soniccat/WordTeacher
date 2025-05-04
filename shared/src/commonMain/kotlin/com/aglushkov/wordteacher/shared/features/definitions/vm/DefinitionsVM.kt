@@ -266,6 +266,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onTryAgainClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.onTryAgainClicked"))
         word?.let {
             wordDefinitionRepository.clear(it)
             loadIfNeeded(it)

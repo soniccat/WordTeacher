@@ -96,7 +96,6 @@ class ArticlesRepository(
             }
         }
 
-
         scope.launch(Dispatchers.Default) {
             database.articles.selectAllShortArticles().asFlow().collect {
                 val result = it.executeAsList()

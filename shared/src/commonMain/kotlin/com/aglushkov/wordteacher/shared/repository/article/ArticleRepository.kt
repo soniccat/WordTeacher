@@ -21,7 +21,7 @@ class ArticleRepository(
     val article: StateFlow<Resource<Article>> = stateFlow
     private var loadJob: Job? = null
 
-    suspend fun loadArticle(id: Long) {
+    fun loadArticle(id: Long) {
         loadJob?.cancel()
         loadJob = scope.launch(Dispatchers.Default) {
             database.articles.selectArticle(id).collect { article ->

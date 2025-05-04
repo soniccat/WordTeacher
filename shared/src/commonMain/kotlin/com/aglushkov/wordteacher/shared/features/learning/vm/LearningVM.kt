@@ -434,6 +434,7 @@ open class LearningVMImpl(
     }
 
     override fun onTryAgainClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Learning.onTryAgainClicked"))
         cardRepository.load(state)
     }
 

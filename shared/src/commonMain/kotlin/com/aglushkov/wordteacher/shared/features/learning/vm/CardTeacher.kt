@@ -268,5 +268,5 @@ class CardTeacher(
     )
 }
 
-private const val CARD_PER_SESSION = 2
+private const val CARD_PER_SESSION = 7
 private const val HINT_HIDDEN_CHAR = '_'

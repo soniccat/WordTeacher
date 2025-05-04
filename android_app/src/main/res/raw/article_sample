@@ -1,561 +1,292 @@
-CORECURSIVE #099
-
+<h1>CORECURSIVE #099</h1>
 Code, Kickflips and Crunch Time
-
 Mick West's Neversoft Journey
 
-
-Transcript
-
+<h2>Transcript</h2>
 Note: This podcast is designed to be heard. If you are able, we strongly encourage you to listen to the audio, which includes emphasis that’s not on the page
-Intro
 
+<h2>Intro</h2>
 Adam: Welcome to CoRecursive. I’m Adam Gordon Bell. How do you build the most successful video game? Like the one that, that tops the charts, that captures a moment, that leads to a franchise, that changes gaming. One key is you gotta catch a rising star at just the right moment.
-
 Mick: We signed Tony Hawk, he was shown a demo of the game. And he liked it. And then luckily after that, he was in the X Games and he landed the first 900 trick, which is like, you’re doing two and a half spins.
-
 And that was like the holy grail of skateboarding tricks.
-
 It’s like the best moment ever in skateboarding history. And just before the game was going to go to the duplicators. And so it really like, it was this extra big boost for us. And we had to get the 900 in the game.
-
 Adam: That’s Mick West, and yeah, he was the lead programmer on Tony Hawk Pro Skater. You know the game, the one where I, I know all the songs, where people my age probably played it obsessively at some point? Well today we’re diving into the story behind its creation.
-
 But you know what bothers me? Is stories that start there, right? With, and then We signed Tony Hawk or, and then we had her IPO because I always think to myself, like, well, what happened before that, right? How did you get to that point? So that’s what I’m talking to Mick about. We’re tracing his path from fresh college grad to successful industry veteran.
-
 And along the way there, there’s lots of passion projects. There’s lucky breaks, but yeah. Mick mastered game design and scheduling and managing teams. And most importantly, nailing the fun game mechanics that separate a mega hit from just another game. So let’s trace that decades long path, right? Mick has years of dedication where he kept leveling up his skills.
-
 He collaborated with other people. And yeah, there was technical hurdles to overcome. There was crunch times that they had to power through. Their focus was on creating games they loved. Right. It’s a, it’s a journey built, not necessarily on dedication, but sort of on passion, pouring yourself in to projects, embracing the growth, surrounding yourself with like minded people and just doing it right.
-
 Because behind every iconic game, there’s an extraordinary career. And a career tale worth exploring. So that’s today. It’s a bit about the nuts and bolts of game creation, but also really, it’s about, you know, how do you craft an extraordinary career in your field and whatever field that might be.
-
 So let’s start at the beginning, right? For Mick, this journey started in 1989. When he finished college and he landed his first job at a game company.
-
-First Game Company
-
+<h2>First Game Company</h2>
 Mick: so I just applied to one and went to the interview. And the guy just asked me these really basic questions like, how do you draw a line and things like that.
-
 Adam: Of course, Mick knew how to draw a line on a screen. He’d been building little games and drawing things on screens of computers since he was a kid. And so this company – which is called Binary Designs – they hired him.
-
-Mick: It’s in a place called Victoria Building, I think, which was part of the train station in Manchester. It was this really old office building, down below us there was a kebab shop on the lower floor and above us there was like a phone hotline where people would like, dial in and pay 50p a minute to have some woman talk to them.
-
+Mick: It’s in a place called Victoria Building, I think, which was part of the train station in Manchester. It was this really old office building, down below us there was a kebab shop on the lower floor and above us there was like a phone sex hotline where people would like, dial in and pay 50p a minute to have some woman talk to them.
 And it was really old. It was like you’re living in some, some building from the Edwardian times. You had these giant high ceilings and peeling paint from the walls. Looked like something out of a movie. And then we were all just crammed into these, these giant rooms with these high ceilings on the, and we all had like, um, two computers on our desk.
-
 Adam: Two computers would be two Amigas, or maybe two Atari STs. These were both far more powerful than the Spectrum that Mick had grown up on. Mick’s first game targeted the Amiga, so they set him up with two Amigas jammed on his desk.
-
 Mick: You’d write the code on one of them and it would have a floppy disk drive. And so you’d write the code, edit something, then you’d like to compile, save it to the floppy, take it out, stick it in the other one, reboot the other computer, let it load up the program, see if your change works.
-
 It was very laborious process
-
-Steve Davis World Snooker
-
+<h2>Steve Davis World Snooker</h2>
 Adam: The game was called Steve Davis World Snooker.
-
 Mick: Steve Davis was a , famous snooker player back in the day. Looks a bit like Ken Jennings with ginger hair. But yeah, so we had to do , this snooker game. And I remember , the guy who was working on it at the start didn’t know any trigonometry at all. Which was a real downside when you’re programming a snooker game.
-
 And so, they hired me and I go in there and immediately start changing all of his code because he, he was doing it in a most ridiculous way where he had I think like 32 entry lookup table. And so if it was like, if it was coming from direction 17 and the velocity is less than this, then go in direction too.
-
 And it would’ve been the worst snooker game ever.
-
 Adam: Once the game was finished, Mick’s latest disc was shipped off to the duplicators, who made copies of this disc, boxed it up, and released it. Remember, this is before Steam and app stores. The game actually hit store shelves. You know, a floppy disk in a box waiting to be picked up by gamers.
-
 Mick: That was an awesome feeling. Seeing my very first game on the shelf. And then not only that, but like seeing it being reviewed in magazines. And people were writing about things that I’d done, and they would put the programmer’s name in the reviews as well because, back then it was these small teams, so it’s like, programmers by, you know, there was three people, I think, working on it
-
 Adam: Was the review good?
-
 Mick: Yeah, it was, it was pretty good. Uh, I mean the game itself wasn’t amazing.
-
 You could have done a good 3D snooker game, pool game on the Atari ST back then But we did this this top down thing So you just see the balls moving around the screen and the the pool cues like that Bouncing off the cushions and that’s how snooker games had always been done up until that point.
-
 People didn’t mind they liked it and it was it was still kind of fun to play. So it got good reviews and it sold reasonably well, I think.
-
-Rotox & Bankruptcy
-
+<h2>Rotox & Bankruptcy</h2>
 Adam: Mick’s next project was Rotox, a tank arcade game with a twist. And the twist was the player stayed centered in the screen while the world moved around it as sort of a top down view, like Contra 3 that I played as a kid.
-
 Mick: And this was like this amazing thing at the time. It was the most incredible thing that no one had ever seen before. Like the whole thing rotates. Because everyone’s used to like, space invaders and things where everything’s very static.
-
 They, they, they really gave us very little instruction.
-
 They said right this is what we’re going to do We’re going to build the game that’s going to be this and you go for it And they didn’t really, you know, give you very much in the way of instructions And this this happened quite consistently
-
 There was like the boss who owned the company and he was in another building and he only came around every like week or so.
-
 And so you, You were kind of left on your own to work on it for a while. So I didn’t really know what I was doing. And I spent all this time writing an editor to edit these levels and everything got really like behind schedule.
-
 Adam: Part of the problem was there wasn’t really any milestones. They expected a 20 year old, fresh out of school to hit an arbitrary schedule that they had made up, right? No questions asked. Honestly, with that type of freedom, I could have easily wasted several months at the beginning of the project. But for Mick, the work was fun, and he liked the artist he worked with, and with few other commitments, you know, he was young, time flew by until the deadline was getting close and the game was almost finished.
-
 Then one day they walked into the office and they noticed something was different.
-
 Mick: And we see that our Atari STs have been replaced by VIC 20s. Like Commodore VIC 20s, which is this really much, much crappier, older computer. And we had no idea what was going on, and we just stood around for a while, and eventually, like, someone came in and said, “You know, I’m the official receiver for this company, which has entered bankruptcy.”
-
 And, uh, we’re going to go and have an interview with all of you and, uh, see how much backpay you’re owed. And then you’re off.
-
-Backrupcy Shennagians
-
+<h2>Backrupcy Shennagians</h2>
 Adam: Right before the bankruptcy, the boss had swapped out all the computers for older machines. The good dev machines all landed, surprise, surprise, in a new gaming company. It started by the same guy.
-
 And he took the old game that I was working on, he took Rotox. And that was released by the new company, even though I’d been working on it on the old company. And it really should have been, I guess, part of the assets of the old company.
-
 Mick: This is all, 30 years ago now or so. Hopefully, hopefully it’s not going to get prosecuted because of my revelations about the VIC 20s.
-
 Adam: The bankruptcy receiver told Mick he actually had a bunch of back pay.
-
 He hadn’t been taking any vacation because he was trying to meet his deadline. And so he had a couple of weeks where he could do his job search. The Binary Designs team, they just regrouped at a local pub and started brainstorming strategies for finding their next jobs.
-
 Mick: So we kind of formed together into groups and we’ve said like, “You, me and, uh, and Larry, we’ll go to this other company and we’ll, we’ll try and get a job there as a team because we’ll stay together as a team.” So I go there with, with these, these two other guys and we get to the interview of this next company and then they say, “Well, yeah, Mick, we’re, we want you, but we don’t want Larry.”
-
 So I was like, “Okay, well, I’ll, I’ll, that’s fine. Sorry, Larry.” I think Larry eventually went into insurance or something like that.
-
-UN Squadron
-
+<h2>UN Squadron</h2>
 Adam: The next company was called Tiertex and they did a lot of conversions from arcade games to home computers. Mick joined and was asked to work on a game called UN Squadron.
-
 Mick: Which is where people from the United Nations are invading a foreign country for some reason. I’m sure there’s some, some good reason why the United Nations was killing all these people, but, uh, probably rescuing the good people from the bad people.
-
 But basically you’re flying a plane, side scrolling, shooting up type thing.
-
 Adam: So did they like buy an arcade machine for it and
-
 Mick: Yeah, they, they had, um, they had an arcade cabinet and the boards back then were kind of standard.
-
 I can’t remember what it was called. It’s called a jammer or something like that. Standard type of thing.
-
 Me and one artist were working on this game. They would send you a board. Which had the game on it and then you, you’re on your own for, for a year trying to, trying to do this,
-
 Adam: Nowadays, if you were doing an arcade conversion, you’d get all the assets from the company. All the artwork, maybe all the code, anything that could help you.
-
 Mick: But this, they didn’t give us anything at all. They didn’t tell us anything at all about the game. Like, how it worked, or anything. There’s zero. So we had, the artist had to recreate all of their artwork from scratch. And so the artist just starts working on getting through that list of stuff and then getting it to me I have to work on fitting it into the game, which means because you’ve got to be fitting within the available memory so I’ve got to figure out, you know, what format it is and how to do a, how to store the maps, the side scrolling maps, because, uh, you couldn’t just draw all the graphics and just scroll a giant picture.
-
 You have to break it down into individual tiles, and then you do a tile map, and then you scroll this tile map.
-
 Adam: Figuring out the tile map was the tricky part for the artist, because they had nothing besides the arcade games, right? They had no assets, they had no code. The only way to figure things out was to play through the game.
-
 Mick: So, like, for the first, uh, I don’t know, like two or three weeks.
-
 All I was doing was playing this game through from the start to the end over and over again getting better and better at it so I could figure out exactly what’s going on videoing myself doing it but also studying things like you know when does this guy come in and if I you know, if I fly in at a different angle, will they trigger it from a different thing?
-
 And how did these missiles work? There’s homing missiles. So I’d have to like fly around the screen and try to figure out what the algorithm was for these, these homing missiles
-
 Adam: Playthroughs were videotaped, and the artist used these recordings to literally trace assets directly from the screen.
-
 Mick: Often with actual paper on the screen. Tracing over that and then, there’s a little grid. And then redoing it in these pixel art programs. Because, you know, everything was like just pixel art back then. It wasn’t 3D at all. You had to just like do individual pixels.
-
 And then I’ve got to recreate it myself in code. And back then we were coding in Motorola, 68, 000 assembly language
-
 And you had to fit it all in 512k or half a megabyte of RAM, which wasn’t very much, and on one floppy disk. But it was actually kind of fun, I enjoyed doing that. It was fun playing the game and it was fun replicating that experience, on the Amiga, or the Atari ST.
-
 And so we just basically just plowed through it, just getting everything in from the arcade game into this conversion and trying to get it all done. I think we had to get it done by Christmas, this particular one. So. And that became a recurring theme, games getting released by Christmas.
-
 Adam: Ah, that’s when parents are out buying games for their kids?
-
 Mick: Indeed, yes, yes. And, yeah, people have a bit of spare spending money as well. If they get given money, they go out and buy a video game. Yeah, that was a big, a big sales time. And, yeah, that was always, throughout my career, was everything was organized around the holidays,
-
 Adam: This was sort of the feel of the game industry back then. A programmer and artist worked side by side, like literally Mick could reach out and touch him, crafting a game from scratch, and racing against the calendar year to hit a launch date in Christmas. And then you kind of repeat this annually. Mick’d work with an artist named James, and they’d hit the pub for lunch each day and gossip about the various local game companies.
-
 Mick: And the pub at the time had this, this deal, where you would get free pizza if you bought a beer.
-
 So we’d always go to the pub at lunchtime, have a beer, usually two, and eat pizza and then plot our, our departure.
-
 We can kind of see that the stuff that was going on at, at Tiertex, they were just doing like these arcade conversions and kind of low quality stuff. And I think we’d heard of other people moving to Ocean and getting paid more and getting paid royalties for their games and getting paid bonuses. And it just seemed like if you go to Ocean, you’re going to get a lot more money, basically. Yeah, for doing similar work, similar type of fun work. They were an actual publisher, whereas Tiertex was working for a publisher. So you didn’t get the same kind of direct involvement.
-
 Adam: If you aren’t up on the games industry, like I’m certainly not, I’m actually not a big gamer, know that game developers create games under contract from publishers. The publishers handle all the marketing and the distribution and the promotion. They’re the ones who get the games into stores, and they’re the ones that reap the profits from sales.
-
 And that profiting from the sale of the game, that was what excited Mick and James. And it was a hot topic during their lunchtime chats over pizza and beer. Sometimes I feel like talking shop gets a bad rap, right? Discussing who’s working where, what it’s like at different companies. People can look down upon that.
-
 But as you’ll see, industry talks, gossip, like this, they’re a key to Mick’s career. Grabbing a beer or coffee with the right folks can occasionally take your career to the next level. So because it sounded exciting, James and Mick decided to go to Ocean for a job interview, and Ocean was on board. They both secured positions to start after they finished their current game.
-
 Mick: And unfortunately, someone overheard us plotting and then they reported it to the management.
-
 And I was figuring I was going to leave after, after I did this, uh, this Atari ST version, but then said, Nope, you have to stay and do the Amiga version.
-
 I was like, Hmm, no, I think I’ll just leave. And then they were like, Nope, you have to stay. Everybody knows everybody within the games industry. So they called their friends over at Ocean and Ocean says, Yes, Mickey, you’re going to have to stay and finish this. So I knocked it out in like two weeks so I could go and start working at Ocean.
-
-Ocean
-
+<h2>Ocean</h2>
 Adam: And so Mick got the start on his new job at Ocean. It was a real game publisher. One that started years ago with mail order games, but now was doing a lot of exclusive games for large U. S. movie franchises, like big blockbuster movies. Ocean was a major player, but their offices didn’t give that impression.
-
 Mick: Well, the Ocean Office was even worse than the Binary Design Office, uh, in that it was, it was a crypt. It was an old Quaker’s meeting hall, and I think they cleaned out the bodies from the crypt. And so we were in these, these like, arched things. If you stood up, uh, the one side of the room, you bang your head on these, these stone arches, which are probably like 300 years old or something.
-
 And it, we were, we were crammed in. It was like two people again, working together, you and an artist. So there’s me and an artist. Then there’s like a kind of a partition in the middle of this arched crypt. And then two people on the other side. Another guy and an artist and then some, some testers were across the, the hallway and this really low arch thing, and they were all kind of like huddled over, like underneath this stone archway where they’re playing on the computers.
-
 Adam: At Ocean, the development environments got better. Mick had a PC and an Atari, and they were connected via a parallel cable, so instead of swapping disks back and forth, you could sync code directly to the Atari. The project that Mick got assigned was turning the new Liam Neeson movie, Darkman, into a game.
-
 Mick: Just this pretty, uh, kind of schlocky, horror, Frankenstein, Invisible Man type thing, where the guy gets badly burned and has to wear masks to solve crimes.
-
 And we had to do a game version of that. We went down to London, I remember that was kind of fun. We went to London to the studio, I mean, it wasn’t the studio, it’s like, because it was an American film, but it was in London. They had like the, whoever the distributors were, had a little, one of those cinemas, like a screening room.
-
 We got to see it in the screening room and I was like, wow, this is awesome. Like, you know, I’m in Hollywood.
-
 Adam: Mick and the artists had to find a way to incorporate elements of the movie into the game. And in the movie, Darkman takes pictures of people and then recreates masks based on the photos.
-
 Mick: And so there was a section in the game where there were these windows and people would occasionally walk past the window and you’d have to like, click on them with a pen cursor and take a picture of them and then if you took enough pictures it would give you a disguise and the disguise would give you some like invincibility for a few minutes where the bad guys wouldn’t recognize you until it wore off and so you have to do these almost like nods to what’s happening in the movie, but really it’s just a game where you jump on platforms and you shoot at things and then you throw bombs and press switches and solve puzzles.
-
 It’s really nothing to do with the actual game, but stylistically you have some similar elements from the movie. But yeah, it was quite remarkable how little direction we were given, like, you know, we, we gave the game to the testers and they would test things and give us bugs. But, you know, the game design was, was all up to me.
-
 I was just like some kid out of college who knew how to code. And they relied upon me to make a, a fun game. And it, it wasn’t, wasn’t that great.
-
-Long Hours
-
+<h2>Long Hours</h2>
 Adam: Even though the game wasn’t original, there was still work to be done. And without clear milestones or oversight, the workload could be inconsistent at times.
-
 Mick: And so, you know, you’re left on your own, la dee dah, for several months, and then all of a sudden, like, it has to be done in three weeks. And I’m like, what? And there’s all this, there’s 500 bugs that you need to fix. And so you end up having to stay a long time. And sometimes like late into the evening, there was one occasion when I actually got locked into the offices because I was there so late.
-
 Uh, so I was the last person to leave and the door didn’t have any, like, fire escape exit or anything like that. It was locked from the outside essentially with a big old key. This old building and so there was no way of getting out once you’re inside. So I was trapped inside this building if there had been a fire I might have died. But yeah, so I was stuck inside there and I could hear people in the church upstairs. And I’ve tried like knocking on the walls, trying to get their attention, but I didn’t get any attention.
-
 Adam: So Mick gets out of the office in the nick of time. Yeah, he gets the game ready in time for launch.
-
 The Lethal Weapon game for the Sega Genesis was shipped as planned. Because, at Ocean and at all the places Mick worked, there was an unwritten law. The game has to hit the deadline, it has to get out for Christmas, no matter what.
-
-Parasol Stars
-
+<h2>Parasol Stars</h2>
 Adam: So next, Mick dove into his next project, converting this lesser known game that was called Parasol Stars. In it, you catch raindrops with parasols, basically umbrellas. Mick’s favorites because it was fun to play. But unfortunately, the conversion process had some challenges.
-
 Mick: So they didn’t give us any code, they didn’t tell us how anything worked or, anything about the secrets of how things were supposed to pop up when they did. So again, I had to play through the game all the way from the start to the finish. So I got very, very good at playing Parasol Stars.
-
-And basically learning exactly what all the algorithms were by just looking at what happens on the screen and trying to figure it out. That was one of the first games where I started writing custom tools for it. Because we got given all the graphics, but on the PC Engine, each individual sprite on screen can have its own 16 colors. So you had a total of like 2, 000 colors possible, but each sprite could have its own palette of 16 colors, which, which was great. But unfortunately on the, uh, the Atari ST, it only had 16 colors total for the entire thing. So we had to come up with a palette of just 16 colors and then map all these like 2, 000 colors to this, this, this, uh, this much more reduced palette.
-
+And basically learning exactly what all the algorithms were by just looking at what happens on the screen and trying to figure it out. That was one of the first games where I started writing custom tools for it. Because we got given all the graphics, but on the PC Engine, each individual sprite on screen can have its own 16 colors.  So you had a total of like 2, 000 colors possible, but each sprite could have its own palette of 16 colors, which, which was great. But unfortunately on the, uh, the Atari ST, it only had 16 colors total for the entire thing. So we had to come up with a palette of just 16 colors and then map all these like 2, 000 colors to this, this, this, uh, this much more reduced palette.
 Adam: During this time, Mick also continued to refine a skill to him throughout his entire career. His ability to reverse engineer an existing game.
-
 Mick: which meant for each level you’d pause the game as it started, and then you’d see where is everything, and then you’d, you’d edit, I wrote a little editor to edit the start positions of everything on screen, then you’d play it, and you’d see how do these things move, and where do they go, where do these things drop, where these little things pop up, What kind of magic makes these things happen, because you sometimes get special bonuses and things like that, we couldn’t figure out the algorithms that they use, and we asked them, we asked the Japanese company, never heard anything back, so we had to basically invent our own best guesses as to why things were happening.
-
 Uh, in the code based on what we saw on the screen, but it worked out really, really well. That was one of the best games I did of that period. It’s an arcade conversion, but it was very, very accurate to the, to the game as it was on the original PC engine. So I was extremely happy with that that particular game.
-
 Adam: Like, why does it stand out?
-
 Mick: It was a fun game to play. It was it was like the UN squadron really wasn’t that great of a game. The Parasol Stars game was much better in that it was more true to the actual original and things that, things moved relatively fast.
-
 But it worked out really well, and I was very happy with the way, like, the end result was to play, because it felt very much like the original game.
-
 And it looked pretty much like the original game, especially the Amiga version.
-
 Adam: And did it, it was released to, to Fanfare
-
 Mick: Yeah, no, it was. People loved it. It was, it was very nice we didn’t design the game, we just did the conversion of it because it was a very good original game. People loved it because the conversion was so accurate and, very, very playable with the, the different controls.
-
 So, it, it was very well received, I think.
-
-California
-
+<h2>California</h2>
 Adam: The game was a hit, right, thanks in part to the great conversion, but really the gameplay was what stole the show. Meanwhile, you know, Mick continued to make friends and talk to people in the gaming industry in the UK and Manchester. And then some of these people that he knew, they started to go to California.
-
 Mick: And, you know, I kind of, eventually, yeah, saw, What was happening and one of my friends, uh, Mike Lamb, he moved to the United States and he worked on, I think, uh, Mike Tyson’s Knockout or something like that, a Mike Tyson boxing game, which is incredibly big selling game at the time.
-
 And he was making like, thousands or tens of thousands of pounds in, in royalties. And I was like, I gotta get me some of that. And so, you know, at the time I’d just broken up with my girlfriend, didn’t have anything keeping me in the, in the, in the U. S. So I thought. Time for my next great adventure. I’m just going to go, go to the United States. So I remember I faxed over my, uh, my resume to the guy and, uh, he was like, come on over. Mike says you’re, you’re a good guy and that’s good enough for me. So, the, the salary was, was like at least twice as much as I was making in, in the UK. So that was a great thing.
-
 I mean, and we were promised royalties as well, so it was like no brainer really.
-
-Malibu
-
+<h2>Malibu</h2>
 Adam: Moving to the States was going to be great, right? Mick thinking about it while he packed. He’s thinking, you know, I’m going to be working on this MechWarrior game. Going to be making twice as much money. I’m going to be in Malibu. It’s an exciting time, but things didn’t quite work out as expected.
-
 Mick: didn’t realize that Malibu was actually, uh, not exactly where the offices were. It was just called Malibu Interactive.
-
 It was actually in, in the San Fernando Valley, which was over on the other side of the Santa Monica mountains. And it was quite a trek to get to the ocean at lunchtime. So, but it was still, you know, it’s America. It was, uh, a novel experience for me.
-
-Starting Neversoft
-
+<h2>Starting Neversoft</h2>
 Mick: I think after the, after this first game, this MechWarrior game, I had nothing to do. So I’ve been left to my own devices. There wasn’t a new game for me to work on.
-
 So I started writing a Doom clone.
-
 So I did that . And I think um, Joel came in one day and he said, How long did that take you?
-
 Adam: Joel was an accountant at Malibu Interactive.
-
 Mick: And I was like, no, like about a week. And he was like, hmm. And he comes back like the next, uh, next week and he was like, so Mick, like I’m thinking, you know, let’s, let’s go to the pub And he told me that he was thinking of starting up a company and, uh, wanted me to, to do it and he had like some contacts already, and I suggested we bring another guy, Chris Ward, I was living with him at the time. We were sharing an apartment. And so I said like, me and Chris, you, we’ll start this company. So that’s what happened. Uh, we started Neversoft.
-
 Adam: How does that work? Like,
-
 you get an accountant, and a programmer, and
-
 Mick: Yeah, yeah, that’s that’s what happened. That’s what happened. So yeah, you get an accountant and a programmer and an artist. The accountant negotiates the deal. You don’t need an accountant, but it’s very good to have one as it turned out. So Joel has been talking to people at Playmates Interactive.
-
 Adam: Playmate Interactive was on board.
-
 They offered 10, 000 a month for three months, and then there was a milestone at the end. Right, they’d evaluate the game and if they wanted to greenlight it and keep paying the 10, 000 a month or just cancel it. That deal was the ticket out of Malibu for the three of them.
-
 But then at that point, even staying in the U. S. became a hurdle
-
 Mick: we were on visas, like temporary work visas. So we had to get new visas via this new company to stay. But if the money had run out, I would have been deported. I would have had to leave the country if I couldn’t find another job. Because, you know, it’s tied to a particular company.
-
 So we had to jump through all these hoops with immigration. Get an immigration attorney and, get the things transferred over. Uh, but yeah, so we started working on this, this game and, you know, again, like, I wasn’t, there was no one, there was no game designer, so it was me doing the game design again.
-
 So I’m getting a bit better at this stage at doing game design, having been forced to do it, uh, for all these years, even though I’m really just a programmer. So I, I do this, this game design document that I wrote up for them and they’re like, yeah, that sounds good. And then we started, uh, we started the company
-
-Neversoft Office
-
+<h2>Neversoft Office</h2>
 Adam: The first game was a success, and it spared Mick and his roommate from being deported. And, you know, this secured their toehold in the industry. And they even had an office. Now they, they set up shop in an office across from a bowling alley in Woodland Hills.
-
 Mick: Which turned out to be fortunate because it tied in with our Tony Hawk’s Pro Skater game, which comes a bit later in the story.
-
 But But yeah, so we sat in an office, there’s no internet back then. Yeah, I mean, I was, I was, Jack of all trades back then, because, you know, back when it was just me, there was no one else to do anything, so I had to do things like build the computers, fix them if they went wrong like, and manage the network and when we eventually got servers, like, I had to do the server management and rebuild, uh, that when it went wrong, and do all the backups and things like that, and a lot of stuff that wasn’t just programming, it was, uh, you know, the type of stuff you would have an IT department do.
-
 do nowadays. But back then, operations were so small, you got to do everything.
-
 Adam: So yeah, sure. Mick started out juggling all the tasks, but as Neversoft found success, they were able to expand the team and grow more people, and for this group of guys in their 20s, the Neversoft office turned into more than just a place to work.
-
 Mick: we would often like hang out in the office in the evening, either just doing work or just playing stuff. And we would do all kinds of just stupid, like, kids stuff. Like we’d build forts and we’d play, we’d do jugg we’d have juggling contests and we’d, we’d play.
-
 throw things around. I had a a stiff like a, it’s like a bow staff, like a five foot staff made out of red oak. Because I was like, you know, everyone fancies themselves to be some kind of ninja when they’re a young man. And we would play with that. And I think it ended up like, like getting stuck in the ceiling at some point because I threw it and it bounced off a box and like ricocheted up into the ceiling and Joel banned it.
-
 Joel had to be like the dad in that situation because he was like, I don’t know, maybe four, he’s like four years older than us, I think, which at the time seemed like he was an old, old dude, like four or five years older. He was practically in his thirties. But yeah, he got to be the dad. Uh, so he would he would tell people off if they got into fights and things, which did actually happen occasionally.
-
 and he confiscated my stick. He made me take my stick home, which was probably a good idea. I probably would have broken a window or something at some point.
-
-Scheduling
-
+<h2>Scheduling</h2>
 Adam: Joel was the CEO and he kind of had to play the heavy. So he tried to minimize the playful chaos at the office, but Mick was an owner as well. And as their games grew more complicated, as it was no longer just, you know, one programmer and one artist, there was some changes that were needed.
-
 Mick: And Joel was always encouraging me to Make a schedule. I was quite resistant to it at first. I was like, no, this is how it works This is how we’ve always done it and joel was more and more insistent.
-
 I mean from joel’s perspective He’s the accountant. He’s the ceo at this point because we’re starting to get more because to get bigger after we do, uh, That that game and so he’s encouraging me to actually write a schedule and I think It got quite quite heated at some point and I was like, yeah, it’s just ridiculous.
-
 I’m not doing it and joel’s like well You know We’re gonna have to call it quits then. And then I kind of saw the error of my ways and I was like, well, okay, I’ll write a schedule. And I wrote this very, very short schedule and yeah, we’ve been fine tuning scheduling ever since.
-
 Adam: Their scheduling process worked well when they had a game to develop, when they had these clear targets that were set by the publisher, right? You have to hit this deadline, you have to hit this milestone. But in the LULs, when they didn’t have a game on the horizon, it was tougher. They’d kind of build prototypes and try to shop them around publishers and try to get some new business going.
-
 Mick: We did all kinds of prototypes of games. We did a prototype rally racing game, and kind of a, Futuristic racing game.
-
 We did a Tiger Woods game thinking this Tiger Woods guy looks like he might be popular one day, let’s say. He was, he was already quite popular by then, but nowhere near what he actually became. Uh, so we pitched a Tiger Woods game. No one, no one bought it, a bass fishing game.
-
-Enter Sony
-
+<h2>Enter Sony</h2>
 Mick:«!–(31:59)–> and then we, we were working on a MEC game, and I think, uh, Sony eventually saw this Met game that we were working on, and, uh, thought that it, uh, it was worth doing.
-
 And so they, they hired us to do this Met game called Big Guns. And then, you know, Sony, big company, they kind of forced us to professionalize a little bit more, like started developing tools and using 3D Studio, that was a 3D editing program back then, to edit the levels in and kind of make things, the process a bit better.
-
 And it kind of helped, but unfortunately they also the game design in this really boring direction, and the game itself got really boring and complicated, and, didn’t really work and then they cancelled it because they, the game that they started with was fun But again, they ended up with through their direction ended up not being very good
-
-MDX Conversion
-
+<h2>MDX Conversion</h2>
 Adam: so the big gun codebase just collected dust for a while. It’s going to come back up, just wait for it. But the next thing that happened is Neversoft did a PC to console conversion. It’s similar to the arcade conversions that Mick had done back at Tiertex
-
 Mick: the PCs back then, they had about 16 megabytes of RAM. And we’re converting it to to like the PlayStation, which had basically one and a half, I think.
-
 Compared to a 16 megabyte PC and the code’s all written in, in C at this point. So it’s, it’s getting quite complicated here. And the PC has floating point. The PlayStation doesn’t have floating point. It’s everything’s fixed point arithmetic, which means that you can’t have very high precision things.
-
 And if you do have high precision, it’s really, really slow. So we had to do all these. Incredible hoops to jump through to actually get it to work on, on the PlayStation
-
 Adam: The publisher promised a 40, 000 bonus if Neversoft could deliver the game and pass QA in October. And it seemed like with their newly honed scheduling skills that this might just be doable.
-
 Mick: And so we’re like, well, we, we all meet that deadline and we did, we met that deadline, but at, at what cost? Well, the cost of meeting the deadline was that the game was just riddled with bugs.
-
 It was just, we, we kind of like thought, oh, it’s maybe it’s okay. Yeah, but then they took it to their test department and immediately they come back with like 500 bugs. That we have to fix. And so the deadline is now gone. And now we’ve just got to try to finish it by Christmas. And so entered like the, the most hellish period of programming in my life.
-
 When I was basically just fix one bug, another one appears,
-
 Adam: the big problem, of course, is that big games mainly sell at Christmas. If you work for a year to hit a Christmas deadline and then you miss it, well, you’ve got a year until the next big sales season again. And a publisher who’s funding you and taking all this risk, if they miss that Christmas slot, that’s putting them in a really bad place.
-
 If you give a publisher a bad time like that, you can bet other publishers will hear about it, and you might not get any games the next year.
-
 So it was crunch time, and the bugs got worked through, and they put it on a CD, and they sent it off to Sony to retest, just in time, if everything played out right, to hit that Christmas release. But then, a critical crash bug was found, the type that Sony won’t let through.
-
-Game Crash
-
+<h2>Game Crash</h2>
 Mick: one of the programmers on his in his own spare time had added an extra difficulty level to the game
-
-You’d only get through after you’ve played through the entire game once. he did that and then they sent it to Sony and then they find a bug with this thing. Which was not authorized by the original publishers. So, we kind of got in trouble for that, because we weren’t supposed to add things like that. And he added this, this, this, the extra thing. And the game would just, it wouldn’t crash. Like, after you finished this super hard difficulty level, it, it wouldn’t crash.
-
+You’d only get through after you’ve played through the entire game once. he did that and then they sent it to Sony and then they find a bug with this thing.  Which was not authorized by the original publishers. So, we kind of got in trouble for that, because we weren’t supposed to add things like that. And he added this, this, this, the extra thing. And the game would just, it wouldn’t crash. Like, after you finished this super hard difficulty level, it, it wouldn’t crash.
 You get a black screen, you press a button and he goes past it. And they failed us for that.
-
 Adam: This is a big problem, right? Because it might be easy to fix this, just remove the level that’s not even supposed to be there, but then there could be new bugs introduced. Sony needs to restart the QA process with this new CD. With this new version.
-
 Mick: and we would have missed our ship date and we would have missed Christmas and the distribution deal would have been messed up and, hundreds of thousands of dollars would have gone up in smoke and no one will work with us ever again,
-
 we, we called, like, the head of, of, of Sony Games and we basically begged him, Please let us, let us, uh, pass this thing. And then they, they said, well, you know, you press a button and get past it, I guess it’s okay.
-
 And so we shipped in time for Christmas, which, which saved us, I think.
-
 Adam: Because it worked out, Neversoft was able to get more work from publishers. Activision, at the time, was struggling with this game called Apocalypse. They had spent six months with some other dev shop, but it wasn’t working out. And so Neversoft was asked to step in. The game had started with this motion capture version of Bruce Willis, and it wasn’t really clear how to turn it into a fun game.
-
 But Neversoft still had that big guns code base. This had sort of become the MO at Neversoft: recycle. You know, things from the previous game to build a game engine for the new game
-
 And so they repurposed it. They inserted motion capture, Bruce Willis into the gameplay. They used that old code as their game engine, tweaking it to meet the needs of the new game.
-
 Mick: That worked out really well And knocked out this lovely little game in, in like seven months or so. In time for Christmas, saved Activision’s bacon and made it seem to them like we were a great professional company.
-
-SkateBoarding
-
+<h2>SkateBoarding</h2>
 Mick: And when that one finished, they said, well, we also were thinking of doing a skateboarding game.
-
 Activision, kind of like their marketing department, had identified an underserved niche. It’s action sports. And they think, oh, we’ll start the whole action sports thing because the X Games was kind of big at the time.
-
 And skateboarding, Tony Hawk was starting to get well known. And so, they said, let’s do a skateboarding game. And they didn’t know how big it would become. They just thought it would be like a nice little earner, you know, they could make some, some money doing a skateboarding game and maybe something would come from it.
-
 And we were like, sure, I guess, yeah. And across the road from us in the bowling alley, there was a, an arcade machine called Top Skater.
-
 Adam: Top Skater was all downhill, almost like a racing game, except you’re racing down a giant halfpipe and, you know, doing tricks and collecting coins or rings or whatever.
-
 But it was a fun game.
-
 Mick: And so we thought, well, let’s do a game like Top Skater. It’ll be fun. We’ll do a fun little game. Yeah, because kind of the mindset we were in back then is you do a game quickly, we do a fun little game. And so we started working on a prototype for this.
-
 And we had deadlines, monthly deadlines. We had to do, uh, uh, uh, a three month green light period where we work on it for three months and then if it worked out They would sign us up for the full deal So we kind of did a game a bit like top skater going downhill
-
 Adam: For the prototype, they repurposed the code again from their previous project, Apocalypse, turned it into a downhill skateboarding game. So they had a digital Bruce Willis with an Apocalypse, uh, shotgun on his back and a skateboard on his feet, racing downhill and able to do tricks.
-
 During game testing, right, players did this small downhill test section, but at the bottom, instead of restarting, there was kind of an open area with a little half pipe, and instead of hitting restart, they’d just hang out there for 20 minutes, jump around, and try to figure out how to do the tricks.
-
 Mick: and then so we changed the design focus of the game to be this, what you see now in the Tony Hawk’s Pro Skater, where it’s more level based, where you’re going around a level rather than just going constantly, constantly downhill.
-
 And once you’ve got, once you’ve got like a good mechanic for a game, especially if it’s a novel mechanic, it’s not that hard to write a fun game.
-
 Because the actual playing the game itself is fun. Like going through half pipes, doing over jump, grinding a rail, and jumping and getting near the rail. You know, these things are fun in themselves. And so making a game around things that are fun just to do in themselves, isn’t that hard? So you just do, here, do these five fun things.
-
 And it becomes like a fun thing that’s also a challenge. And so that’s kind of how the game grew. You know, you have lots of fun doing whatever you’re doing, and with just challenges that are a bit more, more and more difficult
-
-Game Production
-
+<h2>Game Production</h2>
 Adam: And so Activision Greenlit the game, which didn’t have Tony Hawk attached to it yet, it was just called Skate internally at Neversoft.
-
 Mick: So we had a full 12 months to work on it from like October to October. And we probably hired a couple more people. We were working fairly closely with Activision at that point.
-
 There’s some of the guys from Activision ended up coming over and working with us. Scott Peace, who was one of the main producers on the game.
-
 Adam: So what, what’s the role of a producer? Maybe you can explain that
-
 Mick: That’s a good question. A sore spot amongst producers. Producers basically organize everything and they make sure everything happens.
-
 Scott was also doing a lot of design and implementation of, of that stuff. So, you know, it’s like scheduling, like getting all the assets, making sure everything is, the programmers are working on the right thing, the designers are working on the right thing, making sure things are working, talking to the publishers about what they need, making sure that’s communicated, going back and forth.
-
 And Scott did a lot of the game design, including the original stuff. He came up with some of the original configuration of the, uh, the controller. And he did a lot of the tweaking of the controls and implementing of tricks and things like that and then working with programmers to get features done
-
 Adam: Mick was the producer initially, but when Scott took over, he dove into game design, and fine tuning the code for the controls. He focused on what buttons did what, and how they made the game characters interact with the world.
-
 Meanwhile, another challenge cropped up. The Neversoft team, they knew how to make fun video games, but they didn’t really know skateboarding culture. Besides what you could learn from a bowling alley skateboarding game. And there wasn’t really time to hang out at the local skate park taking notes,
-
 but they found an interesting shortcut.
-
-Skateboarding Video Culture
-
+<h2>Skateboarding Video Culture</h2>
 Mick: we kind of, designed the game around skate video culture, more than actual skateboarding culture. So within the game, you had to do things like hit, particular spots. And this is something in skate culture, there’s particular spots where you would go and do a particular trick and people would video you.
-
 And so the idea is that you would do a trick over this spot and then you get a little video replay of it. Or you would have to find videotapes. So actual videotapes back in the day. People wouldn’t even recognize what they are nowadays. But yeah, so, we watch a lot of these, these, these videos every lunchtime.
-
 We watch a new Skate video and we see that’s, that’s what’s cool. We’ve got to get that in the game. Adam: The skate videos also showed the need for music in games. Back then, licensing music for games was pretty new. So they’d call up bands like Primus or Goldfinger that they saw in the skate videos and offer them a small amount to use a track in the game. The bands, who were a bit clueless about licensing, you know, generally just said yes. And for them, it turned out to be a pretty good deal when the game hit shelves.
-
 Mick: . It was very popular, uh, game, you know, we were college kids. And so when they go to a concert, everyone’s heard your music because they’ve all seen it on Tony Hawk’s Pro Skater.
-
 But at some point we had to actually design the game. And I remember we did a big design session where I stood in front, in the conference room, and then we had these whiteboards all on the table on the wall, like four or five whiteboards.
-
 And I was like, all right, let’s design the school level. And so I drew a schoolhouse, like just a rectangle and said, like, we’ll put some stairs down here and we’ll have a grind these rails and then we’ll have a pool and we’ll have some walls. then we started coming up with the, the mini games type things.
-
 Like we could do a skate where you have to collect the letters S K A T E. Or you have to find the hidden tapes or you have to do this kind of a timed run with so many points, or you have to hit all these points, or grind these rails, there’s these challenges, and we were just people throwing out ideas, and I would like to write them down, or I would draw a little bit more on the board, uh, and one of the artists, Silvio took the designs that I put on the whiteboard and drew better versions of them, and those kind of became the blueprints.
-
 For the, for the artists
-
 Yeah, so we designed the whole game, I think over like three days. And we had basically, these are the levels we’re going to do, these are the types of goals that we’re going to do, and this is, let’s, let’s start working on it. And then we were just, we were just into it at that point.
-
-The Demo Game
-
+<h2>The Demo Game</h2>
 Adam: At this point, the game was greenlit, they had a timeline, and Activision was busy sorting out the deal with Tony Hawk. And then Activision got the idea that they should do a demo version of the game.
-
 Mick: Pizza hut would include a free PlayStation demo disc with your pizza back then. And that’s, uh, I think we. We shipped like a hundred thousand of these demo discs and we got a lot of very positive feedback you know, it was kind of an encapsulation of the game.
-
 It had like pools and ramps and rails and stuff like that. Just enough to have fun in. And it was like Like a one minute timer or maybe a 30 second timer.
-
 So it was very limited to what you could actually do, but it was enough to have fun because you could just restart it instantly. You could just like play it, have fun you know, your time would run out, you’d go and try and do the same thing. I’m going to try and do whatever the trick was in this, this thing, have fun.
-
 Adam: People love the game. In the real world, learning to skateboard is hard, but as this game got refined, it became pretty clear that playing this game was just a lot of fun
-
 Mick: And at the same time, we were also bringing people in to test the game. We had like, Kids from a local high school coming in to, to test the game. And we’re getting lots of feedback from them about what was fun and what wasn’t.
-
 And you were just watching them to see if they got frustrated at various points. And, and so like, yeah, that then after that demo ship, then it’s just a case of finishing the game. So we were just trying to make the game as good as possible in the time available. And that’s when our, our magical scheduling technique of, uh, rewriting the schedule every week, uh, was born.
-
 came in. So we wouldn’t have like a fixed schedule that we were going to stick by where every week we just like say, well, what’s the schedule going to be now? Because like we didn’t meet our deadlines last week and you know, this isn’t going to work. Can we add this? Well, yes, but then we’d have to get rid of this.
-
 So we had a very flexible deadlines other than we’ve got to, we’ve got to ship a game. But, uh, yeah, we, we would basically revisit it every week to make sure that we were, we were always on target because every week we’d have a new, a new, a new schedule.
-
-X-Games
-
+<h2>X-Games</h2>
 Adam: So, Activision signed Tony Hawk, and with the success of the Pizza Hut demo, Activision was getting pretty pumped up about the possibilities for this game. And as the game was getting close to be sent off to the duplicators, X Games 5 was on TV, featuring Tony Hawk.
-
 Mick: and he landed the first 900 trick, which is like, you’re doing two and a half spins. Is that right? Yes. Yes. Three 60 is one seven 20 is two, two and a half is 900.
-
 And that was like the holy grail of skateboarding tricks. And it was this really dramatic event where he was trying it and trying it and trying it and everyone was like cheering him on, the huge crowd, all the other skaters were around him going like, come on Tony, you can do it
-
 Adam: Tony had been wanting to do this trick for a decade. He had written it on this list of tricks he wanted to get done. And this was a timed event, and making these various attempts at it, he ran out of time. But they just let him go, they knew this was something special, and after ten attempts, he nailed it.
-
 And the crowd went wild, and he threw his skateboard into the crowd.
-
 Mick: It’s like the best moment ever in skateboarding history. And just before the game was going to go to the duplicators. And so it really like, it was this extra big boost for us. And we had to get the 900 in the game. The game was like nearly done at that point, but we still, you know, had to get that in.
-
 So we made that his special move, obviously because no one had done it before. He couldn’t put it in the game because no one could even do it. Not that that stops us bringing in ridiculous moves later, but, but yeah, it was, uh, it was really helpful that we signed the right guy. Tony Hawk. And they signed him, signed him, I think, to like a 20 year deal or something,
-
-Tony Hawk 2
-
+<h2>Tony Hawk 2</h2>
 Adam: So the first game went out, and Neversoft started working on the second. It’s easy to know what to include, because it was all the stuff that they had had to cut due to scheduling in the first place, like a level designer.
-
 Mick: And, uh, whilst we were doing this, the first game was selling incredibly well. It became number one bestseller, uh, and at the time, like, we were, we could see the actual sales figures because, industry had this, this, this thing where you could actually get, you could buy a spreadsheet of all the, the sales figures of games and you could see how yours compared to all the other ones and how much money they made, so we could see the sales figures and we could see, like, how incredibly well it was doing and we could see, like, things are going well and you know, we, we were getting royalties and bonuses from, from Activision for, for that, which was great.
-
 Yeah. And so it became clear that Tony Hawk’s Pro Skater was going to be a big thing. And so we started focusing a little bit more on, on the second one.
-
 Adam: And so with the royalties coming in, and a successful franchise on their hands, the company started to change, and the company started to grow.
-
-Mick: the role starts spreading out, like Instead of one programmer doing everything, now you’ve got two programmers doing everything and then you’ve got like kind of programmers doing more niche things. Like you end up having a programmer who’s just working on sound eventually and getting the sound effects working.
-
+Mick: the role starts spreading out, like Instead of one programmer doing everything, now you’ve got two programmers doing everything and then you’ve got like kind of programmers doing more niche things.  Like you end up having a programmer who’s just working on sound eventually and getting the sound effects working.
 And we’d hire a sound guy who built a sound booth in his office. Soundproof booth. And, you know, record the audio. voiceover and stuff like that.
-
 it’s just kind of a gradual process of growing up and becoming more and more professional. We still did silly stuff though, like, go, go to the pub at lunchtime and have a few drinks and then come back and continue working. We still have juggling contests.
-
 The stick never made its way back to the office, unfortunately. I still have that somewhere here. I think it’s in my garage.
-
 Yeah, the NSA was like a hundred people in the office and almost getting to the stage where you didn’t know the names of everybody cause you, you’d be hiring new people and especially if they’re artists, they’d be working with people not directly with you. Before it’s like me and then there’s my artists sat there close enough to touch and we just worked together for many, many months.
-
 But in the, in the end state of Neversoft, it’s more compartmentalized. It was people in the other end of the building that you, you didn’t even know their names or what they were even working on. so it became, uh, a bigger. And slightly less personal endeavor
-
 Adam: Along the way, Neversoft was acquired by Activision. And although Mick still loved the work, he was also just getting tired. And a condition of the acquisition was, Mick had to stay for at least four more years.
-
 Mick: I wanted to branch out and do something different. And so I decided, like, when my four years at Neversoft were up, I would just leave and do something else.
-
 And so I told Joel towards the end of, uh, the fourth year, and then started, like, grooming my successors to, to take over after I left and then eventually, like, told people I was leaving, and people were like, ‘Oh no, we can’t do it without you, Mick!’
-
 And of course they could, they were just fine. They were just fine without me. But, you know, it was, it was kind of an emotional time leaving, because I’d you know, spent, maybe 10 years or so at Neversoft.
-
-On Missing People
-
+<h2>On Missing People</h2>
 Adam: So yeah, Mick left Neversoft. And although he doesn’t regret it, because he’s done a lot of things since, sometimes when he thinks back on this passion for gaming and programming and the friendships he built and the work with like minded devs, yeah, it can bring up some feelings.
-
 Mick: Yeah, well, I guess the big thing I miss is working with people working with other people directly, kind of, it’s kind of fun in two ways, just like, just, Working with other people is fun socially. But it’s also, you get this force multiplier if you’re working with other people. Is that you can do so much more if you have ten programmers than if it’s just you by yourself.
-
 So you can create bigger things. Like, I’m working now by myself as a sole programmer on a single person project. It’s open source, but no one’s really contributed much to it. So I’m, I’m doing it all by myself, but I keep thinking, ah, I want to do this new feature. If only I had like Ken, say, back from my, my, uh, Neversoft days.
-
 I could just say, Ken, like, do this. And like two weeks later it would be done. But now I have to spend that two weeks, which means I can’t do other things. And I don’t have a 10 programmers that can do all these different things for me.
-
 Adam: So obviously, you know, Mythical Man month notwithstanding, a bigger team can just get more stuff done. But for Mick, it’s not just about the headcount. It’s also about, you know, people pouring their heart out into the work.
-
-The Passion To Create
-
+<h2>The Passion To Create</h2>
 Adam: The people who really cared a lot, those are the people that Mick clicked with.
-
 Mick: For me, the big takeaway from my experience is, is working with people who are passionate about what they do and not people who are just like doing it because it’s their job. Like people who actually enjoy doing it, people who enjoy coding
-
 I would stay up late at night sometimes programming something just because I thought it would be a fun, a fun feature.
-
 And one of the programmers, Paul, spent like three weeks trying to get shadows on the, uh, the GameCube version of the game because he knew he could do it. He was, he was, he had the, he had the fire in him to, to get these shadows working. And unfortunately, It couldn’t quite do it and it was a sad day when we had to say “Paul, you’re going to have to work on finishing the game and not on these shadows” and he was like, “but I can do it” and it’s like no, sorry Paul you have to stop.
-
 But yeah, he had that passion and that’s that’s really valuable.
-
 Actually enjoying coding is, is a necessary thing. Like, obviously you could be a good coder without actually enjoying it, but if you’re not really, I think, getting into the, the nitty gritty of it, if, and, and the deep understanding of the code.
-
 If you’re not actually doing it to the stage where you can enjoy it, where you can actually like, write something and it works and you’re like, yeah, or you find a bug and you’re like, that’s what it was, that little bastard. That kind of passion for, for coding and for game development is something that’s, that’s, I really enjoyed working with people who shared that passion.
-
-Outro
-
+<h2>Outro</h2>
 Adam: That was the show. But yeah, as I hinted at, Mick West’s interesting career kept going.
-
 You can catch him now, you know, talking about conspiracy theories, talking about skeptical inquiry. You can find him on Twitter or YouTube or in Scientific America or on Joe Rogan or in The Guardian. Everywhere.
-
 Plus, you know, he’s channeling his passion into programming, into Site Rec, an open source project that he made that’s dedicated to examining and recreating UFO videos. It’s pretty interesting stuff. But yeah, it’s just another way that Mick kind of shows me that his passion, his really going all in, is part of the secret of his success.
-
 Right now his passion is about fighting the spread of irrational beliefs. And yeah, if you want to learn more about Mick’s actual game programming advice, he wrote a lot of it down after leaving Neversoft. I put some links on the podcast page.
-
 But yeah, the, for true fans, if you really want to support the podcast, go to CoRecursive.com/supporters, and, you’ll get access to bonus episodes. And you’ll just show me that I should keep doing this. Last month, I made a kind of a behind the scenes peek that shows how I make episodes.
-
 And it was a look into how I do editing, and it was editing this particular episode that you’re listening to right now.
-
 There’s a lot of work that I put into each episode. I think that if you were to ask somebody for, you know, Oh, what’s the keys to a successful career, you know, they might give you some platitudes, but if you get to hear their story, you know, it, it’s more vivid and it’s more true and it’s easier to apply to your own circumstances, even if you have nothing, you know, to do with gaming, even if you’re an accountant, I think that there are lessons you can take when you get to hear the story.
-
 Okay. And so, yeah, I want to say thank you to all the supporters who, you know, donate some monthly money on Patreon to me because they think this type of content is valuable.
-
 And until next time, supporter or not, thank you so much for listening.
+
+<h2>Support CoRecursive</h2>
+       Hello, I make CoRecursive because I love it when someone shares the details behind some project, some bug, or some incident with me.
+         No other podcast was telling stories quite like I wanted to hear.
+        Right now this is all done by just me and I love doing it, but it's also exhausting.
+        Recommending the show to others and contributing to this patreon are the biggest things you can do to help out.
+        Whatever you can do to help, I truly appreciate it!
+        Thanks! Adam Gordon Bell
+

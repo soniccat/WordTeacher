@@ -218,7 +218,8 @@ open class CardSetsVMImpl(
     }
 
     override fun onTryAgainClicked() {
-        // TODO: do sth with articlesRepository
+        // TODO: do sth with cardSetsRepository
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.onTryAgainClicked"))
     }
 
     private fun showError(e: Exception) {
@@ -246,6 +247,7 @@ open class CardSetsVMImpl(
     }
 
     override fun onTryAgainSearchClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.onTryAgainSearchClicked"))
         cardSetSearchRepository.search()
     }
 

@@ -349,7 +349,14 @@ open class CardSetVMImpl(
     }
 
     override fun onTryAgainClicked() {
-        // TODO: do sth with articlesRepository
+        analytics.send(AnalyticEvent.createActionEvent("CardSet.onTryAgainClicked"))
+        val safeState = state.value
+        viewModelScope.launch {
+            if (safeState is CardSetVM.State.RemoteCardSet) {
+                cardSetRepository.loadRemoteCardSet(safeState.id)
+            }
+            // TODO: do sth with CardSetVM.State.LocalCardSet
+        }
     }
 
     override fun onInfoPressed() {

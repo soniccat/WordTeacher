@@ -101,6 +101,7 @@ open class ArticlesVMImpl(
     }
 
     override fun onTryAgainClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Articles.onTryAgainClicked"))
         // TODO: do sth with articlesRepository
     }
 }

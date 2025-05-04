@@ -200,10 +200,8 @@ open class ArticleVMImpl(
         get() = articlesRepository.lastFirstVisibleItemMap.value.data()?.get(stateController.articleId) ?: 0
 
     init {
-        viewModelScope.launch {
-            // TODO: handle loading error
-            articleRepository.loadArticle(state.value.id)
-        }
+        articleRepository.loadArticle(state.value.id)
+
         // handle markIsRead changes
         viewModelScope.launch {
             articleRepository.article.count {
@@ -501,7 +499,8 @@ open class ArticleVMImpl(
     }
 
     override fun onTryAgainClicked() {
-        // TODO: do sth with articlesRepository
+        analytics.send(AnalyticEvent.createActionEvent("Article.onTryAgainClicked"))
+        articleRepository.loadArticle(state.value.id)
     }
 
     override fun onWordDefinitionHidden() {
@@ -509,6 +508,7 @@ open class ArticleVMImpl(
     }
 
     override fun onMarkAsReadUnreadClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Article.onMarkAsReadUnreadClicked"))
         val newState = !stateController.stateFlow.value.isRead
         stateController.updateIsReadState(newState)
         articleRepository.markAsRead(newState)

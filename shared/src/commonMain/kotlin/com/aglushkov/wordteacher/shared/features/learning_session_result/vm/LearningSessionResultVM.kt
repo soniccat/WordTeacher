@@ -35,7 +35,7 @@ interface LearningSessionResultVM: Clearable {
 }
 
 open class LearningSessionResultVMImpl(
-    private var state: LearningSessionResultVM.State,
+    initialState: LearningSessionResultVM.State,
     private val cardLoader: CardLoader,
     private val idGenerator: IdGenerator
 ) : ViewModel(), LearningSessionResultVM {
@@ -44,8 +44,9 @@ open class LearningSessionResultVMImpl(
 
     override val viewItems = MutableStateFlow<Resource<List<BaseViewItem<*>>>>(Resource.Uninitialized())
 
-    fun restore(state: LearningSessionResultVM.State) {
-        this.state = state
+    var state: LearningSessionResultVM.State = initialState
+
+    init {
         startScreenFlow(state.sessionResults)
     }
 
