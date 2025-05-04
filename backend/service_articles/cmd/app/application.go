@@ -142,6 +142,15 @@ var sources []model.HeadlineSource = []model.HeadlineSource{
 		CrawlPeriod: int64(time.Duration(60) * time.Minute),
 		Category:    model.HeadlineSourceCategoryNews,
 	},
+	{
+		IntId:       15,
+		Title:       "CoRecursive: Coding Stories",
+		Description: "The stories and people behind the code.  Hear stories of software development from interesting people.",
+		Type:        model.HeadlineSourceTypeRss,
+		Link:        "https://corecursive.com/feed",
+		CrawlPeriod: int64(time.Duration(60) * time.Minute),
+		Category:    model.HeadlineSourceCategoryTech,
+	},
 }
 
 type application struct {
