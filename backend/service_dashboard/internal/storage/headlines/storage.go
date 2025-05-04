@@ -20,6 +20,7 @@ var categoriesToPull = []int32{
 	int32(articlesgrpc.Category_ALL),
 	int32(articlesgrpc.Category_NEWS),
 	int32(articlesgrpc.Category_TECH),
+	int32(articlesgrpc.Category_SCIENCE),
 }
 var pullLimit = 15
 
