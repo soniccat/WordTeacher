@@ -57,6 +57,10 @@ func (c *rssTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	d.DecodeElement(&v, &start)
 	parse, err := time.Parse(time.RFC1123, v)
 	if err != nil {
+		parse, err = time.Parse(time.RFC1123Z, v)
+	}
+
+	if err != nil {
 		return err
 	}
 	*c = rssTime{parse}

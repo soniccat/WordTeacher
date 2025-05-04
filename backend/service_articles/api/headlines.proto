@@ -42,4 +42,5 @@ enum Category {
 	ALL = 0;
 	NEWS = 1;
   TECH = 2;
+  SCIENCE = 3;
 }

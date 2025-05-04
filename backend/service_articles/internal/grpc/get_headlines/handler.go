@@ -75,6 +75,8 @@ func categoryNameById(category int32) string {
 		return model.HeadlineSourceCategoryNews
 	case int32(grpcapi.Category_TECH):
 		return model.HeadlineSourceCategoryTech
+	case int32(grpcapi.Category_SCIENCE):
+		return model.HeadlineSourceCategoryScience
 	}
 
 	return model.HeadlineSourceCategoryAll

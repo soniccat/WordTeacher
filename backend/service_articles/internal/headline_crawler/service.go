@@ -205,6 +205,10 @@ func resolveParser(t string, ugcPolicy *bluemonday.Policy) sourceParser {
 		return &RssParser{
 			ugcPolicy,
 		}
+	} else if t == model.HeadlineSourceTypeAtom {
+		return &AtomParser{
+			ugcPolicy,
+		}
 	}
 
 	return nil

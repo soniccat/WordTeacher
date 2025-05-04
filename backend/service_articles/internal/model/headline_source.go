@@ -5,13 +5,15 @@ import (
 )
 
 const (
-	HeadlineSourceTypeRss = "rss"
+	HeadlineSourceTypeRss  = "rss"
+	HeadlineSourceTypeAtom = "atom"
 )
 
 const (
-	HeadlineSourceCategoryAll  = "all"
-	HeadlineSourceCategoryTech = "tech"
-	HeadlineSourceCategoryNews = "news"
+	HeadlineSourceCategoryAll     = "all"
+	HeadlineSourceCategoryTech    = "tech"
+	HeadlineSourceCategoryNews    = "news"
+	HeadlineSourceCategoryScience = "science"
 )
 
 type HeadlineSource struct {
