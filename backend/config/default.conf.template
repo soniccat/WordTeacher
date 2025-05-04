@@ -49,18 +49,18 @@ server {
 server {
     http2 on;
 
-    listen 9090 default_server;
-    listen [::]:9090;
+    # listen 9090 default_server;
+    # listen [::]:9090;
 
     # enable after calling make cronsetup, make cronup
-    # listen 9090 default_server ssl;
-    # listen [::]:9090 ssl;
+    listen 9090 default_server ssl;
+    listen [::]:9090 ssl;
 
     server_name aglushkov.ru;
 
     # enable after calling make cronsetup, make cronup
-    # ssl_certificate /etc/nginx/ssl/live/aglushkov.ru/fullchain.pem;
-    # ssl_certificate_key /etc/nginx/ssl/live/aglushkov.ru/privkey.pem;
+    ssl_certificate /etc/nginx/ssl/live/aglushkov.ru/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/aglushkov.ru/privkey.pem;
 
     # set DNS resolver as Docker internal DNS
     resolver 127.0.0.11 valid=10s;
@@ -139,18 +139,18 @@ server {
 server {
     http2 on;
 
-    listen 443 default_server;
-    listen [::]:443;
+    # listen 443 default_server;
+    # listen [::]:443;
 
     # enable after calling make cronsetup, make cronup
-    # listen 443 default_server ssl;
-    # listen [::]:443 ssl;
+    listen 443 default_server ssl;
+    listen [::]:443 ssl;
 
     server_name aglushkov.ru;
 
     # enable after calling make cronsetup, make cronup
-    # ssl_certificate /etc/nginx/ssl/live/aglushkov.ru/fullchain.pem;
-    # ssl_certificate_key /etc/nginx/ssl/live/aglushkov.ru/privkey.pem;
+    ssl_certificate /etc/nginx/ssl/live/aglushkov.ru/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/aglushkov.ru/privkey.pem;
 
     root /www/data;
 
