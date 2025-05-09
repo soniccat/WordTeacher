@@ -156,6 +156,8 @@ server {
 
     location /docs/ {
         autoindex on;
-        
+    }
+
+    location /audio/ {
     }
 }

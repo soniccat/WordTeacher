@@ -14,9 +14,18 @@ import (
 type WordEntry struct {
 	// Order          int           //`bson:"order"`
 	Term           string        `bson:"term,omitempty"`
+	TermLowercased string        `bson:"term_lowercased,omitempty"`
 	Transcriptions []string      `bson:"transcriptions,omitempty"`
+	Audios         []WordAudio   `bson:"audios,omitempty"`
 	Etymology      int           `bson:"etymology,omitempty"`
 	DefPairs       []WordDefPair `bson:"defs,omitempty"`
+}
+
+type WordAudio struct {
+	FileName      string  `bson:"fileName"`
+	Accent        *string `bson:"accent,omitempty"`
+	Transcription *string `bson:"transcription,omitempty"`
+	Text          *string `bson:"text,omitempty"`
 }
 
 type WordDefPair struct {

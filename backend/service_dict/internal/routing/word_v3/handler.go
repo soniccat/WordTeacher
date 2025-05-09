@@ -76,6 +76,14 @@ func (h *Handler) Word(w http.ResponseWriter, r *http.Request) {
 		apiW := api_dict_v2.Word{
 			Term:           w.Term,
 			Transcriptions: w.Transcriptions,
+			AudioFiles: tools.Map(w.Audios, func(wa repository_v2.WordAudio) api_dict_v2.WordAudioFile {
+				return api_dict_v2.WordAudioFile{
+					Url:           "https://aglushkov.ru/audio/" + wa.FileName,
+					Accent:        wa.Accent,
+					Transcription: wa.Transcription,
+					Text:          wa.Text,
+				}
+			}),
 		}
 
 		for _, v := range w.DefPairs {

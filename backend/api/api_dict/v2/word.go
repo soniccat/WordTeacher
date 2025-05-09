@@ -5,9 +5,17 @@ import (
 )
 
 type Word struct {
-	Term           string    `json:"term"`
-	Transcriptions []string  `json:"transcriptions,omitempty"`
-	DefPairs       []DefPair `json:"defPairs"`
+	Term           string          `json:"term"`
+	Transcriptions []string        `json:"transcriptions,omitempty"`
+	AudioFiles     []WordAudioFile `json:"audioFiles,omitempty"`
+	DefPairs       []DefPair       `json:"defPairs"`
+}
+
+type WordAudioFile struct {
+	Url           string  `json:"url"`
+	Accent        *string `json:"accent,omitempty"`
+	Transcription *string `json:"transcription,omitempty"`
+	Text          *string `json:"text,omitempty"`
 }
 
 type DefPair struct {
