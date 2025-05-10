@@ -64,22 +64,22 @@ func (c *Card) WithoutIds() *Card {
 	}
 }
 
-// func (c *Card) ResultTranscription() *string {
-// 	if len(c.Transcriptions) != 0 {
-// 		return &c.Transcriptions[0]
-// 	}
+func (c *Card) ResultTranscription() *string {
+	if len(c.Transcriptions) != 0 {
+		return &c.Transcriptions[0]
+	}
 
-// 	return c.Transcription
-// }
+	return c.Transcription
+}
 
-// func (c *Card) ResultTranscriptions() []string {
-// 	if len(c.Transcriptions) != 0 {
-// 		return c.Transcriptions
-// 	}
+func (c *Card) ResultTranscriptions() []string {
+	if len(c.Transcriptions) != 0 {
+		return c.Transcriptions
+	}
 
-// 	if c.Transcription != nil {
-// 		return []string{*c.Transcription}
-// 	}
+	if c.Transcription != nil {
+		return []string{*c.Transcription}
+	}
 
-// 	return nil
-// }
+	return nil
+}
