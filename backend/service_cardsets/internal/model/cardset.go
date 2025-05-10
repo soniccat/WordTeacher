@@ -76,9 +76,11 @@ type DbCardSetInfo struct {
 
 func (cs *DbCardSet) ToApi() *api.CardSet {
 	apiCardSet := &api.CardSet{
-		Name:             cs.Name,
-		Tags:             cs.Tags,
-		Cards:            tools.Map(cs.Cards, func(cardDb *DbCard) *api.Card { return cardDb.ToApi() }),
+		Name: cs.Name,
+		Tags: cs.Tags,
+		Cards: tools.Map(cs.Cards, func(cardDb *DbCard) *api.Card {
+			return cardDb.ToApi()
+		}),
 		UserId:           cs.UserId.Hex(),
 		CreationDate:     tools.DbDateToApiDate(cs.CreationDate),
 		ModificationDate: tools.DbDateToApiDate(cs.ModificationDate),

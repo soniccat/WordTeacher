@@ -60,7 +60,6 @@ message CardSetInfo {
 message Card {
 	string id = 1;
 	string term = 2;
-	optional string transcription = 3;
 	PartOfSpeech partOfSpeech = 4;
 	repeated string definitions = 5;
 	repeated string synonyms = 6;
@@ -69,6 +68,15 @@ message Card {
 	string creationDate = 9;
 	string modificationDate = 10;
 	repeated string labels = 11;
+	repeated string transcriptions = 12;
+	repeated AudioFile audioFiles = 13;
+}
+
+message AudioFile {
+	string url = 1;
+	optional string accent = 2;
+	optional string transcription = 3;
+	optional string text = 4;
 }
 
 enum PartOfSpeech {

@@ -81,7 +81,7 @@ class CardSetRepository(
         term: String = "",
         definitions: MutableList<String> = mutableListOf(),
         partOfSpeech: WordTeacherWord.PartOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
-        transcription: String = "",
+        transcriptions: List<String> = emptyList(),
         synonyms: MutableList<String> = mutableListOf(),
         examples: MutableList<String> = mutableListOf()
     ): Card {
@@ -93,7 +93,7 @@ class CardSetRepository(
                 term = term,
                 definitions = definitions,
                 partOfSpeech = partOfSpeech,
-                transcription = transcription,
+                transcriptions = transcriptions,
                 synonyms = synonyms,
                 examples = examples
             )

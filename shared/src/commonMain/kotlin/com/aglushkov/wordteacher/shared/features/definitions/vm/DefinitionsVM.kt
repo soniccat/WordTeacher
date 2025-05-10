@@ -616,10 +616,11 @@ open class DefinitionsVMImpl(
                 definitions = viewData.def.definitions,
                 labels = viewData.def.labels.orEmpty(),
                 partOfSpeech = viewData.partOfSpeech,
-                transcription = viewData.word.transcriptions?.firstOrNull(),
+                transcriptions = viewData.word.transcriptions,
                 synonyms = viewData.def.synonyms.orEmpty(),
                 examples = viewData.def.examples.orEmpty() + contextExamples,
-                termFrequency = wordFrequency.value.data()
+                termFrequency = wordFrequency.value.data(),
+                audioFiles = viewData.word.audioFiles,
             )
             router?.onLocalCardSetUpdated(cardSetViewItem.cardSetId)
         }

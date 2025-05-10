@@ -75,7 +75,7 @@ data class ImportCardSet (
                 labels = it.labels.orEmpty(),
                 definitionTermSpans = listOf(),
                 partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
-                transcription = it.transcription,
+                transcriptions = it.transcription?.let { listOf(it) } ?: emptyList(),
                 synonyms = it.synonyms.orEmpty(),
                 examples = it.examples.orEmpty(),
                 exampleTermSpans = listOf(),
@@ -87,7 +87,8 @@ data class ImportCardSet (
                 needToUpdateDefinitionSpans = true,
                 needToUpdateExampleSpans = true,
                 creationId = Uuid.randomUUID().toString(),
-                termFrequency = UNDEFINED_FREQUENCY
+                termFrequency = UNDEFINED_FREQUENCY,
+                audioFiles = emptyList(),
             )
         },
         terms = listOf(),

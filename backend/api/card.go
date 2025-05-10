@@ -11,10 +11,19 @@ type Span struct {
 	End   int `json:"end" bson:"end"`
 }
 
+type AudioFile struct {
+	Url           string  `json:"url"`
+	Accent        *string `json:"accent,omitempty"`
+	Transcription *string `json:"transcription,omitempty"`
+	Text          *string `json:"text,omitempty"`
+}
+
 type Card struct {
 	Id                          string        `json:"id"`
 	Term                        string        `json:"term"`
 	Transcription               *string       `json:"transcription,omitempty"`
+	Transcriptions              []string      `json:"transcriptions,omitempty"`
+	AudioFiles                  []AudioFile   `json:"audioFiles,omitempty"`
 	PartOfSpeech                PartOfSpeech  `json:"partOfSpeech"`
 	Definitions                 []string      `json:"definitions"`
 	Labels                      []string      `json:"labels"`
@@ -36,6 +45,8 @@ func (c *Card) WithoutIds() *Card {
 		Id:                          "",
 		Term:                        c.Term,
 		Transcription:               c.Transcription,
+		Transcriptions:              c.Transcriptions,
+		AudioFiles:                  c.AudioFiles,
 		PartOfSpeech:                c.PartOfSpeech,
 		Definitions:                 c.Definitions,
 		Labels:                      c.Labels,
@@ -52,3 +63,23 @@ func (c *Card) WithoutIds() *Card {
 		NeedToUpdateExampleSpans:    c.NeedToUpdateExampleSpans,
 	}
 }
+
+// func (c *Card) ResultTranscription() *string {
+// 	if len(c.Transcriptions) != 0 {
+// 		return &c.Transcriptions[0]
+// 	}
+
+// 	return c.Transcription
+// }
+
+// func (c *Card) ResultTranscriptions() []string {
+// 	if len(c.Transcriptions) != 0 {
+// 		return c.Transcriptions
+// 	}
+
+// 	if c.Transcription != nil {
+// 		return []string{*c.Transcription}
+// 	}
+
+// 	return nil
+// }

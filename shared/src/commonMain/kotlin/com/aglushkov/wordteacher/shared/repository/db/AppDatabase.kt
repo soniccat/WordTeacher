@@ -51,9 +51,11 @@ class AppDatabase(
             StringListAdapter(),
             StringListAdapter(),
             StringListAdapter(),
+            StringListAdapter(),
             CardSpanListAdapter(),
             CardSpanListAdapter(),
             StringListAdapter(),
+            WordTeacherWordAudioFileAdapter(),
         ),
         DBNLPSentenceAdapter = DBNLPSentence.Adapter(
             StringListAdapter(),
@@ -251,12 +253,12 @@ class AppDatabase(
             }
         }
 
-        fun selectAllSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectAllSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels ->
-            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels)
+        fun selectAllSetIdsWithCards() = db.dBCardSetToCardRelationQueries.selectAllSetIdsWithCards { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels, audioFiles ->
+            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels, audioFiles)
         }
 
-        fun selectSetIdsWithCards(setIds: List<Long>) = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards(setIds) { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels ->
-            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels)
+        fun selectSetIdsWithCards(setIds: List<Long>) = db.dBCardSetToCardRelationQueries.selectSetIdsWithCards(setIds) { setId, id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels, audioFiles ->
+            setId to cards.optionalCardMapper().invoke(id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, editDate, spanUpdateDate, modificationDate, creationId, remoteId, termFrequency, labels, audioFiles)
         }
 
         fun lastModificationDate() = db.dBCardSetQueries.lastModificationDate().executeAsList().firstOrNull()?.MAX ?: 0L
@@ -403,7 +405,7 @@ class AppDatabase(
             date: Long,
             term: String,
             partOfSpeech: WordTeacherWord.PartOfSpeech,
-            transcription: String?,
+            transcriptions: List<String>?,
             definitions: List<String>,
             synonyms: List<String>,
             examples: List<String>,
@@ -419,8 +421,9 @@ class AppDatabase(
             remoteId: String,
             termFrequency: Double,
             labels: List<String>,
+            audioFiles: List<WordTeacherWord.AudioFile>,
         ) -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId, termFrequency, labels ->
+            { id, date, term, partOfSpeech, transcriptions, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId, termFrequency, labels, audioFiles ->
                 Card(
                     id,
                     remoteId,
@@ -431,7 +434,8 @@ class AppDatabase(
                     labels,
                     definitionTermSpans,
                     partOfSpeech,
-                    transcription,
+                    transcriptions.orEmpty(),
+                    audioFiles = audioFiles,
                     synonyms,
                     examples,
                     exampleTermSpans,
@@ -456,7 +460,7 @@ class AppDatabase(
             date: Long?,
             term: String?,
             partOfSpeech: WordTeacherWord.PartOfSpeech?,
-            transcription: String?,
+            transcriptions: List<String>?,
             definitions: List<String>?,
             synonyms: List<String>?,
             examples: List<String>?,
@@ -472,8 +476,9 @@ class AppDatabase(
             remoteId: String?,
             termFrequency: Double?,
             labels: List<String>?,
+            audioFiles: List<WordTeacherWord.AudioFile>?,
         )  -> Card =
-            { id, date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId, termFrequency, labels ->
+            { id, date, term, partOfSpeech, transcriptions, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleSpans, modificationDate, creationId, remoteId, termFrequency, labels, audioFiles ->
                 Card(
                     id!!,
                     remoteId.orEmpty(),
@@ -484,7 +489,8 @@ class AppDatabase(
                     labels!!,
                     definitionTermSpans!!,
                     partOfSpeech ?: WordTeacherWord.PartOfSpeech.Undefined,
-                    transcription,
+                    transcriptions.orEmpty(),
+                    audioFiles = audioFiles.orEmpty(),
                     synonyms.orEmpty(),
                     examples.orEmpty(),
                     exampleTermSpans.orEmpty(),
@@ -512,7 +518,7 @@ class AppDatabase(
             labels: List<String> = listOf(),
             definitionTermSpans: List<List<CardSpan>> = listOf(),
             partOfSpeech: WordTeacherWord.PartOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
-            transcription: String? = "",
+            transcriptions: List<String>? = emptyList(),
             synonyms: List<String> = mutableListOf(),
             examples: List<String> = mutableListOf(),
             exampleTermSpans: List<List<CardSpan>> = listOf(),
@@ -521,6 +527,7 @@ class AppDatabase(
             needToUpdateExampleSpans: Boolean = false,
             creationId: String = uuid4().toString(),
             termFrequency: Double? = null,
+            audioFiles: List<WordTeacherWord.AudioFile> = emptyList()
         ): Card {
             var newCard = Card(
                 id = -1,
@@ -531,7 +538,7 @@ class AppDatabase(
                 definitions = definitions,
                 definitionTermSpans = definitionTermSpans,
                 partOfSpeech = partOfSpeech,
-                transcription = transcription,
+                transcriptions = transcriptions.orEmpty(),
                 synonyms = synonyms,
                 examples = examples,
                 exampleTermSpans = exampleTermSpans,
@@ -541,6 +548,7 @@ class AppDatabase(
                 creationId = creationId,
                 termFrequency = termFrequency ?: UNDEFINED_FREQUENCY,
                 labels = labels,
+                audioFiles = audioFiles,
             )
 
             cards.insertCard(setId, newCard)
@@ -561,7 +569,7 @@ class AppDatabase(
                 definitions = card.definitions,
                 definitionTermSpans = card.definitionTermSpans,
                 partOfSpeech = card.partOfSpeech,
-                transcription = card.transcription,
+                transcriptions = card.transcriptions,
                 synonyms = card.synonyms,
                 examples = card.examples,
                 exampleTermSpans = card.exampleTermSpans,
@@ -572,6 +580,7 @@ class AppDatabase(
                 remoteId = card.remoteId,
                 termFrequency = card.termFrequency,
                 labels = card.labels,
+                audioFiles = card.audioFiles,
             )
         }
 
@@ -584,7 +593,7 @@ class AppDatabase(
             labels: List<String>,
             definitionTermSpans: List<List<CardSpan>> = listOf(),
             partOfSpeech: WordTeacherWord.PartOfSpeech,
-            transcription: String?,
+            transcriptions: List<String>?,
             synonyms: List<String>,
             examples: List<String>,
             exampleTermSpans: List<List<CardSpan>> = listOf(),
@@ -594,6 +603,7 @@ class AppDatabase(
             creationId: String,
             remoteId: String,
             termFrequency: Double,
+            audioFiles: List<WordTeacherWord.AudioFile>,
         ) {
             db.transaction {
                 db.dBCardSetQueries.updateCardSetModificationDate(modificationDate, setId)
@@ -602,7 +612,7 @@ class AppDatabase(
                     creationDate,
                     term,
                     partOfSpeech,
-                    transcription,
+                    transcriptions,
                     definitions,
                     synonyms,
                     examples,
@@ -618,6 +628,7 @@ class AppDatabase(
                     remoteId,
                     termFrequency,
                     labels,
+                    audioFiles
                 )
 
                 val cardId = db.dBCardQueries.lastInsertedRowId().firstLong().value!!
@@ -639,7 +650,7 @@ class AppDatabase(
                 labels = card.labels,
                 definitionTermSpans = card.definitionTermSpans,
                 partOfSpeech = card.partOfSpeech,
-                transcription = card.transcription,
+                transcriptions = card.transcriptions,
                 synonyms = card.synonyms,
                 examples = card.examples,
                 exampleTermSpans = card.exampleTermSpans,
@@ -648,6 +659,7 @@ class AppDatabase(
                 progressLastLessonDate = card.progress.lastLessonDate?.toEpochMilliseconds() ?: 0L,
                 needToUpdateDefinitionSpans = card.needToUpdateDefinitionSpans.toLong(),
                 needToUpdateExampleSpans = card.needToUpdateExampleSpans.toLong(),
+                audioFiles = card.audioFiles,
             )
             return card
         }
@@ -662,7 +674,7 @@ class AppDatabase(
             labels: List<String>,
             definitionTermSpans: List<List<CardSpan>>,
             partOfSpeech: WordTeacherWord.PartOfSpeech,
-            transcription: String?,
+            transcriptions: List<String>?,
             synonyms: List<String>,
             examples: List<String>,
             exampleTermSpans: List<List<CardSpan>>,
@@ -671,6 +683,7 @@ class AppDatabase(
             progressLastLessonDate: Long,
             needToUpdateDefinitionSpans: Long,
             needToUpdateExampleSpans: Long,
+            audioFiles: List<WordTeacherWord.AudioFile>,
         ) {
             db.transaction {
                 db.dBCardSetQueries.selectCardSetIdByCardId(cardId).executeAsOneOrNull()?.let { cardSetId ->
@@ -681,7 +694,7 @@ class AppDatabase(
                     creationDate,
                     term,
                     partOfSpeech,
-                    transcription,
+                    transcriptions,
                     definitions,
                     synonyms,
                     examples,
@@ -695,6 +708,7 @@ class AppDatabase(
                     modificationDate,
                     remoteId,
                     labels,
+                    audioFiles,
                     cardId,
                 )
             }
@@ -892,6 +906,22 @@ private class CardSpanListAdapter: ColumnAdapter<List<List<CardSpan>>, String> {
                 )
             }
         )
+}
+
+private class WordTeacherWordAudioFileAdapter: ColumnAdapter<List<WordTeacherWord.AudioFile>, String> {
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+        explicitNulls = false
+    }
+
+    override fun decode(databaseValue: String): List<WordTeacherWord.AudioFile> {
+        return json.decodeFromString(databaseValue)
+    }
+
+    override fun encode(value: List<WordTeacherWord.AudioFile>): String {
+        return json.encodeToString(value)
+    }
 }
 
 private fun CardSpan.encode(): String =

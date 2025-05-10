@@ -487,12 +487,21 @@ func createApiCardSet(name string, creationId string, creationDate time.Time, ca
 
 func createApiCard(creationId string, creationDate time.Time) *api.Card {
 	return &api.Card{
-		Term:          "testTerm1",
-		Transcription: tools.Ptr("testTranscription"),
-		PartOfSpeech:  api.Adverb,
-		Definitions:   []string{"testDef1", "testDef2"},
-		Synonyms:      []string{"testSyn1", "testSyn2"},
-		Examples:      []string{"testEx1", "testEx2"},
+		Term:           "testTerm1",
+		Transcription:  tools.Ptr("testTranscription"),
+		Transcriptions: []string{"testTranscription", "testTranscription2"},
+		AudioFiles: []api.AudioFile{
+			{
+				Url:           "test.ru",
+				Accent:        tools.Ptr("audioAccent"),
+				Transcription: tools.Ptr("audioTranscription"),
+				Text:          tools.Ptr("audioText"),
+			},
+		},
+		PartOfSpeech: api.Adverb,
+		Definitions:  []string{"testDef1", "testDef2"},
+		Synonyms:     []string{"testSyn1", "testSyn2"},
+		Examples:     []string{"testEx1", "testEx2"},
 		DefinitionTermSpans: [][]api.Span{
 			{{Start: 1, End: 2}, {Start: 3, End: 4}},
 			{{Start: 5, End: 6}, {Start: 7, End: 8}},

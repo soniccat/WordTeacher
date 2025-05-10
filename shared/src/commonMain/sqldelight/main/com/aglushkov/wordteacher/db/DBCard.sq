@@ -1,4 +1,5 @@
 import com.aglushkov.wordteacher.shared.model.CardSpan;
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord.AudioFile;
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord.PartOfSpeech;
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord;
 import kotlin.Long;
@@ -10,7 +11,7 @@ CREATE TABLE IF NOT EXISTS DBCard (
   date INTEGER NOT NULL, -- creation date
   term TEXT NOT NULL,
   partOfSpeech TEXT AS WordTeacherWord.PartOfSpeech NOT NULL,
-  transcription TEXT,
+  transcription TEXT AS List<String>, -- not plural for backward compatibility
   definitions TEXT AS List<String> NOT NULL,
   synonyms TEXT AS List<String> NOT NULL,
   examples TEXT AS List<String> NOT NULL,
@@ -30,7 +31,8 @@ CREATE TABLE IF NOT EXISTS DBCard (
  -- -2: frequency isn't set
  -- -1: frequency is undefined i.e. couldn't find it in db
   termFrequency REAL NOT NULL DEFAULT -2.0,
-  labels TEXT AS List<String> NOT NULL DEFAULT ""
+  labels TEXT AS List<String> NOT NULL DEFAULT "",
+  audioFiles TEXT AS List<WordTeacherWord.AudioFile> NOT NULL DEFAULT ""
 );
 
 selectAllCardIds:
@@ -52,16 +54,16 @@ FROM DBCard
 WHERE DBCard.needToUpdateDefinitionSpans OR DBCard.needToUpdateExampleDefinitionSpans;
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, termFrequency, labels)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, termFrequency, labels, audioFiles)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, labels)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, labels, audioFiles)
 VALUES ?;
 
 updateCard:
 UPDATE DBCard
-SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?, needToUpdateDefinitionSpans = ?, needToUpdateExampleDefinitionSpans = ?, modificationDate = ?, remoteId = ?, labels = ?
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?, needToUpdateDefinitionSpans = ?, needToUpdateExampleDefinitionSpans = ?, modificationDate = ?, remoteId = ?, labels = ?, audioFiles = ?
 WHERE id = ?;
 
 lastInsertedRowId:

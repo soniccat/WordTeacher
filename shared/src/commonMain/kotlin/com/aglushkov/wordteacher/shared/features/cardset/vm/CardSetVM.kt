@@ -196,9 +196,9 @@ open class CardSetVMImpl(
                 cardId = card.id,
                 frequencyLevelAndRatio = gradationLevelAndRatio,
             )
-            if (!state.value.isRemoteCardSet || !card.transcription.isNullOrEmpty()) {
+            if (!state.value.isRemoteCardSet || card.transcriptions.isNotEmpty()) {
                 cardViewItems += WordTranscriptionViewItem(
-                    card.transcription.orEmpty(),
+                    card.transcriptions.firstOrNull().orEmpty(), // TODO: support multiple transcriptions
                     cardId = card.id
                 )
             }
@@ -395,10 +395,14 @@ open class CardSetVMImpl(
                 is WordTranscriptionViewItem -> {
                     itemType = ItemType.Transcription
                     card.copy(
-                        transcription = if (card.transcription != text) {
-                            text
+                        transcriptions = if (card.transcriptions.firstOrNull().orEmpty() != text) {
+                            if (card.transcriptions.size <= 1) {
+                                listOf(text)
+                            } else {
+                                listOf(text) + card.transcriptions.subList(1, card.transcriptions.size)
+                            }
                         } else {
-                            card.transcription
+                            card.transcriptions
                         },
                     )
                 }

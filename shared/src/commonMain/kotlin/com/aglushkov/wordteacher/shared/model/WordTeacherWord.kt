@@ -14,8 +14,16 @@ data class WordTeacherWord(
     @SerialName("term") val word: String,
     @SerialName("transcriptions") val transcriptions: List<String>?,
     @SerialName("definitions") val definitions: LinkedHashMap<PartOfSpeech, List<WordTeacherDefinition>>,
-    @Transient val types: List<Config.Type> = emptyList()
+    @Transient val types: List<Config.Type> = emptyList(),
+    @SerialName("audioFiles") val audioFiles: List<AudioFile> = emptyList(),
 ) {
+    @Serializable
+    data class AudioFile(
+        @SerialName("url") val url: String,
+        @SerialName("accent") val accent: String?,
+        @SerialName("transcription") val transcription: String?,
+        @SerialName("text") val text: String?,
+    )
 
     private class PartOfSpeechSerializer: EnumAsIntSerializer<PartOfSpeech>(
         "partOfSpeech",

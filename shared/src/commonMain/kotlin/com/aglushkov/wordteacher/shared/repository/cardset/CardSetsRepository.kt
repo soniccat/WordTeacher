@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.CardSpan
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord.AudioFile
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -68,10 +69,11 @@ class CardSetsRepository(
         definitions: List<String>,
         labels: List<String>,
         partOfSpeech: WordTeacherWord.PartOfSpeech,
-        transcription: String?,
+        transcriptions: List<String>?,
         synonyms: List<String>,
         examples: List<String>,
-        termFrequency: Double?
+        termFrequency: Double?,
+        audioFiles: List<AudioFile>
     ): Card {
         return scope.async(Dispatchers.Default) {
             databaseWorker.run {
@@ -82,12 +84,13 @@ class CardSetsRepository(
                     definitions = definitions,
                     labels = labels,
                     partOfSpeech = partOfSpeech,
-                    transcription = transcription,
+                    transcriptions = transcriptions,
                     synonyms = synonyms,
                     examples = examples,
                     needToUpdateExampleSpans = true,
                     needToUpdateDefinitionSpans = true,
-                    termFrequency = termFrequency
+                    termFrequency = termFrequency,
+                    audioFiles = audioFiles,
                 )
             }
         }.await()

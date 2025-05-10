@@ -34,7 +34,8 @@ func ApiCardToDb(ctx context.Context, c *api.Card) (*DbCard, error) {
 	return &DbCard{
 		Id:                          cardDbId,
 		Term:                        c.Term,
-		Transcription:               c.Transcription,
+		Transcriptions:              c.ResultTranscriptions(),
+		AudioFiles:                  c.AudioFiles,
 		PartOfSpeech:                c.PartOfSpeech,
 		Definitions:                 c.Definitions,
 		Labels:                      c.Labels,
@@ -52,10 +53,14 @@ func ApiCardToDb(ctx context.Context, c *api.Card) (*DbCard, error) {
 	}, nil
 }
 
+// TODO: remove, just use api.Card instead
 type DbCard struct {
-	Id                          *primitive.ObjectID `bson:"_id,omitempty"`
-	Term                        string              `bson:"term"`
+	Id   *primitive.ObjectID `bson:"_id,omitempty"`
+	Term string              `bson:"term"`
+	// Deprecated: use Transcriptions instead
 	Transcription               *string             `bson:"transcription,omitempty"`
+	Transcriptions              []string            `bson:"transcriptions,omitempty"`
+	AudioFiles                  []api.AudioFile     `json:"audioFiles,omitempty"`
 	PartOfSpeech                api.PartOfSpeech    `bson:"partOfSpeech"`
 	Definitions                 []string            `bson:"definitions"`
 	Labels                      []string            `bson:"labels"`
@@ -75,7 +80,9 @@ type DbCard struct {
 func (c *DbCard) ToApi() *api.Card {
 	apiCard := &api.Card{
 		Term:                        c.Term,
-		Transcription:               c.Transcription,
+		Transcription:               c.ResultTranscription(),
+		Transcriptions:              c.ResultTranscriptions(),
+		AudioFiles:                  c.AudioFiles,
 		PartOfSpeech:                c.PartOfSpeech,
 		Definitions:                 c.Definitions,
 		Labels:                      c.Labels,
@@ -104,7 +111,6 @@ func (c *DbCard) ToGrpc() *cardsetsgrpc.Card {
 	return &cardsetsgrpc.Card{
 		Id:               c.Id.Hex(),
 		Term:             c.Term,
-		Transcription:    c.Transcription,
 		PartOfSpeech:     cardsetsgrpc.PartOfSpeech(int32(c.PartOfSpeech)),
 		Definitions:      c.Definitions,
 		Labels:           c.Labels,
@@ -113,5 +119,34 @@ func (c *DbCard) ToGrpc() *cardsetsgrpc.Card {
 		UserId:           c.UserId.Hex(),
 		CreationDate:     tools.DbDateToApiDate(c.CreationDate),
 		ModificationDate: tools.DbDateToApiDate(c.ModificationDate),
+		Transcriptions:   c.ResultTranscriptions(),
+		AudioFiles: tools.Map(c.AudioFiles, func(a api.AudioFile) *cardsetsgrpc.AudioFile {
+			return &cardsetsgrpc.AudioFile{
+				Url:           a.Url,
+				Accent:        a.Accent,
+				Transcription: a.Transcription,
+				Text:          a.Text,
+			}
+		}),
 	}
+}
+
+func (c *DbCard) ResultTranscription() *string {
+	if len(c.Transcriptions) != 0 {
+		return &c.Transcriptions[0]
+	}
+
+	return c.Transcription
+}
+
+func (c *DbCard) ResultTranscriptions() []string {
+	if len(c.Transcriptions) != 0 {
+		return c.Transcriptions
+	}
+
+	if c.Transcription != nil {
+		return []string{*c.Transcription}
+	}
+
+	return nil
 }

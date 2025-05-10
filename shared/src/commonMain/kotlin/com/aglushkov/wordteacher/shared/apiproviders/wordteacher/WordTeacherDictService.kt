@@ -50,8 +50,17 @@ data class WordTeacherDictTextSearchResponse(
 data class WordTeacherDictWord(
     @SerialName("term") val word: String,
     @SerialName("transcriptions") val transcriptions: List<String>?,
+    @SerialName("audioFiles") val audioFiles: List<AudioFile> = emptyList(),
     @SerialName("defPairs") val defPairs: List<DefPair>,
 ) {
+    @Serializable
+    data class AudioFile(
+        @SerialName("url") val url: String,
+        @SerialName("accent") val accent: String?,
+        @SerialName("transcription") val transcription: String?,
+        @SerialName("text") val text: String?,
+    )
+
     @Serializable
     data class DefPair(
         @SerialName("partOfSpeech") val partOfSpeech: WordTeacherWord.PartOfSpeech = PartOfSpeech.Undefined,
@@ -97,7 +106,15 @@ data class WordTeacherDictWord(
                     )
                 }
             },
-            types = listOf(Config.Type.WordTeacher) // TODO: provide type from backend ("Wiktionary")
+            types = listOf(Config.Type.WordTeacher), // TODO: provide type from backend ("Wiktionary")
+            audioFiles = audioFiles.map {
+                WordTeacherWord.AudioFile(
+                    url = it.url,
+                    accent = it.accent,
+                    transcription = it.transcription,
+                    text = it.text,
+                )
+            },
         )
     }
 }
