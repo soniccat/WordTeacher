@@ -916,6 +916,9 @@ private class WordTeacherWordAudioFileAdapter: ColumnAdapter<List<WordTeacherWor
     }
 
     override fun decode(databaseValue: String): List<WordTeacherWord.AudioFile> {
+        if (databaseValue.isEmpty()) {
+            return emptyList()
+        }
         return json.decodeFromString(databaseValue)
     }
 
