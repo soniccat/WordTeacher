@@ -25,7 +25,6 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
 interface CardSetVM: Clearable {
@@ -201,6 +200,11 @@ open class CardSetVMImpl(
                     card.transcriptions.firstOrNull().orEmpty(), // TODO: support multiple transcriptions
                     cardId = card.id
                 )
+            }
+            if (card.audioFiles.isNotEmpty()) {
+                cardViewItems += WordAudioFilesViewItem(card.audioFiles.map { audioFile ->
+                    audioFile.toViewItemAudioFile()
+                })
             }
             cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech, cardId = card.id)
 
@@ -397,7 +401,11 @@ open class CardSetVMImpl(
                     card.copy(
                         transcriptions = if (card.transcriptions.firstOrNull().orEmpty() != text) {
                             if (card.transcriptions.size <= 1) {
-                                listOf(text)
+                                if (text.isEmpty()) {
+                                    emptyList()
+                                } else {
+                                    listOf(text)
+                                }
                             } else {
                                 listOf(text) + card.transcriptions.subList(1, card.transcriptions.size)
                             }

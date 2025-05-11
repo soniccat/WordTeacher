@@ -67,6 +67,7 @@ interface DefinitionsVM: Clearable {
     fun getErrorText(res: Resource<*>): StringDesc?
     fun onSuggestsAppeared()
     fun onBackPressed(): Boolean
+    fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
 
     val wordTextValue: StateFlow<String>
     val state: State
@@ -471,8 +472,15 @@ open class DefinitionsVMImpl(
         val hasNewItems = items.size - topIndex > 0
         if (hasNewItems) {
             items.add(topIndex, WordTitleViewItem(word.word, word.types, frequencyLevelAndRatio = wordFrequencyLevelAndRatio))
+            var insertIndex = topIndex + 1
             if (word.transcriptions?.isNotEmpty() == true) {
-                items.add(topIndex + 1, WordTranscriptionViewItem(word.transcriptions.joinToString(", ")))
+                items.add(insertIndex, WordTranscriptionViewItem(word.transcriptions.joinToString(", ")))
+                insertIndex += 1
+            }
+            if (word.audioFiles.isNotEmpty()) {
+                items.add(insertIndex, WordAudioFilesViewItem(word.audioFiles.map { audioFile ->
+                    audioFile.toViewItemAudioFile()
+                }))
             }
         }
 
@@ -624,6 +632,10 @@ open class DefinitionsVMImpl(
             )
             router?.onLocalCardSetUpdated(cardSetViewItem.cardSetId)
         }
+    }
+
+    override fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile) {
+
     }
 
     override fun onCardSetExpandCollapseClicked(item: CardSetExpandOrCollapseViewItem) {
@@ -783,6 +795,27 @@ data class DefinitionsContext(
 data class DefinitionsWordContext(
     val examples: List<String>
 )
+
+fun WordTeacherWord.AudioFile.toViewItemAudioFile(): WordAudioFilesViewItem.AudioFile {
+    val name = accent ?: "Audio"
+    var details = ""
+    if (text != null) {
+        details += text
+    }
+    if (transcription != null) {
+        if (details.isNotEmpty()) {
+            details += ", "
+        }
+        details += transcription
+    }
+    if (details.isNotEmpty()) {
+        details = " ($details)"
+    }
+    return WordAudioFilesViewItem.AudioFile(
+        url = url,
+        name = name + details,
+    )
+}
 
 private const val SETTING_EXPAND_CARDSETS_POPUP = "expandCardSetsPopup"
 private const val SETTING_LAST_DEFINED_WORD = "lastDefinedWord"

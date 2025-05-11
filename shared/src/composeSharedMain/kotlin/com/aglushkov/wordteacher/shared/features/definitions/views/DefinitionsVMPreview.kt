@@ -73,6 +73,9 @@ open class DefinitionsVMPreview(
     ) {
     }
 
+    override fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile) {
+    }
+
     // Suggests
 
     override val suggests: StateFlow<Resource<List<BaseViewItem<*>>>>

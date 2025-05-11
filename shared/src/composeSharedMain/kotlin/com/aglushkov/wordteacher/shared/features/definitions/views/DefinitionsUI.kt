@@ -408,6 +408,9 @@ private fun showViewItem(
     is WordDividerViewItem -> WordDividerView(modifier)
     is WordTitleViewItem -> WordTitleView(item, modifier)
     is WordTranscriptionViewItem -> WordTranscriptionView(item, modifier)
+    is WordAudioFilesViewItem -> WordAudioFilesView(item, modifier) {
+        vm.onAudioFileClicked(it)
+    }
     is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier)
     is WordDefinitionViewItem -> WordDefinitionView(
         item,
@@ -691,6 +694,45 @@ fun WordTranscriptionView(
             )
     ) {
         textContent(viewItem.firstItem(), textStyle)
+    }
+}
+
+@Composable
+fun WordAudioFilesView(
+    viewItem: WordAudioFilesViewItem,
+    modifier: Modifier = Modifier,
+    onClicked: (WordAudioFilesViewItem.AudioFile) -> Unit
+) {
+    FlowRow(
+        modifier.padding(
+            start = LocalDimensWord.current.wordHorizontalPadding,
+            end = LocalDimensWord.current.wordHorizontalPadding,
+        )
+    ) {
+        viewItem.items.onEach { audioFile ->
+            WordAudioFileView(audioFile, modifier.clickable { onClicked(audioFile) })
+        }
+    }
+}
+
+@Composable
+fun WordAudioFileView(
+    audioFile: WordAudioFilesViewItem.AudioFile,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.padding(2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = audioFile.name,
+            style = LocalAppTypography.current.wordDefinition,
+        )
+        Icon(
+            painter = painterResource(MR.images.audio_small),
+            contentDescription = null,
+            tint = MaterialTheme.colors.secondary
+        )
     }
 }
 

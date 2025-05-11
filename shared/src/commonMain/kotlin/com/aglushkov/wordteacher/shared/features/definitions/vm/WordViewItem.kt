@@ -29,6 +29,19 @@ class WordTranscriptionViewItem(transcription: String, val cardId: Long = -1): B
     }
 }
 
+class WordAudioFilesViewItem(
+    audioFiles: List<AudioFile>,
+): BaseViewItem<WordAudioFilesViewItem.AudioFile>(audioFiles, Type) {
+    companion object {
+        const val Type = 112
+    }
+
+    data class AudioFile(
+        val url: String,
+        val name: String
+    )
+}
+
 class WordPartOfSpeechViewItem(
     partOfSpeechString: StringDesc,
     val partOfSpeech: WordTeacherWord.PartOfSpeech,
