@@ -122,6 +122,7 @@ open class DefinitionsVMImpl(
     private val analytics: Analytics,
     private val settings: FlowSettings,
     private val wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
+    private val audioService: AudioService,
 ): ViewModel(), DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
@@ -635,7 +636,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile) {
-
+        audioService.play(audioFile.url)
     }
 
     override fun onCardSetExpandCollapseClicked(item: CardSetExpandOrCollapseViewItem) {

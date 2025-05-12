@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
@@ -35,6 +36,7 @@ class DefinitionsModule {
         analytics: Analytics,
         settings: FlowSettings,
         wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
+        audioService: AudioService,
     ) = DefinitionsDecomposeComponent(
         componentContext,
         initialState,
@@ -50,5 +52,6 @@ class DefinitionsModule {
         analytics,
         settings,
         wordDefinitionHistoryRepository,
+        audioService,
     )
 }

@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -44,4 +45,5 @@ interface DefinitionsDependencies {
     fun settings(): FlowSettings
     fun clipboardRepository(): ClipboardRepository
     fun wordDefinitionHistoryRepository(): WordDefinitionHistoryRepository
+    fun audioService(): AudioService
 }

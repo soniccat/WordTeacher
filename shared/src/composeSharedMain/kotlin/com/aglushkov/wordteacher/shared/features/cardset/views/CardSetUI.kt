@@ -273,6 +273,10 @@ fun CardSetViewItems(
             )
         }
 
+        is WordAudioFilesViewItem -> WordAudioFilesView(item, modifier) {
+            vm.onAudioFileClicked(it)
+        }
+
         is WordPartOfSpeechViewItem -> PartOfSpeechSelectPopup(
             vm,
             item,

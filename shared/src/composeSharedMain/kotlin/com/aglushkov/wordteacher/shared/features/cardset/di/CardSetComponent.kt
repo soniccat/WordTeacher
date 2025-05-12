@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.cardset.di
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardset.CardSetDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
+import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -39,4 +40,5 @@ interface CardSetDependencies {
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
     fun analytics(): Analytics
+    fun audioService(): AudioService
 }

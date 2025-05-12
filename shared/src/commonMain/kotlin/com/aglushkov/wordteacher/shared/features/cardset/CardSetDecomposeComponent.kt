@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl
+import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
@@ -23,6 +24,7 @@ class CardSetDecomposeComponent (
     timeSource: TimeSource,
     idGenerator: IdGenerator,
     analytics: Analytics,
+    audioService: AudioService,
 ) : CardSetVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -35,6 +37,7 @@ class CardSetDecomposeComponent (
     timeSource,
     idGenerator,
     analytics,
+    audioService,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_CardSet"
 

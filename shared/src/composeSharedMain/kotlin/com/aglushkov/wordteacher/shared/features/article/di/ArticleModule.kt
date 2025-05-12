@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeCompone
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
+import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -52,6 +53,7 @@ class ArticleModule {
         analytics: Analytics,
         settings: FlowSettings,
         wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
+        audioService: AudioService,
     ): DefinitionsVM = DefinitionsVMImpl(
         DefinitionsVM.State(),
         connectivityManager,
@@ -67,7 +69,8 @@ class ArticleModule {
         idGenerator,
         analytics,
         settings,
-        wordDefinitionHistoryRepository
+        wordDefinitionHistoryRepository,
+        audioService,
     )
 
     @Provides

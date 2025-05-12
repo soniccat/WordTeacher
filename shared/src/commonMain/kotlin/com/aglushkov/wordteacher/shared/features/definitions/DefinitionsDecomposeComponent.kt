@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImpl
+import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -42,6 +43,7 @@ class DefinitionsDecomposeComponent (
     analytics: Analytics,
     settings: FlowSettings,
     wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
+    audioService: AudioService,
 ) : DefinitionsVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -59,6 +61,7 @@ class DefinitionsDecomposeComponent (
     analytics,
     settings,
     wordDefinitionHistoryRepository,
+    audioService,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Definitions"
 

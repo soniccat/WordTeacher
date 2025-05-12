@@ -365,6 +365,14 @@ class AppModule {
         return impl
     }
 
+    @AppComp
+    @Provides
+    fun audioService(
+        context: Context,
+    ): AudioService {
+        return AudioServiceImpl(context)
+    }
+
     // Features
 
     @AppComp

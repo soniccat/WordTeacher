@@ -54,6 +54,7 @@ interface CardSetVM: Clearable {
     fun getPlaceholder(viewItem: BaseViewItem<*>): StringDesc?
     fun onStartLearningClicked()
     fun onAddClicked()
+    fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
 
     @Serializable
     sealed interface State {
@@ -82,6 +83,7 @@ open class CardSetVMImpl(
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
+    private val audioService: AudioService,
 ): ViewModel(), CardSetVM {
 
     override var router: CardSetRouter? = null
@@ -729,6 +731,10 @@ open class CardSetVMImpl(
                 }
             }
         }
+    }
+
+    override fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile) {
+        audioService.play(audioFile.url)
     }
 
     enum class FocusLastType {
