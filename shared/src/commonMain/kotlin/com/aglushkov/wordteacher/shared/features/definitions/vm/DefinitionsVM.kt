@@ -496,6 +496,7 @@ open class DefinitionsVMImpl(
 
         val allWords = mutableListOf<String>()
         val allTranscriptions = mutableListOf<String>()
+        val allAudioFiles = mutableListOf<WordTeacherWord.AudioFile>()
         val allDefinitions = LinkedHashMap<WordTeacherWord.PartOfSpeech, List<WordTeacherDefinition>>()
         val allTypes = mutableListOf<Config.Type>()
 
@@ -507,6 +508,12 @@ open class DefinitionsVMImpl(
             it.transcriptions?.onEach {
                 if (!allTranscriptions.contains(it)) {
                     allTranscriptions.add(it)
+                }
+            }
+
+            it.audioFiles.onEach {
+                if (!allAudioFiles.contains(it)) {
+                    allAudioFiles.add(it)
                 }
             }
 
@@ -530,13 +537,12 @@ open class DefinitionsVMImpl(
             }
         }
 
-        val resultWord = allWords.joinToString()
-        val resultTranscription = if (allTranscriptions.isEmpty())
-                emptyList<String>()
-            else
-                allTranscriptions
-
-        return WordTeacherWord(resultWord, resultTranscription, allDefinitions, allTypes)
+        return WordTeacherWord(
+            allWords.joinToString(),
+            allTranscriptions,
+            allDefinitions,
+            allTypes,
+            allAudioFiles)
     }
 
     override fun getErrorText(res: Resource<*>): StringDesc? {
@@ -636,6 +642,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile) {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.onAudioFileClicked"))
         audioService.play(audioFile.url)
     }
 

@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
+import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -42,4 +43,5 @@ interface LearningDependencies {
     fun routerResolver(): RouterResolver
     fun nlpCore(): NLPCore
     fun analytics(): Analytics
+    fun audioService(): AudioService
 }

@@ -1,12 +1,11 @@
 package com.aglushkov.wordteacher.shared.general
 
-import android.R
 import android.content.Context
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultDataSourceFactory
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.FileDataSource
 import androidx.media3.datasource.cache.Cache
@@ -16,16 +15,18 @@ import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
 import java.io.File
-
 
 @UnstableApi
 class AudioServiceImpl(
     val context: Context,
 ): AudioService {
-    val evictor = LeastRecentlyUsedCacheEvictor(100 * 1024 * 1024)
-    val simpleCache = SimpleCache(File(context.cacheDir, "media"), evictor)
+    private val evictor = LeastRecentlyUsedCacheEvictor(100 * 1024 * 1024)
+    private val simpleCache = SimpleCache(
+        File(context.cacheDir, "media"),
+        evictor,
+        StandaloneDatabaseProvider(context)
+    )
     val player = ExoPlayer.Builder(context)
         .setMediaSourceFactory(
             DefaultMediaSourceFactory(context)
@@ -37,7 +38,6 @@ class AudioServiceImpl(
                     )
                 )
         ).build()
-//    val mediaSession = MediaSession.Builder(context, player).build()
 
     override fun play(url: String) {
         player.setMediaItem(MediaItem.fromUri(url))

@@ -99,6 +99,7 @@ yandexId = { module = "com.yandex.android:authsdk", version.ref = "yandexId" }
 # android
 androidXBrowser = { module = "androidx.browser:browser", version.ref = "browser" }
 exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "exoplayer" }
+exoplayerDatabase = { module = "androidx.media3:media3-database", version.ref = "exoplayer" }
 
 # for android tests
 kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

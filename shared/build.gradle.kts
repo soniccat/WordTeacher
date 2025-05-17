@@ -88,6 +88,7 @@ kotlin {
                 api(libs.appmetrica)
                 api(libs.ktorAndroidClient)
                 api(libs.exoplayer)
+                api(libs.exoplayerDatabase)
             }
         }
         val androidUnitTest by getting {

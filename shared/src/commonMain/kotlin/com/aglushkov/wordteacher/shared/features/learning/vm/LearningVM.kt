@@ -3,12 +3,15 @@ package com.aglushkov.wordteacher.shared.features.learning.vm
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordAudioFilesViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.toViewItemAudioFile
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM.State.Companion.AllCards
+import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
@@ -58,6 +61,7 @@ interface LearningVM: Clearable {
     fun onHintAskedPressed()
     fun onGiveUpPressed()
     fun onClosePressed()
+    fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
 
     fun save(): State
     fun getErrorText(res: Resource<*>): StringDesc?
@@ -89,6 +93,7 @@ interface LearningVM: Clearable {
             val index: Int,
             val count: Int,
             val termViewItems: List<BaseViewItem<*>>,
+            val audioFilews: WordAudioFilesViewItem,
         ): Challenge
 
         fun index(): Int = when(this) {
@@ -128,6 +133,7 @@ open class LearningVMImpl(
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
+    private val audioService: AudioService,
 ) : ViewModel(), LearningVM {
 
     override var router: LearningRouter? = null
@@ -250,6 +256,9 @@ open class LearningVMImpl(
                                 index = index,
                                 count = cardCount,
                                 termViewItems = buildCardItem(card),
+                                audioFilews = WordAudioFilesViewItem(card.audioFiles.map {
+                                    it.toViewItemAudioFile()
+                                })
                             )
                         )
                     }
@@ -445,6 +454,11 @@ open class LearningVMImpl(
     private fun onLearningCompleted() {
         analytics.send(AnalyticEvent.createActionEvent("Learning.learningCompleted"))
         router?.onScreenFinished(this, SimpleRouter.Result(false))
+    }
+
+    override fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile) {
+        analytics.send(AnalyticEvent.createActionEvent("Learning.onAudioFileClicked"))
+        audioService.play(audioFile.url)
     }
 
     override fun getErrorText(res: Resource<*>): StringDesc? {

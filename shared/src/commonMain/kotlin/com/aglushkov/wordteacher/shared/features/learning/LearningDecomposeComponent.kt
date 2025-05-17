@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVMImpl
+import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
@@ -16,6 +17,7 @@ class LearningDecomposeComponent (
     timeSource: TimeSource,
     idGenerator: IdGenerator,
     analytics: Analytics,
+    audioService: AudioService,
 ) : LearningVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -25,6 +27,7 @@ class LearningDecomposeComponent (
     timeSource,
     idGenerator,
     analytics,
+    audioService,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Learning"
 

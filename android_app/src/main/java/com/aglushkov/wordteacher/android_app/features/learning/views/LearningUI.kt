@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAbsoluteAlignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.shared.features.definitions.views.*
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordAudioFilesViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
@@ -52,8 +54,6 @@ import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.desc.StringDesc
 import java.util.*
 
-//@ExperimentalUnitApi
-//@ExperimentalComposeUiApi
 @Composable
 fun LearningUIDialog(
     vm: LearningVM,
@@ -149,7 +149,7 @@ fun LearningUI(
         }
 
         if (data is LearningVM.Challenge.Type) {
-            typeBottomButtons(canShowHint, snackbarHostState, hintString, vm)
+            typeBottomButtons(data.audioFilews, canShowHint, snackbarHostState, hintString, vm)
         }
     }
 }
@@ -178,6 +178,7 @@ private fun typeChallengeUI(
 
 @Composable
 private fun BoxScope.typeBottomButtons(
+    audioFilesViewItem: WordAudioFilesViewItem,
     canShowHint: Boolean,
     snackbarHostState: SnackbarHostState,
     hintString: List<Char>,
@@ -188,30 +189,47 @@ private fun BoxScope.typeBottomButtons(
             .fillMaxWidth()
             .align(Alignment.BottomEnd)
     ) {
-        ExtendedFloatingActionButton(
-            text = {
-                Text(
-                    text = stringResource(
-                        id = if (canShowHint) {
-                            MR.strings.learning_show_hint.resourceId
-                        } else {
-                            MR.strings.learning_give_up.resourceId
-                        }
-                    ).uppercase(Locale.getDefault()),
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
-                )
-            },
-            onClick = {
-                if (canShowHint) {
-                    vm.onHintAskedPressed()
-                } else {
-                    vm.onGiveUpPressed()
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(dimensionResource(id = R.dimen.content_padding))
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            WordAudioFilesView(
+                viewItem = audioFilesViewItem,
+                modifier = Modifier.weight(1.0f, true)
+                    //not to stretch children to width
+                    .wrapContentWidth(Alignment.Start)
+                    .width(IntrinsicSize.Max),
+            ) { 
+                vm.onAudioFileClicked(it)
+            }
+            
+            ExtendedFloatingActionButton(
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = if (canShowHint) {
+                                MR.strings.learning_show_hint.resourceId
+                            } else {
+                                MR.strings.learning_give_up.resourceId
+                            }
+                        ).uppercase(Locale.getDefault()),
+                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
+                    )
+                },
+                onClick = {
+                    if (canShowHint) {
+                        vm.onHintAskedPressed()
+                    } else {
+                        vm.onGiveUpPressed()
+                    }
+                },
+                modifier = Modifier
+                    .width(IntrinsicSize.Max)
+//                    .wrapContentWidth(Alignment.End)
+//                    .weight(1.0f, false)
+                    .padding(dimensionResource(id = R.dimen.content_padding))
+            )
+        }
 
         SnackbarHost(
             modifier = Modifier.animateContentSize(),
@@ -278,7 +296,9 @@ private fun matchRowUI(
     onExampleClicked: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(intrinsicSize = IntrinsicSize.Max)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(intrinsicSize = IntrinsicSize.Max)
     ) {
         Text(
             modifier = Modifier
