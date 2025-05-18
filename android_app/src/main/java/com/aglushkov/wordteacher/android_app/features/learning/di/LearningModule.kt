@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
+import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Module
 import dagger.Provides
 
@@ -25,6 +26,7 @@ class LearningModule {
         idGenerator: IdGenerator,
         analytics: Analytics,
         audioService: AudioService,
+        settings: FlowSettings,
     ) = LearningDecomposeComponent(
         state,
         componentContext,
@@ -33,5 +35,6 @@ class LearningModule {
         idGenerator,
         analytics,
         audioService,
+        settings,
     )
 }

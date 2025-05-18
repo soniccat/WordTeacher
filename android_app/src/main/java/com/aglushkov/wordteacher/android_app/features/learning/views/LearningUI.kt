@@ -8,12 +8,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,6 +50,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.MatchSession
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
@@ -62,10 +66,36 @@ fun LearningUIDialog(
     CustomDialogUI(
         onDismissRequest = { vm.onClosePressed() }
     ) {
+        val playSoundOnTypingCompletion by vm.playSoundOnTypingCompletion.collectAsState()
+        val challengeState by vm.challengeState.collectAsState()
+        val needShowSoundIcon by remember(challengeState) {
+            derivedStateOf {
+                challengeState.data() is LearningVM.Challenge.Type
+            }
+        }
+
         LearningUI(
             vm = vm,
             modifier = modifier,
             actions = {
+                if (needShowSoundIcon) {
+                    IconButton(
+                        onClick = { vm.onPlaySoundOnTypingCompletionClicked() }
+                    ) {
+                        Icon(
+                            painter = dev.icerock.moko.resources.compose.painterResource(
+                                if (playSoundOnTypingCompletion) {
+                                    MR.images.audio_24
+                                } else {
+                                    MR.images.audio_muted_24
+                                }
+                            ),
+                            contentDescription = null,
+                            tint = LocalContentColor.current
+                        )
+                    }
+                }
+
                 IconButton(
                     onClick = { vm.onClosePressed() }
                 ) {
@@ -149,7 +179,7 @@ fun LearningUI(
         }
 
         if (data is LearningVM.Challenge.Type) {
-            typeBottomButtons(data.audioFilews, canShowHint, snackbarHostState, hintString, vm)
+            typeBottomButtons(data.audioFiles, canShowHint, snackbarHostState, hintString, vm)
         }
     }
 }
@@ -178,7 +208,7 @@ private fun typeChallengeUI(
 
 @Composable
 private fun BoxScope.typeBottomButtons(
-    audioFilesViewItem: WordAudioFilesViewItem,
+    audioFilesViewItem: WordAudioFilesViewItem?,
     canShowHint: Boolean,
     snackbarHostState: SnackbarHostState,
     hintString: List<Char>,
@@ -193,14 +223,29 @@ private fun BoxScope.typeBottomButtons(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            WordAudioFilesView(
-                viewItem = audioFilesViewItem,
-                modifier = Modifier.weight(1.0f, true)
-                    //not to stretch children to width
-                    .wrapContentWidth(Alignment.Start)
-                    .width(IntrinsicSize.Max),
-            ) { 
-                vm.onAudioFileClicked(it)
+            if (!canShowHint && audioFilesViewItem != null) {
+                WordAudioFilesView(
+                    viewItem = audioFilesViewItem,
+                    modifier = Modifier.weight(1.0f, true)
+                        // to minimize the width when there's a single line
+                        .wrapContentWidth(Alignment.Start)
+                        .width(IntrinsicSize.Max)
+                        .padding(
+                            start = LocalDimensWord.current.wordHorizontalPadding,
+                            end = LocalDimensWord.current.wordHorizontalPadding,
+                        )
+                        .background(
+                            // chip background
+                            MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+                                .compositeOver(MaterialTheme.colors.surface),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(4.dp),
+                ) {
+                    vm.onAudioFileClicked(it)
+                }
+            } else {
+                Spacer(modifier = Modifier.weight(1.0f))
             }
             
             ExtendedFloatingActionButton(
@@ -225,8 +270,6 @@ private fun BoxScope.typeBottomButtons(
                 },
                 modifier = Modifier
                     .width(IntrinsicSize.Max)
-//                    .wrapContentWidth(Alignment.End)
-//                    .weight(1.0f, false)
                     .padding(dimensionResource(id = R.dimen.content_padding))
             )
         }

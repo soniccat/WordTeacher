@@ -112,7 +112,7 @@ fun CustomListItem(
         }
         if (trailing != null) {
             Box(
-                Modifier.align(Alignment.Top)
+                Modifier.padding(start = 4.dp).align(Alignment.Top)
             ) { trailing() }
         }
     }

@@ -408,7 +408,13 @@ private fun showViewItem(
     is WordDividerViewItem -> WordDividerView(modifier)
     is WordTitleViewItem -> WordTitleView(item, modifier)
     is WordTranscriptionViewItem -> WordTranscriptionView(item, modifier)
-    is WordAudioFilesViewItem -> WordAudioFilesView(item, modifier) {
+    is WordAudioFilesViewItem -> WordAudioFilesView(
+        item,
+        Modifier.padding(
+            start = LocalDimensWord.current.wordHorizontalPadding,
+            end = LocalDimensWord.current.wordHorizontalPadding,
+        )
+    ) {
         vm.onAudioFileClicked(it)
     }
     is WordPartOfSpeechViewItem -> WordPartOfSpeechView(item, modifier)
@@ -478,14 +484,15 @@ private fun AddToSet(vm: DefinitionsVM, wordDefinitionViewItem: WordDefinitionVi
                             onClick = {
                                 vm.onAddDefinitionInSet(wordDefinitionViewItem, it)
                                 expanded = false
-                            }
+                            },
+                            contentPadding = PaddingValues(16.dp, 4.dp)
                         ) {
                             Text(it.name)
                         }
                         is CardSetExpandOrCollapseViewItem -> DropdownMenuItem(
                             onClick = {
                                 vm.onCardSetExpandCollapseClicked(it)
-                            }
+                            },
                         ) {
                             Text(
                                 it.text.localized(),
@@ -703,14 +710,9 @@ fun WordAudioFilesView(
     modifier: Modifier = Modifier,
     onClicked: (WordAudioFilesViewItem.AudioFile) -> Unit
 ) {
-    FlowRow(
-        modifier.padding(
-            start = LocalDimensWord.current.wordHorizontalPadding,
-            end = LocalDimensWord.current.wordHorizontalPadding,
-        )
-    ) {
+    FlowRow(modifier) {
         viewItem.items.onEach { audioFile ->
-            WordAudioFileView(audioFile, modifier.clickable { onClicked(audioFile) })
+            WordAudioFileView(audioFile, Modifier.clickable { onClicked(audioFile) })
         }
     }
 }

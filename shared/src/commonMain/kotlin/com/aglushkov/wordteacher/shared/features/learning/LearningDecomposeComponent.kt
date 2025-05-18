@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
+import com.russhwolf.settings.coroutines.FlowSettings
 
 class LearningDecomposeComponent (
     initialState: LearningVM.State,
@@ -18,6 +19,7 @@ class LearningDecomposeComponent (
     idGenerator: IdGenerator,
     analytics: Analytics,
     audioService: AudioService,
+    settings: FlowSettings,
 ) : LearningVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -28,6 +30,7 @@ class LearningDecomposeComponent (
     idGenerator,
     analytics,
     audioService,
+    settings,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Learning"
 

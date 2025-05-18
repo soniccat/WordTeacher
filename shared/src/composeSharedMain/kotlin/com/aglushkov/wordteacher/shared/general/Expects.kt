@@ -15,14 +15,14 @@ import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.format
 
-@Composable
-expect fun DropdownMenu(expanded: Boolean, onDismissRequest: ()->Unit, content: @Composable ColumnScope.() -> Unit)
-
-@Composable
-expect fun DropdownMenuItem(
-    onClick: () -> Unit,
-    content: @Composable RowScope.() -> Unit
-)
+//@Composable
+//expect fun DropdownMenu(expanded: Boolean, onDismissRequest: ()->Unit, content: @Composable ColumnScope.() -> Unit)
+//
+//@Composable
+//expect fun DropdownMenuItem(
+//    onClick: () -> Unit,
+//    content: @Composable RowScope.() -> Unit
+//)
 
 @Composable
 expect fun CustomDialogUI(

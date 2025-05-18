@@ -34,11 +34,15 @@ import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.russhwolf.settings.boolean
+import com.russhwolf.settings.coroutines.FlowSettings
+import com.russhwolf.settings.coroutines.toBlockingSettings
 import dev.icerock.moko.graphics.Color
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.internal.NamedCompanion
 
@@ -49,6 +53,7 @@ interface LearningVM: Clearable {
     val titleErrorFlow: StateFlow<StringDesc?>
     val canShowHint: StateFlow<Boolean>
     val hintString: StateFlow<List<Char>>
+    val playSoundOnTypingCompletion: StateFlow<Boolean>
 
     fun onMatchTermPressed(matchRow: Challenge.MatchRow)
     fun onMatchExamplePressed(matchRow: Challenge.MatchRow)
@@ -62,6 +67,7 @@ interface LearningVM: Clearable {
     fun onGiveUpPressed()
     fun onClosePressed()
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
+    fun onPlaySoundOnTypingCompletionClicked()
 
     fun save(): State
     fun getErrorText(res: Resource<*>): StringDesc?
@@ -93,7 +99,7 @@ interface LearningVM: Clearable {
             val index: Int,
             val count: Int,
             val termViewItems: List<BaseViewItem<*>>,
-            val audioFilews: WordAudioFilesViewItem,
+            val audioFiles: WordAudioFilesViewItem?,
         ): Challenge
 
         fun index(): Int = when(this) {
@@ -134,6 +140,7 @@ open class LearningVMImpl(
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
     private val audioService: AudioService,
+    private val settings: FlowSettings
 ) : ViewModel(), LearningVM {
 
     override var router: LearningRouter? = null
@@ -143,6 +150,11 @@ open class LearningVMImpl(
     override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
     override val canShowHint = MutableStateFlow(true)
     override val hintString = MutableStateFlow(listOf<Char>())
+    override val playSoundOnTypingCompletion = MutableStateFlow(
+        runBlocking {
+            settings.getBoolean(SETTING_PLAY_SOUND_ON_TYPING_COMPLETION, true)
+        }
+    )
     private val matchColorMap: MutableMap<Int, Int> = mutableMapOf() // selection group to color index from MatchColors
 
     private var teacher: CardTeacher? = null
@@ -167,6 +179,13 @@ open class LearningVMImpl(
     init {
         cardRepository.load(state)
         startLearning(state)
+
+        // update settings
+        viewModelScope.launch {
+            playSoundOnTypingCompletion.onEach {
+                settings.putBoolean(SETTING_PLAY_SOUND_ON_TYPING_COMPLETION, it)
+            }.collect()
+        }
     }
 
     override fun save(): LearningVM.State {
@@ -248,7 +267,17 @@ open class LearningVMImpl(
 
                 // type session
                 analytics.send(AnalyticEvent.createActionEvent("Learning.session.typing.started"))
+                var prevAudioFile: WordTeacherWord.AudioFile? = null
+                val playPrevAudioFile = {
+                    prevAudioFile?.let {
+                        if (playSoundOnTypingCompletion.value) {
+                            audioService.play(it.url)
+                        }
+                    }
+                }
                 sessionCards.collectIndexed { index, card ->
+                    playPrevAudioFile()
+                    prevAudioFile = card.audioFiles.firstOrNull()
                     challengeState.update {
                         Resource.Loaded(
                             LearningVM.Challenge.Type(
@@ -256,13 +285,18 @@ open class LearningVMImpl(
                                 index = index,
                                 count = cardCount,
                                 termViewItems = buildCardItem(card),
-                                audioFilews = WordAudioFilesViewItem(card.audioFiles.map {
-                                    it.toViewItemAudioFile()
-                                })
+                                audioFiles = if (card.audioFiles.isNotEmpty()) {
+                                    WordAudioFilesViewItem(card.audioFiles.map {
+                                        it.toViewItemAudioFile()
+                                    })
+                                } else {
+                                    null
+                                }
                             )
                         )
                     }
                 }
+                playPrevAudioFile()
                 analytics.send(AnalyticEvent.createActionEvent("Learning.session.typing.completed"))
                 analytics.send(AnalyticEvent.createActionEvent("Learning.completeSession"))
             }
@@ -461,6 +495,11 @@ open class LearningVMImpl(
         audioService.play(audioFile.url)
     }
 
+    override fun onPlaySoundOnTypingCompletionClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Learning.onPlaySoundOnTypingCompletionClicked"))
+        playSoundOnTypingCompletion.update { !it }
+    }
+
     override fun getErrorText(res: Resource<*>): StringDesc? {
         return StringDesc.Resource(MR.strings.learning_error)
     }
@@ -480,3 +519,5 @@ private val MatchColors = listOf(
     Color(0x14E2B9FF),
     Color(0x5F5D5DFF),
 )
+
+private const val SETTING_PLAY_SOUND_ON_TYPING_COMPLETION = "playSoundOnTypingCompletion"

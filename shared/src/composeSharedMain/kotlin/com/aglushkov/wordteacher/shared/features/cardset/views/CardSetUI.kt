@@ -38,8 +38,6 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CreateCardViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.views.*
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
-import com.aglushkov.wordteacher.shared.general.DropdownMenu
-import com.aglushkov.wordteacher.shared.general.DropdownMenuItem
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -273,7 +271,13 @@ fun CardSetViewItems(
             )
         }
 
-        is WordAudioFilesViewItem -> WordAudioFilesView(item, modifier) {
+        is WordAudioFilesViewItem -> WordAudioFilesView(
+            item,
+            Modifier.padding(
+                start = LocalDimensWord.current.wordHorizontalPadding,
+                end = LocalDimensWord.current.wordHorizontalPadding,
+            )
+        ) {
             vm.onAudioFileClicked(it)
         }
 
