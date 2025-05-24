@@ -170,5 +170,7 @@
     <string name="sidesheet_default_error_message">Invalid input</string>
     <string name="sidesheet_exposed_dropdown">Dropdown menu</string>
 
-    <string name="cardset_json_import">CardSet json import</string>
+    <string name="cardset_json_import_title">CardSet json import</string>
+    <string name="cardset_json_import_check">Check</string>
+    <string name="cardset_json_import_enrich">Enrich</string>
 </resources>

@@ -221,7 +221,7 @@ private fun AddArticlesFieldsUI(
                         minHeight = with(LocalDensity.current) {
                             (42 * 2).sp.toDp()
                         },
-                        maxHeight = 300.dp
+                        maxHeight = 600.dp
                     ),
                 label = {
                     Text(stringResource(MR.strings.add_article_field_text_hint))

@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.cardset_json_import.di
 
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.CardSetJsonImportDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeComponent
@@ -32,4 +33,5 @@ interface CardSetJsonImportDependencies {
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
     fun analytics(): Analytics
+    fun wordTeacherDictService(): WordTeacherDictService
 }

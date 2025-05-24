@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.cardset_json_import.vm
 
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import com.aglushkov.wordteacher.shared.events.CompletionData
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.CompletionResult
@@ -12,6 +13,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.exception
+import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardProgress
 import com.aglushkov.wordteacher.shared.model.CardSet
@@ -38,6 +40,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 interface CardSetJsonImportVM: Clearable {
@@ -46,6 +49,8 @@ interface CardSetJsonImportVM: Clearable {
     val eventFlow: Flow<Event>
 
     fun onJsonTextChanged(text: String)
+    fun onEnrichClicked()
+    fun onCheckClicked()
     fun onCompletePressed()
     fun onCancelPressed(): Job
 }
@@ -56,7 +61,7 @@ data class ImportCardSet (
     val cards: List<ImportCard> = emptyList(),
     var terms: List<String> = emptyList(), // for cardsets from search
     var info: CardSetInfo,
-    var isAvailableInSearch: Boolean = true,
+    var isAvailableInSearch: Boolean = false,
 ) {
     fun toCardSet(nowTime: Instant) = CardSet(
         id = 0,
@@ -75,7 +80,7 @@ data class ImportCardSet (
                 labels = it.labels.orEmpty(),
                 definitionTermSpans = listOf(),
                 partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
-                transcriptions = it.transcription?.let { listOf(it) } ?: emptyList(),
+                transcriptions = it.transcriptions.orEmpty(),
                 synonyms = it.synonyms.orEmpty(),
                 examples = it.examples.orEmpty(),
                 exampleTermSpans = listOf(),
@@ -88,7 +93,7 @@ data class ImportCardSet (
                 needToUpdateExampleSpans = true,
                 creationId = Uuid.randomUUID().toString(),
                 termFrequency = UNDEFINED_FREQUENCY,
-                audioFiles = emptyList(),
+                audioFiles = it.audioFiles.orEmpty(),
             )
         },
         terms = listOf(),
@@ -100,18 +105,20 @@ data class ImportCardSet (
 
 @Serializable
 data class ImportCard (
-    val term: String,
-    val definitions: List<String>?,
-    val labels: List<String>?,
-    val transcription: String?,
-    val synonyms: List<String>?,
-    val examples: List<String>?,
+    var term: String,
+    var definitions: List<String>?,
+    var labels: List<String>?,
+    var transcriptions: List<String>?,
+    var synonyms: List<String>?,
+    var examples: List<String>?,
+    var audioFiles: List<WordTeacherWord.AudioFile>?,
 )
 
 open class CardSetJsonImportVMImpl(
     private val configuration: MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration,
     private val cardSetsRepository: CardSetsRepository,
     private val timeSource: TimeSource,
+    private val wordTeacherDictService: WordTeacherDictService,
 ): ViewModel(), CardSetJsonImportVM {
     override val jsonText = MutableStateFlow("")
     override val jsonTextErrorFlow = MutableStateFlow<StringDesc?>(null)
@@ -123,6 +130,7 @@ open class CardSetJsonImportVMImpl(
         ignoreUnknownKeys = true
         coerceInputValues = true
         explicitNulls = false
+        prettyPrint = true
     }
 
     override fun onJsonTextChanged(text: String) {
@@ -130,18 +138,61 @@ open class CardSetJsonImportVMImpl(
         jsonTextErrorFlow.value = null
     }
 
+    override fun onCheckClicked() {
+        createCardSetWithErrorHandling()
+    }
+
+    override fun onEnrichClicked() {
+        val importCardSet: ImportCardSet = createCardSetWithErrorHandling() ?: return
+        viewModelScope.launch {
+            try {
+                val loadedWords = wordTeacherDictService.loadWords(
+                    importCardSet.cards.map { it.term }
+                ).toOkResponse().words.orEmpty()
+
+                importCardSet.cards.onEach { card ->
+                    val firstWord = loadedWords.firstOrNull { it.word == card.term }
+                    firstWord?.let { word ->
+                        if (card.transcriptions.isNullOrEmpty() && word.transcriptions.orEmpty().isNotEmpty()) {
+                            card.transcriptions = word.transcriptions
+                        }
+
+                        if (card.audioFiles.isNullOrEmpty() && word.audioFiles.isNotEmpty()) {
+                            card.audioFiles = word.audioFiles.map {
+                                WordTeacherWord.AudioFile(
+                                    url = it.url,
+                                    accent = it.accent,
+                                    transcription = it.transcription,
+                                    text = it.text,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                jsonText.value = json.encodeToString(importCardSet)
+
+            } catch (e: Exception) {
+                Logger.e(e.message.orEmpty(), TAG)
+                jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
+            }
+        }
+    }
+
     override fun onCompletePressed() {
-        val importCardSet: ImportCardSet
+        val importCardSet: ImportCardSet = createCardSetWithErrorHandling() ?: return
+        val nowTime = timeSource.timeInstant()
+        createCardSet(importCardSet.toCardSet(nowTime))
+    }
+
+    private fun createCardSetWithErrorHandling(): ImportCardSet? {
         try {
-            importCardSet = json.decodeFromString<ImportCardSet>(jsonText.value)
+            return json.decodeFromString<ImportCardSet>(jsonText.value)
         } catch (e: Exception) {
             Logger.e(e.message.orEmpty(), TAG)
             jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
-            return
+            return null
         }
-
-        val nowTime = timeSource.timeInstant()
-        createCardSet(importCardSet.toCardSet(nowTime))
     }
 
     override fun onCancelPressed() = viewModelScope.launch {

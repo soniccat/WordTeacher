@@ -72,7 +72,7 @@ fun CardSetJsonImportUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(text = stringResource(MR.strings.cardset_json_import)) },
+                title = { Text(text = stringResource(MR.strings.cardset_json_import_title)) },
                 actions = actions
             )
 
@@ -82,18 +82,41 @@ fun CardSetJsonImportUI(
             )
         }
 
-        ExtendedFloatingActionButton(
-            text = {
-                Text(
-                    text = stringResource(MR.strings.add_article_done),
-                    modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
-                )
-            },
-            onClick = { vm.onCompletePressed() },
+        Row(
             modifier = Modifier.Companion
                 .align(Alignment.BottomEnd)
                 .padding(LocalDimens.current.contentPadding)
-        )
+        ) {
+            ExtendedFloatingActionButton(
+                text = {
+                    Text(
+                        text = stringResource(MR.strings.cardset_json_import_enrich),
+                        modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
+                    )
+                },
+                onClick = { vm.onEnrichClicked() },
+            )
+
+            ExtendedFloatingActionButton(
+                text = {
+                    Text(
+                        text = stringResource(MR.strings.cardset_json_import_check),
+                        modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
+                    )
+                },
+                onClick = { vm.onCheckClicked() },
+            )
+
+            ExtendedFloatingActionButton(
+                text = {
+                    Text(
+                        text = stringResource(MR.strings.add_article_done),
+                        modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
+                    )
+                },
+                onClick = { vm.onCompletePressed() },
+            )
+        }
 
         // TODO: replace with SnackbarEventHolder
         SnackbarHost(
@@ -152,9 +175,12 @@ private fun CardSetJsonImportFieldsUI(
             onValueChange = { vm.onJsonTextChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
-                .sizeIn(minHeight = with(LocalDensity.current) {
-                    (42 * 2).sp.toDp()
-                }),
+                .sizeIn(
+                    minHeight = with(LocalDensity.current) {
+                        (42 * 2).sp.toDp()
+                    },
+                    maxHeight = 300.dp
+                ),
             label = { Text(stringResource(MR.strings.add_article_field_text_hint)) }
         )
         Box(
