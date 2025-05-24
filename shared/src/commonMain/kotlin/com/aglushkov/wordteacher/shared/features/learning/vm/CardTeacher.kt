@@ -85,7 +85,7 @@ class CardTeacher(
 
         val sessionCards = cards.filter { card ->
             !rightAnsweredCardSet.contains(card.id)
-        }.sortedBy { it.termFrequency }.take(CARD_PER_SESSION)
+        }.sortedByFrequency().take(CARD_PER_SESSION)
 
         if (sessionCards.isEmpty()) {
             currentSession = null
@@ -100,6 +100,20 @@ class CardTeacher(
         }
 
         return currentSession
+    }
+
+    private fun List<Card>.sortedByFrequency(): List<Card> {
+        val cardsWithNegativeFrequency = mutableListOf<Card>()
+        val cardsWithPositiveFrequency = mutableListOf<Card>()
+        onEach {
+            if (it.termFrequency < 0) {
+                cardsWithNegativeFrequency.add(it)
+            } else {
+                cardsWithPositiveFrequency.add(it)
+            }
+        }
+
+        return cardsWithNegativeFrequency + cardsWithPositiveFrequency.sortedByDescending { it.termFrequency }
     }
 
     private fun prepareToNewCard() {
