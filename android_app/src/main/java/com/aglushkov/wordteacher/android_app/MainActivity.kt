@@ -54,6 +54,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_json_import.views.CardS
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetsUI
 import com.aglushkov.wordteacher.shared.features.dashboard.DashboardUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
+import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUIDialog
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
@@ -194,6 +195,10 @@ class MainActivity : AppCompatActivity(), Router {
                                 override fun onLocalCardSetUpdated(cardSetId: Long) {
                                     mainDecomposeComponent.onCardSetUpdated(cardSetId)
                                 }
+
+                                override fun onDefinitionsClosed() {
+                                    // won't happen
+                                }
                             }
                         }
                     )
@@ -275,6 +280,10 @@ class MainActivity : AppCompatActivity(), Router {
                                 override fun onLocalCardSetUpdated(cardSetId: Long) {
                                     mainDecomposeComponent.onCardSetUpdated(cardSetId)
                                 }
+
+                                override fun onDefinitionsClosed() {
+                                    // won't happen
+                                }
                             }
                         },
                         modalModifier = Modifier.padding(innerPadding)
@@ -339,8 +348,12 @@ class MainActivity : AppCompatActivity(), Router {
                     LearningUIDialog(
                         vm = instance.vm.apply {
                             router = object : LearningRouter {
-                                override fun openSessionResult(results: List<SessionCardResult>) {
+                                override fun openLearningSessionResult(results: List<SessionCardResult>) {
                                     mainDecomposeComponent.openLearningSessionResult(results)
+                                }
+
+                                override fun openDefinitions(word: String) {
+                                    mainDecomposeComponent.openDefinitions(word)
                                 }
 
                                 override fun onScreenFinished(
@@ -369,6 +382,24 @@ class MainActivity : AppCompatActivity(), Router {
                         onCardSetCreated = {
                             mainDecomposeComponent.popDialog(child.configuration)
                         }
+                    )
+                is MainDecomposeComponent.Child.Definitions ->
+                    DefinitionsUIDialog(
+                        vm = instance.vm.apply {
+                            router = object : DefinitionsRouter {
+                                override fun openCardSets() {
+                                    mainDecomposeComponent.openCardSets()
+                                }
+
+                                override fun onLocalCardSetUpdated(cardSetId: Long) {
+                                    mainDecomposeComponent.onCardSetUpdated(cardSetId)
+                                }
+
+                                override fun onDefinitionsClosed() {
+                                    mainDecomposeComponent.popDialog(child.configuration)
+                                }
+                            }
+                        },
                     )
                 else -> {}
             }

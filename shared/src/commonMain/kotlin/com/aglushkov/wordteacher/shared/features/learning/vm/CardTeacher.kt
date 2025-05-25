@@ -30,7 +30,7 @@ class CardTeacher(
     private var sessions = mutableListOf<LearningSession>()
     private var currentSession: LearningSession? = null
     private var currentCardStateFlow = MutableStateFlow<Card?>(null)
-    private val currentCard: Card?
+    val currentCard: Card?
         get() = currentCardStateFlow.value
 
     private var hintStringStateFlow = MutableStateFlow<List<Char>>(emptyList())
@@ -179,7 +179,7 @@ class CardTeacher(
         }
     }
 
-    private suspend fun countWrongAnswer() {
+    suspend fun countWrongAnswer() {
         if (isWrongAnswerCounted) return
 
         val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.withWrongAnswer(timeSource), timeSource.timeInMilliseconds())

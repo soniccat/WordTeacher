@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features
 
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent.Child
+import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent.ChildConfiguration
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
@@ -16,9 +18,12 @@ import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeCompo
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsRouter
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
+import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.DictConfigsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.LearningSessionResultDecomposeComponent
@@ -60,6 +65,7 @@ interface MainDecomposeComponent:
     fun openCardSetInfo(state: CardSetInfoVM.State)
     override fun openLearning(state: LearningVM.State)
     fun openLearningSessionResult(results: List<SessionCardResult>)
+    fun openDefinitions(word: String)
     fun back()
     fun popToRoot()
     override fun openWebAuth(networkType: SpaceAuthService.NetworkType)
@@ -80,6 +86,7 @@ interface MainDecomposeComponent:
         data class WebAuth(val vm: WebAuthVM): Child(vm)
         data class CardSetJsonImport(val vm: CardSetJsonImportVM): Child(vm)
         data class DictConfigs(val vm: DictConfigsVM): Child(vm)
+        data class Definitions(val vm: DefinitionsVM): Child(vm)
         object EmptyDialog: Child(null)
 
         override fun onCleared() {
@@ -100,6 +107,7 @@ interface MainDecomposeComponent:
         @Serializable data object CardSetsConfiguration : ChildConfiguration()
         @Serializable data object TabsConfiguration : ChildConfiguration()
         @Serializable data class AddArticleConfiguration(val state: AddArticleVM.State = AddArticleVM.State()) : ChildConfiguration()
+        @Serializable data class DefinitionConfiguration(val state: DefinitionsVM.State) : ChildConfiguration()
         @Serializable data object EmptyDialogConfiguration : ChildConfiguration() // TODO: it seems we can remove that
     }
 }
@@ -173,6 +181,9 @@ class MainDecomposeComponentImpl(
             )
         is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> MainDecomposeComponent.Child.AddArticle(
             vm = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
+        )
+        is MainDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> MainDecomposeComponent.Child.Definitions(
+            vm = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
         )
         is MainDecomposeComponent.ChildConfiguration.LearningConfiguration -> MainDecomposeComponent.Child.Learning(
             vm = childComponentFactory(componentContext, configuration) as LearningDecomposeComponent
@@ -277,6 +288,12 @@ class MainDecomposeComponentImpl(
 
     override fun openAddArticle() {
         openAddArticle(null, true)
+    }
+
+    override fun openDefinitions(word: String) {
+        addDialogConfigIfNotAtTop(MainDecomposeComponent.ChildConfiguration.DefinitionConfiguration(
+            state = DefinitionsVM.State(word = word)
+        ))
     }
 
     private inline fun <reified C: MainDecomposeComponent.ChildConfiguration> addDialogConfigIfNotAtTop(config: C) {

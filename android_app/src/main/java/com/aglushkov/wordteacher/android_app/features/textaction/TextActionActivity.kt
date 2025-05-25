@@ -212,6 +212,10 @@ class TextActionActivity: AppCompatActivity() {
                                     override fun onLocalCardSetUpdated(cardSetId: Long) {
                                         textActionDecomposeComponent.onCardSetUpdated(cardSetId)
                                     }
+
+                                    override fun onDefinitionsClosed() {
+                                        // won't happen
+                                    }
                                 }
                             },
                             modalModifier = Modifier.padding(innerPadding)

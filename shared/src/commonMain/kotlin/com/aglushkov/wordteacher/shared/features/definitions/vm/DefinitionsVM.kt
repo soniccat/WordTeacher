@@ -68,6 +68,7 @@ interface DefinitionsVM: Clearable {
     fun onSuggestsAppeared()
     fun onBackPressed(): Boolean
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
+    fun onCloseClicked()
 
     val wordTextValue: StateFlow<String>
     val state: State
@@ -787,6 +788,10 @@ open class DefinitionsVMImpl(
     override fun onWordHistoryItemClicked(item: WordHistoryViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.wordHistoryItemClicked"))
         updateCurrentWord(item.firstItem())
+    }
+
+    override fun onCloseClicked() {
+        router?.onDefinitionsClosed()
     }
 }
 

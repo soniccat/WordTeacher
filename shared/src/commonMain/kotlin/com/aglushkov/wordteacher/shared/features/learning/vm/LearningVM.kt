@@ -65,6 +65,7 @@ interface LearningVM: Clearable {
     fun onTryAgainClicked()
     fun onHintAskedPressed()
     fun onGiveUpPressed()
+    fun onOpenDefinitionsClicked()
     fun onClosePressed()
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
     fun onPlaySoundOnTypingCompletionClicked()
@@ -302,7 +303,7 @@ open class LearningVMImpl(
             }
 
             if (sessionResults != null) {
-                router?.openSessionResult(sessionResults)
+                router?.openLearningSessionResult(sessionResults)
             }
         } while (sessionResults != null)
 
@@ -493,11 +494,24 @@ open class LearningVMImpl(
     override fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile) {
         analytics.send(AnalyticEvent.createActionEvent("Learning.onAudioFileClicked"))
         audioService.play(audioFile.url)
+        viewModelScope.launch {
+            teacher?.countWrongAnswer()
+        }
     }
 
     override fun onPlaySoundOnTypingCompletionClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Learning.onPlaySoundOnTypingCompletionClicked"))
         playSoundOnTypingCompletion.update { !it }
+    }
+
+    override fun onOpenDefinitionsClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Learning.onOpenDefinitionsClicked"))
+        viewModelScope.launch {
+            teacher?.countWrongAnswer()
+        }
+        teacher?.currentCard?.term?.let {
+            router?.openDefinitions(it)
+        }
     }
 
     override fun getErrorText(res: Resource<*>): StringDesc? {

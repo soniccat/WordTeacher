@@ -15,7 +15,9 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.di.DaggerDictConfigsComponent
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.di.DaggerCardSetJsonImportComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.di.DaggerCardSetInfoComponent
+import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.arkivanov.decompose.ComponentContext
@@ -102,6 +104,18 @@ class MainComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .cardSetsDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.DefinitionConfiguration ->
+                    DaggerDefinitionsComposeComponent.builder()
+                        .setComponentContext(context)
+                        .setInitialState(configuration.state)
+                        .settings(
+                            DefinitionsVM.Settings(
+                                needStoreDefinedWordInSettings = true,
+                            )
+                        )
+                        .setDeps(appComponent)
+                        .build()
+                        .definitionsDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.WebAuthConfiguration ->
                     TODO("Not supported")
             }

@@ -105,5 +105,9 @@ open class DefinitionsVMPreview(
     override fun onBackPressed(): Boolean {
         return false
     }
+
+    override fun onCloseClicked() {
+    }
+
     override val wordStack = MutableStateFlow<List<String>>(emptyList())
 }

@@ -30,6 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.views.CardSetJsonImportUI
+import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJsonImportVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
@@ -55,6 +57,23 @@ import kotlinx.coroutines.launch
 import java.util.*
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.localized
+
+
+@Composable
+fun DefinitionsUIDialog(
+    vm: DefinitionsVM,
+    modifier: Modifier = Modifier,
+) {
+    CustomDialogUI(
+        onDismissRequest = { vm.onCloseClicked() }
+    ) {
+        DefinitionsUI(
+            vm = vm,
+            contentModifier = modifier,
+        )
+    }
+}
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

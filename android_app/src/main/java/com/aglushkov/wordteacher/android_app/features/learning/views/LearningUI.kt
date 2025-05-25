@@ -217,14 +217,29 @@ private fun BoxScope.typeBottomButtons(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .align(Alignment.BottomEnd)
+            .align(Alignment.BottomEnd),
+        horizontalAlignment = Alignment.End
     ) {
+        FloatingActionButton(
+            onClick = {
+                vm.onOpenDefinitionsClicked()
+            },
+            modifier = Modifier
+                .width(IntrinsicSize.Max)
+                .padding(dimensionResource(id = R.dimen.content_padding))
+        ) {
+            Icon(
+                painter = dev.icerock.moko.resources.compose.painterResource(MR.images.field_search_24),
+                contentDescription = null
+            )
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End,
         ) {
-            if (!canShowHint && audioFilesViewItem != null) {
+            if (audioFilesViewItem != null) {
                 WordAudioFilesView(
                     viewItem = audioFilesViewItem,
                     modifier = Modifier

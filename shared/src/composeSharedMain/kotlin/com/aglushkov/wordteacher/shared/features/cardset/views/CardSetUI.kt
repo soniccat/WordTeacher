@@ -103,7 +103,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 }
             },
             actions = {
-                if (vm.availableFeatures.canEnrich) {
+                if (vm.availableFeatures.canEnrich && !state.isRemoteCardSet) {
                     Button(
                         onClick = { vm.onEnrichClicked() }
                     ) {
