@@ -103,6 +103,14 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 }
             },
             actions = {
+                if (vm.availableFeatures.canEnrich) {
+                    Button(
+                        onClick = { vm.onEnrichClicked() }
+                    ) {
+                        Text(text = "Enrich")
+                    }
+                }
+
                 IconButton(
                     onClick = { vm.onInfoPressed() }
                 ) {

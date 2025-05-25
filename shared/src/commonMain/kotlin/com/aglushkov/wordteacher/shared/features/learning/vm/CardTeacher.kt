@@ -113,7 +113,7 @@ class CardTeacher(
             }
         }
 
-        return cardsWithNegativeFrequency + cardsWithPositiveFrequency.sortedByDescending { it.termFrequency }
+        return cardsWithPositiveFrequency.sortedByDescending { it.termFrequency } + cardsWithNegativeFrequency
     }
 
     private fun prepareToNewCard() {

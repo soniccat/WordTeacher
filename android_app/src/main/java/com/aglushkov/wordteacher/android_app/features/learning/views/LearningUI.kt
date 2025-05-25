@@ -222,18 +222,13 @@ private fun BoxScope.typeBottomButtons(
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End,
         ) {
             if (!canShowHint && audioFilesViewItem != null) {
                 WordAudioFilesView(
                     viewItem = audioFilesViewItem,
-                    modifier = Modifier.weight(1.0f, true)
-                        // to minimize the width when there's a single line
-                        .wrapContentWidth(Alignment.Start)
-                        .width(IntrinsicSize.Max)
-                        .padding(
-                            start = LocalDimensWord.current.wordHorizontalPadding,
-                            end = LocalDimensWord.current.wordHorizontalPadding,
-                        )
+                    modifier = Modifier
+                        .padding(end = 8.dp)
                         .background(
                             // chip background
                             MaterialTheme.colors.onSurface.copy(alpha = 0.12f)

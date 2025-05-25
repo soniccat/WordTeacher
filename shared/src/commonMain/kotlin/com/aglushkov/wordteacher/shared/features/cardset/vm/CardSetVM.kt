@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.events.ScrollViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM.Features
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.*
@@ -13,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.model.*
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
@@ -33,6 +35,7 @@ interface CardSetVM: Clearable {
     val cardSet: StateFlow<Resource<out CardSet>>
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val eventFlow: Flow<List<Event>>
+    val availableFeatures: Features
 
     fun onCardCreatePressed()
     fun onCardDeleted(cardId: Long)
@@ -55,6 +58,7 @@ interface CardSetVM: Clearable {
     fun onStartLearningClicked()
     fun onAddClicked()
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
+    fun onEnrichClicked()
 
     @Serializable
     sealed interface State {
@@ -72,6 +76,10 @@ interface CardSetVM: Clearable {
             override val isRemoteCardSet: Boolean = true
         }
     }
+
+    data class Features(
+        val canEnrich: Boolean = false
+    )
 }
 
 open class CardSetVMImpl(
@@ -84,6 +92,8 @@ open class CardSetVMImpl(
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
     private val audioService: AudioService,
+    private val cardEnricher: CardEnricher,
+    override val availableFeatures: CardSetVM.Features
 ): ViewModel(), CardSetVM {
 
     override var router: CardSetRouter? = null
@@ -735,6 +745,23 @@ open class CardSetVMImpl(
 
     override fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile) {
         audioService.play(audioFile.url)
+    }
+
+    override fun onEnrichClicked() {
+        viewModelScope.launch {
+            val cards = cardSet.value.data()?.cards.orEmpty()
+            val newDataList = cardEnricher.enrich(cards)
+            cards.onEachIndexed { index, card ->
+                val newData = newDataList[index]
+                updateCard(
+                    card.copy(
+                        transcriptions = newData.transcriptions ?: card.transcriptions,
+                        audioFiles = newData.audioFiles ?: card.audioFiles,
+                        partOfSpeech = newData.partOfSpeech,
+                    )
+                )
+            }
+        }
     }
 
     enum class FocusLastType {

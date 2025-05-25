@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
@@ -41,4 +42,6 @@ interface CardSetDependencies {
     fun timeSource(): TimeSource
     fun analytics(): Analytics
     fun audioService(): AudioService
+    fun cardEnricher(): CardEnricher
+    fun features(): CardSetVM.Features
 }

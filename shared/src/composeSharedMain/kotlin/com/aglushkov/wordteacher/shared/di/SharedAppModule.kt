@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.di
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
@@ -13,6 +14,8 @@ import com.aglushkov.wordteacher.shared.service.SpaceHttpClientBuilder
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricherImpl
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
@@ -466,5 +469,24 @@ class SharedAppModule {
     ): ReadCardSetRepository {
         val filePath = basePath.div("readCardSetHistory")
         return ReadCardSetRepository(filePath, fileSystem)
+    }
+
+    @AppComp
+    @Provides
+    fun cardEnricher(
+        wordTeacherDictService: WordTeacherDictService,
+        nlpCore: NLPCore
+    ): CardEnricher {
+        return CardEnricherImpl(wordTeacherDictService, nlpCore)
+    }
+
+    @AppComp
+    @Provides
+    fun cardSetFeatures(
+        @IsDebug isDebug: Boolean,
+    ): CardSetVM.Features {
+        return CardSetVM.Features(
+            canEnrich = isDebug,
+        )
     }
 }

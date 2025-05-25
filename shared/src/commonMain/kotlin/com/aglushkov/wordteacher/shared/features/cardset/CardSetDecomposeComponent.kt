@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl
 import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
@@ -25,6 +26,8 @@ class CardSetDecomposeComponent (
     idGenerator: IdGenerator,
     analytics: Analytics,
     audioService: AudioService,
+    cardEnricher: CardEnricher,
+    availableFeatures: CardSetVM.Features
 ) : CardSetVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -38,6 +41,8 @@ class CardSetDecomposeComponent (
     idGenerator,
     analytics,
     audioService,
+    cardEnricher,
+    availableFeatures
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_CardSet"
 

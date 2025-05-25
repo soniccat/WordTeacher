@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
@@ -38,6 +39,8 @@ class CardSetModule {
         idGenerator: IdGenerator,
         analytics: Analytics,
         audioService: AudioService,
+        cardEnricher: CardEnricher,
+        availableFeatures: CardSetVM.Features
     ) = CardSetDecomposeComponent(
         state,
         cardSetsRepository,
@@ -49,5 +52,7 @@ class CardSetModule {
         idGenerator,
         analytics,
         audioService,
+        cardEnricher,
+        availableFeatures,
     )
 }

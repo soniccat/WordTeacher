@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.model
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.aglushkov.wordteacher.shared.repository.db.UNDEFINED_FREQUENCY
 import com.aglushkov.wordteacher.shared.repository.db.UNKNOWN_FREQUENCY
 import kotlinx.datetime.Instant
@@ -16,22 +17,22 @@ data class Card (
     @SerialName("id") val remoteId: String,
     val creationDate: Instant,
     val modificationDate: Instant,
-    val term: String,
+    override val term: String,
     val definitions: List<String>,
     val labels: List<String> = emptyList(),
     val definitionTermSpans: List<List<CardSpan>>,
-    val partOfSpeech: WordTeacherWord.PartOfSpeech,
-    val transcriptions: List<String> = emptyList(),
-    val audioFiles: List<WordTeacherWord.AudioFile> = emptyList(),
+    override val partOfSpeech: WordTeacherWord.PartOfSpeech,
+    override val transcriptions: List<String> = emptyList(),
+    override val audioFiles: List<WordTeacherWord.AudioFile> = emptyList(),
     val synonyms: List<String>,
-    val examples: List<String>,
+    override val examples: List<String>,
     val exampleTermSpans: List<List<CardSpan>>,
     val progress: CardProgress,
     val needToUpdateDefinitionSpans: Boolean,
     val needToUpdateExampleSpans: Boolean,
     val creationId: String,
     @Transient val termFrequency: Double = UNDEFINED_FREQUENCY,
-) {
+) : CardEnricher.Target {
     fun withRightAnswer(timeSource: TimeSource) =
         copy(
             progress = progress.withRightAnswer(timeSource),

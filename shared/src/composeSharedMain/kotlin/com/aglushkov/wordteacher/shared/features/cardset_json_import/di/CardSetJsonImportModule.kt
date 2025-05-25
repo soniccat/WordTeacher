@@ -8,6 +8,8 @@ import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeCompo
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.arkivanov.decompose.ComponentContext
@@ -24,7 +26,7 @@ class CardSetJsonImportModule {
         cardSetsRepository: CardSetsRepository,
         timeSource: TimeSource,
         analytics: Analytics,
-        wordTeacherDictService: WordTeacherDictService,
+        cardSetEnricher: CardEnricher,
     ): CardSetJsonImportDecomposeComponent {
         return CardSetJsonImportDecomposeComponent(
             componentContext,
@@ -32,7 +34,7 @@ class CardSetJsonImportModule {
             cardSetsRepository,
             timeSource,
             analytics,
-            wordTeacherDictService,
+            cardSetEnricher,
         )
     }
 }

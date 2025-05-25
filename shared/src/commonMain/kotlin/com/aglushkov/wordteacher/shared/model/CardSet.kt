@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.sumOf
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.benasher44.uuid.uuid4
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName

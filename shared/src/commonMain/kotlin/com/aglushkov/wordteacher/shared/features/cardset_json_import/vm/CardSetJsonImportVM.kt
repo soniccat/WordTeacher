@@ -20,6 +20,12 @@ import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.CardSetInfo
 import com.aglushkov.wordteacher.shared.model.CardSpan
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
+import com.aglushkov.wordteacher.shared.model.nlp.NLPSpan
+import com.aglushkov.wordteacher.shared.model.nlp.TokenSpan
+import com.aglushkov.wordteacher.shared.model.nlp.toPartOfSpeech
+import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.UNDEFINED_FREQUENCY
 import com.aglushkov.wordteacher.shared.res.MR
@@ -28,6 +34,7 @@ import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +42,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -79,7 +87,7 @@ data class ImportCardSet (
                 definitions = it.definitions.orEmpty(),
                 labels = it.labels.orEmpty(),
                 definitionTermSpans = listOf(),
-                partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
+                partOfSpeech = it.partOfSpeech,
                 transcriptions = it.transcriptions.orEmpty(),
                 synonyms = it.synonyms.orEmpty(),
                 examples = it.examples.orEmpty(),
@@ -105,20 +113,21 @@ data class ImportCardSet (
 
 @Serializable
 data class ImportCard (
-    var term: String,
+    override var term: String,
+    override var partOfSpeech: WordTeacherWord.PartOfSpeech = WordTeacherWord.PartOfSpeech.Undefined,
     var definitions: List<String>?,
     var labels: List<String>?,
-    var transcriptions: List<String>?,
+    override var transcriptions: List<String>?,
     var synonyms: List<String>?,
-    var examples: List<String>?,
-    var audioFiles: List<WordTeacherWord.AudioFile>?,
-)
+    override var examples: List<String>?,
+    override var audioFiles: List<WordTeacherWord.AudioFile>?,
+) : CardEnricher.Target
 
 open class CardSetJsonImportVMImpl(
     private val configuration: MainDecomposeComponent.ChildConfiguration.CardSetJsonImportConfiguration,
     private val cardSetsRepository: CardSetsRepository,
     private val timeSource: TimeSource,
-    private val wordTeacherDictService: WordTeacherDictService,
+    private val cardEnricher: CardEnricher,
 ): ViewModel(), CardSetJsonImportVM {
     override val jsonText = MutableStateFlow("")
     override val jsonTextErrorFlow = MutableStateFlow<StringDesc?>(null)
@@ -139,38 +148,27 @@ open class CardSetJsonImportVMImpl(
     }
 
     override fun onCheckClicked() {
-        createCardSetWithErrorHandling()
+        val cardSet = createCardSetWithErrorHandling() ?: return
+        jsonText.value = json.encodeToString(cardSet)
     }
 
     override fun onEnrichClicked() {
         val importCardSet: ImportCardSet = createCardSetWithErrorHandling() ?: return
         viewModelScope.launch {
             try {
-                val loadedWords = wordTeacherDictService.loadWords(
-                    importCardSet.cards.map { it.term }
-                ).toOkResponse().words.orEmpty()
-
-                importCardSet.cards.onEach { card ->
-                    val firstWord = loadedWords.firstOrNull { it.word == card.term }
-                    firstWord?.let { word ->
-                        if (card.transcriptions.isNullOrEmpty() && word.transcriptions.orEmpty().isNotEmpty()) {
-                            card.transcriptions = word.transcriptions
-                        }
-
-                        if (card.audioFiles.isNullOrEmpty() && word.audioFiles.isNotEmpty()) {
-                            card.audioFiles = word.audioFiles.map {
-                                WordTeacherWord.AudioFile(
-                                    url = it.url,
-                                    accent = it.accent,
-                                    transcription = it.transcription,
-                                    text = it.text,
-                                )
-                            }
-                        }
+                val newDataList = cardEnricher.enrich(importCardSet.cards)
+                val enrichedCardSet = importCardSet.copy(
+                    cards = importCardSet.cards.mapIndexed { index, importCard ->
+                        val newData = newDataList[index]
+                        importCard.copy(
+                            transcriptions = newData.transcriptions ?: importCard.transcriptions,
+                            audioFiles = newData.audioFiles ?: importCard.audioFiles,
+                            partOfSpeech = newData.partOfSpeech,
+                        )
                     }
-                }
+                )
 
-                jsonText.value = json.encodeToString(importCardSet)
+                jsonText.value = json.encodeToString(enrichedCardSet)
 
             } catch (e: Exception) {
                 Logger.e(e.message.orEmpty(), TAG)
