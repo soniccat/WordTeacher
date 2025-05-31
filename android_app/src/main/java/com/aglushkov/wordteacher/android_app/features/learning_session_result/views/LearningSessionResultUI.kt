@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.android_app.features.learning_session_result.v
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -127,7 +128,11 @@ fun LearningSessionResultViewItems(
     vm: LearningSessionResultVM,
 ) {
     when(val item = itemView) {
-        is LearningSessionTermResultViewItem -> LearningSessionCardResultView(item, modifier)
+        is LearningSessionTermResultViewItem -> LearningSessionCardResultView(
+            item,
+            modifier,
+            vm,
+        )
         else -> {
             Text(
                 text = "unknown item $item",
@@ -140,7 +145,8 @@ fun LearningSessionResultViewItems(
 @Composable
 fun LearningSessionCardResultView(
     viewItem: LearningSessionTermResultViewItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    vm: LearningSessionResultVM,
 ) {
     Row(
         modifier = modifier
@@ -152,6 +158,9 @@ fun LearningSessionCardResultView(
                     Color.Red.copy(alpha = 0.3f)
                 }
             )
+            .clickable {
+                vm.onTermClicked(viewItem)
+            }
             .padding(
                 all = dimensionResource(id = R.dimen.word_horizontalPadding)
             )

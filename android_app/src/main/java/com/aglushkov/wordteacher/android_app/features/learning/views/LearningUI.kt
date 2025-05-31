@@ -22,8 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAbsoluteAlignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -34,7 +32,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
@@ -46,16 +43,14 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeech
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
-import com.aglushkov.wordteacher.shared.features.learning.vm.MatchSession
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
-import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.desc.StringDesc
+import dev.icerock.moko.resources.compose.localized
 import java.util.*
 
 @Composable
@@ -180,6 +175,8 @@ fun LearningUI(
 
         if (data is LearningVM.Challenge.Type) {
             typeBottomButtons(data.audioFiles, canShowHint, snackbarHostState, hintString, vm)
+        } else if (data is LearningVM.Challenge.Test) {
+            testBottomButtons(data.audioFiles(), vm)
         }
     }
 }
@@ -205,6 +202,58 @@ private fun typeChallengeUI(
     termInfo(data.termViewItems)
 }
 
+@Composable
+private fun BoxScope.testBottomButtons(
+    audioFilesViewItem: WordAudioFilesViewItem?,
+    vm: LearningVM,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomEnd),
+        horizontalAlignment = Alignment.End
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End,
+        ) {
+            if (audioFilesViewItem != null) {
+                WordAudioFilesView(
+                    viewItem = audioFilesViewItem,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .background(
+                            // chip background
+                            MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+                                .compositeOver(MaterialTheme.colors.surface),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(4.dp),
+                ) {
+                    vm.onAudioFileClicked(it)
+                }
+            } else {
+                Spacer(modifier = Modifier.weight(1.0f))
+            }
+
+            FloatingActionButton(
+                onClick = {
+                    vm.onOpenDefinitionsClicked()
+                },
+                modifier = Modifier
+                    .width(IntrinsicSize.Max)
+                    .padding(dimensionResource(id = R.dimen.content_padding)),
+                backgroundColor = MaterialTheme.colors.primarySurface,
+            ) {
+                Icon(
+                    painter = dev.icerock.moko.resources.compose.painterResource(MR.images.field_search_24),
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
 
 @Composable
 private fun BoxScope.typeBottomButtons(
@@ -226,7 +275,8 @@ private fun BoxScope.typeBottomButtons(
             },
             modifier = Modifier
                 .width(IntrinsicSize.Max)
-                .padding(dimensionResource(id = R.dimen.content_padding))
+                .padding(dimensionResource(id = R.dimen.content_padding)),
+            backgroundColor = MaterialTheme.colors.primarySurface,
         ) {
             Icon(
                 painter = dev.icerock.moko.resources.compose.painterResource(MR.images.field_search_24),
@@ -280,7 +330,8 @@ private fun BoxScope.typeBottomButtons(
                 },
                 modifier = Modifier
                     .width(IntrinsicSize.Max)
-                    .padding(dimensionResource(id = R.dimen.content_padding))
+                    .padding(dimensionResource(id = R.dimen.content_padding)),
+                backgroundColor = MaterialTheme.colors.primarySurface
             )
         }
 

@@ -20,7 +20,8 @@ class LearningSessionResultDecomposeComponent (
         strategy = LearningSessionResultVM.State.serializer()
     ) ?: initialState,
     cardLoader,
-    idGenerator
+    idGenerator,
+    analytics
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_LearningSession"
 

@@ -22,7 +22,7 @@ class CardTeacher(
     private var testSessions = mutableListOf<TestSession>()
     private var currentTestSession: TestSession? = null
     private var currentTestCardStateFlow = MutableStateFlow<TestSession.TestCard?>(null)
-    private val currentTestCard: TestSession.TestCard?
+    val currentTestCard: TestSession.TestCard?
         get() = currentTestCardStateFlow.value
 
     private var matchSession: MatchSession? = null

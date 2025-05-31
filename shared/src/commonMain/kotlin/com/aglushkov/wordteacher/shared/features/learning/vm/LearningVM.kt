@@ -93,6 +93,7 @@ interface LearningVM: Clearable {
             val count: Int,
             val testOptions: List<String>,
             val termViewItems: List<BaseViewItem<*>>,
+            val audioFiles: WordAudioFilesViewItem?,
         ): Challenge
 
         data class Type(
@@ -119,6 +120,12 @@ interface LearningVM: Clearable {
             is Test -> termViewItems
             is Type -> termViewItems
             else -> emptyList()
+        }
+
+        fun audioFiles(): WordAudioFilesViewItem?  = when(this) {
+            is Test -> audioFiles
+            is Type -> audioFiles
+            else -> null
         }
     }
 
@@ -259,6 +266,7 @@ open class LearningVMImpl(
                                     count = cardCount,
                                     testOptions = testCard.options,
                                     termViewItems = buildCardItem(testCard.card),
+                                    audioFiles = audioFilesViewItemFromCard(testCard.card),
                                 )
                             )
                         }
@@ -286,13 +294,7 @@ open class LearningVMImpl(
                                 index = index,
                                 count = cardCount,
                                 termViewItems = buildCardItem(card),
-                                audioFiles = if (card.audioFiles.isNotEmpty()) {
-                                    WordAudioFilesViewItem(card.audioFiles.map {
-                                        it.toViewItemAudioFile()
-                                    })
-                                } else {
-                                    null
-                                }
+                                audioFiles = audioFilesViewItemFromCard(card)
                             )
                         )
                     }
@@ -309,6 +311,15 @@ open class LearningVMImpl(
 
         onLearningCompleted()
     }
+
+    private fun audioFilesViewItemFromCard(card: Card) =
+        if (card.audioFiles.isNotEmpty()) {
+            WordAudioFilesViewItem(card.audioFiles.map {
+                it.toViewItemAudioFile()
+            })
+        } else {
+            null
+        }
 
     private fun resolveColorForGroup(group: Int): Color? {
         if (group == -1) {
@@ -506,7 +517,7 @@ open class LearningVMImpl(
 
     override fun onOpenDefinitionsClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Learning.onOpenDefinitionsClicked"))
-        val term = teacher?.currentCard?.term ?: return
+        val term = teacher?.currentTestCard?.card?.term ?: teacher?.currentCard?.term ?: return
         viewModelScope.launch {
             teacher?.countWrongAnswer()
             router?.openDefinitions(term)

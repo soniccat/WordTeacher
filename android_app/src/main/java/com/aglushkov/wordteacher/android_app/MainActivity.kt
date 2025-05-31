@@ -372,6 +372,10 @@ class MainActivity : AppCompatActivity(), Router {
                                 override fun onScreenFinished(inner: Any, result: SimpleRouter.Result) {
                                     mainDecomposeComponent.popDialog(child.configuration)
                                 }
+
+                                override fun openDefinitions(word: String) {
+                                    mainDecomposeComponent.openDefinitions(word)
+                                }
                             }
                         }
                     )

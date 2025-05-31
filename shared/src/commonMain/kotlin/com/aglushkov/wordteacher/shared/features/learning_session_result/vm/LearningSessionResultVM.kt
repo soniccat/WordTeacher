@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.features.learning_session_result.vm
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -23,6 +25,7 @@ interface LearningSessionResultVM: Clearable {
 
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
 
+    fun onTermClicked(item: LearningSessionTermResultViewItem)
     fun onTryAgainClicked()
     fun onCloseClicked()
 
@@ -37,7 +40,8 @@ interface LearningSessionResultVM: Clearable {
 open class LearningSessionResultVMImpl(
     initialState: LearningSessionResultVM.State,
     private val cardLoader: CardLoader,
-    private val idGenerator: IdGenerator
+    private val idGenerator: IdGenerator,
+    private val analytics: Analytics,
 ) : ViewModel(), LearningSessionResultVM {
 
     override var router: LearningSessionResultRouter? = null
@@ -99,6 +103,11 @@ open class LearningSessionResultVMImpl(
 
     private fun generateIds(items: List<BaseViewItem<*>>) {
         generateViewItemIds(items, viewItems.value.data().orEmpty(), idGenerator)
+    }
+
+    override fun onTermClicked(item: LearningSessionTermResultViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("LearningResult.onTermClicked"))
+        router?.openDefinitions(item.term)
     }
 
     override fun onTryAgainClicked() = cardLoader.tryLoadCardsAgain()
