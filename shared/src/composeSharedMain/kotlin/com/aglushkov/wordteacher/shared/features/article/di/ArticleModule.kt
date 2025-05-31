@@ -63,7 +63,7 @@ class ArticleModule {
         wordFrequencyGradationProvider,
         wordTeacherDictService,
         DefinitionsVM.Settings(
-            needStoreDefinedWordInSettings = false,
+            needStoreDefinedWordInSettings = true,
         ),
         clipboardRepository,
         idGenerator,

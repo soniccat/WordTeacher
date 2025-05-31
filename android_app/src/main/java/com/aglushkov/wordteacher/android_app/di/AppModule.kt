@@ -326,15 +326,13 @@ class AppModule {
                 BuildConfig.defaultWordlistVersion,
                 flowSettings
             ),
-            LoadNLPCoreTask(
-                nlpCore,
-            ),
+            LoadNLPCoreTask(nlpCore),
             AddArticleSampleTask(
                 articlesRepository,
                 flowSettings
             ) {
                 ArticleSample(
-                    "Article Sample",
+                    "Article Sample. CORECURSIVE #099, Code, Kickflips and Crunch Time",
                     context.resources.openRawResource(R.raw.article_sample).use {
                         it.readBytes().commonToUtf8String()
                     },

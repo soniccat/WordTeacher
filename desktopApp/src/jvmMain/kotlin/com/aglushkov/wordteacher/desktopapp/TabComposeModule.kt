@@ -32,6 +32,7 @@ class TabComposeModule {
                         .settings(
                             DefinitionsVM.Settings(
                                 needStoreDefinedWordInSettings = true,
+                                needShowLastDefinedWord = true,
                             )
                         )
                         .setDeps(appComponent)

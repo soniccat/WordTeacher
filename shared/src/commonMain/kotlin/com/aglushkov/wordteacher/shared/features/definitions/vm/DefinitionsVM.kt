@@ -60,6 +60,11 @@ interface DefinitionsVM: Clearable {
         filter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
         definitionsContext: DefinitionsContext? = null
     )
+    fun onWordClicked(
+        word: String,
+        filter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
+        definitionsContext: DefinitionsContext? = null
+    )
     fun onTryAgainClicked()
     fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
@@ -106,6 +111,7 @@ interface DefinitionsVM: Clearable {
 
     data class Settings(
         val needStoreDefinedWordInSettings: Boolean = false,
+        val needShowLastDefinedWord: Boolean = false,
     )
 }
 
@@ -128,7 +134,7 @@ open class DefinitionsVMImpl(
 
     override var router: DefinitionsRouter? = null
     final override var state: DefinitionsVM.State = restoredState.copy(
-        word = if (definitionsSettings.needStoreDefinedWordInSettings) {
+        word = if (definitionsSettings.needShowLastDefinedWord) {
             settings.toBlockingSettings().getStringOrNull(SETTING_LAST_DEFINED_WORD) ?: restoredState.word
         } else {
             restoredState.word
@@ -190,16 +196,13 @@ open class DefinitionsVMImpl(
     override val isWordHistorySelected = MutableStateFlow(false)
 
     init {
-        if (definitionsSettings.needStoreDefinedWordInSettings) {
-            settings.toBlockingSettings().getStringOrNull(SETTING_LAST_DEFINED_WORD) ?: word
-        } else {
-            word
-        }?.let {
+        state.word?.let {
             updateCurrentWord(it)
         }
 
         if (definitionsSettings.needStoreDefinedWordInSettings) {
             viewModelScope.launch {
+                // observe loaded definitions to form history
                 definitionWords.collect {
                     if (it.data()?.isNotEmpty() == true) {
                         word?.let { w ->
@@ -233,22 +236,35 @@ open class DefinitionsVMImpl(
             selectedPartsOfSpeechStateFlow.value = emptyList()
             this.definitionsContext = null
         } else {
-            updateCurrentWord(word, filter, definitionsContext)
+            updateCurrentWord(word, filter, definitionsContext, clearStack = true)
         }
+    }
+
+    override fun onWordClicked(
+        word: String,
+        filter: List<WordTeacherWord.PartOfSpeech>,
+        definitionsContext: DefinitionsContext?
+    ) {
+        updateCurrentWord(word, filter, definitionsContext)
     }
 
     private fun updateCurrentWord(
         word: String,
         filter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
         definitionsContext: DefinitionsContext? = null,
-        putInWordStack: Boolean = true
+        putInWordStack: Boolean = true,
+        clearStack: Boolean = false,
     ) {
         wordTextValue.update { word }
         selectedPartsOfSpeechStateFlow.value = filter
         this.definitionsContext = definitionsContext
         loadIfNeeded(word)
         if (putInWordStack) {
-            wordStack.update { it + word }
+            if (clearStack) {
+                wordStack.update { listOf(word) }
+            } else {
+                wordStack.update { it + word }
+            }
         }
     }
 
@@ -787,7 +803,7 @@ open class DefinitionsVMImpl(
 
     override fun onWordHistoryItemClicked(item: WordHistoryViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.wordHistoryItemClicked"))
-        updateCurrentWord(item.firstItem())
+        updateCurrentWord(item.firstItem(), clearStack = true)
     }
 
     override fun onCloseClicked() {

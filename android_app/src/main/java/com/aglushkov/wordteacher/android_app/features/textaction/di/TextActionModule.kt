@@ -30,7 +30,7 @@ class TextActionModule {
                         .setInitialState(DefinitionsVM.State(word = config.text))
                         .settings(
                             DefinitionsVM.Settings(
-                                needStoreDefinedWordInSettings = false,
+                                needStoreDefinedWordInSettings = true,
                             )
                         )
                         .setDeps(appComponent)

@@ -442,7 +442,7 @@ private fun showViewItem(
         modifier,
         textContent = { text, ts ->
             TextWithWordClickHandler(text, ts) {
-                vm.onWordSubmitted(it)
+                vm.onWordClicked(it)
             }
             if (item.withAddButton) {
                 AddToSet(vm, item)
@@ -455,7 +455,7 @@ private fun showViewItem(
         modifier,
         textContent = { text, ts ->
             TextWithWordClickHandler(text, ts) {
-                vm.onWordSubmitted(it)
+                vm.onWordClicked(it)
             }
         }
     )
@@ -464,7 +464,7 @@ private fun showViewItem(
         modifier,
         textContent = { text, ts ->
             TextWithWordClickHandler(text, ts) {
-                vm.onWordSubmitted(it)
+                vm.onWordClicked(it)
             }
         },
     )

@@ -30,6 +30,13 @@ open class DefinitionsVMPreview(
     ) {
     }
 
+    override fun onWordClicked(
+        word: String,
+        filter: List<WordTeacherWord.PartOfSpeech>,
+        definitionsContext: DefinitionsContext?
+    ) {
+    }
+
     override fun onTryAgainClicked() {
     }
 

@@ -506,11 +506,10 @@ open class LearningVMImpl(
 
     override fun onOpenDefinitionsClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Learning.onOpenDefinitionsClicked"))
+        val term = teacher?.currentCard?.term ?: return
         viewModelScope.launch {
             teacher?.countWrongAnswer()
-        }
-        teacher?.currentCard?.term?.let {
-            router?.openDefinitions(it)
+            router?.openDefinitions(term)
         }
     }
 
