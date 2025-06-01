@@ -250,7 +250,7 @@ open class CardSetVMImpl(
             )
 
             card.examples.onEachIndexed { index, example ->
-                cardViewItems += WordExampleViewItem(example, Indent.SMALL, index, isLast = index == card.examples.size - 1, cardId = card.id).also {
+                cardViewItems += WordExampleViewItem(example, Indent.SMALL, index, isLast = index == card.examples.lastIndex, cardId = card.id).also {
                     lastExViewItem = it
                 }
             }

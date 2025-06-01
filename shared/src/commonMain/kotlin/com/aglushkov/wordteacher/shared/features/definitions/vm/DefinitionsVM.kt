@@ -470,8 +470,8 @@ open class DefinitionsVMImpl(
                         StringDesc.Resource(MR.strings.word_section_examples),
                         Indent.SMALL
                     ))
-                    for (ex in def.examples.orEmpty()) {
-                        items.add(WordExampleViewItem(ex, Indent.SMALL))
+                    def.examples.onEachIndexed { index, ex ->
+                        items.add(WordExampleViewItem(ex, Indent.SMALL, isLast = index == def.examples.lastIndex))
                     }
                 }
 

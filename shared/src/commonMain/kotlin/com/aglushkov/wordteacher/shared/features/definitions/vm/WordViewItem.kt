@@ -73,7 +73,13 @@ class WordDefinitionViewItem(
     }
 }
 
-class WordExampleViewItem(example: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false, val cardId: Long = -1): BaseViewItem<String>(example, Type) {
+class WordExampleViewItem(
+    example: String,
+    val indent: Indent = Indent.NONE,
+    val index: Int = -1,
+    val isLast: Boolean = false,
+    val cardId: Long = -1,
+): BaseViewItem<String>(example, Type) {
     companion object {
         const val Type = 105
     }

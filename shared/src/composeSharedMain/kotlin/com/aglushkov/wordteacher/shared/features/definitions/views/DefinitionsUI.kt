@@ -74,7 +74,6 @@ fun DefinitionsUIDialog(
     }
 }
 
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DefinitionsUI(
@@ -937,7 +936,7 @@ fun WordExampleView(
             .padding(
                 start = LocalDimensWord.current.wordHorizontalPadding + viewItem.indent.toDp(),
                 end = LocalDimensWord.current.wordHorizontalPadding,
-//                top = dimensionResource(id = R.dimen.word_header_topMargin)
+                bottom = if (viewItem.isLast) 0.dp else 4.dp,
             ),
     ) {
         textContent(viewItem.firstItem(), textStyle)

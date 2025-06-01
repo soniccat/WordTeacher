@@ -397,13 +397,14 @@ open class LearningVMImpl(
         )
 
         if (card.examples.isNotEmpty()) {
+            val examples = card.resolveExamplesWithHiddenTerm()
             viewItems.addElements(
                 WordSubHeaderViewItem(
                     StringDesc.Resource(MR.strings.word_section_examples),
                     Indent.SMALL
                 ),
-                *card.resolveExamplesWithHiddenTerm().map { ex ->
-                    WordExampleViewItem(ex, Indent.SMALL)
+                *examples.mapIndexed { index, ex ->
+                    WordExampleViewItem(ex, Indent.SMALL, isLast = index == examples.lastIndex)
                 }.toTypedArray(),
             )
         }
