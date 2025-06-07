@@ -5,7 +5,20 @@
     [
         {
             "term": "hurdle",
-            "transcription": "hûr'dəl",
+            "transcriptions":
+            [
+                "hûr'dəl",
+                "/ˈhɜːdl̩/",
+                "hûr'dəl",
+                "/ˈhɝd(ə)l/"
+            ],
+            "audioFiles":
+            [
+                {
+                    "url": "https://aglushkov.ru/audio/en-us-hurdle.ogg",
+                    "accent": "GA"
+                }
+            ],
             "partOfSpeech": 1,
             "definitions":
             [
@@ -24,7 +37,18 @@
         },
         {
             "term": "out of",
-            "transcription": "/ˈaʊt əv/",
+            "transcriptions":
+            [
+                "/ˈaʊt əv/",
+                "/ˈaʊtə/"
+            ],
+            "audioFiles":
+            [
+                {
+                    "url": "https://aglushkov.ru/audio/en-us-out-of.ogg",
+                    "accent": "US"
+                }
+            ],
             "partOfSpeech": 6,
             "definitions":
             [
@@ -60,6 +84,13 @@
         },
         {
             "term": "fly by",
+            "audioFiles":
+            [
+                {
+                    "url": "https://aglushkov.ru/audio/en-au-fly_by.ogg",
+                    "accent": "AU"
+                }
+            ],
             "partOfSpeech": 2,
             "definitions":
             [
@@ -119,7 +150,18 @@
         },
         {
             "term": "plot",
-            "transcription": "/plɒt/",
+            "transcriptions":
+            [
+                "/plɒt/",
+                "/plɑt/"
+            ],
+            "audioFiles":
+            [
+                {
+                    "url": "https://aglushkov.ru/audio/en-us-plot.ogg",
+                    "accent": "US"
+                }
+            ],
             "partOfSpeech": 2,
             "definitions":
             [
@@ -139,6 +181,13 @@
         },
         {
             "term": "steal the show",
+            "audioFiles":
+            [
+                {
+                    "url": "https://aglushkov.ru/audio/en-au-steal_the_show.ogg",
+                    "accent": "AU"
+                }
+            ],
             "partOfSpeech": 2,
             "definitions":
             [
@@ -178,7 +227,18 @@
         },
         {
             "term": "hone",
-            "transcription": "/hoʊn/",
+            "transcriptions":
+            [
+                "/hoʊn/",
+                "/həʊn/"
+            ],
+            "audioFiles":
+            [
+                {
+                    "url": "https://aglushkov.ru/audio/en-us-hone.ogg",
+                    "accent": "US"
+                }
+            ],
             "partOfSpeech": 2,
             "definitions":
             [
@@ -221,6 +281,13 @@
         },
         {
             "term": "go up in smoke",
+            "audioFiles":
+            [
+                {
+                    "url": "https://aglushkov.ru/audio/en-au-go_up_in_smoke.ogg",
+                    "accent": "AU"
+                }
+            ],
             "partOfSpeech": 2,
             "definitions":
             [
