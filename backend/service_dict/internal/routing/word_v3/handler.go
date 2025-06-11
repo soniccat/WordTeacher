@@ -78,7 +78,7 @@ func (h *Handler) Word(w http.ResponseWriter, r *http.Request) {
 			Transcriptions: w.Transcriptions,
 			AudioFiles: tools.Map(w.Audios, func(wa repository_v2.WordAudio) api_dict_v2.WordAudioFile {
 				return api_dict_v2.WordAudioFile{
-					Url:           "https://aglushkov.ru/audio/" + wa.FileName,
+					Url:           "https://aglushkov.ru/" + wa.FileName,
 					Accent:        wa.Accent,
 					Transcription: wa.Transcription,
 					Text:          wa.Text,
