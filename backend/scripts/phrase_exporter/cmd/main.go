@@ -26,7 +26,7 @@ type MongoTermWrapperList []MongoTermWrapper
 
 func run() int {
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
-	outputFilePath := flag.String("output", "./default_filtered.wordlist", "Output wordlist file path")
+	outputFilePath := flag.String("output", "./default_filtered2.wordlist", "Output wordlist file path")
 	flag.Parse()
 
 	ex, err := os.Executable()
