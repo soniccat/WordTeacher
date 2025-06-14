@@ -3,6 +3,12 @@
 
 A complete solution for learning English words and phrases with spaced repetition technique. The project consists of an Android application, a desktop application, a backend component, and various tools and scripts. The repository has everything to set up all the parts yourself.
 
+## Tech Stack
+
+![logo](./docs/images/tech-stack.jpg)
+
+## Definitions
+
 There're terms I use in the docs and the source code:  
 * **Card** - a word or phrase with related definitions, synonyms and examples. Word Teacher tracks your learning progress for each card separately. When a word you want to start learning has different meanings, it's preferable to create a card per a meaning.  
 * **Card Set** - a list of cards grouped by a topic in the title. Also a description and a source url could be set.    
@@ -17,7 +23,9 @@ The main pattern is MVVM with UDF in mind. A ViewModel is mostly in charge of bu
 
 Dagger2 DI is used because of its compile-time dependency checking. 
 
-Each app screen is a feature. All the features with ViewModels are in [commonMain/features](./shared/src/commonMain/kotlin/com/aglushkov/wordteacher/shared/features). Their UI could be found in [composeSharedMain/features](./shared/src/composeSharedMain/kotlin/com/aglushkov/wordteacher/shared/features).
+To archieve decent phrase highlight performance I implemented [Radix tree](./shared/src/commonMain/kotlin/com/aglushkov/wordteacher/shared/repository/dict/Trie.kt) data structure. Phrases and common words are stored in [words.wordlist](./android_app/src/main/res/raw/words.wordlist) and loaded in memory on launch. Their definitions are stored in Dict microservice. Hence, no offline dictionaries are needed to make phrase highlighting work, however network connecton is required. Later words.wordlist could be updated from the app and not just bundled in apk.
+
+Each app screen is a **feature**. All the features with ViewModels are in [commonMain/features](./shared/src/commonMain/kotlin/com/aglushkov/wordteacher/shared/features). Their UI could be found in [composeSharedMain/features](./shared/src/composeSharedMain/kotlin/com/aglushkov/wordteacher/shared/features).
 
 ## Backend
 
@@ -44,6 +52,10 @@ The source of recent news and Card Sets. They can be downloaded and stored local
 
 In the backend, there's a separate composition microservice [Dashboard](./backend/service_dashboard) which just pulls headlines and Card Sets from the other microservices (Articles and Cardsets), caches the data, and just provides it from /api/v1/dashboard.
 
+### Articles
+![logo](./docs/images/articles.png)
+
+
 ### Definitions
 
 A screen where you can search for a word and find its definitions, examples, synonyms, and antonyms. If you add your DSL dictionaries, searching will work through them too, showing live suggestions while typing.
@@ -52,4 +64,5 @@ A screen where you can search for a word and find its definitions, examples, syn
 
 ## Roadmap
 
-TBD
+* download the lates version of words.wordlist  
+* repair Desktop version

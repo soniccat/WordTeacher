@@ -80,15 +80,6 @@ var sources []model.HeadlineSource = []model.HeadlineSource{
 		Category:    model.HeadlineSourceCategoryTech,
 	},
 	{
-		IntId:       8,
-		Title:       "New Scientist Magazine RSS Feed",
-		Description: "New Scientist - Home",
-		Type:        model.HeadlineSourceTypeRss,
-		Link:        "https://www.newscientist.com/feed/home/",
-		CrawlPeriod: int64(time.Duration(60) * time.Minute),
-		Category:    model.HeadlineSourceCategoryScience,
-	},
-	{
 		IntId:       9,
 		Title:       "Scientific American",
 		Description: "Scientific American is the essential guide to the most awe-inspiring advances in science and technology, explaining how they change our understanding of the world and shape our lives.",
