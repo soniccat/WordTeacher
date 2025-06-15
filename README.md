@@ -46,15 +46,20 @@ Now there's only one way to start all the services, and that is docker-compose f
 ## Main Features
 
 ### Dashboard
-![logo](./docs/images/dashboard.png)
+![logo](./docs/images/dashboard.jpg)
 
 The source of recent news and Card Sets. They can be downloaded and stored locally from here. After using the app for some time, you'll find your recent articles and card sets to come back to them easily.
 
 In the backend, there's a separate composition microservice [Dashboard](./backend/service_dashboard) which just pulls headlines and Card Sets from the other microservices (Articles and Cardsets), caches the data, and just provides it from /api/v1/dashboard.
 
-### Articles
-![logo](./docs/images/articles.png)
+### Articles / Article / Add Article
+![logo](./docs/images/articles.jpg)
+![logo](./docs/images/article1.jpg)
+![logo](./docs/images/article2.jpg)
 
+The main way to import an article is sharing it from a browser to the app. It takes some time to pass each sentence through NLP steps: normalize, tokenize, part of speech tagging, lemmatize, build chunks. All the gathered infromation is stored in sqlite database (thanks to SQLDelight). A detected part of speech is used to automatically set the right filter in a word definition after tapping on a word. Knowledge of a noun phrase allows to skip it while detecting a phrase. For example, this approach detects `turn off` phrase in `Turn the light off` clause.  
+
+Android implementation of NLPCore
 
 ### Definitions
 

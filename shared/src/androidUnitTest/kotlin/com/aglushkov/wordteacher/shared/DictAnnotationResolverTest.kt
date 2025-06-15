@@ -189,6 +189,26 @@ class DictAnnotationResolverTest {
     }
 
     @Test
+    fun testPhraseHighlightWithNounPhraseInTheMiddle() {
+        val dict = createFakeDict(
+            buildDictContent {
+                addTerm("turn", listOf("def0"))
+                addTerm("turn off", listOf("def1"))
+                addTerm("turn the boat", listOf("def2"))
+            }
+        )
+
+        val nlpSentence = nlpSentenceProcessor.processString("Please turn the radio off now", nlpCore)
+        val annotations = dictAnnotationResolver.resolve(
+            listOf(dict),
+            nlpSentence,
+            nlpSentence.phrases()
+        )
+
+        assertEquals(1, annotations.filter { it.entry.word.contains(' ')}.size)
+    }
+
+    @Test
     fun testNounHighlight() {
         val dict = createFakeDict(
             buildDictContent {
