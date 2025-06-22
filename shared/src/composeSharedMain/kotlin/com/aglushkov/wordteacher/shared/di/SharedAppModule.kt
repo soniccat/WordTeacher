@@ -272,6 +272,7 @@ class SharedAppModule {
         spaceAuthRepository: Lazy<SpaceAuthRepository>,
         secureCodec: SecureCodec,
         @IsDebug isDebug: Boolean,
+        analytics: Lazy<Analytics>,
     ): HttpClient = SpaceHttpClientBuilder(
         deviceIdRepository,
         appInfo,
@@ -279,6 +280,7 @@ class SharedAppModule {
         { spaceAuthRepository.get() },
         secureCodec,
         isDebug,
+        { analytics.get() },
     ).build()
 
     @AppComp
@@ -349,12 +351,14 @@ class SharedAppModule {
         deviceIdRepository: DeviceIdRepository,
         appInfo: AppInfo,
         @IsDebug isDebug: Boolean,
+        analytics: Lazy<Analytics>,
     ): WordTeacherDictService {
         return WordTeacherDictService(
             baseUrl = apiBaseUrl,
             deviceIdRepository = deviceIdRepository,
             appInfo = appInfo,
-            isDebug = isDebug
+            isDebug = isDebug,
+            analyticsProvider = { analytics.get() }
         )
     }
 

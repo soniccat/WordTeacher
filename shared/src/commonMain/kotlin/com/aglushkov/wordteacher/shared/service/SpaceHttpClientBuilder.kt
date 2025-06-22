@@ -2,6 +2,8 @@ package com.aglushkov.wordteacher.shared.service
 
 import co.touchlab.stately.concurrency.AtomicBoolean
 import co.touchlab.stately.concurrency.synchronize
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.resource.*
 import com.aglushkov.wordteacher.shared.general.serialization.GZip
@@ -35,6 +37,7 @@ class SpaceHttpClientBuilder(
     private val spaceAuthRepositoryProvider: () -> SpaceAuthRepository,
     private val secureCodec: SecureCodec,
     private val isDebug: Boolean,
+    private val analyticsProvider: () -> Analytics,
 ) {
     fun build() = HttpClient {
         installLogger(isDebug)
@@ -43,6 +46,7 @@ class SpaceHttpClientBuilder(
         installCookies()
         installHeaders()
         install401Handler()
+        installErrorTracker(analyticsProvider)
     }
 
     private fun HttpClientConfig<*>.installGzipForResponse() {
@@ -194,6 +198,43 @@ fun HttpClientConfig<*>.installLogger(isDebug: Boolean) {
         }
         level = LogLevel.ALL
     }
+}
+
+fun HttpClientConfig<*>.installErrorTracker(
+    analyticsProvider: () -> Analytics
+) {
+    install(
+        createClientPlugin("Error Tracker") {
+            client.requestPipeline.intercept(HttpRequestPipeline.Before) {
+                try {
+                    proceed()
+                } catch (cause: Throwable) {
+                    analyticsProvider().send(
+                        AnalyticEvent.createErrorEvent(
+                            message = "ErrorHttpRequest_" + context.url.pathSegments.joinToString("/"),
+                            throwable =  cause,
+                        )
+                    )
+                    throw cause
+                }
+            }
+
+            // Took the idea from Logger Plugin
+            client.responsePipeline.intercept(HttpResponsePipeline.Receive) {
+                try {
+                    proceed()
+                } catch (cause: Throwable) {
+                    analyticsProvider().send(
+                        AnalyticEvent.createErrorEvent(
+                            message = "ErrorHttpResponse_" + context.request.url.pathSegments.joinToString("/"),
+                            throwable =  cause,
+                        )
+                    )
+                    throw cause
+                }
+            }
+        }
+    )
 }
 
 private fun renderClientCookies(cookies: List<Cookie>): String =

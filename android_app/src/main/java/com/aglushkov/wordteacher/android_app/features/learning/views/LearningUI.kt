@@ -293,6 +293,8 @@ private fun BoxScope.typeBottomButtons(
                 WordAudioFilesView(
                     viewItem = audioFilesViewItem,
                     modifier = Modifier
+                        .weight(1.0f) // not to stretch too much in row
+                        .wrapContentWidth(Alignment.End) // wrap_content for WordAudioFilesView, and proper alignment
                         .padding(end = 8.dp)
                         .background(
                             // chip background
@@ -329,7 +331,6 @@ private fun BoxScope.typeBottomButtons(
                     }
                 },
                 modifier = Modifier
-                    .width(IntrinsicSize.Max)
                     .padding(dimensionResource(id = R.dimen.content_padding)),
                 backgroundColor = MaterialTheme.colors.primarySurface
             )

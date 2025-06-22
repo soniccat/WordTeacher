@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.apiproviders.wordteacher
 
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.Response
@@ -14,6 +15,7 @@ import com.aglushkov.wordteacher.shared.service.HeaderAppVersion
 import com.aglushkov.wordteacher.shared.service.HeaderDeviceId
 import com.aglushkov.wordteacher.shared.service.HeaderDeviceType
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
+import com.aglushkov.wordteacher.shared.service.installErrorTracker
 import com.aglushkov.wordteacher.shared.service.installLogger
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -123,6 +125,7 @@ class WordTeacherDictService (
     private val baseUrl: String,
     private val deviceIdRepository: DeviceIdRepository,
     private val appInfo: AppInfo,
+    private val analyticsProvider: () -> Analytics,
     isDebug: Boolean,
 ) {
     companion object {}
@@ -131,6 +134,7 @@ class WordTeacherDictService (
     private val httpClient = HttpClient {
         installHeaders()
         installLogger(isDebug)
+        installErrorTracker(analyticsProvider)
         install(ContentEncoding) {
             gzip(0.9F)
         }

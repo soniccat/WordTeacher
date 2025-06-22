@@ -70,6 +70,7 @@ fun DefinitionsUIDialog(
         DefinitionsUI(
             vm = vm,
             contentModifier = modifier,
+            withCloseButton = true,
         )
     }
 }
@@ -81,7 +82,8 @@ fun DefinitionsUI(
     contentModifier: Modifier = Modifier,
     modalModifier: Modifier = Modifier,
     withSearchBar: Boolean = true,
-    contentHeader: @Composable () -> Unit = {}
+    contentHeader: @Composable () -> Unit = {},
+    withCloseButton: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
     val partsOfSpeech by vm.partsOfSpeechFilterStateFlow.collectAsState()
@@ -113,6 +115,7 @@ fun DefinitionsUI(
                 contentModifier,
                 withSearchBar,
                 contentHeader,
+                withCloseButton,
                 onPartOfSpeechFilterClicked = { items ->
                     focusManager.clearFocus() // consider showing choose in a window popup
                     scope.launch {
@@ -131,6 +134,7 @@ private fun DefinitionsWordUI(
     modifier: Modifier = Modifier,
     withSearchBar: Boolean,
     contentHeader: @Composable () -> Unit,
+    withCloseButton: Boolean,
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
@@ -177,24 +181,38 @@ private fun DefinitionsWordUI(
         if (withSearchBar) {
             CustomTopAppBar(
                 actions = {
-                    IconButton(
-                        onClick = {
-                            vm.toggleWordHistory()
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(MR.images.word_history_menu),
-                            contentDescription = null,
-                            tint = if (needShowWordHistory) {
-                                if (MaterialTheme.colors.isLight){
-                                    Color.DarkGray
-                                } else {
-                                    MaterialTheme.colors.secondary
-                                }
-                            } else {
-                                LocalContentColor.current
+                    if (withCloseButton) {
+                        IconButton(
+                            onClick = {
+                                vm.onCloseClicked()
                             }
-                        )
+                        ) {
+                            Icon(
+                                painter = painterResource(MR.images.close_24),
+                                contentDescription = null,
+                                tint = LocalContentColor.current
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = {
+                                vm.toggleWordHistory()
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(MR.images.word_history_menu),
+                                contentDescription = null,
+                                tint = if (needShowWordHistory) {
+                                    if (MaterialTheme.colors.isLight) {
+                                        Color.DarkGray
+                                    } else {
+                                        MaterialTheme.colors.secondary
+                                    }
+                                } else {
+                                    LocalContentColor.current
+                                }
+                            )
+                        }
                     }
                 }
             ) {
