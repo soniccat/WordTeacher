@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class AppMetricaEngine(
     key: String,
     app: Application,
-    spaceAuthRepository: SpaceAuthRepository,
+    spaceAuthRepositoryProvider: () -> SpaceAuthRepository,
 ): AnalyticEngine {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     override val type: AnalyticEngineType = AnalyticEngineType.AppMetrica
@@ -26,7 +26,7 @@ class AppMetricaEngine(
         AppMetrica.setLocationTracking(true)
 
         scope.launch {
-            spaceAuthRepository.authDataFlow.collect { authDataRes ->
+            spaceAuthRepositoryProvider().authDataFlow.collect { authDataRes ->
                 authDataRes.onData { authData ->
                     AppMetrica.setUserProfileID(authData.user.id)
                 }

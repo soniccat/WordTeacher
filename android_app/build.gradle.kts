@@ -18,6 +18,8 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     maven("https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-andorid/")
+    maven("https://artifactory-external.vkpartner.ru/artifactory/maven/")
+    maven("https://artifactory-external.vkpartner.ru/artifactory/vk-id-captcha/android/")
 }
 
 group = "com.aglushkov.wordteacher"
@@ -66,6 +68,8 @@ kotlin {
             implementation(libs.yandexId)
             implementation(libs.playServicesAuth)
             implementation(libs.androidXBrowser)
+            implementation(libs.varioqubConfig)
+            implementation(libs.varioqubAppmetricaAdapter)
         }
     }
 }

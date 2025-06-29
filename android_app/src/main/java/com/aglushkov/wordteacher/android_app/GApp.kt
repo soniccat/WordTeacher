@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.android_app
 import android.app.ActivityManager
 import android.app.Application
 import android.os.Process
+import android.util.Log
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
@@ -23,6 +24,11 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.tasks.Task
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.vk.id.VKID
+import com.yandex.varioqub.appmetricaadapter.AppMetricaAdapter
+import com.yandex.varioqub.config.FetchError
+import com.yandex.varioqub.config.OnFetchCompleteListener
+import com.yandex.varioqub.config.Varioqub
+import com.yandex.varioqub.config.VarioqubSettings
 import io.ktor.client.plugins.cookies.CookiesStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,10 +56,10 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var activityVisibilityResolver: ActivityVisibilityResolver
 
     // declare here to force initialization on startup (main process only)
+    @Inject lateinit var analytics: Analytics
     @Inject lateinit var databaseCardWorker: DatabaseCardWorker
     @Inject lateinit var cookieStorage: CookiesStorage
     @Inject lateinit var freqDb: WordFrequencyDatabase
-    @Inject lateinit var analytics: Analytics
     @Inject lateinit var fileLogger: FileLogger
     @Inject lateinit var tasks: Array<Task>
 
