@@ -205,6 +205,7 @@ fun HttpClientConfig<*>.installErrorTracker(
 ) {
     install(
         createClientPlugin("Error Tracker") {
+            // Took the idea from Logger Plugin
             client.requestPipeline.intercept(HttpRequestPipeline.Before) {
                 try {
                     proceed()
@@ -219,14 +220,48 @@ fun HttpClientConfig<*>.installErrorTracker(
                 }
             }
 
-            // Took the idea from Logger Plugin
             client.responsePipeline.intercept(HttpResponsePipeline.Receive) {
+                try {
+                   proceed()
+                } catch (cause: Throwable) {
+                    analyticsProvider().send(
+                        AnalyticEvent.createErrorEvent(
+                            message = "ErrorHttpResponse_" + context.request.url.pathSegments.joinToString("/"),
+                            throwable =  cause,
+                        )
+                    )
+                    throw cause
+                }
+            }
+
+            client.sendPipeline.intercept(HttpSendPipeline.Before) {
                 try {
                     proceed()
                 } catch (cause: Throwable) {
                     analyticsProvider().send(
                         AnalyticEvent.createErrorEvent(
-                            message = "ErrorHttpResponse_" + context.request.url.pathSegments.joinToString("/"),
+                            message = "ErrorHttpSend_" + context.url.pathSegments.joinToString("/"),
+                            throwable =  cause,
+                        )
+                    )
+                    throw cause
+                }
+            }
+
+            client.receivePipeline.intercept(HttpReceivePipeline.Before) { response ->
+                try {
+                    if (response.status != HttpStatusCode.OK) {
+                        val message = "ErrorHttpStatus_" + response.request.url.pathSegments.joinToString("/") + ":" + response.status.value
+                        AnalyticEvent.createErrorEvent(
+                            message = message,
+                            throwable =  RuntimeException(message),
+                        )
+                    }
+                    proceed()
+                } catch (cause: Throwable) {
+                    analyticsProvider().send(
+                        AnalyticEvent.createErrorEvent(
+                            message = "ErrorHttpReceive_" + response.request.url.pathSegments.joinToString("/"),
                             throwable =  cause,
                         )
                     )

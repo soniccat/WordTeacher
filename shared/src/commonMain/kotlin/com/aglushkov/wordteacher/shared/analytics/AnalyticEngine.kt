@@ -25,7 +25,7 @@ data class AnalyticEvent(
                 engineType = AnalyticEngineType.AppMetrica
             )
         }
-        fun createErrorEvent(message: String, throwable: Throwable?): AnalyticEvent {
+        fun createErrorEvent(message: String, throwable: Throwable): AnalyticEvent {
             return AnalyticEvent(
                 name = message,
                 params = mapOf(),
