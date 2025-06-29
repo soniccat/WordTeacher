@@ -251,7 +251,7 @@ fun HttpClientConfig<*>.installErrorTracker(
             client.receivePipeline.intercept(HttpReceivePipeline.Before) { response ->
                 try {
                     if (response.status != HttpStatusCode.OK) {
-                        val message = "ErrorHttpStatus_" + response.request.url.pathSegments.joinToString("/") + ":" + response.status.value
+                        val message = "ErrorHttpReceiveStatus_" + response.request.url.pathSegments.joinToString("/") + ":" + response.status.value
                         AnalyticEvent.createErrorEvent(
                             message = message,
                             throwable =  RuntimeException(message),
