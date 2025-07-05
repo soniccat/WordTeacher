@@ -423,8 +423,7 @@ private fun setupVarioqub(app: Application) {
     )
         .build()
     Varioqub.init(settings, AppMetricaAdapter(app), app)
-    Varioqub.clearClientFeatures()
-    Varioqub.activateConfig()
+    //Varioqub.activateConfig()
     Varioqub.fetchConfig(object : OnFetchCompleteListener {
         override fun onSuccess() {
             Log.i("VARIOQUB", "FETCH SUCCESS")
