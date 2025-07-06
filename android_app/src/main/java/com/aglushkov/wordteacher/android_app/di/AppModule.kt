@@ -1,12 +1,7 @@
 package com.aglushkov.wordteacher.android_app.di
 
 import android.app.Application
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
-import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
 import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.aglushkov.wordteacher.android_app.BuildConfig
@@ -50,6 +45,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.tasks.AddArticleSampleTask
 import com.aglushkov.wordteacher.shared.tasks.AddCardSetSampleTask
@@ -59,15 +55,9 @@ import com.aglushkov.wordteacher.shared.tasks.LoadNLPCoreTask
 import com.aglushkov.wordteacher.shared.tasks.Task
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
-import com.yandex.varioqub.appmetricaadapter.AppMetricaAdapter
-import com.yandex.varioqub.config.FetchError
-import com.yandex.varioqub.config.OnFetchCompleteListener
-import com.yandex.varioqub.config.Varioqub
-import com.yandex.varioqub.config.VarioqubSettings
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import io.appmetrica.analytics.AppMetrica
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toOkioPath
@@ -97,15 +87,21 @@ class AppModule {
         context: Context
     ): Path = context.filesDir.absolutePath.toPath()
 
-
+    @ToggleUrl
+    @AppComp
+    @Provides
+    fun togglesUrl(
+        context: Context
+    ): String = context.getString(MR.strings.toggles_url.resourceId)
 
     @ApiBaseUrl
     @AppComp
     @Provides
     fun apiBaseUrl(
-        context: Context
+        context: Context,
+        toggleRepository: ToggleRepository
     ): String {
-        return if (Varioqub.getString(DOMAIN_FEATURE_FLAG, DOMAIN_FEATURE_FLAG_DEFAULT) == "com") {
+        return if (toggleRepository.toggles.topLevelDomain == "com") {
             context.getString(MR.strings.api_base_url_com.resourceId)
         } else {
             context.getString(MR.strings.api_base_url.resourceId)
@@ -305,11 +301,25 @@ class AppModule {
     @AppComp
     @Provides
     fun analyticEngines(
-        app: Application,
-        spaceAuthRepository: Lazy<SpaceAuthRepository>,
+        appMetricaEngine: AppMetricaEngine,
     ): Array<AnalyticEngine> {
         return arrayOf(
-            createAppMetricaEngine(app, { spaceAuthRepository.get() })
+            appMetricaEngine
+        )
+    }
+
+    @AppComp
+    @Provides
+    fun appMetricaEngine(
+        app: Application,
+        toggleRepositoryProvider: Lazy<ToggleRepository>,
+        spaceAuthRepository: SpaceAuthRepository,
+    ): AppMetricaEngine {
+        return AppMetricaEngine(
+            app.getString(R.string.app_metrica_key),
+            app,
+            { toggleRepositoryProvider.get() },
+            spaceAuthRepository
         )
     }
 
@@ -399,42 +409,3 @@ class AppModule {
         )
     }
 }
-
-fun createAppMetricaEngine(
-    app: Application,
-    spaceAuthRepositoryProvider: () -> SpaceAuthRepository
-): AppMetricaEngine {
-    val appMetrica = AppMetricaEngine(
-        app.getString(R.string.app_metrica_key),
-        app,
-        spaceAuthRepositoryProvider
-    )
-    setupVarioqub(app)
-    AppMetrica.putAppEnvironmentValue(
-        "feature_flag_$DOMAIN_FEATURE_FLAG",
-        Varioqub.getString(DOMAIN_FEATURE_FLAG, DOMAIN_FEATURE_FLAG_DEFAULT)
-    )
-    return appMetrica
-}
-
-private fun setupVarioqub(app: Application) {
-    val settings = VarioqubSettings.Builder(
-        app.getString(R.string.app_metrica_client_id)
-    )
-        .build()
-    Varioqub.init(settings, AppMetricaAdapter(app), app)
-    //Varioqub.activateConfig()
-    Varioqub.fetchConfig(object : OnFetchCompleteListener {
-        override fun onSuccess() {
-            Log.i("VARIOQUB", "FETCH SUCCESS")
-            Log.i("VARIOQUB", Varioqub.getId())
-        }
-
-        override fun onError(message: String, error: FetchError) {
-            Log.i("VARIOQUB", "FETCH ERROR: $message")
-        }
-    })
-}
-
-private const val DOMAIN_FEATURE_FLAG = "domain"
-private const val DOMAIN_FEATURE_FLAG_DEFAULT = "ru"

@@ -17,7 +17,6 @@ import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricherImpl
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
-import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
@@ -38,6 +37,7 @@ import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.service.*
 import com.aglushkov.wordteacher.shared.workers.CardFrequencyUpdateWorker
@@ -491,6 +491,20 @@ class SharedAppModule {
     ): CardSetVM.Features {
         return CardSetVM.Features(
             canEnrich = isDebug,
+        )
+    }
+
+    @AppComp
+    @Provides
+    fun toggleRepository(
+        @ToggleUrl toggleUrl: String,
+        @SpaceHttpClient httpClient: HttpClient,
+        settings: FlowSettings
+    ): ToggleRepository {
+        return ToggleRepository(
+            toggleUrl,
+            httpClient,
+            settings
         )
     }
 }

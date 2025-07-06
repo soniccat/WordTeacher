@@ -68,8 +68,6 @@ kotlin {
             implementation(libs.yandexId)
             implementation(libs.playServicesAuth)
             implementation(libs.androidXBrowser)
-            implementation(libs.varioqubConfig)
-            implementation(libs.varioqubAppmetricaAdapter)
         }
     }
 }

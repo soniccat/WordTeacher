@@ -22,6 +22,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.util.decodeBase64Bytes
+import io.ktor.util.reflect.instanceOf
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -210,12 +212,16 @@ fun HttpClientConfig<*>.installErrorTracker(
                 try {
                     proceed()
                 } catch (cause: Throwable) {
-                    analyticsProvider().send(
-                        AnalyticEvent.createErrorEvent(
-                            message = "ErrorHttpRequest_" + context.url.pathSegments.joinToString("/"),
-                            throwable =  cause,
+                    if (cause !is CancellationException) {
+                        analyticsProvider().send(
+                            AnalyticEvent.createErrorEvent(
+                                message = "ErrorHttpRequest_" + context.url.pathSegments.joinToString(
+                                    "/"
+                                ),
+                                throwable = cause,
+                            )
                         )
-                    )
+                    }
                     throw cause
                 }
             }
@@ -224,12 +230,16 @@ fun HttpClientConfig<*>.installErrorTracker(
                 try {
                    proceed()
                 } catch (cause: Throwable) {
-                    analyticsProvider().send(
-                        AnalyticEvent.createErrorEvent(
-                            message = "ErrorHttpResponse_" + context.request.url.pathSegments.joinToString("/"),
-                            throwable =  cause,
+                    if (cause !is CancellationException) {
+                        analyticsProvider().send(
+                            AnalyticEvent.createErrorEvent(
+                                message = "ErrorHttpResponse_" + context.request.url.pathSegments.joinToString(
+                                    "/"
+                                ),
+                                throwable = cause,
+                            )
                         )
-                    )
+                    }
                     throw cause
                 }
             }
@@ -238,19 +248,22 @@ fun HttpClientConfig<*>.installErrorTracker(
                 try {
                     proceed()
                 } catch (cause: Throwable) {
-                    analyticsProvider().send(
-                        AnalyticEvent.createErrorEvent(
-                            message = "ErrorHttpSend_" + context.url.pathSegments.joinToString("/"),
-                            throwable =  cause,
+                    if (cause !is CancellationException) {
+                        analyticsProvider().send(
+                            AnalyticEvent.createErrorEvent(
+                                message = "ErrorHttpSend_" + context.url.pathSegments.joinToString("/"),
+                                throwable = cause,
+                            )
                         )
-                    )
+                    }
                     throw cause
                 }
             }
 
             client.receivePipeline.intercept(HttpReceivePipeline.Before) { response ->
                 try {
-                    if (response.status != HttpStatusCode.OK) {
+                    if (response.status != HttpStatusCode.OK &&
+                        response.status != HttpStatusCode.NotModified) {
                         val message = "ErrorHttpReceiveStatus_" + response.request.url.pathSegments.joinToString("/") + ":" + response.status.value
                         AnalyticEvent.createErrorEvent(
                             message = message,
@@ -259,12 +272,16 @@ fun HttpClientConfig<*>.installErrorTracker(
                     }
                     proceed()
                 } catch (cause: Throwable) {
-                    analyticsProvider().send(
-                        AnalyticEvent.createErrorEvent(
-                            message = "ErrorHttpReceive_" + response.request.url.pathSegments.joinToString("/"),
-                            throwable =  cause,
+                    if (cause !is CancellationException) {
+                        analyticsProvider().send(
+                            AnalyticEvent.createErrorEvent(
+                                message = "ErrorHttpReceive_" + response.request.url.pathSegments.joinToString(
+                                    "/"
+                                ),
+                                throwable = cause,
+                            )
                         )
-                    )
+                    }
                     throw cause
                 }
             }

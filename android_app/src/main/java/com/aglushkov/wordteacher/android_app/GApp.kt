@@ -24,11 +24,6 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.tasks.Task
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.vk.id.VKID
-import com.yandex.varioqub.appmetricaadapter.AppMetricaAdapter
-import com.yandex.varioqub.config.FetchError
-import com.yandex.varioqub.config.OnFetchCompleteListener
-import com.yandex.varioqub.config.Varioqub
-import com.yandex.varioqub.config.VarioqubSettings
 import io.ktor.client.plugins.cookies.CookiesStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

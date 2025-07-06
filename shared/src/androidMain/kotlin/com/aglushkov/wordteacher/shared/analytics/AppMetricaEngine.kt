@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.analytics
 import android.app.Application
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import io.appmetrica.analytics.AppMetricaConfig
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.profile.UserProfile
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 class AppMetricaEngine(
     key: String,
     app: Application,
-    spaceAuthRepositoryProvider: () -> SpaceAuthRepository,
+    toggleRepositoryProvider: () -> ToggleRepository,
+    spaceAuthRepository: SpaceAuthRepository,
 ): AnalyticEngine {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     override val type: AnalyticEngineType = AnalyticEngineType.AppMetrica
@@ -26,7 +28,11 @@ class AppMetricaEngine(
         AppMetrica.setLocationTracking(true)
 
         scope.launch {
-            spaceAuthRepositoryProvider().authDataFlow.collect { authDataRes ->
+            AppMetrica.putAppEnvironmentValue(
+                "toggles", toggleRepositoryProvider().togglesAsString
+            )
+
+            spaceAuthRepository.authDataFlow.collect { authDataRes ->
                 authDataRes.onData { authData ->
                     AppMetrica.setUserProfileID(authData.user.id)
                 }
