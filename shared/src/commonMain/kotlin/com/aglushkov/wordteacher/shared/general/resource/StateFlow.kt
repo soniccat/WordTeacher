@@ -9,3 +9,7 @@ fun <T> StateFlow<Resource<T>>?.isUninitialized(): Boolean {
 fun <T> StateFlow<Resource<T>>?.isLoading(): Boolean {
     return this?.value?.isLoading() ?: false
 }
+
+fun <T> StateFlow<Resource<T>>?.isLoaded(): Boolean {
+    return this?.value?.isLoaded() ?: false
+}

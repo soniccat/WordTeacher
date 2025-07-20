@@ -62,7 +62,6 @@ kotlin {
             implementation(libs.androidx.appcompat)
             implementation(projects.shared)
             implementation(libs.dagger)
-            implementation(libs.settingsDataStore)
             implementation(libs.datastorePreference)
             implementation(libs.vkId)
             implementation(libs.yandexId)

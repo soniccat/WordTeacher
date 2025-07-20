@@ -74,7 +74,6 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
-import com.russhwolf.settings.coroutines.toBlockingSettings
 import dev.icerock.moko.resources.desc.StringDesc
 
 class MainActivity : AppCompatActivity(), Router {
@@ -97,8 +96,6 @@ class MainActivity : AppCompatActivity(), Router {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        clipboardRepository().lastTextHash = flowSettings().toBlockingSettings().getInt(
-            STATE_CLIPBOARD_HASH, 0)
         (appComponent().wordFrequencyFileOpenController() as FileOpenControllerImpl).bind(this)
         (appComponent().dslDictOpenController() as FileOpenControllerImpl).bind(this)
         appComponent().googleAuthRepository().bind(this)
@@ -146,8 +143,6 @@ class MainActivity : AppCompatActivity(), Router {
         (applicationContext as AppComponentOwner).appComponent
 
     private fun clipboardRepository() = appComponent().clipboardRepository()
-
-    private fun flowSettings() = appComponent().flowSettings()
 
     @Composable
     private fun ComposeUI() {
@@ -488,4 +483,3 @@ sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: In
 }
 
 const val EXTRA_ARTICLE_ID = "articleId"
-const val STATE_CLIPBOARD_HASH = "clipboard_hash"

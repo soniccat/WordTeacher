@@ -23,6 +23,7 @@ import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.resource.onLoaded
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -127,7 +128,7 @@ open class DefinitionsVMImpl(
     private val clipboardRepository: ClipboardRepository,
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
-    private val settings: FlowSettings,
+    private val settings: SettingStore,
     private val wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
     private val audioService: AudioService,
 ): ViewModel(), DefinitionsVM {
@@ -135,7 +136,7 @@ open class DefinitionsVMImpl(
     override var router: DefinitionsRouter? = null
     final override var state: DefinitionsVM.State = restoredState.copy(
         word = if (definitionsSettings.needShowLastDefinedWord) {
-            settings.toBlockingSettings().getStringOrNull(SETTING_LAST_DEFINED_WORD) ?: restoredState.word
+            settings.string(SETTING_LAST_DEFINED_WORD) ?: restoredState.word
         } else {
             restoredState.word
         }
@@ -149,7 +150,7 @@ open class DefinitionsVMImpl(
 
     override val definitions = combine(
         definitionWords,
-        settings.getIntFlow(SETTING_DEFINITION_DISPLAY_MODE, SETTING_DEFINITION_DISPLAY_MODE_BY_SOURCE),
+        settings.intFlow(SETTING_DEFINITION_DISPLAY_MODE, SETTING_DEFINITION_DISPLAY_MODE_BY_SOURCE),
         selectedPartsOfSpeechStateFlow,
         wordFrequencyGradationProvider.gradationState,
         wordFrequency,
@@ -206,7 +207,7 @@ open class DefinitionsVMImpl(
                 definitionWords.collect {
                     if (it.data()?.isNotEmpty() == true) {
                         word?.let { w ->
-                            settings.putString(SETTING_LAST_DEFINED_WORD, w)
+                            settings[SETTING_LAST_DEFINED_WORD] = w
                             wordDefinitionHistoryRepository.put(w)
                         }
                     }
@@ -279,9 +280,7 @@ open class DefinitionsVMImpl(
 
     override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.displayModeChanged"))
-        viewModelScope.launch {
-            settings.putInt(SETTING_DEFINITION_DISPLAY_MODE, mode.ordinal)
-        }
+        settings[SETTING_DEFINITION_DISPLAY_MODE] = mode.ordinal
     }
 
     override fun onTryAgainClicked() {
@@ -584,7 +583,7 @@ open class DefinitionsVMImpl(
     }
 
     // card sets
-    override val cardSets = combine(cardSetsRepository.cardSets, settings.getBooleanFlow(SETTING_EXPAND_CARDSETS_POPUP, false)) { cardsets, isExpanded ->
+    override val cardSets = combine(cardSetsRepository.cardSets, settings.booleanFlow(SETTING_EXPAND_CARDSETS_POPUP, false)) { cardsets, isExpanded ->
         //Logger.v("build view items")
         cardsets.copyWith(buildCardSetViewItems(cardsets.data().orEmpty(), isExpanded))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
@@ -673,9 +672,7 @@ open class DefinitionsVMImpl(
                 }
             )
         )
-        viewModelScope.launch {
-            settings.putBoolean(SETTING_EXPAND_CARDSETS_POPUP, !item.isExpanded)
-        }
+        settings[SETTING_EXPAND_CARDSETS_POPUP] = !item.isExpanded
     }
 
     // suggests

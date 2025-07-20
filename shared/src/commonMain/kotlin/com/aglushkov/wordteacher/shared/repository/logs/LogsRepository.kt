@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.repository.logs
 
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
 import kotlinx.coroutines.CoroutineScope
@@ -13,12 +14,12 @@ import okio.Path
 
 @OptIn(ExperimentalSettingsApi::class)
 class LogsRepository(
-    private val settings: FlowSettings,
+    private val settings: SettingStore,
     private val logFolderPath: Path,
     private val fileSystem: FileSystem,
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    val isLoggingEnabledState = settings.getBooleanFlow(IS_LOGGING_SETTING_NAME, false)
+    val isLoggingEnabledState = settings.booleanFlow(IS_LOGGING_SETTING_NAME, false)
         .stateIn(scope, SharingStarted.Eagerly, false)
 
     fun logPaths(): List<Path> {
@@ -28,9 +29,7 @@ class LogsRepository(
     }
 
     fun setIsLoggingEnabled(value: Boolean) {
-        scope.launch {
-            settings.putBoolean(IS_LOGGING_SETTING_NAME, value)
-        }
+        settings[IS_LOGGING_SETTING_NAME] = value
     }
 }
 

@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.workers
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.merge
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -20,7 +21,7 @@ class CardSetSyncWorker(
     private val database: AppDatabase,
     private val databaseWorker: DatabaseWorker,
     private val timeSource: TimeSource,
-    private val settings: FlowSettings,
+    private val settings: SettingStore,
 ) {
     sealed interface State {
         object Initializing: State
@@ -82,8 +83,8 @@ class CardSetSyncWorker(
 
     init {
         scope.launch {
-            lastSyncDate = Instant.fromEpochMilliseconds(settings.getLong(LAST_SYNC_DATE_KEY, 0))
-            lastSyncUserId = settings.getString(LAST_SYNC_USER_ID, "")
+            lastSyncDate = Instant.fromEpochMilliseconds(settings.long(LAST_SYNC_DATE_KEY, 0))
+            lastSyncUserId = settings.string(LAST_SYNC_USER_ID, "")
 
             val authData = spaceAuthRepository.currentAuthData.asLoaded()?.data
             if (authData != null) {
@@ -351,17 +352,17 @@ class CardSetSyncWorker(
         toState(State.AuthRequired)
     }
 
-    private suspend fun updateLastSyncDate(newSyncDate: Instant) {
-        settings.putLong(LAST_SYNC_DATE_KEY, newSyncDate.toEpochMilliseconds())
+    private fun updateLastSyncDate(newSyncDate: Instant) {
+        settings[LAST_SYNC_DATE_KEY] = newSyncDate.toEpochMilliseconds()
         lastSyncDate = newSyncDate
     }
 
-    private suspend fun updateLastSyncUserId(id: String) {
+    private fun updateLastSyncUserId(id: String) {
         if (lastSyncUserId == id) {
             return
         }
 
-        settings.putString(LAST_SYNC_USER_ID, id)
+        settings[LAST_SYNC_USER_ID] = id
         lastSyncUserId = id
     }
 

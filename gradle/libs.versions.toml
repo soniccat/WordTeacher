@@ -7,7 +7,7 @@ androidx-activityCompose = "1.9.0"
 androidx-appcompat = "1.7.0"
 androidx-material = "1.12.0"
 compose-plugin = "1.7.1"
-datastore-preferences = "1.0.0"
+datastore-preferences = "1.1.7"
 coroutines = "1.9.0-RC"
 
 desugar_jdk_libs = "2.1.2"
@@ -30,7 +30,6 @@ sqlDelight = "2.0.2"
 ktor = "2.3.12"
 mokoResources = "0.24.1"
 decomposeVersion = "2.2.2"
-settings = "1.2.0"
 stately = "2.0.6"
 uuid = "0.3.0"
 dagger = "2.56.1"
@@ -87,9 +86,6 @@ mokoCompose = { module = "dev.icerock.moko:resources-compose", version.ref = "mo
 
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decomposeVersion" }
 decomposeJetbrains = { module = "com.arkivanov.decompose:extensions-compose-jetbrains", version.ref = "decomposeVersion" }
-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
-settingsCoroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "settings" }
-settingsDataStore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "settings" }
 statelyCommon = { module = "co.touchlab:stately-common", version.ref = "stately" }
 statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }

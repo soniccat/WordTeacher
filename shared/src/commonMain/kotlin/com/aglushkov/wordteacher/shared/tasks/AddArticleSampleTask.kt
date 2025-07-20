@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.tasks
 
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
-import com.russhwolf.settings.coroutines.FlowSettings
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 
@@ -14,11 +14,11 @@ data class ArticleSample(
 
 class AddArticleSampleTask(
     private val articlesRepository: ArticlesRepository,
-    private val settings: FlowSettings,
+    private val settings: SettingStore,
     private val articleProvider: () -> ArticleSample
 ): Task {
     override suspend fun run(nextTasksChannel: Channel<Task>) {
-        val isImported = settings.getBoolean(IS_ARTICLE_SAMPLE_IMPORTED_KEY, false)
+        val isImported = settings.boolean(IS_ARTICLE_SAMPLE_IMPORTED_KEY) ?: false
         if (isImported) {
             return
         }
@@ -30,7 +30,7 @@ class AddArticleSampleTask(
             article.link,
         ).collect()
 
-        settings.putBoolean(IS_ARTICLE_SAMPLE_IMPORTED_KEY, true)
+        settings[IS_ARTICLE_SAMPLE_IMPORTED_KEY] = true
     }
 }
 

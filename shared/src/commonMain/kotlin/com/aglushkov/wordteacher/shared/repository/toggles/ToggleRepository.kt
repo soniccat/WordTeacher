@@ -1,22 +1,16 @@
 package com.aglushkov.wordteacher.shared.repository.toggles
 
-import com.aglushkov.wordteacher.shared.general.Response
-import com.aglushkov.wordteacher.shared.service.SpaceAuthData
-import com.aglushkov.wordteacher.shared.service.SpaceAuthService.AuthInput
-import com.aglushkov.wordteacher.shared.service.SpaceAuthToken
-import com.aglushkov.wordteacher.shared.service.SpaceAuthUser
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.serializable
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.coroutines.toBlockingSettings
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,8 +28,9 @@ data class Toggles(
 
 class ToggleRepository(
     private val url: String,
+    private val url2: String,
     private val httpClient: HttpClient,
-    private val settings: FlowSettings
+    private val settings: SettingStore
 ) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val json = Json {
@@ -44,23 +39,18 @@ class ToggleRepository(
         coerceInputValues = true
     }
 
-    val toggles: Toggles
+    val toggles: Toggles = settings.serializable(TogglesLastLoadedToggles) ?: Toggles()
 
     init {
-        toggles = try {
-            val toggleString = settings.toBlockingSettings().getStringOrNull(TogglesLastLoadedToggles)
-            toggleString?.let {
-                json.decodeFromString<Toggles>(it)
-            }
-        } catch (e: Throwable) {
-            null
-        } ?: Toggles()
-
         mainScope.launch(Dispatchers.Default) {
             try {
-                loadRemoteToggles()
+                loadRemoteToggles(url)
             } catch (e: Exception) {
-                // ignore, sends network logs in httpClient
+                try {
+                    loadRemoteToggles(url2)
+                } catch (e: Exception) {
+                    // ignore, sends network logs in httpClient
+                }
             }
         }
     }
@@ -69,24 +59,24 @@ class ToggleRepository(
         json.encodeToString(toggles)
     }
 
-    suspend fun loadRemoteToggles(): Toggles {
+    private suspend fun loadRemoteToggles(urlString: String): Toggles {
         return withContext(Dispatchers.Default) {
             val res: HttpResponse =
-                httpClient.get(urlString = url) {
+                httpClient.get(urlString = urlString) {
                     contentType(ContentType.Application.Json)
-                    settings.getStringOrNull(TogglesEtagKey)?.let { etag ->
+                    settings.string(TogglesEtagKey)?.let { etag ->
                         headers {
                             append("If-None-Match", etag)
                         }
                     }
                 }
             val stringResponse: String = res.body()
-            val resultToggles = json.decodeFromString<Toggles>(stringResponse)
-            settings.putString(TogglesLastLoadedToggles, stringResponse)
-            res.headers["etag"]?.let {
-                settings.putString(TogglesEtagKey, it)
+            json.decodeFromString<Toggles>(stringResponse).also {
+                settings[TogglesLastLoadedToggles] = stringResponse
+                res.headers["etag"]?.let {
+                    settings[TogglesEtagKey] = it
+                }
             }
-            resultToggles
         }
     }
 }

@@ -13,6 +13,9 @@ import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.onData
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.serializable
+import com.aglushkov.wordteacher.shared.general.settings.setSerializable
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.ArticleStyle
 import com.aglushkov.wordteacher.shared.model.Card
@@ -66,28 +69,16 @@ interface ArticleVM: Clearable {
     // TODO: simplify
     class StateController(
         restoredState: State,
-        private val settings: FlowSettings,
+        private val settings: SettingStore,
     ) {
         private val SELECTION_STATE_KEY = "articleSelectionState"
-        private val jsonCoder = Json {
-            ignoreUnknownKeys = true
-        }
-        private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-
         private var inMemoryState = runBlocking {
             InMemoryState(
                 id = restoredState.id,
                 isRead = false,
                 // TODO: move that into ArticlesRepository
                 selectionState =
-                    settings.getString(SELECTION_STATE_KEY, "{}").let {
-                        try {
-                            jsonCoder.decodeFromString(it) as SelectionState
-                        } catch (e: Exception) {
-                            SelectionState()
-                        }
-                    },
+                    settings.serializable(SELECTION_STATE_KEY) ?: SelectionState(),
             )
         }
 
@@ -100,10 +91,7 @@ interface ArticleVM: Clearable {
             set(value) {
                 inMemoryState = inMemoryState.update { copy(selectionState = value) }
                 mutableFlow.update { inMemoryState }
-                scope.launch {
-                    val stringValue = jsonCoder.encodeToString(value)
-                    settings.putString(SELECTION_STATE_KEY, stringValue)
-                }
+                settings.setSerializable(SELECTION_STATE_KEY, value)
             }
 
         fun updateSelectionState(block: (SelectionState) -> SelectionState) {
@@ -169,7 +157,7 @@ open class ArticleVMImpl(
     private val cardsRepository: CardsRepository,
     private val dictRepository: DictRepository,
     private val idGenerator: IdGenerator,
-    settings: FlowSettings,
+    settings: SettingStore,
     private val analytics: Analytics,
 ): ViewModel(), ArticleVM {
     override var router: ArticleRouter? = null

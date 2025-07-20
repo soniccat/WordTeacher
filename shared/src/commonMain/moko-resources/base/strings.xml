@@ -3,6 +3,7 @@
     <string name="api_base_url">https://aglushkov.ru:9090</string>
     <string name="api_base_url_com">https://aglushkov.com:9090</string>
     <string name="toggles_url">https://aglushkov.com/toggles/main.json</string>
+    <string name="toggles_url2">https://aglushkov.ru/toggles/main.json</string>
     <string name="app_name">Word Teacher</string>
     <string name="support_email">soniccat2@gmail.com</string>
     <string name="privacy_policy_url">https://aglushkov.ru/docs/privacy_policy.html</string>

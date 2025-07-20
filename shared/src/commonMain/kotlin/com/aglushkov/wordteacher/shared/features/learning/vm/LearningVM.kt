@@ -28,6 +28,7 @@ import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepo
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.onError
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
@@ -148,7 +149,7 @@ open class LearningVMImpl(
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
     private val audioService: AudioService,
-    private val settings: FlowSettings
+    private val settings: SettingStore
 ) : ViewModel(), LearningVM {
 
     override var router: LearningRouter? = null
@@ -159,9 +160,7 @@ open class LearningVMImpl(
     override val canShowHint = MutableStateFlow(true)
     override val hintString = MutableStateFlow(listOf<Char>())
     override val playSoundOnTypingCompletion = MutableStateFlow(
-        runBlocking {
-            settings.getBoolean(SETTING_PLAY_SOUND_ON_TYPING_COMPLETION, true)
-        }
+        settings.boolean(SETTING_PLAY_SOUND_ON_TYPING_COMPLETION, true)
     )
     private val matchColorMap: MutableMap<Int, Int> = mutableMapOf() // selection group to color index from MatchColors
 
@@ -191,7 +190,7 @@ open class LearningVMImpl(
         // update settings
         viewModelScope.launch {
             playSoundOnTypingCompletion.onEach {
-                settings.putBoolean(SETTING_PLAY_SOUND_ON_TYPING_COMPLETION, it)
+                settings[SETTING_PLAY_SOUND_ON_TYPING_COMPLETION] = it
             }.collect()
         }
     }

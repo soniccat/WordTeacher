@@ -50,7 +50,6 @@ import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
-import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.Component
 import io.ktor.client.*
 import io.ktor.client.plugins.cookies.*

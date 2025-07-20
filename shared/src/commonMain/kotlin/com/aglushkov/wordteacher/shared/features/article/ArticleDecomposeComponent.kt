@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecompo
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
@@ -30,7 +31,7 @@ class ArticleDecomposeComponent(
     cardsRepository: CardsRepository,
     dictRepository: DictRepository,
     idGenerator: IdGenerator,
-    settings: FlowSettings,
+    settings: SettingStore,
     analytics: Analytics,
 ) : ArticleVMImpl (
     componentContext.stateKeeper.consume(

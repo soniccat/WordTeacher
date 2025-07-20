@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.general.okio
 
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.russhwolf.settings.coroutines.FlowSettings
 import okio.BufferedSource
 import okio.FileSystem
@@ -54,18 +55,18 @@ fun FileSystem.writeToWithLockFile(
     delete(lockPath)
 }
 
-suspend fun FileSystem.writeToWithVersioning(
+fun FileSystem.writeToWithVersioning(
     src: Source?,
     outputPath: Path,
     versionKey: String,
     lastVersion: Int,
-    flowSettings: FlowSettings,
+    settings: SettingStore,
 ): Boolean {
-    val currentVersion = flowSettings.getInt(versionKey, -1)
+    val currentVersion = settings.int(versionKey) ?: -1
     return if (!exists(outputPath) || currentVersion != lastVersion) {
         if (src != null) {
             writeToWithLockFile(src, outputPath)
-            flowSettings.putInt(versionKey, lastVersion)
+            settings[versionKey] = lastVersion
             true
         } else {
             false

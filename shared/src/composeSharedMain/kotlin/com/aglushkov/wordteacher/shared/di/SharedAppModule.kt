@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
 import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.auth.YandexAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.service.SpaceHttpClientBuilder
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -142,7 +143,7 @@ class SharedAppModule {
         database: AppDatabase,
         nlpCore: NLPCore,
         processor: NLPSentenceProcessor,
-        settings: FlowSettings,
+        settings: SettingStore,
         timeSource: TimeSource,
         @IsDebug isDebug: Boolean,
     ): ArticlesRepository {
@@ -184,7 +185,7 @@ class SharedAppModule {
     fun wordFrequencyDatabase(
         driver: DatabaseDriverFactory,
         @WordFrequencyPreparer dbPreparer: () -> Path,
-        settings: FlowSettings,
+        settings: SettingStore,
     ): WordFrequencyDatabase {
         return WordFrequencyDatabase(driver, dbPreparer, settings)
     }
@@ -237,7 +238,7 @@ class SharedAppModule {
         database: AppDatabase,
         databaseWorker: DatabaseWorker,
         timeSource: TimeSource,
-        settings: FlowSettings,
+        settings: SettingStore,
     ): CardSetSyncWorker {
         return CardSetSyncWorker(
             spaceAuthRepository,
@@ -286,7 +287,7 @@ class SharedAppModule {
     @AppComp
     @Provides
     fun deviceIdRepository(
-        settings: FlowSettings
+        settings: SettingStore
     ): DeviceIdRepository =
         DeviceIdRepository(settings)
 
@@ -417,7 +418,7 @@ class SharedAppModule {
     fun logsRepository(
         @BasePath basePath: Path,
         fileSystem: FileSystem,
-        settings: FlowSettings
+        settings: SettingStore
     ): LogsRepository {
         val dirPath = basePath.div("logs")
         if (!fileSystem.exists(dirPath)) {
@@ -498,11 +499,13 @@ class SharedAppModule {
     @Provides
     fun toggleRepository(
         @ToggleUrl toggleUrl: String,
+        @ToggleUrl2 toggleUrl2: String,
         @SpaceHttpClient httpClient: HttpClient,
-        settings: FlowSettings
+        settings: SettingStore
     ): ToggleRepository {
         return ToggleRepository(
             toggleUrl,
+            toggleUrl2,
             httpClient,
             settings
         )

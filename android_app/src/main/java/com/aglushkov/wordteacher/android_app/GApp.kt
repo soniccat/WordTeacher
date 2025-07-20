@@ -18,6 +18,7 @@ import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilFalse
 import com.aglushkov.wordteacher.shared.general.setAnalytics
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
@@ -97,6 +98,7 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         appComponent.connectivityManager().checkNetworkState()
 
         mainScope.launch(Dispatchers.Default) {
+
             val taskChannel = Channel<Task>(UNLIMITED)
             launch {
                 taskChannel.receiveAsFlow().collect {

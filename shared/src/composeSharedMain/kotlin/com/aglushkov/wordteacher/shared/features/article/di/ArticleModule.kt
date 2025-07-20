@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImp
 import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
@@ -51,7 +52,7 @@ class ArticleModule {
         idGenerator: IdGenerator,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
         analytics: Analytics,
-        settings: FlowSettings,
+        settings: SettingStore,
         wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
         audioService: AudioService,
     ): DefinitionsVM = DefinitionsVMImpl(
@@ -83,7 +84,7 @@ class ArticleModule {
         cardsRepository: CardsRepository,
         dictRepository: DictRepository,
         idGenerator: IdGenerator,
-        settings: FlowSettings,
+        settings: SettingStore,
         analytics: Analytics,
     ) = ArticleDecomposeComponent(
         componentContext,

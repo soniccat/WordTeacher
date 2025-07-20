@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVMImpl
 import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 import com.russhwolf.settings.coroutines.FlowSettings
@@ -19,7 +20,7 @@ class LearningDecomposeComponent (
     idGenerator: IdGenerator,
     analytics: Analytics,
     audioService: AudioService,
-    settings: FlowSettings,
+    settings: SettingStore,
 ) : LearningVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,

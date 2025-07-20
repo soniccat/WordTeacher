@@ -17,6 +17,7 @@ import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
@@ -50,7 +51,7 @@ class SettingsDecomposeComponent (
     emailOpener: EmailOpener,
     webLinkOpener: WebLinkOpener,
     databaseCardWorker: DatabaseCardWorker,
-    settings: FlowSettings
+    settings: SettingStore
 ) : SettingsVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,

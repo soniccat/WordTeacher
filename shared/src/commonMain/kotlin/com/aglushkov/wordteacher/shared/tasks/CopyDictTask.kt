@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.tasks
 
 import com.aglushkov.wordteacher.shared.general.okio.writeToWithVersioning
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.russhwolf.settings.coroutines.FlowSettings
 import kotlinx.coroutines.channels.Channel
@@ -14,7 +15,7 @@ class CopyDictTask(
     private val fileSystem: FileSystem,
     private val dictRepository: DictRepository,
     private val lastVersion: Int,
-    private val flowSettings: FlowSettings,
+    private val settings: SettingStore,
 ): Task {
     override suspend fun run(nextTasksChannel: Channel<Task>) {
         if (
@@ -23,7 +24,7 @@ class CopyDictTask(
                 copyPath,
                 COPY_DICT_TASK_VERSION + copyPath.name,
                 lastVersion,
-                flowSettings
+                settings
             )
         ) {
             dictRepository.importDicts()

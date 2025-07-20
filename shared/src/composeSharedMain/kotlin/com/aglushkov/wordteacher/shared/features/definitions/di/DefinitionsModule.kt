@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
@@ -34,7 +35,7 @@ class DefinitionsModule {
         clipboardRepository: ClipboardRepository,
         idGenerator: IdGenerator,
         analytics: Analytics,
-        settings: FlowSettings,
+        settings: SettingStore,
         wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
         audioService: AudioService,
     ) = DefinitionsDecomposeComponent(

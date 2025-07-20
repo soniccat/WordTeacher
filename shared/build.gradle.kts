@@ -46,13 +46,12 @@ kotlin {
             api(libs.ktorLogging)
             api(libs.ktorContentEncoding)
             api(libs.mokoResourcesLib)
-            api(libs.settings)
-            api(libs.settingsCoroutines)
             api(libs.decompose)
             implementation(libs.ktorAuth)
             implementation(libs.kotlinxDateTime)
             implementation(libs.statelyCommon)
             implementation(libs.statelyConcurrency)
+            implementation(libs.datastorePreference)
             val version = "0.5.0"
 
             // For parsing HTML

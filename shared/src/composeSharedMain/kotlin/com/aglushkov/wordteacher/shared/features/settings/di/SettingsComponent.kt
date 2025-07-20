@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
@@ -50,5 +51,5 @@ interface SettingsDependencies {
     fun emailOpener(): EmailOpener
     fun webLinkOpener(): WebLinkOpener
     fun databaseCardWorker(): DatabaseCardWorker
-    fun flowSettings(): FlowSettings
+    fun settings(): SettingStore
 }

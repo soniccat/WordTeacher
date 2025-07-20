@@ -2,8 +2,10 @@ package com.aglushkov.wordteacher.android_app.di
 
 import android.app.Application
 import android.content.Context
+import androidx.datastore.core.DataStore
 import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
 import com.aglushkov.wordteacher.android_app.BuildConfig
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.features.add_article.ContentProviderRepository
@@ -32,6 +34,7 @@ import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.auth.YandexAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.okio.writeTo
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
@@ -53,11 +56,10 @@ import com.aglushkov.wordteacher.shared.tasks.ArticleSample
 import com.aglushkov.wordteacher.shared.tasks.CopyDictTask
 import com.aglushkov.wordteacher.shared.tasks.LoadNLPCoreTask
 import com.aglushkov.wordteacher.shared.tasks.Task
-import com.russhwolf.settings.coroutines.FlowSettings
-import com.russhwolf.settings.datastore.DataStoreSettings
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.channels.Channel
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toOkioPath
@@ -94,6 +96,13 @@ class AppModule {
         context: Context
     ): String = context.getString(MR.strings.toggles_url.resourceId)
 
+    @ToggleUrl2
+    @AppComp
+    @Provides
+    fun togglesUrl2(
+        context: Context
+    ): String = context.getString(MR.strings.toggles_url2.resourceId)
+
     @ApiBaseUrl
     @AppComp
     @Provides
@@ -124,14 +133,20 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun settings(
+    fun dataStore(
         context: Context
-    ): FlowSettings {
-        return DataStoreSettings(
-            PreferenceDataStoreFactory.create {
-                context.dataStoreFile("settings.preferences_pb")
-            }
-        )
+    ): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create {
+            context.dataStoreFile("settings.preferences_pb")
+        }
+    }
+
+    @AppComp
+    @Provides
+    fun settingStore(
+        dataStore: DataStore<Preferences>
+    ): SettingStore {
+        return SettingStore(dataStore)
     }
 
     @AppComp
@@ -340,7 +355,7 @@ class AppModule {
         cardSetsRepository: CardSetsRepository,
         timeSource: TimeSource,
         fileSystem: FileSystem,
-        flowSettings: FlowSettings,
+        settings: SettingStore,
     ): Array<Task> {
         return arrayOf(
             CopyDictTask(
@@ -350,12 +365,12 @@ class AppModule {
                 fileSystem,
                 dictRepository,
                 BuildConfig.defaultWordlistVersion,
-                flowSettings
+                settings
             ),
             LoadNLPCoreTask(nlpCore),
             AddArticleSampleTask(
                 articlesRepository,
-                flowSettings
+                settings
             ) {
                 ArticleSample(
                     "Article Sample. CORECURSIVE #099, Code, Kickflips and Crunch Time",
@@ -366,7 +381,7 @@ class AppModule {
                 )
             },
             AddCardSetSampleTask(
-                flowSettings,
+                settings,
                 cardSetsRepository,
                 timeSource
             ) {

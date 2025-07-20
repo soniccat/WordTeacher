@@ -8,12 +8,12 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
-import com.russhwolf.settings.coroutines.FlowSettings
 import dagger.BindsInstance
 import dagger.Component
 
@@ -45,5 +45,5 @@ interface LearningDependencies {
     fun nlpCore(): NLPCore
     fun analytics(): Analytics
     fun audioService(): AudioService
-    fun settings(): FlowSettings
+    fun settings(): SettingStore
 }

@@ -12,6 +12,9 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgress
 import com.aglushkov.wordteacher.shared.general.resource.onData
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.serializable
+import com.aglushkov.wordteacher.shared.general.settings.setSerializable
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.ArticleStyle
@@ -57,7 +60,7 @@ class ArticlesRepository(
     private val database: AppDatabase,
     private val nlpCore: NLPCore,
     private val nlpSentenceProcessor: NLPSentenceProcessor,
-    private val settings: FlowSettings,
+    private val settings: SettingStore,
     private val timeSource: TimeSource,
     private val isDebug: Boolean,
 ) {
@@ -67,22 +70,13 @@ class ArticlesRepository(
     val shortArticles: StateFlow<Resource<List<ShortArticle>>> = stateFlow
 
     // reading progress map
-    private val jsonCoder = Json {
-        ignoreUnknownKeys = true
-    }
     val lastFirstVisibleItemMap: MutableStateFlow<Resource<Map<Long, Int>>> = MutableStateFlow(Resource.Loading())
     private var updateFirstVisibleItemMapJob: Job? = null
 
     init {
         scope.launch(Dispatchers.Default) {
             loadResource {
-                settings.getString(FIRSTITEMINDEX_STATE_KEY, "{}").let { loadedMapJson ->
-                    try {
-                        (jsonCoder.decodeFromString(loadedMapJson) as Map<Long, Int>)
-                    } catch (e: Exception) {
-                        emptyMap()
-                    }
-                }
+                settings.serializable(FIRSTITEMINDEX_STATE_KEY) ?: emptyMap<Long, Int>()
             }.collect(lastFirstVisibleItemMap)
 
             // listen changes to store
@@ -90,8 +84,7 @@ class ArticlesRepository(
                 updateFirstVisibleItemMapJob?.cancel()
                 updateFirstVisibleItemMapJob = launch {
                     delay(200)
-                    val stringValue = jsonCoder.encodeToString(lastFirstVisibleItemMap.value.data().orEmpty())
-                    settings.putString(FIRSTITEMINDEX_STATE_KEY, stringValue)
+                    settings.setSerializable(FIRSTITEMINDEX_STATE_KEY, lastFirstVisibleItemMap.value.data().orEmpty())
                 }
             }
         }

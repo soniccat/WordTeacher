@@ -29,6 +29,9 @@ annotation class ApiBaseUrl
 annotation class ToggleUrl
 
 @Qualifier
+annotation class ToggleUrl2
+
+@Qualifier
 annotation class Email
 
 @Qualifier

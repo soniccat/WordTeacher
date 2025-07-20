@@ -7,6 +7,9 @@ import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.serializable
+import com.aglushkov.wordteacher.shared.general.settings.setSerializable
 import com.aglushkov.wordteacher.wordfrequencydb.WordFrequencyDB
 import com.russhwolf.settings.coroutines.FlowSettings
 import kotlinx.coroutines.CoroutineScope
@@ -89,7 +92,7 @@ interface WordFrequencyGradationProvider {
 class WordFrequencyDatabase(
     private val driverFactory: DatabaseDriverFactory,
     private val dbPreparer: () -> Path,
-    private val settings: FlowSettings,
+    private val settings: SettingStore,
 ): WordFrequencyGradationProvider {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var driver = driverFactory.createFrequencyDBDriver()
@@ -141,11 +144,9 @@ class WordFrequencyDatabase(
 
     private suspend fun resolveGradation() {
         try {
-            val gradationString = settings.getStringOrNull(WORD_FREQUENCY_GRADATION_SETTINGS_NAME)
-            if (gradationString != null) {
-                (jsonCoder.decodeFromString(gradationString) as? WordFrequencyGradation)?.let { gradation ->
-                    gradationState.update { Resource.Loaded(gradation) }
-                }
+            val gradation: WordFrequencyGradation? = settings.serializable(WORD_FREQUENCY_GRADATION_SETTINGS_NAME)
+            if (gradation != null) {
+                gradationState.update { Resource.Loaded(gradation) }
             }
 //            defaultFrequency = settings.getDoubleOrNull(WORD_FREQUENCY_DEFAULT_SETTINGS_NAME) ?: UNKNOWN_FREQUENCY
         } catch (_: Exception) {
@@ -165,10 +166,7 @@ class WordFrequencyDatabase(
         //                newGradation.levels[newGradation.levels.size/2].frequency
         //            }
 
-        settings.putString(
-            WORD_FREQUENCY_GRADATION_SETTINGS_NAME,
-            jsonCoder.encodeToString(newGradation)
-        )
+        settings.setSerializable(WORD_FREQUENCY_GRADATION_SETTINGS_NAME, newGradation)
         //            settings.putDouble(WORD_FREQUENCY_DEFAULT_SETTINGS_NAME, defaultFrequency)
     }
 

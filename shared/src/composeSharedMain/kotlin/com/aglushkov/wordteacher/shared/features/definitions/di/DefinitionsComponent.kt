@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
@@ -42,7 +43,7 @@ interface DefinitionsDependencies {
     fun wordFrequencyGradationProvider(): WordFrequencyGradationProvider
     fun analytics(): Analytics
     fun wordTeacherDictService(): WordTeacherDictService
-    fun settings(): FlowSettings
+    fun settings(): SettingStore
     fun clipboardRepository(): ClipboardRepository
     fun wordDefinitionHistoryRepository(): WordDefinitionHistoryRepository
     fun audioService(): AudioService

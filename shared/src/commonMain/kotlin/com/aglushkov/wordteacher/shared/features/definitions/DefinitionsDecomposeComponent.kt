@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVMImp
 import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
@@ -41,7 +42,7 @@ class DefinitionsDecomposeComponent (
     clipboardRepository: ClipboardRepository,
     idGenerator: IdGenerator,
     analytics: Analytics,
-    settings: FlowSettings,
+    settings: SettingStore,
     wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
     audioService: AudioService,
 ) : DefinitionsVMImpl(

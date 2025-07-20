@@ -17,6 +17,7 @@ import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.downgradeToErrorOrLoading
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
@@ -81,7 +82,7 @@ open class SettingsVMImpl (
     private val emailOpener: EmailOpener,
     private val webLinkOpener: WebLinkOpener,
     private val databaseCardWorker: DatabaseCardWorker,
-    private val settings: FlowSettings,
+    private val settings: SettingStore,
 ): ViewModel(), SettingsVM {
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())

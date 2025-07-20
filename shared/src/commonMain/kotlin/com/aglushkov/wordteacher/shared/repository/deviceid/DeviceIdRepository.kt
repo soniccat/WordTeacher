@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.repository.deviceid
 
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.benasher44.uuid.uuid4
 import com.russhwolf.settings.coroutines.FlowSettings
 import kotlinx.coroutines.*
@@ -11,7 +12,7 @@ interface DeviceIdProvider {
 }
 
 class DeviceIdRepository(
-    private val settings: FlowSettings,
+    private val settings: SettingStore,
     private val deviceIdProvider: DeviceIdProvider = object : DeviceIdProvider {
         override fun generateDeviceId(): String {
             return uuid4().toString()
@@ -39,12 +40,10 @@ class DeviceIdRepository(
 
     private suspend fun loadDeviceIdOrGenerateIfNeeded(): String {
         val deviceId = withContext(Dispatchers.Default) {
-            val loadedDeviceId = settings.getString(DEVICE_ID, "")
+            val loadedDeviceId = settings.string(DEVICE_ID) ?: ""
             if (loadedDeviceId.isEmpty()) {
                 val generatedDeviceId = deviceIdProvider.generateDeviceId()
-                launch {
-                    settings.putString(DEVICE_ID, generatedDeviceId)
-                }
+                settings[DEVICE_ID] = generatedDeviceId
                 generatedDeviceId
             } else {
                 loadedDeviceId
