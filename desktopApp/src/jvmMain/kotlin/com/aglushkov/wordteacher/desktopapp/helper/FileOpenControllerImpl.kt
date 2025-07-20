@@ -29,7 +29,6 @@ class FileOpenControllerImpl(
     private val successHandler: FileOpenController.SuccessHandler,
 ): FileOpenController {
     var parent: Frame? = null
-    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     override val state: MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Uninitialized())
 
     override suspend fun chooseFile(): Resource<Unit> {
@@ -40,7 +39,7 @@ class FileOpenControllerImpl(
         fd.setFilenameFilter { file, s -> mimeTypes.any { file.endsWith(it) } }
         fd.file?.let { choseFile ->
             val choseFilePath = fd.directory.toPath().div(choseFile)
-            withContext(Dispatchers.Default) {
+            withContext(Dispatchers.IO) {
                 loadResource {
                     val tmpFilePath = if (tmpPath.toFile().isDirectory) {
                         tmpPath.div(choseFile)

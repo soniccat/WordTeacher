@@ -31,7 +31,7 @@ class NotesRepository(
     val notes: StateFlow<Resource<List<Note>>> = stateFlow
 
     init {
-        scope.launch(Dispatchers.Default) {
+        scope.launch(Dispatchers.IO) {
             database.notes.selectAll().asFlow().collect {
                 val result = it.executeAsList()
                 Logger.v("NotesRepository loaded ${result.size} notes")
@@ -43,13 +43,13 @@ class NotesRepository(
     suspend fun createNote(date: Long, text: String) = supervisorScope {
         // Async in the scope to avoid retaining the parent coroutine and to cancel immediately
         // when it cancels (when corresponding ViewModel is cleared for example)
-        scope.async(Dispatchers.Default) {
+        scope.async(Dispatchers.IO) {
             createNoteInternal(date, text)
         }.await()
     }
 
     suspend fun removeNote(noteId: Long) = supervisorScope {
-        scope.async(Dispatchers.Default) {
+        scope.async(Dispatchers.IO) {
             removeNoteInternal(noteId)
         }.await()
     }
@@ -72,7 +72,7 @@ class NotesRepository(
     }
 
     suspend fun updateNote(noteId: Long, text: String) = supervisorScope {
-        scope.async(Dispatchers.Default) {
+        scope.async(Dispatchers.IO) {
             updateNoteInternal(noteId, text)
         }.await()
     }

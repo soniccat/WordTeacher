@@ -31,10 +31,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 
 class SettingStore(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
 ) {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    private var prefRes: StateFlow<Preferences>
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val prefRes: StateFlow<Preferences>
 
     init {
         // load from the main thread to be as quick as possible

@@ -44,8 +44,6 @@ actual class NLPCore(
     private val fileSystem: FileSystem,
     dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) {
-    private val mainScope = CoroutineScope(dispatcher + SupervisorJob())
-
     private val lemmatizerState = MutableStateFlow<Resource<MyLemmatizer>>(Resource.Uninitialized())
     private val state = MutableStateFlow<Resource<NLPCore>>(Resource.Uninitialized())
 

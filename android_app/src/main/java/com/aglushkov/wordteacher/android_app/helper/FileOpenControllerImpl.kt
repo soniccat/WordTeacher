@@ -41,7 +41,7 @@ class FileOpenControllerImpl(
 //    @SuppressLint("Recycle")
     fun bind(activity: ComponentActivity) {
         openDocumentLauncher = activity.registerForActivityResult(ActivityResultContracts.OpenDocument()) { result ->
-            mainScope.launch(Dispatchers.Default) {
+            mainScope.launch(Dispatchers.IO) {
                 if (result == null) {
                     state.update { it.toUninitialized() }
                 } else {

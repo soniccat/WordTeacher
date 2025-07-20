@@ -80,7 +80,7 @@ class SpaceDashboardService(
     }
 
     suspend fun load(): Response<SpaceDashboardResponse> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             val res: HttpResponse = httpClient.get(urlString = "${baseUrl}/api/v1/dashboard")
             val stringResponse: String = res.body()
             json.decodeFromString<Response<SpaceDashboardResponse>>(stringResponse).setStatusCode(res.status.value)

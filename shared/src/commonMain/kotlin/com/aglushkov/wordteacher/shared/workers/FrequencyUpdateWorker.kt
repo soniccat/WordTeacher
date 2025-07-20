@@ -14,7 +14,7 @@ class CardFrequencyUpdateWorker (
     private val databaseWorker: DatabaseWorker,
     private val frequencyDatabase: WordFrequencyDatabase,
 ) {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val state = MutableStateFlow<State>(State.Paused(State.Done))
     val stateFlow: Flow<State> = state
 

@@ -97,7 +97,7 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
 
         appComponent.connectivityManager().checkNetworkState()
 
-        mainScope.launch(Dispatchers.Default) {
+        mainScope.launch(Dispatchers.IO) {
 
             val taskChannel = Channel<Task>(UNLIMITED)
             launch {

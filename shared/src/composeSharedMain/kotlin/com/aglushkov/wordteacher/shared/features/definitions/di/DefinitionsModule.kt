@@ -15,7 +15,7 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProv
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.arkivanov.decompose.ComponentContext
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import dagger.Module
 import dagger.Provides
 

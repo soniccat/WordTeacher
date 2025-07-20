@@ -100,7 +100,7 @@ class SpaceAuthService(
     }
 
     suspend fun auth(network: NetworkType, token: String): Response<SpaceAuthData> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             val res: HttpResponse =
                 httpClient.post(urlString = "${baseUrl}/api/auth/social/" + network.value) {
                     contentType(ContentType.Application.Json)
@@ -118,7 +118,7 @@ class SpaceAuthService(
     }
 
     suspend fun refresh(token: SpaceAuthToken): Response<SpaceAuthToken> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             val res: HttpResponse =
                 httpClient.post(urlString = "${baseUrl}/api/auth/refresh") {
                     contentType(ContentType.Application.Json)

@@ -133,20 +133,23 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun dataStore(
+    fun settingStore(
         context: Context
-    ): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create {
+    ): SettingStore {
+        return SettingStore(PreferenceDataStoreFactory.create {
             context.dataStoreFile("settings.preferences_pb")
-        }
+        })
     }
 
     @AppComp
+    @ArticleSettingStore
     @Provides
-    fun settingStore(
-        dataStore: DataStore<Preferences>
+    fun articleSettingStore(
+        context: Context
     ): SettingStore {
-        return SettingStore(dataStore)
+        return SettingStore(PreferenceDataStoreFactory.create {
+            context.dataStoreFile("article.preferences_pb")
+        })
     }
 
     @AppComp

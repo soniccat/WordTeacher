@@ -3,7 +3,7 @@ package com.aglushkov.wordteacher.shared.tasks
 import com.aglushkov.wordteacher.shared.general.okio.writeToWithVersioning
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import kotlinx.coroutines.channels.Channel
 import okio.FileSystem
 import okio.Path

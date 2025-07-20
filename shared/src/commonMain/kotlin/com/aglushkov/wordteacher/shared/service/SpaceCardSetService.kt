@@ -104,7 +104,7 @@ class SpaceCardSetService(
     }
 
     suspend fun pull(currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<CardSetPullResponse> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             val res: HttpResponse =
                 httpClient.post(urlString = "${baseUrl}/api/cardsets/pull") {
                     contentType(ContentType.Application.Json)
@@ -116,7 +116,7 @@ class SpaceCardSetService(
     }
 
     suspend fun push(updatedCardSets: List<CardSet>, currentCardSetIds: List<String>, lastModificationDate: Instant?): Response<CardSetPushResponse> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             val res: HttpResponse =
                 httpClient.post(urlString = "${baseUrl}/api/cardsets/push") {
                     contentType(ContentType.Application.Json)
@@ -128,7 +128,7 @@ class SpaceCardSetService(
     }
 
     suspend fun getById(id: String): Response<CardSetByIdResponse> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             val res: HttpResponse =
                 httpClient.get(urlString = "${baseUrl}/api/cardsets/" + id)
             val stringResponse: String = res.body()

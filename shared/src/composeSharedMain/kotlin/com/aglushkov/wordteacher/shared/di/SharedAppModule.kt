@@ -45,7 +45,7 @@ import com.aglushkov.wordteacher.shared.workers.CardFrequencyUpdateWorker
 import com.aglushkov.wordteacher.shared.workers.CardSetSyncWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import dagger.Lazy
 import okio.FileSystem
 import dagger.Module
@@ -143,11 +143,11 @@ class SharedAppModule {
         database: AppDatabase,
         nlpCore: NLPCore,
         processor: NLPSentenceProcessor,
-        settings: SettingStore,
+        @ArticleSettingStore settings: Lazy<SettingStore>,
         timeSource: TimeSource,
         @IsDebug isDebug: Boolean,
     ): ArticlesRepository {
-        return ArticlesRepository(database, nlpCore, processor, settings, timeSource, isDebug)
+        return ArticlesRepository(database, nlpCore, processor, { settings.get() }, timeSource, isDebug)
     }
 
     @AppComp

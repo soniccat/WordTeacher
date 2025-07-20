@@ -46,6 +46,9 @@ annotation class WordFrequencyFileOpener
 @Qualifier
 annotation class DslFileOpener
 
+@Qualifier
+annotation class ArticleSettingStore
+
 val LocalIsDebug = staticCompositionLocalOf { false }
 
 val LocalIsDarkTheme = staticCompositionLocalOf { false }

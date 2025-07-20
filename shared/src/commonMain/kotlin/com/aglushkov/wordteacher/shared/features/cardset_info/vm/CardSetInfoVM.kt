@@ -215,7 +215,7 @@ open class CardSetInfoVMImpl(
     }
 
     private fun loadCardSet() {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.IO) {
             when (state) {
                 is CardSetInfoVM.State.LocalCardSet -> {
                     cardSetRepository.loadCardSetWithoutCards(state.id).collect(cardSetState)

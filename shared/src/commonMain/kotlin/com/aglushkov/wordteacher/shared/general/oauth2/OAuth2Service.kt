@@ -105,7 +105,7 @@ class OAuth2Service(
     }
 
     suspend fun accessToken(code: String, context: AuthContext): Token {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             val res: HttpResponse =
                 httpClient.post(tokenUrl) {
                     setBody(

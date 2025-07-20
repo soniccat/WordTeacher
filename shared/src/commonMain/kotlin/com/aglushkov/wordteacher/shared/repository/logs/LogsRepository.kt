@@ -1,8 +1,6 @@
 package com.aglushkov.wordteacher.shared.repository.logs
 
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
-import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.coroutines.FlowSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -12,7 +10,6 @@ import kotlinx.coroutines.launch
 import okio.FileSystem
 import okio.Path
 
-@OptIn(ExperimentalSettingsApi::class)
 class LogsRepository(
     private val settings: SettingStore,
     private val logFolderPath: Path,

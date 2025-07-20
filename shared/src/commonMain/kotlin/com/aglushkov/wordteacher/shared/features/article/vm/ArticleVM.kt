@@ -30,7 +30,6 @@ import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardsRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import com.russhwolf.settings.coroutines.FlowSettings
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.*
@@ -72,7 +71,7 @@ interface ArticleVM: Clearable {
         private val settings: SettingStore,
     ) {
         private val SELECTION_STATE_KEY = "articleSelectionState"
-        private var inMemoryState = runBlocking {
+        private var inMemoryState =
             InMemoryState(
                 id = restoredState.id,
                 isRead = false,
@@ -80,7 +79,6 @@ interface ArticleVM: Clearable {
                 selectionState =
                     settings.serializable(SELECTION_STATE_KEY) ?: SelectionState(),
             )
-        }
 
         val articleId = restoredState.id
         private val mutableFlow = MutableStateFlow(inMemoryState)
@@ -199,7 +197,7 @@ open class ArticleVMImpl(
             }
         }
 
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.IO) {
             cardsRepository.cards.map { res ->
                 res.copyWith(
                     res.data()?.associateBy { it.term to it.partOfSpeech }

@@ -36,7 +36,7 @@ public class FileCookieStorage(
     val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     init {
-        scope.launch(Dispatchers.Default) {
+        scope.launch(Dispatchers.IO) {
             try {
                 val loadedState = load()!!
                 oldestCookie.set(loadedState.oldestCookie)
@@ -106,7 +106,7 @@ public class FileCookieStorage(
     }
 
     private fun saveAsync() {
-        scope.launch(Dispatchers.Default) {
+        scope.launch(Dispatchers.IO) {
             save()
         }
     }

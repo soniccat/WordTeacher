@@ -37,8 +37,8 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
-import com.russhwolf.settings.coroutines.FlowSettings
-import com.russhwolf.settings.coroutines.toBlockingSettings
+
+
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -302,7 +302,7 @@ open class DefinitionsVMImpl(
             return
         }
 
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.IO) {
             loadResource {
                 wordFrequencyGradationProvider.resolveFrequencyForWord(word)
             }.collect(wordFrequency)
@@ -740,7 +740,7 @@ open class DefinitionsVMImpl(
         suggestJob?.cancel()
         suggestJob = null
 
-        suggestJob = viewModelScope.launch(Dispatchers.Default) {
+        suggestJob = viewModelScope.launch(Dispatchers.IO) {
             delay(200)
             suggestedDictEntryRepository.load(word)
                 .waitUntilDone {

@@ -31,8 +31,8 @@ import kotlinx.coroutines.flow.*
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
-import com.russhwolf.settings.coroutines.FlowSettings
-import com.russhwolf.settings.coroutines.toBlockingSettings
+
+
 import dev.icerock.moko.resources.desc.ResourceFormatted
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

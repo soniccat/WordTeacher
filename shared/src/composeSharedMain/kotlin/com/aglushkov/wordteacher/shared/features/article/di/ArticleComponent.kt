@@ -12,7 +12,7 @@ import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.arkivanov.decompose.ComponentContext
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import dagger.BindsInstance
 import dagger.Component
 

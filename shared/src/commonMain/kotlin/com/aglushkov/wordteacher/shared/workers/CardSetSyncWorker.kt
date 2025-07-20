@@ -9,7 +9,7 @@ import com.aglushkov.wordteacher.shared.model.merge
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -143,7 +143,7 @@ class CardSetSyncWorker(
 
             // watch database changes
             launch {
-                withContext(Dispatchers.Default) {
+                withContext(Dispatchers.IO) {
                     var pushRequestJob: Job? = null
                     combine(database.cardSets.changeFlow(), database.cards.changeFlow()) { a, b ->
                         a + b
@@ -199,7 +199,7 @@ class CardSetSyncWorker(
         val newSyncDate: Instant?
 
         try {
-            withContext(Dispatchers.Default) {
+            withContext(Dispatchers.IO) {
                 val cardSetRemoteIds = databaseWorker.run { database ->
                     database.cardSets.remoteIds()
                 }
@@ -299,7 +299,7 @@ class CardSetSyncWorker(
         val newSyncDate: Instant?
 
         try {
-            withContext(Dispatchers.Default) {
+            withContext(Dispatchers.IO) {
                 var updatedCardSets: List<CardSet> = emptyList()
 
                 databaseWorker.run { database ->

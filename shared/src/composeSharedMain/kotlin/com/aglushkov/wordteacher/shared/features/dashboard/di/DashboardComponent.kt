@@ -24,7 +24,7 @@ import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import dagger.BindsInstance
 import dagger.Component
 

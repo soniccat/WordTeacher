@@ -11,7 +11,7 @@ import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.general.settings.serializable
 import com.aglushkov.wordteacher.shared.general.settings.setSerializable
 import com.aglushkov.wordteacher.wordfrequencydb.WordFrequencyDB
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -115,14 +115,14 @@ class WordFrequencyDatabase(
     suspend fun waitUntilInitialized() = state.first { it.isLoaded() }
 
     override suspend fun resolveFrequencyForWord(word: String): Double {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             waitUntilInitialized()
             db.dBWordFrequencyQueries.selectFrequency(word).executeAsOneOrNull()?.frequency ?: defaultFrequency
         }
     }
 
     override suspend fun resolveFrequencyForWords(words: List<String>): List<Double> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             waitUntilInitialized()
             val list = db.dBWordFrequencyQueries.selectFrequencies(words).executeAsList()
             words.map { w ->
@@ -132,13 +132,13 @@ class WordFrequencyDatabase(
     }
 
     private fun create() {
-        mainScope.launch(Dispatchers.Default) {
+        mainScope.launch(Dispatchers.IO) {
             loadResource {
                 dbPreparer()
                 resolveGradation()
 
                 this@WordFrequencyDatabase
-            }.flowOn(Dispatchers.Default).collect(state)
+            }.flowOn(Dispatchers.IO).collect(state)
         }
     }
 

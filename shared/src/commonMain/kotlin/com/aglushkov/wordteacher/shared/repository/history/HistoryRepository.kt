@@ -19,8 +19,8 @@ open class HistoryRepository(
     private val fileSystem: FileSystem,
     private val limit: Int,
 ) {
-    private val queue = SerialQueue(Dispatchers.Default)
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val queue = SerialQueue(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val stateFlow = MutableStateFlow<Resource<LinkedHashSet<String>>>(Resource.Uninitialized())
     init {
         scope.launch {

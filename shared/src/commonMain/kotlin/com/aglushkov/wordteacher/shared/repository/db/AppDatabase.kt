@@ -41,7 +41,7 @@ class AppDatabase(
     private val timeSource: TimeSource
 ) {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val defaultScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val defaultScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val driver = driverFactory.createMainDBDriver()
     private var db = MainDB(
@@ -86,7 +86,7 @@ class AppDatabase(
 
     fun create() {
         state.value = Resource.Loading(this@AppDatabase)
-        mainScope.launch(Dispatchers.Default) {
+        mainScope.launch(Dispatchers.IO) {
             try {
                 createDb()
                 state.value = Resource.Loaded(this@AppDatabase)

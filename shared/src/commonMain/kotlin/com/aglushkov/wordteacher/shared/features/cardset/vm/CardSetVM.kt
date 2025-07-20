@@ -733,7 +733,7 @@ open class CardSetVMImpl(
         analytics.send(AnalyticEvent.createActionEvent("CardSet.addClicked"))
         viewModelScope.launch {
             cardSet.value.data()?.let {
-                launch(Dispatchers.Default) {
+                launch(Dispatchers.IO) {
                     val insertedCardSet = cardSetsRepository.insertCardSet(it)
                     cardSetRepository.loadAndObserveCardSet(insertedCardSet.id) {
                         state.update { CardSetVM.State.LocalCardSet(insertedCardSet.id) }

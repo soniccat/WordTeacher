@@ -18,7 +18,7 @@ class AppMetricaEngine(
     toggleRepositoryProvider: () -> ToggleRepository,
     spaceAuthRepository: SpaceAuthRepository,
 ): AnalyticEngine {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     override val type: AnalyticEngineType = AnalyticEngineType.AppMetrica
 
     init {

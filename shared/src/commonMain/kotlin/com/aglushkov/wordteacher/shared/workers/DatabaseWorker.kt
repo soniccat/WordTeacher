@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 class DatabaseWorker(
     val database: AppDatabase,
 ) {
-    private val serialQueue = SerialQueue(Dispatchers.Default)
+    private val serialQueue = SerialQueue(Dispatchers.IO)
 
     fun <T> read(task: (database: AppDatabase) -> T) {
         task(database)

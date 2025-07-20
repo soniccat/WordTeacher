@@ -52,7 +52,7 @@ class SpaceAuthRepository(
     }
 
     init {
-        mainScope.launch(Dispatchers.Default) {
+        mainScope.launch(Dispatchers.IO) {
             restore()?.let { authData ->
                 spaceAuthStateFlow.compareAndSet(Resource.Uninitialized(), Resource.Loaded(authData))
             }
@@ -167,7 +167,7 @@ class SpaceAuthRepository(
 
     private fun storeAuthDataIfNeeded(it: Resource<SpaceAuthData>) {
         it.asLoaded()?.data?.let { authData ->
-            mainScope.launch(Dispatchers.Default) {
+            mainScope.launch(Dispatchers.IO) {
                 store(authData)
             }
         }

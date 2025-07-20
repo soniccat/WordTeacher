@@ -32,7 +32,7 @@ class DictRepositoryImpl(
     private val dictFactory: DictFactory,
     private val fileSystem: FileSystem
 ) : DictRepository {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     override val dicts = MutableStateFlow<Resource<List<Dict>>>(Resource.Uninitialized())
     private var isImporting = MutableStateFlow(false)
 
@@ -100,7 +100,7 @@ class DictRepositoryImpl(
         }
 
         wordJob?.cancel()
-        wordJob = scope.launch(Dispatchers.Default) {
+        wordJob = scope.launch(Dispatchers.IO) {
             defineInternal(word).collect(wordStateFlow)
         }
 
@@ -138,7 +138,7 @@ class DictRepositoryImpl(
 
     override fun delete(path: Path) {
         val dict = dicts.value.data()?.firstOrNull { it.path == path } ?: return
-        scope.launch(Dispatchers.Default) {
+        scope.launch(Dispatchers.IO) {
             fileSystem.delete(dict.index.path)
             fileSystem.delete(dict.path)
             dicts.update { it.mapLoadedData { it.filter { it != dict } } }

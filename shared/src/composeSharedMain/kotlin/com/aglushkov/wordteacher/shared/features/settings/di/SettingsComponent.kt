@@ -18,7 +18,7 @@ import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Qualifier

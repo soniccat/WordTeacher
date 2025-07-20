@@ -156,7 +156,7 @@ class WordTeacherDictService (
     }
 
     suspend fun loadWords(words: List<String>): Response<WordTeacherDictWordsResponse> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             val terms = words.joinToString(",") { it.lowercase(Locale.getDefault()) }
             logger.logLoadingStarted(terms)
             val res: HttpResponse = httpClient.get("${baseUrl}/api/v3/dict/words", block = {
@@ -184,7 +184,7 @@ class WordTeacherDictService (
     }
 
     suspend fun textSearch(text: String): Response<WordTeacherDictTextSearchResponse> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             logger.logLoadingStarted(text)
             val res: HttpResponse = httpClient.get("${baseUrl}/api/v2/dict/words/textsearch/${text}")
             val responseString: String = res.body()

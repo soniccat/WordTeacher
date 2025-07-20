@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 class Analytics(
     private val engines: List<AnalyticEngine>
 ) {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     fun sendScreen(name: String) {
         send(AnalyticEvent.createScreenEvent(name))

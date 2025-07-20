@@ -10,7 +10,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
-import com.russhwolf.settings.coroutines.FlowSettings
+
 
 class LearningDecomposeComponent (
     initialState: LearningVM.State,

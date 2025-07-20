@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 class CardsRepository(
     private val database: AppDatabase
 ) {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val cards = database.cards.selectAllCards().asFlow().map {
         tryInResource(canTryAgain = true) { it.executeAsList() }
     }.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())

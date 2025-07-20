@@ -2,7 +2,7 @@ package com.aglushkov.wordteacher.shared.repository.deviceid
 
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.benasher44.uuid.uuid4
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -23,7 +23,7 @@ class DeviceIdRepository(
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     init {
-        mainScope.launch(Dispatchers.Default) {
+        mainScope.launch(Dispatchers.IO) {
             loadDeviceIdOrGenerateIfNeeded()
         }
     }

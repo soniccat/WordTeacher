@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.shared.repository.article
 
 import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.StringReader
 import com.aglushkov.wordteacher.shared.general.StringsReader
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
@@ -9,7 +8,6 @@ import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoaded
 import com.aglushkov.wordteacher.shared.general.resource.RESOURCE_UNDEFINED_PROGRESS
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgress
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
@@ -26,7 +24,7 @@ import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentenceProcessor
 import com.aglushkov.wordteacher.shared.model.nlp.split
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
-import com.russhwolf.settings.coroutines.FlowSettings
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -37,22 +35,12 @@ import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlin.math.max
 import kotlin.math.min
 
@@ -60,7 +48,7 @@ class ArticlesRepository(
     private val database: AppDatabase,
     private val nlpCore: NLPCore,
     private val nlpSentenceProcessor: NLPSentenceProcessor,
-    private val settings: SettingStore,
+    private val articleSettingsProvider: () -> SettingStore,
     private val timeSource: TimeSource,
     private val isDebug: Boolean,
 ) {
@@ -74,10 +62,11 @@ class ArticlesRepository(
     private var updateFirstVisibleItemMapJob: Job? = null
 
     init {
-        scope.launch(Dispatchers.Default) {
-            loadResource {
-                settings.serializable(FIRSTITEMINDEX_STATE_KEY) ?: emptyMap<Long, Int>()
-            }.collect(lastFirstVisibleItemMap)
+        scope.launch(Dispatchers.IO) {
+            val settings = articleSettingsProvider()
+            lastFirstVisibleItemMap.update {
+                Resource.Loaded(settings.serializable(FIRSTITEMINDEX_STATE_KEY) ?: emptyMap<Long, Int>())
+            }
 
             // listen changes to store
             lastFirstVisibleItemMap.collect {
@@ -89,7 +78,7 @@ class ArticlesRepository(
             }
         }
 
-        scope.launch(Dispatchers.Default) {
+        scope.launch(Dispatchers.IO) {
             database.articles.selectAllShortArticles().asFlow().collect {
                 val result = it.executeAsList()
                 Logger.v("ArticleRepository loaded ${result.size} articles")
@@ -99,7 +88,7 @@ class ArticlesRepository(
     }
 
     fun updateLastFirstVisibleItem(id: Long, itemIndex: Int) {
-        scope.launch(Dispatchers.Default) {
+        scope.launch(Dispatchers.IO) {
             lastFirstVisibleItemMap.waitUntilLoaded()
             lastFirstVisibleItemMap.value.onData { data ->
                 if (data[id] != itemIndex) {
@@ -111,7 +100,7 @@ class ArticlesRepository(
         }
     }
 
-    suspend fun createArticle(title: String, text: String, link: String?): Flow<Resource<Article>> {
+    fun createArticle(title: String, text: String, link: String?): Flow<Resource<Article>> {
         return flow {
             Logger.v("start", "tag_createArticle")
             emit(Resource.Loading(progress = RESOURCE_UNDEFINED_PROGRESS))
@@ -126,7 +115,7 @@ class ArticlesRepository(
     }
 
     suspend fun removeArticle(articleId: Long) = supervisorScope {
-        scope.async(Dispatchers.Default) {
+        scope.async(Dispatchers.IO) {
             removeArticleInternal(articleId)
         }.await()
     }
@@ -361,7 +350,7 @@ class ArticlesRepository(
             headers = headers
         )
         val progressChannel = Channel<Pair<Float, Article?>>(UNLIMITED)
-        scope.launch(Dispatchers.Default) {
+        scope.launch(Dispatchers.IO) {
             val article = database.transactionWithResult {
                 val articleId = database.articles.run {
                     insert(title, timeSource.timeInMilliseconds(), link, style)

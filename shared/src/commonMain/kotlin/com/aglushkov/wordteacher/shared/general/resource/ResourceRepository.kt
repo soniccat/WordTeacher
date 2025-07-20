@@ -21,7 +21,7 @@ interface ResourceRepository<T, A> {
 
 abstract class SimpleResourceRepository<T, A>(
     initialValue: Resource<T> = Resource.Uninitialized(),
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     private val canTryAgain: Boolean = true,
 ): ResourceRepository<T, A> {
     override val value: Resource<T>
@@ -59,7 +59,7 @@ abstract class SimpleResourceRepository<T, A>(
 }
 
 fun <T, A> buildSimpleResourceRepository(
-    scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
+    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     load: suspend (arg: A) -> T
 ): SimpleResourceRepository<T, A> {
     return object : SimpleResourceRepository<T,A>(
