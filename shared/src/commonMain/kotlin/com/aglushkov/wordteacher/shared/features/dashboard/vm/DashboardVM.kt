@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.dashboard.vm
 
+import androidx.datastore.preferences.core.Preferences
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict
@@ -19,6 +20,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.extensions.combine6
+import com.aglushkov.wordteacher.shared.general.extensions.combine7
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
@@ -30,6 +32,10 @@ import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.resource.onLoading
+import com.aglushkov.wordteacher.shared.general.settings.HintType
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.isHintShown
+import com.aglushkov.wordteacher.shared.general.settings.setHintShown
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.ShortArticle
@@ -71,6 +77,7 @@ interface DashboardVM: Clearable {
     fun onExpandClicked(item: DashboardExpandViewItem)
     fun onLinkClicked(link: String)
     fun onDashboardTryAgainClicked()
+    fun onHintClicked(hintType: HintType)
 
     interface Router {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
@@ -99,6 +106,7 @@ open class DashboardVMIMpl(
     private val idGenerator: IdGenerator,
     private val timeSource: TimeSource,
     private val analytics: Analytics,
+    private val settingsStore: SettingStore,
 ): ViewModel(), DashboardVM {
     override var router: DashboardVM.Router? = null
     private val stateFlow = MutableStateFlow<DashboardVM.State>(restoredState)
@@ -110,13 +118,14 @@ open class DashboardVMIMpl(
             spaceDashboardService.load().toOkResponse()
         }
 
-    override val viewItems = combine6(
+    override val viewItems = combine7(
         stateFlow,
         dashboardRepository.stateFlow,
         cardSetsRepository.cardSets,
         articlesRepository.shortArticles,
         readHeadlineRepository.stateFlow.map { it.data().orEmpty() },
         readCardSetRepository.stateFlow.map { it.data().orEmpty() },
+        settingsStore.prefs,
         ::buildViewItems,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Loading())
 
@@ -210,6 +219,10 @@ open class DashboardVMIMpl(
         loadDashboard()
     }
 
+    override fun onHintClicked(hintType: HintType) {
+        settingsStore.setHintShown(hintType)
+    }
+
     private fun buildViewItems(
         state: DashboardVM.State,
         dashboardRes: Resource<SpaceDashboardResponse>,
@@ -217,6 +230,7 @@ open class DashboardVMIMpl(
         articlesRes: Resource<List<ShortArticle>>,
         readHeadlineRepository: Set<String>,
         readCardSetRepository: Set<String>,
+        prefs: Preferences,
     ): Resource<List<BaseViewItem<*>>> {
         if (cardSetsRes.isLoading() && cardSetsRes.data() == null) {
             return Resource.Loading()
@@ -227,6 +241,10 @@ open class DashboardVMIMpl(
         }
 
         val resultList = mutableListOf<BaseViewItem<*>>()
+
+        if (!prefs.isHintShown(HintType.HintIntroduction)) {
+            resultList.add(HintViewItem(HintType.HintIntroduction))
+        }
 
         // ready to learn card sets
         cardSetsRes.data()?.filter {
@@ -275,6 +293,9 @@ open class DashboardVMIMpl(
                             ResourceStringDesc(MR.strings.dashboard_headline_title)
                         )
                     )
+                    if (!prefs.isHintShown(HintType.DashboardArticles)) {
+                        resultList.add(HintViewItem(HintType.DashboardArticles))
+                    }
                     resultList.add(
                         DashboardCategoriesViewItem(
                             categories = it.headlineBlock.categories.map { it.categoryName },

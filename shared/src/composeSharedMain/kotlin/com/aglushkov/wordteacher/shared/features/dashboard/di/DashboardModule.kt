@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -40,6 +41,7 @@ class DashboardModule {
         idGenerator: IdGenerator,
         timeSource: TimeSource,
         analytics: Analytics,
+        settingStore: SettingStore,
     ) = DashboardDecomposeComponent(
         componentContext,
         initialState,
@@ -52,5 +54,6 @@ class DashboardModule {
         idGenerator,
         timeSource,
         analytics,
+        settingStore,
     )
 }

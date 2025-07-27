@@ -47,15 +47,18 @@ import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardExpandVie
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardHeadlineViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardTryAgainViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewItem
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.toAnnotatedString
 import com.aglushkov.wordteacher.shared.general.views.CustomAnnotatedTextListItem
 import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
+import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.StartLearningButton
 import com.aglushkov.wordteacher.shared.res.MR
@@ -152,7 +155,6 @@ fun dashboardItem(
                     Text(categoryName)
                 }
             }
-
         }
     }
     is DashboardHeadlineViewItem -> {
@@ -240,6 +242,20 @@ fun dashboardItem(
         Box(Modifier.fillMaxWidth().padding(LocalDimens.current.contentPadding), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
+    }
+    is HintViewItem -> {
+        HintView(
+            Modifier.clickable { vm.onHintClicked(item.firstItem()) },
+            item.firstItem(),
+            contentPadding = PaddingValues(
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+                top = if (item.firstItem() == HintType.HintIntroduction)
+                    LocalDimens.current.contentPadding
+                else
+                    0.dp,
+            )
+        )
     }
     else -> {
         Text(

@@ -57,6 +57,8 @@ data class AppTypography(
     var settingsTitle: TextStyle = materialTypography.h5,
     var settingsText: TextStyle = materialTypography.body1,
     var wordFrequency: TextStyle = materialTypography.body2,
+
+    var hintStyle: TextStyle = materialTypography.subtitle1
 ) {
     @Composable
     fun initStylesFromResources(colors: Colors): AppTypography {
@@ -69,6 +71,10 @@ data class AppTypography(
         noteDate = wordDefinitionProvidedBy
         notePlaceholder = noteText.copy(color = colors.secondary)
         learningHint = materialTypography.body2.copy(color = colorResource(MR.colors.hintColor))
+
+        hintStyle = materialTypography.subtitle1.copy(
+            color = colors.onSurface
+        )
         return this
     }
 }
