@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsModul
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -57,4 +58,5 @@ interface DashboardDependencies {
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
     fun analytics(): Analytics
+    fun settingsStore(): SettingStore
 }

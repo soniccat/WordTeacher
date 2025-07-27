@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVMIMpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -31,6 +32,7 @@ class DashboardDecomposeComponent(
     idGenerator: IdGenerator,
     timeSource: TimeSource,
     analytics: Analytics,
+    settingStore: SettingStore,
 ) : DashboardVMIMpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -45,6 +47,7 @@ class DashboardDecomposeComponent(
     idGenerator,
     timeSource,
     analytics,
+    settingStore
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Dashboard"
 

@@ -26,3 +26,4 @@ fun DownloadForOfflineButton(
         tint = MaterialTheme.colors.secondary
     )
 }
+

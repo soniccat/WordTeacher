@@ -1,8 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.dashboard.vm
 
-import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem.HintType
 import com.aglushkov.wordteacher.shared.general.HtmlString
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.settings.HintType
 
 
 import dev.icerock.moko.resources.desc.StringDesc
@@ -56,21 +56,9 @@ class DashboardExpandViewItem(
 }
 
 class HintViewItem(
-    private val text: StringDesc,
     hintType: HintType,
-): BaseViewItem<HintViewItem.HintType>(hintType, Type) {
-    enum class HintType {
-        HintIntroduction,
-        ScreenIntroduction,
-        RemoteCardSetIntroduction,
-        ReadyToLearnIntroduction,
-    }
-
+): BaseViewItem<HintType>(hintType, Type) {
     companion object {
         const val Type = 1204
     }
 }
-
-//fun FlowSettings.isHintAvailable(hintType: HintType): Boolean {
-//    getBoolean()
-//}
