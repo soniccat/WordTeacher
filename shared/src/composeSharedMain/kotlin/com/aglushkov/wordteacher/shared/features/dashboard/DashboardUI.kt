@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticleTitleView
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetItemView
-import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetWithTotalProgressItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetSearchItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
@@ -64,7 +63,6 @@ import com.aglushkov.wordteacher.shared.general.views.StartLearningButton
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.desc.ResourceStringDesc
-import dev.icerock.moko.resources.compose.localized
 
 @Composable
 fun DashboardUI(
@@ -250,7 +248,7 @@ fun dashboardItem(
             contentPadding = PaddingValues(
                 start = LocalDimens.current.contentPadding,
                 end = LocalDimens.current.contentPadding,
-                top = if (item.firstItem() == HintType.HintIntroduction)
+                top = if (item.firstItem() == HintType.Introduction)
                     LocalDimens.current.contentPadding
                 else
                     0.dp,

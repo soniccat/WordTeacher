@@ -3,14 +3,11 @@ package com.aglushkov.wordteacher.shared.features.dashboard.vm
 import androidx.datastore.preferences.core.Preferences
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
-import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
-import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
-import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewItem
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
@@ -19,7 +16,6 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
-import com.aglushkov.wordteacher.shared.general.extensions.combine6
 import com.aglushkov.wordteacher.shared.general.extensions.combine7
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -30,14 +26,11 @@ import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepo
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onData
-import com.aglushkov.wordteacher.shared.general.resource.onError
-import com.aglushkov.wordteacher.shared.general.resource.onLoading
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
-import com.aglushkov.wordteacher.shared.general.settings.isHintShown
-import com.aglushkov.wordteacher.shared.general.settings.setHintShown
+import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
+import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.general.toOkResponse
-import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
@@ -56,7 +49,6 @@ import kotlinx.serialization.Serializable
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -220,7 +212,8 @@ open class DashboardVMIMpl(
     }
 
     override fun onHintClicked(hintType: HintType) {
-        settingsStore.setHintShown(hintType)
+        analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
+        settingsStore.setHintClosed(hintType)
     }
 
     private fun buildViewItems(
@@ -242,9 +235,12 @@ open class DashboardVMIMpl(
 
         val resultList = mutableListOf<BaseViewItem<*>>()
 
-        if (!prefs.isHintShown(HintType.HintIntroduction)) {
-            resultList.add(HintViewItem(HintType.HintIntroduction))
+        if (!prefs.isHintClosed(HintType.Introduction)) {
+            resultList.add(HintViewItem(HintType.Introduction))
         }
+
+        val wereInitialHintsClosed = prefs.isHintClosed(HintType.DashboardArticles) &&
+                prefs.isHintClosed(HintType.DashboardCardSets)
 
         // ready to learn card sets
         cardSetsRes.data()?.filter {
@@ -258,6 +254,9 @@ open class DashboardVMIMpl(
                         ResourceStringDesc(MR.strings.dashboard_ready_to_learn_cardsets_title)
                     )
                 )
+                if (wereInitialHintsClosed && !prefs.isHintClosed(HintType.DashboardUsersCardSets)) {
+                    resultList.add(HintViewItem(HintType.DashboardUsersCardSets))
+                }
                 cardSets.onEach { cardSet ->
                     resultList.add(
                         cardSetViewItem(cardSet)
@@ -277,6 +276,9 @@ open class DashboardVMIMpl(
                     ResourceStringDesc(MR.strings.dashboard_reading_articles)
                 )
             )
+            if (wereInitialHintsClosed && !prefs.isHintClosed(HintType.DashboardUsersArticles)) {
+                resultList.add(HintViewItem(HintType.DashboardUsersArticles))
+            }
             articles.onEach { article ->
                 resultList.add(
                     ArticleViewItem(article.id, article.name, timeSource.stringDate(article.date), article.isRead)
@@ -293,7 +295,7 @@ open class DashboardVMIMpl(
                             ResourceStringDesc(MR.strings.dashboard_headline_title)
                         )
                     )
-                    if (!prefs.isHintShown(HintType.DashboardArticles)) {
+                    if (!prefs.isHintClosed(HintType.DashboardArticles)) {
                         resultList.add(HintViewItem(HintType.DashboardArticles))
                     }
                     resultList.add(
@@ -336,6 +338,9 @@ open class DashboardVMIMpl(
                             ResourceStringDesc(MR.strings.dashboard_cardsets_title)
                         )
                     )
+                    if (!prefs.isHintClosed(HintType.DashboardCardSets)) {
+                        resultList.add(HintViewItem(HintType.DashboardCardSets))
+                    }
                     val resultCardSets = if (state.isCardSetBlockExpanded) {
                         it.newCardSetBlock.cardSets
                     } else {

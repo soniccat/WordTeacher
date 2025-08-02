@@ -2,27 +2,30 @@ package com.aglushkov.wordteacher.shared.general.settings
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 
 enum class HintType {
-    HintIntroduction,
+    Introduction,
     DashboardArticles,
     DashboardCardSets,
     DashboardUsersArticles,
-    DashboardUsersCardSets;
+    DashboardUsersCardSets,
+    Articles,
+    AddArticle,
+    Article,
+    CardSets;
 
     override fun toString() = this.ordinal.toString()
 }
 
-fun Preferences.isHintShown(hintType: HintType): Boolean {
+fun Preferences.isHintClosed(hintType: HintType): Boolean {
     return boolean(hintName(hintType), false)
 }
 
-fun SettingStore.setHintShown(hintType: HintType) {
+fun SettingStore.setHintClosed(hintType: HintType) {
     this[hintName(hintType)] = true
 }
 
-fun DataStore<Preferences>.setHintShown(hintType: HintType) {
+fun DataStore<Preferences>.setHintClosed(hintType: HintType) {
     this[hintName(hintType)] = true
 }
 
