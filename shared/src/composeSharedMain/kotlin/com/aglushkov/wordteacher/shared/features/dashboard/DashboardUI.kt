@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -34,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.articles.views.ArticleTitleView
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
@@ -120,11 +122,23 @@ fun dashboardItem(
         },
         item,
         trailing = {
-            StartLearningButton(
-                modifier = Modifier.clickable {
-                    vm.onCardSetStartLearningClicked(item)
-                }
-            )
+            val side = 40.dp
+            Box(
+                modifier = Modifier.size(side, side)
+            ) {
+                CircularProgressIndicator(
+                    progress = 1.0f,
+                    color = Color.LightGray.copy(alpha = 0.2f)
+                )
+                CircularProgressIndicator(
+                    progress = item.totalProgress,
+                )
+                StartLearningButton(
+                    modifier = Modifier.clickable {
+                        vm.onCardSetStartLearningClicked(item)
+                    }
+                )
+            }
         }
     )
     is ArticleViewItem -> ArticleTitleView(

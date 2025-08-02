@@ -105,7 +105,7 @@ fun HintType.toAttributedString(): AnnotatedString {
         HintType.DashboardUsersCardSets -> buildAnnotatedString {
             append("Below are the card sets you've chosen to learn. Mastering them takes time, so tap ")
             appendInlineContent(DashboardCardsets_Learn, "[Plus]")
-            append(" regularly to continue your progress.")
+            append(" regularly to improve your progress.")
         }
         HintType.Articles -> buildAnnotatedString {
             append("Here you'll find your saved articles, with the most recent ones at the top. Press ")
