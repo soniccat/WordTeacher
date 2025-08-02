@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.CardSetsDecomposeCompo
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -37,4 +38,5 @@ interface CardSetsDependencies {
     fun cardSetsFeatures(): CardSetsVM.Features
     fun appDatabase(): AppDatabase
     fun analytics(): Analytics
+    fun settingsStore(): SettingStore
 }

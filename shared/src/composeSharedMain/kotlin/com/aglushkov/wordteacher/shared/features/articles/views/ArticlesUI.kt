@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.articles.views
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,12 +9,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
+import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.views.CustomAnnotatedTextListItem
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
+import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
@@ -93,6 +99,13 @@ private fun ArticlesViewItem(
         onClick = { vm.onArticleClicked(item) },
         onDeleted = { vm.onArticleRemoved(item) }
     )
+    is HintViewItem -> {
+        HintView(
+            Modifier.clickable { vm.onHintClicked(item.firstItem()) },
+            item.firstItem(),
+            contentPadding = PaddingValues(LocalDimens.current.contentPadding)
+        )
+    }
     else -> {
         Text(
             text = "unknown item $item"

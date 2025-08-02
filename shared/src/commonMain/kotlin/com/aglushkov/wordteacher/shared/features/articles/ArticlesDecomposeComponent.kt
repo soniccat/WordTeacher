@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
@@ -15,12 +16,14 @@ class ArticlesDecomposeComponent (
     articlesRepository: ArticlesRepository,
     idGenerator: IdGenerator,
     timeSource: TimeSource,
-    analytics: Analytics
+    analytics: Analytics,
+    settingStore: SettingStore,
 ) : ArticlesVMImpl(
     articlesRepository,
     idGenerator,
     timeSource,
     analytics,
+    settingStore,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Articles"
 

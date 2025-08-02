@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecompose
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticleParserRepository
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -24,6 +25,7 @@ class AddArticleComposeModule {
         cardSetsRepository: CardSetsRepository,
         timeSource: TimeSource,
         analytics: Analytics,
+        settingStore: SettingStore,
     ): AddArticleDecomposeComponent {
         return AddArticleDecomposeComponent(
             componentContext,
@@ -33,6 +35,7 @@ class AddArticleComposeModule {
             timeSource,
             analytics,
             state,
+            settingStore,
         )
     }
 }

@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.articles.ArticlesDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
@@ -29,4 +30,5 @@ interface ArticlesDependencies {
     fun idGenerator(): IdGenerator
     fun timeSource(): TimeSource
     fun analytics(): Analytics
+    fun settingsStore(): SettingStore
 }

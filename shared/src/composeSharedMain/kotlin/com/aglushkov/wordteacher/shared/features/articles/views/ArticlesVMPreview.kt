@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesRouter
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticlesVM
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.settings.HintType
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class ArticlesVMPreview(
@@ -27,4 +28,6 @@ class ArticlesVMPreview(
     }
 
     override fun onTryAgainClicked() {}
+
+    override fun onHintClicked(hintType: HintType) {}
 }

@@ -18,6 +18,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.SectionViewItem
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.general.BackHandler
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
@@ -212,25 +213,22 @@ private fun CardSetsViewItem(
             top = if (item.isTop) 0.dp else 16.dp
         )
     )
-//        Text(
-//        item.name.localized(),
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(
-//                top = if (item.isTop) 0.dp else 16.dp
-//            )
-//            .background(color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
-//            .padding(
-//                start = LocalDimens.current.contentPadding,
-//                end = LocalDimens.current.contentPadding
-//            ),
-//        style = LocalAppTypography.current.wordDefinitionSubHeader
-//    )
     is CardSetViewItem -> CardSetWithTotalProgressItemView(
         item,
         onClick = { vm.onCardSetClicked(item) },
         onDeleted = { vm.onCardSetRemoved(item) }
     )
+    is HintViewItem -> {
+        HintView(
+            Modifier.clickable { vm.onHintClicked(item.firstItem()) },
+            item.firstItem(),
+            contentPadding = PaddingValues(
+                top = LocalDimens.current.contentPadding,
+                start = LocalDimens.current.contentPadding,
+                end = LocalDimens.current.contentPadding,
+            )
+        )
+    }
     else -> {
         Text(
             text = "unknown item $item"

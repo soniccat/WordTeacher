@@ -1,8 +1,10 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
+import androidx.datastore.preferences.core.Preferences
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -13,13 +15,16 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.settings.HintType
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
+import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.ResourceFormatted
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -47,6 +52,7 @@ interface CardSetsVM: Clearable {
     fun onSearchCardSetClicked(item: RemoteCardSetViewItem)
     fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem)
     fun onJsonImportClicked()
+    fun onHintClicked(hintType: HintType)
 
     @Serializable
     data class State(
@@ -77,6 +83,7 @@ open class CardSetsVMImpl(
     private val idGenerator: IdGenerator,
     override val availableFeatures: CardSetsVM.Features,
     private val analytics: Analytics,
+    private val settingStore: SettingStore,
 ): ViewModel(), CardSetsVM {
     override var router: CardSetsRouter? = null
     final override val state: CardSetsVM.State
@@ -89,9 +96,12 @@ open class CardSetsVMImpl(
         )
     )
 
-    override val cardSets = cardSetsRepository.cardSets.map {
-        it.mapLoadedData {
-            buildViewItems(it, uiStateFlow.value.newCardSetText)
+    override val cardSets = combine(
+        cardSetsRepository.cardSets,
+        settingStore.prefs,
+    ) { cardSets, prefs ->
+        cardSets.mapLoadedData {
+            buildViewItems(it, uiStateFlow.value.newCardSetText, prefs)
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
@@ -159,7 +169,11 @@ open class CardSetsVMImpl(
         DONE,
     }
 
-    private fun buildViewItems(cardSets: List<ShortCardSet>, newCardSetText: String?): List<BaseViewItem<*>> {
+    private fun buildViewItems(
+        cardSets: List<ShortCardSet>,
+        newCardSetText: String?,
+        prefs: Preferences,
+    ): List<BaseViewItem<*>> {
         val groups = cardSets.groupBy {
             if (it.totalProgress < 1.0) {
                 if (it.readyToLearnProgress < 1.0) {
@@ -177,6 +191,9 @@ open class CardSetsVMImpl(
             SectionType.DONE to StringDesc.Resource(MR.strings.cardsets_section_done),
         )
         val resultList = mutableListOf<BaseViewItem<*>>()
+        if (!prefs.isHintClosed(HintType.CardSets)) {
+            resultList.add(HintViewItem(HintType.CardSets))
+        }
         resultList += CreateCardSetViewItem(
             placeholder = StringDesc.Resource(MR.strings.cardsets_create_cardset),
             text = newCardSetText.orEmpty()
@@ -284,5 +301,10 @@ open class CardSetsVMImpl(
 
     override fun onJsonImportClicked() {
         router?.openJsonImport()
+    }
+
+    override fun onHintClicked(hintType: HintType) {
+        analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
+        settingStore.setHintClosed(hintType)
     }
 }

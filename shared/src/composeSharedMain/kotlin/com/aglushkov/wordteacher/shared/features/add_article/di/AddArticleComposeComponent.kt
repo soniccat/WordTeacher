@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecompose
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.add_article.vm.ArticleContentExtractor
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.arkivanov.decompose.ComponentContext
@@ -31,4 +32,5 @@ interface AddArticleDependencies {
     fun timeSource(): TimeSource
     fun contentExtractors(): Array<ArticleContentExtractor>
     fun analytics(): Analytics
+    fun settingStore(): SettingStore
 }

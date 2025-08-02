@@ -1,8 +1,10 @@
 package com.aglushkov.wordteacher.shared.features.articles.vm
 
+import androidx.datastore.preferences.core.Preferences
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
@@ -10,12 +12,13 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.exception
-import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.getErrorString
-import com.aglushkov.wordteacher.shared.general.v
+import com.aglushkov.wordteacher.shared.general.settings.HintType
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
+import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -35,6 +38,7 @@ interface ArticlesVM {
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
     fun onTryAgainClicked()
+    fun onHintClicked(hintType: HintType)
 
     @Serializable
     class State {
@@ -46,12 +50,13 @@ open class ArticlesVMImpl(
     private val idGenerator: IdGenerator,
     private val timeSource: TimeSource,
     private val analytics: Analytics,
+    private val settingStore: SettingStore,
 ): ViewModel(), ArticlesVM {
     override var router: ArticlesRouter? = null
 
-    override val articles = articlesRepository.shortArticles.map {
+    override val articles = combine(articlesRepository.shortArticles, settingStore.prefs) { articles, prefs ->
         //Logger.v("build view items")
-        it.copyWith(buildViewItems(it.data() ?: emptyList()))
+        articles.copyWith(buildViewItems(articles.data() ?: emptyList(), prefs))
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     override fun onCreateTextArticleClicked() {
@@ -82,8 +87,12 @@ open class ArticlesVMImpl(
         }
     }
 
-    private fun buildViewItems(articles: List<ShortArticle>): List<BaseViewItem<*>> {
+    private fun buildViewItems(articles: List<ShortArticle>, prefs: Preferences,): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
+        if (!prefs.isHintClosed(HintType.Articles)) {
+            items.add(HintViewItem(HintType.Articles))
+        }
+
         articles.forEach {
             items.add(ArticleViewItem(it.id, it.name, timeSource.stringDate(it.date), it.isRead))
         }
@@ -103,5 +112,10 @@ open class ArticlesVMImpl(
     override fun onTryAgainClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Articles.onTryAgainClicked"))
         // TODO: do sth with articlesRepository
+    }
+
+    override fun onHintClicked(hintType: HintType) {
+        analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
+        settingStore.setHintClosed(hintType)
     }
 }

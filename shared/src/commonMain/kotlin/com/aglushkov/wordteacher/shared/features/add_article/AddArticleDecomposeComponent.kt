@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecompo
 import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent.Companion
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.arkivanov.decompose.ComponentContext
@@ -25,6 +26,7 @@ class AddArticleDecomposeComponent(
     timeSource: TimeSource,
     analytics: Analytics,
     private val initialState: AddArticleVM.State,
+    settingStore: SettingStore,
 ): AddArticleVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -35,6 +37,7 @@ class AddArticleDecomposeComponent(
     cardSetsRepository,
     timeSource,
     analytics,
+    settingStore,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_AddArticle"
 

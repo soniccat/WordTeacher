@@ -63,6 +63,7 @@ import com.aglushkov.wordteacher.shared.general.views.StartLearningButton
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.desc.ResourceStringDesc
+import dev.icerock.moko.resources.compose.localized
 
 @Composable
 fun DashboardUI(

@@ -33,6 +33,8 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.settings.HintType
+import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.OutlinedTextFieldWithError
 import dev.icerock.moko.resources.compose.localized
@@ -158,6 +160,15 @@ private fun AddArticlesFieldsUI(
                     bottom = 88.dp,
                 )
         ) {
+            val visibleHintType = data.visibleHintType
+            if (visibleHintType != null) {
+                HintView(
+                    Modifier.clickable { vm.onHintClicked(visibleHintType) },
+                    visibleHintType,
+                    contentPadding = PaddingValues(LocalDimens.current.contentPadding)
+                )
+            }
+
             OutlinedTextFieldWithError(
                 value = titleState,
                 onValueChange = {

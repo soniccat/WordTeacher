@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.add_article.vm
 
+import androidx.datastore.preferences.core.Preferences
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.*
@@ -12,6 +13,11 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.resource.onError
+import com.aglushkov.wordteacher.shared.general.settings.HintType
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.hintName
+import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
+import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
@@ -46,6 +52,7 @@ interface AddArticleVM: Clearable {
     fun onNeedToCreateSetPressed()
     fun onTryAgainPressed()
     fun getErrorText(): StringDesc?
+    fun onHintClicked(hintType: HintType)
 
     @Serializable
     data class State(
@@ -53,7 +60,7 @@ interface AddArticleVM: Clearable {
         val text: String? = null,
         val uri: String? = null,
         val needToCreateSet: Boolean = true,
-        val showNeedToCreateCardSet: Boolean = true,
+        val showNeedToCreateCardSet: Boolean = true
     )
 
     data class UIState(
@@ -62,8 +69,16 @@ interface AddArticleVM: Clearable {
         val text: String,
         val needToCreateSet: Boolean,
         val showNeedToCreateCardSet: Boolean = true,
-        val contentUri: String? = null
-    )
+        val contentUri: String? = null,
+        val canShowHint: Boolean = false
+    ) {
+        val visibleHintType: HintType?
+            get() {
+                return if (canShowHint && title.isEmpty() && text.isEmpty()) {
+                    HintType.AddArticle
+                } else null
+            }
+    }
 }
 
 open class AddArticleVMImpl(
@@ -73,6 +88,7 @@ open class AddArticleVMImpl(
     private val cardSetsRepository: CardSetsRepository,
     private val timeSource: TimeSource,
     private val analytics: Analytics,
+    private val settingStore: SettingStore,
 ): ViewModel(), AddArticleVM {
 
     override var router: AddArticleRouter? = null
@@ -88,12 +104,25 @@ open class AddArticleVMImpl(
             text = state.text.orEmpty(),
             needToCreateSet = state.needToCreateSet,
             showNeedToCreateCardSet = state.showNeedToCreateCardSet,
+            canShowHint = !settingStore.isHintClosed(HintType.AddArticle),
         )
 
         state.uri?.let { uri ->
             extractContent(uri, dataFromState)
         } ?: run {
             uiStateFlow.update { it.toLoaded(dataFromState) }
+        }
+
+        viewModelScope.launch {
+            settingStore.prefs.collect { prefs ->
+                uiStateFlow.update {
+                    it.mapLoadedData {
+                        it.copy(
+                            canShowHint = !settingStore.isHintClosed(HintType.AddArticle)
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -222,6 +251,11 @@ open class AddArticleVMImpl(
 
     override fun getErrorText(): StringDesc? {
         return StringDesc.Resource(MR.strings.article_error)
+    }
+
+    override fun onHintClicked(hintType: HintType) {
+        analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
+        settingStore.setHintClosed(hintType)
     }
 }
 

@@ -98,7 +98,7 @@ open class DashboardVMIMpl(
     private val idGenerator: IdGenerator,
     private val timeSource: TimeSource,
     private val analytics: Analytics,
-    private val settingsStore: SettingStore,
+    private val settingStore: SettingStore,
 ): ViewModel(), DashboardVM {
     override var router: DashboardVM.Router? = null
     private val stateFlow = MutableStateFlow<DashboardVM.State>(restoredState)
@@ -117,7 +117,7 @@ open class DashboardVMIMpl(
         articlesRepository.shortArticles,
         readHeadlineRepository.stateFlow.map { it.data().orEmpty() },
         readCardSetRepository.stateFlow.map { it.data().orEmpty() },
-        settingsStore.prefs,
+        settingStore.prefs,
         ::buildViewItems,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Loading())
 
@@ -213,7 +213,7 @@ open class DashboardVMIMpl(
 
     override fun onHintClicked(hintType: HintType) {
         analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
-        settingsStore.setHintClosed(hintType)
+        settingStore.setHintClosed(hintType)
     }
 
     private fun buildViewItems(
