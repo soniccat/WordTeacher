@@ -61,11 +61,12 @@ fun LearningUIDialog(
     CustomDialogUI(
         onDismissRequest = { vm.onClosePressed() }
     ) {
-        val playSoundOnTypingCompletion by vm.playSoundOnTypingCompletion.collectAsState()
+        val playSoundOnChallengeCompletion by vm.playSoundOnChallengeCompletion.collectAsState()
         val challengeState by vm.challengeState.collectAsState()
         val needShowSoundIcon by remember(challengeState) {
             derivedStateOf {
-                challengeState.data() is LearningVM.Challenge.Type
+                challengeState.data() is LearningVM.Challenge.Type ||
+                        challengeState.data() is LearningVM.Challenge.Test
             }
         }
 
@@ -75,11 +76,11 @@ fun LearningUIDialog(
             actions = {
                 if (needShowSoundIcon) {
                     IconButton(
-                        onClick = { vm.onPlaySoundOnTypingCompletionClicked() }
+                        onClick = { vm.onPlaySoundOnChallengeCompletionClicked() }
                     ) {
                         Icon(
                             painter = dev.icerock.moko.resources.compose.painterResource(
-                                if (playSoundOnTypingCompletion) {
+                                if (playSoundOnChallengeCompletion) {
                                     MR.images.audio_24
                                 } else {
                                     MR.images.audio_muted_24

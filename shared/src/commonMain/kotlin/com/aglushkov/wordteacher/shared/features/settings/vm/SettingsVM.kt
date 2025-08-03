@@ -18,6 +18,7 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.downgradeToErrorOrLoading
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.resetHint
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
@@ -55,6 +56,7 @@ interface SettingsVM: Clearable {
     fun onLogFileShareClicked(path: Path)
     fun onEmailClicked()
     fun onPrivacyPolicyClicked()
+    fun onResetHintsClicked()
 
     // Created to use in future
     @Serializable
@@ -82,7 +84,7 @@ open class SettingsVMImpl (
     private val emailOpener: EmailOpener,
     private val webLinkOpener: WebLinkOpener,
     private val databaseCardWorker: DatabaseCardWorker,
-    private val settings: SettingStore,
+    private val settingStore: SettingStore,
 ): ViewModel(), SettingsVM {
 
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -153,6 +155,10 @@ open class SettingsVMImpl (
                 emptyList()
             }
         )
+
+        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_hints_title))
+        resultItems += SettingsResetHintsItem(StringDesc.Resource(MR.strings.settings_hints_reset))
+
         resultItems += SettingsPrivacyPolicyItem()
         resultItems += SettingsAbout(
             appTitle = appInfo.getAppInfo(),
@@ -222,5 +228,9 @@ open class SettingsVMImpl (
 
     override fun onPrivacyPolicyClicked() {
         webLinkOpener.open(appInfo.privacyPolicyUrl)
+    }
+
+    override fun onResetHintsClicked() {
+        settingStore.resetHint()
     }
 }

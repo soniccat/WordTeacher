@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.general.settings
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -77,6 +78,14 @@ class SettingStore(
 
     fun <T> serializable(key: String, strategy: DeserializationStrategy<T>): T? =
         prefs.value.serializable(key, strategy)
+
+    fun edit(
+        transform: suspend (MutablePreferences) -> Unit
+    ) {
+        settingScope.launch {
+            dataStore.edit(transform)
+        }
+    }
 }
 
 inline fun <reified T> SettingStore.setSerializable(key: String, value: T)  {

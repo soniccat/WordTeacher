@@ -101,3 +101,11 @@ class SettingsPrivacyPolicyItem(
         const val Type = 1011
     }
 }
+
+class SettingsResetHintsItem(
+    text: StringDesc,
+): BaseViewItem<StringDesc>(text, Type) {
+    companion object {
+        const val Type = 1012
+    }
+}

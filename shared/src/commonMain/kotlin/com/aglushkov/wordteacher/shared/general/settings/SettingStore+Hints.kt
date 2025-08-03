@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.general.settings
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 
 enum class HintType {
     Introduction,
@@ -31,6 +32,14 @@ fun SettingStore.setHintClosed(hintType: HintType) {
 
 fun DataStore<Preferences>.setHintClosed(hintType: HintType) {
     this[hintName(hintType)] = true
+}
+
+fun SettingStore.resetHint() {
+    edit { prefs ->
+        HintType.entries.toTypedArray().onEach { v ->
+            prefs[booleanPreferencesKey(hintName(v))] = false
+        }
+    }
 }
 
 fun hintName(hintType: HintType) = "hint_$hintType"

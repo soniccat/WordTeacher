@@ -18,21 +18,15 @@ import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.extensions.addElements
-import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoaded
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepository
-import com.aglushkov.wordteacher.shared.general.resource.isLoaded
-import com.aglushkov.wordteacher.shared.general.resource.loadResource
-import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
-import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import dev.icerock.moko.graphics.Color
@@ -40,9 +34,7 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.internal.NamedCompanion
 
 interface LearningVM: Clearable {
     var router: LearningRouter?
@@ -51,7 +43,7 @@ interface LearningVM: Clearable {
     val titleErrorFlow: StateFlow<StringDesc?>
     val canShowHint: StateFlow<Boolean>
     val hintString: StateFlow<List<Char>>
-    val playSoundOnTypingCompletion: StateFlow<Boolean>
+    val playSoundOnChallengeCompletion: StateFlow<Boolean>
 
     fun onMatchTermPressed(matchRow: Challenge.MatchRow)
     fun onMatchExamplePressed(matchRow: Challenge.MatchRow)
@@ -66,7 +58,7 @@ interface LearningVM: Clearable {
     fun onOpenDefinitionsClicked()
     fun onClosePressed()
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
-    fun onPlaySoundOnTypingCompletionClicked()
+    fun onPlaySoundOnChallengeCompletionClicked()
 
     fun save(): State
     fun getErrorText(res: Resource<*>): StringDesc?
@@ -156,8 +148,8 @@ open class LearningVMImpl(
     override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
     override val canShowHint = MutableStateFlow(true)
     override val hintString = MutableStateFlow(listOf<Char>())
-    override val playSoundOnTypingCompletion = MutableStateFlow(
-        settings.boolean(SETTING_PLAY_SOUND_ON_TYPING_COMPLETION, true)
+    override val playSoundOnChallengeCompletion = MutableStateFlow(
+        settings.boolean(SETTING_PLAY_SOUND_ON_CHALLENGE_COMPLETION, true)
     )
     private val matchColorMap: MutableMap<Int, Int> = mutableMapOf() // selection group to color index from MatchColors
 
@@ -186,8 +178,8 @@ open class LearningVMImpl(
 
         // update settings
         viewModelScope.launch {
-            playSoundOnTypingCompletion.onEach {
-                settings[SETTING_PLAY_SOUND_ON_TYPING_COMPLETION] = it
+            playSoundOnChallengeCompletion.onEach {
+                settings[SETTING_PLAY_SOUND_ON_CHALLENGE_COMPLETION] = it
             }.collect()
         }
     }
@@ -249,10 +241,22 @@ open class LearningVMImpl(
                     analytics.send(AnalyticEvent.createActionEvent("Learning.session.match.completed"))
                 }
 
+                var prevAudioFile: WordTeacherWord.AudioFile? = null
+                val playPrevAudioFile = {
+                    prevAudioFile?.let {
+                        if (playSoundOnChallengeCompletion.value) {
+                            audioService.play(it.url)
+                        }
+                    }
+                    prevAudioFile = null
+                }
+
                 // test session
                 if (testCards != null) {
                     analytics.send(AnalyticEvent.createActionEvent("Learning.session.test.started"))
                     testCards.collectIndexed { index, testCard ->
+                        playPrevAudioFile()
+                        prevAudioFile = testCard.card.audioFiles.firstOrNull()
                         challengeState.update {
                             Resource.Loaded(
                                 LearningVM.Challenge.Test(
@@ -269,17 +273,10 @@ open class LearningVMImpl(
                     }
                     analytics.send(AnalyticEvent.createActionEvent("Learning.session.test.completed"))
                 }
+                playPrevAudioFile()
 
                 // type session
                 analytics.send(AnalyticEvent.createActionEvent("Learning.session.typing.started"))
-                var prevAudioFile: WordTeacherWord.AudioFile? = null
-                val playPrevAudioFile = {
-                    prevAudioFile?.let {
-                        if (playSoundOnTypingCompletion.value) {
-                            audioService.play(it.url)
-                        }
-                    }
-                }
                 sessionCards.collectIndexed { index, card ->
                     playPrevAudioFile()
                     prevAudioFile = card.audioFiles.firstOrNull()
@@ -507,9 +504,9 @@ open class LearningVMImpl(
         }
     }
 
-    override fun onPlaySoundOnTypingCompletionClicked() {
+    override fun onPlaySoundOnChallengeCompletionClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Learning.onPlaySoundOnTypingCompletionClicked"))
-        playSoundOnTypingCompletion.update { !it }
+        playSoundOnChallengeCompletion.update { !it }
     }
 
     override fun onOpenDefinitionsClicked() {
@@ -541,4 +538,4 @@ private val MatchColors = listOf(
     Color(0x5F5D5DFF),
 )
 
-private const val SETTING_PLAY_SOUND_ON_TYPING_COMPLETION = "playSoundOnTypingCompletion"
+private const val SETTING_PLAY_SOUND_ON_CHALLENGE_COMPLETION = "playSoundOnTypingCompletion"

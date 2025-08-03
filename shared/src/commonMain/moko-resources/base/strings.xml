@@ -130,6 +130,8 @@
     <string name="settings_logging_title">Logging</string>
     <string name="settings_logging_enabled">Enable logging</string>
     <string name="settings_logging_share">Share log</string>
+    <string name="settings_hints_title">Hints</string>
+    <string name="settings_hints_reset">Show hints again</string>
     <string name="settings_open_privacy_policy">Open Privacy Policy</string>
 
     <string name="dictconfigs_online_section_title">Online dictionaries</string>

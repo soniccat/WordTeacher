@@ -159,6 +159,14 @@ private fun showSettingsItem(
             Text(text = item.firstItem().localized())
         }
     }
+    is SettingsResetHintsItem -> {
+        Button(
+            onClick = { vm.onResetHintsClicked() },
+            modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
+        ) {
+            Text(text = item.firstItem().localized())
+        }
+    }
     is SettingsLogsConfigsItem -> {
         CustomListItem(
             modifier = Modifier
@@ -216,11 +224,7 @@ private fun showSettingsItem(
                 .clickable {
                     vm.onPrivacyPolicyClicked()
                 },
-            contentPadding = PaddingValues(
-                start = LocalDimens.current.contentPadding,
-                end = LocalDimens.current.contentPadding,
-                bottom = LocalDimens.current.contentPadding
-            ),
+            contentPadding = PaddingValues(LocalDimens.current.contentPadding),
             content = {
                 Text(stringResource(MR.strings.settings_open_privacy_policy))
             },
