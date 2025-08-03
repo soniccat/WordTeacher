@@ -216,6 +216,7 @@ private fun CardSetsViewItem(
     is CardSetViewItem -> CardSetWithTotalProgressItemView(
         item,
         onClick = { vm.onCardSetClicked(item) },
+        onStartLearningClick = { vm.onCardSetStartLearningClicked(item) },
         onDeleted = { vm.onCardSetRemoved(item) }
     )
     is HintViewItem -> {
@@ -236,11 +237,11 @@ private fun CardSetsViewItem(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CardSetWithTotalProgressItemView(
     item: CardSetViewItem,
     onClick: () -> Unit = {},
+    onStartLearningClick: () -> Unit = {},
     onDeleted: () -> Unit = {}
 ) {
     DeletableCell(
@@ -252,7 +253,8 @@ fun CardSetWithTotalProgressItemView(
     ) {
         CardSetWithTotalProgressItemView(
             Modifier,
-            item
+            item,
+            onStartLearningClick,
         )
     }
 }
@@ -261,20 +263,30 @@ fun CardSetWithTotalProgressItemView(
 fun CardSetWithTotalProgressItemView(
     modifier: Modifier = Modifier,
     item: CardSetViewItem,
+    onStartLearningClick: () -> Unit = {},
 ) {
     CardSetItemView(
         modifier = modifier,
         item = item,
         trailing = {
-            val side = 30.dp
+            val side = 40.dp
             Box(
                 modifier = Modifier.size(side, side)
             ) {
                 CircularProgressIndicator(
                     progress = 1.0f,
+                    modifier = Modifier.padding(5.dp),
                     color = Color.LightGray.copy(alpha = 0.2f)
                 )
-                CircularProgressIndicator(progress = item.totalProgress)
+                CircularProgressIndicator(
+                    progress = item.totalProgress,
+                    modifier = Modifier.padding(5.dp),
+                )
+                StartLearningButton(
+                    modifier = Modifier.clickable {
+                        onStartLearningClick()
+                    }
+                )
             }
         }
     )

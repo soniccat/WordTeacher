@@ -107,6 +107,7 @@
     <string name="articles_error">Something went wrong :(</string>
     <string name="article_error">Something went wrong :(</string>
     <string name="article_empty">There\'s an empty article</string>
+    <string name="article_side_sheet_title">Text highlighting settings</string>
     <string name="article_side_sheet_selection_dicts">Dictionaries</string>
     <string name="article_side_sheet_selection_filter_dict_single_word_entries">Filter single word entries</string>
     <string name="article_side_sheet_selection_phrases">Phrases</string>

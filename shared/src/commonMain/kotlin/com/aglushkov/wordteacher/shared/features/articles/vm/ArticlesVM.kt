@@ -87,7 +87,7 @@ open class ArticlesVMImpl(
         }
     }
 
-    private fun buildViewItems(articles: List<ShortArticle>, prefs: Preferences,): List<BaseViewItem<*>> {
+    private fun buildViewItems(articles: List<ShortArticle>, prefs: Preferences): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
         if (!prefs.isHintClosed(HintType.Articles)) {
             items.add(HintViewItem(HintType.Articles))

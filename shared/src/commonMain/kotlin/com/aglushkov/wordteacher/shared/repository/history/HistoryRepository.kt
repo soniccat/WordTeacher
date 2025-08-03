@@ -49,8 +49,13 @@ open class HistoryRepository(
 
     fun put(word: String) {
         stateFlow.updateLoadedData { words ->
-            val newList = (listOf(word) + words.filter { it != word }).take(limit)
+            val newList = words.filter { it != word }.take(limit-1)
             LinkedHashSet(newList)
+        }
+        // TODO: hack to call updateLoadedData twice just to pass equal check
+        // otherwise LinkedHashSet(newList) equal to LinkedHashSet(words) if word already exist
+        stateFlow.updateLoadedData {
+            LinkedHashSet(listOf(word) + it)
         }
         queue.sendWithDelay("put", 1000) {
             save()

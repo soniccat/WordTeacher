@@ -128,10 +128,12 @@ fun dashboardItem(
             ) {
                 CircularProgressIndicator(
                     progress = 1.0f,
+                    modifier = Modifier.padding(5.dp),
                     color = Color.LightGray.copy(alpha = 0.2f)
                 )
                 CircularProgressIndicator(
                     progress = item.totalProgress,
+                    modifier = Modifier.padding(5.dp),
                 )
                 StartLearningButton(
                     modifier = Modifier.clickable {

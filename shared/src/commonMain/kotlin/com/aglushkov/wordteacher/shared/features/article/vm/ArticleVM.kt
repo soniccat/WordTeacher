@@ -1,8 +1,10 @@
 package com.aglushkov.wordteacher.shared.features.article.vm
 
+import androidx.datastore.preferences.core.Preferences
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsContext
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsWordContext
@@ -13,8 +15,11 @@ import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.onData
+import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
 import com.aglushkov.wordteacher.shared.general.settings.serializable
+import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.general.settings.setSerializable
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.ArticleStyle
@@ -62,6 +67,7 @@ interface ArticleVM: Clearable {
     fun onFirstItemIndexChanged(index: Int)
     fun onWordDefinitionShown()
     fun onMarkAsReadUnreadClicked()
+    fun onHintClicked(hintType: HintType)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
 
@@ -155,7 +161,7 @@ open class ArticleVMImpl(
     private val cardsRepository: CardsRepository,
     private val dictRepository: DictRepository,
     private val idGenerator: IdGenerator,
-    settings: SettingStore,
+    private val settingStore: SettingStore,
     private val analytics: Analytics,
 ): ViewModel(), ArticleVM {
     override var router: ArticleRouter? = null
@@ -163,7 +169,7 @@ open class ArticleVMImpl(
 
     private val stateController = ArticleVM.StateController(
         restoredState = restoredState,
-        settings = settings,
+        settings = settingStore,
     )
     override val state = stateController.stateFlow
 
@@ -171,10 +177,9 @@ open class ArticleVMImpl(
         Resource.Uninitialized())
     private val annotations = MutableStateFlow<List<List<ArticleAnnotation>>>(emptyList())
 
-    override val paragraphs = combine(article, annotations) { a, b -> a to b }
-        .map { (article, annotations) ->
+    override val paragraphs = combine(article, annotations, settingStore.prefs) { article, annotations, prefs ->
             //Logger.v("build view items")
-            article.copyWith(buildViewItems(article, annotations))
+            article.copyWith(buildViewItems(article, annotations, prefs))
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
 
     private val dicts: StateFlow<Resource<List<Dict>>> = dictRepository.dicts
@@ -288,11 +293,18 @@ open class ArticleVMImpl(
 
     private fun buildViewItems(
         article: Resource<Article>,
-        annotations: List<List<ArticleAnnotation>>
+        annotations: List<List<ArticleAnnotation>>,
+        prefs: Preferences,
     ): List<BaseViewItem<*>> {
         return when (article) {
             is Resource.Loaded -> {
-                makeParagraphs(article, annotations)
+                val resultList = mutableListOf<BaseViewItem<*>>()
+                if (!prefs.isHintClosed(HintType.Article)) {
+                    resultList.add(HintViewItem(HintType.Article))
+                }
+
+                resultList.addAll(makeParagraphs(article, annotations))
+                resultList
             }
             else -> emptyList()
         }
@@ -498,6 +510,11 @@ open class ArticleVMImpl(
         val newState = !stateController.stateFlow.value.isRead
         stateController.updateIsReadState(newState)
         articleRepository.markAsRead(newState)
+    }
+
+    override fun onHintClicked(hintType: HintType) {
+        analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
+        settingStore.setHintClosed(hintType)
     }
 
     override fun onBackPressed() {

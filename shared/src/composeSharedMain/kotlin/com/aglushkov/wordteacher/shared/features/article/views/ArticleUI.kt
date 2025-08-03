@@ -40,6 +40,7 @@ import com.aglushkov.wordteacher.shared.di.LocalIsDarkTheme
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleAnnotation
 import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.article.vm.ParagraphViewItem
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.views.BottomSheetStates
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.HandleUI
@@ -49,6 +50,7 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.ModalSideSheet
 import com.aglushkov.wordteacher.shared.general.views.SideSheetValue
@@ -159,7 +161,8 @@ fun ArticleUI(
                         )
                     ) {
                         items(data) { item ->
-                            ParagraphViewItem(
+                            ArticleViewItem(
+                                vm,
                                 item,
                                 { sentence, offset ->
                                     vm.onTextClicked(sentence, offset)
@@ -243,6 +246,12 @@ private fun ArticleSideSheetContent(
     state: ArticleVM.InMemoryState
 ) {
     val dictPaths by vm.dictPaths.collectAsState()
+
+    Text(
+        modifier = Modifier.padding(all = LocalDimens.current.contentPadding),
+        text = stringResource(MR.strings.article_side_sheet_title),
+        style = LocalAppTypography.current.articleSideSheetSection
+    )
 
     CheckableListItem(
         isChecked = state.selectionState.cardSetWords,
@@ -384,12 +393,20 @@ private fun ArticleTopBar(
 }
 
 @Composable
-fun ParagraphViewItem(
+fun ArticleViewItem(
+    vm: ArticleVM,
     item: BaseViewItem<*>,
     onSentenceClick: (sentence: NLPSentence, offset: Int) -> Unit,
     onSentenceLongPressed: (sentence: NLPSentence, offset: Int) -> Unit,
 ) = when (item) {
     is ParagraphViewItem -> ArticleParagraphView(item, onSentenceClick, onSentenceLongPressed)
+    is HintViewItem -> {
+        HintView(
+            Modifier.clickable { vm.onHintClicked(item.firstItem()) },
+            item.firstItem(),
+            contentPadding = PaddingValues(LocalDimens.current.contentPadding)
+        )
+    }
     else -> {
         Text(
             text = "unknown item $item"

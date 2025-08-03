@@ -60,6 +60,13 @@ val HintInlineContent = mapOf(
             tint = MaterialTheme.colors.secondary,
         )
     },
+    Article_Menu to
+    InlineTextContent(inlineTextPlaceholder) {
+        TextIcon(
+            imageResource = MR.images.article_filter_24,
+            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.87f),
+        )
+    },
 )
 
 @Composable
@@ -118,13 +125,13 @@ fun HintType.toAttributedString(): AnnotatedString {
             append("Try sharing an article from your browser to the app for automatic text extraction.")
         }
         HintType.Article -> buildAnnotatedString {
-            append("Tap any word or highlighted phrase to get its definition. Add unfamiliar words to a card set and start learning them.")
+            append("Tap any word or highlighted phrase to get its definition. While reading add unfamiliar words to a card set to learn it later.")
             appendEndOfParagraph()
             append("To get a word's definition within a highlighted phrase, press and hold it for 2 seconds.")
             appendEndOfParagraph()
             append("Tap ")
             appendInlineContent(Article_Menu, "[Menu]")
-            append("to adjust text highlighting settings.")
+            append(" to adjust text highlighting settings.")
         }
         HintType.CardSets -> buildAnnotatedString {
             append("All your card sets are displayed here with each set's progress shown on the right. This progress is calculated from your completion of individual cards within the set.")

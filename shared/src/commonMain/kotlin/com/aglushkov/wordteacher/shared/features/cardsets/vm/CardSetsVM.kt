@@ -41,6 +41,7 @@ interface CardSetsVM: Clearable {
     fun onCardSetAdded(name: String)
     fun onNewCardSetTextChange(text: String)
     fun onStartLearningClicked()
+    fun onCardSetStartLearningClicked(item: CardSetViewItem)
     fun onCardSetClicked(item: CardSetViewItem)
     fun onCardSetRemoved(item: CardSetViewItem)
     fun getErrorText(): StringDesc
@@ -144,6 +145,11 @@ open class CardSetsVMImpl(
                 showError(e)
             }
         }
+    }
+
+    override fun onCardSetStartLearningClicked(item: CardSetViewItem) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onCardSetStartLearningClicked"))
+        router?.openLearning(LearningVM.State(cardSetId = item.cardSetId))
     }
 
     override fun onCardSetClicked(item: CardSetViewItem) {
