@@ -10,6 +10,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,7 +60,7 @@ class ToggleRepository(
         json.encodeToString(toggles)
     }
 
-    private suspend fun loadRemoteToggles(urlString: String): Toggles {
+    private suspend fun loadRemoteToggles(urlString: String) {
         return withContext(Dispatchers.Default) {
             val res: HttpResponse =
                 httpClient.get(urlString = urlString) {
@@ -71,10 +72,12 @@ class ToggleRepository(
                     }
                 }
             val stringResponse: String = res.body()
-            json.decodeFromString<Toggles>(stringResponse).also {
-                settings[TogglesLastLoadedToggles] = stringResponse
-                res.headers["etag"]?.let {
-                    settings[TogglesEtagKey] = it
+            if (res.status == HttpStatusCode.OK) {
+                json.decodeFromString<Toggles>(stringResponse).also {
+                    settings[TogglesLastLoadedToggles] = stringResponse
+                    res.headers["etag"]?.let {
+                        settings[TogglesEtagKey] = it
+                    }
                 }
             }
         }
