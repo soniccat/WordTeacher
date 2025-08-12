@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.vm.LinkDividerChar
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.indexOfChar
 import com.aglushkov.wordteacher.shared.general.HtmlString
 import com.aglushkov.wordteacher.shared.general.Response
+import com.aglushkov.wordteacher.shared.general.serialization.InstantIso8601Serializer
 import com.aglushkov.wordteacher.shared.general.setStatusCode
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
@@ -16,7 +17,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
+import kotlinx.datetime.serializers.FormattedInstantSerializer
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -25,6 +27,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import java.util.Stack
+import kotlin.time.ExperimentalTime
 
 @Serializable
 data class SpaceDashboardResponse(
@@ -56,6 +59,7 @@ data class SpaceDashboardHeadline(
     @SerialName("title") val title: String,
     @SerialName("description") val description: HtmlString?,
     @SerialName("link") val link: String,
+    @Serializable(with = InstantIso8601Serializer::class)
     @SerialName("date") val date: Instant,
     @SerialName("creator") val creator: String?,
 )

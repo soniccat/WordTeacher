@@ -13,7 +13,8 @@ import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class CardSetSyncWorker(
     private val spaceAuthRepository: SpaceAuthRepository,

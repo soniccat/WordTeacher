@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 data class ShortCardSet (
     val id: Long,

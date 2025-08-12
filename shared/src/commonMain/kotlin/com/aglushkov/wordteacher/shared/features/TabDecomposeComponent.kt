@@ -21,6 +21,7 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import kotlinx.serialization.Serializable
+import kotlin.time.ExperimentalTime
 
 interface TabDecomposeComponent: Clearable {
     val childStack: Value<ChildStack<*, Child>>

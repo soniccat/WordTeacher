@@ -6,7 +6,8 @@ import com.aglushkov.wordteacher.shared.general.settings.HintType
 
 
 import dev.icerock.moko.resources.desc.StringDesc
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class DashboardCategoriesViewItem(
     categories: List<String>,

@@ -1,13 +1,16 @@
 package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
-import kotlinx.datetime.Instant
+import com.aglushkov.wordteacher.shared.general.serialization.InstantIso8601Serializer
+import kotlin.time.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.ExperimentalTime
 
 @Serializable
 data class CardProgress(
     val currentLevel: Int = 0,
     val lastMistakeCount: Int = 0,
+    @Serializable(with = InstantIso8601Serializer::class)
     val lastLessonDate: Instant? = null
 ) {
 

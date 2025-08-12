@@ -2,19 +2,23 @@ package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.sumOf
+import com.aglushkov.wordteacher.shared.general.serialization.InstantIso8601Serializer
 import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.benasher44.uuid.uuid4
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlin.time.ExperimentalTime
 
 @Serializable
 data class CardSet (
     @Transient val id: Long = 0,
     @SerialName("id") val remoteId: String,
     val name: String,
+    @Serializable(with = InstantIso8601Serializer::class)
     val creationDate: Instant,
+    @Serializable(with = InstantIso8601Serializer::class)
     val modificationDate: Instant,
     @SerialName("cards") val cards: List<Card> = emptyList(),
     var terms: List<String> = emptyList(), // for cardsets from search

@@ -1,9 +1,10 @@
 package com.aglushkov.wordteacher.shared.general
 
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
 
 interface TimeSource {
     fun stringDate(dateLong: Long): String
@@ -26,5 +27,5 @@ class TimeSourceImpl: TimeSource {
 
     override fun timeInMilliseconds() = timeInstant().toEpochMilliseconds()
 
-    override fun timeInstant(): Instant = Clock.System.now()
+    override fun timeInstant(): Instant = kotlin.time.Clock.System.now()
 }

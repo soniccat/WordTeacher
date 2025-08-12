@@ -26,6 +26,7 @@ import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepo
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onData
+import com.aglushkov.wordteacher.shared.general.serialization.InstantIso8601Serializer
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
@@ -44,7 +45,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Resource
@@ -52,6 +53,8 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Contextual
+import kotlin.time.ExperimentalTime
 
 interface DashboardVM: Clearable {
     var router: Router?
@@ -80,6 +83,7 @@ interface DashboardVM: Clearable {
 
     @Serializable
     data class State (
+        @Serializable(with = InstantIso8601Serializer::class)
         val lastLoadDate: Instant? = null,
         val selectedCategoryIndex: Int = 0,
         val isHeadlineBlockExpanded: Boolean = false,

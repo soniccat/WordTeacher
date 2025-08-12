@@ -4,6 +4,7 @@ import co.touchlab.kermit.LoggerConfig
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import kotlinx.datetime.Clock
+import kotlin.time.ExperimentalTime
 
 expect class Logger {
     // TODO: consider using a variable instead of a singleton
@@ -32,8 +33,8 @@ fun Logger.Companion.exception(message: String, e: Throwable, tag: String? = nul
 }
 
 fun <T> Logger.Companion.measure(message: String, block: () -> T): T {
-    val time = Clock.System.now()
+    val time = kotlin.time.Clock.System.now()
     val res = block()
-    Logger.v("$message${Clock.System.now().toEpochMilliseconds() - time.toEpochMilliseconds()}")
+    Logger.v("$message${kotlin.time.Clock.System.now().toEpochMilliseconds() - time.toEpochMilliseconds()}")
     return res
 }

@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.service
 
 import com.aglushkov.wordteacher.shared.general.Response
+import com.aglushkov.wordteacher.shared.general.serialization.InstantIso8601Serializer
 import com.aglushkov.wordteacher.shared.general.setStatusCode
 import com.aglushkov.wordteacher.shared.model.CardSet
 import io.ktor.client.*
@@ -12,7 +13,7 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -21,10 +22,12 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import kotlin.time.ExperimentalTime
 
 @Serializable
 data class CardSetPullInput(
     @SerialName("currentCardSetIds") val currentCardSetIds: List<String>,
+    @Serializable(with = InstantIso8601Serializer::class)
     @SerialName("latestModificationDate") val latestModificationDate: Instant?
 )
 
@@ -32,6 +35,7 @@ data class CardSetPullInput(
 data class CardSetPullResponse(
     @SerialName("updatedCardSets") val updatedCardSets: List<CardSet>?,
     @SerialName("deletedCardSetIds") val deletedCardSetIds: List<String>?,
+    @Serializable(with = InstantIso8601Serializer::class)
     @SerialName("latestModificationDate") val latestModificationDate: Instant
 )
 
@@ -39,6 +43,7 @@ data class CardSetPullResponse(
 data class CardSetPushInput(
     @SerialName("updatedCardSets") val updatedCardSets: List<CardSet>,
     @SerialName("currentCardSetIds") val currentCardSetIds: List<String>,
+    @Serializable(with = InstantIso8601Serializer::class)
     @SerialName("latestModificationDate") val latestModificationDate: Instant?
 )
 
@@ -46,6 +51,7 @@ data class CardSetPushInput(
 data class CardSetPushResponse(
     @SerialName("cardSetIds") val cardSetIds: Map<String,String>?,
     @SerialName("cardIds") val cardIds: Map<String,String>?,
+    @Serializable(with = InstantIso8601Serializer::class)
     @SerialName("latestModificationDate") val latestModificationDate: Instant
 )
 
