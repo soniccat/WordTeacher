@@ -41,6 +41,7 @@ import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import dev.icerock.moko.resources.desc.StringDesc
 import io.ktor.util.reflect.instanceOf
 import kotlinx.serialization.Serializable
@@ -52,7 +53,8 @@ interface MainDecomposeComponent:
     SettingsRouter,
     DashboardVM.Router,
     AuthOpener,
-    SnackbarEventHolder {
+    SnackbarEventHolder,
+    BackHandlerOwner {
     val childStack: Value<ChildStack<ChildConfiguration, Child>>
     val dialogsStateFlow: Value<ChildStack<ChildConfiguration, Child>>
 

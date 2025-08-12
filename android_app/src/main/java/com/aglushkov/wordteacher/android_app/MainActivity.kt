@@ -71,6 +71,7 @@ import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
@@ -175,7 +176,11 @@ class MainActivity : AppCompatActivity(), Router {
             Children(
                 stack = mainDecomposeComponent.childStack,
                 modifier = Modifier,
-                animation = stackAnimation(slideFromRight())
+                animation = predictiveBackAnimation(
+                    backHandler = mainDecomposeComponent.backHandler,
+                    animation = stackAnimation(slideFromRight()),
+                    onBack = mainDecomposeComponent::back
+                )
             ) {
                 when (val instance = it.instance) {
                     is MainDecomposeComponent.Child.Tabs -> TabsUI(component = instance.vm)

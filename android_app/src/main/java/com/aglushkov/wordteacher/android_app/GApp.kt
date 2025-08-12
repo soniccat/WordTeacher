@@ -3,7 +3,6 @@ package com.aglushkov.wordteacher.android_app
 import android.app.ActivityManager
 import android.app.Application
 import android.os.Process
-import android.util.Log
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
@@ -16,10 +15,7 @@ import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilFalse
 import com.aglushkov.wordteacher.shared.general.setAnalytics
-import com.aglushkov.wordteacher.shared.general.settings.SettingStore
-import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.tasks.Task
@@ -31,12 +27,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import java.io.File
 import javax.inject.Inject
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.outputStream
+
 
 // to inject some fields for non main process
 class GAppNonMainProccess {
@@ -98,7 +95,6 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         appComponent.connectivityManager().checkNetworkState()
 
         mainScope.launch(Dispatchers.IO) {
-
             val taskChannel = Channel<Task>(UNLIMITED)
             launch {
                 taskChannel.receiveAsFlow().collect {
