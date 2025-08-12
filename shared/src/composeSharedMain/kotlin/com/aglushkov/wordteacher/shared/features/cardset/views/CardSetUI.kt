@@ -139,7 +139,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 ) {
                     items(data, key = { it.id }) { item ->
                         CardSetViewItems(
-                            Modifier.animateItemPlacement(),
+                            Modifier.animateItem(),
                             item,
                             vm,
                             if (item == focusEvent?.viewItem) {

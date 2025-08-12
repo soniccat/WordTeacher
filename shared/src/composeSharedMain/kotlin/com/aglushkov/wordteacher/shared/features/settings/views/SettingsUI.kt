@@ -49,7 +49,7 @@ fun SettingsUI(
             ) {
                 items(itemsState.value, key = { it.id }) { item ->
                     showSettingsItem(
-                        Modifier.animateItemPlacement(),
+                        Modifier.animateItem(),
                         item,
                         vm
                     )

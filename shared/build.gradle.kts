@@ -69,6 +69,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                api(compose.materialIconsExtended)
                 api(compose.ui)
                 api(compose.components.resources)
                 api(compose.components.uiToolingPreview)
@@ -81,7 +82,7 @@ kotlin {
         val androidMain by getting {
             dependsOn(composeSharedMain)
             dependencies {
-                implementation(libs.androidx.material)
+                implementation(libs.androidx.material) // for colorOnPrimary in xmls
                 implementation(libs.sqlDelightAndroidDriver)
                 api(libs.androidx.activity.compose)
                 api(libs.appmetrica)

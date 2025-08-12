@@ -254,7 +254,7 @@ private fun DefinitionsWordUI(
                 ) {
                     items(derivedDefs, key = { it.id }, contentType = { it.type }) { item ->
                         showViewItem(
-                            Modifier.animateItemPlacement(),
+                            Modifier.animateItem(),
                             item,
                             vm,
                             onPartOfSpeechFilterClicked,
@@ -293,7 +293,7 @@ private fun wordHistoryUI(
         ) {
             items(words.data().orEmpty(), key = { it.id }) { item ->
                 showWordHistoryItem(
-                    Modifier.animateItemPlacement(),
+                    Modifier.animateItem(),
                     item,
                     vm,
                 )
@@ -327,7 +327,7 @@ private fun suggestListUI(
     ) {
         items(suggestsData, key = { it.id }) { item ->
             showSuggestItem(
-                Modifier.animateItemPlacement(),
+                Modifier.animateItem(),
                 item,
                 vm,
                 onClicked = {

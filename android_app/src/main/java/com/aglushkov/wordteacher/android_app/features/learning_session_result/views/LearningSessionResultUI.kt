@@ -94,7 +94,7 @@ fun LearningSessionResultUI(
                     )
                 ) {
                     items(data, key = { it.id }) { item ->
-                        LearningSessionResultViewItems(Modifier.animateItemPlacement(), item, vm)
+                        LearningSessionResultViewItems(Modifier.animateItem(), item, vm)
                     }
                 }
             } else {

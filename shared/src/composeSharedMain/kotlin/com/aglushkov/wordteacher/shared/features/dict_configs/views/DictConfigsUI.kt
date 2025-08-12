@@ -93,7 +93,7 @@ fun DictConfigsUI(
             ) {
                 items(viewItems.value, key = { it.id }) { item ->
                     showDictConfigsItem(
-                        Modifier.animateItemPlacement(),
+                        Modifier.animateItem(),
                         item,
                         vm
                     )
