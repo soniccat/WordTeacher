@@ -29,8 +29,8 @@ opennlp = "1.9.4"
 sqlDelight = "2.1.0"
 ktor = "3.2.3"
 mokoResources = "0.25.0"
-decomposeVersion = "2.2.2"
-stately = "2.0.6"
+decomposeVersion = "3.3.0"
+stately = "2.1.0"
 uuid = "0.8.4"
 dagger = "2.57"
 
@@ -86,7 +86,7 @@ mokoResourcesLib = { module = "dev.icerock.moko:resources", version.ref = "mokoR
 mokoCompose = { module = "dev.icerock.moko:resources-compose", version.ref = "mokoResources"}
 
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decomposeVersion" }
-decomposeJetbrains = { module = "com.arkivanov.decompose:extensions-compose-jetbrains", version.ref = "decomposeVersion" }
+decomposeComposeExtensions = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decomposeVersion" }
 statelyCommon = { module = "co.touchlab:stately-common", version.ref = "stately" }
 statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }

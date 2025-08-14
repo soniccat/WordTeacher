@@ -46,10 +46,10 @@ import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
 import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
 import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
-import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
+import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import dev.icerock.moko.resources.desc.StringDesc
 
 class TextActionActivity: AppCompatActivity() {

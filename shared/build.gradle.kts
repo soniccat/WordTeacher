@@ -80,7 +80,7 @@ kotlin {
                 api(compose.components.uiToolingPreview)
                 implementation(libs.jsoup)
                 implementation(libs.opennlp)
-                api(libs.decomposeJetbrains)
+                api(libs.decomposeComposeExtensions)
                 api(libs.mokoCompose)
             }
         }

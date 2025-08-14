@@ -10,8 +10,7 @@ import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
-import com.arkivanov.essenty.lifecycle.doOnDestroy
-import com.arkivanov.essenty.statekeeper.consume
+
 
 class NotesDecomposeComponent (
     componentContext: ComponentContext,
@@ -26,25 +25,13 @@ class NotesDecomposeComponent (
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Notes"
 
-    private val instanceState = instanceKeeper.getOrCreate(KEY_STATE) {
-        Handler(stateKeeper.consume(KEY_STATE) ?: state)
-    }
-
     init {
         baseInit(analytics)
 
         stateKeeper.register(
             key = KEY_STATE,
             strategy = NotesVM.State.serializer()
-        ) {
-            state
-        }
-
-        restore(instanceState.state)
-    }
-
-    private class Handler(val state: NotesVM.State) : InstanceKeeper.Instance {
-        override fun onDestroy() {}
+        ) { state }
     }
 
     private companion object {

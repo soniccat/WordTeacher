@@ -5,9 +5,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.Direction
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.StackAnimator
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimator
+import com.arkivanov.decompose.extensions.compose.stack.animation.Direction
+import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimator
 
 internal val defaultChildAnimationSpec: FiniteAnimationSpec<Float> = tween()
 

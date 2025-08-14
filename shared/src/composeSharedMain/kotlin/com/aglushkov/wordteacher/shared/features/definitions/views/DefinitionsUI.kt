@@ -92,7 +92,11 @@ fun DefinitionsUI(
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val focusManager = LocalFocusManager.current
 
-    Box(modifier = modalModifier.fillMaxSize()) {
+    Box(
+        modifier = modalModifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colors.background)
+    ) {
         // TODO: consider moving chooser outside...
         ChooserUI(
             state = partOfSpeechFilterBottomSheetState,

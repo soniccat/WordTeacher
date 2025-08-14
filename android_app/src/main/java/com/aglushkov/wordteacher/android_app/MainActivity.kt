@@ -70,11 +70,12 @@ import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.defaultComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.predictiveback.predictiveBackAnimation
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
-import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
+import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.materialPredictiveBackAnimatable
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
+import com.arkivanov.decompose.extensions.compose.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import dev.icerock.moko.resources.desc.StringDesc
 
 class MainActivity : AppCompatActivity(), Router {
@@ -178,7 +179,7 @@ class MainActivity : AppCompatActivity(), Router {
                 modifier = Modifier,
                 animation = predictiveBackAnimation(
                     backHandler = mainDecomposeComponent.backHandler,
-                    animation = stackAnimation(slideFromRight()),
+                    fallbackAnimation = stackAnimation(slideFromRight()),
                     onBack = mainDecomposeComponent::back
                 )
             ) {
@@ -261,7 +262,11 @@ class MainActivity : AppCompatActivity(), Router {
         ) { innerPadding ->
             Children(
                 stack = component.childStack,
-                animation = stackAnimation(slide())
+                animation = predictiveBackAnimation(
+                    component.backHandler,
+                    stackAnimation(slide()),
+                    onBack = component::back
+                )
             ) {
                 when (val instance = it.instance) {
                     is TabDecomposeComponent.Child.Dashboard -> DashboardUI(

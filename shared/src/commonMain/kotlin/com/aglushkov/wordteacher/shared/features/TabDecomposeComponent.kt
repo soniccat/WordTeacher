@@ -20,10 +20,11 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
+import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import kotlinx.serialization.Serializable
 import kotlin.time.ExperimentalTime
 
-interface TabDecomposeComponent: Clearable {
+interface TabDecomposeComponent: Clearable, BackHandlerOwner {
     val childStack: Value<ChildStack<*, Child>>
 
     fun openDashboard()

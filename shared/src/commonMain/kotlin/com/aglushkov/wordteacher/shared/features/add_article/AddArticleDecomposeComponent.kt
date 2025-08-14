@@ -16,7 +16,6 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
-import com.arkivanov.essenty.statekeeper.consume
 
 class AddArticleDecomposeComponent(
     componentContext: ComponentContext,
