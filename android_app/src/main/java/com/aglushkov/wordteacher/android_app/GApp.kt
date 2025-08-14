@@ -1,8 +1,6 @@
 package com.aglushkov.wordteacher.android_app
 
-import android.app.ActivityManager
 import android.app.Application
-import android.os.Process
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
@@ -56,19 +54,9 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var fileLogger: FileLogger
     @Inject lateinit var tasks: Array<Task>
 
-    private var nonMainProcessDeps: GAppNonMainProccess? = null
-
     override fun onCreate() {
         super.onCreate()
 
-        if (isMainProcess()) {
-            onMainProcessCreated()
-        }else {
-            onNonMainProcessCreated()
-        }
-    }
-
-    private fun onMainProcessCreated() {
         appComponent = DaggerAppComponent.builder()
             .generalModule(GeneralModule(this))
             .build()
@@ -109,31 +97,6 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
                 }
             }
         }
-    }
-
-    private fun onNonMainProcessCreated() {
-        nonMainProcessDeps = GAppNonMainProccess().apply {
-            DaggerAppComponent.builder()
-                .generalModule(GeneralModule(this@GApp))
-                .build()
-                .injectAppNonMainProccess(this)
-        }
-    }
-
-    private fun isMainProcess(): Boolean {
-        return packageName == myProcessName()
-    }
-
-    private fun myProcessName(): String? {
-        val mypid = Process.myPid()
-        val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        val infos = manager.runningAppProcesses
-        for (info in infos) {
-            if (info.pid == mypid) {
-                return info.processName
-            }
-        }
-        return null
     }
 
     override fun onFirstActivityStarted() {

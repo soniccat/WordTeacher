@@ -201,7 +201,7 @@ private data class CookieWrapper(
     val name: String,
     val value: String,
     val encoding: CookieEncoding = CookieEncoding.URI_ENCODING,
-    val maxAge: Int = 0,
+    val maxAge: Int? = null,
     val expiresTimestamp: Long? = null,
     val domain: String? = null,
     val path: String? = null,

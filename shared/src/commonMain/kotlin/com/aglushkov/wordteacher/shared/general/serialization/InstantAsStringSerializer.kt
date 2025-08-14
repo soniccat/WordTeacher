@@ -20,5 +20,4 @@ object InstantIso8601Serializer : KSerializer<Instant> {
     override fun serialize(encoder: Encoder, value: Instant) {
         encoder.encodeString(value.toString())
     }
-
 }
