@@ -16,6 +16,12 @@ class DashboardCategoriesViewItem(
     companion object {
         const val Type = 1200
     }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) &&
+                other is DashboardCategoriesViewItem
+                && selectedIndex == other.selectedIndex
+    }
 }
 
 class DashboardHeadlineViewItem(

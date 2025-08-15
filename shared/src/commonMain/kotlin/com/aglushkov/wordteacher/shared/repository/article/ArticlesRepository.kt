@@ -73,7 +73,7 @@ class ArticlesRepository(
                 updateFirstVisibleItemMapJob?.cancel()
                 updateFirstVisibleItemMapJob = launch {
                     delay(200)
-                    settings.setSerializable(FIRSTITEMINDEX_STATE_KEY, lastFirstVisibleItemMap.value.data().orEmpty())
+                    settings.setSerializable(FIRSTITEMINDEX_STATE_KEY, it.data().orEmpty())
                 }
             }
         }
@@ -95,6 +95,17 @@ class ArticlesRepository(
                     lastFirstVisibleItemMap.updateLoadedData(defaultData = emptyMap()) {
                         it + (id to itemIndex)
                     }
+                }
+            }
+        }
+    }
+
+    fun offsetLastFirstVisibleItem(offset: Int) {
+        scope.launch(Dispatchers.IO) {
+            lastFirstVisibleItemMap.waitUntilLoaded()
+            lastFirstVisibleItemMap.value.onData { data ->
+                lastFirstVisibleItemMap.updateLoadedData(defaultData = emptyMap()) {
+                    it.mapValues { entry -> maxOf(0, entry.value + offset) }
                 }
             }
         }

@@ -163,9 +163,9 @@ private fun AddArticlesFieldsUI(
             val visibleHintType = data.visibleHintType
             if (visibleHintType != null) {
                 HintView(
-                    Modifier.clickable { vm.onHintClicked(visibleHintType) },
-                    visibleHintType,
-                    contentPadding = PaddingValues(LocalDimens.current.contentPadding)
+                    hintType = visibleHintType,
+                    contentPadding = PaddingValues(LocalDimens.current.contentPadding),
+                    onHidden = { vm.onHintClicked(visibleHintType) }
                 )
             }
 

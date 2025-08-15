@@ -93,7 +93,7 @@ fun DashboardUI(
                 ) {
                     items(items.orEmpty(), key = { it.id }) { item ->
                         dashboardItem(
-                            Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                            Modifier.animateItem(),
                             item,
                             vm
                         )
@@ -260,8 +260,7 @@ fun dashboardItem(
     }
     is HintViewItem -> {
         HintView(
-            Modifier.clickable { vm.onHintClicked(item.firstItem()) },
-            item.firstItem(),
+            hintType = item.firstItem(),
             contentPadding = PaddingValues(
                 start = LocalDimens.current.contentPadding,
                 end = LocalDimens.current.contentPadding,
@@ -269,7 +268,8 @@ fun dashboardItem(
                     LocalDimens.current.contentPadding
                 else
                     0.dp,
-            )
+            ),
+            onHidden = { vm.onHintClicked(item.firstItem()) }
         )
     }
     else -> {

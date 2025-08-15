@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Quadruple
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.settings.HintType
@@ -42,6 +43,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.collections.orEmpty
 
 interface ArticleVM: Clearable {
     val state: StateFlow<InMemoryState>
@@ -304,6 +306,7 @@ open class ArticleVMImpl(
                 }
 
                 resultList.addAll(makeParagraphs(article, annotations))
+                generateIds(resultList)
                 resultList
             }
             else -> emptyList()
@@ -334,7 +337,7 @@ open class ArticleVMImpl(
 
             paragraphList.add(
                 ParagraphViewItem(
-                    idGenerator.nextId(),
+                    paragraphId = 0L,
                     sentences = sentences,
                     annotations = if (annotations.isNotEmpty()) {
                         annotations.split(paragraph)
@@ -351,6 +354,10 @@ open class ArticleVMImpl(
         }
 
         return paragraphList
+    }
+
+    private fun generateIds(items: MutableList<BaseViewItem<*>>) {
+        generateViewItemIds(items, paragraphs.value.data().orEmpty(), idGenerator)
     }
 
     override fun onTextClicked(sentence: NLPSentence, offset: Int) {
@@ -515,6 +522,7 @@ open class ArticleVMImpl(
     override fun onHintClicked(hintType: HintType) {
         analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
         settingStore.setHintClosed(hintType)
+        articlesRepository.offsetLastFirstVisibleItem(-1)
     }
 
     override fun onBackPressed() {

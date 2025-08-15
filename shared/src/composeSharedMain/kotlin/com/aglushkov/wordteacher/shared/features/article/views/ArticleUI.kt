@@ -160,7 +160,11 @@ fun ArticleUI(
                             bottom = LocalDimensWord.current.articleHorizontalPadding + this@BoxWithConstraints.maxHeight / 2
                         )
                     ) {
-                        items(data) { item ->
+                        items(
+                            data,
+                            key = { it.id },
+                            contentType = { it.type }
+                        ) { item ->
                             ArticleViewItem(
                                 vm,
                                 item,
@@ -402,9 +406,9 @@ fun ArticleViewItem(
     is ParagraphViewItem -> ArticleParagraphView(item, onSentenceClick, onSentenceLongPressed)
     is HintViewItem -> {
         HintView(
-            Modifier.clickable { vm.onHintClicked(item.firstItem()) },
-            item.firstItem(),
-            contentPadding = PaddingValues(LocalDimens.current.contentPadding)
+            hintType = item.firstItem(),
+            contentPadding = PaddingValues(LocalDimens.current.contentPadding),
+            onHidden = { vm.onHintClicked(item.firstItem()) }
         )
     }
     else -> {

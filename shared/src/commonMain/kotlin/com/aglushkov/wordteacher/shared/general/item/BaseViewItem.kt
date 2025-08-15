@@ -31,7 +31,7 @@ abstract class BaseViewItem<T> {
     open fun equalsByContent(other: BaseViewItem<*>): Boolean {
         // as we check the content in equalsByIds we can return true here
         // this should be overridden if equalsByIds is overridden
-        return items == other.items
+        return this::class == other::class && type == other.type && items == other.items
     }
 
     override fun equals(other: Any?): Boolean {
@@ -96,7 +96,7 @@ fun generateViewItemIds(
         } else {
             val itemsHashCode = it.itemsHashCode()
             val mapListOfViewItems = map[itemsHashCode]
-            val item = mapListOfViewItems?.firstOrNull { listItem -> listItem.equalsByIds(it) && listItem.equalsByContent(it) }
+            val item = mapListOfViewItems?.firstOrNull { listItem -> /*listItem.equalsByIds(it) &&*/ listItem.equalsByContent(it) }
 
             if (item != null) {
                 it.id = item.id

@@ -221,13 +221,13 @@ private fun CardSetsViewItem(
     )
     is HintViewItem -> {
         HintView(
-            Modifier.clickable { vm.onHintClicked(item.firstItem()) },
-            item.firstItem(),
+            hintType = item.firstItem(),
             contentPadding = PaddingValues(
                 top = LocalDimens.current.contentPadding,
                 start = LocalDimens.current.contentPadding,
                 end = LocalDimens.current.contentPadding,
-            )
+            ),
+            onHidden = { vm.onHintClicked(item.firstItem()) }
         )
     }
     else -> {

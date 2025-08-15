@@ -104,9 +104,9 @@ private fun ArticlesViewItem(
     )
     is HintViewItem -> {
         HintView(
-            Modifier.clickable { vm.onHintClicked(item.firstItem()) },
-            item.firstItem(),
-            contentPadding = PaddingValues(LocalDimens.current.contentPadding)
+            hintType = item.firstItem(),
+            contentPadding = PaddingValues(LocalDimens.current.contentPadding),
+            onHidden = { vm.onHintClicked(item.firstItem()) }
         )
     }
     else -> {

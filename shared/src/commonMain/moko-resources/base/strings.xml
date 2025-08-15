@@ -167,8 +167,8 @@
 
     <string name="error_try_again">Retry</string>
     <string name="error_default_loading_error">Something went wrong :(</string>
-    <string name="default_expand">Show all</string>
-    <string name="default_collapse">Collapse</string>
+    <string name="default_expand">More</string>
+    <string name="default_collapse">Less</string>
 
     <string name="sidesheet_navigation_menu">Navigation menu</string>
     <string name="sidesheet_side_sheet">Close navigation menu</string>
