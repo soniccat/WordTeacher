@@ -37,8 +37,8 @@ downtest:
 cronsetup:
 	sudo mkdir -p /var/spool/cron/crontabs/$(USER) &&\
 	sudo ln -s ./cron/crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab &&\
-	sudo mkdir /Users/Shared/WordTeacher/certbot/logs &&\
-	sudo mkdir /Users/Shared/WordTeacher/backups/mongo/logs
+	sudo mkdir -p /Users/Shared/WordTeacher/certbot/logs &&\
+	sudo mkdir -p /Users/Shared/WordTeacher/backups/mongo/logs
 
 cronup:
 	sudo crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab

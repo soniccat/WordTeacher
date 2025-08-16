@@ -15,4 +15,10 @@ class ParagraphViewItem(
     companion object {
         const val Type = 201
     }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) &&
+                other is ParagraphViewItem &&
+                annotations == other.annotations
+    }
 }
