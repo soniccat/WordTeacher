@@ -11,55 +11,12 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.shared.general.views.Chip
 import com.aglushkov.wordteacher.shared.general.views.ChipColors
+import com.aglushkov.wordteacher.shared.general.views.ChipPreview
 
 @Preview
 @Composable
 fun ChipPreview() {
     ComposeAppTheme {
-        Column(
-        ) {
-            Chip(
-                modifier = Modifier.padding(4.dp),
-                text = "By Source",
-                isChecked = true,
-                colors = null,
-                isCloseIconVisible = true,
-                closeBlock = {},
-                clickBlock = {}
-            )
-            Chip(
-                modifier = Modifier.padding(4.dp),
-                text = "By Source",
-                isChecked = false,
-                colors = null,
-                isCloseIconVisible = true,
-                closeBlock = {},
-                clickBlock = {}
-            )
-            Chip(
-                modifier = Modifier.padding(4.dp),
-                text = "Add Filter",
-                isChecked = false,
-                colors = ChipColors(
-                    contentColor = MaterialTheme.colors.onSecondary,
-                    bgColor = MaterialTheme.colors.secondary
-                ),
-                isCloseIconVisible = false,
-                closeBlock = {},
-                clickBlock = {}
-            )
-            Chip(
-                modifier = Modifier.padding(4.dp),
-                text = "Add Filter",
-                isChecked = false,
-                colors = ChipColors(
-                    contentColor = MaterialTheme.colors.onSecondary,
-                    bgColor = MaterialTheme.colors.secondary
-                ),
-                isCloseIconVisible = true,
-                closeBlock = {},
-                clickBlock = {}
-            )
-        }
+        ChipPreview()
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.aglushkov.wordteacher.shared.general.views.pxToDp
 import kotlinx.coroutines.flow.Flow
@@ -73,11 +74,15 @@ actual fun CustomDialogUI(
                 },
             color = MaterialTheme.colors.background
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                content()
-                SnackbarUI()
+            window.ProvideWindowInsets {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .withWindowInsetsPadding()
+                ) {
+                    content()
+                    SnackbarUI()
+                }
             }
         }
     }
@@ -129,10 +134,10 @@ fun Modifier.withWindowInsetsPadding() = composed {
 }
 
 @Composable
-fun Activity.ProvideWindowInsets(
+fun Window.ProvideWindowInsets(
     content: @Composable () -> Unit
 ) {
-    val initialInset = window.decorView.rootWindowInsets.toWindowInsets()
+    val initialInset = decorView.rootWindowInsets.toWindowInsets()
     var windowInsets by remember { mutableStateOf(initialInset) }
 
     CompositionLocalProvider(
@@ -141,13 +146,13 @@ fun Activity.ProvideWindowInsets(
     )
 
     DisposableEffect("ActivityInsets") {
-        window.decorView.setOnApplyWindowInsetsListener { v, insets ->
+        decorView.setOnApplyWindowInsetsListener { v, insets ->
             windowInsets = insets.toWindowInsets()
             insets.consumeSystemWindowInsets()
         }
 
         onDispose {
-            window.decorView.setOnApplyWindowInsetsListener(null)
+            decorView.setOnApplyWindowInsetsListener(null)
         }
     }
 }

@@ -77,7 +77,6 @@ kotlin {
                 api(compose.materialIconsExtended)
                 api(compose.ui)
                 api(compose.components.resources)
-                api(compose.components.uiToolingPreview)
                 implementation(libs.jsoup)
                 implementation(libs.opennlp)
                 api(libs.decomposeComposeExtensions)
@@ -94,6 +93,7 @@ kotlin {
                 api(libs.ktorAndroidClient)
                 api(libs.exoplayer)
                 api(libs.exoplayerDatabase)
+                api(libs.androidx.ui.tooling)
             }
         }
         val androidUnitTest by getting {
@@ -111,6 +111,7 @@ kotlin {
             dependencies {
                 implementation(libs.ktorDesktop)
                 implementation(libs.sqlDelightJvmDriver)
+                api(compose.components.uiToolingPreview)
             }
         }
     }

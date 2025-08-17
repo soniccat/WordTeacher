@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.android_app
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -134,6 +135,7 @@ class MainActivity : AppCompatActivity(), Router {
             .build()
             .mainDecomposeComponent()
 
+        enableEdgeToEdge()
         setContent {
             BindSnackbarEventHolder(mainDecomposeComponent) {
                 ComposeUI()
@@ -149,7 +151,7 @@ class MainActivity : AppCompatActivity(), Router {
     @Composable
     private fun ComposeUI() {
         ComposeAppTheme(isDebug = appComponent().isDebug()) {
-            ProvideWindowInsets {
+            window.ProvideWindowInsets {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

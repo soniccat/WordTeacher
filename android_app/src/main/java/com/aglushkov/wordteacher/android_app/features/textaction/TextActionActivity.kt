@@ -164,7 +164,7 @@ class TextActionActivity: AppCompatActivity() {
     @Composable
     private fun ComposeUI() {
         ComposeAppTheme {
-            ProvideWindowInsets {
+            window.ProvideWindowInsets {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
