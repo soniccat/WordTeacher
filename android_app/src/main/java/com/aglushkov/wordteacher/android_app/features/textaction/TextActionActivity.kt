@@ -66,12 +66,6 @@ class TextActionActivity: AppCompatActivity() {
         recreate()
     }
 
-    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
-        super.onNewIntent(intent, caller)
-        setIntent(intent)
-        recreate()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -120,16 +114,6 @@ class TextActionActivity: AppCompatActivity() {
 
         if (urlString == null) {
             text = intentString
-        }
-
-        // consume state not to restore it, treat TextActionComponent.Config as an actual state
-        // do it not to restore state after onNewIntent and just use data from intent
-        val storedBundle = Bundle()
-        savedStateRegistry.performSave(storedBundle)
-        storedBundle.keySet().firstOrNull()?.let {
-            storedBundle.getBundle(it)?.keySet()?.onEach { key ->
-                savedStateRegistry.consumeRestoredStateForKey(key)
-            }
         }
 
         val context = defaultComponentContext()

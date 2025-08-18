@@ -153,7 +153,6 @@ fun dashboardItem(
         val horizontalPadding = LocalDimens.current.contentPadding
         Row(
             modifier = Modifier
-                .then(modifier)
                 .padding(
                     start = horizontalPadding,
                     end = horizontalPadding,

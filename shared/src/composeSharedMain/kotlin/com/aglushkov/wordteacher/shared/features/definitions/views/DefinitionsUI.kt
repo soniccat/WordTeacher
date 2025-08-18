@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -440,7 +441,6 @@ private fun showViewItem(
 ) = when (item) {
     is DefinitionsDisplayModeViewItem -> DefinitionsDisplayModeView(
         item,
-        modifier,
         { onPartOfSpeechFilterClicked(item) },
         { onPartOfSpeechFilterCloseClicked(item) },
         onDisplayModeChanged
@@ -557,62 +557,96 @@ private fun AddToSet(vm: DefinitionsVM, wordDefinitionViewItem: WordDefinitionVi
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DefinitionsDisplayModeView(
     item: DefinitionsDisplayModeViewItem,
-    modifier: Modifier,
     onPartOfSpeechFilterClicked: () -> Unit,
     onPartOfSpeechFilterCloseClicked: () -> Unit,
     onDisplayModeChanged: (mode: DefinitionsDisplayMode) -> Unit
 ) {
     val horizontalPadding = LocalDimens.current.definitionsDisplayModeHorizontalPadding
     val topPadding = LocalDimens.current.definitionsDisplayModeVerticalPadding
-    Row(
-        modifier = Modifier
-            .then(modifier)
-            .padding(
-                start = horizontalPadding,
-                end = horizontalPadding,
-                top = topPadding
-            )
-            .horizontalScroll(rememberScrollState())
-    ) {
-        com.aglushkov.wordteacher.shared.general.views.Chip(
-            modifier = Modifier.padding(
-                top = 4.dp,
-                bottom = 4.dp
-            ),
-            text = item.partsOfSpeechFilterText.localized(),
-            colors = com.aglushkov.wordteacher.shared.general.views.ChipColors(
-                contentColor = MaterialTheme.colors.onSecondary,
-                bgColor = MaterialTheme.colors.secondary
-            ),
-            isCloseIconVisible = item.canClearPartsOfSpeechFilter,
-            closeBlock = {
-                onPartOfSpeechFilterCloseClicked()
-            },
-            clickBlock = {
-                onPartOfSpeechFilterClicked()
-            }
-        )
 
-        Spacer(modifier = Modifier.width(LocalDimens.current.definitionsDisplayModeHorizontalPadding))
-
-        // Group
-        val selectedMode = item.items[item.selectedIndex]
-        val firstMode = item.items.firstOrNull()
-        for (mode in item.items) {
-            com.aglushkov.wordteacher.shared.general.views.Chip(
-                modifier = Modifier.padding(
-                    top = 4.dp,
-                    bottom = 4.dp,
-                    start = if (mode == firstMode) 0.dp else 4.dp,
-                    end = 4.dp
+    // to decrease the height from 48 to 32 (https://stackoverflow.com/questions/75406686/android-compose-how-to-remove-the-space-above-and-below-the-switch)
+    CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+        Row(
+            modifier = Modifier
+                .padding(
+                    start = horizontalPadding,
+                    end = horizontalPadding,
+                    top = topPadding
+                )
+                .horizontalScroll(rememberScrollState())
+        ) {
+            FilterChip(
+                selected = false,
+                onClick = {
+                    onPartOfSpeechFilterClicked()
+                },
+                colors = ChipDefaults.filterChipColors(
+                    backgroundColor = MaterialTheme.colors.secondary,
+                    contentColor = MaterialTheme.colors.onSecondary,
                 ),
-                text = mode.toStringDesc().localized(),
-                isChecked = mode == selectedMode
+                trailingIcon = if (item.canClearPartsOfSpeechFilter) {
+                    {
+                        Icon(
+                            painter = painterResource(MR.images.close_18),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(end = 2.dp)
+                                .clickable {
+                                    onPartOfSpeechFilterCloseClicked()
+                                },
+                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.87f)
+                        )
+                    }
+                } else {
+                    null
+                },
             ) {
-                onDisplayModeChanged(mode)
+                Text(
+                    text = item.partsOfSpeechFilterText.localized(),
+                    overflow = TextOverflow.Clip,
+                    softWrap = false,
+                    maxLines = 1
+                )
+            }
+
+            Spacer(modifier = Modifier.width(LocalDimens.current.definitionsDisplayModeHorizontalPadding))
+
+            // Group
+            val selectedMode = item.items[item.selectedIndex]
+            val firstMode = item.items.firstOrNull()
+            for (mode in item.items) {
+                FilterChip(
+                    selected = mode == selectedMode,
+                    onClick = {
+                        onDisplayModeChanged(mode)
+                    },
+                    modifier = Modifier.padding(
+                        start = if (mode == firstMode) 0.dp else 4.dp,
+                        end = 4.dp
+                    ),
+                    leadingIcon = if (mode == selectedMode) {
+                        {
+                            Icon(
+                                painter = painterResource(MR.images.check),
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                        }
+                    } else {
+                        null
+                    }
+                ) {
+                    Text(
+                        text = mode.toStringDesc().localized(),
+                        overflow = TextOverflow.Clip,
+                        softWrap = false,
+                        maxLines = 1
+                    )
+                }
             }
         }
     }

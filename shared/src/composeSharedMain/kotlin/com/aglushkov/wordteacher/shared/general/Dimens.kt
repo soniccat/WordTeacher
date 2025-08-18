@@ -12,7 +12,7 @@ data class Dimens(
     val definitionsSearchHorizontalMargin: Dp = contentPadding,
     val definitionsSearchVerticalMargin: Dp = 8.dp,
     val definitionsDisplayModeHorizontalPadding: Dp = definitionsSearchHorizontalMargin,
-    val definitionsDisplayModeVerticalPadding: Dp = definitionsSearchVerticalMargin,
+    val definitionsDisplayModeVerticalPadding: Dp = contentPadding,
 
     val learningTestOptionMargin: Dp = 8.dp
 )
