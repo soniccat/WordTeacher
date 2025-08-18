@@ -75,7 +75,7 @@
 
         <!-- The same part we have in AppTheme, check the comment there -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@color/primaryColor</item>
+        <item name="android:statusBarColor">@color/statusBarColor</item>
         <item name="android:windowContentOverlay">@null</item>
 
         <!-- Styles -->

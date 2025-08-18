@@ -37,6 +37,7 @@ import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.OutlinedTextFieldWithError
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -154,6 +155,7 @@ private fun AddArticlesFieldsUI(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .windowInsetsHorizontalPadding()
                 .verticalScroll(scrollableState)
                 .padding(
                     top = LocalDimens.current.contentPadding,

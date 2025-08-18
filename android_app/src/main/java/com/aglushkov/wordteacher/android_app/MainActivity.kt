@@ -9,9 +9,17 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.AppBarDefaults.TopAppBarElevation
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -64,11 +72,13 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
-import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPadding
+import com.aglushkov.wordteacher.shared.general.withWindowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
+import com.aglushkov.wordteacher.shared.general.withWindowInsetsVerticalPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.stack.Children
@@ -151,22 +161,20 @@ class MainActivity : AppCompatActivity(), Router {
     @Composable
     private fun ComposeUI() {
         ComposeAppTheme(isDebug = appComponent().isDebug()) {
-            window.ProvideWindowInsets {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .withWindowInsetsPadding(),
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsVerticalPadding(),
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
                 ) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colors.background
-                    ) {
-                        mainUI()
-                        dialogUI()
-                    }
-
-                    SnackbarUI()
+                    mainUI()
+                    dialogUI()
                 }
+
+                SnackbarUI()
             }
         }
     }
@@ -275,7 +283,8 @@ class MainActivity : AppCompatActivity(), Router {
                         vm = instance.vm.apply {
                             router = mainDecomposeComponent
                         },
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        //contentModifier = Modifier.withWindowInsetsHorizontalPadding()
                     )
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
                         vm = instance.vm.apply {
