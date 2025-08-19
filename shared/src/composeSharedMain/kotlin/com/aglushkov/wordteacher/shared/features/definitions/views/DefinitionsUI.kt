@@ -49,6 +49,7 @@ import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.SearchView
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserViewItem
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.res.MR
@@ -252,7 +253,7 @@ private fun DefinitionsWordUI(
         } else {
             if (isNotEmpty) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
                     contentPadding = PaddingValues(
                         bottom = 300.dp
                     )
@@ -291,7 +292,7 @@ private fun wordHistoryUI(
     val words by vm.wordHistory.collectAsState()
     if (words.isLoadedAndNotEmpty()) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
             contentPadding = PaddingValues(
                 bottom = 300.dp
             )
@@ -325,7 +326,7 @@ private fun suggestListUI(
     focusManager: FocusManager
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
         contentPadding = PaddingValues(
             bottom = 300.dp
         )

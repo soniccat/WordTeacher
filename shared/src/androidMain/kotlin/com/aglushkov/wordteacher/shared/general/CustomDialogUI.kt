@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.primarySurface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -39,6 +40,7 @@ import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPaddin
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPaddingWithIME
 import kotlinx.coroutines.flow.Flow
 import kotlin.coroutines.cancellation.CancellationException
+import androidx.core.graphics.drawable.toDrawable
 
 @Composable
 actual fun CustomDialogUI(
@@ -54,6 +56,7 @@ actual fun CustomDialogUI(
     ) {
         val window = findDialogWindow() ?: throw Resources.NotFoundException("Window isn't found")
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+        window.decorView.background = MaterialTheme.colors.background.value.toInt().toDrawable()
 //        window.setDimAmount(0.0f)
 
         val view = window.decorView
@@ -80,28 +83,27 @@ actual fun CustomDialogUI(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(androidx.compose.ui.graphics.Color.Red)
+                .graphicsLayer {
+                    translationY = -animationProgress * 5.dp.toPx()
+                    translationX = animationProgress * 25.dp.toPx()
+                    alpha = 1 - animationProgress
+                    scaleX = 1 - (animationProgress / 10F)
+                    scaleY = 1 - (animationProgress / 10F)
+
+                    val radius = 16.dp * animationProgress
+                    shape = RoundedCornerShape(
+                        topStart = radius,
+                        topEnd = radius,
+                        bottomEnd = radius,
+                        bottomStart = radius,
+                    )
+                    clip = true
+                }
+                .background(MaterialTheme.colors.primarySurface)
                 .windowInsetsVerticalPaddingWithIME(),
         ) {
             Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        translationY = -animationProgress * 5.dp.toPx()
-                        translationX = animationProgress * 25.dp.toPx()
-                        alpha = 1 - animationProgress
-                        scaleX = 1 - (animationProgress / 10F)
-                        scaleY = 1 - (animationProgress / 10F)
-
-                        val radius = 16.dp * animationProgress
-                        shape = RoundedCornerShape(
-                            topStart = radius,
-                            topEnd = radius,
-                            bottomEnd = radius,
-                            bottomStart = radius,
-                        )
-                        clip = true
-                    },
+                modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
                 content()
@@ -126,90 +128,90 @@ private fun findDialogWindow(): Window? {
     }
 }
 
-fun android.view.WindowInsets.toWindowInsets(): WindowInsets {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        val systemInsets = getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())
-        WindowInsets(
-            top = systemInsets.top,
-            bottom = systemInsets.bottom,
-            left = systemInsets.left,
-            right = systemInsets.right
-        )
-    } else {
-        WindowInsets(
-            top = systemWindowInsetTop,
-            bottom = systemWindowInsetBottom,
-            left = systemWindowInsetLeft,
-            right = systemWindowInsetRight
-        )
-    }
+//fun android.view.WindowInsets.toWindowInsets(): WindowInsets {
+//    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//        val systemInsets = getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())
+//        WindowInsets(
+//            top = systemInsets.top,
+//            bottom = systemInsets.bottom,
+//            left = systemInsets.left,
+//            right = systemInsets.right
+//        )
+//    } else {
+//        WindowInsets(
+//            top = systemWindowInsetTop,
+//            bottom = systemWindowInsetBottom,
+//            left = systemWindowInsetLeft,
+//            right = systemWindowInsetRight
+//        )
+//    }
+//
+//}
+//
+//data class WindowInsets(
+//    val left: Int = 0,
+//    val right: Int = 0,
+//    val top: Int = 0,
+//    val bottom: Int = 0
+//) {
+//    fun log() {
+//        Logger.v(
+//            "WindowInsets",
+//            "left:${left} right:${right} top:${top} bottom:${bottom}"
+//        )
+//    }
+//}
 
-}
-
-data class WindowInsets(
-    val left: Int = 0,
-    val right: Int = 0,
-    val top: Int = 0,
-    val bottom: Int = 0
-) {
-    fun log() {
-        Logger.v(
-            "WindowInsets",
-            "left:${left} right:${right} top:${top} bottom:${bottom}"
-        )
-    }
-}
-
-fun Modifier.withWindowInsetsPadding() = composed {
-    this.padding(
-        start = LocalWindowInsets.current.left.pxToDp(),
-        top = LocalWindowInsets.current.top.pxToDp(),
-        end = LocalWindowInsets.current.right.pxToDp(),
-        bottom = LocalWindowInsets.current.bottom.pxToDp()
-    )
-}
-
-fun Modifier.withWindowInsetsVerticalPadding() = composed {
-    this.padding(
-        top = LocalWindowInsets.current.top.pxToDp(),
-        bottom = LocalWindowInsets.current.bottom.pxToDp()
-    )
-}
-
-fun Modifier.withWindowInsetsHorizontalPadding() = composed {
-    this.padding(
-        start = LocalWindowInsets.current.left.pxToDp(),
-        end = LocalWindowInsets.current.right.pxToDp(),
-    )
-}
-
-@Composable
-fun Window.ProvideWindowInsets(
-    content: @Composable () -> Unit
-) {
-    val initialInset = decorView.rootWindowInsets.toWindowInsets()
-    var windowInsets by remember { mutableStateOf(initialInset) }
-
-    CompositionLocalProvider(
-        LocalWindowInsets provides windowInsets,
-        content = content
-    )
-
-    DisposableEffect("ActivityInsets") {
-        decorView.setOnApplyWindowInsetsListener { v, insets ->
-            windowInsets = insets.toWindowInsets()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//                android.view.WindowInsets.CONSUMED
-                insets
-            } else {
-                insets//.consumeSystemWindowInsets()
-            }
-        }
-
-        onDispose {
-            decorView.setOnApplyWindowInsetsListener(null)
-        }
-    }
-}
-
-val LocalWindowInsets = staticCompositionLocalOf { WindowInsets() }
+//fun Modifier.withWindowInsetsPadding() = composed {
+//    this.padding(
+//        start = LocalWindowInsets.current.left.pxToDp(),
+//        top = LocalWindowInsets.current.top.pxToDp(),
+//        end = LocalWindowInsets.current.right.pxToDp(),
+//        bottom = LocalWindowInsets.current.bottom.pxToDp()
+//    )
+//}
+//
+//fun Modifier.withWindowInsetsVerticalPadding() = composed {
+//    this.padding(
+//        top = LocalWindowInsets.current.top.pxToDp(),
+//        bottom = LocalWindowInsets.current.bottom.pxToDp()
+//    )
+//}
+//
+//fun Modifier.withWindowInsetsHorizontalPadding() = composed {
+//    this.padding(
+//        start = LocalWindowInsets.current.left.pxToDp(),
+//        end = LocalWindowInsets.current.right.pxToDp(),
+//    )
+//}
+//
+//@Composable
+//fun Window.ProvideWindowInsets(
+//    content: @Composable () -> Unit
+//) {
+//    val initialInset = decorView.rootWindowInsets.toWindowInsets()
+//    var windowInsets by remember { mutableStateOf(initialInset) }
+//
+//    CompositionLocalProvider(
+//        LocalWindowInsets provides windowInsets,
+//        content = content
+//    )
+//
+//    DisposableEffect("ActivityInsets") {
+//        decorView.setOnApplyWindowInsetsListener { v, insets ->
+//            windowInsets = insets.toWindowInsets()
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+////                android.view.WindowInsets.CONSUMED
+//                insets
+//            } else {
+//                insets//.consumeSystemWindowInsets()
+//            }
+//        }
+//
+//        onDispose {
+//            decorView.setOnApplyWindowInsetsListener(null)
+//        }
+//    }
+//}
+//
+//val LocalWindowInsets = staticCompositionLocalOf { WindowInsets() }

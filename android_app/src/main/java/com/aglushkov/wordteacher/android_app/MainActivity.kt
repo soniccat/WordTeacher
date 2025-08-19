@@ -76,9 +76,6 @@ import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPadding
-import com.aglushkov.wordteacher.shared.general.withWindowInsetsHorizontalPadding
-import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
-import com.aglushkov.wordteacher.shared.general.withWindowInsetsVerticalPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.stack.Children

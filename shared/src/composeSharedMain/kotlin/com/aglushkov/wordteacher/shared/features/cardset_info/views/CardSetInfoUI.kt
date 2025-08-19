@@ -56,6 +56,7 @@ import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.OutlinedTextFieldWithError
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -121,6 +122,7 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .windowInsetsHorizontalPadding()
             .verticalScroll(scrollableState)
             .padding(
                 top = LocalDimens.current.contentPadding,

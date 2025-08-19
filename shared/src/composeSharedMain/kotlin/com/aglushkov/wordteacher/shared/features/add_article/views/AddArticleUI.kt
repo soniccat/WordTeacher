@@ -125,6 +125,7 @@ fun AddArticleUI(
                 modifier = Modifier.Companion
                     .align(Alignment.BottomEnd)
                     .padding(LocalDimens.current.contentPadding)
+                    .windowInsetsHorizontalPadding()
             )
         }
     }

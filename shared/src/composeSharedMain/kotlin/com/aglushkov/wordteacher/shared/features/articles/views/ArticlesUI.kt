@@ -22,6 +22,7 @@ import com.aglushkov.wordteacher.shared.general.views.CustomAnnotatedTextListIte
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -51,9 +52,10 @@ fun ArticlesUI(
             )
 
             val data = articles.data()
-
             if (data?.isNotEmpty() == true) {
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.windowInsetsHorizontalPadding(),
+                ) {
                     items(
                         data,
                         key = { it.id }
@@ -74,7 +76,7 @@ fun ArticlesUI(
         }
 
         Box(
-            modifier = Modifier.matchParentSize(),
+            modifier = Modifier.matchParentSize().windowInsetsHorizontalPadding(),
             contentAlignment = Alignment.BottomEnd
         ) {
             FloatingActionButton(

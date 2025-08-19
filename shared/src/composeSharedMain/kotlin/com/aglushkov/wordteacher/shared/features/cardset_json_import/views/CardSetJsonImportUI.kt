@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJsonImportVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.compose.localized
@@ -68,6 +69,7 @@ fun CardSetJsonImportUI(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .windowInsetsHorizontalPadding()
             .then(modifier)
     ) {
         Column {

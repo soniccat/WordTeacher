@@ -47,6 +47,7 @@ import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.dpToPx
 import com.aglushkov.wordteacher.shared.general.views.pxToDp
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
@@ -124,7 +125,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
         )
 
         Box(
-            modifier = modifier.fillMaxSize()
+            modifier = modifier.fillMaxSize().windowInsetsHorizontalPadding()
         ) {
             if (data != null) {
                 val listState = rememberLazyListState()

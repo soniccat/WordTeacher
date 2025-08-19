@@ -7,15 +7,26 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.pager.PageSize.Fill.calculateMainAxisPageSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun Modifier.windowInsetsHorizontalPadding() = windowInsetsPadding(
 WindowInsets.displayCutout
             .union(WindowInsets.systemBars)
             .only(WindowInsetsSides.Horizontal)
+)
+
+@Composable
+fun Modifier.windowInsetsRightPadding() = windowInsetsPadding(
+    WindowInsets.displayCutout
+        .union(WindowInsets.systemBars)
+        .only(WindowInsetsSides.Right)
 )
 
 @Composable
@@ -27,8 +38,6 @@ fun Modifier.windowInsetsVerticalPadding() = windowInsetsPadding(
 
 @Composable
 fun Modifier.windowInsetsVerticalPaddingWithIME() = windowInsetsPadding(
-    WindowInsets.displayCutout
-        .union(WindowInsets.systemBars)
-        .union(WindowInsets.ime)
+    WindowInsets.safeDrawing
         .only(WindowInsetsSides.Vertical)
 )

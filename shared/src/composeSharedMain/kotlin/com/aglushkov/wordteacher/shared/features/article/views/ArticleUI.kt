@@ -56,6 +56,8 @@ import com.aglushkov.wordteacher.shared.general.views.ModalSideSheet
 import com.aglushkov.wordteacher.shared.general.views.SideSheetValue
 import com.aglushkov.wordteacher.shared.general.views.pxToDp
 import com.aglushkov.wordteacher.shared.general.views.rememberSideSheetState
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsRightPadding
 import com.aglushkov.wordteacher.shared.model.Header
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
@@ -155,6 +157,7 @@ fun ArticleUI(
 
                 if (data != null) {
                     LazyColumn(
+                        modifier = Modifier.windowInsetsHorizontalPadding(),
                         state = lazyColumnState,
                         contentPadding = PaddingValues(
                             bottom = LocalDimensWord.current.articleHorizontalPadding + this@BoxWithConstraints.maxHeight / 2
@@ -203,6 +206,7 @@ fun ArticleUI(
                 Box(
                     modifier = Modifier.fillMaxWidth()
                         .padding(LocalDimens.current.contentPadding)
+                        .windowInsetsHorizontalPadding()
                 ) {
                     Button(onClick = {
                         vm.onMarkAsReadUnreadClicked()
@@ -252,25 +256,27 @@ private fun ArticleSideSheetContent(
     val dictPaths by vm.dictPaths.collectAsState()
 
     Text(
-        modifier = Modifier.padding(all = LocalDimens.current.contentPadding),
+        modifier = Modifier.padding(all = LocalDimens.current.contentPadding).windowInsetsRightPadding(),
         text = stringResource(MR.strings.article_side_sheet_title),
         style = LocalAppTypography.current.articleSideSheetSection
     )
 
     CheckableListItem(
+        modifier = Modifier.windowInsetsRightPadding(),
         isChecked = state.selectionState.cardSetWords,
         text = stringResource(MR.strings.article_side_sheet_selection_cardset_words),
         onClicked = { vm.onCardSetWordSelectionChanged() }
     )
 
     Text(
-        modifier = Modifier.padding(all = LocalDimens.current.contentPadding),
+        modifier = Modifier.padding(all = LocalDimens.current.contentPadding).windowInsetsRightPadding(),
         text = stringResource(MR.strings.article_side_sheet_selection_dicts),
         style = LocalAppTypography.current.articleSideSheetSection
     )
     if (dictPaths.isLoaded()) {
         if (dictPaths.data()?.isNotEmpty() == true) {
             CheckableListItem(
+                modifier = Modifier.windowInsetsRightPadding(),
                 isChecked = state.selectionState.filterDictSingleWordEntries,
                 text = stringResource(MR.strings.article_side_sheet_selection_filter_dict_single_word_entries),
                 onClicked = { vm.onFilterDictSingleWordEntriesChanged() }
@@ -279,6 +285,7 @@ private fun ArticleSideSheetContent(
 
         dictPaths.data()?.onEach {
             CheckableListItem(
+                modifier = Modifier.windowInsetsRightPadding(),
                 isChecked = state.selectionState.dicts.contains(it),
                 text = it,
                 onClicked = { vm.onDictSelectionChanged(it) }
@@ -289,12 +296,13 @@ private fun ArticleSideSheetContent(
     }
 
     Text(
-        modifier = Modifier.padding(all = LocalDimens.current.contentPadding),
+        modifier = Modifier.padding(all = LocalDimens.current.contentPadding).windowInsetsRightPadding(),
         text = stringResource(MR.strings.article_side_sheet_selection_phrases),
         style = LocalAppTypography.current.articleSideSheetSection
     )
     ChunkType.values().onEach { chunkType ->
         CheckableListItem(
+            modifier = Modifier.windowInsetsRightPadding(),
             isChecked = state.selectionState.phrases.contains(chunkType),
             text = chunkType.toStringDesc().localized(),
             onClicked = { vm.onPhraseSelectionChanged(chunkType) }
@@ -302,12 +310,13 @@ private fun ArticleSideSheetContent(
     }
 
     Text(
-        modifier = Modifier.padding(all = LocalDimens.current.contentPadding),
+        modifier = Modifier.padding(all = LocalDimens.current.contentPadding).windowInsetsRightPadding(),
         text = stringResource(MR.strings.article_side_sheet_part_of_speech_title),
         style = LocalAppTypography.current.articleSideSheetSection
     )
     WordTeacherWord.PartOfSpeech.values().onEach { partOfSpeech ->
         CheckableListItem(
+            modifier = Modifier.windowInsetsRightPadding(),
             isChecked = state.selectionState.partsOfSpeech.contains(partOfSpeech),
             text = partOfSpeech.toStringDesc().localized(),
             onClicked = { vm.onPartOfSpeechSelectionChanged(partOfSpeech) }
@@ -775,11 +784,12 @@ private val PhraseTypeToColorMap = mapOf(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CheckableListItem(
+    modifier: Modifier = Modifier,
     isChecked: Boolean,
     text: String,
     onClicked: () -> Unit
 ) = ListItem(
-    modifier = Modifier.clickable(onClick = onClicked),
+    modifier = modifier.clickable(onClick = onClicked),
     trailing = {
         Checkbox(
             checked = isChecked,

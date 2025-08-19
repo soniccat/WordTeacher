@@ -21,7 +21,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
-import com.aglushkov.wordteacher.android_app.general.views.compose.*
 import com.aglushkov.wordteacher.shared.features.notes.vm.CreateNoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NoteViewItem
 import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
@@ -62,7 +61,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
 
             if (notes.isLoaded() && data != null) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
                     state = lazyColumnState,
                     contentPadding = PaddingValues(bottom = 300.dp)
                 ) {

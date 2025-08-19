@@ -101,6 +101,7 @@ fun CardSetsUI(
                 val data = searchCardSets.data()
                 if (searchCardSets.isLoadedAndNotEmpty() && data != null) {
                     LazyColumn(
+                        modifier = Modifier.windowInsetsHorizontalPadding(),
                         contentPadding = PaddingValues(bottom = 100.dp)
                     ) {
                         items(
@@ -130,6 +131,7 @@ fun CardSetsUI(
 //                    }
 
                     LazyColumn(
+                        modifier = Modifier.windowInsetsHorizontalPadding(),
                         contentPadding = PaddingValues(bottom = 100.dp)
                     ) {
                         items(
@@ -152,7 +154,7 @@ fun CardSetsUI(
         }
 
         Box(
-            modifier = Modifier.matchParentSize(),
+            modifier = Modifier.matchParentSize().windowInsetsHorizontalPadding(),
             contentAlignment = Alignment.BottomEnd
         ) {
             FloatingActionButton(

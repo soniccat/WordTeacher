@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -44,7 +45,7 @@ fun SettingsUI(
             )
 
             LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
                 contentPadding = PaddingValues(
                     bottom = 100.dp
                 )

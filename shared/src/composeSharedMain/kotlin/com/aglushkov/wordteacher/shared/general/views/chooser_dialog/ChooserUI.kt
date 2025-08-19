@@ -14,6 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 
 @ExperimentalMaterialApi
 @Composable
@@ -29,7 +30,7 @@ fun ChooserUI(
         sheetContent = {
             Column(
                 // We must keep it non empty to avoid this crash: https://kotlinlang.slack.com/archives/CJLTWPH7S/p1619607891021400
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp).windowInsetsHorizontalPadding()
             ) {
                 LazyColumn{
                     items(items) { item ->

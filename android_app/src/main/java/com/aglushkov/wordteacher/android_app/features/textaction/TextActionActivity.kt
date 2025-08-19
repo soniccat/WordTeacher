@@ -42,10 +42,9 @@ import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleRouter
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponentRouter
-import com.aglushkov.wordteacher.shared.general.ProvideWindowInsets
 import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
-import com.aglushkov.wordteacher.shared.general.withWindowInsetsPadding
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPaddingWithIME
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
@@ -148,21 +147,19 @@ class TextActionActivity: AppCompatActivity() {
     @Composable
     private fun ComposeUI() {
         ComposeAppTheme {
-            window.ProvideWindowInsets {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .withWindowInsetsPadding(),
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsVerticalPaddingWithIME(),
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
                 ) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colors.background
-                    ) {
-                        MainUI()
-                    }
-
-                    SnackbarUI()
+                    MainUI()
                 }
+
+                SnackbarUI()
             }
         }
     }

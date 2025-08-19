@@ -48,6 +48,7 @@ import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.StringDesc
 import dev.icerock.moko.resources.compose.localized
@@ -190,6 +191,7 @@ private fun typeChallengeUI(
     vm: LearningVM
 ) {
     TermInput(
+        modifier = Modifier.windowInsetsHorizontalPadding(),
         term = data.term,
         errorString = errorString?.resolveString(),
         focusRequester = focusRequester,
@@ -215,7 +217,7 @@ private fun BoxScope.testBottomButtons(
         horizontalAlignment = Alignment.End
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End,
         ) {
@@ -267,6 +269,7 @@ private fun BoxScope.typeBottomButtons(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .windowInsetsHorizontalPadding()
             .align(Alignment.BottomEnd),
         horizontalAlignment = Alignment.End
     ) {
@@ -362,7 +365,7 @@ private fun matchChallengeUI(
 ) {
     val instructionString = data.instruction.localized()
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
         contentPadding = PaddingValues(
             bottom = 300.dp
         )
@@ -483,6 +486,7 @@ private fun testChallengeUI(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .windowInsetsHorizontalPadding()
             .padding(dimensionResource(id = R.dimen.learning_testOption_margin))
     ) {
         Column {
@@ -525,7 +529,7 @@ private fun testChallengeUI(
 @Composable
 fun termInfo(termViewItems: List<BaseViewItem<*>>) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
         contentPadding = PaddingValues(
             bottom = 300.dp
         )
