@@ -28,6 +28,7 @@ import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import java.util.*
@@ -91,7 +92,7 @@ fun LearningSessionResultUI(
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
                     contentPadding = PaddingValues(
-                        bottom = 300.dp
+                        bottom = listBottomPadding()
                     )
                 ) {
                     items(data, key = { it.id }) { item ->

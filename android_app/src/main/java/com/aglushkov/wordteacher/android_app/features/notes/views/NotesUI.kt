@@ -63,7 +63,7 @@ fun NotesUI(vm: NotesVM, modifier: Modifier = Modifier) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
                     state = lazyColumnState,
-                    contentPadding = PaddingValues(bottom = 300.dp)
+                    contentPadding = PaddingValues(bottom = listBottomPadding())
                 ) {
                     items(
                         data.size,

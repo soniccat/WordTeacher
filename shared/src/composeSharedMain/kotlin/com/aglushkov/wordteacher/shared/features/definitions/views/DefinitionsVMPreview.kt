@@ -90,7 +90,7 @@ open class DefinitionsVMPreview(
 
     override fun clearSuggests() {}
 
-    override fun requestSuggests(word: String) {}
+    override fun requestSuggests(word: String?) {}
 
     override fun onCleared() {}
 

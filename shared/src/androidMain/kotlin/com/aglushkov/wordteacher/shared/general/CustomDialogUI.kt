@@ -56,8 +56,7 @@ actual fun CustomDialogUI(
     ) {
         val window = findDialogWindow() ?: throw Resources.NotFoundException("Window isn't found")
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
-        window.decorView.background = MaterialTheme.colors.background.value.toInt().toDrawable()
-//        window.setDimAmount(0.0f)
+        window.setDimAmount(0.5f)
 
         val view = window.decorView
         val statusBarIsDark = (view.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
@@ -90,7 +89,7 @@ actual fun CustomDialogUI(
                     scaleX = 1 - (animationProgress / 10F)
                     scaleY = 1 - (animationProgress / 10F)
 
-                    val radius = 16.dp * animationProgress
+                    val radius = 16.dp.toPx() * animationProgress
                     shape = RoundedCornerShape(
                         topStart = radius,
                         topEnd = radius,

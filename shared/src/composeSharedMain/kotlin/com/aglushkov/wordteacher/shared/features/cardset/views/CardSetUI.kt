@@ -46,6 +46,7 @@ import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.dpToPx
+import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.pxToDp
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -135,7 +136,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                     state = listState,
                     contentPadding = PaddingValues(
                         top = LocalDimensWord.current.wordHorizontalPadding,
-                        bottom = 300.dp
+                        bottom = listBottomPadding()
                     )
                 ) {
                     items(data, key = { it.id }) { item ->

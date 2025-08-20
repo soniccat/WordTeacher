@@ -77,7 +77,7 @@ interface DefinitionsVM: Clearable {
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
     fun onCloseClicked()
 
-    val wordTextValue: StateFlow<String>
+    val wordTextValue: StateFlow<String?>
     val state: State
     val definitions: StateFlow<Resource<List<BaseViewItem<*>>>>
     val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
@@ -95,7 +95,7 @@ interface DefinitionsVM: Clearable {
     val suggests: StateFlow<Resource<List<BaseViewItem<*>>>>
 
     fun clearSuggests()
-    fun requestSuggests(word: String)
+    fun requestSuggests(word: String?)
     fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem)
     fun onSuggestedShowAllSearchWordClicked()
 
@@ -109,6 +109,7 @@ interface DefinitionsVM: Clearable {
     @Serializable
     data class State(
         var word: String? = null,
+        var selectedPartsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
     )
 
     data class Settings(
@@ -135,19 +136,26 @@ open class DefinitionsVMImpl(
 ): ViewModel(), DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
-    final override var state: DefinitionsVM.State = restoredState.copy(
+    private val initialState: DefinitionsVM.State = restoredState.copy(
         word = if (definitionsSettings.needShowLastDefinedWord) {
             settings.string(SETTING_LAST_DEFINED_WORD) ?: restoredState.word
         } else {
             restoredState.word
         }
     )
-    override val wordTextValue = MutableStateFlow(state.word.orEmpty())
+
+    override val wordTextValue = MutableStateFlow(initialState.word)
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
-    final override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(emptyList())
+    final override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(initialState.selectedPartsOfSpeechFilter)
     override val wordStack = MutableStateFlow<List<String>>(emptyList())
+
+    override val state: DefinitionsVM.State
+        get() = DefinitionsVM.State(
+            word = wordTextValue.value,
+            selectedPartsOfSpeechFilter = selectedPartsOfSpeechStateFlow.value,
+        )
 
     override val definitions = combine(
         definitionWords,
@@ -187,19 +195,11 @@ open class DefinitionsVMImpl(
     private var observeJob: Job? = null
     private var definitionsContext: DefinitionsContext? = null
 
-    private var word: String?
-        get() {
-            return state.word
-        }
-        set(value) {
-            state.word = value
-        }
-
     override val isWordHistorySelected = MutableStateFlow(false)
 
     init {
-        state.word?.let {
-            updateCurrentWord(it)
+        initialState.word?.let {
+            updateCurrentWord(it, initialState.selectedPartsOfSpeechFilter)
         }
 
         if (definitionsSettings.needStoreDefinedWordInSettings) {
@@ -207,7 +207,7 @@ open class DefinitionsVMImpl(
                 // observe loaded definitions to form history
                 definitionWords.collect {
                     if (it.data()?.isNotEmpty() == true) {
-                        word?.let { w ->
+                        wordTextValue.value?.let { w ->
                             settings[SETTING_LAST_DEFINED_WORD] = w
                             wordDefinitionHistoryRepository.put(w)
                         }
@@ -233,8 +233,7 @@ open class DefinitionsVMImpl(
         definitionsContext: DefinitionsContext?
     ) {
         if (word == null) {
-            this.word = null
-            wordTextValue.update { "" }
+            wordTextValue.update { null }
             selectedPartsOfSpeechStateFlow.value = emptyList()
             this.definitionsContext = null
         } else {
@@ -286,7 +285,7 @@ open class DefinitionsVMImpl(
 
     override fun onTryAgainClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.onTryAgainClicked"))
-        word?.let {
+        wordTextValue.value?.let {
             wordDefinitionRepository.clear(it)
             loadIfNeeded(it)
         }
@@ -295,7 +294,6 @@ open class DefinitionsVMImpl(
     // Actions
 
     private fun loadIfNeeded(word: String) {
-        this.word = word
         isWordHistorySelected.update { false }
 
         val wordRes = wordDefinitionRepository.obtainStateFlow(word).value
@@ -569,7 +567,7 @@ open class DefinitionsVMImpl(
     }
 
     override fun onSuggestsAppeared() {
-        if (wordTextValue.value.isNotEmpty()) {
+        if (wordTextValue.value?.isNotEmpty() == true) {
             requestSuggests(wordTextValue.value)
         }
     }
@@ -737,9 +735,13 @@ open class DefinitionsVMImpl(
     }
 
     private var suggestJob: Job? = null
-    override fun requestSuggests(word: String) {
+    override fun requestSuggests(word: String?) {
         suggestJob?.cancel()
         suggestJob = null
+
+        if (word == null || word.isEmpty()) {
+            return
+        }
 
         suggestJob = viewModelScope.launch(Dispatchers.IO) {
             delay(200)

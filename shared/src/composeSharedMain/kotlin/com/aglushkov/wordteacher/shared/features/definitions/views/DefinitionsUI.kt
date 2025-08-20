@@ -49,6 +49,7 @@ import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.SearchView
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserViewItem
+import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
@@ -224,7 +225,7 @@ private fun DefinitionsWordUI(
             ) {
                 SearchView(
                     Modifier.weight(1.0f),
-                    searchText.value,
+                    searchText.value.orEmpty(),
                     focusRequester = focusRequester,
                     onTextChanged = {
                         vm.onWordTextUpdated(it)
@@ -255,7 +256,7 @@ private fun DefinitionsWordUI(
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
                     contentPadding = PaddingValues(
-                        bottom = 300.dp
+                        bottom = listBottomPadding()
                     )
                 ) {
                     items(derivedDefs, key = { it.id }, contentType = { it.type }) { item ->
@@ -294,7 +295,7 @@ private fun wordHistoryUI(
         LazyColumn(
             modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
             contentPadding = PaddingValues(
-                bottom = 300.dp
+                bottom = listBottomPadding()
             )
         ) {
             items(words.data().orEmpty(), key = { it.id }) { item ->
@@ -328,7 +329,7 @@ private fun suggestListUI(
     LazyColumn(
         modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
         contentPadding = PaddingValues(
-            bottom = 300.dp
+            bottom = listBottomPadding()
         )
     ) {
         items(suggestsData, key = { it.id }) { item ->

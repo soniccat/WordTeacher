@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJsonImportVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -181,7 +182,7 @@ private fun CardSetJsonImportFieldsUI(
                     minHeight = with(LocalDensity.current) {
                         (42 * 2).sp.toDp()
                     },
-                    maxHeight = 300.dp
+                    maxHeight = listBottomPadding()
                 ),
             label = { Text(stringResource(MR.strings.add_article_field_text_hint)) }
         )

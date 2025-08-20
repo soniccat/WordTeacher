@@ -50,6 +50,7 @@ import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
+import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
@@ -89,7 +90,7 @@ fun DictConfigsUI(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
                 contentPadding = PaddingValues(
-                    bottom = 300.dp
+                    bottom = listBottomPadding()
                 )
             ) {
                 items(viewItems.value, key = { it.id }) { item ->

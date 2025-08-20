@@ -48,6 +48,7 @@ import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.StringDesc
@@ -367,7 +368,7 @@ private fun matchChallengeUI(
     LazyColumn(
         modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
         contentPadding = PaddingValues(
-            bottom = 300.dp
+            bottom = listBottomPadding()
         )
     ) {
         items(
@@ -531,7 +532,7 @@ fun termInfo(termViewItems: List<BaseViewItem<*>>) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
         contentPadding = PaddingValues(
-            bottom = 300.dp
+            bottom = listBottomPadding()
         )
     ) {
         items(termViewItems, key = { it.id }) { item ->
