@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.features.learning.vm
 
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordAudioFilesViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
@@ -9,6 +10,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewI
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordPartOfSpeechViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
+import com.aglushkov.wordteacher.shared.features.definitions.vm.toPartsOfSpeechFilter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.toViewItemAudioFile
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM.State.Companion.AllCards
 import com.aglushkov.wordteacher.shared.general.AudioService
@@ -511,10 +513,15 @@ open class LearningVMImpl(
 
     override fun onOpenDefinitionsClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Learning.onOpenDefinitionsClicked"))
-        val term = teacher?.currentTestCard?.card?.term ?: teacher?.currentCard?.term ?: return
+        val card = teacher?.currentTestCard?.card ?: teacher?.currentCard ?: return
         viewModelScope.launch {
             teacher?.countWrongAnswer()
-            router?.openDefinitions(term)
+            router?.openDefinitions(
+                DefinitionsVM.State(
+                    word = card.term,
+                    selectedPartsOfSpeechFilter = card.partOfSpeech.toPartsOfSpeechFilter()
+                )
+            )
         }
     }
 

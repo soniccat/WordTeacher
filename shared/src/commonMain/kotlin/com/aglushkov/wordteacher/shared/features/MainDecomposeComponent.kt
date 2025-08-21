@@ -1,7 +1,5 @@
 package com.aglushkov.wordteacher.shared.features
 
-import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent.Child
-import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent.ChildConfiguration
 import com.aglushkov.wordteacher.shared.features.add_article.AddArticleDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
@@ -23,7 +21,6 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.DictConfigsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.LearningSessionResultDecomposeComponent
@@ -67,7 +64,7 @@ interface MainDecomposeComponent:
     fun openCardSetInfo(state: CardSetInfoVM.State)
     override fun openLearning(state: LearningVM.State)
     fun openLearningSessionResult(results: List<SessionCardResult>)
-    fun openDefinitions(word: String)
+    fun openDefinitions(state: DefinitionsVM.State)
     fun back()
     fun popToRoot()
     override fun openWebAuth(networkType: SpaceAuthService.NetworkType)
@@ -292,9 +289,9 @@ class MainDecomposeComponentImpl(
         openAddArticle(null, true)
     }
 
-    override fun openDefinitions(word: String) {
+    override fun openDefinitions(state: DefinitionsVM.State) {
         addDialogConfigIfNotAtTop(MainDecomposeComponent.ChildConfiguration.DefinitionConfiguration(
-            state = DefinitionsVM.State(word = word)
+            state = state
         ))
     }
 

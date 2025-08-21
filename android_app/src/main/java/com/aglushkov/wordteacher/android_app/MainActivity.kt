@@ -9,17 +9,9 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.add
-import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.AppBarDefaults.TopAppBarElevation
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -65,6 +57,7 @@ import com.aglushkov.wordteacher.shared.features.dashboard.DashboardUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUIDialog
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
@@ -79,7 +72,6 @@ import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPaddin
 import com.aglushkov.wordteacher.shared.res.MR
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.stack.Children
-import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.materialPredictiveBackAnimatable
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
@@ -365,8 +357,8 @@ class MainActivity : AppCompatActivity(), Router {
                                     mainDecomposeComponent.openLearningSessionResult(results)
                                 }
 
-                                override fun openDefinitions(word: String) {
-                                    mainDecomposeComponent.openDefinitions(word)
+                                override fun openDefinitions(state: DefinitionsVM.State) {
+                                    mainDecomposeComponent.openDefinitions(state)
                                 }
 
                                 override fun onScreenFinished(
@@ -386,8 +378,8 @@ class MainActivity : AppCompatActivity(), Router {
                                     mainDecomposeComponent.popDialog(child.configuration)
                                 }
 
-                                override fun openDefinitions(word: String) {
-                                    mainDecomposeComponent.openDefinitions(word)
+                                override fun openDefinitions(state: DefinitionsVM.State) {
+                                    mainDecomposeComponent.openDefinitions(state)
                                 }
                             }
                         }

@@ -2,6 +2,8 @@ package com.aglushkov.wordteacher.shared.features.learning_session_result.vm
 
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.definitions.vm.toPartsOfSpeechFilter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
@@ -92,6 +94,7 @@ open class LearningSessionResultVMImpl(
             LearningSessionTermResultViewItem(
                 cardId = it.card.id,
                 term = it.card.term,
+                partOfSpeech = it.card.partOfSpeech,
                 newProgress = it.newProgress,
                 isRight = it.isRight
             )
@@ -107,7 +110,12 @@ open class LearningSessionResultVMImpl(
 
     override fun onTermClicked(item: LearningSessionTermResultViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("LearningResult.onTermClicked"))
-        router?.openDefinitions(item.term)
+        router?.openDefinitions(
+            DefinitionsVM.State(
+                word = item.term,
+                item.partOfSpeech.toPartsOfSpeechFilter()
+            )
+        )
     }
 
     override fun onTryAgainClicked() = cardLoader.tryLoadCardsAgain()

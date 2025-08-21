@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsContext
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsWordContext
+import com.aglushkov.wordteacher.shared.features.definitions.vm.toPartsOfSpeechFilter
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.Quadruple
@@ -400,17 +401,10 @@ open class ArticleVMImpl(
     ) {
         val resultWord = firstAnnotation?.entry?.word ?: slice.tokenString
         val resultPartOfSpeech = firstAnnotation?.entry?.partOfSpeech ?: slice.partOfSpeech()
-        val resultPartOfSpeechList = when(resultPartOfSpeech) {
-            // undefined to show dict results
-            WordTeacherWord.PartOfSpeech.Verb -> listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.PhrasalVerb, WordTeacherWord.PartOfSpeech.Undefined)
-            WordTeacherWord.PartOfSpeech.PhrasalVerb -> listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.Verb, WordTeacherWord.PartOfSpeech.Undefined)
-            WordTeacherWord.PartOfSpeech.Undefined -> listOf()
-            else -> listOf(resultPartOfSpeech, WordTeacherWord.PartOfSpeech.Undefined)
-        }
 
         definitionsVM.onWordSubmitted(
             resultWord,
-            resultPartOfSpeechList,
+            resultPartOfSpeech.toPartsOfSpeechFilter(),
             DefinitionsContext(
                 wordContexts = mapOf(
                     resultPartOfSpeech to DefinitionsWordContext(

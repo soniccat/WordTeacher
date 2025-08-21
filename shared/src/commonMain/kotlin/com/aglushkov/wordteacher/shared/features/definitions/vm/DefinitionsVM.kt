@@ -118,6 +118,16 @@ interface DefinitionsVM: Clearable {
     )
 }
 
+fun WordTeacherWord.PartOfSpeech.toPartsOfSpeechFilter(): List<WordTeacherWord.PartOfSpeech> {
+    return when(this) {
+        // undefined to show dict results
+        WordTeacherWord.PartOfSpeech.Verb -> listOf(this, WordTeacherWord.PartOfSpeech.PhrasalVerb, WordTeacherWord.PartOfSpeech.Undefined)
+        WordTeacherWord.PartOfSpeech.PhrasalVerb -> listOf(this, WordTeacherWord.PartOfSpeech.Verb, WordTeacherWord.PartOfSpeech.Undefined)
+        WordTeacherWord.PartOfSpeech.Undefined -> listOf()
+        else -> listOf(this, WordTeacherWord.PartOfSpeech.Undefined)
+    }
+}
+
 open class DefinitionsVMImpl(
     restoredState: DefinitionsVM.State,
     private val connectivityManager: ConnectivityManager,
@@ -401,14 +411,16 @@ open class DefinitionsVMImpl(
         words.groupBy { it.word }
             .map {
                 val mergedWord = mergeWords(it.value, partsOfSpeechFilter)
-                addWordViewItems(
-                    mergedWord,
-                    partsOfSpeechFilter,
-                    items,
-                    if (isFirst) wordFrequencyLevelAndRatio else null
-                )
-                items.add(WordDividerViewItem())
-                isFirst = false
+                if (mergedWord.definitions.isNotEmpty()) {
+                    addWordViewItems(
+                        mergedWord,
+                        partsOfSpeechFilter,
+                        items,
+                        if (isFirst) wordFrequencyLevelAndRatio else null
+                    )
+                    items.add(WordDividerViewItem())
+                    isFirst = false
+                }
             }
     }
 
@@ -507,8 +519,6 @@ open class DefinitionsVMImpl(
         words: List<WordTeacherWord>,
         partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>
     ): WordTeacherWord {
-        if (words.size == 1) return words.first()
-
         val allWords = mutableListOf<String>()
         val allTranscriptions = mutableListOf<String>()
         val allAudioFiles = mutableListOf<WordTeacherWord.AudioFile>()
