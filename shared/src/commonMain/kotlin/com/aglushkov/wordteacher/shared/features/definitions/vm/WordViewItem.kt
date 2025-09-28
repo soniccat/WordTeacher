@@ -117,14 +117,13 @@ class WordSubHeaderViewItem(
     }
 }
 
-class WordDividerViewItem(): BaseViewItem<Any>(Obj, Type) {
+class WordDividerViewItem(): BaseViewItem<Unit>(Unit, Type) {
     companion object {
-        val Obj = Any()
         const val Type = 109
     }
 }
 
-class WordLoadingViewItem: BaseViewItem<String>("loading", Type) {
+class WordLoadingViewItem: BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 110
     }

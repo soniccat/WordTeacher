@@ -111,7 +111,7 @@ fun DashboardUI(
                         contentType = { it.type }
                     ) { item ->
                         dashboardItem(
-                            Modifier,//.animateItem(),
+                            Modifier.animateItem(),
                             item,
                             vm
                         )
