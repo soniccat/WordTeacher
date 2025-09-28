@@ -14,8 +14,7 @@ class ArticleViewItem(
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        other as ArticleViewItem
-        return super.equalsByContent(other) && date == other.date &&
+        return super.equalsByContent(other) && other is ArticleViewItem && date == other.date &&
                 isRead == other.isRead
     }
 }

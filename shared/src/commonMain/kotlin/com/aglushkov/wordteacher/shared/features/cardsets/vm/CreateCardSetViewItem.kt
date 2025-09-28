@@ -11,9 +11,4 @@ class CreateCardSetViewItem(
     companion object {
         const val Type = 601
     }
-
-    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        other as CreateCardSetViewItem
-        return super.equalsByContent(other)
-    }
 }

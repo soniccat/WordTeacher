@@ -17,7 +17,7 @@ class LogsRepository(
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     val isLoggingEnabledState = settings.booleanFlow(IS_LOGGING_SETTING_NAME, false)
-        .stateIn(scope, SharingStarted.Eagerly, false)
+        .stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
     fun logPaths(): List<Path> {
         return fileSystem.list(logFolderPath).filter {

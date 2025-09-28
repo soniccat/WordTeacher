@@ -183,12 +183,12 @@ open class ArticleVMImpl(
     override val paragraphs = combine(article, annotations, settingStore.prefs) { article, annotations, prefs ->
             //Logger.v("build view items")
             article.copyWith(buildViewItems(article, annotations, prefs))
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     private val dicts: StateFlow<Resource<List<Dict>>> = dictRepository.dicts
     override val dictPaths: StateFlow<Resource<List<String>>> = dicts.map {
             it.copyWith(it.data()?.map { dict -> dict.path.name })
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     override val lastFirstVisibleItem: Int
         get() = articlesRepository.lastFirstVisibleItemMap.value.data()?.get(stateController.articleId) ?: 0

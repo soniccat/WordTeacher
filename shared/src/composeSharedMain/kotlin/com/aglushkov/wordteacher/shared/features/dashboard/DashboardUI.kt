@@ -105,9 +105,13 @@ fun DashboardUI(
                         bottom = 100.dp
                     )
                 ) {
-                    items(items.orEmpty(), key = { it.id }) { item ->
+                    items(
+                        items = items.orEmpty(),
+                        key = { it.id },
+                        contentType = { it.type }
+                    ) { item ->
                         dashboardItem(
-                            Modifier.animateItem(),
+                            Modifier,//.animateItem(),
                             item,
                             vm
                         )

@@ -104,7 +104,7 @@ open class CardSetsVMImpl(
         cardSets.mapLoadedData {
             buildViewItems(it, uiStateFlow.value.newCardSetText, prefs)
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     override val searchCardSets = cardSetSearchRepository.cardSets.map { cardSetsRes ->
         cardSetsRes.mapLoadedData { cardSets ->
@@ -119,7 +119,7 @@ open class CardSetsVMImpl(
                generateSearchViewItemIds(it)
            }
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     private fun generateSearchViewItemIds(viewItems: List<BaseViewItem<*>>) {
         generateViewItemIds(viewItems, searchCardSets.value.data().orEmpty(), idGenerator)

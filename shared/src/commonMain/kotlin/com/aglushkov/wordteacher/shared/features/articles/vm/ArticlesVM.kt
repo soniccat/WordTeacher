@@ -57,7 +57,7 @@ open class ArticlesVMImpl(
     override val articles = combine(articlesRepository.shortArticles, settingStore.prefs) { articles, prefs ->
         //Logger.v("build view items")
         articles.copyWith(buildViewItems(articles.data() ?: emptyList(), prefs))
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     override fun onCreateTextArticleClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Articles.createTextArticleClicked"))

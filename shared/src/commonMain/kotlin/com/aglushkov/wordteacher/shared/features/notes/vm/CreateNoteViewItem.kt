@@ -11,9 +11,4 @@ class CreateNoteViewItem(
     companion object {
         const val Type = 501
     }
-
-    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        other as CreateNoteViewItem
-        return super.equalsByContent(other)
-    }
 }

@@ -32,7 +32,7 @@ class ServiceRepository(
                     emptyList()
                 }
             )
-        }.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
+        }.stateIn(scope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     private fun createWordTeacherWordService(it: Config): WordTeacherWordService? {
         return serviceFactory.createService(it.type, it.connectParams, ServiceMethodParams(it.methods))

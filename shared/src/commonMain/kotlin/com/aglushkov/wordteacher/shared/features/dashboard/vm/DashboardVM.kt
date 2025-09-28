@@ -23,6 +23,7 @@ import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
 import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepository
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onData
@@ -123,7 +124,7 @@ open class DashboardVMIMpl(
         readCardSetRepository.stateFlow.map { it.data().orEmpty() },
         settingStore.prefs,
         ::buildViewItems,
-    ).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Loading())
+    ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Loading())
 
     init {
         loadDashboard()
@@ -239,16 +240,16 @@ open class DashboardVMIMpl(
 
         val resultList = mutableListOf<BaseViewItem<*>>()
 
-        if (!prefs.isHintClosed(HintType.Introduction)) {
-            resultList.add(HintViewItem(HintType.Introduction))
-        }
+//        if (!prefs.isHintClosed(HintType.Introduction)) {
+//            resultList.add(HintViewItem(HintType.Introduction))
+//        }
 
         val wereInitialHintsClosed = prefs.isHintClosed(HintType.DashboardArticles) &&
                 prefs.isHintClosed(HintType.DashboardCardSets)
 
         // ready to learn card sets
         cardSetsRes.data()?.filter {
-                it.terms.size > 0 && it.readyToLearnProgress < 1.0
+                it.terms.isNotEmpty() && it.readyToLearnProgress < 1.0
             }?.sortedByDescending { it.modificationDate }
             ?.take(3)
             ?.takeIf { it.isNotEmpty() }
@@ -268,37 +269,44 @@ open class DashboardVMIMpl(
                 }
             }
 
-        // recently started articles
-        articlesRes.data()?.filter {
-            !it.isRead
-        }?.sortedByDescending { it.date }
-        ?.take(3)
-        ?.takeIf { it.isNotEmpty() }
-        ?.let { articles ->
-            resultList.add(
-                SettingsViewTitleItem(
-                    ResourceStringDesc(MR.strings.dashboard_reading_articles)
-                )
-            )
-            if (wereInitialHintsClosed && !prefs.isHintClosed(HintType.DashboardUsersArticles)) {
-                resultList.add(HintViewItem(HintType.DashboardUsersArticles))
-            }
-            articles.onEach { article ->
-                resultList.add(
-                    ArticleViewItem(article.id, article.name, timeSource.stringDate(article.date), article.isRead)
-                )
-            }
+        if (cardSetsRes.isLoaded()) {
+            // recently started articles
+            articlesRes.data()?.filter {
+                !it.isRead
+            }?.sortedByDescending { it.date }
+                ?.take(3)
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { articles ->
+//                    resultList.add(
+//                        SettingsViewTitleItem(
+//                            ResourceStringDesc(MR.strings.dashboard_reading_articles)
+//                        )
+//                    )
+                    if (wereInitialHintsClosed && !prefs.isHintClosed(HintType.DashboardUsersArticles)) {
+                        resultList.add(HintViewItem(HintType.DashboardUsersArticles))
+                    }
+                    articles.onEach { article ->
+                        resultList.add(
+                            ArticleViewItem(
+                                article.id,
+                                article.name,
+                                timeSource.stringDate(article.date),
+                                article.isRead
+                            )
+                        )
+                    }
+                }
         }
 
         // dashboard content
         dashboardRes.on(
             data = {
                 it.headlineBlock.categories.getOrNull(state.selectedCategoryIndex)?.let { selectedCategory ->
-                    resultList.add(
-                        SettingsViewTitleItem(
-                            ResourceStringDesc(MR.strings.dashboard_headline_title)
-                        )
-                    )
+//                    resultList.add(
+//                        SettingsViewTitleItem(
+//                            ResourceStringDesc(MR.strings.dashboard_headline_title)
+//                        )
+//                    )
                     if (!prefs.isHintClosed(HintType.DashboardArticles)) {
                         resultList.add(HintViewItem(HintType.DashboardArticles))
                     }
@@ -337,11 +345,11 @@ open class DashboardVMIMpl(
                 }
 
                 if (it.newCardSetBlock.cardSets.isNotEmpty()) {
-                    resultList.add(
-                        SettingsViewTitleItem(
-                            ResourceStringDesc(MR.strings.dashboard_cardsets_title)
-                        )
-                    )
+//                    resultList.add(
+//                        SettingsViewTitleItem(
+//                            ResourceStringDesc(MR.strings.dashboard_cardsets_title)
+//                        )
+//                    )
                     if (!prefs.isHintClosed(HintType.DashboardCardSets)) {
                         resultList.add(HintViewItem(HintType.DashboardCardSets))
                     }

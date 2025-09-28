@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.dashboard.vm
 
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.general.HtmlString
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.settings.HintType
@@ -36,6 +37,12 @@ class DashboardHeadlineViewItem(
 ): BaseViewItem<String>(id, Type) {
     companion object {
         const val Type = 1201
+    }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) &&
+                other is DashboardHeadlineViewItem &&
+                isRead == other.isRead
     }
 }
 

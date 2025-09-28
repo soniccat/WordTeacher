@@ -22,7 +22,7 @@ class CardsRepository(
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val cards = database.cards.selectAllCards().asFlow().map {
         tryInResource(canTryAgain = true) { it.executeAsList() }
-    }.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(scope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     fun cancel() {
         scope.cancel()

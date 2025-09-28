@@ -16,8 +16,8 @@ class CardSetViewItem(
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        other as CardSetViewItem
         return super.equalsByContent(other) &&
+                other is CardSetViewItem &&
                 name == other.name &&
                 date == other.date &&
                 readyToLearnProgress == other.readyToLearnProgress &&
@@ -46,8 +46,10 @@ class RemoteCardSetViewItem(
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        other as RemoteCardSetViewItem
-        return super.equalsByContent(other) && terms == other.terms
+        return super.equalsByContent(other) &&
+                other is RemoteCardSetViewItem &&
+                terms == other.terms &&
+                isRead == other.isRead
     }
 }
 

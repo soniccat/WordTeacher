@@ -130,7 +130,7 @@ open class CardSetVMImpl(
             } else {
                 Resource.Loading()
             }
-    }).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     private val events = MutableStateFlow<List<Event>>(emptyList())
     override val eventFlow = events.map { eventList -> eventList.filter { !it.isHandled } }
@@ -141,7 +141,7 @@ open class CardSetVMImpl(
             //Logger.v("build view items")
             cardSet.copyWith(buildViewItems(cardSet, gradation))
         }
-    ).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     init {
         addClearable(databaseCardWorker.startEditing())

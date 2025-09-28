@@ -13,7 +13,6 @@ class NoteViewItem(
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        other as NoteViewItem
-        return super.equalsByContent(other) && date == other.date
+        return super.equalsByContent(other) && other is NoteViewItem && date == other.date
     }
 }

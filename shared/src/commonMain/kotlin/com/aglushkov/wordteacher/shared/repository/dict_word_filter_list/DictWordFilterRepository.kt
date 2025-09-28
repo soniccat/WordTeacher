@@ -47,7 +47,7 @@ interface DictWordFilterListRepository {
 //
 ////    private val files: StateFlow<List<DictFilter>> = dictRepository.dicts.map {
 ////
-////    }.stateIn(scope, SharingStarted.Eagerly, Resource.Uninitialized())
+////    }.stateIn(scope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 ////        //MutableStateFlow<Resource<List<DictFilter>>>(Resource.Uninitialized())
 //
 //    var word: String? = null

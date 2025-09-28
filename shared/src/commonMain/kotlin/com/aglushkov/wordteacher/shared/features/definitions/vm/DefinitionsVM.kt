@@ -185,13 +185,13 @@ open class DefinitionsVMImpl(
                     wordFrequencyLevelAndRatio
                 )
             )
-    }).stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     override val partsOfSpeechFilterStateFlow = definitionWords.map {
         it.data().orEmpty().map { word ->
             word.definitions.keys
         }.flatten().distinct()
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String> { word ->
         dictRepository.wordsStartWith(word, 60)
@@ -595,7 +595,7 @@ open class DefinitionsVMImpl(
     override val cardSets = combine(cardSetsRepository.cardSets, settings.booleanFlow(SETTING_EXPAND_CARDSETS_POPUP, false)) { cardsets, isExpanded ->
         //Logger.v("build view items")
         cardsets.copyWith(buildCardSetViewItems(cardsets.data().orEmpty(), isExpanded))
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     private fun buildCardSetViewItems(cardSets: List<ShortCardSet>, isExpanded: Boolean): List<BaseViewItem<*>> {
         val items = mutableListOf<BaseViewItem<*>>()
@@ -737,7 +737,7 @@ open class DefinitionsVMImpl(
             }
             viewItems.onEachIndexed { index, item -> item.id = index.toLong() }
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     override fun clearSuggests() {
         suggestedDictEntryRepository.clear()
@@ -796,7 +796,7 @@ open class DefinitionsVMImpl(
                 WordHistoryViewItem(index.toLong(), s) as BaseViewItem<*>
             }
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     override fun toggleWordHistory() {
         analytics.send(

@@ -87,7 +87,7 @@ open class DictConfigsVMImpl(
         dictRepository.dicts
     ) { configs, dicts ->
         buildViewItems(configs, dicts)
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     override fun onConfigDeleteClicked(item: ConfigYandexViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("DictConfigs.configDeleteClicked"))

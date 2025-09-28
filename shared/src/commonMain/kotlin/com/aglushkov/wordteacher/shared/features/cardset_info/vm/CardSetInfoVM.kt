@@ -150,7 +150,7 @@ open class CardSetInfoVMImpl(
                 isEditable = !state.isRemoteCardSet,
             )
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     init {
         addClearable(databaseCardWorker.startEditing())

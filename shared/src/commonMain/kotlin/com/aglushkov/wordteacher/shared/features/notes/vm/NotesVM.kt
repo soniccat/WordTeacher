@@ -57,7 +57,7 @@ open class NotesVMImpl(
     .map { (notes, state) ->
         //Logger.v("build view items")
         notes.copyWith(buildViewItems(notes.data() ?: emptyList(), state.newNoteText))
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Resource.Uninitialized())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     override fun restore(newState: NotesVM.State) {
         updateState(newState)

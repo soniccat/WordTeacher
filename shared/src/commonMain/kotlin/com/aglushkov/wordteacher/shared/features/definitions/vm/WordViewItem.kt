@@ -124,7 +124,7 @@ class WordDividerViewItem(): BaseViewItem<Any>(Obj, Type) {
     }
 }
 
-class WordLoadingViewItem: BaseViewItem<String>("", Type) {
+class WordLoadingViewItem: BaseViewItem<String>("loading", Type) {
     companion object {
         const val Type = 110
     }

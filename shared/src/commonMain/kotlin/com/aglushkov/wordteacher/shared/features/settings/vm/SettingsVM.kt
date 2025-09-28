@@ -105,7 +105,7 @@ open class SettingsVMImpl (
         ) { a, b -> a.downgradeToErrorOrLoading(b) }
     ) { authRes, isLoggingEnabled, gradationState ->
         buildItems(authRes, gradationState, isLoggingEnabled, isDebug)
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private fun buildItems(
         authDataRes: Resource<SpaceAuthData>,
