@@ -98,7 +98,7 @@ fun DashboardUI(
                 title = { Text(stringResource(MR.strings.dashboard_title)) },
             )
 
-            if (itemsState.isLoaded() || items != null) {
+            if (items?.isNotEmpty() == true) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
                     contentPadding = PaddingValues(
@@ -106,7 +106,7 @@ fun DashboardUI(
                     )
                 ) {
                     items(
-                        items = items.orEmpty(),
+                        items = items,
                         key = { it.id },
                         contentType = { it.type }
                     ) { item ->

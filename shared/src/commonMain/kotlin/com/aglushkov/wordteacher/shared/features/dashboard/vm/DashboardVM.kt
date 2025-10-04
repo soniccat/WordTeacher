@@ -24,6 +24,7 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
 import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepository
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onData
@@ -240,9 +241,9 @@ open class DashboardVMIMpl(
 
         val resultList = mutableListOf<BaseViewItem<*>>()
 
-//        if (!prefs.isHintClosed(HintType.Introduction)) {
-//            resultList.add(HintViewItem(HintType.Introduction))
-//        }
+        if (!prefs.isHintClosed(HintType.Introduction)) {
+            resultList.add(HintViewItem(HintType.Introduction))
+        }
 
         val wereInitialHintsClosed = prefs.isHintClosed(HintType.DashboardArticles) &&
                 prefs.isHintClosed(HintType.DashboardCardSets)
@@ -269,19 +270,19 @@ open class DashboardVMIMpl(
                 }
             }
 
-        if (cardSetsRes.isLoaded()) {
-            // recently started articles
+        // recently started articles
+        if (cardSetsRes.isLoadedOrError()) {
             articlesRes.data()?.filter {
                 !it.isRead
             }?.sortedByDescending { it.date }
                 ?.take(3)
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { articles ->
-//                    resultList.add(
-//                        SettingsViewTitleItem(
-//                            ResourceStringDesc(MR.strings.dashboard_reading_articles)
-//                        )
-//                    )
+                    resultList.add(
+                        SettingsViewTitleItem(
+                            ResourceStringDesc(MR.strings.dashboard_reading_articles)
+                        )
+                    )
                     if (wereInitialHintsClosed && !prefs.isHintClosed(HintType.DashboardUsersArticles)) {
                         resultList.add(HintViewItem(HintType.DashboardUsersArticles))
                     }
@@ -301,12 +302,16 @@ open class DashboardVMIMpl(
         // dashboard content
         dashboardRes.on(
             data = {
+                if (cardSetsRes.isLoading() || articlesRes.isLoading()) {
+                    return@on
+                }
+
                 it.headlineBlock.categories.getOrNull(state.selectedCategoryIndex)?.let { selectedCategory ->
-//                    resultList.add(
-//                        SettingsViewTitleItem(
-//                            ResourceStringDesc(MR.strings.dashboard_headline_title)
-//                        )
-//                    )
+                    resultList.add(
+                        SettingsViewTitleItem(
+                            ResourceStringDesc(MR.strings.dashboard_headline_title)
+                        )
+                    )
                     if (!prefs.isHintClosed(HintType.DashboardArticles)) {
                         resultList.add(HintViewItem(HintType.DashboardArticles))
                     }
@@ -345,11 +350,11 @@ open class DashboardVMIMpl(
                 }
 
                 if (it.newCardSetBlock.cardSets.isNotEmpty()) {
-//                    resultList.add(
-//                        SettingsViewTitleItem(
-//                            ResourceStringDesc(MR.strings.dashboard_cardsets_title)
-//                        )
-//                    )
+                    resultList.add(
+                        SettingsViewTitleItem(
+                            ResourceStringDesc(MR.strings.dashboard_cardsets_title)
+                        )
+                    )
                     if (!prefs.isHintClosed(HintType.DashboardCardSets)) {
                         resultList.add(HintViewItem(HintType.DashboardCardSets))
                     }
@@ -378,7 +383,9 @@ open class DashboardVMIMpl(
                 }
             },
             loading = {
-                resultList.add(WordLoadingViewItem())
+                if (resultList.isNotEmpty()) {
+                    resultList.add(WordLoadingViewItem())
+                }
             },
             error = {
                 resultList.add(DashboardTryAgainViewItem(
@@ -387,6 +394,10 @@ open class DashboardVMIMpl(
                 ))
             }
         )
+
+        if (resultList.isEmpty()) {
+            return Resource.Loading()
+        }
 
         generateIds(resultList)
         return Resource.Loaded(resultList)

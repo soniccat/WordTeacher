@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.setAnalytics
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
+import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.tasks.Task
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.vk.id.VKID
@@ -46,11 +47,12 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var routerResolver: RouterResolver
     @Inject lateinit var activityVisibilityResolver: ActivityVisibilityResolver
 
-    // declare here to force initialization on startup (main process only)
+    // declare here to force initialization on startup
     @Inject lateinit var analytics: Analytics
     @Inject lateinit var databaseCardWorker: DatabaseCardWorker
     @Inject lateinit var cookieStorage: CookiesStorage
     @Inject lateinit var freqDb: WordFrequencyDatabase
+    @Inject lateinit var wordDefinitionRepository: WordDefinitionRepository
     @Inject lateinit var fileLogger: FileLogger
     @Inject lateinit var tasks: Array<Task>
 

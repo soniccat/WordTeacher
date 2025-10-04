@@ -14,6 +14,7 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.primarySurface
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -23,6 +24,7 @@ import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.compose.DarkColorPalette
 import com.aglushkov.wordteacher.android_app.compose.LightColorPalette
 import com.aglushkov.wordteacher.android_app.features.textaction.TextActionActivity
+import com.aglushkov.wordteacher.shared.general.DarkWindowBackground
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.views.dpToPx
 import com.aglushkov.wordteacher.shared.res.MR
@@ -43,13 +45,15 @@ class WebLinkOpenerImpl: WebLinkOpener {
                 // set the default color scheme
                 .setDefaultColorSchemeParams(
                     CustomTabColorSchemeParams.Builder()
+                        .setNavigationBarColor(LightColorPalette.primary.toArgb())
                         .setToolbarColor(LightColorPalette.primary.toArgb())
                         .build())
                 // set the alternative dark color scheme
                 .setColorSchemeParams(
                     CustomTabsIntent.COLOR_SCHEME_DARK,
                     CustomTabColorSchemeParams.Builder()
-                        .setToolbarColor(DarkColorPalette.background.toArgb())
+                        .setNavigationBarColor(DarkWindowBackground.toArgb())
+                        .setToolbarColor(DarkWindowBackground.toArgb())
                         .build())
                 // import button
                 .setShareState(CustomTabsIntent.SHARE_STATE_OFF)

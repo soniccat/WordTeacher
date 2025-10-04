@@ -2,7 +2,6 @@ package com.aglushkov.wordteacher.shared.general
 
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.view.View
@@ -25,6 +24,7 @@ import androidx.compose.material.primarySurface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalView
@@ -41,6 +41,7 @@ import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPaddin
 import kotlinx.coroutines.flow.Flow
 import kotlin.coroutines.cancellation.CancellationException
 import androidx.core.graphics.drawable.toDrawable
+import com.google.android.material.color.MaterialColors
 
 @Composable
 actual fun CustomDialogUI(
@@ -98,7 +99,17 @@ actual fun CustomDialogUI(
                     )
                     clip = true
                 }
-                .background(MaterialTheme.colors.primarySurface)
+                .background(
+                    if (MaterialTheme.colors.isLight) {
+                        MaterialTheme.colors.primarySurface
+                    } else {
+                        // hack to make the color above the appbar equal to the appbar background
+                        // changing DarkColorPalette.surface makes the appbar background lighter
+                        // need to investigate... on the same time in the main activity everything
+                        // works as expected
+                        DarkWindowBackground
+                    }
+                )
                 .windowInsetsVerticalPaddingWithIME(),
         ) {
             Surface(
@@ -127,90 +138,4 @@ private fun findDialogWindow(): Window? {
     }
 }
 
-//fun android.view.WindowInsets.toWindowInsets(): WindowInsets {
-//    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//        val systemInsets = getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())
-//        WindowInsets(
-//            top = systemInsets.top,
-//            bottom = systemInsets.bottom,
-//            left = systemInsets.left,
-//            right = systemInsets.right
-//        )
-//    } else {
-//        WindowInsets(
-//            top = systemWindowInsetTop,
-//            bottom = systemWindowInsetBottom,
-//            left = systemWindowInsetLeft,
-//            right = systemWindowInsetRight
-//        )
-//    }
-//
-//}
-//
-//data class WindowInsets(
-//    val left: Int = 0,
-//    val right: Int = 0,
-//    val top: Int = 0,
-//    val bottom: Int = 0
-//) {
-//    fun log() {
-//        Logger.v(
-//            "WindowInsets",
-//            "left:${left} right:${right} top:${top} bottom:${bottom}"
-//        )
-//    }
-//}
-
-//fun Modifier.withWindowInsetsPadding() = composed {
-//    this.padding(
-//        start = LocalWindowInsets.current.left.pxToDp(),
-//        top = LocalWindowInsets.current.top.pxToDp(),
-//        end = LocalWindowInsets.current.right.pxToDp(),
-//        bottom = LocalWindowInsets.current.bottom.pxToDp()
-//    )
-//}
-//
-//fun Modifier.withWindowInsetsVerticalPadding() = composed {
-//    this.padding(
-//        top = LocalWindowInsets.current.top.pxToDp(),
-//        bottom = LocalWindowInsets.current.bottom.pxToDp()
-//    )
-//}
-//
-//fun Modifier.withWindowInsetsHorizontalPadding() = composed {
-//    this.padding(
-//        start = LocalWindowInsets.current.left.pxToDp(),
-//        end = LocalWindowInsets.current.right.pxToDp(),
-//    )
-//}
-//
-//@Composable
-//fun Window.ProvideWindowInsets(
-//    content: @Composable () -> Unit
-//) {
-//    val initialInset = decorView.rootWindowInsets.toWindowInsets()
-//    var windowInsets by remember { mutableStateOf(initialInset) }
-//
-//    CompositionLocalProvider(
-//        LocalWindowInsets provides windowInsets,
-//        content = content
-//    )
-//
-//    DisposableEffect("ActivityInsets") {
-//        decorView.setOnApplyWindowInsetsListener { v, insets ->
-//            windowInsets = insets.toWindowInsets()
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-////                android.view.WindowInsets.CONSUMED
-//                insets
-//            } else {
-//                insets//.consumeSystemWindowInsets()
-//            }
-//        }
-//
-//        onDispose {
-//            decorView.setOnApplyWindowInsetsListener(null)
-//        }
-//    }
-//}
-//
-//val LocalWindowInsets = staticCompositionLocalOf { WindowInsets() }
+public val DarkWindowBackground = Color(0xFF434343)

@@ -600,7 +600,7 @@ private fun DefinitionsDisplayModeView(
                                 .clickable {
                                     onPartOfSpeechFilterCloseClicked()
                                 },
-                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.87f)
+                            tint = MaterialTheme.colors.onSecondary.copy(alpha = 0.87f)
                         )
                     }
                 } else {

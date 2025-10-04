@@ -7,7 +7,7 @@ import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import okio.Path
 
 
-class SettingsViewTitleItem(title: StringDesc): BaseViewItem<StringDesc>(title, Type) {
+class SettingsViewTitleItem(title: StringDesc) : BaseViewItem<StringDesc>(title, Type) {
     companion object {
         const val Type = 1000
     }
@@ -16,13 +16,13 @@ class SettingsViewTitleItem(title: StringDesc): BaseViewItem<StringDesc>(title, 
 class SettingsViewTextItem(
     title: StringDesc,
     val withBottomPadding: Boolean = true,
-): BaseViewItem<StringDesc>(title, Type) {
+) : BaseViewItem<StringDesc>(title, Type) {
     companion object {
         const val Type = 1001
     }
 }
 
-class SettingsViewLoading: BaseViewItem<Unit>(Unit, Type) {
+class SettingsViewLoading : BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 1002
     }
@@ -30,7 +30,7 @@ class SettingsViewLoading: BaseViewItem<Unit>(Unit, Type) {
 
 class SettingsSignInItem(
     val networkTypes: List<SpaceAuthService.NetworkType>,
-): BaseViewItem<Unit>(Unit, Type) {
+) : BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 1003
     }
@@ -41,19 +41,19 @@ class SettingsSignInItem(
     }
 }
 
-class SettingsSignOutItem(text: StringDesc): BaseViewItem<StringDesc>(text, Type) {
+class SettingsSignOutItem(text: StringDesc) : BaseViewItem<StringDesc>(text, Type) {
     companion object {
         const val Type = 1009
     }
 }
 
-class SettingsViewAuthRefreshButtonItem(text: StringDesc): BaseViewItem<StringDesc>(text, Type) {
+class SettingsViewAuthRefreshButtonItem(text: StringDesc) : BaseViewItem<StringDesc>(text, Type) {
     companion object {
         const val Type = 1004
     }
 }
 
-class SettingsOpenDictConfigsItem: BaseViewItem<Unit>(Unit, Type) {
+class SettingsOpenDictConfigsItem : BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 1005
     }
@@ -62,7 +62,7 @@ class SettingsOpenDictConfigsItem: BaseViewItem<Unit>(Unit, Type) {
 class SettingsLogsConfigsItem(
     val isEnabled: Boolean,
     val paths: List<LogFileItem>
-): BaseViewItem<Boolean>(isEnabled, Type) {
+) : BaseViewItem<Boolean>(isEnabled, Type) {
     companion object {
         const val Type = 1006
     }
@@ -72,7 +72,7 @@ class SettingsLogsConfigsItem(
 
 class SettingsWordFrequencyGradationItem(
     val gradation: WordFrequencyGradation,
-): BaseViewItem<WordFrequencyGradation>(gradation, Type) {
+) : BaseViewItem<WordFrequencyGradation>(gradation, Type) {
     companion object {
         const val Type = 1007
     }
@@ -80,7 +80,7 @@ class SettingsWordFrequencyGradationItem(
 
 class SettingsWordFrequencyUploadFileItem(
     text: StringDesc,
-): BaseViewItem<StringDesc>(text, Type) {
+) : BaseViewItem<StringDesc>(text, Type) {
     companion object {
         const val Type = 1008
     }
@@ -89,14 +89,14 @@ class SettingsWordFrequencyUploadFileItem(
 class SettingsAbout(
     val appTitle: String,
     val email: String,
-): BaseViewItem<Unit>(Unit, Type) {
+) : BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 1009
     }
 }
 
 class SettingsPrivacyPolicyItem(
-): BaseViewItem<Unit>(Unit, Type) {
+) : BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 1011
     }
@@ -104,7 +104,7 @@ class SettingsPrivacyPolicyItem(
 
 class SettingsResetHintsItem(
     text: StringDesc,
-): BaseViewItem<StringDesc>(text, Type) {
+) : BaseViewItem<StringDesc>(text, Type) {
     companion object {
         const val Type = 1012
     }
