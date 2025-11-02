@@ -33,7 +33,6 @@ loki.process "nginx" {
 loki.source.file "nginx" {
 	targets               = local.file_match.nginx.targets
 	forward_to            = [loki.process.nginx.receiver]
-	legacy_positions_file = "/var/lib/promtail/positions.yaml"
 }
 
 local.file_match "root" {
@@ -47,7 +46,6 @@ local.file_match "root" {
 loki.source.file "root" {
 	targets               = local.file_match.root.targets
 	forward_to            = [loki.write.default.receiver]
-	legacy_positions_file = "/var/lib/promtail/positions.yaml"
 }
 
 local.file_match "service_auth" {
@@ -89,7 +87,6 @@ loki.process "service_auth" {
 loki.source.file "service_auth" {
 	targets               = local.file_match.service_auth.targets
 	forward_to            = [loki.process.service_auth.receiver]
-	legacy_positions_file = "/var/lib/promtail/positions.yaml"
 }
 
 local.file_match "service_cardsets" {
@@ -137,7 +134,6 @@ loki.process "service_cardsets" {
 loki.source.file "service_cardsets" {
 	targets               = local.file_match.service_cardsets.targets
 	forward_to            = [loki.process.service_cardsets.receiver]
-	legacy_positions_file = "/var/lib/promtail/positions.yaml"
 }
 
 local.file_match "service_cardsetsearch" {
@@ -181,7 +177,6 @@ loki.process "service_cardsetsearch" {
 loki.source.file "service_cardsetsearch" {
 	targets               = local.file_match.service_cardsetsearch.targets
 	forward_to            = [loki.process.service_cardsetsearch.receiver]
-	legacy_positions_file = "/var/lib/promtail/positions.yaml"
 }
 
 local.file_match "service_dict" {
@@ -225,7 +220,6 @@ loki.process "service_dict" {
 loki.source.file "service_dict" {
 	targets               = local.file_match.service_dict.targets
 	forward_to            = [loki.process.service_dict.receiver]
-	legacy_positions_file = "/var/lib/promtail/positions.yaml"
 }
 
 local.file_match "service_articles" {
@@ -269,7 +263,6 @@ loki.process "service_articles" {
 loki.source.file "service_articles" {
 	targets               = local.file_match.service_articles.targets
 	forward_to            = [loki.process.service_articles.receiver]
-	legacy_positions_file = "/var/lib/promtail/positions.yaml"
 }
 
 local.file_match "service_dashboard" {
@@ -313,7 +306,6 @@ loki.process "service_dashboard" {
 loki.source.file "service_dashboard" {
 	targets               = local.file_match.service_dashboard.targets
 	forward_to            = [loki.process.service_dashboard.receiver]
-	legacy_positions_file = "/var/lib/promtail/positions.yaml"
 }
 
 loki.write "default" {
