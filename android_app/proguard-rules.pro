@@ -38,3 +38,6 @@
 -dontwarn org.osgi.util.tracker.ServiceTrackerCustomizer
 
 -keep class opennlp.** { *; }
+
+-keep class com.yandex.authsdk.** { *; }
+

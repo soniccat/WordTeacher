@@ -1,0 +1,324 @@
+local.file_match "nginx" {
+	path_targets = [{
+		__address__  = "localhost",
+		__path__     = "/var/log/nginx/*",
+		service_name = "nginx",
+	}]
+}
+
+loki.process "nginx" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.json {
+		expressions = {
+			request_uri = "",
+			status      = "",
+			time        = "time",
+		}
+	}
+
+	stage.labels {
+		values = {
+			request_uri = null,
+			status      = null,
+		}
+	}
+
+	stage.timestamp {
+		source = "time"
+		format = "RFC3339"
+	}
+}
+
+loki.source.file "nginx" {
+	targets               = local.file_match.nginx.targets
+	forward_to            = [loki.process.nginx.receiver]
+	legacy_positions_file = "/var/lib/promtail/positions.yaml"
+}
+
+local.file_match "root" {
+	path_targets = [{
+		__address__  = "localhost",
+		__path__     = "/var/log/root/*log",
+		service_name = "root",
+	}]
+}
+
+loki.source.file "root" {
+	targets               = local.file_match.root.targets
+	forward_to            = [loki.write.default.receiver]
+	legacy_positions_file = "/var/lib/promtail/positions.yaml"
+}
+
+local.file_match "service_auth" {
+	path_targets = [{
+		__address__  = "localhost",
+		__path__     = "/var/log/auth/service*",
+		service_name = "service_auth",
+	}]
+}
+
+loki.process "service_auth" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.json {
+		expressions = {
+			appVersion  = "",
+			deviceType  = "",
+			level       = "",
+			networkType = "",
+			time        = "",
+		}
+	}
+
+	stage.labels {
+		values = {
+			appVersion  = null,
+			deviceType  = null,
+			level       = null,
+			networkType = null,
+		}
+	}
+
+	stage.timestamp {
+		source = "time"
+		format = "RFC3339Nano"
+	}
+}
+
+loki.source.file "service_auth" {
+	targets               = local.file_match.service_auth.targets
+	forward_to            = [loki.process.service_auth.receiver]
+	legacy_positions_file = "/var/lib/promtail/positions.yaml"
+}
+
+local.file_match "service_cardsets" {
+	path_targets = [{
+		__address__  = "localhost",
+		__path__     = "/var/log/cardsets/service*",
+		service_name = "service_cardsets",
+	}]
+}
+
+loki.process "service_cardsets" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.json {
+		expressions = {
+			appVersion  = "",
+			deviceType  = "",
+			isPull      = "",
+			isPush      = "",
+			level       = "",
+			networkType = "",
+			time        = "",
+			userId      = "",
+		}
+	}
+
+	stage.labels {
+		values = {
+			appVersion  = null,
+			deviceType  = null,
+			isPull      = null,
+			isPush      = null,
+			level       = null,
+			networkType = null,
+			userId      = null,
+		}
+	}
+
+	stage.timestamp {
+		source = "time"
+		format = "RFC3339Nano"
+	}
+}
+
+loki.source.file "service_cardsets" {
+	targets               = local.file_match.service_cardsets.targets
+	forward_to            = [loki.process.service_cardsets.receiver]
+	legacy_positions_file = "/var/lib/promtail/positions.yaml"
+}
+
+local.file_match "service_cardsetsearch" {
+	path_targets = [{
+		__address__  = "localhost",
+		__path__     = "/var/log/cardsetsearch/service*",
+		service_name = "service_cardsetsearch",
+	}]
+}
+
+loki.process "service_cardsetsearch" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.json {
+		expressions = {
+			appVersion  = "",
+			deviceType  = "",
+			level       = "",
+			networkType = "",
+			time        = "",
+			userId      = "",
+		}
+	}
+
+	stage.labels {
+		values = {
+			appVersion  = null,
+			deviceType  = null,
+			level       = null,
+			networkType = null,
+			userId      = null,
+		}
+	}
+
+	stage.timestamp {
+		source = "time"
+		format = "RFC3339Nano"
+	}
+}
+
+loki.source.file "service_cardsetsearch" {
+	targets               = local.file_match.service_cardsetsearch.targets
+	forward_to            = [loki.process.service_cardsetsearch.receiver]
+	legacy_positions_file = "/var/lib/promtail/positions.yaml"
+}
+
+local.file_match "service_dict" {
+	path_targets = [{
+		__address__  = "localhost",
+		__path__     = "/var/log/dict/service*",
+		service_name = "service_dict",
+	}]
+}
+
+loki.process "service_dict" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.json {
+		expressions = {
+			appVersion  = "",
+			deviceType  = "",
+			level       = "",
+			networkType = "",
+			time        = "",
+			userId      = "",
+		}
+	}
+
+	stage.labels {
+		values = {
+			appVersion  = null,
+			deviceType  = null,
+			level       = null,
+			networkType = null,
+			userId      = null,
+		}
+	}
+
+	stage.timestamp {
+		source = "time"
+		format = "RFC3339Nano"
+	}
+}
+
+loki.source.file "service_dict" {
+	targets               = local.file_match.service_dict.targets
+	forward_to            = [loki.process.service_dict.receiver]
+	legacy_positions_file = "/var/lib/promtail/positions.yaml"
+}
+
+local.file_match "service_articles" {
+	path_targets = [{
+		__address__  = "localhost",
+		__path__     = "/var/log/articles/service*",
+		service_name = "service_articles",
+	}]
+}
+
+loki.process "service_articles" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.json {
+		expressions = {
+			appVersion  = "",
+			deviceType  = "",
+			level       = "",
+			networkType = "",
+			time        = "",
+			userId      = "",
+		}
+	}
+
+	stage.labels {
+		values = {
+			appVersion  = null,
+			deviceType  = null,
+			level       = null,
+			networkType = null,
+			userId      = null,
+		}
+	}
+
+	stage.timestamp {
+		source = "time"
+		format = "RFC3339Nano"
+	}
+}
+
+loki.source.file "service_articles" {
+	targets               = local.file_match.service_articles.targets
+	forward_to            = [loki.process.service_articles.receiver]
+	legacy_positions_file = "/var/lib/promtail/positions.yaml"
+}
+
+local.file_match "service_dashboard" {
+	path_targets = [{
+		__address__  = "localhost",
+		__path__     = "/var/log/dashboard/service*",
+		service_name = "service_dashboard",
+	}]
+}
+
+loki.process "service_dashboard" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.json {
+		expressions = {
+			appVersion  = "",
+			deviceType  = "",
+			level       = "",
+			networkType = "",
+			time        = "",
+			userId      = "",
+		}
+	}
+
+	stage.labels {
+		values = {
+			appVersion  = null,
+			deviceType  = null,
+			level       = null,
+			networkType = null,
+			userId      = null,
+		}
+	}
+
+	stage.timestamp {
+		source = "time"
+		format = "RFC3339Nano"
+	}
+}
+
+loki.source.file "service_dashboard" {
+	targets               = local.file_match.service_dashboard.targets
+	forward_to            = [loki.process.service_dashboard.receiver]
+	legacy_positions_file = "/var/lib/promtail/positions.yaml"
+}
+
+loki.write "default" {
+	endpoint {
+		url = "http://loki:3100/loki/api/v1/push"
+	}
+	external_labels = {}
+}

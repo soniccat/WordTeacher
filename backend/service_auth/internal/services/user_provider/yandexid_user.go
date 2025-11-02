@@ -51,7 +51,6 @@ func (s *Service) YandexUser(
 	}
 
 	if resposeBody.ClientId != s.yandexIdConfig.ClientId {
-		ctx := logger.WrapContext(ctx, "token", token)
 		return nil, logger.Error(ctx, "clientId is invalid")
 	}
 
