@@ -282,7 +282,7 @@ services:
       - mongosetup
 
   grafana:
-    image: grafana/grafana-enterprise
+    image: grafana/grafana-enterprise:12.3.0-19020365962
     container_name: grafana
     restart: unless-stopped
     hostname: "grafana"
