@@ -20,6 +20,14 @@ scrape_configs:
   - targets:
     - localhost:9191
 
+- job_name: 'node'
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - node-exporter:9100
+
 - job_name: mongo-exporter
   honor_timestamps: true
   metrics_path: /metrics

@@ -300,6 +300,9 @@ services:
     hostname: "prometheus"
     command:
       - '--web.listen-address=:9191'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
       - 9191:9191
@@ -310,6 +313,26 @@ services:
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - ${VOLUME_PROMETHEUS}:/prometheus
+
+  node-exporter:
+    image: prom/node-exporter:v1.10.2
+    container_name: node-exporter
+    hostname: "node-exporter"
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - 9100:9100
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.24
 
   loki:
     image: grafana/loki:3.5.8
