@@ -10,12 +10,13 @@
     "url": "/d/edipdzkb75logf/services",
     "expires": "0001-01-01T00:00:00Z",
     "created": "2024-04-28T14:30:15Z",
-    "updated": "2025-04-02T18:32:28Z",
+    "updated": "2025-11-15T14:28:11Z",
     "updatedBy": "admin",
-    "createdBy": "Anonymous",
-    "version": 11,
+    "createdBy": "api_guy",
+    "version": 34,
     "hasAcl": false,
     "isFolder": false,
+    "apiVersion": "v0alpha1",
     "folderId": 0,
     "folderUid": "",
     "folderTitle": "General",
@@ -87,6 +88,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -103,6 +105,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -118,7 +121,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -144,25 +147,27 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "label_replace(\n    label_replace(\n        label_replace(\n            label_replace(\n                quantile_over_time(\n                    0.95,\n                    {service_name=\"nginx\", filename = \"/var/log/nginx/access_log\"} | status >= 200 and status < 300 | json | unwrap request_time [$__auto]\n                ) by (request_uri), \n                \"request_uri\", \n                \"/api/v3/dict/words*\", \n                \"request_uri\", \n                \"/api/v3/dict/words.*\"\n            ),\n            \"request_uri\", \n            \"/api/cardsets/search*\", \n            \"request_uri\", \n            \"/api/cardsets/search.*\"\n        ),\n        \"request_uri\", \n        \"/api/v2/dict/words/textsearch/*\", \n        \"request_uri\", \n        \"/api/v2/dict/words/textsearch/.*\"  \n    ),\n    \"request_uri\", \n    \"/api/cardsets/*\", \n    \"request_uri\", \n    \"/api/cardsets/.*\"  \n)",
+            "expr": "label_replace(\n    label_replace(\n        label_replace(\n            label_replace(\n                label_replace(\n                    label_replace(\n                        quantile_over_time(\n                            0.95,\n                            {service_name=\"nginx\", filename = \"/var/log/nginx/access_log\"} | status >= 200 and status < 300 | json | unwrap request_time [$__auto]\n                        ) by (request_uri), \n                        \"request_uri\", \n                        \"/api/v3/dict/words*\", \n                        \"request_uri\", \n                        \"/api/v3/dict/words.*\"\n                    ),\n                    \"request_uri\", \n                    \"/api/cardsets/search*\", \n                    \"request_uri\", \n                    \"/api/cardsets/search.*\"\n                ),\n                \"request_uri\", \n                \"/api/v2/dict/words/textsearch/*\", \n                \"request_uri\", \n                \"/api/v2/dict/words/textsearch/.*\"  \n            ),\n            \"pull\", \n            \"/api/cardsets/pull\", \n            \"request_uri\", \n            \"/api/cardsets/pull\"  \n        ),\n        \"push\", \n        \"/api/cardsets/push\", \n        \"request_uri\", \n        \"/api/cardsets/push\"  \n    ),\n    \"request_uri\", \n    \"/api/cardsets/*\", \n    \"request_uri\", \n    \"/api/cardsets/.*\"  \n)",
             "hide": false,
             "queryType": "range",
             "refId": "B"
           }
         ],
-        "title": "nginx - access_log - 200...299",
+        "title": "nginx - time, access_log - 200...299",
         "type": "timeseries"
       },
       {
@@ -182,6 +187,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -198,6 +204,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -213,7 +220,131 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "__systemRef": "hideSeriesFrom",
+              "matcher": {
+                "id": "byNames",
+                "options": {
+                  "mode": "exclude",
+                  "names": [
+                    "{request_uri=\"/api/v1/dashboard\"}"
+                  ],
+                  "prefix": "All except:",
+                  "readOnly": true
+                }
+              },
+              "properties": [
+                {
+                  "id": "custom.hideFrom",
+                  "value": {
+                    "legend": false,
+                    "tooltip": true,
+                    "viz": true
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 1
+        },
+        "id": 40,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "12.3.0-19020365962",
+        "targets": [
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "cdi1al0jre0aoc"
+            },
+            "direction": "backward",
+            "editorMode": "code",
+            "expr": "label_replace(\n    label_replace(\n        label_replace(\n            label_replace(\n                label_replace(\n                    label_replace(\n                        count by(request_uri) (rate({service_name=\"nginx\", filename=\"/var/log/nginx/access_log\"} | status >= 200 and status < 300 [$__auto])),\n                        \"request_uri\", \n                        \"/api/v3/dict/words*\", \n                        \"request_uri\", \n                        \"/api/v3/dict/words.*\"\n                    ),\n                    \"request_uri\", \n                    \"/api/cardsets/search*\", \n                    \"request_uri\", \n                    \"/api/cardsets/search.*\"\n                ),\n                \"request_uri\", \n                \"/api/v2/dict/words/textsearch/*\", \n                \"request_uri\", \n                \"/api/v2/dict/words/textsearch/.*\"  \n            ),\n            \"pull\", \n            \"/api/cardsets/pull\", \n            \"request_uri\", \n            \"/api/cardsets/pull\"  \n        ),\n        \"push\", \n        \"/api/cardsets/push\", \n        \"request_uri\", \n        \"/api/cardsets/push\"  \n    ),\n    \"request_uri\", \n    \"/api/cardsets/*\", \n    \"request_uri\", \n    \"/api/cardsets/.*\"  \n)",
+            "hide": false,
+            "queryType": "range",
+            "refId": "B"
+          }
+        ],
+        "title": "nginx - count, access_log - 200...299",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "cdi1al0jre0aoc"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": 3600000,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "showValues": false,
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -227,8 +358,8 @@
         "gridPos": {
           "h": 8,
           "w": 12,
-          "x": 12,
-          "y": 1
+          "x": 0,
+          "y": 9
         },
         "id": 22,
         "options": {
@@ -239,11 +370,12 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -277,6 +409,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -293,6 +426,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -308,7 +442,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -334,17 +468,19 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
             "expr": "quantile_over_time(0.95,{service_name=\"nginx\"} | status >= 500 | filename = `/var/log/nginx/access_log` | json | unwrap request_time [$__interval]) by (request_uri)",
             "hide": false,
@@ -385,6 +521,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -401,6 +538,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -416,7 +554,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -442,19 +580,21 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_auth\", level=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_auth\", level=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -464,8 +604,9 @@
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_auth\", level!=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_auth\", level!=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "C"
@@ -488,6 +629,7 @@
         "id": 21,
         "options": {
           "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
           "enableLogDetails": true,
           "prettifyLogMessage": false,
           "showCommonLabels": false,
@@ -496,7 +638,7 @@
           "sortOrder": "Descending",
           "wrapLogMessage": false
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -543,6 +685,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -559,6 +702,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -574,7 +718,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -600,19 +744,21 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsets\", level=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsets\", level=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -622,8 +768,9 @@
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsets\", level!=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsets\", level!=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "C"
@@ -646,6 +793,7 @@
         "id": 27,
         "options": {
           "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
           "enableLogDetails": true,
           "prettifyLogMessage": false,
           "showCommonLabels": false,
@@ -654,7 +802,7 @@
           "sortOrder": "Descending",
           "wrapLogMessage": false
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -701,6 +849,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -717,6 +866,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -732,7 +882,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -758,19 +908,21 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsetsearch\", level=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsetsearch\", level=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -780,8 +932,9 @@
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsetsearch\", level!=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_cardsetsearch\", level!=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "C"
@@ -804,6 +957,7 @@
         "id": 30,
         "options": {
           "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
           "enableLogDetails": true,
           "prettifyLogMessage": false,
           "showCommonLabels": false,
@@ -812,7 +966,7 @@
           "sortOrder": "Descending",
           "wrapLogMessage": false
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -859,6 +1013,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -875,6 +1030,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -890,7 +1046,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -916,19 +1072,21 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dict\", level=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dict\", level=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -938,8 +1096,9 @@
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dict\", level!=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dict\", level!=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "C"
@@ -962,6 +1121,7 @@
         "id": 34,
         "options": {
           "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
           "enableLogDetails": true,
           "prettifyLogMessage": false,
           "showCommonLabels": false,
@@ -970,7 +1130,7 @@
           "sortOrder": "Descending",
           "wrapLogMessage": false
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -1017,6 +1177,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -1033,6 +1194,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -1048,7 +1210,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -1057,32 +1219,7 @@
               ]
             }
           },
-          "overrides": [
-            {
-              "__systemRef": "hideSeriesFrom",
-              "matcher": {
-                "id": "byNames",
-                "options": {
-                  "mode": "exclude",
-                  "names": [
-                    "{level=\"INFO\"}"
-                  ],
-                  "prefix": "All except:",
-                  "readOnly": true
-                }
-              },
-              "properties": [
-                {
-                  "id": "custom.hideFrom",
-                  "value": {
-                    "legend": false,
-                    "tooltip": false,
-                    "viz": true
-                  }
-                }
-              ]
-            }
-          ]
+          "overrides": []
         },
         "gridPos": {
           "h": 8,
@@ -1099,19 +1236,21 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_articles\", level=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_articles\", level=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -1121,8 +1260,9 @@
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_articles\", level!=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_articles\", level!=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "C"
@@ -1145,6 +1285,7 @@
         "id": 33,
         "options": {
           "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
           "enableLogDetails": true,
           "prettifyLogMessage": false,
           "showCommonLabels": false,
@@ -1153,7 +1294,7 @@
           "sortOrder": "Descending",
           "wrapLogMessage": false
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -1200,6 +1341,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -1216,6 +1358,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -1231,7 +1374,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -1257,19 +1400,21 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
-            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dashboard\", level=\"INFO\"}[1m]\n    )\n)",
+            "expr": "sum by (level) (\n    count_over_time(\n        {service_name=\"service_dashboard\", level=\"INFO\"}[$__auto]\n    )\n)",
             "hide": false,
             "queryType": "range",
             "refId": "A"
@@ -1292,6 +1437,7 @@
         "id": 39,
         "options": {
           "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
           "enableLogDetails": true,
           "prettifyLogMessage": false,
           "showCommonLabels": false,
@@ -1300,7 +1446,7 @@
           "sortOrder": "Descending",
           "wrapLogMessage": false
         },
-        "pluginVersion": "10.4.1",
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -1344,6 +1490,7 @@
         "id": 9,
         "options": {
           "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
           "enableLogDetails": true,
           "prettifyLogMessage": false,
           "showCommonLabels": false,
@@ -1352,12 +1499,14 @@
           "sortOrder": "Descending",
           "wrapLogMessage": false
         },
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
               "type": "loki",
               "uid": "cdi1al0jre0aoc"
             },
+            "direction": "backward",
             "editorMode": "code",
             "expr": "{job=\"rootlogs\"}",
             "queryType": "range",
@@ -1381,6 +1530,7 @@
         "id": 14,
         "options": {
           "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
           "enableLogDetails": true,
           "prettifyLogMessage": false,
           "showCommonLabels": false,
@@ -1389,6 +1539,7 @@
           "sortOrder": "Descending",
           "wrapLogMessage": false
         },
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -1418,6 +1569,7 @@
         "id": 15,
         "options": {
           "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
           "enableLogDetails": true,
           "prettifyLogMessage": false,
           "showCommonLabels": false,
@@ -1426,6 +1578,7 @@
           "sortOrder": "Descending",
           "wrapLogMessage": false
         },
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -1471,6 +1624,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -1487,6 +1641,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -1502,7 +1657,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -1514,7 +1669,7 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 8,
+          "h": 9,
           "w": 12,
           "x": 0,
           "y": 89
@@ -1528,10 +1683,12 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -1544,6 +1701,7 @@
             "fullMetaSearch": false,
             "includeNullMetadata": true,
             "instant": false,
+            "interval": "$__rate_interval",
             "legendFormat": "__auto",
             "range": true,
             "refId": "A",
@@ -1570,6 +1728,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -1586,6 +1745,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -1601,107 +1761,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            },
-            "unit": "decbytes"
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 12,
-          "x": 12,
-          "y": 89
-        },
-        "id": 6,
-        "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "tooltip": {
-            "mode": "single",
-            "sort": "none"
-          }
-        },
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "ddhxdbpp16qdcc"
-            },
-            "disableTextWrap": false,
-            "editorMode": "builder",
-            "expr": "mongodb_dbstats_avgObjSize",
-            "fullMetaSearch": false,
-            "includeNullMetadata": true,
-            "instant": false,
-            "legendFormat": "{{database}}",
-            "range": true,
-            "refId": "A",
-            "useBackend": false
-          }
-        ],
-        "title": "mongo avg Obj size",
-        "type": "timeseries"
-      },
-      {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "ddhxdbpp16qdcc"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "barAlignment": 0,
-              "drawStyle": "line",
-              "fillOpacity": 0,
-              "gradientMode": "none",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": false,
-              "lineInterpolation": "linear",
-              "lineWidth": 1,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "auto",
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -1715,8 +1775,8 @@
         "gridPos": {
           "h": 9,
           "w": 12,
-          "x": 0,
-          "y": 97
+          "x": 12,
+          "y": 89
         },
         "id": 7,
         "options": {
@@ -1727,10 +1787,12 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -1743,6 +1805,7 @@
             "fullMetaSearch": false,
             "includeNullMetadata": true,
             "instant": false,
+            "interval": "$__rate_interval",
             "legendFormat": "{{database}}",
             "range": true,
             "refId": "A",
@@ -1769,6 +1832,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -1785,6 +1849,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -1800,7 +1865,112 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "decbytes"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 98
+        },
+        "id": 6,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "12.3.0-19020365962",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "ddhxdbpp16qdcc"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "mongodb_dbstats_avgObjSize",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "interval": "$__rate_interval",
+            "legendFormat": "{{database}}",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "mongo avg Obj size",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "ddhxdbpp16qdcc"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "showValues": false,
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -1812,10 +1982,10 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 9,
+          "h": 8,
           "w": 12,
           "x": 12,
-          "y": 97
+          "y": 98
         },
         "id": 4,
         "options": {
@@ -1826,10 +1996,12 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -1841,6 +2013,7 @@
             "expr": "mongodb_dbstats_dataSize",
             "fullMetaSearch": false,
             "includeNullMetadata": true,
+            "interval": "$__rate_interval",
             "legendFormat": "__auto",
             "range": true,
             "refId": "A",
@@ -1880,6 +2053,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -1896,6 +2070,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -1911,7 +2086,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -1937,10 +2112,12 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -1952,6 +2129,7 @@
             "expr": "go_goroutines",
             "fullMetaSearch": false,
             "includeNullMetadata": true,
+            "interval": "$__rate_interval",
             "legendFormat": "__auto",
             "range": true,
             "refId": "A",
@@ -1978,6 +2156,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -1994,6 +2173,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -2009,7 +2189,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -2018,32 +2198,7 @@
               ]
             }
           },
-          "overrides": [
-            {
-              "__systemRef": "hideSeriesFrom",
-              "matcher": {
-                "id": "byNames",
-                "options": {
-                  "mode": "exclude",
-                  "names": [
-                    "{__name__=\"go_gc_duration_seconds\", instance=\"localhost:9091\", job=\"prometheus\", quantile=\"0.75\"}"
-                  ],
-                  "prefix": "All except:",
-                  "readOnly": true
-                }
-              },
-              "properties": [
-                {
-                  "id": "custom.hideFrom",
-                  "value": {
-                    "legend": false,
-                    "tooltip": false,
-                    "viz": true
-                  }
-                }
-              ]
-            }
-          ]
+          "overrides": []
         },
         "gridPos": {
           "h": 8,
@@ -2060,10 +2215,12 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -2076,6 +2233,7 @@
             "fullMetaSearch": false,
             "includeNullMetadata": true,
             "instant": false,
+            "interval": "$__rate_interval",
             "legendFormat": "__auto",
             "range": true,
             "refId": "A",
@@ -2102,6 +2260,7 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
+              "barWidthFactor": 0.6,
               "drawStyle": "line",
               "fillOpacity": 0,
               "gradientMode": "none",
@@ -2118,6 +2277,7 @@
                 "type": "linear"
               },
               "showPoints": "auto",
+              "showValues": false,
               "spanNulls": false,
               "stacking": {
                 "group": "A",
@@ -2133,7 +2293,7 @@
               "steps": [
                 {
                   "color": "green",
-                  "value": null
+                  "value": 0
                 },
                 {
                   "color": "red",
@@ -2159,10 +2319,12 @@
             "showLegend": true
           },
           "tooltip": {
+            "hideZeros": false,
             "mode": "single",
             "sort": "none"
           }
         },
+        "pluginVersion": "12.3.0-19020365962",
         "targets": [
           {
             "datasource": {
@@ -2175,6 +2337,7 @@
             "fullMetaSearch": false,
             "includeNullMetadata": true,
             "instant": false,
+            "interval": "$__rate_interval",
             "legendFormat": "__auto",
             "range": true,
             "refId": "A",
@@ -2185,8 +2348,9 @@
         "type": "timeseries"
       }
     ],
+    "preload": false,
     "refresh": "",
-    "schemaVersion": 39,
+    "schemaVersion": 42,
     "tags": [],
     "templating": {
       "list": []
@@ -2199,7 +2363,7 @@
     "timezone": "browser",
     "title": "Services",
     "uid": "edipdzkb75logf",
-    "version": 11,
+    "version": 34,
     "weekStart": ""
   }
 }
