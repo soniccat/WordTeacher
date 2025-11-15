@@ -291,6 +291,8 @@ services:
     networks:
       mongo_net:
         ipv4_address: 172.16.0.15
+    depends_on:
+      - prometheus
     volumes:
       - ${VOLUME_GRAFANA}:/var/lib/grafana
 
@@ -310,6 +312,18 @@ services:
       mongo_net:
         ipv4_address: 172.16.0.16
     restart: unless-stopped
+    depends_on:
+      - loki
+      - cadvisor
+      - alloy
+      - node-exporter
+      - mongo-exporter
+      - articles
+      - auth
+      - cardsets
+      - cardsetsearch
+      - dashboard
+      - dict
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - ${VOLUME_PROMETHEUS}:/prometheus
