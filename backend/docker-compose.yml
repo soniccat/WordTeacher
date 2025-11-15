@@ -359,6 +359,9 @@ services:
     - /var/run:/var/run:rw
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.25
 
   loki:
     image: grafana/loki:3.5.8
