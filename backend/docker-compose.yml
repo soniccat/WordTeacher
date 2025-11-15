@@ -379,34 +379,6 @@ services:
       mongo_net:
         ipv4_address: 172.16.0.23
 
-  # promtail:
-  #   image: grafana/promtail:2.8.11
-  #   container_name: promtail
-  #   hostname: "promtail"
-  #   user: root
-  #   volumes:
-  #     - /var/log/system.log:/var/log/root/system.log
-  #     - ./config/promtail-local-config.yaml:/etc/config/promtail-local-config.yaml
-  #     - ${VOLUME_NGINX_PATH}:/var/log/nginx
-  #     - ${VOLUME_PROMTAIL_PATH}:/var/lib/promtail
-  #     - ${VOLUME_AUTH_LOG_PATH}:/var/log/auth
-  #     - ${VOLUME_CARDSETS_LOG_PATH}:/var/log/cardsets
-  #     - ${VOLUME_CARDSETSEARCH_LOG_PATH}:/var/log/cardsetsearch
-  #     - ${VOLUME_DICT_LOG_PATH}:/var/log/dict
-  #     - ${VOLUME_ARTICLES_LOG_PATH}:/var/log/articles
-  #     - ${VOLUME_DASHBOARD_LOG_PATH}:/var/log/dashboard
-  #   environment:
-  #     - PROMTAIL_PORT=${PROMTAIL_PORT}
-  #   entrypoint:
-  #     - /usr/bin/promtail
-  #     - -config.file=/etc/config/promtail-local-config.yaml
-  #     - -config.expand-env=true
-  #   ports:
-  #     - ${PROMTAIL_PORT}:${PROMTAIL_PORT}
-  #   networks:
-  #     mongo_net:
-  #       ipv4_address: 172.16.0.19
-
 networks:
   mongo_net:
     driver: bridge

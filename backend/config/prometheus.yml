@@ -36,14 +36,6 @@ scrape_configs:
   - targets:
     - mongo-exporter:9216
 
-- job_name: promtail
-  honor_timestamps: true
-  metrics_path: /metrics
-  scheme: http
-  static_configs:
-  - targets:
-    - promtail:9080
-
 - job_name: loki
   honor_timestamps: true
   metrics_path: /metrics
