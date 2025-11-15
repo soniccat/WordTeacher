@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"service_dict/internal/routing/text_search"
 	"service_dict/internal/routing/word"
@@ -54,6 +55,11 @@ func (app *application) routes() *mux.Router {
 	r.Handle(
 		"/api/v2/dict/words/textsearch/{text}",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(examplesHandlerV2.WordTextSearch)),
+	).Methods("GET")
+
+	r.Handle(
+		"/metrics",
+		promhttp.Handler(),
 	).Methods("GET")
 
 	return r

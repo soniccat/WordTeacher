@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"service_cardsets/internal/routing/cardset_by_id"
 	"service_cardsets/internal/routing/cardset_pull"
@@ -43,6 +44,11 @@ func (app *application) routes() *mux.Router {
 	r.Handle(
 		"/api/cardsets/{id}",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(cardSetByIdHandler.CardSetById)),
+	).Methods("GET")
+
+	r.Handle(
+		"/metrics",
+		promhttp.Handler(),
 	).Methods("GET")
 
 	return r

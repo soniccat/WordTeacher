@@ -1,6 +1,6 @@
 module phrase_eporter
 
-go 1.22.2
+go 1.25.4
 
 require tools v0.0.1
 

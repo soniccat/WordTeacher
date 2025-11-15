@@ -1,4 +1,4 @@
-FROM golang:1.22.2-alpine3.19 AS builder
+FROM golang:1.25.4-alpine3.22 AS builder
 # create appuser.
 RUN adduser --disabled-password --gecos '' elf
 # create workspace
@@ -26,7 +26,7 @@ WORKDIR /opt/app/service_dashboard
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo -o /go/bin/ ./cmd/app
 
 # build a small image
-FROM alpine:3.14.1
+FROM alpine:3.22.2
 LABEL language="golang"
 LABEL org.opencontainers.image.source https://github.com/soniccat/WordTeacher
 # import the user and group files from the builder

@@ -1,6 +1,6 @@
 module ipset-filler
 
-go 1.22
+go 1.25.4
 
 require (
 	github.com/nxadm/tail v1.4.11

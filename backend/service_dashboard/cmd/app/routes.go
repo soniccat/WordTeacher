@@ -2,9 +2,11 @@ package main
 
 import (
 	"net/http"
-	"service_dashboard/internal/routing/dashboard"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"service_dashboard/internal/routing/dashboard"
 )
 
 func (app *application) routes() *mux.Router {
@@ -20,6 +22,11 @@ func (app *application) routes() *mux.Router {
 	r.Handle(
 		"/api/v1/dashboard",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(dashboardHandler.Handle)),
+	).Methods("GET")
+
+	r.Handle(
+		"/metrics",
+		promhttp.Handler(),
 	).Methods("GET")
 
 	return r

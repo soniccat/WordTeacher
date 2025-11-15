@@ -59,3 +59,51 @@ scrape_configs:
   static_configs:
   - targets:
     - grafana:3000
+
+- job_name: service_articles
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - articles:4004
+
+- job_name: service_auth
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - auth:4000
+
+- job_name: service_cardsets
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - cardsets:4001
+
+- job_name: service_cardsetsearch
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - cardsetsearch:4002
+
+- job_name: service_dashboard
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - dashboard:4005
+
+- job_name: service_dict
+  honor_timestamps: true
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - dict:4003
