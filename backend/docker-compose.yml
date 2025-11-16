@@ -318,6 +318,7 @@ services:
       - alloy
       - node-exporter
       - mongo-exporter
+      - redis_exporter
       - articles
       - auth
       - cardsets
@@ -362,6 +363,20 @@ services:
     networks:
       mongo_net:
         ipv4_address: 172.16.0.25
+
+  redis_exporter:
+    image: oliver006/redis_exporter:v1.80.0-alpine
+    container_name: redis_exporter
+    restart: unless-stopped
+    environment:
+      - REDIS_ADDR=redis:${REDIS_PORT}
+    ports:
+      - "9121:9121" # Exposes the exporter's metrics port
+    depends_on:
+      - redis
+    networks:
+      mongo_net:
+        ipv4_address: 172.16.0.26
 
   loki:
     image: grafana/loki:3.5.8
