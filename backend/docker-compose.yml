@@ -360,6 +360,9 @@ services:
     - /var/run:/var/run:rw
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
+    command: 
+      - '-housekeeping_interval=300s'
+      - '-docker_only=true'
     networks:
       mongo_net:
         ipv4_address: 172.16.0.25
