@@ -143,13 +143,28 @@ class DatabaseCardWorker(
         }
     }
 
+    suspend fun startEditingAndWait(): Clearable {
+        if (currentState == State.EDITING) {
+            return object : Clearable {
+                override fun onCleared() {}
+            }
+        }
+
+        pushStateAndWait(State.EDITING)
+        return object : Clearable {
+            override fun onCleared() {
+                endEditing()
+            }
+        }
+    }
+
     fun endEditing() = popState(State.EDITING)
 
-    suspend fun updateSpansAndStartEditing() {
-        pushState(State.UPDATING_SPANS)
+    suspend fun updateSpansAndStartEditing(): Clearable {
+        pushStateAndWait(State.UPDATING_SPANS)
         waitUntilUpdatingSpansIsDone()
-        popState(State.UPDATING_SPANS)
-        pushStateAndWait(State.EDITING)
+        popStateAndWait(State.UPDATING_SPANS)
+        return startEditingAndWait()
     }
 
     private fun pushState(newState: State) = serialQueue.send {

@@ -72,6 +72,11 @@ interface CardSetInfoVM: Clearable {
             } else {
                 null
             }
+        val isNull: Boolean
+            get() = name == null &&
+                    description == null &&
+                    source == null &&
+                    isAvailableInSearch == null
     }
 
     data class UIState(
@@ -105,6 +110,7 @@ open class CardSetInfoVMImpl(
 
     override var router: CardSetInfoRouter? = null
     val state: CardSetInfoVM.State = restoredState
+    var hasEditing = false
 
     private val cardSetState = MutableStateFlow<Resource<CardSet>>(Resource.Uninitialized())
     private val inputState = MutableStateFlow(CardSetInfoVM.InputState())
@@ -161,18 +167,24 @@ open class CardSetInfoVMImpl(
             viewModelScope.launch {
                 inputState.collect { lastInputState ->
                     cardSetState.value.data()?.let { dbCardSet ->
-                        databaseCardWorker.updateCardSetInfo(
-                            dbCardSet.copy(
-                                name = lastInputState.validatedName ?: dbCardSet.name,
-                                info = dbCardSet.info.copy(
-                                    description = lastInputState.description
-                                        ?: dbCardSet.info.description,
-                                    source = lastInputState.source ?: dbCardSet.info.source,
-                                ),
-                                isAvailableInSearch = lastInputState.isAvailableInSearch
-                                    ?: dbCardSet.isAvailableInSearch
+                        if (!hasEditing && !lastInputState.isNull) {
+                            hasEditing = true
+                        }
+
+                        if (hasEditing) {
+                            databaseCardWorker.updateCardSetInfo(
+                                dbCardSet.copy(
+                                    name = lastInputState.validatedName ?: dbCardSet.name,
+                                    info = dbCardSet.info.copy(
+                                        description = lastInputState.description
+                                            ?: dbCardSet.info.description,
+                                        source = lastInputState.source ?: dbCardSet.info.source,
+                                    ),
+                                    isAvailableInSearch = lastInputState.isAvailableInSearch
+                                        ?: dbCardSet.isAvailableInSearch
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -185,22 +197,54 @@ open class CardSetInfoVMImpl(
 
     override fun onNameChanged(name: String) {
         logChange("name")
-        inputState.update { it.copy(name = name) }
+        inputState.update {
+            it.copy(
+                name = if (name != cardSetState.value.data()?.name) {
+                    name
+                } else {
+                    null
+                }
+            )
+        }
     }
 
     override fun onDescriptionChanged(description: String) {
         logChange("description")
-        inputState.update { it.copy(description = description) }
+        inputState.update {
+            it.copy(
+                description = if (description != cardSetState.value.data()?.info?.description) {
+                    description
+                } else {
+                    null
+                }
+            )
+        }
     }
 
     override fun onSourceChanged(source: String) {
         logChange("source")
-        inputState.update { it.copy(source = source) }
+        inputState.update {
+            it.copy(
+                source = if (source != cardSetState.value.data()?.info?.source) {
+                    source
+                } else {
+                    null
+                }
+            )
+        }
     }
 
     override fun onIsAvailableInSearchChanged(isAvailableInSearch: Boolean) {
         logChange("isAvailableInSearchChanged")
-        inputState.update { it.copy(isAvailableInSearch = isAvailableInSearch) }
+        inputState.update {
+            it.copy(
+                isAvailableInSearch = if (isAvailableInSearch != cardSetState.value.data()?.isAvailableInSearch) {
+                    isAvailableInSearch
+                } else {
+                    null
+                }
+            )
+        }
     }
 
     override fun onLinkClicked(link: String) {

@@ -191,17 +191,12 @@ open class LearningVMImpl(
         return state
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        stopLearning()
-    }
-
     // Screen state flow
     private fun startLearning(aState: LearningVM.State) = viewModelScope.launch {
         challengeState.update { Resource.Loading() }
 
         // TODO: consider updating span priority to calculate required card spans first and skip not required for now
-        databaseCardWorker.updateSpansAndStartEditing()
+        addClearable(databaseCardWorker.updateSpansAndStartEditing())
 
         val cards = cardRepository.stateFlow.waitUntilLoaded().data().orEmpty()
         state = state.copy(cardIds = cards.map { it.id })
@@ -360,10 +355,6 @@ open class LearningVMImpl(
         }
 
         return 0
-    }
-
-    private fun stopLearning() {
-        databaseCardWorker.endEditing()
     }
 
     private fun createTeacher(cards: List<Card>, teacherState: CardTeacher.State?): CardTeacher {
