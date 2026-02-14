@@ -112,7 +112,7 @@ open class CardSetsVMImpl(
                RemoteCardSetViewItem(
                    searchCardSet.cardSet.remoteId,
                    searchCardSet.cardSet.name,
-                   searchCardSet.cardSet.terms.take(10),
+                   searchCardSet.cardSet.terms,
                    isLoading = searchCardSet.fullCardSetRes.isLoading(),
                ) as BaseViewItem<*>
            }.also {
