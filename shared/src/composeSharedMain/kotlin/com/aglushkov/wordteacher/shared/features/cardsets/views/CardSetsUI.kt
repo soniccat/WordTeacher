@@ -303,7 +303,11 @@ fun CardSetItemView(
     CustomTextListItem(
         modifier = modifier,
         title = item.name,
-        subtitle = item.terms.joinToString(),
+        subtitle = if (item.terms.isNotEmpty()) {
+            "${item.terms.size} words: " + item.terms.joinToString()
+        } else {
+            ""
+        },
         trailing = {
             trailing(item)
         }
@@ -325,7 +329,11 @@ fun CardSetSearchItemView(
                 onClick()
             },
         title = item.name,
-        subtitle = item.terms.joinToString().takeIf { it.isNotEmpty() },
+        subtitle = if (item.terms.isNotEmpty()) {
+            "${item.terms.size} words: " + item.terms.joinToString()
+        } else {
+            ""
+        },
         trailing = onAdded?.let { onAdded ->
             {
                 if (item.isLoading) {

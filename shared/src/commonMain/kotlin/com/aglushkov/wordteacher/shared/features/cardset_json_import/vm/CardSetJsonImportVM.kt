@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.article_parser.ParsedArticle
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.exception
 import com.aglushkov.wordteacher.shared.general.toOkResponse
@@ -33,6 +34,11 @@ import com.benasher44.uuid.Uuid
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.Url
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -143,9 +149,32 @@ open class CardSetJsonImportVMImpl(
         prettyPrint = true
     }
 
+    private val httpClient = HttpClient {
+    }
+
+    private var loadTextJob: Job? = null
     override fun onJsonTextChanged(text: String) {
         jsonText.value = text
         jsonTextErrorFlow.value = null
+
+        if (text.startsWith("http")) {
+            loadTextJob?.cancel()
+            loadTextJob = viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val loadedText = loadText(text)
+                    jsonText.value = loadedText
+                } catch (e: Exception) {
+                    jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    suspend fun loadText(url: String): String {
+        val res: HttpResponse = httpClient.get(url)
+        val responseString: String = res.body()
+        return responseString
     }
 
     override fun onCheckClicked() {
@@ -174,6 +203,7 @@ open class CardSetJsonImportVMImpl(
             } catch (e: Exception) {
                 Logger.e(e.message.orEmpty(), TAG)
                 jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
+                e.printStackTrace()
             }
         }
     }
@@ -186,7 +216,17 @@ open class CardSetJsonImportVMImpl(
 
     private fun createCardSetWithErrorHandling(): ImportCardSet? {
         try {
-            return json.decodeFromString<ImportCardSet>(jsonText.value)
+            val cardSet = json.decodeFromString<ImportCardSet>(jsonText.value)
+            return cardSet.copy(
+                cards = cardSet.cards.map {
+                    it.copy(
+                        examples = it.examples?.map {
+                            it.replace("\n", "")
+                                .replace("\t", "")
+                        }
+                    )
+                }
+            )
         } catch (e: Exception) {
             Logger.e(e.message.orEmpty(), TAG)
             jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())

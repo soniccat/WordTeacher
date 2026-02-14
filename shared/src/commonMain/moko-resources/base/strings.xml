@@ -150,6 +150,7 @@
     <string name="dashboard_cardsets_title">New Card Sets:</string>
     <string name="dashboard_ready_to_learn_cardsets_title">Ready to learn Card Sets:</string>
     <string name="dashboard_reading_articles">Articles you're reading:</string>
+    <string name="dashboard_open_cardsets">Search for more</string>
 
     <string name="notes_error">Something went wrong :(</string>
     <string name="notes_create_note">Create a note</string>

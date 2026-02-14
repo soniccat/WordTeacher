@@ -59,6 +59,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewIt
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardCategoriesViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardExpandViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardHeadlineViewItem
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardOpenCardSetsItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardTryAgainViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
@@ -242,6 +243,32 @@ fun dashboardItem(
         }
 
     }
+
+    is DashboardOpenCardSetsItem -> {
+        Button(
+            onClick = {
+                vm.onOpenCardSetsClicked()
+            },
+            modifier = Modifier.padding(
+                horizontal = LocalDimens.current.contentPadding
+            ).heightIn(min = 28.dp),
+            contentPadding = PaddingValues(
+                start = 8.dp,
+                top = 4.dp,
+                end = 8.dp,
+                bottom = 4.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.primarySurface
+            )
+        ) {
+            Text(
+                ResourceStringDesc(MR.strings.dashboard_open_cardsets).localized(),
+                color = contentColorFor(MaterialTheme.colors.primarySurface)
+            )
+        }
+    }
+
     is DashboardTryAgainViewItem -> {
         Column(
             modifier = Modifier.padding(LocalDimens.current.contentPadding).fillMaxWidth(),

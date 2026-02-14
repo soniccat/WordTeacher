@@ -103,7 +103,7 @@ interface MainDecomposeComponent:
         @Serializable data class WebAuthConfiguration(val networkType: SpaceAuthService.NetworkType) : ChildConfiguration()
         @Serializable data object DictConfigs : ChildConfiguration()
         @Serializable data object CardSetJsonImportConfiguration : ChildConfiguration()
-        @Serializable data object CardSetsConfiguration : ChildConfiguration()
+        @Serializable data class CardSetsConfiguration(val state: CardSetsVM.State) : ChildConfiguration()
         @Serializable data object TabsConfiguration : ChildConfiguration()
         @Serializable data class AddArticleConfiguration(val state: AddArticleVM.State = AddArticleVM.State()) : ChildConfiguration()
         @Serializable data class DefinitionConfiguration(val state: DefinitionsVM.State) : ChildConfiguration()
@@ -230,10 +230,14 @@ class MainDecomposeComponentImpl(
         )
     }
 
-    override fun openCardSets() {
+    override fun openCardSets(state: CardSetsVM.State) {
         navigation.pushChildConfigurationIfNotAtTop(
-            MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration
+            MainDecomposeComponent.ChildConfiguration.CardSetsConfiguration(state)
         )
+    }
+
+    override fun openCardSets() {
+        openCardSets(CardSetsVM.State())
     }
 
     override fun openLearning(state: LearningVM.State) {

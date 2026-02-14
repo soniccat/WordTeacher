@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.articles.vm.ArticleViewItem
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewItem
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
@@ -75,12 +76,14 @@ interface DashboardVM: Clearable {
     fun onLinkClicked(link: String)
     fun onDashboardTryAgainClicked()
     fun onHintClicked(hintType: HintType)
+    fun onOpenCardSetsClicked()
 
     interface Router {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
         fun openCardSet(state: CardSetVM.State)
         fun openArticle(state: ArticleVM.State)
         fun openLearning(state: LearningVM.State)
+        fun openCardSets(state: CardSetsVM.State)
     }
 
     @Serializable
@@ -161,6 +164,11 @@ open class DashboardVMIMpl(
     override fun onCardSetClicked(item: CardSetViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("Dashboard.onCardSetClicked"))
         router?.openCardSet(CardSetVM.State.LocalCardSet(item.cardSetId))
+    }
+
+    override fun onOpenCardSetsClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onOpenCardSetsClicked"))
+        router?.openCardSets(CardSetsVM.State())
     }
 
     override fun onCardSetStartLearningClicked(item: CardSetViewItem) {
@@ -375,10 +383,14 @@ open class DashboardVMIMpl(
                         )
                     }
                     resultList.add(
-                        DashboardExpandViewItem(
-                            expandType = DashboardExpandViewItem.ExpandType.CardSets,
-                            isExpanded = state.isCardSetBlockExpanded,
-                        )
+                        if (state.isCardSetBlockExpanded) {
+                            DashboardOpenCardSetsItem()
+                        } else {
+                            DashboardExpandViewItem(
+                                expandType = DashboardExpandViewItem.ExpandType.CardSets,
+                                isExpanded = state.isCardSetBlockExpanded,
+                            )
+                        }
                     )
                 }
             },

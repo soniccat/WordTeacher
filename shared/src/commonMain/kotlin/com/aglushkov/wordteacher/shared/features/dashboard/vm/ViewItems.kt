@@ -69,6 +69,13 @@ class DashboardExpandViewItem(
     }
 }
 
+class DashboardOpenCardSetsItem(
+): BaseViewItem<Unit>(Unit, Type) {
+    companion object {
+        const val Type = 1205
+    }
+}
+
 class HintViewItem(
     hintType: HintType,
 ): BaseViewItem<HintType>(hintType, Type) {
