@@ -271,24 +271,26 @@ fun CardSetWithTotalProgressItemView(
         modifier = modifier,
         item = item,
         trailing = {
-            val side = 40.dp
-            Box(
-                modifier = Modifier.size(side, side)
-            ) {
-                CircularProgressIndicator(
-                    progress = 1.0f,
-                    modifier = Modifier.padding(5.dp),
-                    color = Color.LightGray.copy(alpha = 0.2f)
-                )
-                CircularProgressIndicator(
-                    progress = item.totalProgress,
-                    modifier = Modifier.padding(5.dp),
-                )
-                StartLearningButton(
-                    modifier = Modifier.clickable {
-                        onStartLearningClick()
-                    }
-                )
+            if (item.terms.isNotEmpty()) {
+                val side = 40.dp
+                Box(
+                    modifier = Modifier.size(side, side)
+                ) {
+                    CircularProgressIndicator(
+                        progress = 1.0f,
+                        modifier = Modifier.padding(5.dp),
+                        color = Color.LightGray.copy(alpha = 0.2f)
+                    )
+                    CircularProgressIndicator(
+                        progress = item.totalProgress,
+                        modifier = Modifier.padding(5.dp),
+                    )
+                    StartLearningButton(
+                        modifier = Modifier.clickable {
+                            onStartLearningClick()
+                        }
+                    )
+                }
             }
         }
     )
