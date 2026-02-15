@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderVie
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.toPartsOfSpeechFilter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.toViewItemAudioFile
+import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM.Hint
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM.State.Companion.AllCards
 import com.aglushkov.wordteacher.shared.general.AudioService
 import com.aglushkov.wordteacher.shared.general.Clearable
@@ -32,11 +33,13 @@ import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import dev.icerock.moko.graphics.Color
+import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlin.collections.fold
 
 interface LearningVM: Clearable {
     var router: LearningRouter?
@@ -44,7 +47,7 @@ interface LearningVM: Clearable {
     val challengeState: StateFlow<Resource<Challenge>>
     val titleErrorFlow: StateFlow<StringDesc?>
     val canShowHint: StateFlow<Boolean>
-    val hintString: StateFlow<List<Char>>
+    val hintString: StateFlow<Hint?>
     val playSoundOnChallengeCompletion: StateFlow<Boolean>
 
     fun onMatchTermPressed(matchRow: Challenge.MatchRow)
@@ -61,9 +64,16 @@ interface LearningVM: Clearable {
     fun onClosePressed()
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
     fun onPlaySoundOnChallengeCompletionClicked()
+    fun onShowDeleteCardHintClicked()
+    fun onDeleteCardClicked()
 
     fun save(): State
     fun getErrorText(res: Resource<*>): StringDesc?
+
+    data class Hint(
+        val id: Int, // to bypass unique check
+        val value: StringDesc,
+    )
 
     sealed interface Challenge {
         data class Match(
@@ -149,7 +159,7 @@ open class LearningVMImpl(
     override val challengeState = MutableStateFlow<Resource<LearningVM.Challenge>>(Resource.Uninitialized())
     override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
     override val canShowHint = MutableStateFlow(true)
-    override val hintString = MutableStateFlow(listOf<Char>())
+    override val hintString = MutableStateFlow<Hint?>(null)
     override val playSoundOnChallengeCompletion = MutableStateFlow(
         settings.boolean(SETTING_PLAY_SOUND_ON_CHALLENGE_COMPLETION, true)
     )
@@ -203,7 +213,16 @@ open class LearningVMImpl(
 
         val teacher = createTeacher(cards, aState.teacherState)
         launch { // start observing hint string
-            teacher.hintString.collect(hintString)
+            teacher.hintString.map {
+                Hint(
+                    id = 0,
+                    value = StringDesc.Raw(
+                        it.fold("") { str, char ->
+                            "$str $char"
+                        }
+                    )
+                )
+            }.collect(hintString)
         }
         launch { // bind canShowHint
             teacher.hintShowCount.map { it < 2 }.collect(canShowHint)
@@ -515,6 +534,25 @@ open class LearningVMImpl(
             )
         }
     }
+
+    override fun onShowDeleteCardHintClicked() {
+        hintString.update {
+            Hint(
+                id = it?.let { it.id + 1 } ?: 0,
+                value = StringDesc.Resource(MR.strings.learning_delete_hint)
+            )
+        }
+    }
+
+    override fun onDeleteCardClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Learning.onDeleteCardClicked"))
+
+        val card = teacher?.currentTestCard?.card ?: teacher?.currentCard ?: return
+        teacher?.onCardDeleted(card.id)
+        databaseCardWorker.deleteCard(card, timeSource.timeInMilliseconds())
+    }
+
+
 
     override fun getErrorText(res: Resource<*>): StringDesc? {
         return StringDesc.Resource(MR.strings.learning_error)

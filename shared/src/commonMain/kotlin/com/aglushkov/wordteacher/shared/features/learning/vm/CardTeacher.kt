@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
 class CardTeacher(
-    private val cards: List<Card>,
+    private var cards: List<Card>,
     private val databaseCardWorker: DatabaseCardWorker,
     private val timeSource: TimeSource,
     private val scope: CoroutineScope
@@ -211,6 +211,18 @@ class CardTeacher(
             true
         } else {
             false
+        }
+    }
+
+    fun onCardDeleted(id: Long) {
+        cards = cards.filter { it.id != id }
+
+        if (currentTestCard?.card?.id == id) {
+            currentTestSession?.deleteCard(id)
+            switchToNextTestCard()
+        } else if (currentCard?.id == id) {
+            currentSession?.deleteCard(id)
+            switchToNextCard()
         }
     }
 

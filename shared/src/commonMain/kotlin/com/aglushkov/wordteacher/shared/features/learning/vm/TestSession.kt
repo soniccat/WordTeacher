@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
 
 class TestSession(
-    val cards: List<Card>,
+    var cards: List<Card>,
     options: List<String>
 ) {
     private var testCards: List<TestCard>
@@ -68,6 +68,21 @@ class TestSession(
                 )
             }
         currentTestCardStateFlow.value = testCards[currentIndex]
+    }
+
+    fun deleteCard(id: Long) {
+        val index = cards.indexOfFirst { it.id == id }
+        if (index == -1) {
+            return
+        }
+
+        if (index <= currentIndex) {
+            --currentIndex
+        }
+        cards = cards.filter { it.id != id }
+        testCards = testCards.filter { it.card.id != id }
+
+        currentTestCardStateFlow.value = testCards.getOrNull(currentIndex)
     }
 
     @Serializable

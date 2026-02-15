@@ -218,7 +218,7 @@ class AppDatabase(
                             set.copy(
                                 readyToLearnProgress = cards?.readyToLearnProgress(timeSource) ?: 0f,
                                 totalProgress = cards?.totalProgress() ?: 0f,
-                                terms = cards.orEmpty().filter { it.progress.isReadyToLearn(timeSource) }.take(15).map { it.term }
+                                terms = cards.orEmpty().filter { it.progress.isReadyToLearn(timeSource) }.map { it.term }
                             )
                         }
                     }

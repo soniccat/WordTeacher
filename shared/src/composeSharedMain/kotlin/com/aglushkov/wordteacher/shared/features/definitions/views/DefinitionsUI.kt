@@ -732,7 +732,7 @@ fun WordTitleView(
                     text = (viewItem.frequencyLevelAndRatio.level + 1).toString(),
                     modifier = Modifier.align(Alignment.Center).offset(y = (-1).dp),
                     textAlign = TextAlign.Center,
-                    style = LocalAppTypography.current.wordFrequency
+                    style = LocalAppTypography.current.wordFrequency,
                 )
             }
         }

@@ -91,6 +91,7 @@
     <string name="learning_give_up">Give up</string>
     <string name="learning_instruction_challenge_match">Find what word or phrase on the left side fills the gap in the sentence on the right side. Tap on one of them then on the opposite</string>
     <string name="learning_instruction_challenge_test">Choose the correct word or phrase matching the definition below</string>
+    <string name="learning_delete_hint">Long press to completely delete this card from the card set</string>
 
     <string name="learning_session_result_title">Results</string>
     <string name="learning_session_result_error">Something went wrong :(</string>

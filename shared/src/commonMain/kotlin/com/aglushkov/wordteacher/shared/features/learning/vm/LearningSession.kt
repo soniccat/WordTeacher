@@ -83,6 +83,21 @@ class LearningSession(
         currentCardStateFlow.value = cards[currentIndex]
     }
 
+    fun deleteCard(id: Long) {
+        val index = cards.indexOfFirst { it.id == id }
+        if (index == -1) {
+            return
+        }
+
+        if (index <= currentIndex) {
+            --currentIndex
+        }
+        cards = cards.filter { it.id != id }
+        results = results.filter { it.cardId != id }
+
+        currentCardStateFlow.value = cards.getOrNull(currentIndex)
+    }
+
     @Serializable
     data class State(
         val cardIds: List<Long>,

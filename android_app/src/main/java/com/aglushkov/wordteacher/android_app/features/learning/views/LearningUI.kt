@@ -5,6 +5,8 @@ package com.aglushkov.wordteacher.android_app.features.learning.views
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,9 +29,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -65,7 +69,7 @@ fun LearningUIDialog(
     ) {
         val playSoundOnChallengeCompletion by vm.playSoundOnChallengeCompletion.collectAsState()
         val challengeState by vm.challengeState.collectAsState()
-        val needShowSoundIcon by remember(challengeState) {
+        val isCardVisible by remember(challengeState) {
             derivedStateOf {
                 challengeState.data() is LearningVM.Challenge.Type ||
                         challengeState.data() is LearningVM.Challenge.Test
@@ -76,7 +80,32 @@ fun LearningUIDialog(
             vm = vm,
             modifier = modifier,
             actions = {
-                if (needShowSoundIcon) {
+
+                if (isCardVisible) {
+                    Box(
+                        modifier = Modifier
+                            .minimumInteractiveComponentSize()
+                            .combinedClickable(
+                                interactionSource = null,
+                                indication = ripple(bounded = false, radius = 24.dp),
+                                onLongClick = {
+                                    vm.onDeleteCardClicked()
+                                },
+                                onClick = {
+                                    vm.onShowDeleteCardHintClicked()
+                                }
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_close_24),
+                            contentDescription = null,
+                            tint = LocalContentColor.current
+                        )
+                    }
+                }
+
+                if (isCardVisible) {
                     IconButton(
                         onClick = { vm.onPlaySoundOnChallengeCompletionClicked() }
                     ) {
@@ -177,9 +206,13 @@ fun LearningUI(
         }
 
         if (data is LearningVM.Challenge.Type) {
-            typeBottomButtons(data.audioFiles, canShowHint, snackbarHostState, hintString, vm)
+            typeBottomButtons(data.audioFiles, canShowHint, vm) {
+                SnackbarUI(snackbarHostState, hintString)
+            }
         } else if (data is LearningVM.Challenge.Test) {
-            testBottomButtons(data.audioFiles(), vm)
+            testBottomButtons(data.audioFiles(), vm) {
+                SnackbarUI(snackbarHostState, hintString)
+            }
         }
     }
 }
@@ -210,6 +243,7 @@ private fun typeChallengeUI(
 private fun BoxScope.testBottomButtons(
     audioFilesViewItem: WordAudioFilesViewItem?,
     vm: LearningVM,
+    bottomPart: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -256,6 +290,8 @@ private fun BoxScope.testBottomButtons(
                 )
             }
         }
+
+        bottomPart()
     }
 }
 
@@ -263,9 +299,8 @@ private fun BoxScope.testBottomButtons(
 private fun BoxScope.typeBottomButtons(
     audioFilesViewItem: WordAudioFilesViewItem?,
     canShowHint: Boolean,
-    snackbarHostState: SnackbarHostState,
-    hintString: List<Char>,
     vm: LearningVM,
+    bottomPart: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -341,20 +376,26 @@ private fun BoxScope.typeBottomButtons(
             )
         }
 
-        SnackbarHost(
-            modifier = Modifier.animateContentSize(),
-            hostState = snackbarHostState
-        ) {
-            Snackbar(snackbarData = it)
-        }
+        bottomPart()
+    }
+}
+
+@Composable
+private fun SnackbarUI(
+    snackbarHostState: SnackbarHostState,
+    hintString: LearningVM.Hint?
+) {
+    SnackbarHost(
+        modifier = Modifier.animateContentSize(),
+        hostState = snackbarHostState
+    ) {
+        Snackbar(snackbarData = it)
     }
 
-    LaunchedEffect(key1 = hintString) {
-        if (hintString.isNotEmpty()) {
-            val resultString = hintString.fold("") { str, char ->
-                "$str $char"
-            }
-            snackbarHostState.showSnackbar(resultString)
+    val text = hintString?.value?.localized()
+    if (text?.isNotEmpty() == true) {
+        LaunchedEffect(key1 = text) {
+            snackbarHostState.showSnackbar(text)
         }
     }
 }
