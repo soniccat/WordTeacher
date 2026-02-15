@@ -36,6 +36,13 @@ class CardTeacher(
     private var hintStringStateFlow = MutableStateFlow<List<Char>>(emptyList())
     private var hintShowCountStateFlow = MutableStateFlow(0)
 
+    val sessionCardCount: Int
+        get() {
+            return currentTestSession?.cards?.size ?:
+            currentSession?.cards?.size ?:
+            0
+        }
+
     val hintString: Flow<List<Char>>
         get() = hintStringStateFlow
     val hintShowCount: Flow<Int>
@@ -46,7 +53,11 @@ class CardTeacher(
         private set
 
     suspend fun runSession(
-        block: suspend (count:Int, matchSessionFlow:  Flow<List<MatchSession.MatchPair>>?, testCards: Flow<TestSession.TestCard>?, cards: Flow<Card>) -> Unit
+        block: suspend (
+            matchSessionFlow:  Flow<List<MatchSession.MatchPair>>?,
+            testCards: Flow<TestSession.TestCard>?,
+            cards: Flow<Card>
+        ) -> Unit
     ): List<SessionCardResult>? {
         val session = buildLearnSession() ?: return null
         val warmupSession = Random.nextInt(2)
@@ -65,7 +76,6 @@ class CardTeacher(
         }
 
         block(
-            session.size,
             matchSession?.matchPairFlow?.takeWhile { it != null } as? Flow<List<MatchSession.MatchPair>>,
             if (currentTestSession != null) {
                 currentTestCardStateFlow.takeWhileNonNull()
@@ -217,11 +227,12 @@ class CardTeacher(
     fun onCardDeleted(id: Long) {
         cards = cards.filter { it.id != id }
 
+        currentTestSession?.deleteCard(id)
+        currentSession?.deleteCard(id)
+
         if (currentTestCard?.card?.id == id) {
-            currentTestSession?.deleteCard(id)
             switchToNextTestCard()
         } else if (currentCard?.id == id) {
-            currentSession?.deleteCard(id)
             switchToNextCard()
         }
     }

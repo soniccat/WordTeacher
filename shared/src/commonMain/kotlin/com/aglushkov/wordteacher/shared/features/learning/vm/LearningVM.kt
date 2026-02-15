@@ -230,7 +230,7 @@ open class LearningVMImpl(
 
         var sessionResults: List<SessionCardResult>? = null
         do {
-            sessionResults = teacher.runSession { cardCount, matchPairs, testCards, sessionCards ->
+            sessionResults = teacher.runSession { matchPairs, testCards, sessionCards ->
                 analytics.send(AnalyticEvent.createActionEvent("Learning.startSession"))
 
                 // match session
@@ -279,7 +279,7 @@ open class LearningVMImpl(
                                     instruction = StringDesc.Resource(MR.strings.learning_instruction_challenge_test),
                                     term = testCard.card.term,
                                     index = index,
-                                    count = cardCount,
+                                    count = teacher.sessionCardCount,
                                     testOptions = testCard.options,
                                     termViewItems = buildCardItem(testCard.card),
                                     audioFiles = audioFilesViewItemFromCard(testCard.card),
@@ -301,7 +301,7 @@ open class LearningVMImpl(
                             LearningVM.Challenge.Type(
                                 term = card.term,
                                 index = index,
-                                count = cardCount,
+                                count = teacher.sessionCardCount,
                                 termViewItems = buildCardItem(card),
                                 audioFiles = audioFilesViewItemFromCard(card)
                             )

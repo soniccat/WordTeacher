@@ -76,7 +76,7 @@ class TestSession(
             return
         }
 
-        if (index <= currentIndex) {
+        if (index < currentIndex) {
             --currentIndex
         }
         cards = cards.filter { it.id != id }

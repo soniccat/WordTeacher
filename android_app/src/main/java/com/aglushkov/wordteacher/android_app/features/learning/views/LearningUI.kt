@@ -98,7 +98,7 @@ fun LearningUIDialog(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_close_24),
+                            painter = dev.icerock.moko.resources.compose.painterResource(MR.images.delete_24),
                             contentDescription = null,
                             tint = LocalContentColor.current
                         )
@@ -148,7 +148,7 @@ fun LearningUI(
     val errorString by vm.titleErrorFlow.collectAsState()
     val data = challengeState.data()
     val canShowHint by vm.canShowHint.collectAsState()
-    val hintString by vm.hintString.collectAsState()
+    val hint by vm.hintString.collectAsState()
     val focusRequester = remember { FocusRequester() }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -207,11 +207,11 @@ fun LearningUI(
 
         if (data is LearningVM.Challenge.Type) {
             typeBottomButtons(data.audioFiles, canShowHint, vm) {
-                SnackbarUI(snackbarHostState, hintString)
+                SnackbarUI(snackbarHostState, hint)
             }
         } else if (data is LearningVM.Challenge.Test) {
             testBottomButtons(data.audioFiles(), vm) {
-                SnackbarUI(snackbarHostState, hintString)
+                SnackbarUI(snackbarHostState, hint)
             }
         }
     }
@@ -383,7 +383,7 @@ private fun BoxScope.typeBottomButtons(
 @Composable
 private fun SnackbarUI(
     snackbarHostState: SnackbarHostState,
-    hintString: LearningVM.Hint?
+    hint: LearningVM.Hint?
 ) {
     SnackbarHost(
         modifier = Modifier.animateContentSize(),
@@ -392,9 +392,9 @@ private fun SnackbarUI(
         Snackbar(snackbarData = it)
     }
 
-    val text = hintString?.value?.localized()
+    val text = hint?.value?.localized()
     if (text?.isNotEmpty() == true) {
-        LaunchedEffect(key1 = text) {
+        LaunchedEffect(key1 = hint) {
             snackbarHostState.showSnackbar(text)
         }
     }
