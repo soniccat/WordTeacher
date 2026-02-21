@@ -25,6 +25,7 @@ data class CardSet (
     val creationId: String,
     val info: CardSetInfo = CardSetInfo("", null),
     val isAvailableInSearch: Boolean = false,
+    val tags: List<String> = emptyList()
 ) {
     fun findCard(id: Long) =
         cards.firstOrNull { it.id == id }

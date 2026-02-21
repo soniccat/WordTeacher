@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
@@ -34,10 +37,14 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
@@ -48,11 +55,16 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.aglushkov.wordteacher.shared.features.cardset.views.CardTextField
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVMImpl
+import com.aglushkov.wordteacher.shared.features.definitions.views.CustomBadge
+import com.aglushkov.wordteacher.shared.features.definitions.views.WordLabels
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
+import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.OutlinedTextFieldWithError
@@ -110,7 +122,10 @@ fun CardSetInfoUI(
 }
 
 @Composable
-fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
+fun CardSetInfoFieldsUI(
+    vm: CardSetInfoVM,
+    uiState: CardSetInfoVM.UIState,
+) {
     val focusRequester = remember { FocusRequester() }
     val scrollableState = rememberScrollState()
     val focusManager = LocalFocusManager.current
@@ -243,6 +258,92 @@ fun CardSetInfoFieldsUI(vm: CardSetInfoVM, uiState: CardSetInfoVM.UIState) {
                     onCheckedChange = null
                 )
             }
+        }
+
+        // tags
+        if (uiState.tags.isNotEmpty() || uiState.isEditable) {
+            WordLabels(
+                uiState.tags,
+                modifier = Modifier.padding(start = 10.dp, end = 24.dp),
+                textContent = { text, index ->
+                    CardTextField(
+                        modifier = Modifier
+                            .onFocusChanged {
+                                if (it.isFocused) {
+//                                    if (uiState.isEditable) {
+//                                        coroutineScope.launch {
+//                                            val index = data.indexOf(it)
+//                                            if (index != -1) {
+//                                                listState.animateScrollToItem(index, scrollOffset)
+//                                            }
+//                                        }
+//                                    }
+                                }
+                            }
+                            .padding(start = 4.dp, end = if (uiState.isEditable) 0.dp else 4.dp)
+                            .width(IntrinsicSize.Min)
+                            .let {
+                                val event = uiState.focusEvent as? CardSetInfoVMImpl.FocusLastEvent
+                                if (index == uiState.tags.size - 1 && event?.type == CardSetInfoVMImpl.ElementType.Tag) {
+                                    vm.onFocusEventHandled()
+                                    it.focusRequester(focusRequester)
+                                } else {
+                                    it
+                                }
+                            },
+                        text = text,
+                        placeholder = "",
+                        readOnly = !uiState.isEditable,
+                        onValueChanged = { newText ->
+                            vm.onTagTextChanged(newText, index)
+                        }
+                    )
+                    if (uiState.isEditable) {
+                        Icon(
+                            painter = painterResource(MR.images.close_18),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .padding(start = 4.dp)
+                                .clickable {
+                                    vm.onTagDeleted(index)
+                                },
+                            tint = MaterialTheme.colors.onSecondary
+                        )
+                    }
+                },
+                lastItem = if (uiState.isEditable) {
+                    {
+                        if (uiState.tags.isNotEmpty()) {
+                            CustomBadge(
+                                modifier = Modifier.clickable {
+                                    vm.onAddTagPressed()
+                                }.align(Alignment.CenterVertically).padding(horizontal = 2.dp),
+                                backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.8f),
+                                contentColor = MaterialTheme.colors.onSecondary,
+                                content = {
+                                    Text(
+                                        text = stringResource(MR.strings.cardset_add_label),
+                                        modifier = Modifier.padding(horizontal = 4.dp)
+                                    )
+                                }
+                            )
+                        } else {
+                            AddIcon(modifier = Modifier.align(Alignment.CenterVertically)) {
+                                vm.onAddTagPressed()
+                            }
+                        }
+                    }
+                } else {
+                    null
+                }
+            )
+        }
+    }
+
+    if (uiState.focusEvent != null) {
+        LaunchedEffect("focus") {
+            focusRequester.requestFocus()
         }
     }
 

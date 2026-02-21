@@ -1,4 +1,6 @@
 import kotlin.Boolean;
+import kotlin.String;
+import kotlin.collections.List;
 
 CREATE TABLE IF NOT EXISTS DBCardSet (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -9,7 +11,8 @@ CREATE TABLE IF NOT EXISTS DBCardSet (
   remoteId TEXT NOT NULL DEFAULT "",
   infoDescription TEXT NOT NULL DEFAULT "",
   infoSource TEXT,
-  isAvailableInSearch INTEGER AS Boolean NOT NULL DEFAULT 0
+  isAvailableInSearch INTEGER AS Boolean NOT NULL DEFAULT 0,
+  tags TEXT AS List<String> NOT NULL DEFAULT ""
 );
 
 selectAll:
@@ -42,16 +45,16 @@ FROM DBCardSet
 WHERE id = ?;
 
 insert:
-INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch, tags)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 insertCardSet:
-INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch)
+INSERT INTO DBCardSet(name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch, tags)
 VALUES ?;
 
 updateCardSet:
 UPDATE DBCardSet
-SET name = ?, date = ?, modificationDate = ?, creationId = ?, remoteId = ?, infoDescription = ?, infoSource = ?, isAvailableInSearch = ?
+SET name = ?, date = ?, modificationDate = ?, creationId = ?, remoteId = ?, infoDescription = ?, infoSource = ?, isAvailableInSearch = ?, tags = ?
 WHERE id = ?;
 
 lastInsertedRowId:

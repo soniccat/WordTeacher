@@ -2,10 +2,16 @@ package com.aglushkov.wordteacher.shared.features.cardset_info.vm
 
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.events.Event
+import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl.FocusLastType
+import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl.PendingEvent
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.StringDescThrowable
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
+import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.CardSetInfo
@@ -16,10 +22,12 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.ResourceStringDesc
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,6 +47,10 @@ interface CardSetInfoVM: Clearable {
     fun onIsAvailableInSearchChanged(isAvailableInSearch: Boolean)
     fun onLinkClicked(link: String)
     fun onImportArticleClicked(link: String)
+    fun onTagTextChanged(newText: String, index: Int)
+    fun onTagDeleted(index: Int)
+    fun onAddTagPressed()
+    fun onFocusEventHandled()
 
     @Serializable
     sealed interface State {
@@ -62,7 +74,8 @@ interface CardSetInfoVM: Clearable {
         val name: String? = null,
         val description: String? = null,
         val source: String? = null,
-        val isAvailableInSearch: Boolean? = null
+        val isAvailableInSearch: Boolean? = null,
+        val tags: List<String>? = null,
     ) {
         val isNameValid: Boolean
             get() = name == null || name.isNotEmpty()
@@ -87,6 +100,8 @@ interface CardSetInfoVM: Clearable {
         val sourceLinks: List<Link>,
         val isAvailableInSearch: Boolean,
         val isEditable: Boolean,
+        val tags: List<String>,
+        val focusEvent: Event?
     )
 
     data class Link(
@@ -110,7 +125,7 @@ open class CardSetInfoVMImpl(
 
     override var router: CardSetInfoRouter? = null
     val state: CardSetInfoVM.State = restoredState
-    var hasEditing = false
+    private var focusEvent = MutableStateFlow<Event?>(null)
 
     private val cardSetState = MutableStateFlow<Resource<CardSet>>(Resource.Uninitialized())
     private val inputState = MutableStateFlow(CardSetInfoVM.InputState())
@@ -130,13 +145,15 @@ open class CardSetInfoVMImpl(
             }
         },
         inputState,
-    ) { cardSetRes, inputState ->
+        focusEvent,
+    ) { cardSetRes, inputState, focusEvent ->
         cardSetRes.mapLoadedData(
             errorTransformer = {
                 StringDescThrowable(ResourceStringDesc(MR.strings.cardset_info_error), it)
             }
         ) { cardSet: CardSet ->
             val source = inputState.source ?: cardSet.info.source
+
             CardSetInfoVM.UIState(
                 name = inputState.validatedName ?: cardSet.name,
                 nameError = if (inputState.isNameValid) {
@@ -154,6 +171,8 @@ open class CardSetInfoVMImpl(
                 },
                 isAvailableInSearch = inputState.isAvailableInSearch ?: cardSet.isAvailableInSearch,
                 isEditable = !state.isRemoteCardSet,
+                tags = inputState.tags ?: cardSet.tags,
+                focusEvent = focusEvent,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
@@ -162,13 +181,18 @@ open class CardSetInfoVMImpl(
         addClearable(databaseCardWorker.startEditing())
         loadCardSet()
 
+        var hasEditing = false
         if (!state.isRemoteCardSet) {
             // subscribe on input state to update db data
             viewModelScope.launch {
                 inputState.collect { lastInputState ->
                     cardSetState.value.data()?.let { dbCardSet ->
-                        if (!hasEditing && !lastInputState.isNull) {
-                            hasEditing = true
+                        if (!hasEditing) {
+                            hasEditing = hasEditing || lastInputState.name != null && lastInputState.name != dbCardSet.name
+                            hasEditing = hasEditing || lastInputState.description != null && lastInputState.description != dbCardSet.info.description
+                            hasEditing = hasEditing || lastInputState.source != null && lastInputState.source != dbCardSet.info.source
+                            hasEditing = hasEditing || lastInputState.isAvailableInSearch != null && lastInputState.isAvailableInSearch != dbCardSet.isAvailableInSearch
+                            hasEditing = hasEditing || lastInputState.tags != null && lastInputState.tags != dbCardSet.tags
                         }
 
                         if (hasEditing) {
@@ -181,7 +205,8 @@ open class CardSetInfoVMImpl(
                                         source = lastInputState.source ?: dbCardSet.info.source,
                                     ),
                                     isAvailableInSearch = lastInputState.isAvailableInSearch
-                                        ?: dbCardSet.isAvailableInSearch
+                                        ?: dbCardSet.isAvailableInSearch,
+                                    tags = lastInputState.tags ?: dbCardSet.tags
                                 )
                             )
                         }
@@ -197,54 +222,22 @@ open class CardSetInfoVMImpl(
 
     override fun onNameChanged(name: String) {
         logChange("name")
-        inputState.update {
-            it.copy(
-                name = if (name != cardSetState.value.data()?.name) {
-                    name
-                } else {
-                    null
-                }
-            )
-        }
+        inputState.update { it.copy(name = name) }
     }
 
     override fun onDescriptionChanged(description: String) {
         logChange("description")
-        inputState.update {
-            it.copy(
-                description = if (description != cardSetState.value.data()?.info?.description) {
-                    description
-                } else {
-                    null
-                }
-            )
-        }
+        inputState.update { it.copy(description = description) }
     }
 
     override fun onSourceChanged(source: String) {
         logChange("source")
-        inputState.update {
-            it.copy(
-                source = if (source != cardSetState.value.data()?.info?.source) {
-                    source
-                } else {
-                    null
-                }
-            )
-        }
+        inputState.update { it.copy(source = source) }
     }
 
     override fun onIsAvailableInSearchChanged(isAvailableInSearch: Boolean) {
         logChange("isAvailableInSearchChanged")
-        inputState.update {
-            it.copy(
-                isAvailableInSearch = if (isAvailableInSearch != cardSetState.value.data()?.isAvailableInSearch) {
-                    isAvailableInSearch
-                } else {
-                    null
-                }
-            )
-        }
+        inputState.update { it.copy(isAvailableInSearch = isAvailableInSearch) }
     }
 
     override fun onLinkClicked(link: String) {
@@ -280,12 +273,79 @@ open class CardSetInfoVMImpl(
                                 description = state.cardSet.info.description,
                                 source = state.cardSet.info.source
                             ),
-                            isAvailableInSearch = false
+                            isAvailableInSearch = false,
+                            tags = state.cardSet.tags,
                         )
                     )
                 }
             }
         }
+    }
+
+    // tags
+
+    override fun onTagTextChanged(newText: String, index: Int) {
+        logChange("onTagTextChanged")
+        val currentTags = inputState.value.tags ?: cardSetState.value.data()?.tags
+        if (currentTags.isNullOrEmpty()) {
+            return
+        }
+
+        inputState.update {
+            it.copy(
+                tags = currentTags.mapIndexed { i, v ->
+                    if (index == i) {
+                        newText
+                    } else {
+                        v
+                    }
+                }
+            )
+        }
+    }
+
+    override fun onTagDeleted(index: Int) {
+        logChange("onTagDeleted")
+        val currentTags = inputState.value.tags ?: cardSetState.value.data()?.tags
+        if (currentTags.isNullOrEmpty()) {
+            return
+        }
+
+        inputState.update {
+            it.copy(
+                tags = currentTags.filterIndexed { i, v ->
+                    i != index
+                }
+            )
+        }
+    }
+
+    override fun onAddTagPressed() {
+        logChange("onAddTagPressed")
+        val currentTags = inputState.value.tags ?: cardSetState.value.data()?.tags
+        inputState.update {
+            it.copy(
+                tags = currentTags.orEmpty() + "",
+            )
+        }
+        focusEvent.update { FocusLastEvent(ElementType.Tag) }
+    }
+
+    override fun onFocusEventHandled() {
+        focusEvent.update { null }
+    }
+
+    open class FocusLastEvent(
+        val type: ElementType,
+        override var isHandled: Boolean = false
+    ): Event {
+        override fun markAsHandled() {
+            isHandled = true
+        }
+    }
+
+    enum class ElementType {
+        Tag,
     }
 }
 

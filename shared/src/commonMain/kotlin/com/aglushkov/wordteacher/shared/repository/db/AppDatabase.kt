@@ -4,6 +4,7 @@ import app.cash.sqldelight.ColumnAdapter
 import app.cash.sqldelight.TransactionWithReturn
 import app.cash.sqldelight.TransactionWithoutReturn
 import com.aglushkov.wordteacher.db.DBCard
+import com.aglushkov.wordteacher.db.DBCardSet
 import com.aglushkov.wordteacher.db.DBNLPSentence
 import com.aglushkov.wordteacher.maindb.MainDB
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
@@ -55,6 +56,9 @@ class AppDatabase(
             CardSpanListAdapter(),
             StringListAdapter(),
             WordTeacherWordAudioFileAdapter(),
+        ),
+        DBCardSetAdapter = DBCardSet.Adapter(
+            tagsAdapter = StringListAdapter(),
         ),
         DBNLPSentenceAdapter = DBNLPSentence.Adapter(
             StringListAdapter(),
@@ -169,25 +173,25 @@ class AppDatabase(
     inner class CardSets {
         val cardSetInsertedFlow = MutableSharedFlow<CardSet>()
 
-        fun insert(name: String, date: Long, infoSource: String? = null) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString(), "", "", infoSource, false)
+        fun insert(name: String, date: Long, infoSource: String? = null) = db.dBCardSetQueries.insert(name, date, date, uuid4().toString(), "", "", infoSource, false, emptyList())
 
         private fun insertedCardSetId() = db.dBCardSetQueries.lastInsertedRowId().firstLong()
 
         fun selectShortCardSets(): List<ShortCardSet> {
-            return db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
+            return db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch, tags ->
                 ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId, terms = emptyList())
             }).executeAsList()
         }
 
-        fun selectUpdatedCardSets(afterDate: Long): List<CardSet> = db.dBCardSetQueries.selectUpdated(afterDate, mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
-            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch)
+        fun selectUpdatedCardSets(afterDate: Long): List<CardSet> = db.dBCardSetQueries.selectUpdated(afterDate, mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch, tags ->
+            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch, tags)
         }).executeAsList()
 
         fun selectUpdatedCardSetsIds(sinceDate: Long) =
             db.dBCardSetQueries.selectUpdatedIds(sinceDate).executeAsList()
 
-        fun selectWithoutRemoteId(): List<CardSet> = db.dBCardSetQueries.selectWithoutRemoteId(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
-            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch)
+        fun selectWithoutRemoteId(): List<CardSet> = db.dBCardSetQueries.selectWithoutRemoteId(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch, tags ->
+            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch, tags)
         }).executeAsList()
 
         fun changeFlow(): Flow<Int> {
@@ -197,7 +201,7 @@ class AppDatabase(
 
         fun selectAll(): Flow<Resource<List<ShortCardSet>>> {
             // TODO: reorganize db to pull progress from it instead of loading all the cards
-            val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
+            val shortCardSetsFlow = db.dBCardSetQueries.selectAll(mapper = { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch, tags ->
                 ShortCardSet(id, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), 0f, 0f, creationId, remoteId, emptyList())
             }).asFlow()
             val setsWithCardsFlow = selectAllSetIdsWithCards().asFlow()
@@ -226,7 +230,7 @@ class AppDatabase(
             )
         }
 
-        fun selectCardSetWithoutCards(id: Long) = db.dBCardSetQueries.selectCardSet(id) { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch ->
+        fun selectCardSetWithoutCards(id: Long) = db.dBCardSetQueries.selectCardSet(id) { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch, tags ->
             CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch)
         }
 
@@ -278,6 +282,7 @@ class AppDatabase(
                     infoDescription = cardSet.info.description,
                     infoSource = cardSet.info.source,
                     isAvailableInSearch = cardSet.isAvailableInSearch,
+                    tags = cardSet.tags,
                 )
                 insertedCarSetId = insertedCardSetId().value!!
                 cardSet.cards.onEach { card ->
@@ -332,7 +337,8 @@ class AppDatabase(
                 remoteId = cardSet.remoteId,
                 infoDescription = cardSet.info.description,
                 infoSource = cardSet.info.source,
-                isAvailableInSearch = cardSet.isAvailableInSearch
+                isAvailableInSearch = cardSet.isAvailableInSearch,
+                tags = cardSet.tags
             )
         }
 
@@ -345,7 +351,8 @@ class AppDatabase(
             remoteId: String,
             infoDescription: String,
             infoSource: String?,
-            isAvailableInSearch: Boolean
+            isAvailableInSearch: Boolean,
+            tags: List<String>,
         ) = db.dBCardSetQueries.updateCardSet(
             name = name,
             date = date,
@@ -356,6 +363,7 @@ class AppDatabase(
             infoDescription = infoDescription,
             infoSource = infoSource,
             isAvailableInSearch = isAvailableInSearch,
+            tags = tags,
         )
 
         fun updateCardSetRemoteId(remoteId: String, creationId: String) =

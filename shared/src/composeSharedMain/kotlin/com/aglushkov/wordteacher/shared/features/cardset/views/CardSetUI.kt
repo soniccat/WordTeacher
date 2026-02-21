@@ -608,7 +608,7 @@ private fun CardItemTextField(
 }
 
 @Composable
-private fun CardTextField(
+fun CardTextField(
     modifier: Modifier = Modifier,
     text: String,
     textStyle: TextStyle = LocalTextStyle.current,
