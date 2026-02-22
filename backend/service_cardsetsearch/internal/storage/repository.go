@@ -3,8 +3,10 @@ package storage
 import (
 	"api"
 	"context"
+	"strings"
 	"time"
 	"tools"
+	"unicode"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -147,11 +149,20 @@ func (m *Repository) SearchCardSets(
 	query string,
 	limit int64,
 ) ([]*api.CardSet, error) {
+	tags, query := readTags(query)
+	query = strings.Trim(query, " ")
+
+	filter := bson.M{}
+	if len(query) != 0 {
+		filter["$text"] = bson.M{"$search": query, "$diacriticSensitive": true}
+	}
+	if len(tags) != 0 {
+		filter["tags"] = bson.M{"$in": tags}
+	}
+
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
-		bson.M{
-			"$text": bson.M{"$search": query, "$diacriticSensitive": true},
-		},
+		filter,
 		options.Find().SetLimit(limit),
 	)
 	if err != nil {
@@ -187,4 +198,65 @@ func (m *Repository) LastCardSetModificationDate(
 	}
 
 	return tools.Ptr(r.ModificationDate.Time()), nil
+}
+
+// tag parsing
+
+func readTags(query string) ([]string, string) {
+	tags := []string{}
+	reader := strings.NewReader(query)
+	for {
+		tag, err := readTag(reader)
+		if err != nil {
+			break
+		} else if tag != nil {
+			tags = append(tags, *tag)
+		} else {
+			break
+		}
+	}
+
+	return tags, query[reader.Size()-int64(reader.Len()):]
+}
+
+func readTag(reader *strings.Reader) (*string, error) {
+	for {
+		r, _, err := reader.ReadRune()
+		if err != nil {
+			return nil, err
+
+		} else if r == '#' {
+			w := readWord(reader)
+			if len(w) != 0 {
+				return &w, nil
+			}
+		} else if unicode.IsPunct(r) || unicode.IsSpace(r) {
+			continue
+
+		} else {
+			reader.UnreadRune()
+			break
+		}
+	}
+
+	return nil, nil
+}
+
+func readWord(reader *strings.Reader) string {
+	b := strings.Builder{}
+	for {
+		r, _, err := reader.ReadRune()
+		if err != nil {
+			break
+		} else if r == '#' {
+			reader.UnreadRune()
+			break
+		} else if unicode.IsDigit(r) || unicode.IsLetter(r) {
+			b.WriteRune(r)
+		} else {
+			break
+		}
+	}
+
+	return b.String()
 }

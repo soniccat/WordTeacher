@@ -266,7 +266,7 @@ fun CardSetInfoFieldsUI(
 
         Text(
             text = stringResource(MR.strings.cardset_info_tag_title),
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             style = LocalAppTypography.current.listItemTitle
         )
 
@@ -312,20 +312,20 @@ fun CardSetInfoFieldsUI(
                             }
                         )
 
-                    if (uiState.isEditable) {
-                        Icon(
-                            painter = painterResource(MR.images.close_18),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .padding(start = 4.dp)
-                                .clickable {
-                                    vm.onTagDeleted(index)
-                                },
-                            tint = MaterialTheme.colors.onSecondary
-                        )
-                    }
+                        if (uiState.isEditable) {
+                            Icon(
+                                painter = painterResource(MR.images.close_18),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .padding(start = 4.dp)
+                                    .clickable {
+                                        vm.onTagDeleted(index)
+                                    },
+                                tint = MaterialTheme.colors.onSecondary
+                            )
                         }
+                    }
                 },
                 lastItem = if (uiState.isEditable) {
                     {

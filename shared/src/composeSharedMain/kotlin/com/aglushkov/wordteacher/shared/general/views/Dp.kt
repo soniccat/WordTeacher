@@ -21,6 +21,6 @@ fun Int.dpToPx(): Float = this * LocalDensity.current.density
 
 @Composable
 fun listBottomPadding(): Dp {
-    val px = LocalWindowInfo.current.containerSize.height / 4.0f
+    val px = LocalWindowInfo.current.containerSize.height / 2.0f
     return px.pxToDp()
 }
