@@ -231,7 +231,7 @@ class AppDatabase(
         }
 
         fun selectCardSetWithoutCards(id: Long) = db.dBCardSetQueries.selectCardSet(id) { id, name, date, modificationDate, creationId, remoteId, infoDescription, infoSource, isAvailableInSearch, tags ->
-            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch)
+            CardSet(id, remoteId, name, Instant.fromEpochMilliseconds(date), Instant.fromEpochMilliseconds(modificationDate), emptyList(), emptyList(), creationId, CardSetInfo(infoDescription, infoSource), isAvailableInSearch, tags)
         }
 
         fun loadCardSetWithCards(id: Long): CardSet? {

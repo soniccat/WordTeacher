@@ -35,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -60,6 +61,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVMImpl
 import com.aglushkov.wordteacher.shared.features.definitions.views.CustomBadge
 import com.aglushkov.wordteacher.shared.features.definitions.views.WordLabels
+import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -261,43 +263,55 @@ fun CardSetInfoFieldsUI(
         }
 
         // tags
+
+        Text(
+            text = stringResource(MR.strings.cardset_info_tag_title),
+            modifier = Modifier.padding(16.dp),
+            style = LocalAppTypography.current.listItemTitle
+        )
+
         if (uiState.tags.isNotEmpty() || uiState.isEditable) {
             WordLabels(
                 uiState.tags,
                 modifier = Modifier.padding(start = 10.dp, end = 24.dp),
                 textContent = { text, index ->
-                    CardTextField(
-                        modifier = Modifier
-                            .onFocusChanged {
-                                if (it.isFocused) {
-//                                    if (uiState.isEditable) {
-//                                        coroutineScope.launch {
-//                                            val index = data.indexOf(it)
-//                                            if (index != -1) {
-//                                                listState.animateScrollToItem(index, scrollOffset)
+                    // to invalidate correctly on tag count change
+                    // without it text won't change
+                    key(uiState.tags.size) {
+                        CardTextField(
+                            modifier = Modifier
+//                                .onFocusChanged {
+//                                    if (it.isFocused) {
+//                                        if (uiState.isEditable) {
+//                                            coroutineScope.launch {
+//                                                val index = data.indexOf(it)
+//                                                if (index != -1) {
+//                                                    listState.animateScrollToItem(index, scrollOffset)
+//                                                }
 //                                            }
 //                                        }
 //                                    }
-                                }
+//                                }
+                                .padding(start = 4.dp, end = if (uiState.isEditable) 0.dp else 4.dp)
+                                .width(IntrinsicSize.Min)
+                                .let {
+                                    val event =
+                                        uiState.focusEvent as? CardSetInfoVMImpl.FocusLastEvent
+                                    if (index == uiState.tags.size - 1 && event?.type == CardSetInfoVMImpl.ElementType.Tag) {
+                                        vm.onFocusEventHandled()
+                                        it.focusRequester(focusRequester)
+                                    } else {
+                                        it
+                                    }
+                                },
+                            text = text,
+                            placeholder = "",
+                            readOnly = !uiState.isEditable,
+                            onValueChanged = { newText ->
+                                vm.onTagTextChanged(newText, index)
                             }
-                            .padding(start = 4.dp, end = if (uiState.isEditable) 0.dp else 4.dp)
-                            .width(IntrinsicSize.Min)
-                            .let {
-                                val event = uiState.focusEvent as? CardSetInfoVMImpl.FocusLastEvent
-                                if (index == uiState.tags.size - 1 && event?.type == CardSetInfoVMImpl.ElementType.Tag) {
-                                    vm.onFocusEventHandled()
-                                    it.focusRequester(focusRequester)
-                                } else {
-                                    it
-                                }
-                            },
-                        text = text,
-                        placeholder = "",
-                        readOnly = !uiState.isEditable,
-                        onValueChanged = { newText ->
-                            vm.onTagTextChanged(newText, index)
-                        }
-                    )
+                        )
+
                     if (uiState.isEditable) {
                         Icon(
                             painter = painterResource(MR.images.close_18),
@@ -311,10 +325,11 @@ fun CardSetInfoFieldsUI(
                             tint = MaterialTheme.colors.onSecondary
                         )
                     }
+                        }
                 },
                 lastItem = if (uiState.isEditable) {
                     {
-                        if (uiState.tags.isNotEmpty()) {
+                        if (uiState.tags.isEmpty()) {
                             CustomBadge(
                                 modifier = Modifier.clickable {
                                     vm.onAddTagPressed()

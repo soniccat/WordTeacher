@@ -41,6 +41,7 @@ func ApiCardSetToDb(ctx context.Context, cs *api.CardSet) (*DbCardSet, error) {
 	cardSetDb := &DbCardSet{
 		Id:               id,
 		Name:             cs.Name,
+		Tags:             cs.Tags,
 		Cards:            cardSetDbs,
 		UserId:           userId,
 		CreationDate:     creationDate,

@@ -76,6 +76,7 @@
     <string name="cardset_info_open_link">Open %s</string>
     <string name="cardset_info_import_article">Import</string>
     <string name="cardset_info_import_action">Import</string>
+    <string name="cardset_info_tag_title">Search tags:</string>
     <string name="cardset_add_label">Add label</string>
 
     <string name="cardsets_search_added">"%s" added</string>
