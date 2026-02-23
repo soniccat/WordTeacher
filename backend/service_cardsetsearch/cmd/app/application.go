@@ -63,6 +63,10 @@ func createApplication(
 	if err != nil {
 		return nil, err
 	}
+	err = app.MongoWrapper.CreateIndexIfNeeded(app.cardSetSearchRepository.CardSetCollection, "tags")
+	if err != nil {
+		return nil, err
+	}
 
 	return app, nil
 }

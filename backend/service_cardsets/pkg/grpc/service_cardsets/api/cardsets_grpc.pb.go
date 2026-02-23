@@ -34,6 +34,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	CardSets_GetCardSets_FullMethodName    = "/cardsetsgrpc.CardSets/GetCardSets"
 	CardSets_GetCardSetById_FullMethodName = "/cardsetsgrpc.CardSets/GetCardSetById"
+	CardSets_GetCardSetTags_FullMethodName = "/cardsetsgrpc.CardSets/GetCardSetTags"
 )
 
 // CardSetsClient is the client API for CardSets service.
@@ -42,6 +43,7 @@ const (
 type CardSetsClient interface {
 	GetCardSets(ctx context.Context, in *GetCardSetsIn, opts ...grpc.CallOption) (grpc.ServerStreamingClient[CardSet], error)
 	GetCardSetById(ctx context.Context, in *GetCardSetIn, opts ...grpc.CallOption) (*GetCardSetOut, error)
+	GetCardSetTags(ctx context.Context, in *GetCardSetTagsIn, opts ...grpc.CallOption) (*GetCardSetTagsOut, error)
 }
 
 type cardSetsClient struct {
@@ -81,12 +83,23 @@ func (c *cardSetsClient) GetCardSetById(ctx context.Context, in *GetCardSetIn, o
 	return out, nil
 }
 
+func (c *cardSetsClient) GetCardSetTags(ctx context.Context, in *GetCardSetTagsIn, opts ...grpc.CallOption) (*GetCardSetTagsOut, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCardSetTagsOut)
+	err := c.cc.Invoke(ctx, CardSets_GetCardSetTags_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CardSetsServer is the server API for CardSets service.
 // All implementations must embed UnimplementedCardSetsServer
 // for forward compatibility.
 type CardSetsServer interface {
 	GetCardSets(*GetCardSetsIn, grpc.ServerStreamingServer[CardSet]) error
 	GetCardSetById(context.Context, *GetCardSetIn) (*GetCardSetOut, error)
+	GetCardSetTags(context.Context, *GetCardSetTagsIn) (*GetCardSetTagsOut, error)
 	mustEmbedUnimplementedCardSetsServer()
 }
 
@@ -102,6 +115,9 @@ func (UnimplementedCardSetsServer) GetCardSets(*GetCardSetsIn, grpc.ServerStream
 }
 func (UnimplementedCardSetsServer) GetCardSetById(context.Context, *GetCardSetIn) (*GetCardSetOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCardSetById not implemented")
+}
+func (UnimplementedCardSetsServer) GetCardSetTags(context.Context, *GetCardSetTagsIn) (*GetCardSetTagsOut, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCardSetTags not implemented")
 }
 func (UnimplementedCardSetsServer) mustEmbedUnimplementedCardSetsServer() {}
 func (UnimplementedCardSetsServer) testEmbeddedByValue()                  {}
@@ -153,6 +169,24 @@ func _CardSets_GetCardSetById_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CardSets_GetCardSetTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCardSetTagsIn)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardSetsServer).GetCardSetTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CardSets_GetCardSetTags_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardSetsServer).GetCardSetTags(ctx, req.(*GetCardSetTagsIn))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CardSets_ServiceDesc is the grpc.ServiceDesc for CardSets service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -163,6 +197,10 @@ var CardSets_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCardSetById",
 			Handler:    _CardSets_GetCardSetById_Handler,
+		},
+		{
+			MethodName: "GetCardSetTags",
+			Handler:    _CardSets_GetCardSetTags_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

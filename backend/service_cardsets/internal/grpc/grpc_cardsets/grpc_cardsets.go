@@ -12,7 +12,7 @@ import (
 )
 
 type storage interface {
-	ModifiedCardSetsSince(ctx context.Context, lastModificationDate *time.Time, onlyAvailableInSearch bool, limit int64) ([]*model.DbCardSet, error)
+	ModifiedCardSetsSince(ctx context.Context, lastModificationDate *time.Time, onlyAvailableInSearch bool, limit int64, withTag *string) ([]*model.DbCardSet, error)
 }
 
 type Handler struct {
@@ -50,6 +50,7 @@ func (s *Handler) GetCardSets(in *grpcapi.GetCardSetsIn, server grpcapi.CardSets
 		sinceDate,
 		tools.PtrBoolValue(in.OnlyAvailableInSearch),
 		tools.PtrInt64Value(in.Limit),
+		in.WithTag,
 	)
 	if err != nil {
 		return logger.WrapError(server.Context(), err)

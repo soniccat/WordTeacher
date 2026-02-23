@@ -40,6 +40,10 @@ func New(
 	}
 
 	r.CardSetCollection = r.Collection(mongowrapper.MongoDatabaseCardSets, mongowrapper.MongoCollectionCardSets)
+	err = r.MongoWrapper.CreateIndexIfNeeded(r.CardSetCollection, "tags")
+	if err != nil {
+		return nil, err
+	}
 
 	return r, nil
 }
@@ -232,7 +236,7 @@ func (m *Storage) ModifiedCardSetsSinceByUserId(
 	userId string,
 	lastModificationDate *time.Time,
 ) ([]*model.DbCardSet, error) {
-	return m.getCardSets(ctx, &userId, lastModificationDate, false, 0)
+	return m.getCardSets(ctx, &userId, lastModificationDate, false, 0, nil)
 }
 
 func (m *Storage) ModifiedCardSetsSince(
@@ -240,8 +244,9 @@ func (m *Storage) ModifiedCardSetsSince(
 	lastModificationDate *time.Time,
 	onlyAvailableInSearch bool,
 	limit int64,
+	withTag *string,
 ) ([]*model.DbCardSet, error) {
-	return m.getCardSets(ctx, nil, lastModificationDate, onlyAvailableInSearch, limit)
+	return m.getCardSets(ctx, nil, lastModificationDate, onlyAvailableInSearch, limit, withTag)
 }
 
 func (m *Storage) getCardSets(
@@ -250,6 +255,7 @@ func (m *Storage) getCardSets(
 	lastModificationDate *time.Time,
 	onlyAvailableInSearch bool,
 	limit int64,
+	withTag *string,
 ) ([]*model.DbCardSet, error) {
 	var mongoUserId *primitive.ObjectID
 
@@ -278,6 +284,11 @@ func (m *Storage) getCardSets(
 	if mongoUserId != nil {
 		filter["userId"] = mongoUserId
 	}
+
+	if withTag != nil {
+		filter["tags"] = *withTag
+	}
+
 	cursor, err := m.CardSetCollection.Find(
 		ctx,
 		filter,
@@ -477,4 +488,51 @@ func (m *Storage) LastModificationDate(
 	}
 
 	return tools.Ptr(modificationDates[0].ModificationDate.Time().UTC()), nil
+}
+
+func (m *Storage) CountTags(
+	ctx context.Context,
+) (map[string]int64, error) {
+	cursor, err := m.CardSetCollection.Aggregate(
+		ctx,
+		bson.A{
+			bson.D{{Key: "$project", Value: bson.D{{Key: "tags", Value: 1}}}},
+			bson.D{
+				{Key: "$unwind",
+					Value: bson.D{
+						{Key: "path", Value: "$tags"},
+						{Key: "preserveNullAndEmptyArrays", Value: false},
+					},
+				},
+			},
+			bson.D{
+				{Key: "$group",
+					Value: bson.D{
+						{Key: "_id", Value: "$tags"},
+						{Key: "ct", Value: bson.D{{Key: "$sum", Value: 1}}},
+					},
+				},
+			},
+		},
+	)
+
+	res := make(map[string]int64)
+	if err != nil {
+		return res, err
+	}
+
+	var tags []struct {
+		Tag string `bson:"_id"`
+		Ct  int64  `bson:"ct"`
+	}
+	err = cursor.All(ctx, &tags)
+	if err != nil {
+		return res, err
+	}
+
+	for _, t := range tags {
+		res[t.Tag] = t.Ct
+	}
+
+	return res, nil
 }

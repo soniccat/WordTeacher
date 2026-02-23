@@ -5,6 +5,7 @@ import (
 	"tools/logger"
 
 	"service_cardsets/internal/grpc/grpc_cardset_by_id"
+	"service_cardsets/internal/grpc/grpc_cardset_tags"
 	"service_cardsets/internal/grpc/grpc_cardsets"
 	grpcapi "service_cardsets/pkg/grpc/service_cardsets/api"
 )
@@ -14,6 +15,7 @@ type CardSetsServer struct {
 	logger             *logger.Logger
 	cardsetByIdHandler grpc_cardset_by_id.Handler
 	cardsetsHandler    grpc_cardsets.Handler
+	cardsetTags        grpc_cardset_tags.Handler
 }
 
 func NewCardSetServer(app *application) *CardSetsServer {
@@ -21,6 +23,7 @@ func NewCardSetServer(app *application) *CardSetsServer {
 		logger:             app.logger,
 		cardsetByIdHandler: *grpc_cardset_by_id.NewHandler(app.sessionValidator, app.cardSetRepository),
 		cardsetsHandler:    *grpc_cardsets.NewHandler(app.logger, app.sessionValidator, app.cardSetRepository),
+		cardsetTags:        *grpc_cardset_tags.NewHandler(app.sessionValidator, app.cardSetRepository),
 	}
 	return s
 }
@@ -38,6 +41,15 @@ func (s *CardSetsServer) GetCardSetById(ctx context.Context, in *grpcapi.GetCard
 	out, err := s.cardsetByIdHandler.GetCardSetById(ctx, in)
 	if err != nil {
 		s.logger.ErrorWithError(ctx, err, "GetCardSetById error")
+	}
+
+	return out, err
+}
+
+func (s *CardSetsServer) GetCardsetTags(ctx context.Context, in *grpcapi.GetCardSetTagsIn) (*grpcapi.GetCardSetTagsOut, error) {
+	out, err := s.cardsetTags.GetCardSetTags(ctx, in)
+	if err != nil {
+		s.logger.ErrorWithError(ctx, err, "GetCardsetTags error")
 	}
 
 	return out, err

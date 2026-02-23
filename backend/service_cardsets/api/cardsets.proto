@@ -24,12 +24,14 @@ package cardsetsgrpc;
 service CardSets {
   rpc GetCardSets (GetCardSetsIn) returns (stream CardSet) {}
   rpc GetCardSetById (GetCardSetIn) returns (GetCardSetOut) {}
+	rpc GetCardSetTags (GetCardSetTagsIn) returns (GetCardSetTagsOut) {}
 }
 
 message GetCardSetsIn {
   optional string sinceDate = 1;
 	optional int64 limit = 2;
 	optional bool onlyAvailableInSearch = 3;
+	optional string withTag = 4;
 }
 
 message GetCardSetIn {
@@ -38,6 +40,13 @@ message GetCardSetIn {
 
 message GetCardSetOut {
   CardSet cardSet = 1;
+}
+
+message GetCardSetTagsIn {
+}
+
+message GetCardSetTagsOut {
+	repeated Tag tags = 1;
 }
 
 message CardSet {
@@ -77,6 +86,11 @@ message AudioFile {
 	optional string accent = 2;
 	optional string transcription = 3;
 	optional string text = 4;
+}
+
+message Tag {
+	string name = 1;
+	int64 count = 2;
 }
 
 enum PartOfSpeech {

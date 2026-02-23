@@ -33,6 +33,8 @@ func (suite *CardSetTestSuite) SetupTest() {
 	if err != nil {
 		suite.T().Fatal(err)
 	}
+
+	suite.CardSetModel.DropAll(context.Background())
 }
 
 func (suite *CardSetTestSuite) TestCreateCardSet() {
@@ -41,12 +43,13 @@ func (suite *CardSetTestSuite) TestCreateCardSet() {
 		Name: "testCardSet",
 		Cards: []*api.Card{
 			{
-				Term:          "testTerm1",
-				Transcription: tools.Ptr("testTranscription"),
-				PartOfSpeech:  api.Adverb,
-				Definitions:   []string{"testDef1", "testDef2"},
-				Synonyms:      []string{"testSyn1", "testSyn2"},
-				Examples:      []string{"testEx1", "testEx2"},
+				Term:           "testTerm1",
+				Transcription:  tools.Ptr("testTranscription"),
+				Transcriptions: []string{"testTranscription"},
+				PartOfSpeech:   api.Adverb,
+				Definitions:    []string{"testDef1", "testDef2"},
+				Synonyms:       []string{"testSyn1", "testSyn2"},
+				Examples:       []string{"testEx1", "testEx2"},
 				DefinitionTermSpans: [][]api.Span{
 					{{1, 2}, {3, 4}},
 					{{5, 6}, {7, 8}},
@@ -84,12 +87,13 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 		Name: "testCardSet",
 		Cards: []*api.Card{
 			{
-				Term:          "testTerm1",
-				Transcription: tools.Ptr("testTranscription"),
-				PartOfSpeech:  api.Adverb,
-				Definitions:   []string{"testDef1", "testDef2"},
-				Synonyms:      []string{"testSyn1", "testSyn2"},
-				Examples:      []string{"testEx1", "testEx2"},
+				Term:           "testTerm1",
+				Transcription:  tools.Ptr("testTranscription"),
+				Transcriptions: []string{"testTranscription"},
+				PartOfSpeech:   api.Adverb,
+				Definitions:    []string{"testDef1", "testDef2"},
+				Synonyms:       []string{"testSyn1", "testSyn2"},
+				Examples:       []string{"testEx1", "testEx2"},
 				DefinitionTermSpans: [][]api.Span{
 					{{1, 2}, {3, 4}},
 					{{5, 6}, {7, 8}},
@@ -115,12 +119,13 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 	insertedCardSet.Cards = append(
 		insertedCardSet.Cards,
 		&api.Card{
-			Term:          "testTerm2",
-			Transcription: tools.Ptr("testTranscription2"),
-			PartOfSpeech:  api.Adverb,
-			Definitions:   []string{"testDef3", "testDef4"},
-			Synonyms:      []string{"testSyn3", "testSyn4"},
-			Examples:      []string{"testEx3", "testEx4"},
+			Term:           "testTerm2",
+			Transcription:  tools.Ptr("testTranscription2"),
+			Transcriptions: []string{"testTranscription2"},
+			PartOfSpeech:   api.Adverb,
+			Definitions:    []string{"testDef3", "testDef4"},
+			Synonyms:       []string{"testSyn3", "testSyn4"},
+			Examples:       []string{"testEx3", "testEx4"},
 			DefinitionTermSpans: [][]api.Span{
 				{{10, 20}, {3, 4}},
 				{{50, 60}, {7, 8}},
@@ -141,6 +146,53 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 	loadedCardSetDb, err := suite.CardSetModel.LoadCardSetDbById(ctx, insertedCardSet.Id)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), insertedCardSet, loadedCardSetDb.ToApi())
+}
+
+func (suite *CardSetTestSuite) TestGetTags() {
+	ctx := context.Background()
+	cardSet := &api.CardSet{
+		Name: "testCardSet",
+		Tags: []string{"tag1", "tag2"},
+		Cards: []*api.Card{
+			{
+				Term:             "testTerm1",
+				CreationId:       "fb23d60c-02f9-4bae-be86-8359274e0e4e",
+				CreationDate:     "2022-11-03T17:30:02Z",
+				ModificationDate: "2022-11-03T17:30:02Z",
+			},
+		},
+		CreationDate:     "2022-11-03T17:30:02Z",
+		ModificationDate: "2022-11-03T17:30:02Z",
+		CreationId:       "bf3d4938-3568-4da7-81ad-a2342745adee",
+	}
+	cardSet2 := &api.CardSet{
+		Name: "testCardSet",
+		Tags: []string{"tag1", "tag3"},
+		Cards: []*api.Card{
+			{
+				Term:             "testTerm1",
+				CreationId:       "fb23d60c-02f9-4bae-be86-8359274e0e4e",
+				CreationDate:     "2022-11-03T17:30:02Z",
+				ModificationDate: "2022-11-03T17:30:02Z",
+			},
+		},
+		CreationDate:     "2022-11-03T17:30:02Z",
+		ModificationDate: "2022-11-03T17:30:02Z",
+		CreationId:       "bf3d4938-3568-4da7-81ad-a2342745adee",
+	}
+	ownerId := primitive.NewObjectID().Hex()
+
+	_, errWithCode := suite.CardSetModel.InsertCardSet(ctx, cardSet, ownerId)
+	assert.Nil(suite.T(), errWithCode)
+	_, errWithCode = suite.CardSetModel.InsertCardSet(ctx, cardSet2, ownerId)
+	assert.Nil(suite.T(), errWithCode)
+
+	tagCount, err := suite.CardSetModel.CountTags(ctx)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), 3, len(tagCount))
+	assert.Equal(suite.T(), 2, tagCount["tag1"])
+	assert.Equal(suite.T(), 1, tagCount["tag2"])
+	assert.Equal(suite.T(), 1, tagCount["tag3"])
 }
 
 func TestCardSetTestSuite(t *testing.T) {
