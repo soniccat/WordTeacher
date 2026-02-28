@@ -15,11 +15,13 @@ type headlineStorage interface {
 
 type cardSetsStorage interface {
 	CardSets() []api.CardSet
+	TagWithCardSets() []api.TagWithCardSets
 }
 
 type response struct {
-	HeadlineBlock   model.DashboardHeadlineBlock    `json:"headlineBlock"`
-	NewCardSetBlock model.DashboardNewCardsSetBlock `json:"newCardSetBlock"`
+	HeadlineBlock        model.DashboardHeadlineBlock        `json:"headlineBlock"`
+	NewCardSetBlock      model.DashboardNewCardsSetBlock     `json:"newCardSetBlock"`
+	TagWithCardSetsBlock model.DashboardTagWithCardSetsBlock `json:"tagWithCardSetsBlock"`
 }
 
 type Handler struct {
@@ -59,15 +61,15 @@ func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 	// 	),
 	// )
 
-	headlineCategories := h.headlineStorage.HeadlineCategories()
-	newCardSets := h.cardSetsStorage.CardSets()
-
 	response := response{
 		HeadlineBlock: model.DashboardHeadlineBlock{
-			Categories: headlineCategories,
+			Categories: h.headlineStorage.HeadlineCategories(),
 		},
 		NewCardSetBlock: model.DashboardNewCardsSetBlock{
-			CardSets: newCardSets,
+			CardSets: h.cardSetsStorage.CardSets(),
+		},
+		TagWithCardSetsBlock: model.DashboardTagWithCardSetsBlock{
+			Tags: h.cardSetsStorage.TagWithCardSets(),
 		},
 	}
 	h.WriteResponse(w, response)

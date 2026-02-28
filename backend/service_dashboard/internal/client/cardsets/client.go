@@ -27,12 +27,13 @@ func New(logger *logger.Logger, grpcClient cardsetsgrpc.CardSetsClient) Client {
 	}
 }
 
-func (c *Client) GetCardSets(ctx context.Context, limit int64) (chan CardSetResult, error) {
+func (c *Client) GetCardSets(ctx context.Context, limit int64, withTag *string) (chan CardSetResult, error) {
 	grpcCardSetStream, err := c.grpcClient.GetCardSets(
 		ctx,
 		&cardsetsgrpc.GetCardSetsIn{
 			Limit:                 tools.Ptr(limit),
 			OnlyAvailableInSearch: tools.Ptr(true),
+			WithTag:               withTag,
 		},
 		grpc.EmptyCallOption{},
 	)
@@ -56,4 +57,18 @@ func (c *Client) GetCardSets(ctx context.Context, limit int64) (chan CardSetResu
 	}()
 
 	return cardSetChan, nil
+}
+
+func (c *Client) GetCardSetTags(ctx context.Context) ([]*cardsetsgrpc.Tag, error) {
+	tags, err := c.grpcClient.GetCardSetTags(
+		ctx,
+		&cardsetsgrpc.GetCardSetTagsIn{},
+		grpc.EmptyCallOption{},
+	)
+
+	if err != nil {
+		return nil, logger.WrapError(ctx, err)
+	}
+
+	return tags.Tags, nil
 }

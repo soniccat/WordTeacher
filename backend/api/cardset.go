@@ -18,6 +18,16 @@ type CardSet struct {
 	IsAvailableInSearch bool        `json:"isAvailableInSearch"`
 }
 
+type CardSetTag struct {
+	Name  string `json:"name"`
+	Count int64  `json:"count"`
+}
+
+type TagWithCardSets struct {
+	Tag      CardSetTag `json:"tag"`
+	CardSets []CardSet  `json:"cardSets"`
+}
+
 type CardSetInfo struct {
 	Description string  `json:"description"`
 	Source      *string `json:"source"` // url

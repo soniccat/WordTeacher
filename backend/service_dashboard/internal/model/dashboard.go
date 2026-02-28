@@ -34,6 +34,10 @@ type DashboardNewCardsSetBlock struct {
 	CardSets []api.CardSet `json:"cardSets" bson:"cardSets"`
 }
 
+type DashboardTagWithCardSetsBlock struct {
+	Tags []api.TagWithCardSets `json:"tagWithCardSets"`
+}
+
 func GRPCCardSetToApi(ctx context.Context, cs *cardsetsgrpc.CardSet) api.CardSet {
 	terms := tools.Map(cs.Cards, func(c *cardsetsgrpc.Card) string {
 		return c.Term
