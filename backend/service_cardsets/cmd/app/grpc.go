@@ -46,7 +46,7 @@ func (s *CardSetsServer) GetCardSetById(ctx context.Context, in *grpcapi.GetCard
 	return out, err
 }
 
-func (s *CardSetsServer) GetCardsetTags(ctx context.Context, in *grpcapi.GetCardSetTagsIn) (*grpcapi.GetCardSetTagsOut, error) {
+func (s *CardSetsServer) GetCardSetTags(ctx context.Context, in *grpcapi.GetCardSetTagsIn) (*grpcapi.GetCardSetTagsOut, error) {
 	out, err := s.cardsetTags.GetCardSetTags(ctx, in)
 	if err != nil {
 		s.logger.ErrorWithError(ctx, err, "GetCardsetTags error")
