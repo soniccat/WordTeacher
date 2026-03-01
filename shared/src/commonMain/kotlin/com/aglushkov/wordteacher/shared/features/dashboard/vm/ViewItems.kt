@@ -89,12 +89,12 @@ class DashboardCardSetTagsViewItem(
     val selectedIndex: Int,
 ): BaseViewItem<String>(tags, Type) {
     companion object {
-        const val Type = 1205
+        const val Type = 1206
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
         return super.equalsByContent(other) &&
-                other is DashboardCategoriesViewItem
+                other is DashboardCardSetTagsViewItem
                 && selectedIndex == other.selectedIndex
     }
 }

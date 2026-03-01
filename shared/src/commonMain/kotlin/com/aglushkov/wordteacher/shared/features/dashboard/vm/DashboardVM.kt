@@ -377,7 +377,7 @@ open class DashboardVMIMpl(
                     resultList.add(
                         DashboardCardSetTagsViewItem(
                             tags = listOf("New") + it.tagWithCardSetsBlock.tagWithCardSets.map { it.tag.name },
-                            selectedIndex = state.selectedCategoryIndex,
+                            selectedIndex = state.selectedCardSetTagIndex,
                         )
                     )
 
@@ -386,11 +386,17 @@ open class DashboardVMIMpl(
                     } else {
                         it.tagWithCardSetsBlock.tagWithCardSets[state.selectedCardSetTagIndex-1].cardSets
                     }
+                    val selectedCardSetTotalCount = if (state.selectedCardSetTagIndex == 0) {
+                        Int.MAX_VALUE
+                    } else {
+                        it.tagWithCardSetsBlock.tagWithCardSets[state.selectedCardSetTagIndex-1].tag.count
+                    }
 
+                    val collapsedCardSetCount = 3
                     val resultCardSets = if (state.isCardSetBlockExpanded) {
                         selectedCardSets
                     } else {
-                        selectedCardSets.take(3)
+                        selectedCardSets.take(collapsedCardSetCount)
                     }
                     resultCardSets.onEach { cardSet ->
                         resultList.add(
@@ -403,16 +409,19 @@ open class DashboardVMIMpl(
                             )
                         )
                     }
-                    resultList.add(
-                        if (state.isCardSetBlockExpanded) {
-                            DashboardOpenCardSetsItem()
-                        } else {
-                            DashboardExpandViewItem(
-                                expandType = DashboardExpandViewItem.ExpandType.CardSets,
-                                isExpanded = state.isCardSetBlockExpanded,
-                            )
-                        }
-                    )
+
+                    if (collapsedCardSetCount < selectedCardSetTotalCount) {
+                        resultList.add(
+                            if (state.isCardSetBlockExpanded) {
+                                DashboardOpenCardSetsItem()
+                            } else {
+                                DashboardExpandViewItem(
+                                    expandType = DashboardExpandViewItem.ExpandType.CardSets,
+                                    isExpanded = state.isCardSetBlockExpanded,
+                                )
+                            }
+                        )
+                    }
                 }
             },
             loading = {
