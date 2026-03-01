@@ -496,6 +496,7 @@ func (m *Storage) CountTags(
 	cursor, err := m.CardSetCollection.Aggregate(
 		ctx,
 		bson.A{
+			bson.D{{Key: "$match", Value: bson.D{{Key: "isAvailableInSearch", Value: true}}}},
 			bson.D{{Key: "$project", Value: bson.D{{Key: "tags", Value: 1}}}},
 			bson.D{
 				{Key: "$unwind",

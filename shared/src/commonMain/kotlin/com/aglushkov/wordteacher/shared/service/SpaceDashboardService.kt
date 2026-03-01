@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.serialization.InstantIso8601Serializer
 import com.aglushkov.wordteacher.shared.general.setStatusCode
 import com.aglushkov.wordteacher.shared.model.CardSet
+import com.aglushkov.wordteacher.shared.model.TagWithCardSet
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
 import io.ktor.client.*
@@ -33,6 +34,7 @@ import kotlin.time.ExperimentalTime
 data class SpaceDashboardResponse(
     @SerialName("headlineBlock") val headlineBlock: SpaceDashboardHeadlineBlock,
     @SerialName("newCardSetBlock") val newCardSetBlock: SpaceDashboardNewCardSetBlock,
+    @SerialName("tagWithCardSetsBlock") val tagWithCardSetsBlock: DashboardTagWithCardSetsBlock,
 )
 
 @Serializable
@@ -43,6 +45,11 @@ data class SpaceDashboardNewCardSetBlock(
 @Serializable
 data class SpaceDashboardHeadlineBlock(
     @SerialName("categories") val categories: List<SpaceDashboardCategory> = emptyList(),
+)
+
+@Serializable
+data class DashboardTagWithCardSetsBlock(
+    @SerialName("tagWithCardSets") val tagWithCardSets: List<TagWithCardSet> = emptyList(),
 )
 
 @Serializable
@@ -85,7 +92,7 @@ class SpaceDashboardService(
 
     suspend fun load(): Response<SpaceDashboardResponse> {
         return withContext(Dispatchers.IO) {
-            val res: HttpResponse = httpClient.get(urlString = "${baseUrl}/api/v1/dashboard")
+            val res: HttpResponse = httpClient.get(urlString = "${baseUrl}/api/v2/dashboard")
             val stringResponse: String = res.body()
             json.decodeFromString<Response<SpaceDashboardResponse>>(stringResponse).setStatusCode(res.status.value)
         }

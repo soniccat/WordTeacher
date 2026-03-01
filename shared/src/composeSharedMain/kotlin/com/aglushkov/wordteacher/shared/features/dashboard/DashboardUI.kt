@@ -56,6 +56,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.views.CardSetSearchItemView
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardCardSetTagsViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardCategoriesViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardExpandViewItem
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardHeadlineViewItem
@@ -241,7 +242,6 @@ fun dashboardItem(
                 color = contentColorFor(MaterialTheme.colors.primarySurface)
             )
         }
-
     }
 
     is DashboardOpenCardSetsItem -> {
@@ -282,6 +282,30 @@ fun dashboardItem(
             }
         }
     }
+
+    is DashboardCardSetTagsViewItem -> {
+        val horizontalPadding = LocalDimens.current.contentPadding
+        Row(
+            modifier = Modifier
+                .padding(
+                    start = horizontalPadding,
+                    end = horizontalPadding,
+                )
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            item.items.onEachIndexed { categoryIndex, tag ->
+                val isSelected = item.selectedIndex == categoryIndex
+                FilterChip(
+                    onClick = { vm.onCardSetTagChanged(categoryIndex) },
+                    selected = isSelected,
+                ) {
+                    Text(tag)
+                }
+            }
+        }
+    }
+
     is RemoteCardSetViewItem -> {
         CardSetSearchItemView(
             item,

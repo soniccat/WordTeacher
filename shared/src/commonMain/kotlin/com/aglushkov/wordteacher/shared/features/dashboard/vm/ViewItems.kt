@@ -83,3 +83,18 @@ class HintViewItem(
         const val Type = 1204
     }
 }
+
+class DashboardCardSetTagsViewItem(
+    tags: List<String>,
+    val selectedIndex: Int,
+): BaseViewItem<String>(tags, Type) {
+    companion object {
+        const val Type = 1205
+    }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) &&
+                other is DashboardCategoriesViewItem
+                && selectedIndex == other.selectedIndex
+    }
+}

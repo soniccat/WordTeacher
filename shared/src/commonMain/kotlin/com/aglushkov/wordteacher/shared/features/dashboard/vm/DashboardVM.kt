@@ -67,6 +67,7 @@ interface DashboardVM: Clearable {
     fun onHeadlineCategoryChanged(index: Int)
     fun onHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onAddHeadlineClicked(item: DashboardHeadlineViewItem)
+    fun onCardSetTagChanged(index: Int)
     fun onCardSetClicked(item: CardSetViewItem)
     fun onCardSetStartLearningClicked(item: CardSetViewItem)
     fun onArticleClicked(item: ArticleViewItem)
@@ -93,6 +94,7 @@ interface DashboardVM: Clearable {
         val selectedCategoryIndex: Int = 0,
         val isHeadlineBlockExpanded: Boolean = false,
         val isCardSetBlockExpanded: Boolean = false,
+        val selectedCardSetTagIndex: Int = 0,
     )
 }
 
@@ -159,6 +161,11 @@ open class DashboardVMIMpl(
         analytics.send(AnalyticEvent.createActionEvent("Dashboard.onAddHeadlineClicked"))
         readHeadlineRepository.put(item.link)
         router?.openAddArticle(item.link, true)
+    }
+
+    override fun onCardSetTagChanged(index: Int) {
+        analytics.send(AnalyticEvent.createActionEvent("Dashboard.onCardSetTagChanged"))
+        stateFlow.update { it.copy(selectedCardSetTagIndex = index) }
     }
 
     override fun onCardSetClicked(item: CardSetViewItem) {
@@ -366,10 +373,24 @@ open class DashboardVMIMpl(
                     if (!prefs.isHintClosed(HintType.DashboardCardSets)) {
                         resultList.add(HintViewItem(HintType.DashboardCardSets))
                     }
-                    val resultCardSets = if (state.isCardSetBlockExpanded) {
+
+                    resultList.add(
+                        DashboardCardSetTagsViewItem(
+                            tags = listOf("New") + it.tagWithCardSetsBlock.tagWithCardSets.map { it.tag.name },
+                            selectedIndex = state.selectedCategoryIndex,
+                        )
+                    )
+
+                    val selectedCardSets = if (state.selectedCardSetTagIndex == 0) {
                         it.newCardSetBlock.cardSets
                     } else {
-                        it.newCardSetBlock.cardSets.take(3)
+                        it.tagWithCardSetsBlock.tagWithCardSets[state.selectedCardSetTagIndex-1].cardSets
+                    }
+
+                    val resultCardSets = if (state.isCardSetBlockExpanded) {
+                        selectedCardSets
+                    } else {
+                        selectedCardSets.take(3)
                     }
                     resultCardSets.onEach { cardSet ->
                         resultList.add(
