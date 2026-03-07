@@ -20,6 +20,8 @@ import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.lifecycle.doOnResume
+import com.arkivanov.essenty.lifecycle.doOnStart
 
 class DashboardDecomposeComponent(
     componentContext: ComponentContext,
@@ -59,6 +61,13 @@ class DashboardDecomposeComponent(
             key = KEY_STATE,
             strategy = DashboardVM.State.serializer()
         ) { this.state }
+
+        doOnStart {
+            onStart()
+        }
+        doOnResume {
+            onResume()
+        }
     }
 
     private companion object {

@@ -24,7 +24,7 @@ interface ResourceRepository<T, A> {
 
 abstract class SimpleResourceRepository<T, A>(
     initialValue: Resource<T> = Resource.Uninitialized(),
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    protected val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     private val canTryAgain: Boolean = true,
     private val needPreload: Boolean = false,
 ): ResourceRepository<T, A> {
@@ -43,13 +43,13 @@ abstract class SimpleResourceRepository<T, A>(
             initialValue
         }
 
+        val resultNeedPreload = stateFlow.value.isUninitialized() && needPreload
         stateFlow.update { bumpedValue.toLoading() }
         loadJob = scope.launch {
-            if (stateFlow.value.isUninitialized() && needPreload) {
+            if (resultNeedPreload) {
                 loadResource { preload(arg) }
-                    .waitUntilDone {
-                        stateFlow.updateWithLoadingData(it)
-                    }
+                    .waitUntilDone()
+                    .onData(stateFlow::updateWithLoadingData)
             }
 
             loadResource(

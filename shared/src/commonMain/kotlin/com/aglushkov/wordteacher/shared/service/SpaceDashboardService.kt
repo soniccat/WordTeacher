@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.LinkDividerCharCategories
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.indexOfChar
 import com.aglushkov.wordteacher.shared.general.HtmlString
+import com.aglushkov.wordteacher.shared.general.HtmlStringSerializer
 import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.serialization.InstantIso8601Serializer
 import com.aglushkov.wordteacher.shared.general.setStatusCode
@@ -64,7 +65,10 @@ data class SpaceDashboardHeadline(
     @SerialName("sourceName") val sourceName: String,
     @SerialName("sourceCategory") val sourceCategory: String,
     @SerialName("title") val title: String,
+
+    @Serializable(with = HtmlStringSerializer::class)
     @SerialName("description") val description: HtmlString?,
+
     @SerialName("link") val link: String,
     @Serializable(with = InstantIso8601Serializer::class)
     @SerialName("date") val date: Instant,

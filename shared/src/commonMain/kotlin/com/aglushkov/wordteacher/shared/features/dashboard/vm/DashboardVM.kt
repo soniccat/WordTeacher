@@ -65,6 +65,8 @@ interface DashboardVM: Clearable {
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val state: State
 
+    fun onStart()
+    fun onResume()
     fun onHeadlineCategoryChanged(index: Int)
     fun onHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onAddHeadlineClicked(item: DashboardHeadlineViewItem)
@@ -90,8 +92,6 @@ interface DashboardVM: Clearable {
 
     @Serializable
     data class State (
-        @Serializable(with = InstantIso8601Serializer::class)
-        val lastLoadDate: Instant? = null,
         val selectedCategoryIndex: Int = 0,
         val isHeadlineBlockExpanded: Boolean = false,
         val isCardSetBlockExpanded: Boolean = false,
@@ -132,13 +132,21 @@ open class DashboardVMIMpl(
         loadDashboard()
     }
 
+    override fun onStart() {
+        viewModelScope.launch {
+            dashboardRepository.reloadIfNeeded()
+        }
+    }
+
+    override fun onResume() {
+        viewModelScope.launch {
+            dashboardRepository.reloadIfNeeded()
+        }
+    }
+
     private fun loadDashboard() {
         viewModelScope.launch {
-            dashboardRepository.load(Unit).waitUntilDone().onData {
-                stateFlow.update {
-                    it.copy(lastLoadDate = timeSource.timeInstant())
-                }
-            }
+            dashboardRepository.load(Unit).waitUntilDone()
         }
     }
 
@@ -242,11 +250,11 @@ open class DashboardVMIMpl(
         readCardSetRepository: Set<String>,
         prefs: Preferences,
     ): Resource<List<BaseViewItem<*>>> {
-        if (cardSetsRes.isLoading() && cardSetsRes.data() == null) {
+        if (!cardSetsRes.isLoadedOrError()) {
             return Resource.Loading()
         }
 
-        if (articlesRes.isLoading() && articlesRes.data() == null) {
+        if (!articlesRes.isLoadedOrError()) {
             return Resource.Loading()
         }
 
