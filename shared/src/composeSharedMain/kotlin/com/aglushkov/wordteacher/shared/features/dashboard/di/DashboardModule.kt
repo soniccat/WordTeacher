@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.DashboardRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
@@ -32,7 +33,7 @@ class DashboardModule {
     fun dashboardDecomposeComponent(
         componentContext: ComponentContext,
         initialState: DashboardVM.State,
-        spaceDashboardService: SpaceDashboardService,
+        dashboardRepository: DashboardRepository,
         cardSetsRepository: CardSetsRepository,
         articlesRepository: ArticlesRepository,
         readHeadlineRepository: ReadHeadlineRepository,
@@ -45,7 +46,7 @@ class DashboardModule {
     ) = DashboardDecomposeComponent(
         componentContext,
         initialState,
-        spaceDashboardService,
+        dashboardRepository,
         cardSetsRepository,
         articlesRepository,
         readHeadlineRepository,

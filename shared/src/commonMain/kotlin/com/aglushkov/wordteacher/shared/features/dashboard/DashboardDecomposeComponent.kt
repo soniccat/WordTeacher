@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.DashboardRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
@@ -23,7 +24,7 @@ import com.arkivanov.essenty.lifecycle.doOnDestroy
 class DashboardDecomposeComponent(
     componentContext: ComponentContext,
     initialState: DashboardVM.State,
-    spaceDashboardService: SpaceDashboardService,
+    dashboardRepository: DashboardRepository,
     cardSetsRepository: CardSetsRepository,
     articlesRepository: ArticlesRepository,
     readHeadlineRepository: ReadHeadlineRepository,
@@ -38,7 +39,7 @@ class DashboardDecomposeComponent(
         key = KEY_STATE,
         strategy = DashboardVM.State.serializer()
     ) ?: initialState,
-    spaceDashboardService,
+    dashboardRepository,
     cardSetsRepository,
     articlesRepository,
     readHeadlineRepository,

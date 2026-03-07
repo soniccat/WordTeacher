@@ -1,6 +1,9 @@
 package com.aglushkov.wordteacher.shared.general.resource
 
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
+import com.aglushkov.wordteacher.shared.general.extensions.updateWithLoadedData
+import com.aglushkov.wordteacher.shared.general.extensions.updateWithLoadingData
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,6 +26,7 @@ abstract class SimpleResourceRepository<T, A>(
     initialValue: Resource<T> = Resource.Uninitialized(),
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     private val canTryAgain: Boolean = true,
+    private val needPreload: Boolean = false,
 ): ResourceRepository<T, A> {
     override val value: Resource<T>
         get() = stateFlow.value
@@ -41,6 +45,13 @@ abstract class SimpleResourceRepository<T, A>(
 
         stateFlow.update { bumpedValue.toLoading() }
         loadJob = scope.launch {
+            if (stateFlow.value.isUninitialized() && needPreload) {
+                loadResource { preload(arg) }
+                    .waitUntilDone {
+                        stateFlow.updateWithLoadingData(it)
+                    }
+            }
+
             loadResource(
                 initialValue = stateFlow.value,
                 canTryAgain = canTryAgain,
@@ -51,6 +62,7 @@ abstract class SimpleResourceRepository<T, A>(
         return stateFlow.takeUntilLoadedOrErrorForVersion()
     }
 
+    protected open suspend fun preload(arg: A): T? = null
     protected abstract suspend fun load(arg: A): T
 
     fun clear() {
@@ -60,11 +72,16 @@ abstract class SimpleResourceRepository<T, A>(
 
 fun <T, A> buildSimpleResourceRepository(
     scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    preload: (suspend (arg: A) -> T?)? = null,
     load: suspend (arg: A) -> T
 ): SimpleResourceRepository<T, A> {
     return object : SimpleResourceRepository<T,A>(
         scope = scope,
     ) {
+        override suspend fun preload(arg: A): T? {
+            return preload?.invoke(arg)
+        }
+
         override suspend fun load(arg: A): T {
             return load(arg)
         }

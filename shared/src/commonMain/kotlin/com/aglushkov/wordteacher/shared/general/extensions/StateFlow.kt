@@ -159,6 +159,18 @@ fun <T> MutableStateFlow<Resource<T>>.updateLoadedData(
     }
 }
 
+fun <T> MutableStateFlow<Resource<T>>.updateWithLoadedData(
+    data: T
+) {
+    this.update { Resource.Loaded(data) }
+}
+
+fun <T> MutableStateFlow<Resource<T>>.updateWithLoadingData(
+    data: T?
+) {
+    this.update { Resource.Loading(data) }
+}
+
 class AbortFlowException constructor(
     val owner: FlowCollector<*>
 ) : CancellationException("Flow was aborted, no more elements needed")

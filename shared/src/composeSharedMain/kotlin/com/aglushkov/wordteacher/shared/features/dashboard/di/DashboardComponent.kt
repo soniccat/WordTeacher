@@ -17,6 +17,7 @@ import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.DashboardRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
@@ -49,6 +50,7 @@ interface DashboardComponent {
 }
 
 interface DashboardDependencies {
+    fun dashboardRepository(): DashboardRepository
     fun spaceDashboardService(): SpaceDashboardService
     fun cardSetsRepository(): CardSetsRepository
     fun articlesRepository(): ArticlesRepository

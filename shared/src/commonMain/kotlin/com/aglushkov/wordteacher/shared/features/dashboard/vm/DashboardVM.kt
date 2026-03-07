@@ -39,6 +39,7 @@ import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.DashboardRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardResponse
@@ -100,7 +101,7 @@ interface DashboardVM: Clearable {
 
 open class DashboardVMIMpl(
     restoredState: DashboardVM.State,
-    spaceDashboardService: SpaceDashboardService,
+    private val dashboardRepository: DashboardRepository,
     private val cardSetsRepository: CardSetsRepository,
     private val articlesRepository: ArticlesRepository,
     private val readHeadlineRepository: ReadHeadlineRepository,
@@ -115,11 +116,6 @@ open class DashboardVMIMpl(
     private val stateFlow = MutableStateFlow<DashboardVM.State>(restoredState)
     override val state: DashboardVM.State
         get() = stateFlow.value
-
-    private val dashboardRepository: SimpleResourceRepository<SpaceDashboardResponse, Unit> =
-        buildSimpleResourceRepository<SpaceDashboardResponse, Unit>(viewModelScope) {
-            spaceDashboardService.load().toOkResponse()
-        }
 
     override val viewItems = combine7(
         stateFlow,
