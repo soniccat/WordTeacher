@@ -48,7 +48,6 @@ class DashboardRepository(
     }
 
     override suspend fun load(arg: Unit): SpaceDashboardResponse {
-        delay(5000)
         return spaceDashboardService.load().toOkResponse()
             .also {
                 responseCache.set(it)
