@@ -22,6 +22,7 @@ import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.CardSetTagRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.DashboardRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
@@ -518,11 +519,21 @@ class SharedAppModule {
         spaceDashboardService: SpaceDashboardService,
         @BasePath basePath: Path,
         fileSystem: FileSystem,
+        timeSource: TimeSource,
     ): DashboardRepository {
         return DashboardRepository(
             spaceDashboardService,
+            timeSource,
             obtainSpaceDirPath(basePath, fileSystem).div("dashboard"),
             fileSystem,
         )
+    }
+
+    @AppComp
+    @Provides
+    fun cardSetTagRepository(
+        dashboardRepository: DashboardRepository,
+    ): CardSetTagRepository {
+        return CardSetTagRepository(dashboardRepository)
     }
 }
