@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.CardSetTagRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetSearchService
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
@@ -31,6 +32,7 @@ interface CardSetsComponent {
 
 interface CardSetsDependencies {
     fun cardSetsRepository(): CardSetsRepository
+    fun cardSetTagRepository(): CardSetTagRepository
     fun spaceCardSetService(): SpaceCardSetService
     fun spaceCardSetSearchService(): SpaceCardSetSearchService
     fun idGenerator(): IdGenerator

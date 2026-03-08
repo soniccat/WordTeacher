@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.CardSetTagRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 
@@ -19,6 +20,7 @@ class CardSetsDecomposeComponent (
     initialState: CardSetsVM.State,
     cardSetsRepository: CardSetsRepository,
     cardSetSearchRepository: CardSetSearchRepository,
+    cardSetTagRepository: CardSetTagRepository,
     componentContext: ComponentContext,
     timeSource: TimeSource,
     idGenerator: IdGenerator,
@@ -32,6 +34,7 @@ class CardSetsDecomposeComponent (
     ) ?: initialState,
     cardSetsRepository,
     cardSetSearchRepository,
+    cardSetTagRepository,
     timeSource,
     idGenerator,
     features,

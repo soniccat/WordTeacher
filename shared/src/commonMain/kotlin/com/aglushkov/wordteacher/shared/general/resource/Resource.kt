@@ -300,7 +300,7 @@ fun <T> Resource<T>.on(
     }
 }
 
-fun <T> Resource<T>.onUnitialized(block: () -> Unit): Boolean {
+inline fun <T> Resource<T>.onUnitialized(block: () -> Unit): Boolean {
     return when (this) {
         is Resource.Uninitialized -> {
             block()
@@ -310,7 +310,7 @@ fun <T> Resource<T>.onUnitialized(block: () -> Unit): Boolean {
     }
 }
 
-fun <T> Resource<T>.onLoaded(elseBlock: () -> Unit = {}, block: (T) -> Unit): Boolean {
+inline fun <T> Resource<T>.onLoaded(elseBlock: () -> Unit = {}, block: (T) -> Unit): Boolean {
     return when (this) {
         is Resource.Loaded -> {
             block(data)
@@ -323,7 +323,7 @@ fun <T> Resource<T>.onLoaded(elseBlock: () -> Unit = {}, block: (T) -> Unit): Bo
     }
 }
 
-fun <T> Resource<T>.onLoading(block: (T?) -> Unit): Boolean {
+inline fun <T> Resource<T>.onLoading(block: (T?) -> Unit): Boolean {
     return when (this) {
         is Resource.Loading -> {
             block(data)
@@ -333,14 +333,14 @@ fun <T> Resource<T>.onLoading(block: (T?) -> Unit): Boolean {
     }
 }
 
-fun <T> Resource<T>.onData(block: (T) -> Unit): Boolean {
+inline fun <T> Resource<T>.onData(block: (T) -> Unit): Boolean {
     return data()?.let {
         block(it)
         true
     } ?: false
 }
 
-fun Resource<*>.onError(block: (Throwable) -> Unit) {
+inline fun Resource<*>.onError(block: (Throwable) -> Unit) {
     when (this) {
         is Resource.Error -> block(throwable)
         else -> return

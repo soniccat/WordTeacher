@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.general
 
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -74,25 +75,14 @@ class HtmlParser {
 
 object HtmlStringSerializer : KSerializer<HtmlString> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("com.aglushkov.HtmlString", PrimitiveKind.STRING)
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
-    private val sr = json.serializersModule.serializer(typeOf<HtmlString>())
 
     override fun serialize(encoder: Encoder, value: HtmlString) {
-        val string = json.encodeToString(sr, value)
-        encoder.encodeString(string)
+        TODO("not supported")
     }
 
     override fun deserialize(decoder: Decoder): HtmlString {
         val string = decoder.decodeString()
-
-        return try {
-            // try parse as json
-            json.decodeFromString(sr as DeserializationStrategy<HtmlString>, string)
-        } catch (_: Exception) {
-            val parser = HtmlParser()
-            parser.parse(string)
-        }
+        val parser = HtmlParser()
+        return parser.parse(string)
     }
 }

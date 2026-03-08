@@ -20,12 +20,14 @@ import io.ktor.client.statement.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.serializers.FormattedInstantSerializer
+import kotlinx.serialization.Contextual
 import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import java.util.Stack
@@ -66,7 +68,7 @@ data class SpaceDashboardHeadline(
     @SerialName("sourceCategory") val sourceCategory: String,
     @SerialName("title") val title: String,
 
-    @Serializable(with = HtmlStringSerializer::class)
+    @Contextual // use HtmlStringSerializer on backend json parsing, and json codec for caching
     @SerialName("description") val description: HtmlString?,
 
     @SerialName("link") val link: String,
@@ -87,9 +89,14 @@ class SpaceDashboardService(
             coerceInputValues = true
             serializersModule = SerializersModule {
                 polymorphic(Response::class) {
-                    subclass(Response.Ok.serializer(SpaceDashboardResponse.serializer()))
+                    subclass(
+                        Response.Ok.serializer(
+                            SpaceDashboardResponse.serializer()
+                        )
+                    )
                     subclass(Response.Err.serializer())
                 }
+                contextual(HtmlStringSerializer)
             }
         }
     }

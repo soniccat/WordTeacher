@@ -19,9 +19,11 @@ import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
 import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
+import com.aglushkov.wordteacher.shared.model.CardSetTag
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.CardSetTagRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Raw
 import dev.icerock.moko.resources.desc.Resource
@@ -36,6 +38,7 @@ interface CardSetsVM: Clearable {
     val uiStateFlow: StateFlow<UIState>
     val cardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
     val searchCardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
+    val searchTags: StateFlow<Resource<List<CardSetTag>>>
     val availableFeatures: Features
 
     fun onCardSetAdded(name: String)
@@ -47,6 +50,7 @@ interface CardSetsVM: Clearable {
     fun getErrorText(): StringDesc
     fun getEmptySearchText(): StringDesc
     fun onTryAgainClicked()
+    fun onSearchTextChanged(query: String)
     fun onSearch(query: String)
     fun onSearchClosed()
     fun onTryAgainSearchClicked()
@@ -54,6 +58,7 @@ interface CardSetsVM: Clearable {
     fun onSearchCardSetAddClicked(item: RemoteCardSetViewItem)
     fun onJsonImportClicked()
     fun onHintClicked(hintType: HintType)
+    fun onCardSetTagClicked(tag: CardSetTag)
 
     @Serializable
     data class State(
@@ -64,6 +69,7 @@ interface CardSetsVM: Clearable {
     data class UIState(
         val searchQuery: String? = null,
         val newCardSetText: String? = null,
+        val needShowSearchResult: Boolean = false,
     ) {
         fun toState() = State(
             searchQuery = searchQuery,
@@ -80,6 +86,7 @@ open class CardSetsVMImpl(
     restoredState: CardSetsVM.State = CardSetsVM.State(),
     private val cardSetsRepository: CardSetsRepository,
     private val cardSetSearchRepository: CardSetSearchRepository,
+    private val cardSetTagRepository: CardSetTagRepository,
     private val timeSource: TimeSource,
     private val idGenerator: IdGenerator,
     override val availableFeatures: CardSetsVM.Features,
@@ -120,6 +127,9 @@ open class CardSetsVMImpl(
            }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
+
+    override val searchTags: StateFlow<Resource<List<CardSetTag>>> = cardSetTagRepository.cardSetTags
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     private fun generateSearchViewItemIds(viewItems: List<BaseViewItem<*>>) {
         generateViewItemIds(viewItems, searchCardSets.value.data().orEmpty(), idGenerator)
@@ -253,6 +263,10 @@ open class CardSetsVMImpl(
         router?.onError(errorText)
     }
 
+    override fun onSearchTextChanged(query: String) {
+        uiStateFlow.update { it.copy(searchQuery = query) }
+    }
+
     override fun onSearch(query: String) {
         analytics.send(AnalyticEvent.createActionEvent("CardSets.search",
             mapOf("query" to query)))
@@ -260,13 +274,18 @@ open class CardSetsVMImpl(
     }
 
     private fun startSearch(query: String) {
-        uiStateFlow.update { it.copy(searchQuery = query) }
         cardSetSearchRepository.search(query)
+        uiStateFlow.update { it.copy(searchQuery = query, needShowSearchResult = true) }
     }
 
     override fun onSearchClosed() {
-        uiStateFlow.update { it.copy(searchQuery = null) }
         cardSetSearchRepository.clear()
+        uiStateFlow.update {
+            it.copy(
+                searchQuery = null,
+                needShowSearchResult = false,
+            )
+        }
     }
 
     override fun onTryAgainSearchClicked() {
@@ -312,5 +331,10 @@ open class CardSetsVMImpl(
     override fun onHintClicked(hintType: HintType) {
         analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
         settingStore.setHintClosed(hintType)
+    }
+
+    override fun onCardSetTagClicked(tag: CardSetTag) {
+        analytics.send(AnalyticEvent.createActionEvent("CardSets.onCardSetTagClicked"))
+        startSearch("#" + tag.name)
     }
 }

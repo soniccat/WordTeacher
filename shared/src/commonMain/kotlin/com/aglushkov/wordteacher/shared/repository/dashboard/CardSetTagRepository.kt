@@ -6,7 +6,6 @@ class CardSetTagRepository(
     dashboardRepository: DashboardRepository
 ) {
     val cardSetTags = dashboardRepository.stateFlow.map {
-        it.data()?.tagWithCardSetsBlock?.tagWithCardSets?.map { it.tag }
-            .orEmpty()
+        it.mapLoadedData { it.tagWithCardSetsBlock.tagWithCardSets.map { it.tag } }
     }
 }

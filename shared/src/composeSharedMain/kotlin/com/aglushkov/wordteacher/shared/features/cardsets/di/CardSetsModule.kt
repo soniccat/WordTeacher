@@ -9,6 +9,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.CardSetTagRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetSearchService
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
@@ -33,6 +34,7 @@ class CardSetsModule {
         state: CardSetsVM.State,
         cardSetsRepository: CardSetsRepository,
         cardSetSearchRepository: CardSetSearchRepository,
+        cardSetTagRepository: CardSetTagRepository,
         componentContext: ComponentContext,
         timeSource: TimeSource,
         idGenerator: IdGenerator,
@@ -44,6 +46,7 @@ class CardSetsModule {
             state,
             cardSetsRepository,
             cardSetSearchRepository,
+            cardSetTagRepository,
             componentContext,
             timeSource,
             idGenerator,

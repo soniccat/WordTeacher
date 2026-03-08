@@ -10,7 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
@@ -22,10 +24,15 @@ import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.general.BackHandler
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
+import com.aglushkov.wordteacher.shared.general.resource.onData
+import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.general.views.*
+import com.aglushkov.wordteacher.shared.model.CardSetTag
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import kotlinx.coroutines.launch
@@ -40,17 +47,19 @@ fun CardSetsUI(
     val coroutineScope = rememberCoroutineScope()
     val cardSets by vm.cardSets.collectAsState()
     val searchCardSets by vm.searchCardSets.collectAsState()
-    var searchText by remember { mutableStateOf(vm.uiStateFlow.value.searchQuery.orEmpty()) }
+    val searchTags by vm.searchTags.collectAsState()
+//    var searchText by remember { mutableStateOf(vm.uiStateFlow.value.searchQuery.orEmpty()) }
 
-    val needShowSearchResult by remember(searchCardSets) { derivedStateOf { !searchCardSets.isUninitialized() } }
-    val uiState = vm.uiStateFlow.collectAsState()
-    val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { uiState.value.newCardSetText }) }
+    val uiState by vm.uiStateFlow.collectAsState()
+    var needShowCardSetTags by remember { mutableStateOf(false) }
+    val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { uiState.newCardSetText }) }
     val focusManager = LocalFocusManager.current
 
-    BackHandler(enabled = needShowSearchResult) {
+    BackHandler(enabled = uiState.needShowSearchResult || needShowCardSetTags) {
         coroutineScope.launch {
-            searchText = ""
+            needShowCardSetTags = false
             vm.onSearchClosed()
+            focusManager.clearFocus()
         }
     }
 
@@ -74,19 +83,22 @@ fun CardSetsUI(
                 }
                 SearchView(
                     modifier = Modifier.weight(1.0f),
-                    searchText,
+                    uiState.searchQuery.orEmpty(),
                     onTextChanged = {
-                        searchText = it
+                        vm.onSearchTextChanged(it)
                         if (it.isEmpty()) {
                             vm.onSearchClosed()
                         }
+                    },
+                    onFocusChanged = {
+                        needShowCardSetTags = it.isFocused
                     }
                 ) {
-                    if (searchText.isEmpty()) {
+                    if (uiState.searchQuery?.isEmpty() == true) {
                         //vm.onSearchClosed()
                         focusManager.clearFocus()
                     } else {
-                        vm.onSearch(searchText)
+                        vm.onSearch(uiState.searchQuery.orEmpty())
                     }
                 }
                 if (vm.availableFeatures.canImportCardSetFromJson) {
@@ -97,7 +109,7 @@ fun CardSetsUI(
             }
 
             // search result
-            if (needShowSearchResult) {
+            if (uiState.needShowSearchResult || needShowCardSetTags) {
                 val data = searchCardSets.data()
                 if (searchCardSets.isLoadedAndNotEmpty() && data != null) {
                     LazyColumn(
@@ -111,7 +123,7 @@ fun CardSetsUI(
                             ShowSearchCardSets(item, vm)
                         }
                     }
-                } else {
+                } else if (!searchCardSets.isUninitialized()) {
                     LoadingStatusView(
                         resource = searchCardSets,
                         loadingText = null,
@@ -120,8 +132,12 @@ fun CardSetsUI(
                     ) {
                         vm.onTryAgainSearchClicked()
                     }
+                // show tags
+                } else if (needShowCardSetTags) {
+                    searchTags.onData {
+                        ShowCardSetTags(it, vm)
+                    }
                 }
-
             } else {
                 // local cardsets
                 val data = cardSets.data()
@@ -153,18 +169,20 @@ fun CardSetsUI(
             }
         }
 
-        Box(
-            modifier = Modifier.matchParentSize().windowInsetsHorizontalPadding(),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            FloatingActionButton(
-                onClick = { vm.onStartLearningClicked() },
-                modifier = Modifier.padding(LocalDimensWord.current.articleHorizontalPadding)
+        if (!uiState.needShowSearchResult && !needShowCardSetTags) {
+            Box(
+                modifier = Modifier.matchParentSize().windowInsetsHorizontalPadding(),
+                contentAlignment = Alignment.BottomEnd
             ) {
-                Icon(
-                    painter = painterResource(MR.images.start_learning_24),
-                    contentDescription = null
-                )
+                FloatingActionButton(
+                    onClick = { vm.onStartLearningClicked() },
+                    modifier = Modifier.padding(LocalDimensWord.current.articleHorizontalPadding)
+                ) {
+                    Icon(
+                        painter = painterResource(MR.images.start_learning_24),
+                        contentDescription = null
+                    )
+                }
             }
         }
     }
@@ -187,6 +205,34 @@ private fun ShowSearchCardSets(
             Text(
                 text = "unknown item $item"
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun ShowCardSetTags(
+    tags: List<CardSetTag>,
+    vm: CardSetsVM
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+            .fillMaxHeight()
+            .windowInsetsHorizontalPadding()
+    ) {
+        FlowRow(
+            Modifier.padding(LocalDimens.current.contentPadding)
+        ) {
+            tags.onEach {
+                Chip(
+                    onClick = { vm.onCardSetTagClicked(it) },
+                    modifier = Modifier.padding(end = 2.dp)
+                ) {
+                    Text(
+                        text = it.name
+                    )
+                }
+            }
         }
     }
 }
