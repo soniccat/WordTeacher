@@ -34,6 +34,7 @@ class CardSetInfoModule {
         databaseCardWorker: DatabaseCardWorker,
         cardSetRepository: CardSetRepository,
         webLinkOpener: WebLinkOpener,
+        idGenerator: IdGenerator,
         analytics: Analytics,
     ) = CardSetInfoDecomposeComponent(
         componentContext,
@@ -42,5 +43,6 @@ class CardSetInfoModule {
         cardSetRepository,
         webLinkOpener,
         analytics,
+        idGenerator,
     )
 }

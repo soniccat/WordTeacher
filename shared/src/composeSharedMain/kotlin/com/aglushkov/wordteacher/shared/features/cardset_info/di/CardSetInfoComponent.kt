@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecompo
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsModule
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -46,4 +47,5 @@ interface CardSetInfoDependencies {
     fun timeSource(): TimeSource
     fun webLinkOpener(): WebLinkOpener
     fun analytics(): Analytics
+    fun idGenerator(): IdGenerator
 }

@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl.FocusLastType
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl.PendingEvent
 import com.aglushkov.wordteacher.shared.general.Clearable
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.StringDescThrowable
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
@@ -75,7 +76,7 @@ interface CardSetInfoVM: Clearable {
         val description: String? = null,
         val source: String? = null,
         val isAvailableInSearch: Boolean? = null,
-        val tags: List<String>? = null,
+        val tags: List<Tag>? = null,
     ) {
         val isNameValid: Boolean
             get() = name == null || name.isNotEmpty()
@@ -100,8 +101,13 @@ interface CardSetInfoVM: Clearable {
         val sourceLinks: List<Link>,
         val isAvailableInSearch: Boolean,
         val isEditable: Boolean,
-        val tags: List<String>,
+        val tags: List<Tag>,
         val focusEvent: Event?
+    )
+
+    data class Tag(
+        val id: Long,
+        val name: String,
     )
 
     data class Link(
@@ -121,6 +127,7 @@ open class CardSetInfoVMImpl(
     private val cardSetRepository: CardSetRepository,
     private val webLinkOpener: WebLinkOpener,
     private val analytics: Analytics,
+    private val idGenerator: IdGenerator,
 ): ViewModel(), CardSetInfoVM {
 
     override var router: CardSetInfoRouter? = null
@@ -171,7 +178,7 @@ open class CardSetInfoVMImpl(
                 },
                 isAvailableInSearch = inputState.isAvailableInSearch ?: cardSet.isAvailableInSearch,
                 isEditable = !state.isRemoteCardSet,
-                tags = inputState.tags ?: cardSet.tags,
+                tags = inputState.tags ?: cardSet.tags.toStateTags(),
                 focusEvent = focusEvent,
             )
         }
@@ -206,7 +213,7 @@ open class CardSetInfoVMImpl(
                                     ),
                                     isAvailableInSearch = lastInputState.isAvailableInSearch
                                         ?: dbCardSet.isAvailableInSearch,
-                                    tags = lastInputState.tags ?: dbCardSet.tags
+                                    tags = lastInputState.tags?.map { it.name } ?: dbCardSet.tags
                                 )
                             )
                         }
@@ -286,7 +293,8 @@ open class CardSetInfoVMImpl(
 
     override fun onTagTextChanged(newText: String, index: Int) {
         logChange("onTagTextChanged")
-        val currentTags = inputState.value.tags ?: cardSetState.value.data()?.tags
+        val currentTags = inputState.value.tags ?:
+            cardSetState.value.data()?.tags?.toStateTags()
         if (currentTags.isNullOrEmpty()) {
             return
         }
@@ -295,7 +303,7 @@ open class CardSetInfoVMImpl(
             it.copy(
                 tags = currentTags.mapIndexed { i, v ->
                     if (index == i) {
-                        newText
+                        v.copy(name = newText)
                     } else {
                         v
                     }
@@ -306,7 +314,8 @@ open class CardSetInfoVMImpl(
 
     override fun onTagDeleted(index: Int) {
         logChange("onTagDeleted")
-        val currentTags = inputState.value.tags ?: cardSetState.value.data()?.tags
+        val currentTags = inputState.value.tags ?:
+            cardSetState.value.data()?.tags?.toStateTags()
         if (currentTags.isNullOrEmpty()) {
             return
         }
@@ -322,10 +331,11 @@ open class CardSetInfoVMImpl(
 
     override fun onAddTagPressed() {
         logChange("onAddTagPressed")
-        val currentTags = inputState.value.tags ?: cardSetState.value.data()?.tags
+        val currentTags = inputState.value.tags ?:
+            cardSetState.value.data()?.tags?.toStateTags()
         inputState.update {
             it.copy(
-                tags = currentTags.orEmpty() + "",
+                tags = currentTags.orEmpty() + CardSetInfoVM.Tag(idGenerator.nextId(), ""),
             )
         }
         focusEvent.update { FocusLastEvent(ElementType.Tag) }
@@ -346,6 +356,13 @@ open class CardSetInfoVMImpl(
 
     enum class ElementType {
         Tag,
+    }
+
+    fun List<String>.toStateTags() = map{
+        CardSetInfoVM.Tag(
+            idGenerator.nextId(),
+            it,
+        )
     }
 }
 

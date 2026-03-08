@@ -514,6 +514,7 @@ func (m *Storage) CountTags(
 					},
 				},
 			},
+			bson.D{{Key: "$sort", Value: bson.D{{Key: "ct", Value: -1}}}},
 		},
 	)
 

@@ -272,12 +272,12 @@ fun CardSetInfoFieldsUI(
 
         if (uiState.tags.isNotEmpty() || uiState.isEditable) {
             WordLabels(
-                uiState.tags,
+                uiState.tags.map { it.name },
                 modifier = Modifier.padding(start = 10.dp, end = 24.dp),
                 textContent = { text, index ->
                     // to invalidate correctly on tag count change
                     // without it text won't change
-                    key(uiState.tags.size) {
+                    key(uiState.tags[index].id) {
                         CardTextField(
                             modifier = Modifier
 //                                .onFocusChanged {

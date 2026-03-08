@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVMImpl
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
@@ -17,6 +18,7 @@ class CardSetInfoDecomposeComponent(
     cardSetRepository: CardSetRepository,
     webLinkOpener: WebLinkOpener,
     analytics: Analytics,
+    idGenerator: IdGenerator,
 ) : CardSetInfoVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -26,6 +28,7 @@ class CardSetInfoDecomposeComponent(
     cardSetRepository,
     webLinkOpener,
     analytics,
+    idGenerator,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_CardSetInfo"
 

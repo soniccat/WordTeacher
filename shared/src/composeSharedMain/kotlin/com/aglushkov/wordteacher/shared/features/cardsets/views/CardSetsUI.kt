@@ -226,10 +226,10 @@ private fun ShowCardSetTags(
             tags.onEach {
                 Chip(
                     onClick = { vm.onCardSetTagClicked(it) },
-                    modifier = Modifier.padding(end = 2.dp)
+                    modifier = Modifier.padding(end = 4.dp)
                 ) {
                     Text(
-                        text = it.name
+                        text = it.name + " • " + it.count
                     )
                 }
             }
