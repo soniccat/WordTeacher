@@ -273,14 +273,13 @@ fun CardSetInfoFieldsUI(
         }
 
         // tags
-
-        Text(
-            text = stringResource(MR.strings.cardset_info_tag_title),
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            style = LocalAppTypography.current.listItemTitle
-        )
-
         if (uiState.tags.isNotEmpty() || uiState.isEditable) {
+            Text(
+                text = stringResource(MR.strings.cardset_info_tag_title),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                style = LocalAppTypography.current.listItemTitle
+            )
+
             WordLabels(
                 uiState.tags.map { it.name },
                 modifier = Modifier.padding(start = 10.dp, end = 24.dp),

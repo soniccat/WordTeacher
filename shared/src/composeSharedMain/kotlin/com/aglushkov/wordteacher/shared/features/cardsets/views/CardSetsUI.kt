@@ -26,6 +26,7 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.extensions.replaceFirstToCapital
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
@@ -229,7 +230,7 @@ private fun ShowCardSetTags(
                     modifier = Modifier.padding(end = 4.dp)
                 ) {
                     Text(
-                        text = it.name + " • " + it.count
+                        text = it.name.replaceFirstToCapital() + " • " + it.count
                     )
                 }
             }

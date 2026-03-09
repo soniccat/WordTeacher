@@ -68,6 +68,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewI
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.extensions.replaceFirstToCapital
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.settings.HintType
@@ -300,7 +301,7 @@ fun dashboardItem(
                     onClick = { vm.onCardSetTagChanged(categoryIndex) },
                     selected = isSelected,
                 ) {
-                    Text(tag)
+                    Text(tag.replaceFirstToCapital())
                 }
             }
         }

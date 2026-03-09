@@ -8,10 +8,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
+import okio.FileNotFoundException
 import okio.FileSystem
 import okio.Path
 import kotlin.reflect.KType
@@ -45,14 +47,12 @@ class SerializableFileCache<T>(
 
     private fun load() {
         return queue.send {
-            if (fileSystem.exists(filePath)) {
-                loadResource {
-                    val text = fileSystem.read(filePath) {
-                        readString(Charsets.UTF_8)
-                    }
-                    json.decodeFromString<T>(sr as DeserializationStrategy<T>, text)
-                }.collect(stateFlow)
-            }
+            loadResource {
+                val text = fileSystem.read(filePath) {
+                    readString(Charsets.UTF_8)
+                }
+                json.decodeFromString<T>(sr as DeserializationStrategy<T>, text)
+            }.collect(stateFlow)
         }
     }
 

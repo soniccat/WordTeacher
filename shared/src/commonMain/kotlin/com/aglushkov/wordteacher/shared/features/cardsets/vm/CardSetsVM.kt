@@ -64,6 +64,7 @@ interface CardSetsVM: Clearable {
     data class State(
         val searchQuery: String? = null,
         val newCardSetText: String? = null,
+        val openSearch: Boolean = false,
     )
 
     data class UIState(
