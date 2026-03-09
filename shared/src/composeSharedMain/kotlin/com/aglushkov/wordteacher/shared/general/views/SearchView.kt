@@ -35,7 +35,7 @@ import dev.icerock.moko.resources.compose.painterResource
 fun SearchView(
     modifier: Modifier = Modifier,
     text: String,
-    focusRequester: FocusRequester = remember { FocusRequester() },
+    focusRequester: FocusRequester? = remember { FocusRequester() },
     onTextChanged: (String) -> Unit,
     onFocusChanged: (FocusState) -> Unit = {},
     onImeAction: () -> Unit,
@@ -49,8 +49,13 @@ fun SearchView(
             .background(
                 color = MaterialTheme.colors.surface,
                 shape = RoundedCornerShape(2.dp)
-            )
-            .focusRequester(focusRequester)
+            ).let {
+                if (focusRequester != null) {
+                    it.focusRequester(focusRequester)
+                } else {
+                    it
+                }
+            }
             .onFocusChanged(onFocusChanged)
             .onPreviewKeyEvent {
                 if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
@@ -79,7 +84,7 @@ fun SearchView(
                     .clip(CircleShape)
                     .clickable {
                         onTextChanged("")
-                        focusRequester.requestFocus()
+                        focusRequester?.requestFocus()
                     },
                 tint = LocalContentColor.current
             )

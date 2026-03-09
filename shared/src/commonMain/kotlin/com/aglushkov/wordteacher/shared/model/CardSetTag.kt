@@ -13,3 +13,6 @@ data class TagWithCardSet (
     val tag: CardSetTag,
     val cardSets: List<CardSet>,
 )
+
+
+fun String.toCardSetTag() = "#$this"

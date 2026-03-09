@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
@@ -49,16 +50,14 @@ fun CardSetsUI(
     val cardSets by vm.cardSets.collectAsState()
     val searchCardSets by vm.searchCardSets.collectAsState()
     val searchTags by vm.searchTags.collectAsState()
-//    var searchText by remember { mutableStateOf(vm.uiStateFlow.value.searchQuery.orEmpty()) }
 
     val uiState by vm.uiStateFlow.collectAsState()
-    var needShowCardSetTags by remember { mutableStateOf(false) }
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { uiState.newCardSetText }) }
     val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
 
-    BackHandler(enabled = uiState.needShowSearchResult || needShowCardSetTags) {
+    BackHandler(enabled = uiState.needShowSearch) {
         coroutineScope.launch {
-            needShowCardSetTags = false
             vm.onSearchClosed()
             focusManager.clearFocus()
         }
@@ -85,6 +84,14 @@ fun CardSetsUI(
                 SearchView(
                     modifier = Modifier.weight(1.0f),
                     uiState.searchQuery.orEmpty(),
+                    focusRequester = run {
+                        val event = uiState.focusEvent
+                        if (event is CardSetsVM.FocusEvent && event.type == CardSetsVM.ElementType.Search) {
+                            focusRequester
+                        } else {
+                            null
+                        }
+                    },
                     onTextChanged = {
                         vm.onSearchTextChanged(it)
                         if (it.isEmpty()) {
@@ -92,7 +99,7 @@ fun CardSetsUI(
                         }
                     },
                     onFocusChanged = {
-                        needShowCardSetTags = it.isFocused
+                        vm.onSearchFocusChanged(it.isFocused)
                     }
                 ) {
                     if (uiState.searchQuery?.isEmpty() == true) {
@@ -110,7 +117,7 @@ fun CardSetsUI(
             }
 
             // search result
-            if (uiState.needShowSearchResult || needShowCardSetTags) {
+            if (uiState.needShowSearch) {
                 val data = searchCardSets.data()
                 if (searchCardSets.isLoadedAndNotEmpty() && data != null) {
                     LazyColumn(
@@ -134,7 +141,7 @@ fun CardSetsUI(
                         vm.onTryAgainSearchClicked()
                     }
                 // show tags
-                } else if (needShowCardSetTags) {
+                } else if (uiState.needShowCardSetTags) {
                     searchTags.onData {
                         ShowCardSetTags(it, vm)
                     }
@@ -170,7 +177,7 @@ fun CardSetsUI(
             }
         }
 
-        if (!uiState.needShowSearchResult && !needShowCardSetTags) {
+        if (!uiState.needShowSearch) {
             Box(
                 modifier = Modifier.matchParentSize().windowInsetsHorizontalPadding(),
                 contentAlignment = Alignment.BottomEnd
@@ -185,6 +192,13 @@ fun CardSetsUI(
                     )
                 }
             }
+        }
+    }
+
+    if (uiState.focusEvent != null) {
+        LaunchedEffect("focusEvent") {
+            focusRequester.requestFocus()
+            vm.onFocusEventHandled()
         }
     }
 }

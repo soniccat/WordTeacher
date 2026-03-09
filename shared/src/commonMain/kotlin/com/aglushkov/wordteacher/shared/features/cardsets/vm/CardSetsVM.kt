@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.features.cardsets.vm
 import androidx.datastore.preferences.core.Preferences
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
@@ -21,6 +22,7 @@ import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
 import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.CardSetTag
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
+import com.aglushkov.wordteacher.shared.model.toCardSetTag
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.CardSetTagRepository
@@ -50,6 +52,7 @@ interface CardSetsVM: Clearable {
     fun getErrorText(): StringDesc
     fun getEmptySearchText(): StringDesc
     fun onTryAgainClicked()
+    fun onSearchFocusChanged(isFocused: Boolean)
     fun onSearchTextChanged(query: String)
     fun onSearch(query: String)
     fun onSearchClosed()
@@ -59,19 +62,25 @@ interface CardSetsVM: Clearable {
     fun onJsonImportClicked()
     fun onHintClicked(hintType: HintType)
     fun onCardSetTagClicked(tag: CardSetTag)
+    fun onFocusEventHandled()
 
     @Serializable
     data class State(
         val searchQuery: String? = null,
         val newCardSetText: String? = null,
-        val openSearch: Boolean = false,
+        val needShowCardSetTags: Boolean = false,
     )
 
     data class UIState(
         val searchQuery: String? = null,
         val newCardSetText: String? = null,
         val needShowSearchResult: Boolean = false,
+        val needShowCardSetTags: Boolean = false,
+        val focusEvent: Event?
     ) {
+        val needShowSearch: Boolean
+            get() = needShowSearchResult || needShowCardSetTags
+
         fun toState() = State(
             searchQuery = searchQuery,
             newCardSetText = newCardSetText,
@@ -81,6 +90,19 @@ interface CardSetsVM: Clearable {
     data class Features(
         val canImportCardSetFromJson: Boolean = false
     )
+
+    open class FocusEvent(
+        val type: ElementType,
+        override var isHandled: Boolean = false
+    ): Event {
+        override fun markAsHandled() {
+            isHandled = true
+        }
+    }
+
+    enum class ElementType {
+        Search,
+    }
 }
 
 open class CardSetsVMImpl(
@@ -102,6 +124,12 @@ open class CardSetsVMImpl(
         CardSetsVM.UIState(
             searchQuery = restoredState.searchQuery,
             newCardSetText = restoredState.newCardSetText,
+            needShowCardSetTags = restoredState.needShowCardSetTags,
+            focusEvent = if (restoredState.needShowCardSetTags) {
+                CardSetsVM.FocusEvent(CardSetsVM.ElementType.Search)
+            } else {
+                null
+            },
         )
     )
 
@@ -113,6 +141,12 @@ open class CardSetsVMImpl(
             buildViewItems(it, uiStateFlow.value.newCardSetText, prefs)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
+
+    init {
+        uiStateFlow.value.searchQuery?.let {
+            startSearch(it)
+        }
+    }
 
     override val searchCardSets = cardSetSearchRepository.cardSets.map { cardSetsRes ->
         cardSetsRes.mapLoadedData { cardSets ->
@@ -264,6 +298,10 @@ open class CardSetsVMImpl(
         router?.onError(errorText)
     }
 
+    override fun onSearchFocusChanged(isFocused: Boolean) {
+        uiStateFlow.update { it.copy(needShowCardSetTags = isFocused) }
+    }
+
     override fun onSearchTextChanged(query: String) {
         uiStateFlow.update { it.copy(searchQuery = query) }
     }
@@ -336,6 +374,10 @@ open class CardSetsVMImpl(
 
     override fun onCardSetTagClicked(tag: CardSetTag) {
         analytics.send(AnalyticEvent.createActionEvent("CardSets.onCardSetTagClicked"))
-        startSearch("#" + tag.name)
+        startSearch(tag.name.toCardSetTag())
+    }
+
+    override fun onFocusEventHandled() {
+        uiStateFlow.update { it.copy(focusEvent = null) }
     }
 }

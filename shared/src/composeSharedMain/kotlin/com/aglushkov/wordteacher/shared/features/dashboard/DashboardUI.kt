@@ -248,7 +248,7 @@ fun dashboardItem(
     is DashboardOpenCardSetsItem -> {
         Button(
             onClick = {
-                vm.onOpenCardSetsClicked()
+                vm.onOpenCardSetsClicked(item.tagIndex, item.tagName)
             },
             modifier = Modifier.padding(
                 horizontal = LocalDimens.current.contentPadding

@@ -70,7 +70,9 @@ class DashboardExpandViewItem(
 }
 
 class DashboardOpenCardSetsItem(
-): BaseViewItem<Unit>(Unit, Type) {
+    val tagIndex: Int,
+    val tagName: String,
+): BaseViewItem<String>(tagName, Type) {
     companion object {
         const val Type = 1205
     }

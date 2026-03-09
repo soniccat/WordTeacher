@@ -37,6 +37,7 @@ import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
+import com.aglushkov.wordteacher.shared.model.toCardSetTag
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.DashboardRepository
@@ -80,7 +81,7 @@ interface DashboardVM: Clearable {
     fun onLinkClicked(link: String)
     fun onDashboardTryAgainClicked()
     fun onHintClicked(hintType: HintType)
-    fun onOpenCardSetsClicked()
+    fun onOpenCardSetsClicked(tagIndex: Int, name: String)
 
     interface Router {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
@@ -177,9 +178,18 @@ open class DashboardVMIMpl(
         router?.openCardSet(CardSetVM.State.LocalCardSet(item.cardSetId))
     }
 
-    override fun onOpenCardSetsClicked() {
+    override fun onOpenCardSetsClicked(tagIndex: Int, name: String) {
         analytics.send(AnalyticEvent.createActionEvent("Dashboard.onOpenCardSetsClicked"))
-        router?.openCardSets(CardSetsVM.State())
+        router?.openCardSets(
+            CardSetsVM.State(
+                searchQuery = if(tagIndex == 0) {
+                    "feelings".toCardSetTag()
+                } else {
+                    name.toCardSetTag()
+                },
+                needShowCardSetTags = true,
+            )
+        )
     }
 
     override fun onCardSetStartLearningClicked(item: CardSetViewItem) {
@@ -378,9 +388,10 @@ open class DashboardVMIMpl(
                         resultList.add(HintViewItem(HintType.DashboardCardSets))
                     }
 
+                    val tagNames = listOf("New") + it.tagWithCardSetsBlock.tagWithCardSets.map { it.tag.name }
                     resultList.add(
                         DashboardCardSetTagsViewItem(
-                            tags = listOf("New") + it.tagWithCardSetsBlock.tagWithCardSets.map { it.tag.name },
+                            tags = tagNames,
                             selectedIndex = state.selectedCardSetTagIndex,
                         )
                     )
@@ -417,7 +428,10 @@ open class DashboardVMIMpl(
                     if (collapsedCardSetCount < selectedCardSetTotalCount) {
                         resultList.add(
                             if (state.isCardSetBlockExpanded) {
-                                DashboardOpenCardSetsItem()
+                                DashboardOpenCardSetsItem(
+                                    state.selectedCardSetTagIndex,
+                                    tagNames[state.selectedCardSetTagIndex]
+                                )
                             } else {
                                 DashboardExpandViewItem(
                                     expandType = DashboardExpandViewItem.ExpandType.CardSets,
