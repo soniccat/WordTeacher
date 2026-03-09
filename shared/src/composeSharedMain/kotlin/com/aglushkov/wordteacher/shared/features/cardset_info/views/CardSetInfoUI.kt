@@ -76,7 +76,9 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.awt.event.FocusEvent
 
 
 @Composable
@@ -136,6 +138,7 @@ fun CardSetInfoFieldsUI(
     var sourceState by remember {
         mutableStateOf(TextFieldValue(uiState.source.orEmpty(),
             TextRange(uiState.source.orEmpty().length))) }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -159,7 +162,14 @@ fun CardSetInfoFieldsUI(
             ),
             hint = stringResource(MR.strings.cardset_info_field_name_hint),
             errorText = uiState.nameError,
-            focusRequester = focusRequester,
+            focusRequester = run {
+                val event = uiState.focusEvent
+                if (event is CardSetInfoVMImpl.FocusLastEvent && event.type == CardSetInfoVMImpl.ElementType.Name) {
+                    focusRequester
+                } else {
+                    null
+                }
+            },
             focusManager = focusManager,
             readOnly = !uiState.isEditable,
         )
@@ -280,25 +290,23 @@ fun CardSetInfoFieldsUI(
                     key(uiState.tags[index].id) {
                         CardTextField(
                             modifier = Modifier
-//                                .onFocusChanged {
-//                                    if (it.isFocused) {
-//                                        if (uiState.isEditable) {
-//                                            coroutineScope.launch {
-//                                                val index = data.indexOf(it)
-//                                                if (index != -1) {
-//                                                    listState.animateScrollToItem(index, scrollOffset)
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
+                                .onFocusChanged {
+                                    if (it.isFocused) {
+                                        if (uiState.isEditable) {
+                                            coroutineScope.launch {
+                                                scrollableState.animateScrollTo(
+                                                    scrollableState.maxValue
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                                 .padding(start = 4.dp, end = if (uiState.isEditable) 0.dp else 4.dp)
                                 .width(IntrinsicSize.Min)
                                 .let {
                                     val event =
                                         uiState.focusEvent as? CardSetInfoVMImpl.FocusLastEvent
                                     if (index == uiState.tags.size - 1 && event?.type == CardSetInfoVMImpl.ElementType.Tag) {
-                                        vm.onFocusEventHandled()
                                         it.focusRequester(focusRequester)
                                     } else {
                                         it
@@ -357,12 +365,9 @@ fun CardSetInfoFieldsUI(
     }
 
     if (uiState.focusEvent != null) {
-        LaunchedEffect("focus") {
+        LaunchedEffect("focusEvent") {
             focusRequester.requestFocus()
+            vm.onFocusEventHandled()
         }
-    }
-
-    LaunchedEffect("focus") {
-        focusRequester.requestFocus()
     }
 }

@@ -39,7 +39,7 @@ fun OutlinedTextFieldWithError(
     hint: String,
     errorText: StringDesc?,
     onFocusChanged: (FocusState) -> Unit = {},
-    focusRequester: FocusRequester,
+    focusRequester: FocusRequester?,
     focusManager: FocusManager = LocalFocusManager.current,
     readOnly: Boolean = false,
 ) {
@@ -52,7 +52,13 @@ fun OutlinedTextFieldWithError(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(focusRequester)
+                .let {
+                    if (focusRequester != null) {
+                        it.focusRequester(focusRequester)
+                    } else {
+                        it
+                    }
+                }
                 .onFocusChanged(onFocusChanged),
             label = { Text(hint) },
             isError = hasTitleError,

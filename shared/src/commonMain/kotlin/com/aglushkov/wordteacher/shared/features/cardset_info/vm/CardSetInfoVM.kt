@@ -23,6 +23,7 @@ import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.ResourceStringDesc
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -187,6 +188,7 @@ open class CardSetInfoVMImpl(
     init {
         addClearable(databaseCardWorker.startEditing())
         loadCardSet()
+        focusEvent.update { FocusLastEvent(ElementType.Name) }
 
         var hasEditing = false
         if (!state.isRemoteCardSet) {
@@ -338,6 +340,7 @@ open class CardSetInfoVMImpl(
                 tags = currentTags.orEmpty() + CardSetInfoVM.Tag(idGenerator.nextId(), ""),
             )
         }
+
         focusEvent.update { FocusLastEvent(ElementType.Tag) }
     }
 
@@ -355,6 +358,7 @@ open class CardSetInfoVMImpl(
     }
 
     enum class ElementType {
+        Name,
         Tag,
     }
 
