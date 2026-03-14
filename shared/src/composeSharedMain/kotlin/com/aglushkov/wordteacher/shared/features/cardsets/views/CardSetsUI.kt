@@ -15,6 +15,8 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
@@ -55,6 +57,7 @@ fun CardSetsUI(
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { uiState.newCardSetText }) }
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
+    val searchSelectionKey = remember { mutableIntStateOf(0) }
 
     BackHandler(enabled = uiState.needShowSearch) {
         coroutineScope.launch {
@@ -81,9 +84,11 @@ fun CardSetsUI(
                         )
                     }
                 }
+
                 SearchView(
                     modifier = Modifier.weight(1.0f),
                     uiState.searchQuery.orEmpty(),
+                    selectionKey = searchSelectionKey.value,
                     focusRequester = run {
                         val event = uiState.focusEvent
                         if (event is CardSetsVM.FocusEvent && event.type == CardSetsVM.ElementType.Search) {
@@ -143,7 +148,7 @@ fun CardSetsUI(
                 // show tags
                 } else if (uiState.needShowCardSetTags) {
                     searchTags.onData {
-                        ShowCardSetTags(it, vm)
+                        ShowCardSetTags(it, vm, searchSelectionKey)
                     }
                 }
             } else {
@@ -228,7 +233,8 @@ private fun ShowSearchCardSets(
 @Composable
 private fun ShowCardSetTags(
     tags: List<CardSetTag>,
-    vm: CardSetsVM
+    vm: CardSetsVM,
+    searchSelectionKey: MutableIntState
 ) {
     Box(
         modifier = Modifier.fillMaxWidth()
@@ -240,7 +246,10 @@ private fun ShowCardSetTags(
         ) {
             tags.onEach {
                 Chip(
-                    onClick = { vm.onCardSetTagClicked(it) },
+                    onClick = {
+                        searchSelectionKey.value += 1
+                        vm.onCardSetTagClicked(it)
+                    },
                     modifier = Modifier.padding(end = 4.dp)
                 ) {
                     Text(

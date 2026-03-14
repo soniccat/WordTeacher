@@ -15,7 +15,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +28,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
@@ -36,13 +41,28 @@ fun SearchView(
     modifier: Modifier = Modifier,
     text: String,
     focusRequester: FocusRequester? = remember { FocusRequester() },
+    selectionKey: Int = 0,
     onTextChanged: (String) -> Unit,
     onFocusChanged: (FocusState) -> Unit = {},
     onImeAction: () -> Unit,
 ) {
+    // to put cursor at the end
+    var searchRange by remember(selectionKey) {
+        mutableStateOf(
+            TextRange(text.length)
+        )
+    }
     TextField(
-        value = text,
-        onValueChange = onTextChanged,
+        value = TextFieldValue(
+            text,
+            searchRange
+        ),
+        onValueChange = {
+            searchRange = it.selection
+            if (text != it.text) {
+                onTextChanged(it.text)
+            }
+        },
         modifier = modifier
             .padding(8.dp)
             //.fillMaxWidth()

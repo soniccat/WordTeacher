@@ -183,7 +183,7 @@ open class DashboardVMIMpl(
         router?.openCardSets(
             CardSetsVM.State(
                 searchQuery = if(tagIndex == 0) {
-                    "feelings".toCardSetTag()
+                    "feelings".toCardSetTag() + " "
                 } else {
                     name.toCardSetTag()
                 },

@@ -374,7 +374,7 @@ open class CardSetsVMImpl(
 
     override fun onCardSetTagClicked(tag: CardSetTag) {
         analytics.send(AnalyticEvent.createActionEvent("CardSets.onCardSetTagClicked"))
-        startSearch(tag.name.toCardSetTag())
+        startSearch(tag.name.toCardSetTag() + " ")
     }
 
     override fun onFocusEventHandled() {

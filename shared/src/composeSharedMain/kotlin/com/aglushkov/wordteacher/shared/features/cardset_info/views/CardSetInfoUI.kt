@@ -133,7 +133,7 @@ fun CardSetInfoFieldsUI(
     val focusRequester = remember { FocusRequester() }
     val scrollableState = rememberScrollState()
     val focusManager = LocalFocusManager.current
-        var nameState by remember { mutableStateOf(TextFieldValue(uiState.name, TextRange(uiState.name.length))) }
+    var nameState by remember { mutableStateOf(TextFieldValue(uiState.name, TextRange(uiState.name.length))) }
     var descriptionState by remember { mutableStateOf(TextFieldValue(uiState.description, TextRange(uiState.description.length))) }
     var sourceState by remember {
         mutableStateOf(TextFieldValue(uiState.source.orEmpty(),
