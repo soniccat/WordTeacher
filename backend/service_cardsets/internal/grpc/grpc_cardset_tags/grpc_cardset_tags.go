@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"models/session_validator"
+	"service_cardsets/internal/model"
 	grpcapi "service_cardsets/pkg/grpc/service_cardsets/api"
 )
 
 type storage interface {
-	CountTags(ctx context.Context) (map[string]int64, error)
+	CountTags(ctx context.Context) ([]model.Tag, error)
 }
 
 type Handler struct {
@@ -34,12 +35,12 @@ func (s *Handler) GetCardSetTags(ctx context.Context, in *grpcapi.GetCardSetTags
 
 	totalCount := int64(0)
 	tags := []*grpcapi.Tag{}
-	for k, v := range tagCount {
+	for _, tag := range tagCount {
 		tags = append(tags, &grpcapi.Tag{
-			Name:  k,
-			Count: v,
+			Name:  tag.Name,
+			Count: tag.Count,
 		})
-		totalCount += v
+		totalCount += tag.Count
 	}
 
 	out := grpcapi.GetCardSetTagsOut{

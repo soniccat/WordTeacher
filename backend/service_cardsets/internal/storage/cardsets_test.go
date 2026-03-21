@@ -167,7 +167,7 @@ func (suite *CardSetTestSuite) TestGetTags() {
 	}
 	cardSet2 := &api.CardSet{
 		Name: "testCardSet",
-		Tags: []string{"tag1", "tag3"},
+		Tags: []string{"tag2"},
 		Cards: []*api.Card{
 			{
 				Term:             "testTerm1",
@@ -189,10 +189,11 @@ func (suite *CardSetTestSuite) TestGetTags() {
 
 	tagCount, err := suite.CardSetModel.CountTags(ctx)
 	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), 3, len(tagCount))
-	assert.Equal(suite.T(), 2, tagCount["tag1"])
-	assert.Equal(suite.T(), 1, tagCount["tag2"])
-	assert.Equal(suite.T(), 1, tagCount["tag3"])
+	assert.Equal(suite.T(), 2, len(tagCount))
+	assert.Equal(suite.T(), "tag2", tagCount[0].Name)
+	assert.Equal(suite.T(), 2, tagCount[0].Count)
+	assert.Equal(suite.T(), "tag1", tagCount[1].Name)
+	assert.Equal(suite.T(), 1, tagCount[1].Count)
 }
 
 func TestCardSetTestSuite(t *testing.T) {

@@ -492,7 +492,7 @@ func (m *Storage) LastModificationDate(
 
 func (m *Storage) CountTags(
 	ctx context.Context,
-) (map[string]int64, error) {
+) ([]model.Tag, error) {
 	cursor, err := m.CardSetCollection.Aggregate(
 		ctx,
 		bson.A{
@@ -518,7 +518,7 @@ func (m *Storage) CountTags(
 		},
 	)
 
-	res := make(map[string]int64)
+	res := []model.Tag{}
 	if err != nil {
 		return res, err
 	}
@@ -533,7 +533,10 @@ func (m *Storage) CountTags(
 	}
 
 	for _, t := range tags {
-		res[t.Tag] = t.Ct
+		res = append(res, model.Tag{
+			Name:  t.Tag,
+			Count: t.Ct,
+		})
 	}
 
 	return res, nil

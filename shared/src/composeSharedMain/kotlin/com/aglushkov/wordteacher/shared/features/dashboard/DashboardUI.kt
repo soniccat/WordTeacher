@@ -3,6 +3,7 @@
 
 package com.aglushkov.wordteacher.shared.features.dashboard
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -102,6 +103,8 @@ fun DashboardUI(
             )
 
             if (items?.isNotEmpty() == true) {
+                val cardSetTagsScrollState = rememberScrollState()
+
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
                     contentPadding = PaddingValues(
@@ -116,7 +119,8 @@ fun DashboardUI(
                         dashboardItem(
                             Modifier.animateItem(),
                             item,
-                            vm
+                            vm,
+                            cardSetTagsScrollState
                         )
                     }
                 }
@@ -136,6 +140,7 @@ fun dashboardItem(
     modifier: Modifier,
     item: BaseViewItem<*>,
     vm: DashboardVM,
+    cardSetTagsScrollState: ScrollState,
 ) = when(item) {
     is CardSetViewItem -> CardSetItemView(
         Modifier.clickable {
@@ -288,11 +293,11 @@ fun dashboardItem(
         val horizontalPadding = LocalDimens.current.contentPadding
         Row(
             modifier = Modifier
+                .horizontalScroll(cardSetTagsScrollState)
                 .padding(
                     start = horizontalPadding,
                     end = horizontalPadding,
-                )
-                .horizontalScroll(rememberScrollState()),
+                ),
             horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             item.items.onEachIndexed { categoryIndex, tag ->

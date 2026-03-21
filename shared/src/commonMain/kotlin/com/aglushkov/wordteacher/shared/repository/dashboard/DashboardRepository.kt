@@ -39,7 +39,7 @@ class DashboardRepository(
 
     suspend fun reloadIfNeeded() {
         loadDate?.let { loadDate ->
-            if (timeSource.timeInstant().minus(loadDate).inWholeMinutes >= 5) {
+            if (timeSource.timeInstant().minus(loadDate).inWholeMinutes >= 15) {
                 if (!stateFlow.value.isLoading()) {
                     load(Unit)
                 }
