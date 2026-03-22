@@ -183,7 +183,7 @@ open class DashboardVMIMpl(
         router?.openCardSets(
             CardSetsVM.State(
                 searchQuery = if(tagIndex == 0) {
-                    "feelings".toCardSetTag() + " "
+                    null
                 } else {
                     name.toCardSetTag()
                 },
@@ -388,7 +388,7 @@ open class DashboardVMIMpl(
                         resultList.add(HintViewItem(HintType.DashboardCardSets))
                     }
 
-                    val tagNames = listOf("New") + it.tagWithCardSetsBlock.tagWithCardSets.map { it.tag.name }
+                    val tagNames = listOf("All") + it.tagWithCardSetsBlock.tagWithCardSets.map { it.tag.name }
                     resultList.add(
                         DashboardCardSetTagsViewItem(
                             tags = tagNames,
