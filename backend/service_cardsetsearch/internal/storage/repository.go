@@ -150,14 +150,18 @@ func (m *Repository) SearchCardSets(
 	limit int64,
 ) ([]*api.CardSet, error) {
 	tags, query := readTags(query)
+	lowerCasedTags := tools.Map(tags, func(tag string) string {
+		return strings.ToLower(tag)
+	})
+
 	query = strings.Trim(query, " ")
 
 	filter := bson.M{}
 	if len(query) != 0 {
 		filter["$text"] = bson.M{"$search": query, "$diacriticSensitive": true}
 	}
-	if len(tags) != 0 {
-		filter["tags"] = bson.M{"$in": tags}
+	if len(lowerCasedTags) != 0 {
+		filter["tags"] = bson.M{"$in": lowerCasedTags}
 	}
 
 	cursor, err := m.CardSetCollection.Find(

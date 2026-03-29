@@ -41,13 +41,13 @@ class DashboardRepository(
         loadDate?.let { loadDate ->
             if (timeSource.timeInstant().minus(loadDate).inWholeMinutes >= 15) {
                 if (!stateFlow.value.isLoading()) {
-                    load(Unit)
+                    load(Unit).waitUntilDone()
                 }
             }
         }
     }
 
-    override suspend fun load(arg: Unit): SpaceDashboardResponse {
+    override suspend fun loadInternal(arg: Unit): SpaceDashboardResponse {
         return spaceDashboardService.load().toOkResponse()
             .also {
                 responseCache.set(it)

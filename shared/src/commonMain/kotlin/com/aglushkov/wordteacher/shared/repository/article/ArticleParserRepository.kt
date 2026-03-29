@@ -16,7 +16,7 @@ class ArticleParserRepository: SimpleResourceRepository<ParsedArticle, String>()
     private val httpClient = HttpClient {
     }
 
-    override suspend fun load(arg: String): ParsedArticle {
+    override suspend fun loadInternal(arg: String): ParsedArticle {
         val res: HttpResponse = httpClient.get(arg)
         val responseString: String = res.body()
         return parser.parse(responseString)

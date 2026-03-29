@@ -1,14 +1,12 @@
 package com.aglushkov.wordteacher.shared.general.resource
 
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
-import com.aglushkov.wordteacher.shared.general.extensions.updateWithLoadedData
 import com.aglushkov.wordteacher.shared.general.extensions.updateWithLoadingData
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,7 +53,7 @@ abstract class SimpleResourceRepository<T, A>(
             loadResource(
                 initialValue = stateFlow.value,
                 canTryAgain = canTryAgain,
-                loader = { load(arg) },
+                loader = { loadInternal(arg) },
             ).collect(stateFlow)
         }
 
@@ -63,7 +61,7 @@ abstract class SimpleResourceRepository<T, A>(
     }
 
     protected open suspend fun preload(arg: A): T? = null
-    protected abstract suspend fun load(arg: A): T
+    protected abstract suspend fun loadInternal(arg: A): T
 
     fun clear() {
         stateFlow.update { Resource.Uninitialized() }
@@ -82,7 +80,7 @@ fun <T, A> buildSimpleResourceRepository(
             return preload?.invoke(arg)
         }
 
-        override suspend fun load(arg: A): T {
+        override suspend fun loadInternal(arg: A): T {
             return load(arg)
         }
     }
