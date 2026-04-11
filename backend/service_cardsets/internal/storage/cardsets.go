@@ -186,7 +186,7 @@ func (m *Storage) replaceCardSet(
 	ctx context.Context,
 	cardSetDb *model.DbCardSet,
 ) error {
-	res, err := m.CardSetCollection.ReplaceOne(
+	_, err := m.CardSetCollection.ReplaceOne(
 		ctx,
 		bson.M{"_id": cardSetDb.Id},
 		cardSetDb,
@@ -194,10 +194,6 @@ func (m *Storage) replaceCardSet(
 	)
 	if err != nil {
 		return logger.WrapError(ctx, err)
-	}
-
-	if res.MatchedCount == 0 {
-		return logger.WrapError(ctx, mongo.ErrNoDocuments)
 	}
 
 	return nil
