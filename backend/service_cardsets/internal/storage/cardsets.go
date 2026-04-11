@@ -186,7 +186,12 @@ func (m *Storage) replaceCardSet(
 	ctx context.Context,
 	cardSetDb *model.DbCardSet,
 ) error {
-	res, err := m.CardSetCollection.ReplaceOne(ctx, bson.M{"_id": cardSetDb.Id}, cardSetDb)
+	res, err := m.CardSetCollection.ReplaceOne(
+		ctx,
+		bson.M{"_id": cardSetDb.Id},
+		cardSetDb,
+		options.Replace().SetUpsert(true), // in case of stale data in db (like data loss)
+	)
 	if err != nil {
 		return logger.WrapError(ctx, err)
 	}
