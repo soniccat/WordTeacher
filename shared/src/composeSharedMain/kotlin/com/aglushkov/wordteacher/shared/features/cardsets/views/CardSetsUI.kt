@@ -347,7 +347,7 @@ fun CardSetWithTotalProgressItemView(
         modifier = modifier,
         item = item,
         trailing = {
-            if (item.terms.isNotEmpty()) {
+            if (item.readyToLearnProgress < 1.0f) {
                 val side = 40.dp
                 Box(
                     modifier = Modifier.size(side, side)

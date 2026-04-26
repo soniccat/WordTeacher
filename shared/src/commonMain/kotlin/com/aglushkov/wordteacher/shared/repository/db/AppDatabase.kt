@@ -219,10 +219,16 @@ class AppDatabase(
                     shortCardSetsRes.merge(setsWithCardsRes) { shortSets, setsWithCards ->
                         shortSets.orEmpty().map { set ->
                             val cards = setsWithCards?.get(set.id)
+                            val readyToLearnProgress = cards?.readyToLearnProgress(timeSource) ?: 0f
                             set.copy(
-                                readyToLearnProgress = cards?.readyToLearnProgress(timeSource) ?: 0f,
+                                readyToLearnProgress = readyToLearnProgress,
                                 totalProgress = cards?.totalProgress() ?: 0f,
-                                terms = cards.orEmpty().filter { it.progress.isReadyToLearn(timeSource) }.map { it.term }
+                                terms = if (readyToLearnProgress >= 1.0f) {
+                                    // nothing is ready to learn, hence show all the terms
+                                    cards.orEmpty().map { it.term }
+                                } else {
+                                    cards.orEmpty().filter { it.progress.isReadyToLearn(timeSource) }.map { it.term }
+                                }
                             )
                         }
                     }

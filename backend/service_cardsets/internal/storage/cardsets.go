@@ -510,7 +510,7 @@ func (m *Storage) CountTags(
 			bson.D{
 				{Key: "$group",
 					Value: bson.D{
-						{Key: "_id", Value: "$tags"},
+						{Key: "_id", Value: bson.D{{Key: "$toLower", Value: "$tags"}}},
 						{Key: "ct", Value: bson.D{{Key: "$sum", Value: 1}}},
 					},
 				},
