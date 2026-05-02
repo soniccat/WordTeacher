@@ -4,6 +4,7 @@ import (
 	"api"
 	"context"
 	"errors"
+	"regexp"
 	"time"
 	"tools"
 	"tools/logger"
@@ -287,7 +288,10 @@ func (m *Storage) getCardSets(
 	}
 
 	if withTag != nil {
-		filter["tags"] = *withTag
+		filter["tags"] = primitive.Regex{
+			Pattern: "^" + regexp.QuoteMeta(*withTag) + "$",
+			Options: "i",
+		}
 	}
 
 	cursor, err := m.CardSetCollection.Find(
