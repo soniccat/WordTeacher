@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.service
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import io.ktor.client.*
@@ -45,6 +47,7 @@ class SpaceAuthService(
     private val baseUrl: String,
     private val httpClient: HttpClient,
     private val secureCodec: SecureCodec,
+    private val analytics: Analytics,
 ) {
     @Serializable
     enum class NetworkType(val value: String) {
@@ -107,13 +110,18 @@ class SpaceAuthService(
                     setBody(authJson.encodeToString(AuthInput(token)))
                 }
             val stringResponse: String = res.body()
-            authJson.decodeFromString<Response<SpaceAuthData>>(stringResponse)
-                .mapOkData {
-                    it.copy(
-                        authToken = it.authToken.encrypt(secureCodec),
-                    )
-                }
-                .setStatusCode(res.status.value)
+            try {
+                authJson.decodeFromString<Response<SpaceAuthData>>(stringResponse)
+                    .mapOkData {
+                        it.copy(
+                            authToken = it.authToken.encrypt(secureCodec),
+                        )
+                    }
+                    .setStatusCode(res.status.value)
+            } catch (e: Exception) {
+                analytics.send(AnalyticEvent.createErrorEvent("SpaceAuthService.auth", e))
+                throw e
+            }
         }
     }
 
@@ -132,11 +140,16 @@ class SpaceAuthService(
                     )
                 }
             val stringResponse: String = res.body()
-            refreshJson.decodeFromString<Response<SpaceAuthToken>>(stringResponse)
-                .mapOkData {
-                   it.encrypt(secureCodec)
-                }
-                .setStatusCode(res.status.value)
+            try {
+                refreshJson.decodeFromString<Response<SpaceAuthToken>>(stringResponse)
+                    .mapOkData {
+                        it.encrypt(secureCodec)
+                    }
+                    .setStatusCode(res.status.value)
+            } catch (e: Exception) {
+                analytics.send(AnalyticEvent.createErrorEvent("SpaceAuthService.refresh", e))
+                throw e
+            }
         }
     }
 

@@ -84,13 +84,15 @@ func (s *Storage) StartPulling(ctx context.Context) {
 					continue
 				}
 
-				tagWithCardSets = append(tagWithCardSets, api.TagWithCardSets{
-					Tag: api.CardSetTag{
-						Name:  tag.Name,
-						Count: tag.Count,
-					},
-					CardSets: cardSets,
-				})
+				if len(cardSets) > 0 {
+					tagWithCardSets = append(tagWithCardSets, api.TagWithCardSets{
+						Tag: api.CardSetTag{
+							Name:  tag.Name,
+							Count: tag.Count,
+						},
+						CardSets: cardSets,
+					})
+				}
 			}
 
 			s.tagWithCardSets = tagWithCardSets

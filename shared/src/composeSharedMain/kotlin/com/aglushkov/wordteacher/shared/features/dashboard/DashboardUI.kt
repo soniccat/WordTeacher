@@ -306,7 +306,7 @@ fun dashboardItem(
                     onClick = { vm.onCardSetTagChanged(categoryIndex) },
                     selected = isSelected,
                 ) {
-                    Text(tag.replaceFirstToCapital())
+                    Text(tag)
                 }
             }
         }

@@ -17,7 +17,7 @@ class AppMetricaEngine(
     key: String,
     app: Application,
     toggleRepositoryProvider: () -> ToggleRepository,
-    spaceAuthRepository: SpaceAuthRepository,
+    spaceAuthRepositoryProvider: () -> SpaceAuthRepository,
 ): AnalyticEngine {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     override val type: AnalyticEngineType = AnalyticEngineType.AppMetrica
@@ -34,7 +34,7 @@ class AppMetricaEngine(
                 "toggles", togglesAsString
             )
 
-            spaceAuthRepository.authDataFlow.collect { authDataRes ->
+            spaceAuthRepositoryProvider().authDataFlow.collect { authDataRes ->
                 authDataRes.onData { authData ->
                     AppMetrica.setUserProfileID(authData.user.id)
 

@@ -1,6 +1,8 @@
 package com.aglushkov.wordteacher.shared.service
 
 import co.touchlab.kermit.Logger
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.LinkDividerCharCategories
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.indexOfChar
@@ -79,7 +81,8 @@ data class SpaceDashboardHeadline(
 
 class SpaceDashboardService(
     private val baseUrl: String,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val analytics: Analytics,
 ) {
     private val json by lazy {
         Json {
@@ -105,7 +108,13 @@ class SpaceDashboardService(
         return withContext(Dispatchers.IO) {
             val res: HttpResponse = httpClient.get(urlString = "${baseUrl}/api/v2/dashboard")
             val stringResponse: String = res.body()
-            json.decodeFromString<Response<SpaceDashboardResponse>>(stringResponse).setStatusCode(res.status.value)
+            try {
+                json.decodeFromString<Response<SpaceDashboardResponse>>(stringResponse)
+                    .setStatusCode(res.status.value)
+            } catch (e: Exception) {
+                analytics.send(AnalyticEvent.createErrorEvent("SpaceDashboardService.load", e))
+                throw e
+            }
         }
     }
 }

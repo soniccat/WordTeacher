@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.service
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.serialization.InstantIso8601Serializer
 import com.aglushkov.wordteacher.shared.general.setStatusCode
@@ -62,7 +64,8 @@ data class CardSetByIdResponse(
 
 class SpaceCardSetService(
     private val baseUrl: String,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val analytics: Analytics,
 ) {
     private val pullJson by lazy {
         Json {
@@ -117,7 +120,12 @@ class SpaceCardSetService(
                     setBody(pullJson.encodeToString(CardSetPullInput(currentCardSetIds, lastModificationDate)))
                 }
             val stringResponse: String = res.body()
-            pullJson.decodeFromString<Response<CardSetPullResponse>>(stringResponse).setStatusCode(res.status.value)
+            try {
+                pullJson.decodeFromString<Response<CardSetPullResponse>>(stringResponse).setStatusCode(res.status.value)
+            } catch (e: Exception) {
+                analytics.send(AnalyticEvent.createErrorEvent("SpaceCardSetService.pull", e))
+                throw e
+            }
         }
     }
 
@@ -129,7 +137,12 @@ class SpaceCardSetService(
                     setBody(pushJson.encodeToString(CardSetPushInput(updatedCardSets, currentCardSetIds, lastModificationDate)))
                 }
             val stringResponse: String = res.body()
-            pushJson.decodeFromString<Response<CardSetPushResponse>>(stringResponse).setStatusCode(res.status.value)
+            try {
+                pushJson.decodeFromString<Response<CardSetPushResponse>>(stringResponse).setStatusCode(res.status.value)
+            } catch (e: Exception) {
+                analytics.send(AnalyticEvent.createErrorEvent("SpaceCardSetService.push", e))
+                throw e
+            }
         }
     }
 
@@ -138,7 +151,12 @@ class SpaceCardSetService(
             val res: HttpResponse =
                 httpClient.get(urlString = "${baseUrl}/api/cardsets/" + id)
             val stringResponse: String = res.body()
-            cardSetByIdJson.decodeFromString<Response<CardSetByIdResponse>>(stringResponse).setStatusCode(res.status.value)
+            try {
+                cardSetByIdJson.decodeFromString<Response<CardSetByIdResponse>>(stringResponse).setStatusCode(res.status.value)
+            } catch (e: Exception) {
+                analytics.send(AnalyticEvent.createErrorEvent("SpaceCardSetService.getById", e))
+                throw e
+            }
         }
     }
 }

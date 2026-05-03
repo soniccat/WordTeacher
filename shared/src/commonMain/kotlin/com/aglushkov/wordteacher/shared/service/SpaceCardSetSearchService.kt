@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.service
 
+import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
+import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.setStatusCode
 import com.aglushkov.wordteacher.shared.model.CardSet
@@ -24,7 +26,8 @@ data class CardSetSearchResponse(
 
 class SpaceCardSetSearchService(
     private val baseUrl: String,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val analytics: Analytics,
 ) {
     private val json by lazy {
         Json {
@@ -50,7 +53,12 @@ class SpaceCardSetSearchService(
                     }
                 }
             val stringResponse: String = res.body()
-            json.decodeFromString<Response<CardSetSearchResponse>>(stringResponse).setStatusCode(res.status.value)
+            try {
+                json.decodeFromString<Response<CardSetSearchResponse>>(stringResponse).setStatusCode(res.status.value)
+            } catch (e: Exception) {
+                analytics.send(AnalyticEvent.createErrorEvent("SpaceCardSetSearchService.load", e))
+                throw e
+            }
         }
     }
 }

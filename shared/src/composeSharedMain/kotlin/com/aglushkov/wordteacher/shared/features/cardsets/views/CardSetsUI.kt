@@ -253,13 +253,13 @@ private fun ShowCardSetTags(
             tags.onEach {
                 Chip(
                     onClick = {
-                        searchSelectionKey.value += 1
+                        searchSelectionKey.intValue += 1
                         vm.onCardSetTagClicked(it)
                     },
                     modifier = Modifier.padding(end = 4.dp)
                 ) {
                     Text(
-                        text = it.name.replaceFirstToCapital() + " • " + it.count
+                        text = it.name + " • " + it.count
                     )
                 }
             }

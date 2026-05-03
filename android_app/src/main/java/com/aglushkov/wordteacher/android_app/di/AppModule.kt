@@ -331,13 +331,13 @@ class AppModule {
     fun appMetricaEngine(
         app: Application,
         toggleRepositoryProvider: Lazy<ToggleRepository>,
-        spaceAuthRepository: SpaceAuthRepository,
+        spaceAuthRepository: Lazy<SpaceAuthRepository>,
     ): AppMetricaEngine {
         return AppMetricaEngine(
             app.getString(R.string.app_metrica_key),
             app,
             { toggleRepositoryProvider.get() },
-            spaceAuthRepository
+            { spaceAuthRepository.get() }
         )
     }
 

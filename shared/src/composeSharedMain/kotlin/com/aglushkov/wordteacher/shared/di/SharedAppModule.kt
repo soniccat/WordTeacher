@@ -298,8 +298,9 @@ class SharedAppModule {
     fun spaceDashboardService(
         @SpaceHttpClient httpClient: HttpClient,
         @ApiBaseUrl apiBaseUrl: String,
+        analytics: Analytics,
     ): SpaceDashboardService =
-        SpaceDashboardService(apiBaseUrl, httpClient)
+        SpaceDashboardService(apiBaseUrl, httpClient, analytics)
 
     @AppComp
     @Provides
@@ -307,24 +308,27 @@ class SharedAppModule {
         @SpaceHttpClient httpClient: HttpClient,
         @ApiBaseUrl apiBaseUrl: String,
         secureCodec: SecureCodec,
+        analytics: Analytics,
     ): SpaceAuthService =
-        SpaceAuthService(apiBaseUrl, httpClient, secureCodec)
+        SpaceAuthService(apiBaseUrl, httpClient, secureCodec, analytics)
 
     @AppComp
     @Provides
     fun spaceCardSetService(
         @SpaceHttpClient httpClient: HttpClient,
         @ApiBaseUrl apiBaseUrl: String,
+        analytics: Analytics,
     ): SpaceCardSetService =
-        SpaceCardSetService(apiBaseUrl, httpClient)
+        SpaceCardSetService(apiBaseUrl, httpClient, analytics)
 
     @AppComp
     @Provides
     fun spaceCardSetSearchService(
         @SpaceHttpClient httpClient: HttpClient,
         @ApiBaseUrl apiBaseUrl: String,
+        analytics: Analytics,
     ): SpaceCardSetSearchService =
-        SpaceCardSetSearchService(apiBaseUrl, httpClient)
+        SpaceCardSetSearchService(apiBaseUrl, httpClient, analytics)
 
     @AppComp
     @Provides
