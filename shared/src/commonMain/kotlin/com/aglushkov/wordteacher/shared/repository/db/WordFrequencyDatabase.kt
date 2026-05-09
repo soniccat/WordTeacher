@@ -205,7 +205,7 @@ class WordFrequencyDatabase(
         val db = WordFrequencyDB(driver)
         val count = db.dBWordFrequencyQueries.selectCount().executeAsOne()
         if (count == 0L) {
-            throw RuntimeException("Empty database")
+            return false //throw RuntimeException("Empty database")
         }
 
         val first = db.dBWordFrequencyQueries.selectFirst().executeAsOne()
@@ -221,14 +221,11 @@ class WordFrequencyDatabase(
     inner class UpdateHandler(
         private val analytics: Analytics
     ): FileOpenController.SuccessHandler {
-        override fun prepare(path: Path): Boolean {
+        override fun handle(path: Path): Boolean {
             driver.close()
             driver = driverFactory.createFrequencyDBDriver()
             db = WordFrequencyDB(driver)
-            return true
-        }
 
-        override fun handle(path: Path): Boolean {
             analytics.send(AnalyticEvent.createActionEvent("FileOpenController.success.wordFrequencyDB",
                 mapOf("name" to path.name)))
             runBlocking {

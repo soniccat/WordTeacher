@@ -8,12 +8,15 @@ import okio.Path
 
 interface FileOpenController {
 
+    interface Converter {
+        fun convert(path: Path): String?
+    }
+
     interface Validator {
         fun validateFile(path: Path): Boolean
     }
 
     interface SuccessHandler {
-        fun prepare(path: Path): Boolean // TODO: check if we can remove it
         fun handle(path: Path): Boolean
     }
 
@@ -25,17 +28,6 @@ interface FileOpenController {
 class FileOpenCompositeSuccessHandler(
     private val handlers: List<FileOpenController.SuccessHandler>
 ): FileOpenController.SuccessHandler {
-
-    override fun prepare(path: Path): Boolean {
-        for(h in handlers) {
-            if (!h.prepare(path)) {
-                return false
-            }
-        }
-
-        return true
-    }
-
     override fun handle(path: Path): Boolean {
         for(h in handlers) {
             if (!h.handle(path)) {

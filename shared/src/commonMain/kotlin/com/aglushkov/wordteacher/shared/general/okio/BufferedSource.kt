@@ -75,3 +75,20 @@ fun FileSystem.writeToWithVersioning(
         false
     }
 }
+
+fun Source.writeToUtf8(outputSink: Sink) {
+    buffer().use { reader ->
+        outputSink.buffer().use { sink ->
+            val readByteArray = ByteArray(100 * 1024)
+            var readByteCount: Int
+            while (true) {
+                readByteCount = reader.read(readByteArray, 0, readByteArray.size)
+                if (readByteCount == -1) {
+                    break
+                }
+
+                sink.writeUtf8(String(readByteArray))
+            }
+        }
+    }
+}

@@ -2,7 +2,6 @@ package com.aglushkov.wordteacher.android_app.helper
 
 import android.content.ContentResolver
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.ComponentActivity
@@ -31,6 +30,7 @@ class FileOpenControllerImpl(
     private val mimeTypes: List<String>,
     private val tmpPath: Path,
     private val dstPath: Path,
+    private val converter: FileOpenController.Converter?,
     private val validator: FileOpenController.Validator,
     private val successHandler: FileOpenController.SuccessHandler,
 ): FileOpenController {
@@ -52,19 +52,22 @@ class FileOpenControllerImpl(
                         } else {
                             tmpPath
                         }
-                        val dstFilePath = if (dstPath.toFile().isDirectory) {
-                            dstPath.div(name)
-                        } else {
-                            dstPath
-                        }
 
                         tmpFilePath.useAsTmp {
                             activity.contentResolver.openInputStream(result)?.source()
                                 ?.writeTo(it.toFile().sink())
-                            validator.validateFile(it)
 
-                            it.toFile().source()?.writeTo(dstFilePath.toFile().sink())
-                            successHandler.handle(dstFilePath)
+                            val dstFileName = converter?.convert(it) ?: name
+                            val dstFilePath = if (dstPath.toFile().isDirectory) {
+                                dstPath.div(dstFileName)
+                            } else {
+                                dstPath
+                            }
+
+                            if (validator.validateFile(it)) {
+                                it.toFile().source().writeTo(dstFilePath.toFile().sink())
+                                successHandler.handle(dstFilePath)
+                            }
                         }
                         Unit
                     }.collect(state)

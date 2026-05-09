@@ -32,7 +32,8 @@ mokoResources = "0.25.0"
 decomposeVersion = "3.3.0"
 stately = "2.1.0"
 uuid = "0.8.4"
-dagger = "2.57"
+dagger = "2.59.2"
+kmpZip = "0.11.2"
 
 # android
 browser = "1.9.0"
@@ -93,6 +94,8 @@ statelyConcurrency = { module = "co.touchlab:stately-concurrency", version.ref =
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 vkId = { module = "com.vk.id:vkid", version.ref = "vkId" }
 yandexId = { module = "com.yandex.android:authsdk", version.ref = "yandexId" }
+kmpZip = { module = "no.synth:kmp-zip", version.ref = "kmpZip" }
+kmpZipOkio = { module = "no.synth:kmp-zip-okio", version.ref = "kmpZip" }
 
 # android
 androidXBrowser = { module = "androidx.browser:browser", version.ref = "browser" }

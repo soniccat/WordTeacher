@@ -241,7 +241,7 @@ class DslDict(
             val namePos = pos
             val endNamePos = readWord()
 
-            if (char == '\t') {
+            if (char == '\t' || char == ' ') {
                 skip(1)
                 if (char == '"') {
                     skip(1)

@@ -54,9 +54,10 @@ class FileOpenControllerImpl(
 
                     tmpFilePath.useAsTmp {
                         choseFilePath.toFile().source().writeTo(it.toFile().sink())
-                        validator.validateFile(it)
-                        it.toFile().source().writeTo(dstFilePath.toFile().sink())
-                        successHandler.handle(dstFilePath)
+                        if (validator.validateFile(it)) {
+                            it.toFile().source().writeTo(dstFilePath.toFile().sink())
+                            successHandler.handle(dstFilePath)
+                        }
                     }
                     Unit
                 }.collect(state)

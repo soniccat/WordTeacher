@@ -45,6 +45,8 @@ kotlin {
         commonMain.dependencies {
             api(libs.logger)
             api(libs.okio)
+            implementation(libs.kmpZip)
+            api(libs.kmpZipOkio)
             implementation(libs.sqlDelightRuntime)
             implementation(libs.kotlinxSerializationJson)
             implementation(libs.ktorCommonCore)

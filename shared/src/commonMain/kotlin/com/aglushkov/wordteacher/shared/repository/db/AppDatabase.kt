@@ -764,10 +764,6 @@ class AppDatabase(
     inner class WordFrequencyUpdateHandler(
         private val analytics: Analytics,
     ): FileOpenController.SuccessHandler {
-        override fun prepare(path: Path): Boolean {
-            return true
-        }
-
         override fun handle(path: Path): Boolean {
             analytics.send(AnalyticEvent.createActionEvent("FileOpenController.success.wordFrequencyDB",
                 mapOf("name" to path.name)))

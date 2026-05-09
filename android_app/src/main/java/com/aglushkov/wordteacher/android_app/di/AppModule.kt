@@ -45,6 +45,7 @@ import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME
 import com.aglushkov.wordteacher.shared.repository.db.FREQUENCY_DB_NAME_TMP
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.dict.DslDictConverter
 import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
@@ -252,7 +253,10 @@ class AppModule {
     @WordFrequencyPreparer
     @AppComp
     @Provides
-    fun wordFrequencyPreparer(context: Context, fileSystem: FileSystem): () -> Path {
+    fun wordFrequencyPreparer(
+        context: Context,
+        fileSystem: FileSystem,
+    ): () -> Path {
         return {
             // copy db in database folder if needed
             val dbPath = context.getDatabasePath("word_frequency.db").toOkioPath()
@@ -281,6 +285,7 @@ class AppModule {
             listOf("application/octet-stream"),
             tmpDestinationPath,
             dstPath,
+            converter = null,
             wordFrequencyDB.Validator(),
             FileOpenCompositeSuccessHandler(
                 listOf(
@@ -303,12 +308,15 @@ class AppModule {
     ): FileOpenController {
         val tmpDestinationPath = context.cacheDir.toOkioPath()
         return FileOpenControllerImpl(
-            "DslFileOpener",
-            listOf("application/octet-stream"),
-            tmpDestinationPath,
-            dictPath,
-            DslDictValidator(fileSystem),
-            FileOpenCompositeSuccessHandler(
+            name = "DslFileOpener",
+            mimeTypes = listOf("application/octet-stream"),
+            tmpPath = tmpDestinationPath,
+            dstPath = dictPath,
+            converter = DslDictConverter(
+                fileSystem,
+            ),
+            validator = DslDictValidator(fileSystem),
+            successHandler = FileOpenCompositeSuccessHandler(
                 listOf(
                     OnNewDictAddedHandler(dictRepository, analytics)
                 )
