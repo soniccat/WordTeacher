@@ -48,15 +48,22 @@ class DslDictConverter(
                 } else if(readByteArray[0] == 0xFF.toByte() && readByteArray[1] == 0xFE.toByte()) {
                     fileCharset = Charsets.UTF_16LE
                 } else {
-                    var zeroByteCount = 0
-                    for (i in 0 until readByteCount) {
-                        if (readByteArray[i] == 0x00.toByte()) {
-                            zeroByteCount += 1
+                    var leftZeroCount = 0
+                    var rightZeroCount = 0
+                    for (i in 0 until readByteCount step 2) {
+                        if (readByteArray[i] == ZeroByte) {
+                            leftZeroCount += 1
+                        } else if (readByteArray[i+1] == ZeroByte) {
+                            rightZeroCount += 1
                         }
                     }
-                    val zeroBytePercent = zeroByteCount.toFloat() / readByteCount.toFloat()
+                    val zeroBytePercent = (leftZeroCount + rightZeroCount).toFloat() / readByteCount.toFloat()
                     if (zeroBytePercent > 0.3f) {
-                        fileCharset = Charsets.UTF_16LE
+                        fileCharset = if (leftZeroCount > rightZeroCount) {
+                            Charsets.UTF_16BE
+                        } else {
+                            Charsets.UTF_16LE
+                        }
                     }
                 }
             }
@@ -88,3 +95,5 @@ class DslDictConverter(
         return newName
     }
 }
+
+private const val ZeroByte =  0x00.toByte()
