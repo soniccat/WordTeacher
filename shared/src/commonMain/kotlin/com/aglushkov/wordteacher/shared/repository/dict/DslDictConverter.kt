@@ -48,8 +48,13 @@ class DslDictConverter(
                 } else if(readByteArray[0] == 0xFF.toByte() && readByteArray[1] == 0xFE.toByte()) {
                     fileCharset = Charsets.UTF_16LE
                 } else {
-                    val zeroByteCount = readByteArray.count { it == 0x00.toByte() }
-                    val zeroBytePercent = zeroByteCount.toFloat() / readByteArray.size.toFloat()
+                    var zeroByteCount = 0
+                    for (i in 0 until readByteCount) {
+                        if (readByteArray[i] == 0x00.toByte()) {
+                            zeroByteCount += 1
+                        }
+                    }
+                    val zeroBytePercent = zeroByteCount.toFloat() / readByteCount.toFloat()
                     if (zeroBytePercent > 0.3f) {
                         fileCharset = Charsets.UTF_16LE
                     }
@@ -70,7 +75,7 @@ class DslDictConverter(
                                 break
                             }
 
-                            sink.writeUtf8(String(readByteArray, fileCharset))
+                            sink.writeUtf8(String(readByteArray, 0, readByteCount, fileCharset))
                         }
                     }
                 }

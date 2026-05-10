@@ -67,6 +67,7 @@ class WordTeacherWordBuilder {
     private var antonyms = mutableListOf<String>()
     private var imageUrl: String? = null
     private var labels = mutableListOf<String>()
+    private var isSynonimsBlock = false
 
     fun setWord(v: String): WordTeacherWordBuilder {
         word = v
@@ -87,6 +88,10 @@ class WordTeacherWordBuilder {
         types.add(type)
     }
 
+    fun addLabel(label: String) {
+        labels.add(label)
+    }
+
     fun startPartOfSpeech(partOfSpeech: WordTeacherWord.PartOfSpeech) {
         if (hasWordDefinition()) {
             addWordDefinition()
@@ -94,6 +99,9 @@ class WordTeacherWordBuilder {
 
         this.partOfSpeech = partOfSpeech
     }
+
+    fun hasPartOfSpeech() =
+        partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined
 
     fun addDefinition(def: String): WordTeacherWordBuilder {
         if (definitions.isNotEmpty() && (examples.isNotEmpty() || synonyms.isNotEmpty())) {
@@ -111,6 +119,19 @@ class WordTeacherWordBuilder {
 
     fun addSynonym(syn: String): WordTeacherWordBuilder {
         synonyms.add(syn)
+        return this
+    }
+
+    fun setIsSynonimsBlock(isSynonimsBlock: Boolean) {
+        this.isSynonimsBlock = isSynonimsBlock
+    }
+
+    fun addText(text: String): WordTeacherWordBuilder {
+        if (isSynonimsBlock) {
+            addSynonym(text)
+        } else {
+            addDefinition(text)
+        }
         return this
     }
 
@@ -145,6 +166,7 @@ class WordTeacherWordBuilder {
         antonyms.clear()
         imageUrl = null
         labels.clear()
+        isSynonimsBlock = false
     }
 
     fun clear() {

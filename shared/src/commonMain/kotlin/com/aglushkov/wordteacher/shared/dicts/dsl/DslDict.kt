@@ -39,12 +39,12 @@ class DslDict(
 
     override suspend fun load() {
         val dslIndex = DslIndex(this, (path.toString() + DSL_INDEX_SUFFIX).toPath(), fileSystem)
-        if (dslIndex.isEmpty()) {
+        //if (dslIndex.isEmpty()) {
             fillIndex(dslIndex)
             dslIndex.save()
-        } else {
-            readHeader()
-        }
+//        } else {
+//            readHeader()
+//        }
 
         this.dslIndex = dslIndex
     }
@@ -87,7 +87,7 @@ class DslDict(
                 if (resultLine.isNotEmpty()) {
                     val firstChar = resultLine.first()
                     when (firstChar) {
-                        '#' -> readHeader(resultLine)
+                        '#', UNICODE_INVISIBLE_SPACE -> readHeader(resultLine)
                         '-', '\n', '\t' -> {}
                         else -> {
                             wordTeacherWordBuilder.clear()
@@ -99,6 +99,7 @@ class DslDict(
                             if (word?.definitions?.isNotEmpty() == true) {
                                 val partOfSpeeches = word.definitions.keys
                                 if (partOfSpeeches.size > 1) {
+                                    // TODO: support several part of speeches in index
                                     Logger.e("DslDict fillIndex found several partOfSpeeches for $word")
                                 } else if (partOfSpeeches.size == 1) {
                                     val partOfSpeech = partOfSpeeches.first()
@@ -151,13 +152,11 @@ class DslDict(
     private fun BufferedSource.readWord(wordTeacherWordBuilder: WordTeacherWordBuilder): Pair<Int, String?> {
         var readBytes = 0
         var line = readUtf8Line()
-        var isFirstLine = true
         while (line != null && line.isNotEmpty() && line.first() == '\t') {
-            readWordLine(line, isFirstLine, wordTeacherWordBuilder)
+            readWordLine(line, wordTeacherWordBuilder)
 
             readBytes += (line.utf8Size() + newLineSize).toInt()
             line = readUtf8Line()
-            isFirstLine = false
         }
 
         // don't add size of the last read line to readBytes on purpose
@@ -165,12 +164,13 @@ class DslDict(
         return Pair(readBytes, line)
     }
 
-    private fun readWordLine(line: String, isFirstLine: Boolean, builder: WordTeacherWordBuilder) {
+    private fun readWordLine(line: String, builder: WordTeacherWordBuilder) {
         var isDef = false
         var isExample = false
         var isTranscription = false
+        var isLabel = false
+        val label = StringBuilder()
         val value = StringBuilder()
-        var firstLineValue: StringBuilder? = null
 
         stringReader.read(line) {
             skip()
@@ -181,7 +181,13 @@ class DslDict(
                     tag = readTag(isCloseTag)
 
                     if (isCloseTag) {
-                        if (tag == "trn" || tag == "ex" || tag == "t") {
+                        if (tag == "p") {
+                            isLabel = false
+                            if (label.isNotEmpty()) {
+                                wordTeacherWordBuilder.addLabel(label.toString())
+                                label.clear()
+                            }
+                        } else if (tag == "trn" || tag == "ex" || tag == "t") {
                             break
                         }
                     } else {
@@ -189,32 +195,44 @@ class DslDict(
                             "trn" -> isDef = true
                             "ex" -> isExample = true
                             "t" -> isTranscription = true
+                            "p" -> isLabel = true
                         }
                     }
                 } else {
                     val ch = readChar()
-                    if (isDef || isExample || isTranscription) {
+                    if (isLabel) {
+                        label.append(ch)
+                    } else /*if (isDef || isExample || isTranscription)*/ {
                         value.append(ch)
-                    } else if (isFirstLine) {
-                        if (firstLineValue == null) {
-                            firstLineValue = StringBuilder()
-                        }
-                        firstLineValue?.append(ch)
                     }
                 }
             }
         }
 
-        if (value.isNotEmpty() || firstLineValue?.isNotEmpty() == true) {
+        if (value.isNotEmpty()) {
+            val text = value.toString()
             if (isTranscription) {
-                builder.setTranscription(value.toString())
+                builder.setTranscription(text)
             } else if (isDef) {
-                builder.addDefinition(value.toString())
+                builder.addDefinition(text)
             } else if(isExample) {
-                builder.addExample(value.toString())
-            } else if (isFirstLine) {
-                val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(firstLineValue.toString().trimNonLetterNonDigit())
-                builder.startPartOfSpeech(partOfSpeech)
+                builder.addExample(text)
+            } else if (text.lowercase().startsWith("syn")) {
+                builder.setIsSynonimsBlock(true)
+            } else {
+                var isHandled = false
+
+                if (!builder.hasPartOfSpeech()) {
+                    val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(text.trimNonLetterNonDigit())
+                    if (partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined) {
+                        builder.startPartOfSpeech(partOfSpeech)
+                        isHandled = true
+                    }
+                }
+
+                if (!isHandled) {
+                    builder.addText(text)
+                }
             }
         }
     }
