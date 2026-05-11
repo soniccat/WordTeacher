@@ -97,14 +97,8 @@ class DslDict(
                             val word = wordTeacherWordBuilder.build()
 
                             if (word?.definitions?.isNotEmpty() == true) {
-                                val partOfSpeeches = word.definitions.keys
-                                if (partOfSpeeches.size > 1) {
-                                    // TODO: support several part of speeches in index
-                                    Logger.e("DslDict fillIndex found several partOfSpeeches for $word")
-                                } else if (partOfSpeeches.size == 1) {
-                                    val partOfSpeech = partOfSpeeches.first()
-                                    index.add(word.word, partOfSpeech, offset)
-                                }
+                                val partOfSpeeches = word.definitions.map { it.key }
+                                index.add(word.word, partOfSpeeches, offset)
                             }
 
                             readLine = nl
@@ -250,12 +244,10 @@ class DslDict(
         text: String,
         builder: WordTeacherWordBuilder,
     ): Boolean {
-        if (!builder.hasPartOfSpeech()) {
-            val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(text.trimNonLetterNonDigit())
-            if (partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined) {
-                builder.startPartOfSpeech(partOfSpeech)
-                return true
-            }
+        val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(text.trimNonLetterNonDigit())
+        if (partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined) {
+            builder.startPartOfSpeech(partOfSpeech)
+            return true
         }
 
         return false

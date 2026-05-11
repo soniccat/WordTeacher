@@ -47,16 +47,16 @@ class DslIndex(
 
             while (!this.exhausted()) {
                 readEntry()?.let {
-                    add(it.word, it.partOfSpeech, it.indexValue, it.dict)
+                    add(it.word, it.partOfSpeeches, it.indexValue, it.dict)
                 }
             }
         }
     }
 
-    fun add(term: String, partOfSpeech: WordTeacherWord.PartOfSpeech?, offset: Int) {
+    fun add(term: String, partOfSpeeches: List<WordTeacherWord.PartOfSpeech>, offset: Int) {
         add(
             term,
-            partOfSpeech ?: WordTeacherWord.PartOfSpeech.Undefined,
+            partOfSpeeches,
             offset,
             dict
         )
@@ -64,11 +64,11 @@ class DslIndex(
 
     fun add(
         term: String,
-        partOfSpeech: WordTeacherWord.PartOfSpeech,
+        partOfSpeeches: List<WordTeacherWord.PartOfSpeech>,
         indexValue: Any?,
         dict: Dict
     ) =
-        index.put(term, DictWordData(partOfSpeech, indexValue, dict))
+        index.put(term, DictWordData(partOfSpeeches, indexValue, dict))
 
     fun save() {
         fileSystem.write(path) {
@@ -82,11 +82,15 @@ class DslIndex(
 
     private fun BufferedSource.readEntry(): ReadEntry? {
         val offset = readInt()
-        val partOfSpeech = WordTeacherWord.PartOfSpeech.values()[readInt()]
-        val word = readUtf8Line()
+        val partOfSpeechesCount = readInt()
+        val partOfSpeeches = mutableListOf<WordTeacherWord.PartOfSpeech>()
+        for (i in 0 until partOfSpeechesCount) {
+            partOfSpeeches.add(WordTeacherWord.PartOfSpeech.values()[readInt()])
+        }
 
+        val word = readUtf8Line()
         return if (word != null && offset != 0) {
-            ReadEntry(word, partOfSpeech, offset, dict)
+            ReadEntry(word, partOfSpeeches, offset, dict)
         } else {
             null
         }
@@ -94,12 +98,15 @@ class DslIndex(
 
     private fun BufferedSink.writeEntry(it: Dict.Index.Entry) {
         writeInt(it.indexValue as Int)
-        writeInt(it.partOfSpeech.ordinal)
+        writeInt(it.partOfSpeeches.size)
+        it.partOfSpeeches.onEach {
+            writeInt(it.ordinal)
+        }
         writeUtf8(it.word)
         writeUtf8("\n")
     }
 
-    fun partOfSpeech(term: String) = index.word(term).firstOrNull()?.partOfSpeech
+    fun partOfSpeech(term: String) = index.word(term).firstOrNull()?.partOfSpeeches
 
     fun offset(term: String): Int? = index.word(term).firstOrNull()?.indexValue as? Int
 
@@ -107,7 +114,7 @@ class DslIndex(
 
     private data class ReadEntry(
         val word: String,
-        val partOfSpeech: WordTeacherWord.PartOfSpeech,
+        val partOfSpeeches: List<WordTeacherWord.PartOfSpeech>,
         val indexValue: Any?,
         val dict: Dict
     )

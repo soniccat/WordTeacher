@@ -209,23 +209,26 @@ fun partOfSpeechEnum(it: String?) = if (it == null) {
 }
 
 fun WordTeacherWord.PartOfSpeech.Companion.fromString(string: String?): WordTeacherWord.PartOfSpeech {
-    val resultString = string?.lowercase() ?: "null"
+    val res = string?.lowercase() ?: "null"
     return when {
-        resultString == "pronoun" -> WordTeacherWord.PartOfSpeech.Pronoun
-        resultString == "preposition" -> WordTeacherWord.PartOfSpeech.Preposition
-        resultString == "conjunction" ||
-                resultString == "conj-subord" ||
-                resultString == "phr-conj-subord" -> WordTeacherWord.PartOfSpeech.Conjunction
-        resultString == "interjection" -> WordTeacherWord.PartOfSpeech.Interjection
-        resultString == "abbreviation" -> WordTeacherWord.PartOfSpeech.Abbreviation
-        resultString == "determiner" -> WordTeacherWord.PartOfSpeech.Determiner
-        resultString == "exclamation" -> WordTeacherWord.PartOfSpeech.Exclamation
-        resultString == "фраз. гл" || resultString == "phrasal verb" -> WordTeacherWord.PartOfSpeech.PhrasalVerb
-        resultString == "n-count" || resultString == "n-uncount" -> WordTeacherWord.PartOfSpeech.Noun
-        resultString.contains("noun") -> WordTeacherWord.PartOfSpeech.Noun
-        resultString.contains("verb") -> WordTeacherWord.PartOfSpeech.Verb
-        resultString.contains("adverb") -> WordTeacherWord.PartOfSpeech.Adverb
-        resultString.contains("adjective") -> WordTeacherWord.PartOfSpeech.Adjective
+        res == "pronoun" -> WordTeacherWord.PartOfSpeech.Pronoun
+        res == "preposition" -> WordTeacherWord.PartOfSpeech.Preposition
+        res == "conjunction" ||
+                res == "conj-subord" ||
+                res == "phr-conj-subord" -> WordTeacherWord.PartOfSpeech.Conjunction
+        res == "interjection" -> WordTeacherWord.PartOfSpeech.Interjection
+        res == "abbreviation" -> WordTeacherWord.PartOfSpeech.Abbreviation
+        res == "determiner" -> WordTeacherWord.PartOfSpeech.Determiner
+        res == "exclamation" -> WordTeacherWord.PartOfSpeech.Exclamation
+        res == "фраз. гл" ||
+                res == "phrasal verb" -> WordTeacherWord.PartOfSpeech.PhrasalVerb
+        res == "n-count" ||
+                res == "n-uncount" ||
+                res == "n-sing" -> WordTeacherWord.PartOfSpeech.Noun
+        res.contains("noun") -> WordTeacherWord.PartOfSpeech.Noun
+        res.contains("verb") -> WordTeacherWord.PartOfSpeech.Verb
+        res.contains("adverb") -> WordTeacherWord.PartOfSpeech.Adverb
+        res.contains("adjective") -> WordTeacherWord.PartOfSpeech.Adjective
         else -> {
             if (string != null) {
                 //Log.d("WordTeacherWord", "New Part of Speech has found: $string")

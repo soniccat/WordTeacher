@@ -48,7 +48,7 @@ class WordListDictIndex(
     private val fileSystem: FileSystem,
 ): DictTrieIndex {
     override val index = DictTrie()
-    private val wordListWordData = DictWordData(WordTeacherWord.PartOfSpeech.Undefined, null, dict)
+    private val wordListWordData = DictWordData(emptyList(), null, dict)
 
     init {
         if (fileSystem.exists(path)) {

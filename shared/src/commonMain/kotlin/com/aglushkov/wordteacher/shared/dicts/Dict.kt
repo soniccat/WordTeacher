@@ -29,7 +29,7 @@ interface Dict: WordTeacherWordService {
         )
 
         abstract class Entry(
-            val partOfSpeech: WordTeacherWord.PartOfSpeech,
+            val partOfSpeeches: List<WordTeacherWord.PartOfSpeech>,
             val indexValue: Any?,
             val dict: Dict
         ) {
@@ -39,7 +39,7 @@ interface Dict: WordTeacherWordService {
 }
 
 fun Dict.Index.Entry.toWordData(): DictWordData =
-    DictWordData(partOfSpeech, indexValue, dict)
+    DictWordData(partOfSpeeches, indexValue, dict)
 
 enum class Language {
     RU,

@@ -7,7 +7,7 @@ class DictTrie: Trie<Dict.Index.Entry, DictWordData>(), Iterable<Dict.Index.Entr
     override fun createEntry(node: TrieNode<Dict.Index.Entry>, data: DictWordData): Dict.Index.Entry {
         return DictEntry(
             node,
-            data.partOfSpeech,
+            data.partOfSpeeches,
             data.indexValue,
             data.dict
         )
@@ -19,17 +19,17 @@ class DictTrie: Trie<Dict.Index.Entry, DictWordData>(), Iterable<Dict.Index.Entr
 }
 
 data class DictWordData(
-    val partOfSpeech: WordTeacherWord.PartOfSpeech,
+    val partOfSpeeches: List<WordTeacherWord.PartOfSpeech>,
     val indexValue: Any?,
     val dict: Dict
 )
 
 class DictEntry(
     var node: TrieNode<Dict.Index.Entry>,
-    partOfSpeech: WordTeacherWord.PartOfSpeech,
+    partOfSpeeches: List<WordTeacherWord.PartOfSpeech>,
     indexValue: Any?,
     dict: Dict
-) : Dict.Index.Entry(partOfSpeech, indexValue, dict) {
+) : Dict.Index.Entry(partOfSpeeches, indexValue, dict) {
     override val word: String
         get() {
             return node.calcWord()

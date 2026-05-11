@@ -400,7 +400,7 @@ open class ArticleVMImpl(
         slice: NLPSentenceSlice,
     ) {
         val resultWord = firstAnnotation?.entry?.word ?: slice.tokenString
-        val resultPartOfSpeech = firstAnnotation?.entry?.partOfSpeech ?: slice.partOfSpeech()
+        val resultPartOfSpeech = /*firstAnnotation?.entry?.partOfSpeech ?:*/ slice.partOfSpeech()
 
         definitionsVM.onWordSubmitted(
             resultWord,
