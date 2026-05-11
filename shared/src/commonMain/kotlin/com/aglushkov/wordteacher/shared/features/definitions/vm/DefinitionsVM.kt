@@ -317,17 +317,18 @@ open class DefinitionsVMImpl(
             }.collect(wordFrequency)
         }
 
-        wordRes.onLoaded(
-            block = {
-                val flattenedValue = it.map { it.second }.flatten()
-                definitionWords.update {
-                    it.toLoaded(flattenedValue).bumpVersion()
-                }
-            },
-            elseBlock = {
-                load(word)
-            },
-        )
+        load(word)
+//        wordRes.onLoaded(
+//            block = {
+//                val flattenedValue = it.map { it.second }.flatten()
+//                definitionWords.update {
+//                    it.toLoaded(flattenedValue).bumpVersion()
+//                }
+//            },
+//            elseBlock = {
+//                load(word)
+//            },
+//        )
     }
 
     private fun load(word: String) {

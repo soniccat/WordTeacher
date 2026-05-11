@@ -87,6 +87,113 @@ class DslDictTests {
                             antonyms = listOf(),
                             imageUrl = null,
                             labels = listOf(),
+                        ),
+                        WordTeacherDefinition(
+                            definitions = listOf("- ref"),
+                            examples = listOf(),
+                            synonyms = listOf(),
+                            antonyms = listOf(),
+                            imageUrl = null,
+                            labels = listOf(),
+                        ),
+                    )
+                ),
+                types = emptyList()
+            ),
+            word
+        )
+    }
+
+    @Test
+    fun testWordParsingWithExamplesWithLabelTag() = runTest {
+        val fakeFileSystem = FakeFileSystem()
+        val dirPath = "/test".toPath()
+        val dictPath = dirPath.div("dict.dsl")
+        fakeFileSystem.createDirectories(dirPath)
+        fakeFileSystem.write(dictPath, true) {
+            writeUtf8(
+                """
+                #NAME	"testname"
+                #INDEX_LANGUAGE	"English"
+                #CONTENTS_LANGUAGE	"Russian"
+
+                term1
+                	[m1][p][i]PHRASAL VERB[/i][/p][/m]
+                	[m1][trn]If you [b]help[/b] someone [b]out[/b], you help them by doing some work for them or by lending them some money.[/trn][/m]
+                	[m2][*][ex][lang id=1033]\[[i][c]V [p]P[/p] with [p]n[/c][/i][/p]\] I help out with the secretarial work...[/lang][/ex][/*][/m]
+                """.trimIndent()
+            )
+        }
+
+        val dslDict = DslDict(dictPath, fakeFileSystem)
+        dslDict.load()
+
+        val word = dslDict.define(listOf("term1")).firstOrNull()
+        assertNotNull(word)
+        assertEquals(
+            WordTeacherWord(
+                word = "term1",
+                transcriptions = emptyList(),
+                definitions = linkedMapOf(
+                    WordTeacherWord.PartOfSpeech.PhrasalVerb to listOf(
+                        WordTeacherDefinition(
+                            definitions = listOf("If you help someone out, you help them by doing some work for them or by lending them some money."),
+                            examples = listOf("[V P with n] I help out with the secretarial work..."),
+                            synonyms = listOf(),
+                            antonyms = listOf(),
+                            imageUrl = null,
+                            labels = listOf(),
+                        )
+                    )
+                ),
+                types = emptyList()
+            ),
+            word
+        )
+    }
+
+    @Test
+    fun testWordParsingOneWordWithLabel() = runTest {
+        val fakeFileSystem = FakeFileSystem()
+        val dirPath = "/test".toPath()
+        val dictPath = dirPath.div("dict.dsl")
+        fakeFileSystem.createDirectories(dirPath)
+        fakeFileSystem.write(dictPath, true) {
+            writeUtf8(
+                """
+                #NAME	"testname"
+                #INDEX_LANGUAGE	"English"
+                #CONTENTS_LANGUAGE	"Russian"
+
+                term1
+                	[m1]1) [p][i][trn]label[/i][/p] If something [b]absorbs[/b] a liquid, gas, or other substance, it soaks it up or takes it in.[/trn][/m]
+                	[m1]2) [trn]def2[/trn][/m]
+                	[m1]3) [trn]def3 [com]([i]comment3[/i])[/com][/trn][/m]
+                	[m1]4) [trn]def4[/trn][/m]
+                	[m1][*]•[/*][/m]
+                	[m1][*][ex][lang id=1033]ex1[/lang] — ex1_1[/ex][/*][/m]
+                """.trimIndent()
+            )
+        }
+
+        val dslDict = DslDict(dictPath, fakeFileSystem)
+        dslDict.load()
+
+        val word = dslDict.define(listOf("term1")).firstOrNull()
+        assertNotNull(word)
+        assertEquals(
+            WordTeacherWord(
+                word = "term1",
+                transcriptions = emptyList(),
+                definitions = linkedMapOf(
+                    WordTeacherWord.PartOfSpeech.Undefined to listOf(
+                        WordTeacherDefinition(
+                            definitions = listOf(" If something absorbs a liquid, gas, or other substance, it soaks it up or takes it in.", "def2", "def3 (comment3)", "def4"),
+                            examples = listOf("ex1 — ex1_1"),
+                            synonyms = listOf(),
+                            antonyms = listOf(),
+                            imageUrl = null,
+                            labels = listOf("label"),
                         )
                     )
                 ),
@@ -130,7 +237,7 @@ class DslDictTests {
                 word = "another term",
                 transcriptions = listOf("transcription"),
                 definitions = linkedMapOf(
-                    WordTeacherWord.PartOfSpeech.Undefined to listOf(
+                    WordTeacherWord.PartOfSpeech.PhrasalVerb to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1"),
                             examples = listOf("ex1 — ex1_1"),
@@ -195,7 +302,7 @@ class DslDictTests {
                 word = "term1",
                 transcriptions = listOf("transcription"),
                 definitions = linkedMapOf(
-                    WordTeacherWord.PartOfSpeech.Undefined to listOf(
+                    WordTeacherWord.PartOfSpeech.PhrasalVerb to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def1"),
                             examples = listOf("ex1 — ex1_1"),
@@ -215,7 +322,7 @@ class DslDictTests {
                 word = "term2",
                 transcriptions = listOf("transcription2"),
                 definitions = linkedMapOf(
-                    WordTeacherWord.PartOfSpeech.Undefined to listOf(
+                    WordTeacherWord.PartOfSpeech.Verb to listOf(
                         WordTeacherDefinition(
                             definitions = listOf("def2"),
                             examples = listOf("ex2 — ex2_2"),

@@ -184,23 +184,41 @@ class DslDict(
                         if (tag == "p") {
                             isLabel = false
                             if (label.isNotEmpty()) {
-                                wordTeacherWordBuilder.addLabel(label.toString())
-                                label.clear()
+                                if (tryToAddPartOfSpeech(label.toString().trimNonLetterNonDigit(), builder)) {
+                                    label.clear()
+                                } else {
+                                    builder.addLabel(label.toString())
+                                    label.clear()
+                                }
                             }
                         } else if (tag == "trn" || tag == "ex" || tag == "t") {
                             break
                         }
                     } else {
                         when (tag) {
-                            "trn" -> isDef = true
-                            "ex" -> isExample = true
-                            "t" -> isTranscription = true
-                            "p" -> isLabel = true
+                            "trn" -> {
+                                value.clear()
+                                isDef = true
+                            }
+                            "ex" -> {
+                                value.clear()
+                                isExample = true
+                            }
+                            "t" -> {
+                                value.clear()
+                                isTranscription = true
+                            }
+                            "p" -> {
+                                if (!isExample) {
+                                    value.clear()
+                                    isLabel = true
+                                }
+                            }
                         }
                     }
                 } else {
                     val ch = readChar()
-                    if (isLabel) {
+                    if (isLabel && !isExample) {
                         label.append(ch)
                     } else /*if (isDef || isExample || isTranscription)*/ {
                         value.append(ch)
@@ -220,21 +238,27 @@ class DslDict(
             } else if (text.lowercase().startsWith("syn")) {
                 builder.setIsSynonimsBlock(true)
             } else {
-                var isHandled = false
-
-                if (!builder.hasPartOfSpeech()) {
-                    val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(text.trimNonLetterNonDigit())
-                    if (partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined) {
-                        builder.startPartOfSpeech(partOfSpeech)
-                        isHandled = true
-                    }
-                }
-
-                if (!isHandled) {
+                val isHandled = tryToAddPartOfSpeech(text.trimNonLetterNonDigit(), builder)
+                if (!isHandled && text.trimNonLetterNonDigit().isNotEmpty()) {
                     builder.addText(text)
                 }
             }
         }
+    }
+
+    private fun tryToAddPartOfSpeech(
+        text: String,
+        builder: WordTeacherWordBuilder,
+    ): Boolean {
+        if (!builder.hasPartOfSpeech()) {
+            val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(text.trimNonLetterNonDigit())
+            if (partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined) {
+                builder.startPartOfSpeech(partOfSpeech)
+                return true
+            }
+        }
+
+        return false
     }
 
     private fun StringReader.readTag(isClose: Boolean): String? {
