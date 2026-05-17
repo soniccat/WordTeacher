@@ -1,6 +1,10 @@
 package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.serialization.EnumAsIntSerializer
+import com.aglushkov.wordteacher.shared.model.label_map.collinsCobuildLabelMap
+import com.aglushkov.wordteacher.shared.model.label_map.collinsCobuildLabelToPartOfSpeechMap
+import com.aglushkov.wordteacher.shared.model.label_map.labelMap
+import com.aglushkov.wordteacher.shared.model.label_map.labelToPartOfSpeechMap
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.repository.config.Config
@@ -89,8 +93,9 @@ class WordTeacherWordBuilder {
     }
 
     fun addLabel(label: String) {
-        if (labels.indexOf(label) == -1) {
-            labels.add(label)
+        val correctedLabel = labelMap[label] ?: label
+        if (labels.indexOf(correctedLabel) == -1) {
+            labels.add(correctedLabel)
         }
     }
 
@@ -106,7 +111,7 @@ class WordTeacherWordBuilder {
         partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined
 
     fun addDefinition(def: String): WordTeacherWordBuilder {
-        if (definitions.isNotEmpty() && (examples.isNotEmpty() || synonyms.isNotEmpty())) {
+        if (definitions.isNotEmpty()) {
             addWordDefinition()
         }
 
@@ -208,8 +213,13 @@ fun partOfSpeechEnum(it: String?) = if (it == null) {
     }
 }
 
+
 fun WordTeacherWord.PartOfSpeech.Companion.fromString(string: String?): WordTeacherWord.PartOfSpeech {
     val res = string?.lowercase() ?: "null"
+    labelToPartOfSpeechMap[string]?.let {
+        return it
+    }
+
     return when {
         res == "pronoun" -> WordTeacherWord.PartOfSpeech.Pronoun
         res == "preposition" -> WordTeacherWord.PartOfSpeech.Preposition
@@ -220,11 +230,7 @@ fun WordTeacherWord.PartOfSpeech.Companion.fromString(string: String?): WordTeac
         res == "abbreviation" -> WordTeacherWord.PartOfSpeech.Abbreviation
         res == "determiner" -> WordTeacherWord.PartOfSpeech.Determiner
         res == "exclamation" -> WordTeacherWord.PartOfSpeech.Exclamation
-        res == "фраз. гл" ||
-                res == "phrasal verb" -> WordTeacherWord.PartOfSpeech.PhrasalVerb
-        res == "n-count" ||
-                res == "n-uncount" ||
-                res == "n-sing" -> WordTeacherWord.PartOfSpeech.Noun
+        res == "phrasal verb" -> WordTeacherWord.PartOfSpeech.PhrasalVerb
         res.contains("noun") -> WordTeacherWord.PartOfSpeech.Noun
         res.contains("verb") -> WordTeacherWord.PartOfSpeech.Verb
         res.contains("adverb") -> WordTeacherWord.PartOfSpeech.Adverb
