@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.model
 
+import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
 import com.aglushkov.wordteacher.shared.general.serialization.EnumAsIntSerializer
 import com.aglushkov.wordteacher.shared.model.label_map.collinsCobuildLabelMap
 import com.aglushkov.wordteacher.shared.model.label_map.collinsCobuildLabelToPartOfSpeechMap
@@ -93,7 +94,8 @@ class WordTeacherWordBuilder {
     }
 
     fun addLabel(label: String) {
-        val correctedLabel = labelMap[label] ?: label
+        val modifiedLabel = label.lowercase().trimNonLetterNonDigit()
+        val correctedLabel = labelMap[modifiedLabel] ?: modifiedLabel
         if (labels.indexOf(correctedLabel) == -1) {
             labels.add(correctedLabel)
         }
@@ -215,8 +217,8 @@ fun partOfSpeechEnum(it: String?) = if (it == null) {
 
 
 fun WordTeacherWord.PartOfSpeech.Companion.fromString(string: String?): WordTeacherWord.PartOfSpeech {
-    val res = string?.lowercase() ?: "null"
-    labelToPartOfSpeechMap[string]?.let {
+    val res = string?.lowercase()?.trimNonLetterNonDigit() ?: "null"
+    labelToPartOfSpeechMap[res]?.let {
         return it
     }
 

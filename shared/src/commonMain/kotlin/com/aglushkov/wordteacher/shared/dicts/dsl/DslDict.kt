@@ -244,7 +244,7 @@ class DslDict(
         text: String,
         builder: WordTeacherWordBuilder,
     ): Boolean {
-        val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(text.trimNonLetterNonDigit())
+        val partOfSpeech = WordTeacherWord.PartOfSpeech.fromString(text)
         if (partOfSpeech != WordTeacherWord.PartOfSpeech.Undefined) {
             builder.startPartOfSpeech(partOfSpeech)
             return true

@@ -154,24 +154,17 @@ class WordDefinitionRepository(
             send(Resource.Loading(version = version))
             Logger.v("send Loading", tag)
 
+            val lemmatizer = nlpCore.waitUntilLemmatizerInitialized()
             for (service in services) {
-                val lemmatizer = if (service.type == Config.Type.Local || service.type == Config.Type.WordTeacher) {
-                    nlpCore.waitUntilLemmatizerInitialized()
-                } else {
-                    null
-                }
-
                 // launch instead of async/await to get results as soon as possible in a completion order
                 val job = launch(CoroutineExceptionHandler { _, throwable ->
                     Logger.e("loadDefinitionsFlow Exception: " + throwable.message, service.type.toString())
                 }) {
                     val wordsToDefine = mutableListOf(word)
-                    if (lemmatizer != null) {
-                        val lemmas = withContext(Dispatchers.Default) {
-                            lemmatizer.allLemmas(word)
-                        }
-                        wordsToDefine.addAll(lemmas)
+                    val lemmas = withContext(Dispatchers.Default) {
+                        lemmatizer.allLemmas(word)
                     }
+                    wordsToDefine.addAll(lemmas)
                     words.add(service to service.define(wordsToDefine))
                     send(Resource.Loading(words.toList(), version = version))
                 }

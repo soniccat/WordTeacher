@@ -17,10 +17,10 @@ data class Config(
 ) {
 
     @Serializable
-    enum class Type {
-        @SerialName("yandex") Yandex,
-        @SerialName("wordteacher") WordTeacher,
-        @SerialName("local") Local
+    enum class Type(val name: String) {
+        @SerialName("yandex") Yandex("yandex"),
+        @SerialName("wordteacher") WordTeacher("Word Teacher"),
+        @SerialName("local") Local ("local")
     }
 }
 
