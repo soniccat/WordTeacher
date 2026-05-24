@@ -6,7 +6,6 @@ import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.events.FocusViewItemEvent
 import com.aglushkov.wordteacher.shared.events.ScrollViewItemEvent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
-import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM.Features
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.*
@@ -203,7 +202,7 @@ open class CardSetVMImpl(
             val gradationLevelAndRatio = frequencyGradation?.gradationLevelAndRatio(card.termFrequency)
             cardViewItems += WordTitleViewItem(
                 card.term,
-                providers = emptyList(),
+                sourceNames = emptyList(),
                 cardId = card.id,
                 frequencyLevelAndRatio = gradationLevelAndRatio,
             )

@@ -95,6 +95,7 @@ class DslDict(
 
                             val (readBytes, nl) = readWord(wordTeacherWordBuilder)
                             val word = wordTeacherWordBuilder.build()
+                            wordTeacherWordBuilder.addSourceName(name)
 
                             if (word?.definitions?.isNotEmpty() == true) {
                                 val partOfSpeeches = word.definitions.map { it.key }
@@ -127,6 +128,7 @@ class DslDict(
         return withContext(Dispatchers.IO) {
             val builder = WordTeacherWordBuilder()
             builder.setWord(indexEntry.word)
+            builder.addSourceName(name)
 
             val pos = indexEntry.indexValue as Int
             fileSystem.read(path) {
@@ -181,8 +183,11 @@ class DslDict(
                                 if (tryToAddPartOfSpeech(label.toString().trimNonLetterNonDigit(), builder)) {
                                     label.clear()
                                 } else {
-                                    builder.addLabel(label.toString())
-                                    label.clear()
+                                    val l = label.toString().lowercase().trimNonLetterNonDigit()
+                                    if (l.isNotEmpty()) {
+                                        builder.addLabel(l)
+                                        label.clear()
+                                    }
                                 }
                             }
                         } else if (tag == "trn" || tag == "ex" || tag == "t") {
@@ -226,15 +231,21 @@ class DslDict(
             if (isTranscription) {
                 builder.setTranscription(text)
             } else if (isDef) {
-                builder.addDefinition(text)
+                if (text.hasLetters()) {
+                    builder.addDefinition(text.dictTrim())
+                }
             } else if(isExample) {
-                builder.addExample(text)
+                if (text.hasLetters()) {
+                    builder.addExample(text.dictTrim())
+                }
             } else if (text.lowercase().startsWith("syn")) {
                 builder.setIsSynonimsBlock(true)
             } else {
                 val isHandled = tryToAddPartOfSpeech(text.trimNonLetterNonDigit(), builder)
                 if (!isHandled && text.trimNonLetterNonDigit().isNotEmpty()) {
-                    builder.addText(text)
+                    if (text.hasLetters()) {
+                        builder.addText(text.dictTrim())
+                    }
                 }
             }
         }
@@ -293,6 +304,21 @@ class DslDict(
             }
         }
     }
+}
+
+fun String.dictTrim(): String {
+    val trimmed = trim()
+    return if (trimmed.startsWith("- ")) {
+        trimmed.substring(2)
+    } else if (trimmed.startsWith("-")) {
+        trimmed.substring(1)
+    } else {
+        trimmed
+    }
+}
+
+fun String.hasLetters(): Boolean {
+    return trim { !it.isLetter() }.isNotEmpty()
 }
 
 private const val DSL_INDEX_SUFFIX = "_index"

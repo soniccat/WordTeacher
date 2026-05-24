@@ -31,17 +31,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aglushkov.wordteacher.shared.features.cardset_json_import.views.CardSetJsonImportUI
-import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJsonImportVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
-import com.aglushkov.wordteacher.shared.general.resource.isNotLoading
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
 import com.aglushkov.wordteacher.shared.general.views.ListSectionCell
@@ -691,9 +687,9 @@ fun WordTitleView(
             )
     ) {
         textContent(viewItem.firstItem(), textStyle)
-        if (viewItem.providers.isNotEmpty()) {
+        if (viewItem.sourceNames.isNotEmpty()) {
             Text(
-                text = MR.strings.word_providedBy_template.format(viewItem.providers.joinToString()).localized(),
+                text = MR.strings.word_providedBy_template.format(viewItem.sourceNames.joinToString()).localized(),
                 modifier = Modifier.width(IntrinsicSize.Min),
                 textAlign = TextAlign.End,
                 style = LocalAppTypography.current.wordDefinitionProvidedBy

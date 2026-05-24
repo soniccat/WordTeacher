@@ -39,5 +39,6 @@ fun YandexWord.asWordTeacherWord(): WordTeacherWord? {
     return WordTeacherWord(text,
             transcription?.let { listOf(it) } ?: emptyList(),
             map,
-            listOf(Config.Type.Yandex))
+            listOf("Yandex"),
+    )
 }

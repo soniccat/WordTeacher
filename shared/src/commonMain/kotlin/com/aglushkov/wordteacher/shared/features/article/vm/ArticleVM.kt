@@ -42,8 +42,6 @@ import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlin.collections.orEmpty
 
 interface ArticleVM: Clearable {
@@ -400,16 +398,18 @@ open class ArticleVMImpl(
         slice: NLPSentenceSlice,
     ) {
         val resultWord = firstAnnotation?.entry?.word ?: slice.tokenString
-        val resultPartOfSpeech = /*firstAnnotation?.entry?.partOfSpeech ?:*/ slice.partOfSpeech()
+        val resultPartOfSpeeches = firstAnnotation?.entry?.partOfSpeeches ?: listOf(slice.partOfSpeech())
 
         definitionsVM.onWordSubmitted(
             resultWord,
-            resultPartOfSpeech.toPartsOfSpeechFilter(),
+            resultPartOfSpeeches.toPartsOfSpeechFilter(),
             DefinitionsContext(
                 wordContexts = mapOf(
-                    resultPartOfSpeech to DefinitionsWordContext(
-                        examples = listOf(sentence.text)
-                    )
+                    *resultPartOfSpeeches.map {
+                        it to DefinitionsWordContext(
+                            examples = listOf(sentence.text)
+                        )
+                    }.toTypedArray()
                 )
             )
         )

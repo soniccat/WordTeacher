@@ -33,12 +33,12 @@ private fun DefinitionsUIPreviewWithResponse() {
                         WordDividerViewItem(),
                         WordTitleViewItem(
                             title = "Word",
-                            providers = listOf(Config.Type.Yandex),
+                            sourceNames = listOf("Yandex"),
                             frequencyLevelAndRatio = WordFrequencyLevelAndRatio(2, 0.5f)
                         ),
                         WordTitleViewItem(
                             title = "Word 2",
-                            providers = listOf(Config.Type.Yandex, Config.Type.WordTeacher, Config.Type.Local),
+                            sourceNames = listOf("Yandex", "Word Teacher"),
                             frequencyLevelAndRatio = WordFrequencyLevelAndRatio(0, 0.1f),
                         ),
                         WordTranscriptionViewItem("[omg]"),

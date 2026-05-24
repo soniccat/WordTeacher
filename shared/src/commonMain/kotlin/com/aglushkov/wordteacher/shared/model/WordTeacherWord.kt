@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
+import com.aglushkov.wordteacher.shared.general.extensions.unbreakable
 import com.aglushkov.wordteacher.shared.general.serialization.EnumAsIntSerializer
 import com.aglushkov.wordteacher.shared.model.label_map.collinsCobuildLabelMap
 import com.aglushkov.wordteacher.shared.model.label_map.collinsCobuildLabelToPartOfSpeechMap
@@ -13,13 +14,14 @@ import com.aglushkov.wordteacher.shared.res.MR
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlin.collections.mutableListOf
 
 @Serializable
 data class WordTeacherWord(
     @SerialName("term") val word: String,
     @SerialName("transcriptions") val transcriptions: List<String>?,
     @SerialName("definitions") val definitions: LinkedHashMap<PartOfSpeech, List<WordTeacherDefinition>>,
-    @Transient val types: List<Config.Type> = emptyList(),
+    @Transient val sourceNames: List<String> = emptyList(),
     @SerialName("audioFiles") val audioFiles: List<AudioFile> = emptyList(),
 ) {
     @Serializable
@@ -60,9 +62,9 @@ data class WordTeacherWord(
 
 class WordTeacherWordBuilder {
     private var word: String = ""
+    private var sourceNames = mutableListOf<String>()
     private var transcriptions = mutableListOf<String>()
     private var wordDefinitions = mutableMapOf<WordTeacherWord.PartOfSpeech, MutableList<WordTeacherDefinition>>()
-    private var types = mutableListOf<Config.Type>()
 
     // current def
     private var partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined
@@ -79,6 +81,11 @@ class WordTeacherWordBuilder {
         return this
     }
 
+    fun addSourceName(n: String): WordTeacherWordBuilder {
+        sourceNames.add(n.unbreakable())
+        return this
+    }
+
     fun setTranscription(v: String): WordTeacherWordBuilder {
         transcriptions = mutableListOf(v)
         return this
@@ -89,13 +96,8 @@ class WordTeacherWordBuilder {
         return this
     }
 
-    fun addType(type: Config.Type) {
-        types.add(type)
-    }
-
     fun addLabel(label: String) {
-        val modifiedLabel = label.lowercase().trimNonLetterNonDigit()
-        val correctedLabel = labelMap[modifiedLabel] ?: modifiedLabel
+        val correctedLabel = labelMap[label] ?: label
         if (labels.indexOf(correctedLabel) == -1) {
             labels.add(correctedLabel)
         }
@@ -116,6 +118,13 @@ class WordTeacherWordBuilder {
         if (definitions.isNotEmpty()) {
             addWordDefinition()
         }
+
+//        val oldFashionedLabel = "[OLD-FASHIONED]"
+//        val embeddedLabelIndex = resDef.indexOf(oldFashionedLabel)
+//        if (embeddedLabelIndex != -1) {
+//            resDef = resDef.removeRange(embeddedLabelIndex, embeddedLabelIndex + oldFashionedLabel.length)
+//            addLabel("old-fashioned")
+//        }
 
         definitions.add(def)
         return this
@@ -182,7 +191,7 @@ class WordTeacherWordBuilder {
         word = ""
         transcriptions.clear()
         wordDefinitions.clear()
-        types.clear()
+        sourceNames.clear()
         partOfSpeech = WordTeacherWord.PartOfSpeech.Undefined
         clearWordDefinition()
     }
@@ -197,7 +206,7 @@ class WordTeacherWordBuilder {
                 word,
                 transcriptions,
                 LinkedHashMap(wordDefinitions),
-                types.toList()
+                sourceNames.toList()
             )
         } else {
             null

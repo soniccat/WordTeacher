@@ -13,13 +13,13 @@ class WordViewItem(word: WordTeacherWord): BaseViewItem<WordTeacherWord>(word, T
     }
 }
 
-class WordTitleViewItem(title: String, val providers: List<Config.Type>, val cardId: Long = -1, val frequencyLevelAndRatio: WordFrequencyLevelAndRatio?): BaseViewItem<String>(title, Type) {
+class WordTitleViewItem(title: String, val sourceNames: List<String>, val cardId: Long = -1, val frequencyLevelAndRatio: WordFrequencyLevelAndRatio?): BaseViewItem<String>(title, Type) {
     companion object {
         const val Type = 101
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        return super.equalsByContent(other) && providers == (other as WordTitleViewItem).providers && frequencyLevelAndRatio == other.frequencyLevelAndRatio
+        return super.equalsByContent(other) && sourceNames == (other as WordTitleViewItem).sourceNames && frequencyLevelAndRatio == other.frequencyLevelAndRatio
     }
 }
 

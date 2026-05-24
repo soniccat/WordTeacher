@@ -1,5 +1,7 @@
 package com.aglushkov.wordteacher.shared.dicts
 
+import com.aglushkov.wordteacher.shared.general.extensions.replaceFirstToCapital
+import com.aglushkov.wordteacher.shared.general.extensions.replaceFirstToLowerCase
 import com.aglushkov.wordteacher.shared.repository.dict.DictTrie
 import java.util.Locale
 
@@ -11,7 +13,13 @@ interface DictTrieIndex: Dict.Index {
     }
 
     override fun indexEntry(word: String): Dict.Index.Entry? {
-        return index.word(word).firstOrNull()
+        return index.word(word).firstOrNull() ?: run {
+            if (word.firstOrNull() != word.firstOrNull()?.lowercaseChar()) {
+                index.word(word.lowercase()).firstOrNull()
+            } else {
+                null
+            }
+        }
     }
 
     override fun entriesStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {

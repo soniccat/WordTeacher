@@ -118,6 +118,10 @@ interface DefinitionsVM: Clearable {
     )
 }
 
+fun List<WordTeacherWord.PartOfSpeech>.toPartsOfSpeechFilter(): List<WordTeacherWord.PartOfSpeech> {
+    return map { it.toPartsOfSpeechFilter() }.flatten().toSet().toList()
+}
+
 fun WordTeacherWord.PartOfSpeech.toPartsOfSpeechFilter(): List<WordTeacherWord.PartOfSpeech> {
     return when(this) {
         // undefined to show dict results
@@ -180,7 +184,7 @@ open class DefinitionsVMImpl(
                 buildViewItems(
                     wordDefinitions.data().orEmpty(),
                     displayModes.getOrNull(displayModeIndex) ?: DefinitionsDisplayMode.BySource,
-                    partOfSpeechFilter,
+                    partOfSpeechFilter.toSet(),
                     wordDefinitions.isLoading(),
                     wordFrequencyLevelAndRatio
                 )
@@ -358,15 +362,23 @@ open class DefinitionsVMImpl(
     private fun buildViewItems(
         words: List<WordTeacherWord>,
         displayMode: DefinitionsDisplayMode,
-        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+        partsOfSpeechFilter: Set<WordTeacherWord.PartOfSpeech>,
         isLoading: Boolean,
         wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ): List<BaseViewItem<*>> {
+        val resutPartOfSpeechFilter = if (words.firstOrNull {
+            it.definitions.keys.any { partsOfSpeechFilter.contains(it) }
+        } != null) {
+            partsOfSpeechFilter
+        } else {
+            emptySet()
+        }
+
         val items = mutableListOf<BaseViewItem<*>>()
         if (words.isNotEmpty()) {
             items.add(DefinitionsDisplayModeViewItem(
                 getPartOfSpeechChipText(partsOfSpeechFilter),
-                partsOfSpeechFilter.isNotEmpty(),
+                resutPartOfSpeechFilter.isNotEmpty(),
                 displayModes,
                 displayModes.indexOf(displayMode)
             ))
@@ -374,8 +386,8 @@ open class DefinitionsVMImpl(
         }
 
         when (displayMode) {
-            DefinitionsDisplayMode.Merged -> addMergedWords(words, partsOfSpeechFilter, items, wordFrequencyLevelAndRatio)
-            else -> addWordsGroupedBySource(words, partsOfSpeechFilter, items, wordFrequencyLevelAndRatio)
+            DefinitionsDisplayMode.Merged -> addMergedWords(words, resutPartOfSpeechFilter, items, wordFrequencyLevelAndRatio)
+            else -> addWordsGroupedBySource(words, resutPartOfSpeechFilter, items, wordFrequencyLevelAndRatio)
         }
 
         if (items.isNotEmpty() && isLoading) {
@@ -387,7 +399,7 @@ open class DefinitionsVMImpl(
     }
 
     private fun getPartOfSpeechChipText(
-        partOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+        partOfSpeechFilter: Set<WordTeacherWord.PartOfSpeech>,
     ): StringDesc {
         return if (partOfSpeechFilter.isEmpty()) {
             StringDesc.Resource(MR.strings.definitions_add_filter)
@@ -403,7 +415,7 @@ open class DefinitionsVMImpl(
 
     private fun addMergedWords(
         words: List<WordTeacherWord>,
-        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+        partsOfSpeechFilter: Set<WordTeacherWord.PartOfSpeech>,
         items: MutableList<BaseViewItem<*>>,
         wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ) {
@@ -426,7 +438,7 @@ open class DefinitionsVMImpl(
 
     private fun addWordsGroupedBySource(
         words: List<WordTeacherWord>,
-        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+        partsOfSpeechFilter: Set<WordTeacherWord.PartOfSpeech>,
         items: MutableList<BaseViewItem<*>>,
         wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ) {
@@ -447,7 +459,7 @@ open class DefinitionsVMImpl(
 
     private fun addWordViewItems(
         word: WordTeacherWord,
-        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>,
+        partsOfSpeechFilter: Set<WordTeacherWord.PartOfSpeech>,
         items: MutableList<BaseViewItem<*>>,
         wordFrequencyLevelAndRatio: WordFrequencyLevelAndRatio?,
     ): Boolean {
@@ -499,7 +511,7 @@ open class DefinitionsVMImpl(
 
         val hasNewItems = items.size - topIndex > 0
         if (hasNewItems) {
-            items.add(topIndex, WordTitleViewItem(word.word, word.types, frequencyLevelAndRatio = wordFrequencyLevelAndRatio))
+            items.add(topIndex, WordTitleViewItem(word.word, word.sourceNames, frequencyLevelAndRatio = wordFrequencyLevelAndRatio))
             var insertIndex = topIndex + 1
             if (word.transcriptions?.isNotEmpty() == true) {
                 items.add(insertIndex, WordTranscriptionViewItem(word.transcriptions.joinToString(", ")))
@@ -517,13 +529,13 @@ open class DefinitionsVMImpl(
 
     private fun mergeWords(
         words: List<WordTeacherWord>,
-        partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech>
+        partsOfSpeechFilter: Set<WordTeacherWord.PartOfSpeech>
     ): WordTeacherWord {
         val allWords = mutableListOf<String>()
         val allTranscriptions = mutableListOf<String>()
         val allAudioFiles = mutableListOf<WordTeacherWord.AudioFile>()
         val allDefinitions = LinkedHashMap<WordTeacherWord.PartOfSpeech, List<WordTeacherDefinition>>()
-        val allTypes = mutableListOf<Config.Type>()
+        val sourceNames = mutableListOf<String>()
 
         words.forEach {
             if (!allWords.contains(it.word)) {
@@ -555,9 +567,9 @@ open class DefinitionsVMImpl(
                 list.addAll(originalDefs)
             }
 
-            for (type in it.types) {
-                if (!allTypes.contains(type)) {
-                    allTypes.add(type)
+            for (n in it.sourceNames) {
+                if (!sourceNames.contains(n)) {
+                    sourceNames.add(n)
                 }
             }
         }
@@ -566,7 +578,7 @@ open class DefinitionsVMImpl(
             allWords.joinToString(),
             allTranscriptions,
             allDefinitions,
-            allTypes,
+            sourceNames,
             allAudioFiles)
     }
 

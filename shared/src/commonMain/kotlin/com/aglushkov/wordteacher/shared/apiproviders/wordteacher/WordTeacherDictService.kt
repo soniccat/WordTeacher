@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.apiproviders.WordServiceLogger
 import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.Response
+import com.aglushkov.wordteacher.shared.general.extensions.unbreakable
 import com.aglushkov.wordteacher.shared.general.getUserAgent
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
@@ -108,7 +109,9 @@ data class WordTeacherDictWord(
                     )
                 }
             },
-            types = listOf(Config.Type.WordTeacher), // TODO: provide type from backend ("Wiktionary")
+            sourceNames = listOf(
+                "Word Teacher".unbreakable()
+            ), // TODO: provide type from backend ("Wiktionary")
             audioFiles = audioFiles.map {
                 WordTeacherWord.AudioFile(
                     url = it.url,
