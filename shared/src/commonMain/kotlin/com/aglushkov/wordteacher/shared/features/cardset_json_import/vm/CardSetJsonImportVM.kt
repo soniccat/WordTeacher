@@ -109,6 +109,7 @@ data class ImportCardSet (
                 creationId = Uuid.randomUUID().toString(),
                 termFrequency = UNDEFINED_FREQUENCY,
                 audioFiles = it.audioFiles.orEmpty(),
+                antonyms = it.antonyms.orEmpty()
             )
         },
         terms = listOf(),
@@ -126,6 +127,7 @@ data class ImportCard (
     var labels: List<String>?,
     override var transcriptions: List<String>?,
     var synonyms: List<String>?,
+    var antonyms: List<String>?,
     override var examples: List<String>?,
     override var audioFiles: List<WordTeacherWord.AudioFile>?,
 ) : CardEnricher.Target

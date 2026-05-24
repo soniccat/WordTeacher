@@ -101,11 +101,11 @@ func (h *Handler) WordTextSearch(w http.ResponseWriter, r *http.Request) {
 
 				if len(apiDefEntry.Examples) > 0 {
 					apiDefEntry.Antonyms = defEntry.Antonyms
+					apiDefEntry.Synonyms = defEntry.Synonyms
 					apiDefEntry.Definition = api_dict_v2.Definition{
 						Value:  defEntry.Def.Value,
 						Labels: defEntry.Def.Labels,
 					}
-					apiDefEntry.Synonyms = defEntry.Synonyms
 
 					apiDefPair.DefEntries = append(apiDefPair.DefEntries, apiDefEntry)
 					apiDefPair.PartOfSpeech = api.PartOfSpeechFromString(defPair.PartOfSpeech)

@@ -49,6 +49,7 @@ func (suite *CardSetTestSuite) TestCreateCardSet() {
 				PartOfSpeech:   api.Adverb,
 				Definitions:    []string{"testDef1", "testDef2"},
 				Synonyms:       []string{"testSyn1", "testSyn2"},
+				Antonyms:       []string{"testAnt1", "testAnt2"},
 				Examples:       []string{"testEx1", "testEx2"},
 				DefinitionTermSpans: [][]api.Span{
 					{{1, 2}, {3, 4}},
@@ -93,6 +94,7 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 				PartOfSpeech:   api.Adverb,
 				Definitions:    []string{"testDef1", "testDef2"},
 				Synonyms:       []string{"testSyn1", "testSyn2"},
+				Antonyms:       []string{"testAnt1", "testAnt2"},
 				Examples:       []string{"testEx1", "testEx2"},
 				DefinitionTermSpans: [][]api.Span{
 					{{1, 2}, {3, 4}},
@@ -125,6 +127,7 @@ func (suite *CardSetTestSuite) TestUpdateCardSetWithNewCard() {
 			PartOfSpeech:   api.Adverb,
 			Definitions:    []string{"testDef3", "testDef4"},
 			Synonyms:       []string{"testSyn3", "testSyn4"},
+			Antonyms:       []string{"testAnt1", "testAnt2"},
 			Examples:       []string{"testEx3", "testEx4"},
 			DefinitionTermSpans: [][]api.Span{
 				{{10, 20}, {3, 4}},
@@ -161,9 +164,10 @@ func (suite *CardSetTestSuite) TestGetTags() {
 				ModificationDate: "2022-11-03T17:30:02Z",
 			},
 		},
-		CreationDate:     "2022-11-03T17:30:02Z",
-		ModificationDate: "2022-11-03T17:30:02Z",
-		CreationId:       "bf3d4938-3568-4da7-81ad-a2342745adee",
+		CreationDate:        "2022-11-03T17:30:02Z",
+		ModificationDate:    "2022-11-03T17:30:02Z",
+		CreationId:          "bf3d4938-3568-4da7-81ad-a2342745adee",
+		IsAvailableInSearch: true,
 	}
 	cardSet2 := &api.CardSet{
 		Name: "testCardSet",
@@ -176,9 +180,10 @@ func (suite *CardSetTestSuite) TestGetTags() {
 				ModificationDate: "2022-11-03T17:30:02Z",
 			},
 		},
-		CreationDate:     "2022-11-03T17:30:02Z",
-		ModificationDate: "2022-11-03T17:30:02Z",
-		CreationId:       "bf3d4938-3568-4da7-81ad-a2342745adee",
+		CreationDate:        "2022-11-03T17:30:02Z",
+		ModificationDate:    "2022-11-03T17:30:02Z",
+		CreationId:          "bf3d4938-3568-4da7-81ad-a2342745adee",
+		IsAvailableInSearch: true,
 	}
 	ownerId := primitive.NewObjectID().Hex()
 
@@ -191,9 +196,9 @@ func (suite *CardSetTestSuite) TestGetTags() {
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), 2, len(tagCount))
 	assert.Equal(suite.T(), "tag2", tagCount[0].Name)
-	assert.Equal(suite.T(), 2, tagCount[0].Count)
+	assert.Equal(suite.T(), int64(2), tagCount[0].Count)
 	assert.Equal(suite.T(), "tag1", tagCount[1].Name)
-	assert.Equal(suite.T(), 1, tagCount[1].Count)
+	assert.Equal(suite.T(), int64(1), tagCount[1].Count)
 }
 
 func TestCardSetTestSuite(t *testing.T) {

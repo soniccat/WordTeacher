@@ -103,10 +103,12 @@ func (cs *DbCardSet) ToApi() *api.CardSet {
 
 func (cs *DbCardSet) ToGrpc() *cardsetsgrpc.CardSet {
 	return &cardsetsgrpc.CardSet{
-		Id:               cs.Id.Hex(),
-		Name:             cs.Name,
-		Tags:             cs.Tags,
-		Cards:            tools.Map(cs.Cards, func(cardDb *DbCard) *cardsetsgrpc.Card { return cardDb.ToGrpc() }),
+		Id:   cs.Id.Hex(),
+		Name: cs.Name,
+		Tags: cs.Tags,
+		Cards: tools.Map(cs.Cards, func(cardDb *DbCard) *cardsetsgrpc.Card {
+			return cardDb.ToGrpc()
+		}),
 		UserId:           cs.UserId.Hex(),
 		CreationDate:     tools.DbDateToApiDate(cs.CreationDate),
 		ModificationDate: tools.DbDateToApiDate(cs.ModificationDate),

@@ -3,13 +3,10 @@ package com.aglushkov.wordteacher.shared.model
 import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
 import com.aglushkov.wordteacher.shared.general.extensions.unbreakable
 import com.aglushkov.wordteacher.shared.general.serialization.EnumAsIntSerializer
-import com.aglushkov.wordteacher.shared.model.label_map.collinsCobuildLabelMap
-import com.aglushkov.wordteacher.shared.model.label_map.collinsCobuildLabelToPartOfSpeechMap
 import com.aglushkov.wordteacher.shared.model.label_map.labelMap
 import com.aglushkov.wordteacher.shared.model.label_map.labelToPartOfSpeechMap
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.res.MR
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -74,7 +71,8 @@ class WordTeacherWordBuilder {
     private var antonyms = mutableListOf<String>()
     private var imageUrl: String? = null
     private var labels = mutableListOf<String>()
-    private var isSynonimsBlock = false
+    private var isSynonymsBlock = false
+    private var isAntonymsBlock = false
 
     fun setWord(v: String): WordTeacherWordBuilder {
         word = v
@@ -140,13 +138,24 @@ class WordTeacherWordBuilder {
         return this
     }
 
-    fun setIsSynonimsBlock(isSynonimsBlock: Boolean) {
-        this.isSynonimsBlock = isSynonimsBlock
+    fun addAntonym(ant: String): WordTeacherWordBuilder {
+        antonyms.add(ant)
+        return this
+    }
+
+    fun setIsSynonymsBlock(isSynonimsBlock: Boolean) {
+        this.isSynonymsBlock = isSynonimsBlock
+    }
+
+    fun setIsAntonymsBlock(isAntonymsBlock: Boolean) {
+        this.isAntonymsBlock = isAntonymsBlock
     }
 
     fun addText(text: String): WordTeacherWordBuilder {
-        if (isSynonimsBlock) {
+        if (isSynonymsBlock) {
             addSynonym(text)
+        } else if (isAntonymsBlock) {
+            addAntonym(text)
         } else {
             addDefinition(text)
         }
@@ -184,7 +193,8 @@ class WordTeacherWordBuilder {
         antonyms.clear()
         imageUrl = null
         labels.clear()
-        isSynonimsBlock = false
+        isSynonymsBlock = false
+        isAntonymsBlock = false
     }
 
     fun clear() {

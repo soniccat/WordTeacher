@@ -48,6 +48,7 @@ interface CardSetVM: Clearable {
     fun onAddExamplePressed(cardId: Long)
     fun onExampleRemoved(item: WordExampleViewItem, cardId: Long)
     fun onAddSynonymPressed(cardId: Long)
+    fun onAddAntonymPressed(cardId: Long)
     fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long)
     fun onBackPressed()
     fun onTryAgainClicked()
@@ -622,6 +623,21 @@ open class CardSetVMImpl(
         }
     }
 
+    override fun onAddAntonymPressed(cardId: Long) {
+        logAdd(ItemType.Antonym)
+        pendingEvents.add(PendingEvent.FocusLast(FocusLastType.Antonym, cardId))
+        pendingEvents.add(PendingEvent.ScrollToLast(FocusLastType.Antonym, cardId))
+        editCard(cardId) {
+            it.copy(
+                synonyms = if (it.antonyms.lastOrNull() != "") {
+                    it.antonyms + ""
+                } else {
+                    it.antonyms
+                },
+            )
+        }
+    }
+
     override fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long) {
         logRemove(ItemType.Synonym)
         editCard(cardId) {
@@ -767,7 +783,8 @@ open class CardSetVMImpl(
         Definition,
         Label,
         Example,
-        Synonym
+        Synonym,
+        Antonym
     }
 
     enum class ItemType(val value: String) {
@@ -777,6 +794,7 @@ open class CardSetVMImpl(
         Definition("definition"),
         Example("example"),
         Synonym("synonym"),
+        Antonym("antonym"),
     }
 
     sealed class PendingEvent(var isHandled: Boolean = false) {

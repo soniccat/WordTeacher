@@ -113,7 +113,8 @@ class WordSubHeaderViewItem(
     enum class ContentType {
         UNKNOWN,
         SYNONYMS,
-        EXAMPLES
+        EXAMPLES,
+        ANTONYMS,
     }
 }
 

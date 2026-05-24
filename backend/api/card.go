@@ -28,6 +28,7 @@ type Card struct {
 	Definitions                 []string      `json:"definitions"`
 	Labels                      []string      `json:"labels"`
 	Synonyms                    []string      `json:"synonyms"`
+	Antonyms                    []string      `json:"antonyms"`
 	Examples                    []string      `json:"examples"`
 	DefinitionTermSpans         [][]Span      `json:"definitionTermSpans"`
 	ExampleTermSpans            [][]Span      `json:"exampleTermSpans"`
@@ -51,6 +52,7 @@ func (c *Card) WithoutIds() *Card {
 		Definitions:                 c.Definitions,
 		Labels:                      c.Labels,
 		Synonyms:                    c.Synonyms,
+		Antonyms:                    c.Antonyms,
 		Examples:                    c.Examples,
 		DefinitionTermSpans:         c.DefinitionTermSpans,
 		ExampleTermSpans:            c.ExampleTermSpans,

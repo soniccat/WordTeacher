@@ -2,13 +2,10 @@ package com.aglushkov.wordteacher.shared.dicts.dsl
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.Language
-import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.StringReader
 import com.aglushkov.wordteacher.shared.general.UNICODE_INVISIBLE_SPACE
-import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
 import com.aglushkov.wordteacher.shared.general.okio.newLineSize
-import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.WordTeacherWordBuilder
 import com.aglushkov.wordteacher.shared.model.fromString
@@ -238,8 +235,10 @@ class DslDict(
                 if (text.hasLetters()) {
                     builder.addExample(text.dictTrim())
                 }
-            } else if (text.lowercase().startsWith("syn")) {
-                builder.setIsSynonimsBlock(true)
+            } else if (text.lowercase().trimNonLetterNonDigit() == "syn") {
+                builder.setIsSynonymsBlock(true)
+            } else if (text.lowercase().trimNonLetterNonDigit() == "ant") {
+                builder.setIsAntonymsBlock(true)
             } else {
                 val isHandled = tryToAddPartOfSpeech(text.trimNonLetterNonDigit(), builder)
                 if (!isHandled && text.trimNonLetterNonDigit().isNotEmpty()) {

@@ -357,6 +357,9 @@ fun CardSetViewItems(
                                 WordSubHeaderViewItem.ContentType.EXAMPLES -> vm.onAddExamplePressed(
                                     item.cardId
                                 )
+                                WordSubHeaderViewItem.ContentType.ANTONYMS -> vm.onAddAntonymPressed(
+                                    item.cardId
+                                )
                                 else -> {}
                             }
                         }

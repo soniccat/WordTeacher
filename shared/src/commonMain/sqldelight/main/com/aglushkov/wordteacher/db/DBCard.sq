@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS DBCard (
  -- -1: frequency is undefined i.e. couldn't find it in db
   termFrequency REAL NOT NULL DEFAULT -2.0,
   labels TEXT AS List<String> NOT NULL DEFAULT "",
-  audioFiles TEXT AS List<WordTeacherWord.AudioFile> NOT NULL DEFAULT ""
+  audioFiles TEXT AS List<WordTeacherWord.AudioFile> NOT NULL DEFAULT "",
+  antonyms TEXT AS List<String> NOT NULL DEFAULT ""
 );
 
 selectAllCardIds:
@@ -54,16 +55,16 @@ FROM DBCard
 WHERE DBCard.needToUpdateDefinitionSpans OR DBCard.needToUpdateExampleDefinitionSpans;
 
 insert:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, termFrequency, labels, audioFiles)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?);
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, termFrequency, labels, audioFiles, antonyms)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?, ?);
 
 insertCard:
-INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, labels, audioFiles)
+INSERT INTO DBCard(date, term, partOfSpeech, transcription, definitions, synonyms, examples, progressLevel, progressLastMistakeCount, progressLastLessonDate, definitionTermSpans, exampleTermSpans, needToUpdateDefinitionSpans, needToUpdateExampleDefinitionSpans, modificationDate, creationId, remoteId, labels, audioFiles, antonyms)
 VALUES ?;
 
 updateCard:
 UPDATE DBCard
-SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?, needToUpdateDefinitionSpans = ?, needToUpdateExampleDefinitionSpans = ?, modificationDate = ?, remoteId = ?, labels = ?, audioFiles = ?
+SET date = ?, term = ?, partOfSpeech = ?, transcription = ?, definitions = ?, synonyms = ?, examples = ?, progressLevel = ?, progressLastMistakeCount = ?, progressLastLessonDate = ?, definitionTermSpans = ?, exampleTermSpans = ?, needToUpdateDefinitionSpans = ?, needToUpdateExampleDefinitionSpans = ?, modificationDate = ?, remoteId = ?, labels = ?, audioFiles = ?, antonyms = ?
 WHERE id = ?;
 
 lastInsertedRowId:

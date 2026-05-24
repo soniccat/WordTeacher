@@ -501,6 +501,7 @@ func createApiCard(creationId string, creationDate time.Time) *api.Card {
 		PartOfSpeech: api.Adverb,
 		Definitions:  []string{"testDef1", "testDef2"},
 		Synonyms:     []string{"testSyn1", "testSyn2"},
+		Antonyms:     []string{"testAnt1", "testAnt2"},
 		Examples:     []string{"testEx1", "testEx2"},
 		DefinitionTermSpans: [][]api.Span{
 			{{Start: 1, End: 2}, {Start: 3, End: 4}},

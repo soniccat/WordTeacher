@@ -79,6 +79,7 @@ message Card {
 	repeated string labels = 11;
 	repeated string transcriptions = 12;
 	repeated AudioFile audioFiles = 13;
+	repeated string antonyms = 14;
 }
 
 message AudioFile {

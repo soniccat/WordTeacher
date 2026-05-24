@@ -29,6 +29,7 @@ data class Card (
     override val transcriptions: List<String> = emptyList(),
     override val audioFiles: List<WordTeacherWord.AudioFile> = emptyList(),
     val synonyms: List<String>,
+    val antonyms: List<String>,
     override val examples: List<String>,
     val exampleTermSpans: List<List<CardSpan>>,
     val progress: CardProgress,

@@ -40,6 +40,7 @@ func ApiCardToDb(ctx context.Context, c *api.Card) (*DbCard, error) {
 		Definitions:                 c.Definitions,
 		Labels:                      c.Labels,
 		Synonyms:                    c.Synonyms,
+		Antonyms:                    c.Antonyms,
 		Examples:                    c.Examples,
 		DefinitionTermSpans:         c.DefinitionTermSpans,
 		ExampleTermSpans:            c.ExampleTermSpans,
@@ -65,6 +66,7 @@ type DbCard struct {
 	Definitions                 []string            `bson:"definitions"`
 	Labels                      []string            `bson:"labels"`
 	Synonyms                    []string            `bson:"synonyms"`
+	Antonyms                    []string            `bson:"antonyms"`
 	Examples                    []string            `bson:"examples"`
 	DefinitionTermSpans         [][]api.Span        `bson:"definitionTermSpans"`
 	ExampleTermSpans            [][]api.Span        `bson:"exampleTermSpans"`
@@ -87,6 +89,7 @@ func (c *DbCard) ToApi() *api.Card {
 		Definitions:                 c.Definitions,
 		Labels:                      c.Labels,
 		Synonyms:                    c.Synonyms,
+		Antonyms:                    c.Antonyms,
 		Examples:                    c.Examples,
 		DefinitionTermSpans:         c.DefinitionTermSpans,
 		ExampleTermSpans:            c.ExampleTermSpans,
@@ -115,6 +118,7 @@ func (c *DbCard) ToGrpc() *cardsetsgrpc.Card {
 		Definitions:      c.Definitions,
 		Labels:           c.Labels,
 		Synonyms:         c.Synonyms,
+		Antonyms:         c.Antonyms,
 		Examples:         c.Examples,
 		UserId:           c.UserId.Hex(),
 		CreationDate:     tools.DbDateToApiDate(c.CreationDate),
