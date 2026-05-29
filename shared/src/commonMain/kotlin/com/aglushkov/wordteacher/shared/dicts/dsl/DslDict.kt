@@ -33,6 +33,8 @@ class DslDict(
 
     override val index: Dict.Index
         get() = dslIndex
+    val wordCount: Int
+        get() = dslIndex.wordCount
 
     override suspend fun load() {
         val dslIndex = DslIndex(this, (path.toString() + DSL_INDEX_SUFFIX).toPath(), fileSystem)

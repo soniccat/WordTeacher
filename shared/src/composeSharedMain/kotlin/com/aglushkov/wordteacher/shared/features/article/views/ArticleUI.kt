@@ -286,7 +286,7 @@ private fun ArticleSideSheetContent(
         dictPaths.data()?.onEach {
             CheckableListItem(
                 modifier = Modifier.windowInsetsRightPadding(),
-                isChecked = state.selectionState.dicts.contains(it),
+                isChecked = !state.selectionState.deselectedDicts.contains(it),
                 text = it,
                 onClicked = { vm.onDictSelectionChanged(it) }
             )

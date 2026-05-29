@@ -504,6 +504,16 @@ open class DefinitionsVMImpl(
                         items.add(WordSynonymViewItem(synonym, Indent.SMALL))
                     }
                 }
+
+                if (def.antonyms?.isNotEmpty() == true) {
+                    items.add(WordSubHeaderViewItem(
+                        StringDesc.Resource(MR.strings.word_section_antonyms),
+                        Indent.SMALL
+                    ))
+                    for (synonym in def.antonyms) {
+                        items.add(WordSynonymViewItem(synonym, Indent.SMALL))
+                    }
+                }
             }
         }
 
@@ -669,6 +679,7 @@ open class DefinitionsVMImpl(
                 transcriptions = viewData.word.transcriptions,
                 synonyms = viewData.def.synonyms.orEmpty(),
                 examples = viewData.def.examples.orEmpty() + contextExamples,
+                antonyms = viewData.def.antonyms.orEmpty(),
                 termFrequency = wordFrequency.value.data(),
                 audioFiles = viewData.word.audioFiles,
             )

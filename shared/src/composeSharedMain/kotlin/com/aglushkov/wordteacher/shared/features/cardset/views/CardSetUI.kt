@@ -403,6 +403,41 @@ fun CardSetViewItems(
             )
         }
 
+        is WordAntonymViewItem -> DeletableCell(
+            stateKey = item.id,
+            enabled = isEditable,
+            onClick = { /*TODO*/ },
+            onDeleted = { vm.onAntonymRemoved(item, item.cardId) }
+        ) {
+            WordAntonymView(
+                item,
+                textContent = { text, textStyle ->
+                    CardItemTextField(
+                        modifier = Modifier
+                            .onFocusChanged {
+                                if (it.isFocused) {
+                                    onFocused(item)
+                                }
+                            }
+                            .weight(1.0f)
+                            .focusRequester(focusRequester),
+                        text,
+                        textStyle,
+                        item,
+                        item.cardId,
+                        !isEditable,
+                        vm
+                    )
+
+                    if (item.isLast && isEditable) {
+                        AddIcon {
+                            vm.onAddAntonymPressed(item.cardId)
+                        }
+                    }
+                }
+            )
+        }
+
         is WordExampleViewItem -> DeletableCell(
             stateKey = item.id,
             enabled = isEditable,

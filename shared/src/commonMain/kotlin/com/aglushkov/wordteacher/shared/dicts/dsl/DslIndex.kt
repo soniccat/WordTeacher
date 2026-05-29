@@ -22,6 +22,7 @@ class DslIndex(
     private val fileSystem: FileSystem,
 ) : DictTrieIndex {
     override val index = DictTrie()
+    var wordCount = 0
 
     init {
         if (fileSystem.exists(path)) {
@@ -45,6 +46,7 @@ class DslIndex(
             }
             skipNewLine()
 
+            wordCount = 0
             while (!this.exhausted()) {
                 readEntry()?.let {
                     add(it.word, it.partOfSpeeches, it.indexValue, it.dict)
@@ -67,8 +69,10 @@ class DslIndex(
         partOfSpeeches: List<WordTeacherWord.PartOfSpeech>,
         indexValue: Any?,
         dict: Dict
-    ) =
+    ) {
         index.put(term, DictWordData(partOfSpeeches, indexValue, dict))
+        ++wordCount
+    }
 
     fun save() {
         fileSystem.write(path) {

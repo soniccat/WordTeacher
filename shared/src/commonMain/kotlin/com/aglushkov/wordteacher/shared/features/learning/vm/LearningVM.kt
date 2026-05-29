@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.Indent
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordAntonymViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordAudioFilesViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
@@ -422,6 +423,9 @@ open class LearningVMImpl(
                 ),
                 *card.synonyms.map { synonym ->
                     WordSynonymViewItem(synonym, Indent.SMALL)
+                }.toTypedArray(),
+                *card.antonyms.map { synonym ->
+                    WordAntonymViewItem(synonym, Indent.SMALL)
                 }.toTypedArray()
             )
         }

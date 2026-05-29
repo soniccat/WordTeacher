@@ -43,6 +43,7 @@
     <string name="word_section_definition">Definition</string>
     <string name="word_section_examples">Examples</string>
     <string name="word_section_synonyms">Synonyms</string>
+    <string name="word_section_antonyms">Antonyms</string>
 
     <string name="definitions_add_filter">Add Filter</string>
     <string name="definitions_displayMode_bySource">By Source</string>
@@ -146,6 +147,7 @@
     <string name="dictconfigs_yandex_param_search_by_word_form">Enable searching by word form</string>
     <string name="dictconfigs_yandex_param_require_matching_parts">Enable a filter that requires matching parts of speech for the search word and translation</string>
     <string name="dictconfigs_settings_dsl_title">Dsl file</string>
+    <string name="dictconfigs_word_count">%d entries</string>
 
     <string name="dashboard_title">Home</string>
     <string name="dashboard_headline_title">New Articles:</string>

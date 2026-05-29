@@ -50,6 +50,7 @@ interface CardSetVM: Clearable {
     fun onAddSynonymPressed(cardId: Long)
     fun onAddAntonymPressed(cardId: Long)
     fun onSynonymRemoved(item: WordSynonymViewItem, cardId: Long)
+    fun onAntonymRemoved(item: WordAntonymViewItem, cardId: Long)
     fun onBackPressed()
     fun onTryAgainClicked()
     fun onInfoPressed()
@@ -198,6 +199,7 @@ open class CardSetVMImpl(
             var lastDefViewItem: BaseViewItem<*>? = null
             var lastExViewItem: BaseViewItem<*>? = null
             var lastSynViewItem: BaseViewItem<*>? = null
+            var lastAntViewItem: BaseViewItem<*>? = null
 
             val cardViewItems = mutableListOf<BaseViewItem<*>>()
             val gradationLevelAndRatio = frequencyGradation?.gradationLevelAndRatio(card.termFrequency)
@@ -270,10 +272,26 @@ open class CardSetVMImpl(
                 }
             }
 
+            // Antnonyms
+
+            cardViewItems += WordSubHeaderViewItem(
+                StringDesc.Resource(MR.strings.word_section_antonyms),
+                Indent.SMALL,
+                isOnlyHeader = card.antonyms.isEmpty(),
+                contentType = WordSubHeaderViewItem.ContentType.ANTONYMS,
+                cardId = card.id
+            )
+
+            card.antonyms.onEachIndexed { index, synonym ->
+                cardViewItems += WordAntonymViewItem(synonym, Indent.SMALL, index, isLast = index == card.antonyms.size - 1, cardId = card.id).also {
+                    lastAntViewItem = it
+                }
+            }
+
             result += cardViewItems
             result += WordDividerViewItem()
 
-            makeFocusEvents(card.id, firstDefViewItem, lastDefViewItem, lastExViewItem, lastSynViewItem)
+            makeFocusEvents(card.id, firstDefViewItem, lastDefViewItem, lastExViewItem, lastSynViewItem, lastAntViewItem)
         }
 
         if (!state.value.isRemoteCardSet) {
@@ -290,6 +308,7 @@ open class CardSetVMImpl(
         lastDefViewItem: BaseViewItem<*>?,
         lastExViewItem: BaseViewItem<*>?,
         lastSynViewItem: BaseViewItem<*>?,
+        lastAntViewItem: BaseViewItem<*>?,
     ) {
         val newEvents = this.events.value.filter { !it.isHandled }.toMutableList()
         this.notHandledPendingEvents.onEach {
@@ -315,6 +334,11 @@ open class CardSetVMImpl(
                             newEvents += e.makeEvent(safeItem)
                         }
                     }
+                    lastAntViewItem?.let { safeItem ->
+                        if (e.type == FocusLastType.Antonym && e.cardId == cardId) {
+                            newEvents += e.makeEvent(safeItem)
+                        }
+                    }
                 }
                 is PendingEvent.ScrollToLast -> {
                     firstDefItemView?.let { safeItem ->
@@ -334,6 +358,11 @@ open class CardSetVMImpl(
                     }
                     lastSynViewItem?.let { safeItem ->
                         if (e.type == FocusLastType.Synonym && e.cardId == cardId) {
+                            newEvents += e.makeEvent(safeItem)
+                        }
+                    }
+                    lastAntViewItem?.let { safeItem ->
+                        if (e.type == FocusLastType.Antonym && e.cardId == cardId) {
                             newEvents += e.makeEvent(safeItem)
                         }
                     }
@@ -460,6 +489,18 @@ open class CardSetVMImpl(
                     itemType = ItemType.Synonym
                     card.copy(
                         synonyms = card.synonyms.mapIndexed { index, s ->
+                            if (item.index == index) {
+                                text
+                            } else {
+                                s
+                            }
+                        },
+                    )
+                }
+                is WordAntonymViewItem -> {
+                    itemType = ItemType.Antonym
+                    card.copy(
+                        antonyms = card.antonyms.mapIndexed { index, s ->
                             if (item.index == index) {
                                 text
                             } else {
@@ -629,7 +670,7 @@ open class CardSetVMImpl(
         pendingEvents.add(PendingEvent.ScrollToLast(FocusLastType.Antonym, cardId))
         editCard(cardId) {
             it.copy(
-                synonyms = if (it.antonyms.lastOrNull() != "") {
+                antonyms = if (it.antonyms.lastOrNull() != "") {
                     it.antonyms + ""
                 } else {
                     it.antonyms
@@ -643,6 +684,17 @@ open class CardSetVMImpl(
         editCard(cardId) {
             it.copy(
                 synonyms = it.synonyms.filterIndexed { i, _ -> i != item.index },
+            ).apply {
+                updateCard(this, delay = 0)
+            }
+        }
+    }
+
+    override fun onAntonymRemoved(item: WordAntonymViewItem, cardId: Long) {
+        logRemove(ItemType.Antonym)
+        editCard(cardId) {
+            it.copy(
+                antonyms = it.antonyms.filterIndexed { i, _ -> i != item.index },
             ).apply {
                 updateCard(this, delay = 0)
             }

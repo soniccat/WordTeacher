@@ -478,6 +478,15 @@ private fun showViewItem(
             }
         }
     )
+    is WordAntonymViewItem -> WordAntonymView(
+        item,
+        modifier,
+        textContent = { text, ts ->
+            TextWithWordClickHandler(text, ts) {
+                vm.onWordClicked(it)
+            }
+        }
+    )
     is WordExampleViewItem -> WordExampleView(
         item,
         modifier,
@@ -951,6 +960,30 @@ fun WordSubHeaderView(
 @Composable
 fun WordSynonymView(
     viewItem: WordSynonymViewItem,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalAppTypography.current.wordSynonym,
+    textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->
+        Text(
+            text = text,
+            style = ts
+        )
+    }
+) {
+    Row(
+        modifier = Modifier
+            .then(modifier)
+            .padding(
+                start = LocalDimensWord.current.wordHorizontalPadding + viewItem.indent.toDp(),
+                end = LocalDimensWord.current.wordHorizontalPadding
+            ),
+    ) {
+        textContent(viewItem.firstItem(), textStyle)
+    }
+}
+
+@Composable
+fun WordAntonymView(
+    viewItem: WordAntonymViewItem,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalAppTypography.current.wordSynonym,
     textContent: @Composable RowScope.(text: String, textStyle: TextStyle) -> Unit = { text, ts ->

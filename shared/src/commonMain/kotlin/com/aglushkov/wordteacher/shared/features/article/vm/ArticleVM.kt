@@ -77,7 +77,7 @@ interface ArticleVM: Clearable {
         restoredState: State,
         private val settings: SettingStore,
     ) {
-        private val SELECTION_STATE_KEY = "articleSelectionState"
+        private val SELECTION_STATE_KEY = "articleSelectionState2"
         private var inMemoryState =
             InMemoryState(
                 id = restoredState.id,
@@ -141,7 +141,7 @@ interface ArticleVM: Clearable {
         val partsOfSpeech: Set<WordTeacherWord.PartOfSpeech> = emptySet(),
         val phrases: Set<ChunkType> = emptySet(),
         val cardSetWords: Boolean = true,
-        val dicts: List<String> = listOf("words.wordlist"),
+        val deselectedDicts: List<String> = listOf(),
         val filterDictSingleWordEntries: Boolean = true,
     )
 
@@ -276,7 +276,9 @@ open class ArticleVMImpl(
             }
         }
 
-        val actualDicts = selectionState.dicts.mapNotNull { s -> dicts.firstOrNull { it.path.name == s } }
+        val actualDicts = dicts.filter {
+            !selectionState.deselectedDicts.contains(it.path.name)
+        }
         val dictAnnotationResolver = DictAnnotationResolver()
         val dictAnnotations = dictAnnotationResolver.resolve(actualDicts, sentence, phrases).run {
             if (selectionState.filterDictSingleWordEntries) {
@@ -467,12 +469,12 @@ open class ArticleVMImpl(
     override fun onDictSelectionChanged(dictPath: String) {
         analytics.send(AnalyticEvent.createActionEvent("Article.dictSelectionChanged"))
         stateController.updateSelectionState {
-            val needRemove = it.dicts.contains(dictPath)
+            val needRemove = it.deselectedDicts.contains(dictPath)
             it.copy(
-                dicts = if (needRemove) {
-                    it.dicts.minus(dictPath)
+                deselectedDicts = if (needRemove) {
+                    it.deselectedDicts.minus(dictPath)
                 } else {
-                    it.dicts.plus(dictPath)
+                    it.deselectedDicts.plus(dictPath)
                 }
             )
         }

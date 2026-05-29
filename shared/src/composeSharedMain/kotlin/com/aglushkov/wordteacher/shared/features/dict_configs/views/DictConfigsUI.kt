@@ -56,6 +56,7 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.format
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -144,7 +145,11 @@ private fun showDictConfigsItem(
                 vm.onDictDeleted(item)
             }
         ) {
-            CustomListItem {
+            CustomListItem(
+                secondaryContent = {
+                    Text(MR.strings.dictconfigs_word_count.format(item.wordCount ?: 0).localized(), style = LocalAppTypography.current.listItemSubtitle)
+                }
+            ) {
                 Text(item.firstItem(), style = LocalAppTypography.current.settingsText)
             }
 

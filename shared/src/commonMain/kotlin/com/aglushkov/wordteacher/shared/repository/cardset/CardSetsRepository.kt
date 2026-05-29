@@ -72,6 +72,7 @@ class CardSetsRepository(
         transcriptions: List<String>?,
         synonyms: List<String>,
         examples: List<String>,
+        antonyms: List<String>,
         termFrequency: Double?,
         audioFiles: List<AudioFile>
     ): Card {
@@ -87,6 +88,7 @@ class CardSetsRepository(
                     transcriptions = transcriptions,
                     synonyms = synonyms,
                     examples = examples,
+                    antonyms = antonyms,
                     needToUpdateExampleSpans = true,
                     needToUpdateDefinitionSpans = true,
                     termFrequency = termFrequency,

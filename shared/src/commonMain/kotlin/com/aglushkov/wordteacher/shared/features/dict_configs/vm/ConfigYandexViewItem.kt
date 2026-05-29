@@ -41,13 +41,15 @@ class ConfigTextViewItem(
 class ConfigDictViewItem(
     name: String,
     val path: Path,
+    val wordCount: Int?,
 ): BaseViewItem<String>(name, Type) {
     companion object {
         const val Type = 1103
     }
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        return super.equalsByContent(other) && path == (other as ConfigDictViewItem).path
+        return super.equalsByContent(other) && path == (other as ConfigDictViewItem).path &&
+                wordCount == other.wordCount
     }
 }
 

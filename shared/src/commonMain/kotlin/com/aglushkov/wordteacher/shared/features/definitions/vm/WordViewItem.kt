@@ -93,6 +93,12 @@ class WordSynonymViewItem(synonym: String, val indent: Indent = Indent.NONE, val
     }
 }
 
+class WordAntonymViewItem(synonym: String, val indent: Indent = Indent.NONE, val index: Int = -1, val isLast: Boolean = false, val cardId: Long = -1): BaseViewItem<String>(synonym, Type) {
+    companion object {
+        const val Type = 113
+    }
+}
+
 class WordHeaderViewItem(name: StringDesc): BaseViewItem<StringDesc>(name, Type) {
     companion object {
         const val Type = 107

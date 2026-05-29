@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.YandexServic
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
 import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDict
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.FileOpenController
@@ -132,7 +133,12 @@ open class DictConfigsVMImpl(
             loaded = {
                 it.onEach { dict ->
                     if (dict !is WordListDict) {
-                        add(ConfigDictViewItem(dict.name, dict.path))
+                        val wordCount = if (dict is DslDict) {
+                            dict.wordCount
+                        } else {
+                            null
+                        }
+                        add(ConfigDictViewItem(dict.name, dict.path, wordCount))
                     }
                 }
             },

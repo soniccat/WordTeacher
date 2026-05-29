@@ -29,7 +29,7 @@ data class AppTypography(
 
     var wordDefinitionTitle: TextStyle = TextStyle.Default,
     var wordDefinitionTranscripton: TextStyle = materialTypography.body2,
-    var wordDefinitionProvidedBy: TextStyle = TextStyle.Default,
+    var wordDefinitionProvidedBy: TextStyle = materialTypography.subtitle1,
     var wordDefinitionPartOfSpeech: TextStyle = TextStyle.Default,
 
     var wordDefinition: TextStyle = materialTypography.body1,
@@ -65,7 +65,7 @@ data class AppTypography(
         listItemSubtitle = materialTypography.body2.copy(color = colors.onBackground.copy(alpha = ContentAlpha.medium))
 
         wordDefinitionTitle = materialTypography.h5.copy(color = colors.secondary)
-        wordDefinitionProvidedBy = materialTypography.body2.copy(color = colorResource(MR.colors.word_provided_by))
+        wordDefinitionProvidedBy = materialTypography.subtitle2.copy(color = colorResource(MR.colors.word_provided_by))
         wordDefinitionPartOfSpeech = materialTypography.subtitle2//.copy(color = colorResource(MR.colors.word_partOfSpeech))
         articleDate = wordDefinitionProvidedBy
         noteDate = wordDefinitionProvidedBy
