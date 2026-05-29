@@ -240,7 +240,9 @@ class MainActivity : AppCompatActivity(), Router {
                     is MainDecomposeComponent.Child.Learning -> LearningUI(vm = instance.vm)
                     is MainDecomposeComponent.Child.LearningSessionResult -> LearningSessionResultUI(vm = instance.vm)
                     is MainDecomposeComponent.Child.DictConfigs -> DictConfigsUI(
-                        vm = instance.vm,
+                        vm = instance.vm.apply {
+                            router = mainDecomposeComponent
+                        },
                         onBackPressed = {
                             mainDecomposeComponent.back()
                         }

@@ -17,8 +17,10 @@ import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.downgradeToErrorOrLoading
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.general.settings.resetHint
+import com.aglushkov.wordteacher.shared.general.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
@@ -205,6 +207,9 @@ open class SettingsVMImpl (
         analytics.send(AnalyticEvent.createActionEvent("Settings.uploadWordFrequencyFileClicked"))
         mainScope.launch {
             wordFrequencyFileOpenController.chooseFile()
+                .onError {
+                    router?.onError(it.toStringDesc())
+                }
         }
     }
 

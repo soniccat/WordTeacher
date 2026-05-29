@@ -18,7 +18,7 @@ import kotlin.io.path.extension
 class DslDictConverter(
     val fileSystem: FileSystem
 ): FileOpenController.Converter {
-    private val gzipExtensions = setOf("gz", "gzip", "dz", "zip")
+    private val gzipExtensions = setOf("gz", "gzip", "dz")
 
     override fun convert(path: Path): String? {
         var newName: String? = null

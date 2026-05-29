@@ -19,6 +19,7 @@ import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.DictConfigsDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsRouter
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
@@ -51,7 +52,9 @@ interface MainDecomposeComponent:
     DashboardVM.Router,
     AuthOpener,
     SnackbarEventHolder,
-    BackHandlerOwner {
+    BackHandlerOwner,
+    DictConfigsRouter
+{
     val childStack: Value<ChildStack<ChildConfiguration, Child>>
     val dialogsStateFlow: Value<ChildStack<ChildConfiguration, Child>>
 

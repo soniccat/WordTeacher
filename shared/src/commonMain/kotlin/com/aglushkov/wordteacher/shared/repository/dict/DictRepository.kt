@@ -77,9 +77,14 @@ class DictRepositoryImpl(
                 } != null
                 if (!isDictLoaded) {
                     dictFactory.createDict(filePath)?.let { dict ->
-                        dict.load()
-                        dicts.update {
-                            Resource.Loading((it.data() ?: emptyList()) + listOf(dict))
+                        try {
+                            dict.load()
+                            dicts.update {
+                                Resource.Loading((it.data() ?: emptyList()) + listOf(dict))
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            fileSystem.delete(dict.path)
                         }
                     }
                 }
