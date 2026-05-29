@@ -229,7 +229,7 @@ fun partOfSpeechEnum(it: String?) = if (it == null) {
 } else {
     try {
         WordTeacherWord.PartOfSpeech.valueOf(it)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         WordTeacherWord.PartOfSpeech.Undefined
     }
 }

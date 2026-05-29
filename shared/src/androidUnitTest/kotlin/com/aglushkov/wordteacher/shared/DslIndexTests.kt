@@ -22,17 +22,17 @@ class DslIndexTests {
 
         val indexPath = (dictPath.toString() + "index").toPath()
         val dslIndex = DslIndex(dict, indexPath, fakeFileSystem)
-        dslIndex.add("term1", WordTeacherWord.PartOfSpeech.Adjective, 100)
-        dslIndex.add("term2", WordTeacherWord.PartOfSpeech.Noun, 101)
-        dslIndex.add("term3", WordTeacherWord.PartOfSpeech.Adverb, 102)
+        dslIndex.add("term1", listOf(WordTeacherWord.PartOfSpeech.Adjective), 100)
+        dslIndex.add("term2", listOf(WordTeacherWord.PartOfSpeech.Noun), 101)
+        dslIndex.add("term3", listOf(WordTeacherWord.PartOfSpeech.Adverb), 102)
         dslIndex.save()
 
         val dslIndex2 = DslIndex(dict, indexPath, fakeFileSystem)
         assertEquals(100, dslIndex2.offset("term1"))
         assertEquals(101, dslIndex2.offset("term2"))
         assertEquals(102, dslIndex2.offset("term3"))
-        assertEquals(WordTeacherWord.PartOfSpeech.Adjective, dslIndex2.partOfSpeech("term1"))
-        assertEquals(WordTeacherWord.PartOfSpeech.Noun, dslIndex2.partOfSpeech("term2"))
-        assertEquals(WordTeacherWord.PartOfSpeech.Adverb, dslIndex2.partOfSpeech("term3"))
+        assertEquals(listOf(WordTeacherWord.PartOfSpeech.Adjective), dslIndex2.partOfSpeech("term1"))
+        assertEquals(listOf(WordTeacherWord.PartOfSpeech.Noun), dslIndex2.partOfSpeech("term2"))
+        assertEquals(listOf(WordTeacherWord.PartOfSpeech.Adverb), dslIndex2.partOfSpeech("term3"))
     }
 }

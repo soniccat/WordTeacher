@@ -46,10 +46,10 @@ class ToggleRepository(
         mainScope.launch(Dispatchers.Default) {
             try {
                 loadRemoteToggles(url)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 try {
                     loadRemoteToggles(url2)
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     // ignore, sends network logs in httpClient
                 }
             }

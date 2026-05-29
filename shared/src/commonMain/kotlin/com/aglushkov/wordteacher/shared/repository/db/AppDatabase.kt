@@ -94,7 +94,7 @@ class AppDatabase(
             try {
                 createDb()
                 state.value = Resource.Loaded(this@AppDatabase)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 state.value = Resource.Error(e, true)
             }
         }

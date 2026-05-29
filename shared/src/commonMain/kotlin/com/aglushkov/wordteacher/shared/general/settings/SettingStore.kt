@@ -132,7 +132,7 @@ fun <T> Preferences.serializable(key: String, strategy: DeserializationStrategy<
     return try {
         val str = string(key, "{}")
         settingJsonCoder.decodeFromString(strategy, str)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         null
     }
 }

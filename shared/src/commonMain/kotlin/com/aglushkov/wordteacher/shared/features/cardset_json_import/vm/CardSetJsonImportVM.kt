@@ -165,7 +165,7 @@ open class CardSetJsonImportVMImpl(
                 try {
                     val loadedText = loadText(text)
                     jsonText.value = loadedText
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
                     e.printStackTrace()
                 }
@@ -202,7 +202,7 @@ open class CardSetJsonImportVMImpl(
 
                 jsonText.value = json.encodeToString(enrichedCardSet)
 
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 Logger.e(e.message.orEmpty(), TAG)
                 jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
                 e.printStackTrace()
@@ -229,7 +229,7 @@ open class CardSetJsonImportVMImpl(
                     )
                 }
             )
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Logger.e(e.message.orEmpty(), TAG)
             jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
             return null
@@ -253,7 +253,7 @@ open class CardSetJsonImportVMImpl(
             block()
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Logger.exception("CardSetJsonImportVM.runSafely", e, TAG)
             val errorText = e.message?.let {
                 StringDesc.Raw(it)

@@ -83,7 +83,7 @@ class OAuth2Service(
     fun parseAuthResponseUrl(urlStr: String, state: String): AuthResult {
         val url = try {
             Url(urlStr)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             return AuthResult.Unknown(e)
         }
 

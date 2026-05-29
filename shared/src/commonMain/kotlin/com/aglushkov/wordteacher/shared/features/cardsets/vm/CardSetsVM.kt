@@ -186,7 +186,7 @@ open class CardSetsVMImpl(
         viewModelScope.launch {
             try {
                 cardSetsRepository.createCardSet(name, timeSource.timeInMilliseconds())
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 showError(e)
             }
         }
@@ -290,7 +290,7 @@ open class CardSetsVMImpl(
         analytics.send(AnalyticEvent.createActionEvent("CardSets.onTryAgainClicked"))
     }
 
-    private fun showError(e: Exception) {
+    private fun showError(e: Throwable) {
         val errorText = e.message?.let {
             StringDesc.Raw(it)
         } ?: StringDesc.Resource(MR.strings.error_default)

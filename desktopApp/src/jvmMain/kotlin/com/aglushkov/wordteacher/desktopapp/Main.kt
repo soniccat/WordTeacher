@@ -374,7 +374,7 @@ private fun tryRestoreStateFromFile(): ParcelableContainer? =
     File(SAVED_STATE_FILE_NAME).takeIf(File::exists)?.let { file ->
         try {
             ObjectInputStream(file.inputStream()).use(ObjectInputStream::readObject) as ParcelableContainer
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             null
         } finally {
             file.delete()

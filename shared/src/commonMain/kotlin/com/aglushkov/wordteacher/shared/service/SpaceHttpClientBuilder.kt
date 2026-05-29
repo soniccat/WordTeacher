@@ -160,7 +160,7 @@ class SpaceHttpClientBuilder(
                                     }
                                     newCall ?: originalCall
                                 }
-                            } catch (e: Exception) {
+                            } catch (e: Throwable) {
                                 originalCall
                             }
                         } else {

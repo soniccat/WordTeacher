@@ -188,7 +188,7 @@ class SpaceAuthRepository(
             fileSystem.read(cachePath) {
                 json.decodeFromString<SpaceAuthData>(readByteString().utf8())
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             null
         }
     }

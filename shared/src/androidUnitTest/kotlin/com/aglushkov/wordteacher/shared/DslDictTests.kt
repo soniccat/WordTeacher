@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.dicts.Language
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslIndex
 import com.aglushkov.wordteacher.shared.dicts.toWordData
+import com.aglushkov.wordteacher.shared.general.extensions.unbreakable
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.dict.DictWordData
@@ -60,8 +61,6 @@ class DslDictTests {
                 term1
                 	[m1]1) [trn]def1[/trn][/m]
                 	[m1]2) [trn]def2[/trn][/m]
-                	[m1]3) [trn]def3 [com]([i]comment3[/i])[/com][/trn][/m]
-                	[m1]4) [trn]def4[/trn][/m]
                 	[m1][*]•[/*][/m]
                 	[m1][*][ex][lang id=1033]ex1[/lang] — ex1_1[/ex][/*][/m]
                 	[m1][*]- [ref]ref[/ref]
@@ -81,7 +80,15 @@ class DslDictTests {
                 definitions = linkedMapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
-                            definitions = listOf("def1", "def2", "def3 (comment3)", "def4"),
+                            definitions = listOf("def1"),
+                            examples = listOf(),
+                            synonyms = listOf(),
+                            antonyms = listOf(),
+                            imageUrl = null,
+                            labels = listOf(),
+                        ),
+                        WordTeacherDefinition(
+                            definitions = listOf("def2"),
                             examples = listOf("ex1 — ex1_1"),
                             synonyms = listOf(),
                             antonyms = listOf(),
@@ -89,7 +96,7 @@ class DslDictTests {
                             labels = listOf(),
                         ),
                         WordTeacherDefinition(
-                            definitions = listOf("- ref"),
+                            definitions = listOf("ref"),
                             examples = listOf(),
                             synonyms = listOf(),
                             antonyms = listOf(),
@@ -98,7 +105,7 @@ class DslDictTests {
                         ),
                     )
                 ),
-                types = emptyList()
+                sourceNames = listOf("testname")
             ),
             word
         )
@@ -146,7 +153,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                types = emptyList()
+                sourceNames = emptyList()
             ),
             word
         )
@@ -197,7 +204,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                types = emptyList()
+                sourceNames = emptyList()
             ),
             word
         )
@@ -256,7 +263,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                types = emptyList()
+                sourceNames = emptyList()
             ),
             word
         )
@@ -313,7 +320,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                types = emptyList()
+                sourceNames = emptyList()
             ),
             word1
         )
@@ -333,7 +340,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                types = emptyList()
+                sourceNames = emptyList()
             ),
             word2
         )
@@ -370,7 +377,7 @@ class DslDictTests {
         assertEquals(1, dslDict.index.allEntries().toList().size)
         assertEquals(
             DictWordData(
-                WordTeacherWord.PartOfSpeech.PhrasalVerb,
+                listOf(WordTeacherWord.PartOfSpeech.PhrasalVerb),
                 73,
                 dslDict
             ),
@@ -404,7 +411,54 @@ class DslDictTests {
                         )
                     )
                 ),
-                types = emptyList()
+                sourceNames = emptyList()
+            ),
+            word
+        )
+    }
+
+    @Test
+    fun testRuToEn() = runTest {
+        val fakeFileSystem = FakeFileSystem()
+        val dirPath = "/test".toPath()
+        val dictPath = dirPath.div("dict.dsl")
+        fakeFileSystem.createDirectories(dirPath)
+        fakeFileSystem.write(dictPath, true) {
+            val writeUtf8 = writeUtf8(
+                """
+                #NAME	"Universal (Ru-En)"
+                #INDEX_LANGUAGE	"Russian"
+                #CONTENTS_LANGUAGE	"English"
+                
+                CD-плеер
+                	[m1][trn]CD player[/trn][/m]
+                """.trimIndent()
+            )
+            writeUtf8
+        }
+
+        val dslDict = DslDict(dictPath, fakeFileSystem)
+        dslDict.load()
+
+        val word = dslDict.define(listOf("CD-плеер")).firstOrNull()
+        assertNotNull(word)
+        assertEquals(
+            WordTeacherWord(
+                word = "CD-плеер",
+                transcriptions = emptyList(),
+                definitions = linkedMapOf(
+                    WordTeacherWord.PartOfSpeech.Undefined to listOf(
+                        WordTeacherDefinition(
+                            definitions = listOf("CD player"),
+                            examples = listOf(),
+                            synonyms = listOf(),
+                            antonyms = listOf(),
+                            imageUrl = null,
+                            labels = listOf(),
+                        ),
+                    )
+                ),
+                sourceNames = listOf("Universal (Ru-En)".unbreakable())
             ),
             word
         )

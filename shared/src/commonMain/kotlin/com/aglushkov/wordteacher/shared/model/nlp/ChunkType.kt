@@ -19,7 +19,7 @@ enum class ChunkType {
 
 fun chunkEnum(it: String) = try {
     ChunkType.valueOf(it)
-} catch (e: Exception) {
+} catch (e: Throwable) {
     ChunkType.X
 }
 

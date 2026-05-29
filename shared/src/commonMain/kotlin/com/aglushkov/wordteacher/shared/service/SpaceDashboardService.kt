@@ -111,7 +111,7 @@ class SpaceDashboardService(
             try {
                 json.decodeFromString<Response<SpaceDashboardResponse>>(stringResponse)
                     .setStatusCode(res.status.value)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 analytics.send(AnalyticEvent.createErrorEvent("SpaceDashboardService.load", e))
                 throw e
             }

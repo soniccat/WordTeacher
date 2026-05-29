@@ -63,7 +63,7 @@ open class WebAuthVMImpl(
                                 )
                             )
                         )
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
                         // TODO: handle error
                         val txt = "accessToken error: " + e.message
                         Logger.e(txt)

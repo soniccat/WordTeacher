@@ -55,7 +55,7 @@ class SpaceCardSetSearchService(
             val stringResponse: String = res.body()
             try {
                 json.decodeFromString<Response<CardSetSearchResponse>>(stringResponse).setStatusCode(res.status.value)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 analytics.send(AnalyticEvent.createErrorEvent("SpaceCardSetSearchService.load", e))
                 throw e
             }

@@ -122,7 +122,7 @@ class SpaceCardSetService(
             val stringResponse: String = res.body()
             try {
                 pullJson.decodeFromString<Response<CardSetPullResponse>>(stringResponse).setStatusCode(res.status.value)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 analytics.send(AnalyticEvent.createErrorEvent("SpaceCardSetService.pull", e))
                 throw e
             }
@@ -139,7 +139,7 @@ class SpaceCardSetService(
             val stringResponse: String = res.body()
             try {
                 pushJson.decodeFromString<Response<CardSetPushResponse>>(stringResponse).setStatusCode(res.status.value)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 analytics.send(AnalyticEvent.createErrorEvent("SpaceCardSetService.push", e))
                 throw e
             }
@@ -153,7 +153,7 @@ class SpaceCardSetService(
             val stringResponse: String = res.body()
             try {
                 cardSetByIdJson.decodeFromString<Response<CardSetByIdResponse>>(stringResponse).setStatusCode(res.status.value)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 analytics.send(AnalyticEvent.createErrorEvent("SpaceCardSetService.getById", e))
                 throw e
             }

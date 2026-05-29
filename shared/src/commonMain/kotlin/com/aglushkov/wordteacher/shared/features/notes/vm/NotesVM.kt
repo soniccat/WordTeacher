@@ -78,7 +78,7 @@ open class NotesVMImpl(
         viewModelScope.launch {
             try {
                 notesRepository.createNote(timeSource.timeInMilliseconds(), text)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 showError(e)
             }
         }
@@ -90,7 +90,7 @@ open class NotesVMImpl(
                 notesRepository.removeNote(item.id)
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 showError(e)
             }
         }
@@ -117,7 +117,7 @@ open class NotesVMImpl(
             viewModelScope.launch {
                 try {
                     notesRepository.updateNote(item.id, text)
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     showError(e)
 
                     // rollback the changes
@@ -135,7 +135,7 @@ open class NotesVMImpl(
         editingStateFlow.value = EmptyEditingState
     }
 
-    private fun showError(e: Exception) {
+    private fun showError(e: Throwable) {
         val errorText = e.message?.let {
             StringDesc.Raw(it)
         } ?: StringDesc.Resource(MR.strings.error_default)

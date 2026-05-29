@@ -95,7 +95,7 @@ actual class NLPCore(
                     createMEObjects()
                 }
                 state.value = Resource.Loaded(this@NLPCore)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 state.value = Resource.Error(e, true)
             }
         }

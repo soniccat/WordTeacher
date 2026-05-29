@@ -27,9 +27,9 @@ class CardSetSyncWorker(
     sealed interface State {
         object Initializing: State
         object AuthRequired: State
-        data class PullRequired(val e: Exception? = null): State
+        data class PullRequired(val e: Throwable? = null): State
         object Pulling: State
-        data class PushRequired(val e: Exception? = null): State
+        data class PushRequired(val e: Throwable? = null): State
         object Pushing: State
         object Idle: State
         data class Paused(val prevState: State): State
@@ -258,7 +258,7 @@ class CardSetSyncWorker(
             if (state.value == State.Pulling) {
                 toState(State.PushRequired())
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             if (state.value == State.Pulling) {
                 if (pullErrorCount >= 2) {
                     pullErrorCount = 0
@@ -338,7 +338,7 @@ class CardSetSyncWorker(
             if (state.value == State.Pushing) {
                 toState(State.Idle)
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
              if (state.value == State.Pushing) {
                  if (e is ErrorResponseException && e.statusCode == HttpStatusCode.Conflict.value) {
                      toState(State.PullRequired(e))

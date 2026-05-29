@@ -118,7 +118,7 @@ class SpaceAuthService(
                         )
                     }
                     .setStatusCode(res.status.value)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 analytics.send(AnalyticEvent.createErrorEvent("SpaceAuthService.auth", e))
                 throw e
             }
@@ -146,7 +146,7 @@ class SpaceAuthService(
                         it.encrypt(secureCodec)
                     }
                     .setStatusCode(res.status.value)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 analytics.send(AnalyticEvent.createErrorEvent("SpaceAuthService.refresh", e))
                 throw e
             }

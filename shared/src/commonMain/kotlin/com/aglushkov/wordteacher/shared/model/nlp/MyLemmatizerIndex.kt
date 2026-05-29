@@ -67,7 +67,7 @@ class MyLemmatizerIndex(
         try {
             offset = readInt()
             word = readUtf8Line()
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Logger.e(e.message.orEmpty())
         }
 

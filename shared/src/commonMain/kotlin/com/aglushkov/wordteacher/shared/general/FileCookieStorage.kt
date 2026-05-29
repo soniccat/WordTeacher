@@ -46,7 +46,7 @@ public class FileCookieStorage(
                     }
                 )
                 containerState.value = Resource.Loaded(container)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 containerState.value = Resource.Loaded(data = mutableListOf())
             }
         }

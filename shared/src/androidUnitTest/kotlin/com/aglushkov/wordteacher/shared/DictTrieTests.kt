@@ -22,7 +22,7 @@ class DictTrieTests {
     fun testPut() {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        val word = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 100, dict)
+        val word = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun), 100, dict)
         trie.put("abc", word)
 
         val foundEntry = trie.word("abc").firstOrNull()
@@ -35,8 +35,8 @@ class DictTrieTests {
     fun testPut2() {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        val word1 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 100, dict)
-        val word2 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 100, dict)
+        val word1 = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun), 100, dict)
+        val word2 = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun), 100, dict)
         trie.put("abc", word1)
         trie.put("abcd", word2)
 
@@ -54,8 +54,8 @@ class DictTrieTests {
     fun testPut3() {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        val word1 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 100, dict)
-        val word2 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 101, dict)
+        val word1 = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun), 100, dict)
+        val word2 = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun), 101, dict)
         trie.put("from ab", word1)
         trie.put("from", word2)
 
@@ -72,9 +72,9 @@ class DictTrieTests {
     fun testPut4() {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        val word1 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 100, dict)
-        val word2 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 101, dict)
-        val word3 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 102, dict)
+        val word1 = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun), 100, dict)
+        val word2 = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun), 101, dict)
+        val word3 = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun), 102, dict)
         trie.put("from ab", word1)
         trie.put("from cd", word2)
         trie.put("from", word3)
@@ -95,8 +95,8 @@ class DictTrieTests {
     fun testAsSequence() {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        val word1 = DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict)
-        val word2 = DictWordData(WordTeacherWord.PartOfSpeech.Noun, 100, dict)
+        val word1 = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict)
+        val word2 = DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun), 100, dict)
         trie.put("abc", word1)
         trie.put("abcd", word2)
 
@@ -110,13 +110,13 @@ class DictTrieTests {
     fun testAsSequence2() = runTest {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        trie.put("drag away", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tap the barrel", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tabula rasa", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tableaux vivants", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tar and feather", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tack about", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("to a proverb", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
+        trie.put("drag away", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tap the barrel", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tabula rasa", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tableaux vivants", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tar and feather", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tack about", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("to a proverb", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
 
         val list = trie.asSequence().toList().map { it.word }
         assertEquals(7, list.size)
@@ -133,14 +133,14 @@ class DictTrieTests {
     fun testAsSequenceWithSpace() = runTest {
         val dict = mock<Dict>()
         val trie = DictTrie()
-        trie.put("tack about", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tack sth2", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("drag away", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tap the barrel", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tabula rasa", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tableaux vivants", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("tar and feather", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
-        trie.put("to a proverb", DictWordData(WordTeacherWord.PartOfSpeech.Noun,100, dict))
+        trie.put("tack about", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tack sth2", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("drag away", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tap the barrel", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tabula rasa", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tableaux vivants", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("tar and feather", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
+        trie.put("to a proverb", DictWordData(listOf(WordTeacherWord.PartOfSpeech.Noun),100, dict))
 
         val list = trie.wordsStartWith("tack ", 2).map { it.word }
         assertEquals(2, list.size)

@@ -38,7 +38,7 @@ class CertCreator(
         try {
             keyGenerator.initialize(rsaKeylength, secureRandom)
             pair = keyGenerator.generateKeyPair()
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             throw IllegalArgumentException(e.message)
         }
         publicKey = pair.public

@@ -87,7 +87,7 @@ class DslDict(
                     val firstChar = resultLine.first()
                     when (firstChar) {
                         '#', UNICODE_INVISIBLE_SPACE -> readHeader(resultLine)
-                        '-', '\n', '\t' -> {}
+                        '\n', '\t' -> {}
                         else -> {
                             wordTeacherWordBuilder.clear()
                             wordTeacherWordBuilder.setWord(resultLine)
@@ -131,7 +131,7 @@ class DslDict(
 
             val pos = indexEntry.indexValue as Int
             fileSystem.read(path) {
-                skip(pos + word.length + newLineSize)
+                skip(pos + word.utf8Size() + newLineSize)
                 readWord(builder)
             }
 

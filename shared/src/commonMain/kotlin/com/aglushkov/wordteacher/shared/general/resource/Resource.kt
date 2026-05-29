@@ -402,7 +402,7 @@ fun <T> loadResource(
         emit(initialValue.toLoaded(result))
     } catch (e: CancellationException) {
         throw e
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         Logger.e(e.message.orEmpty(), "loadResource")
         e.printStackTrace()
         emit(initialValue.toError(e, canTryAgain))
@@ -424,7 +424,7 @@ fun <T> loadResourceWithProgress(
         emit(Resource.Loaded(lastValue ?: throw RuntimeException("loadResourceWithProgress: loaded data is null")))
     } catch (e: CancellationException) {
         throw e
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         Logger.e(e.message.orEmpty(), "loadResource")
         e.printStackTrace()
         emit(initialValue.toError(e, canTryAgain))

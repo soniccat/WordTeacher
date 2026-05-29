@@ -82,7 +82,7 @@ class DictRepositoryImpl(
                             dicts.update {
                                 Resource.Loading((it.data() ?: emptyList()) + listOf(dict))
                             }
-                        } catch (e: Exception) {
+                        } catch (e: Throwable) {
                             e.printStackTrace()
                             fileSystem.delete(dict.path)
                         }

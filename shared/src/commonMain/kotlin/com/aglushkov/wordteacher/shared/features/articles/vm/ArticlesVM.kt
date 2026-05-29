@@ -75,7 +75,7 @@ open class ArticlesVMImpl(
                 articlesRepository.removeArticle(item.articleId)
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 Logger.exception("ArticlesVM.onArticleRemoved", e)
                 val errorText = e.message?.let {
                     StringDesc.Raw(it)

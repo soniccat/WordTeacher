@@ -93,7 +93,7 @@ data class NLPSentenceSlice(
 
 private fun tagEnum(it: String) = try {
     Tag.valueOf(it)
-} catch (e: Exception) {
+} catch (e: Throwable) {
     Tag.UNKNOWN
 }
 

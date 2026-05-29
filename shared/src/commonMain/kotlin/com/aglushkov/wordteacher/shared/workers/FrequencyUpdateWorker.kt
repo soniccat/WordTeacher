@@ -58,7 +58,7 @@ class CardFrequencyUpdateWorker (
                         var frequencies = listOf<Double>()
                         try {
                             frequencies = frequencyDatabase.resolveFrequencyForWords(cardChunk.map { it.term })
-                        } catch (e: Exception) {
+                        } catch (e: Throwable) {
                             Logger.e("updateCardFrequency exception " + e.message, TAG)
                         }
                         databaseWorker.run {
@@ -66,7 +66,7 @@ class CardFrequencyUpdateWorker (
                                 cardChunk.onEachIndexed { cardIndex, card ->
                                     it.cards.updateCardFrequency(card.id, frequencies[cardIndex])
                                 }
-                            } catch (e: Exception) {
+                            } catch (e: Throwable) {
                                 Logger.e("updateCardFrequency exception " + e.message, TAG)
                             }
                         }
