@@ -699,7 +699,7 @@ fun WordTitleView(
         if (viewItem.sourceNames.isNotEmpty()) {
             Text(
                 text = MR.strings.word_providedBy_template.format(viewItem.sourceNames.joinToString()).localized(),
-                modifier = Modifier.width(IntrinsicSize.Min),
+                modifier = Modifier.width(IntrinsicSize.Min).requiredWidthIn(max = 200.dp),
                 textAlign = TextAlign.End,
                 style = LocalAppTypography.current.wordDefinitionProvidedBy
             )

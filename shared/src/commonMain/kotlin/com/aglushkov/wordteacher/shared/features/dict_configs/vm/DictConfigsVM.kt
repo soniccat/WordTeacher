@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.aglushkov.wordteacher.shared.res.MR
+import kotlinx.coroutines.flow.MutableStateFlow
 
 // https://yandex.com/dev/dictionary/doc/dg/reference/lookup.html
 data class YandexSettings(
@@ -85,9 +86,10 @@ open class DictConfigsVMImpl(
 
     override val viewItems = combine(
         configRepository.flow,
-        dictRepository.dicts
-    ) { configs, dicts ->
-        buildViewItems(configs, dicts)
+        dictRepository.dicts,
+        dslDictOpenController.state,
+    ) { configs, dicts, dictImportProgress ->
+        buildViewItems(configs, dicts, dictImportProgress)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     override fun onConfigDeleteClicked(item: ConfigYandexViewItem) {
@@ -101,7 +103,11 @@ open class DictConfigsVMImpl(
         configRepository.value.data()
             ?.firstOrNull { it.id == item.id.toInt() }
 
-    private fun buildViewItems(configs: Resource<List<Config>>, dicts: Resource<List<Dict>>): List<BaseViewItem<*>> = buildList<BaseViewItem<*>> {
+    private fun buildViewItems(
+        configs: Resource<List<Config>>,
+        dicts: Resource<List<Dict>>,
+        dictImportProgress: Resource<Unit>,
+    ): List<BaseViewItem<*>> = buildList<BaseViewItem<*>> {
         add(ConfigHeaderViewItem(ResourceStringDesc(MR.strings.dictconfigs_online_section_title)))
         configs.on(
             loaded = {
@@ -130,7 +136,7 @@ open class DictConfigsVMImpl(
         add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Online))
         add(ConfigHeaderViewItem(ResourceStringDesc(MR.strings.dictconfigs_offline_section_title)))
         dicts.on(
-            loaded = {
+            data = {
                 it.onEach { dict ->
                     if (dict !is WordListDict) {
                         val wordCount = if (dict is DslDict) {
@@ -142,11 +148,17 @@ open class DictConfigsVMImpl(
                     }
                 }
             },
+            breakOnDataCall = false,
             loading = {
                 add(ConfigLoadingViewItem())
             },
             error = {
                 add(ConfigTextViewItem(it.toStringDesc()))
+            }
+        )
+        dictImportProgress.on(
+            loading = {
+                add(ConfigLoadingViewItem())
             }
         )
         add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Offline))

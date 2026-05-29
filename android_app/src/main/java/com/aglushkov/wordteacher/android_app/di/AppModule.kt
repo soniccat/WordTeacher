@@ -309,7 +309,7 @@ class AppModule {
         val tmpDestinationPath = context.cacheDir.toOkioPath()
         return FileOpenControllerImpl(
             name = "DslFileOpener",
-            mimeTypes = listOf("application/octet-stream"),
+            mimeTypes = listOf("application/octet-stream", "application/gzip"),
             tmpPath = tmpDestinationPath,
             dstPath = dictPath,
             converter = DslDictConverter(

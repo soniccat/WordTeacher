@@ -79,11 +79,12 @@ class DictRepositoryImpl(
                     dictFactory.createDict(filePath)?.let { dict ->
                         dict.load()
                         dicts.update {
-                            Resource.Loaded((it.data() ?: emptyList()) + listOf(dict))
+                            Resource.Loading((it.data() ?: emptyList()) + listOf(dict))
                         }
                     }
                 }
             }
+            dicts.update { it.toLoaded(it.data().orEmpty()) }
         }
     }
 

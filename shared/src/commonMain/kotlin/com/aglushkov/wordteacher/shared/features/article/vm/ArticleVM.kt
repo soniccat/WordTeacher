@@ -185,7 +185,8 @@ open class ArticleVMImpl(
 
     private val dicts: StateFlow<Resource<List<Dict>>> = dictRepository.dicts
     override val dictPaths: StateFlow<Resource<List<String>>> = dicts.map {
-            it.copyWith(it.data()?.map { dict -> dict.path.name })
+            it.map { it.orEmpty().map { it.path.name } }
+            //it.copyWith(it.data()?.map { dict -> dict.path.name })
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     override val lastFirstVisibleItem: Int

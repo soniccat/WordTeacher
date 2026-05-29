@@ -49,9 +49,13 @@ import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.hasData
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
 import com.aglushkov.wordteacher.shared.general.views.ModalSideSheet
 import com.aglushkov.wordteacher.shared.general.views.SideSheetValue
 import com.aglushkov.wordteacher.shared.general.views.pxToDp
@@ -273,7 +277,7 @@ private fun ArticleSideSheetContent(
         text = stringResource(MR.strings.article_side_sheet_selection_dicts),
         style = LocalAppTypography.current.articleSideSheetSection
     )
-    if (dictPaths.isLoaded()) {
+    if (dictPaths.hasData()) {
         if (dictPaths.data()?.isNotEmpty() == true) {
             CheckableListItem(
                 modifier = Modifier.windowInsetsRightPadding(),
@@ -291,6 +295,10 @@ private fun ArticleSideSheetContent(
                 onClicked = { vm.onDictSelectionChanged(it) }
             )
         }
+
+        if (dictPaths.isLoading()) {
+            LoadingViewItemUI()
+        }
     } else {
         // TODO: handle other states
     }
@@ -300,7 +308,7 @@ private fun ArticleSideSheetContent(
         text = stringResource(MR.strings.article_side_sheet_selection_phrases),
         style = LocalAppTypography.current.articleSideSheetSection
     )
-    ChunkType.values().onEach { chunkType ->
+    ChunkType.entries.toTypedArray().onEach { chunkType ->
         CheckableListItem(
             modifier = Modifier.windowInsetsRightPadding(),
             isChecked = state.selectionState.phrases.contains(chunkType),
