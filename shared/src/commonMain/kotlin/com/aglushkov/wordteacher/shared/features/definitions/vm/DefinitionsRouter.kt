@@ -7,4 +7,5 @@ interface DefinitionsRouter {
     fun openCardSets()
     fun onLocalCardSetUpdated(cardSetId: Long)
     fun onDefinitionsClosed()
+    fun openDictConfigs()
 }

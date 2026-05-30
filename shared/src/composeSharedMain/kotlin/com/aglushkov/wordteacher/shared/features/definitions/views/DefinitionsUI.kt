@@ -38,10 +38,13 @@ import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
+import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.ListSectionCell
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
+import com.aglushkov.wordteacher.shared.general.views.LoadingStatusViewWithErrorContent
 import com.aglushkov.wordteacher.shared.general.views.SearchView
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserViewItem
@@ -147,6 +150,7 @@ private fun DefinitionsWordUI(
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val needShowWordHistory by vm.isWordHistorySelected.collectAsState()
+    val needShowDslHintOnEmptyResult by vm.needShowDslHintOnEmptyResult.collectAsState()
     val wordStack by vm.wordStack.collectAsState()
 
     if (withSearchBar) {
@@ -267,14 +271,46 @@ private fun DefinitionsWordUI(
                     }
                 }
             } else {
-                LoadingStatusView(
+                LoadingStatusViewWithErrorContent(
                     resource = defsValue,
                     loadingText = null,
                     errorText = vm.getErrorText(defsValue)?.localized(),
                     tryAgainText = stringResource(MR.strings.error_try_again),
                     emptyText = stringResource(MR.strings.error_no_definitions)
-                ) {
-                    vm.onTryAgainClicked()
+                ) { errorState ->
+                    Column(
+                        modifier = Modifier.padding(bottom = 50.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        errorState.text?.let { text ->
+                            Text(
+                                text,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                        errorState.tryAgainText?.let { text ->
+                            Button(
+                                onClick = { vm.onTryAgainClicked() }
+                            ) {
+                                Text(text = text)
+                            }
+                        }
+
+                        if (needShowDslHintOnEmptyResult) {
+                            HintView(
+                                modifier = Modifier.padding(top = 15.dp)
+                                    .clickable {
+                                        vm.onDslHintClicked()
+                                    },
+                                hintType = HintType.DefinitionEmptyResult,
+                                contentPadding = PaddingValues(
+                                    start = LocalDimens.current.contentPadding,
+                                    end = LocalDimens.current.contentPadding,
+                                ),
+                                onHidden = { vm.onHintHidden(HintType.DefinitionEmptyResult) }
+                            )
+                        }
+                    }
                 }
             }
         }

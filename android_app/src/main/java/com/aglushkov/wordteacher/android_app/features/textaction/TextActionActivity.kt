@@ -197,6 +197,10 @@ class TextActionActivity: AppCompatActivity() {
                                     override fun onDefinitionsClosed() {
                                         // won't happen
                                     }
+
+                                    override fun openDictConfigs() {
+                                        // won't happen
+                                    }
                                 }
                             },
                             modalModifier = Modifier.padding(innerPadding)

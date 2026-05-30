@@ -140,6 +140,9 @@ fun HintType.toAttributedString(): AnnotatedString {
             appendEndOfParagraph()
             append("Sign In from the Settings screen to sync your card sets and their progress between devices.")
         }
+        HintType.DefinitionEmptyResult -> buildAnnotatedString {
+            append("Or consider adding DSL dictionaries in any language for access in offline. Tap to open settings.")
+        }
     }
 }
 

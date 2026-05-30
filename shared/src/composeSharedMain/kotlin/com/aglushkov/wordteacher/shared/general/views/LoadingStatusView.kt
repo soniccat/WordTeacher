@@ -53,6 +53,54 @@ fun <T> LoadingStatusView(
 }
 
 @Composable
+fun <T> LoadingStatusViewWithErrorContent(
+    modifier: Modifier = Modifier,
+    resource: Resource<T>,
+    loadingText: String? = null,
+    errorText: String? = null,
+    tryAgainText: String? = null,
+    emptyText: String?,
+    errorContent: @Composable (errorState: LoadingStatusViewState.Error) -> Unit,
+) where T : Collection<*> {
+    if (resource.isLoadedAndEmpty() && emptyText != null) {
+        LoadingStatusViewWithErrorContent(
+            modifier,
+            state = LoadingStatusViewState.Error(
+                text = emptyText,
+                tryAgainText = tryAgainText
+            ),
+            errorContent
+        )
+    } else {
+        LoadingStatusViewWithErrorContent(
+            modifier,
+            resource,
+            loadingText,
+            errorText,
+            errorContent,
+        )
+    }
+}
+
+@Composable
+fun <T> LoadingStatusViewWithErrorContent(
+    modifier: Modifier = Modifier,
+    resource: Resource<T>,
+    loadingText: String? = null,
+    errorText: String? = null,
+    errorContent: @Composable (errorState: LoadingStatusViewState.Error) -> Unit,
+) {
+    val data = resource.data()
+    val isEmptyList = data is List<*> && data.isEmpty()
+
+    LoadingStatusViewWithErrorContent(
+        modifier = modifier,
+        state = resource.toLoadingStatusViewState(isEmptyList, loadingText, errorText),
+        errorContent = errorContent
+    )
+}
+
+@Composable
 fun <T> LoadingStatusView(
     modifier: Modifier = Modifier,
     resource: Resource<T>,
@@ -65,42 +113,50 @@ fun <T> LoadingStatusView(
 
     LoadingStatusView(
         modifier = modifier,
-        state = if (data != null && !isEmptyList) {
-            LoadingStatusViewState.Hidden
-        } else {
-            when {
-                resource.isLoading() -> {
-                    LoadingStatusViewState.Loading(
-                        text = loadingText
-                    )
-                }
-                resource is Resource.Error -> {
-                    val throwable = resource.throwable
-                    val text = if (throwable is StringDescThrowable) {
-                        throwable.stringDesc.localized()
-                    } else {
-                        errorText
-                    }
-
-                    LoadingStatusViewState.Error(
-                        text = text,
-                        tryAgainText = stringResource(MR.strings.error_try_again)
-                    )
-                }
-                else -> {
-                    LoadingStatusViewState.Hidden
-                }
-            }
-        },
+        state = resource.toLoadingStatusViewState(isEmptyList, loadingText, errorText),
         tryAgainBlock = tryAgainBlock
     )
 }
 
 @Composable
-fun LoadingStatusView(
+private fun <T> Resource<T>.toLoadingStatusViewState(
+    isEmptyList: Boolean,
+    loadingText: String?,
+    errorText: String?
+): LoadingStatusViewState = if (data() != null && !isEmptyList) {
+    LoadingStatusViewState.Hidden
+} else {
+    when {
+        isLoading() -> {
+            LoadingStatusViewState.Loading(
+                text = loadingText
+            )
+        }
+
+        this is Resource.Error -> {
+            val text = if (throwable is StringDescThrowable) {
+                throwable.stringDesc.localized()
+            } else {
+                errorText
+            }
+
+            LoadingStatusViewState.Error(
+                text = text,
+                tryAgainText = stringResource(MR.strings.error_try_again)
+            )
+        }
+
+        else -> {
+            LoadingStatusViewState.Hidden
+        }
+    }
+}
+
+@Composable
+fun LoadingStatusViewWithErrorContent(
     modifier: Modifier = Modifier,
     state: LoadingStatusViewState,
-    tryAgainBlock: (() -> Unit)? = null
+    errorContent: @Composable (errorState: LoadingStatusViewState.Error) -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -110,7 +166,9 @@ fun LoadingStatusView(
     ) {
         when (state) {
             is LoadingStatusViewState.Loading -> {
-                Column {
+                Column(
+                    modifier = Modifier.padding(bottom = 50.dp),
+                ) {
                     CircularProgressIndicator()
                     state.text?.let { text ->
                         Text(
@@ -121,27 +179,44 @@ fun LoadingStatusView(
                 }
             }
             is LoadingStatusViewState.Error -> {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    state.text?.let { text ->
-                        Text(
-                            text,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    }
-                    state.tryAgainText?.let { text ->
-                        Button(
-                            onClick = tryAgainBlock ?: {}
-                        ) {
-                            Text(text = text)
-                        }
-                    }
-                }
+                errorContent?.invoke(state)
             }
             is LoadingStatusViewState.Hidden -> {
             }
         }
     }
 }
+
+@Composable
+fun LoadingStatusView(
+    modifier: Modifier = Modifier,
+    state: LoadingStatusViewState,
+    tryAgainBlock: (() -> Unit)? = null,
+) = LoadingStatusViewWithErrorContent(
+    modifier = modifier,
+    state = state,
+    errorContent = { errorState ->
+        Column(
+            modifier = Modifier.padding(bottom = 50.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            errorState.text?.let { text ->
+                Text(
+                    text,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+            errorState.tryAgainText?.let { text ->
+                Button(
+                    onClick = tryAgainBlock ?: {}
+                ) {
+                    Text(text = text)
+                }
+            }
+
+        }
+    }
+)
 
 sealed class LoadingStatusViewState {
     object Hidden: LoadingStatusViewState()

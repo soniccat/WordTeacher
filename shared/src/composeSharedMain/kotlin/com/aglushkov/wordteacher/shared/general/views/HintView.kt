@@ -60,6 +60,7 @@ fun HintView(
         Box(
             modifier = Modifier.fillMaxWidth()
                 .padding(contentPadding)
+                .then(modifier)
                 .background(
                     color = MaterialTheme.colors.onSurface.copy(alpha = 0.10f),
                     shape = RoundedCornerShape(6.dp)
@@ -87,7 +88,6 @@ fun HintView(
                         .clickable {
                             isVisible = false
                         }
-                        .then(modifier)
                         .padding(4.dp),
                     tint = MaterialTheme.colors.onSurface.copy(alpha = 0.87f)
                 )

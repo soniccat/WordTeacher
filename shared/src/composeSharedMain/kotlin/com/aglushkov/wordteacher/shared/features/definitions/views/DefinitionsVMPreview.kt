@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -116,5 +117,12 @@ open class DefinitionsVMPreview(
     override fun onCloseClicked() {
     }
 
+    override fun onHintHidden(hintType: HintType) {
+    }
+
+    override fun onDslHintClicked() {
+    }
+
+    override val needShowDslHintOnEmptyResult = MutableStateFlow<Boolean>(true)
     override val wordStack = MutableStateFlow<List<String>>(emptyList())
 }

@@ -13,7 +13,8 @@ enum class HintType {
     Articles,
     AddArticle,
     Article,
-    CardSets;
+    CardSets,
+    DefinitionEmptyResult;
 
     override fun toString() = this.ordinal.toString()
 }

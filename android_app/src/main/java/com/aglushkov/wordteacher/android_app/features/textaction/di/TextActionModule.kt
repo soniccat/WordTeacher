@@ -31,6 +31,7 @@ class TextActionModule {
                         .settings(
                             DefinitionsVM.Settings(
                                 needStoreDefinedWordInSettings = true,
+                                supportDslHint = false,
                             )
                         )
                         .setDeps(appComponent)

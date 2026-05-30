@@ -199,6 +199,10 @@ class MainActivity : AppCompatActivity(), Router {
                                 override fun onDefinitionsClosed() {
                                     // won't happen
                                 }
+
+                                override fun openDictConfigs() {
+                                    mainDecomposeComponent.openDictConfigs()
+                                }
                             }
                         }
                     )
@@ -290,6 +294,10 @@ class MainActivity : AppCompatActivity(), Router {
 
                                 override fun onDefinitionsClosed() {
                                     // won't happen
+                                }
+
+                                override fun openDictConfigs() {
+                                    mainDecomposeComponent.openDictConfigs()
                                 }
                             }
                         },
@@ -408,6 +416,10 @@ class MainActivity : AppCompatActivity(), Router {
 
                                 override fun onDefinitionsClosed() {
                                     mainDecomposeComponent.popDialog(child.configuration)
+                                }
+
+                                override fun openDictConfigs() {
+                                    mainDecomposeComponent.openDictConfigs()
                                 }
                             }
                         },

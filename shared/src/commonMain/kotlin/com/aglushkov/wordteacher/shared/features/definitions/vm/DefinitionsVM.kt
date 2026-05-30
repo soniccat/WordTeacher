@@ -7,7 +7,6 @@ import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDict
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
-import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.general.*
@@ -23,14 +22,16 @@ import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.resource.onLoaded
+import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
+import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringDesc
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
-import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
@@ -43,13 +44,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
-import kotlin.time.ExperimentalTime
 
 interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
@@ -74,12 +72,15 @@ interface DefinitionsVM: Clearable {
     fun onBackPressed(): Boolean
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
     fun onCloseClicked()
+    fun onHintHidden(hintType: HintType)
+    fun onDslHintClicked()
 
     val wordTextValue: StateFlow<String?>
     val state: State
     val definitions: StateFlow<Resource<List<BaseViewItem<*>>>>
     val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
     val selectedPartsOfSpeechStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
+    val needShowDslHintOnEmptyResult: StateFlow<Boolean>
     val wordStack: StateFlow<List<String>>
 
     // Card Sets
@@ -113,6 +114,7 @@ interface DefinitionsVM: Clearable {
     data class Settings(
         val needStoreDefinedWordInSettings: Boolean = false,
         val needShowLastDefinedWord: Boolean = false,
+        val supportDslHint: Boolean = true,
     )
 }
 
@@ -160,7 +162,8 @@ open class DefinitionsVMImpl(
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
-    final override var selectedPartsOfSpeechStateFlow = MutableStateFlow<List<WordTeacherWord.PartOfSpeech>>(initialState.selectedPartsOfSpeechFilter)
+    final override var selectedPartsOfSpeechStateFlow = MutableStateFlow(initialState.selectedPartsOfSpeechFilter)
+    override val needShowDslHintOnEmptyResult = MutableStateFlow(definitionsSettings.supportDslHint && !settings.isHintClosed(HintType.DefinitionEmptyResult))
     override val wordStack = MutableStateFlow<List<String>>(emptyList())
 
     override val state: DefinitionsVM.State
@@ -839,6 +842,16 @@ open class DefinitionsVMImpl(
 
     override fun onCloseClicked() {
         router?.onDefinitionsClosed()
+    }
+
+    override fun onHintHidden(hintType: HintType) {
+        analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
+        settings.setHintClosed(hintType)
+        needShowDslHintOnEmptyResult.update { false }
+    }
+
+    override fun onDslHintClicked() {
+        router?.openDictConfigs()
     }
 }
 
