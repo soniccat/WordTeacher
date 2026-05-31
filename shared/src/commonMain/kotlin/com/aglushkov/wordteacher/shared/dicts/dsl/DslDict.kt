@@ -90,7 +90,7 @@ class DslDict(
                         '\n', '\t' -> {}
                         else -> {
                             wordTeacherWordBuilder.clear()
-                            wordTeacherWordBuilder.setWord(resultLine)
+                            wordTeacherWordBuilder.setWord(resultLine.dictTitleTrim())
 
                             val (readBytes, nl) = readWord(wordTeacherWordBuilder)
                             val word = wordTeacherWordBuilder.build()
@@ -126,7 +126,7 @@ class DslDict(
     override suspend fun define(word: String, indexEntry: Dict.Index.Entry): List<WordTeacherWord> {
         return withContext(Dispatchers.IO) {
             val builder = WordTeacherWordBuilder()
-            builder.setWord(indexEntry.word)
+            builder.setWord(indexEntry.word.dictTitleTrim())
             builder.addSourceName(name)
 
             val pos = indexEntry.indexValue as Int
@@ -315,6 +315,31 @@ fun String.dictTrim(): String {
         trimmed.substring(1)
     } else {
         trimmed
+    }
+}
+
+fun String.dictTitleTrim(): String {
+    val macroStartIndex = indexOfFirst { it == '{' }
+    if (macroStartIndex == -1) {
+        return this
+    }
+
+    return buildString {
+        var startIndex = macroStartIndex
+        var substringBeginIndex = 0
+
+        for (i in macroStartIndex + 1 until this@dictTitleTrim.length) {
+            val ch = this@dictTitleTrim[i]
+            if (ch == '{') {
+                startIndex = i
+            } else if (ch == '}' && startIndex != -1) {
+                this@buildString.append(this@dictTitleTrim.substring(substringBeginIndex, startIndex))
+                substringBeginIndex = i + 1
+                startIndex = -1
+            }
+        }
+
+        append(this@dictTitleTrim.substring(substringBeginIndex, this@dictTitleTrim.length))
     }
 }
 

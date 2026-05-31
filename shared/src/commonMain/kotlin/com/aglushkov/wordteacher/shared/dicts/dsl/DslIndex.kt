@@ -70,7 +70,7 @@ class DslIndex(
         indexValue: Any?,
         dict: Dict
     ) {
-        index.put(term, DictWordData(partOfSpeeches, indexValue, dict))
+        index.put(term.dictTitleTrim(), DictWordData(partOfSpeeches, indexValue, dict))
         ++wordCount
     }
 
