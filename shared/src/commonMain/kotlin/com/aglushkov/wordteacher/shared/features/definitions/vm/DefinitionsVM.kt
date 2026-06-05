@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrColl
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.extensions.combine6
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
@@ -173,13 +174,20 @@ open class DefinitionsVMImpl(
         )
 
     override val definitions = combine(
+        combine(
+        dictRepository.dicts,
         definitionWords,
+            transform = { dicts, wordDefinitions ->
+                // to show loading when dicts are loading
+                dicts.merge(wordDefinitions) { a, b -> b }
+            }
+        ),
         settings.intFlow(SETTING_DEFINITION_DISPLAY_MODE, SETTING_DEFINITION_DISPLAY_MODE_BY_SOURCE),
         selectedPartsOfSpeechStateFlow,
         wordFrequencyGradationProvider.gradationState,
         wordFrequency,
         transform = { wordDefinitions, displayModeIndex, partOfSpeechFilter, wordFrequencyGradation, wordFrequency ->
-        //Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
+            //Logger.v("build view items ${wordDefinitions.data()?.size ?: 0}")
             val wordFrequencyLevelAndRatio = wordFrequencyGradation.data()?.gradationLevelAndRatio(wordFrequency.data())
             wordDefinitions.copyWith(
                 buildViewItems(

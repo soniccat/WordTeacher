@@ -126,6 +126,6 @@ class DslIndex(
 
 class WrongVersionException: RuntimeException("")
 
-private const val CURRENT_VERSION = 2
+private const val CURRENT_VERSION = 3
 
 private const val INDEX_VERSION = 0

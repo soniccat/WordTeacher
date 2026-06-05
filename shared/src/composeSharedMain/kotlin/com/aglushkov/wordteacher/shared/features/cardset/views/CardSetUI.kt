@@ -128,7 +128,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
         Box(
             modifier = modifier.fillMaxSize().windowInsetsHorizontalPadding()
         ) {
-            if (data != null) {
+            if (data != null && data.isNotEmpty()) {
                 val listState = rememberLazyListState()
                 val coroutineScope = rememberCoroutineScope()
 

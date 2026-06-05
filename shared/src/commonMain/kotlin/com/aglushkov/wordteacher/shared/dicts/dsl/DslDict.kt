@@ -98,7 +98,7 @@ class DslDict(
 
                             if (word?.definitions?.isNotEmpty() == true) {
                                 val partOfSpeeches = word.definitions.map { it.key }
-                                index.add(word.word, partOfSpeeches, offset)
+                                index.add(word.word, partOfSpeeches, offset + resultLine.utf8Size().toInt() + newLineSize.toInt())
                             }
 
                             readLine = nl
@@ -131,7 +131,7 @@ class DslDict(
 
             val pos = indexEntry.indexValue as Int
             fileSystem.read(path) {
-                skip(pos + word.utf8Size() + newLineSize)
+                skip(pos.toLong())
                 readWord(builder)
             }
 
