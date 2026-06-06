@@ -24,6 +24,9 @@ open class DefinitionsVMPreview(
 
     override var router: DefinitionsRouter? = null
 
+    override fun restore(state: DefinitionsVM.State) {
+    }
+
     override fun onWordSubmitted(
         word: String?,
         filter: List<WordTeacherWord.PartOfSpeech>,

@@ -76,7 +76,7 @@ class AppModule {
     @IsDebug
     @AppComp
     @Provides
-    fun isDebug(): Boolean = BuildConfig.DEBUG
+    fun isDebug(): Boolean = false //BuildConfig.DEBUG
 
     @Platform
     @AppComp

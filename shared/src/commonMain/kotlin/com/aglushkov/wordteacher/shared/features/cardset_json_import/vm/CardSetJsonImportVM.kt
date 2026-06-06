@@ -77,6 +77,7 @@ data class ImportCardSet (
     var terms: List<String> = emptyList(), // for cardsets from search
     var info: CardSetInfo,
     var isAvailableInSearch: Boolean = false,
+    var tags: List<String> = emptyList()
 ) {
     fun toCardSet(nowTime: Instant) = CardSet(
         id = 0,
@@ -116,6 +117,7 @@ data class ImportCardSet (
         creationId = Uuid.randomUUID().toString(),
         info = info,
         isAvailableInSearch = isAvailableInSearch,
+        tags = tags,
     )
 }
 

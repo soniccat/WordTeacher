@@ -43,6 +43,7 @@ class ArticleModule {
 
     @Provides
     fun definitionsVM(
+        initialState: ArticleVM.State,
         connectivityManager: ConnectivityManager,
         wordDefinitionRepository: WordDefinitionRepository,
         dictRepository: DictRepository,
@@ -56,7 +57,7 @@ class ArticleModule {
         wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
         audioService: AudioService,
     ): DefinitionsVM = DefinitionsVMImpl(
-        DefinitionsVM.State(),
+        initialState.definitionsState,
         connectivityManager,
         wordDefinitionRepository,
         dictRepository,

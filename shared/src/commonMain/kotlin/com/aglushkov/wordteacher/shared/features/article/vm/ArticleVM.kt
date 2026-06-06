@@ -75,11 +75,13 @@ interface ArticleVM: Clearable {
     // TODO: simplify
     class StateController(
         restoredState: State,
+        private val definitionsVM: DefinitionsVM,
         private val settings: SettingStore,
     ) {
         private val SELECTION_STATE_KEY = "articleSelectionState2"
         private var inMemoryState =
             InMemoryState(
+                definitionsVM = definitionsVM,
                 id = restoredState.id,
                 isRead = false,
                 // TODO: move that into ArticlesRepository
@@ -120,6 +122,7 @@ interface ArticleVM: Clearable {
     }
 
     data class InMemoryState(
+        val definitionsVM: DefinitionsVM,
         val version: Int = 0,
         val id: Long,
         val isRead: Boolean,
@@ -128,12 +131,13 @@ interface ArticleVM: Clearable {
         val annotationChooserState: AnnotationChooserState? = null,
     ) {
         fun update(block: InMemoryState.()->InMemoryState) = run { block(this).copy(version = version + 1) }
-        fun toState() = State(id = id)
+        fun toState() = State(id = id, definitionsVM.state)
     }
 
     @Serializable
     data class State(
         val id: Long,
+        val definitionsState: DefinitionsVM.State = DefinitionsVM.State()
     )
 
     @Serializable
@@ -169,6 +173,7 @@ open class ArticleVMImpl(
     override val article: StateFlow<Resource<Article>> = articleRepository.article
 
     private val stateController = ArticleVM.StateController(
+        definitionsVM = definitionsVM,
         restoredState = restoredState,
         settings = settingStore,
     )
@@ -194,6 +199,7 @@ open class ArticleVMImpl(
 
     init {
         articleRepository.loadArticle(state.value.id)
+        definitionsVM.restore(restoredState.definitionsState)
 
         // handle markIsRead changes
         viewModelScope.launch {

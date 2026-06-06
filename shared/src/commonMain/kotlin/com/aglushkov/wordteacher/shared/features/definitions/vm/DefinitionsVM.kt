@@ -53,6 +53,7 @@ import kotlinx.serialization.Serializable
 interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
 
+    fun restore(state: DefinitionsVM.State)
     fun onWordTextUpdated(newText: String)
     fun onWordSubmitted(
         word: String?,
@@ -221,9 +222,7 @@ open class DefinitionsVMImpl(
     override val isWordHistorySelected = MutableStateFlow(false)
 
     init {
-        initialState.word?.let {
-            updateCurrentWord(it, initialState.selectedPartsOfSpeechFilter)
-        }
+        restore(initialState)
 
         if (definitionsSettings.needStoreDefinedWordInSettings) {
             viewModelScope.launch {
@@ -237,6 +236,12 @@ open class DefinitionsVMImpl(
                     }
                 }
             }
+        }
+    }
+
+    override fun restore(state: DefinitionsVM.State) {
+        state.word?.let {
+            updateCurrentWord(it, state.selectedPartsOfSpeechFilter)
         }
     }
 
