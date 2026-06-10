@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity(), Router {
         (appComponent().dslDictOpenController() as FileOpenControllerImpl).bind(this)
         appComponent().googleAuthRepository().bind(this)
         appComponent().vkAuthController().bind(this)
+        appComponent().telegramAuthController().bind(this)
         appComponent().yandexAuthController().bind(this)
         appComponent().webLinkOpenerImpl().bind(this)
         (appComponent().emailOpener() as EmailOpenerImpl).bind(this)

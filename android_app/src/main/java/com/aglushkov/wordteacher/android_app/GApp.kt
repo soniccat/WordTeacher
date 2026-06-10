@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.android_app
 
 import android.app.Application
+import android.content.res.Resources
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
@@ -11,6 +12,7 @@ import com.aglushkov.wordteacher.android_app.di.GeneralModule
 import com.aglushkov.wordteacher.android_app.general.ActivityVisibilityResolver
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.setAnalytics
@@ -28,16 +30,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import org.telegram.login.TelegramLogin
 import java.io.File
 import javax.inject.Inject
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.outputStream
-
-
-// to inject some fields for non main process
-class GAppNonMainProccess {
-    @Inject lateinit var analytics: Analytics
-}
 
 class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listener {
     override lateinit var appComponent: AppComponent
@@ -77,6 +74,14 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
             )
         )
         VKID.init(this)
+        TelegramLogin.init(
+            clientId = resources.getString(R.string.telegram_client_id),
+            redirectUri = buildString {
+                append("https://")
+                append(getTelegramRedirect(resources, appComponent.isDebug()))
+                append("/tglogin")
+            }
+        )
 
         routerResolver.attach()
         activityVisibilityResolver.listener = this
@@ -109,3 +114,6 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         appComponent.connectivityManager().unregister()
     }
 }
+
+fun getTelegramRedirect(res: Resources, isDebug: Boolean) =
+    res.getString(if(isDebug) R.string.telegram_redirect_release else R.string.telegram_redirect_release)

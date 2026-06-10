@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.android_app.general.crypto.SecureCodecBuilder
 import com.aglushkov.wordteacher.android_app.helper.EmailOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
+import com.aglushkov.wordteacher.android_app.helper.TelegramAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.WebLinkOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.YandexAuthControllerImpl
@@ -30,6 +31,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
+import com.aglushkov.wordteacher.shared.general.auth.TelegramAuthController
 import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.auth.YandexAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
@@ -187,6 +189,13 @@ class AppModule {
 
     @AppComp
     @Provides
+    fun telegramAuthControllerImpl(
+        timeSource: TimeSource,
+        @IsDebug isDebug: Boolean,
+    ): TelegramAuthControllerImpl = TelegramAuthControllerImpl(timeSource, isDebug)
+
+    @AppComp
+    @Provides
     fun yandexAuthControllerImpl(
         timeSource: TimeSource
     ): YandexAuthControllerImpl = YandexAuthControllerImpl(timeSource)
@@ -197,6 +206,12 @@ class AppModule {
     fun vkAuthController(
         impl: VKAuthControllerImpl
     ): VKAuthController = impl
+
+    @AppComp
+    @Provides
+    fun telegramAuthController(
+        impl: TelegramAuthControllerImpl
+    ): TelegramAuthController = impl
 
     @AppComp
     @Provides

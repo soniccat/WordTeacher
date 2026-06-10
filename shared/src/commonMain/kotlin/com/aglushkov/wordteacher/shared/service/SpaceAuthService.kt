@@ -56,12 +56,15 @@ class SpaceAuthService(
         @SerialName("vkid")
         VKID("vkid"),
         @SerialName("yandexid")
-        YandexId("yandexid");
+        YandexId("yandexid"),
+        @SerialName("telegram")
+        Telegram("telegram");
 
         override fun toString(): String = when(this) {
             Google -> "Google"
             YandexId -> "Yandex ID"
             VKID -> "VK ID"
+            Telegram -> "Telegram"
         }
     }
 

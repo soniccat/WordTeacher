@@ -1,12 +1,12 @@
 package com.aglushkov.wordteacher.android_app.di
 
 import com.aglushkov.wordteacher.android_app.GApp
-import com.aglushkov.wordteacher.android_app.GAppNonMainProccess
 import com.aglushkov.wordteacher.android_app.features.learning.di.LearningDependencies
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.di.LearningSessionResultDependencies
 import com.aglushkov.wordteacher.android_app.features.notes.di.NotesDependencies
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.android_app.helper.GoogleAuthControllerImpl
+import com.aglushkov.wordteacher.android_app.helper.TelegramAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.WebLinkOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.YandexAuthControllerImpl
@@ -78,6 +78,7 @@ interface AppComponent:
 
     fun googleAuthRepository(): GoogleAuthControllerImpl
     fun vkAuthController(): VKAuthControllerImpl
+    fun telegramAuthController(): TelegramAuthControllerImpl
     fun yandexAuthController(): YandexAuthControllerImpl
     fun cookieStorage(): CookiesStorage
     @SpaceHttpClient
@@ -88,7 +89,6 @@ interface AppComponent:
     fun webLinkOpenerImpl(): WebLinkOpenerImpl
 
     fun injectApplication(app: GApp)
-    fun injectAppNonMainProccess(app: GAppNonMainProccess)
 
     @IsDebug fun isDebug(): Boolean
     @Platform fun platform(): String

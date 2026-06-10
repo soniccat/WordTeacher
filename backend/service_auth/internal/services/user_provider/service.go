@@ -11,6 +11,7 @@ type Service struct {
 	googleConfig   service_models.GoogleConfig
 	vkIdConfig     service_models.VKIDConfig
 	yandexIdConfig service_models.YandexIdConfig
+	telegramConfig service_models.TelegramConfig
 	userStorage    userStorage
 	httpClient     http.Client
 }
@@ -20,6 +21,7 @@ func New(
 	googleConfig service_models.GoogleConfig,
 	vkIdConfig service_models.VKIDConfig,
 	yandexIdConfig service_models.YandexIdConfig,
+	telegramConfig service_models.TelegramConfig,
 	userStorage userStorage,
 ) *Service {
 
@@ -29,6 +31,7 @@ func New(
 		googleConfig:   googleConfig,
 		vkIdConfig:     vkIdConfig,
 		yandexIdConfig: yandexIdConfig,
+		telegramConfig: telegramConfig,
 		userStorage:    userStorage,
 		httpClient:     httpClient,
 	}

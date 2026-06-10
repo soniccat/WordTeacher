@@ -5,6 +5,8 @@ secrets:
     file: ./google
   yandexid:
     file: ./yandexid
+  telegram:
+    file: ./telegram
 
 services:
   nginx:

@@ -57,7 +57,7 @@ func createApplication(
 		userRepository,
 		sessionManager,
 	)
-	userResolver := user_provider.New(app.logger, config.GoogleConfig, config.VKIDConfig, config.YandexIdConfig, userRepository)
+	userResolver := user_provider.New(app.logger, config.GoogleConfig, config.VKIDConfig, config.YandexIdConfig, config.TelegramConfig, userRepository)
 
 	app.authorizer = authorizer.New(
 		userResolver,

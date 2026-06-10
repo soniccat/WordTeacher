@@ -104,6 +104,7 @@ private fun showSettingsItem(
                             SpaceAuthService.NetworkType.Google -> MR.images.google
                             SpaceAuthService.NetworkType.VKID -> MR.images.vk
                             SpaceAuthService.NetworkType.YandexId -> MR.images.yandex
+                            SpaceAuthService.NetworkType.Telegram -> MR.images.telegram
                         }
                     ),
                     contentDescription = null,

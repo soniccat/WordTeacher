@@ -13,6 +13,16 @@ plugins {
     alias(libs.plugins.kapt)
 }
 
+// Telegram props
+var telegramProps: Properties? = null
+val telegramPropFile = file("${project.rootDir}/android_app/telegram.properties")
+if (telegramPropFile.exists()) {
+    telegramProps = Properties().apply {
+        load(FileInputStream(telegramPropFile))
+    }
+}
+
+
 repositories {
     google()
     mavenCentral()
@@ -20,6 +30,13 @@ repositories {
     maven("https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-andorid/")
     maven("https://artifactory-external.vkpartner.ru/artifactory/maven/")
     maven("https://artifactory-external.vkpartner.ru/artifactory/vk-id-captcha/android/")
+    maven {
+        url = uri("https://maven.pkg.github.com/TelegramMessenger/telegram-login-android")
+        credentials {
+            username = telegramProps!!["telegram_github_user"]?.toString() ?: providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_USERNAME")
+            password = telegramProps!!["telegram_github_key"]?.toString() ?: providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 group = "com.aglushkov.wordteacher"
@@ -67,6 +84,7 @@ kotlin {
             implementation(libs.yandexId)
             implementation(libs.playServicesAuth)
             implementation(libs.androidXBrowser)
+            implementation("org.telegram:login-sdk:1.0.0")
         }
     }
 }
@@ -112,6 +130,9 @@ android {
     buildTypes {
         defaultConfig {
             yandexProps?.onEach {
+                resValue("string", it.key.toString(), it.value.toString())
+            }
+            telegramProps?.onEach {
                 resValue("string", it.key.toString(), it.value.toString())
             }
 

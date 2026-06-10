@@ -8,10 +8,12 @@ const (
 	Google UserNetworkType = iota
 	VKID
 	YandexId
+	Telegram
 
 	GoogleString   = "google"
 	VKIDString     = "vkid"
 	YandexIdString = "yandexid"
+	TelegramString = "telegram"
 )
 
 type UserNetwork struct {
@@ -27,6 +29,8 @@ func UserNetworkTypeFromString(value string) (UserNetworkType, error) {
 		return VKID, nil
 	case YandexIdString:
 		return YandexId, nil
+	case TelegramString:
+		return Telegram, nil
 	}
 	return Google, fmt.Errorf("invalid user network type (%s)", value)
 }

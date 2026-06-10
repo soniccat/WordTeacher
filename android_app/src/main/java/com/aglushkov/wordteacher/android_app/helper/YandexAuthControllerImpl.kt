@@ -29,7 +29,6 @@ import kotlinx.coroutines.withContext
 class YandexAuthControllerImpl(
     val timeSource: TimeSource
 ) : YandexAuthController {
-    private var scope = CoroutineScope(Dispatchers.Main)
     private var yandexSdk: YandexAuthSdk? = null
     private var yandexAuthDataState: MutableStateFlow<Resource<NetworkAuthData>> =
         MutableStateFlow(Resource.Uninitialized())

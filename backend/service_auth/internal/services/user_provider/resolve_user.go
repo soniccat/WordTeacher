@@ -23,6 +23,8 @@ func (s *Service) ResolveUser(
 		userWithNetwork, err = s.VKUser(ctx, token, deviceType)
 	} else if networkType == models.YandexId {
 		userWithNetwork, err = s.YandexUser(ctx, token, deviceType)
+	} else if networkType == models.Telegram {
+		userWithNetwork, err = s.TelegramUser(ctx, token, deviceType)
 	} else {
 		err = logger.WrapError(ctx, fmt.Errorf("unsupported networkType: %d", networkType))
 	}

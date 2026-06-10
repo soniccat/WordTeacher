@@ -4,6 +4,7 @@ type Configs struct {
 	GoogleConfig   GoogleConfig
 	VKIDConfig     VKIDConfig
 	YandexIdConfig YandexIdConfig
+	TelegramConfig TelegramConfig
 }
 
 type GoogleConfig struct {
@@ -16,5 +17,9 @@ type VKIDConfig struct {
 }
 
 type YandexIdConfig struct {
+	ClientId string `json:"clientId"`
+}
+
+type TelegramConfig struct {
 	ClientId string `json:"clientId"`
 }

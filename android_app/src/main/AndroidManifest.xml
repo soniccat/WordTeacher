@@ -28,8 +28,16 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="com.wordteacher"
-                    android:host="open" />
+                <data android:scheme="com.wordteacher" android:host="open" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                    android:host="app2176426288-login.tg.dev"/>
+                <data android:scheme="https"
+                    android:host="app947223760-login.tg.dev"/>
             </intent-filter>
         </activity>
 
