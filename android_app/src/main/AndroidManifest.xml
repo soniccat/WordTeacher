@@ -35,9 +35,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https"
-                    android:host="app2176426288-login.tg.dev"/>
+                    android:host="app2176426288-login.tg.dev"
+                    android:pathPrefix="/tglogin"/>
                 <data android:scheme="https"
-                    android:host="app947223760-login.tg.dev"/>
+                    android:host="app947223760-login.tg.dev"
+                    android:pathPrefix="/tglogin"/>
             </intent-filter>
         </activity>
 

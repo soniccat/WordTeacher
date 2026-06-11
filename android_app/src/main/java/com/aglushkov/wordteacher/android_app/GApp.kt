@@ -31,10 +31,7 @@ import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.telegram.login.TelegramLogin
-import java.io.File
 import javax.inject.Inject
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.outputStream
 
 class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listener {
     override lateinit var appComponent: AppComponent
