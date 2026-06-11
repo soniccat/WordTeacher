@@ -66,6 +66,7 @@ services:
       - vkid
       - google
       - yandexid
+      - telegram
     volumes:
       - ${VOLUME_AUTH_LOG_PATH}:/var/log
     networks:
