@@ -21,7 +21,7 @@ class TabComposeModule {
     @Provides
     fun tabDecomposeComponentFactory(
         appComponent: AppComponent,
-        @IsDebug isDebug: Boolean
+        @IsDebug isDebug: Boolean,
     ): (context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration) -> Any =
         { context: ComponentContext, configuration: TabDecomposeComponent.ChildConfiguration ->
             when (configuration) {

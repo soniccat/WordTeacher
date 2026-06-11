@@ -27,6 +27,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 
@@ -35,6 +36,7 @@ import com.arkivanov.decompose.ComponentContext
 class SettingsDecomposeComponent (
     componentContext: ComponentContext,
     initialState: SettingsVM.State,
+    authNetworkTypes: Array<SpaceAuthService.NetworkType>,
     connectivityManager: ConnectivityManager,
     spaceAuthRepository: SpaceAuthRepository,
     logsRepository: LogsRepository,
@@ -54,6 +56,7 @@ class SettingsDecomposeComponent (
         key = KEY_STATE,
         strategy = SettingsVM.State.serializer()
     ) ?: initialState,
+    authNetworkTypes,
     connectivityManager,
     spaceAuthRepository,
     logsRepository,

@@ -84,7 +84,7 @@ kotlin {
             implementation(libs.yandexId)
             implementation(libs.playServicesAuth)
             implementation(libs.androidXBrowser)
-            implementation("org.telegram:login-sdk:1.0.0")
+            implementation(libs.telegramLogin)
         }
     }
 }
@@ -110,8 +110,8 @@ android {
         applicationId = "com.aglushkov.wordteacher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 16
-        versionName = "1.16"
+        versionCode = 17
+        versionName = "1.17"
 
         addManifestPlaceholders(
             buildMap {
@@ -144,6 +144,21 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
+    flavorDimensions += "auth"
+    productFlavors {
+        create("rustore") {
+            dimension = "auth"
+            buildConfigField("boolean", "isGoogleAuthEnabled", "false")
+            buildConfigField("boolean", "isTelegramAuthEnabled", "false")
+        }
+        create("full") {
+            dimension = "auth"
+            buildConfigField("boolean", "isGoogleAuthEnabled", "true")
+            buildConfigField("boolean", "isTelegramAuthEnabled", "true")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

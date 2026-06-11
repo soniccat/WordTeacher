@@ -53,6 +53,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.tasks.AddArticleSampleTask
 import com.aglushkov.wordteacher.shared.tasks.AddCardSetSampleTask
 import com.aglushkov.wordteacher.shared.tasks.ArticleSample
@@ -118,6 +119,21 @@ class AppModule {
         } else {
             context.getString(MR.strings.api_base_url.resourceId)
         }
+    }
+
+    @AppComp
+    @Provides
+    fun authNetworkTypes(): Array<SpaceAuthService.NetworkType> {
+        return buildList<SpaceAuthService.NetworkType> {
+            if (BuildConfig.isTelegramAuthEnabled) {
+                add(SpaceAuthService.NetworkType.Telegram)
+            }
+            if (BuildConfig.isGoogleAuthEnabled) {
+                add(SpaceAuthService.NetworkType.Google)
+            }
+            add(SpaceAuthService.NetworkType.VKID)
+            add(SpaceAuthService.NetworkType.YandexId)
+        }.toTypedArray()
     }
 
     @Email

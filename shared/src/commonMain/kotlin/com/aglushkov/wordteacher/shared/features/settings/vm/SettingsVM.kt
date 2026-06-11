@@ -73,6 +73,7 @@ interface FileSharer {
 
 open class SettingsVMImpl (
     restoredState: SettingsVM.State,
+    private val authNetworkTypes: Array<SpaceAuthService.NetworkType>,
     private val connectivityManager: ConnectivityManager,
     private val spaceAuthRepository: SpaceAuthRepository,
     private val logsRepository: LogsRepository,
@@ -122,9 +123,7 @@ open class SettingsVMImpl (
             is Resource.Error,
             is Resource.Uninitialized -> {
                 resultItems += SettingsViewTextItem(StringDesc.Resource(MR.strings.settings_auth_signin), withBottomPadding = false)
-                resultItems += SettingsSignInItem(
-                    listOf(SpaceAuthService.NetworkType.YandexId, SpaceAuthService.NetworkType.VKID, SpaceAuthService.NetworkType.Google, SpaceAuthService.NetworkType.Telegram)
-                )
+                resultItems += SettingsSignInItem(authNetworkTypes.toList())
             }
             is Resource.Loaded -> {
                 resultItems += SettingsSignOutItem(StringDesc.ResourceFormatted(MR.strings.settings_auth_signout, authDataRes.data.user.networkType.toString()))

@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 
@@ -28,6 +29,7 @@ class SettingsModule {
     fun settingsDecomposeComponent(
         componentContext: ComponentContext,
         state: SettingsVM.State,
+        authNetworkTypes: Array<SpaceAuthService.NetworkType>,
         connectivityManager: ConnectivityManager,
         spaceAuthRepository: SpaceAuthRepository,
         logsRepository: LogsRepository,
@@ -45,6 +47,7 @@ class SettingsModule {
     ) = SettingsDecomposeComponent(
         componentContext,
         state,
+        authNetworkTypes,
         connectivityManager,
         spaceAuthRepository,
         logsRepository,

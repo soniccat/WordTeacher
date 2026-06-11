@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 
@@ -39,6 +40,7 @@ interface SettingsComponent {
 }
 
 interface SettingsDependencies {
+    fun authNetworkTypes(): Array<SpaceAuthService.NetworkType>
     fun spaceAuthRepository(): SpaceAuthRepository
     fun connectivityManager(): ConnectivityManager
     fun idGenerator(): IdGenerator
