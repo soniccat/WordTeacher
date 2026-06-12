@@ -45,11 +45,11 @@ class SymSpellDictionaryHolder(
         for (delete in editDeletes) {
             val hash = hashFunction.hash(delete)
             if (hash != null) {
-                if (deletes.containsKey(hash)) {
-                    deletes[hash]!!.add(key)
-                } else {
-                    deletes[hash] = arrayListOf(key)
-                }
+//                if (deletes.containsKey(hash)) {
+//                    deletes[hash]!!.add(key)
+//                } else {
+//                    deletes[hash] = arrayListOf(key)
+//                }
             }
         }
         return true

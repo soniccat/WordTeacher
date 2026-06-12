@@ -40,4 +40,21 @@ actual class DatabaseDriverFactory(private val context: Context) {
             )
         )
     }
+
+    actual fun createMisspellingDBDriver(): SqlDriver =
+        createMisspellingDBDriverByName(MISSPELLING_DB_NAME)
+
+    actual fun createTmpMisspellingDBDriver(): SqlDriver =
+        createMisspellingDBDriverByName(MISSPELLING_DB_NAME_TMP)
+
+    private fun createMisspellingDBDriverByName(name: String): SqlDriver {
+        return AndroidSqliteDriver(
+            WordFrequencyDB.Schema,
+            context,
+            name,
+            callback = AndroidSqliteDriver.Callback(
+                schema = WordFrequencyDB.Schema,
+            )
+        )
+    }
 }

@@ -153,6 +153,11 @@ sqldelight {
             schemaOutputDirectory.set(File("./src/commonMain/sqldelight/wordfrequency/com/aglushkov/wordteacher/schemes"))
             srcDirs.setFrom("src/commonMain/sqldelight/wordfrequency")
         }
+        create("MisspellingDB") {
+            packageName.set("com.aglushkov.wordteacher.misspellingdb")
+            schemaOutputDirectory.set(File("./src/commonMain/sqldelight/misspelling/com/aglushkov/wordteacher/schemes"))
+            srcDirs.setFrom("src/commonMain/sqldelight/misspelling")
+        }
     }
 }
 

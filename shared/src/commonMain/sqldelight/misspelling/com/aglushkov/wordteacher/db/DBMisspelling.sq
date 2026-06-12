@@ -1,0 +1,18 @@
+import kotlin.Long;
+import kotlin.String;
+import kotlin.collections.List;
+
+CREATE TABLE IF NOT EXISTS misspelling (
+  hash INTEGER AS Long NOT NULL,
+  candidates TEXT AS List<String> NOT NULL
+);
+
+selectCandidates:
+SELECT candidates
+FROM misspelling
+WHERE hash = ?;
+
+insert:
+INSERT INTO misspelling(hash, candidates)
+VALUES (?, ?);
+
