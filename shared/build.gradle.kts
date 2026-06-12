@@ -59,6 +59,8 @@ kotlin {
             implementation(libs.statelyCommon)
             implementation(libs.statelyConcurrency)
             implementation(libs.datastorePreference)
+            implementation("com.darkrockstudios:symspellkt:3.4.0")
+
             val version = "0.5.0"
 
             // For parsing HTML

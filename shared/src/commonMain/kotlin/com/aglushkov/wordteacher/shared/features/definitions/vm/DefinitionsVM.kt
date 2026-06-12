@@ -39,6 +39,8 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
+import com.darkrockstudios.symspellkt.api.DictionaryHolder
+import com.darkrockstudios.symspellkt.impl.SymSpell
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -794,7 +796,7 @@ open class DefinitionsVMImpl(
             delay(200)
             suggestedDictEntryRepository.load(word)
                 .waitUntilDone {
-                    if (it.size in 0..19) {
+                    if (it.size in 0..30) {
                         launch {
                             wordTextSearchRepository.load(word).collect()
                         }
