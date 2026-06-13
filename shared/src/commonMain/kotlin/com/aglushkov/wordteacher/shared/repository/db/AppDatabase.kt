@@ -836,7 +836,7 @@ private class WordPartOfSpeechAdapter: ColumnAdapter<WordTeacherWord.PartOfSpeec
     }
 }
 
-private class StringListAdapter(
+class StringListAdapter(
     private val divider: Char = LIST_DIVIDER,
     private val escape: Char = LIST_ESCAPE
 ): ColumnAdapter<List<String>, String> {

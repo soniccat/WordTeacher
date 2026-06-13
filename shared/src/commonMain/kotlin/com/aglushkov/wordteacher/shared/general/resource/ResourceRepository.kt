@@ -51,16 +51,19 @@ abstract class SimpleResourceRepository<T, A>(
                     .onData(stateFlow::updateWithLoadingData)
             }
 
-            loadResource(
-                initialValue = stateFlow.value,
-                canTryAgain = canTryAgain,
-                loader = { loadInternal(arg) },
-            ).collect(stateFlow)
+            handleLoading(arg)
         }
 
         return stateFlow.takeUntilLoadedOrErrorForVersion()
     }
 
+    protected open suspend fun handleLoading(arg: A) {
+        loadResource(
+            initialValue = stateFlow.value,
+            canTryAgain = canTryAgain,
+            loader = { loadInternal(arg) },
+        ).collect(stateFlow)
+    }
     protected open suspend fun preload(arg: A): T? = null
     protected abstract suspend fun loadInternal(arg: A): T
 

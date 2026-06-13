@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.shared.repository.db
 
-import co.touchlab.kermit.Logger
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.FileOpenController
@@ -24,8 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import okio.Path
 import kotlin.math.pow
 
@@ -100,12 +97,7 @@ class WordFrequencyDatabase(
 
     val state = MutableStateFlow<Resource<WordFrequencyDatabase>>(Resource.Uninitialized())
 
-    private val jsonCoder = Json {
-        ignoreUnknownKeys = true
-    }
-
     override var gradationState = MutableStateFlow<Resource<WordFrequencyGradation>>(Resource.Uninitialized())
-    // private var gradation: WordFrequencyGradation? = null
     private val defaultFrequency: Double = UNKNOWN_FREQUENCY
 
     init {
@@ -148,7 +140,6 @@ class WordFrequencyDatabase(
             if (gradation != null) {
                 gradationState.update { Resource.Loaded(gradation) }
             }
-//            defaultFrequency = settings.getDoubleOrNull(WORD_FREQUENCY_DEFAULT_SETTINGS_NAME) ?: UNKNOWN_FREQUENCY
         } catch (_: Exception) {
         }
 
@@ -160,14 +151,7 @@ class WordFrequencyDatabase(
     private suspend fun updateGradation() {
         val newGradation = calcGradation()
         gradationState.update { Resource.Loaded(newGradation) }
-        //            val defaultFrequency = if (newGradation.levels.isEmpty()) {
-        //                UNKNOWN_FREQUENCY
-        //            } else {
-        //                newGradation.levels[newGradation.levels.size/2].frequency
-        //            }
-
         settings.setSerializable(WORD_FREQUENCY_GRADATION_SETTINGS_NAME, newGradation)
-        //            settings.putDouble(WORD_FREQUENCY_DEFAULT_SETTINGS_NAME, defaultFrequency)
     }
 
     private fun calcGradation(): WordFrequencyGradation {
@@ -237,7 +221,6 @@ class WordFrequencyDatabase(
 }
 
 private const val WORD_FREQUENCY_GRADATION_SETTINGS_NAME = "wordFrequencyGradation"
-//private const val WORD_FREQUENCY_DEFAULT_SETTINGS_NAME = "wordFrequencyDefault"
 
 const val UNKNOWN_FREQUENCY = -1.0 // not found in db
 const val UNDEFINED_FREQUENCY = -2.0 // haven't checked yet

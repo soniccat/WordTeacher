@@ -29,6 +29,7 @@ import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetReposito
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.repository.db.DatabaseDriverFactory
+import com.aglushkov.wordteacher.shared.repository.db.MisspellingDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
@@ -41,6 +42,8 @@ import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellDictionaryHolder
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.service.*
@@ -48,6 +51,9 @@ import com.aglushkov.wordteacher.shared.workers.CardFrequencyUpdateWorker
 import com.aglushkov.wordteacher.shared.workers.CardSetSyncWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
+import com.darkrockstudios.symspellkt.common.Murmur3HashFunction
+import com.darkrockstudios.symspellkt.common.SpellCheckSettings
+import com.darkrockstudios.symspellkt.impl.SymSpell
 
 import dagger.Lazy
 import okio.FileSystem
@@ -56,6 +62,7 @@ import dagger.Provides
 import io.ktor.client.*
 import io.ktor.client.plugins.cookies.*
 import okio.Path
+import okio.Path.Companion.toPath
 
 @Module
 class SharedAppModule {
@@ -191,6 +198,14 @@ class SharedAppModule {
         settings: SettingStore,
     ): WordFrequencyDatabase {
         return WordFrequencyDatabase(driver, dbPreparer, settings)
+    }
+
+    @AppComp
+    @Provides
+    fun misspellingDatabase(
+        driver: DatabaseDriverFactory,
+    ): MisspellingDatabase {
+        return MisspellingDatabase(driver, { "".toPath() })
     }
 
     @AppComp
@@ -542,5 +557,24 @@ class SharedAppModule {
         dashboardRepository: DashboardRepository,
     ): CardSetTagRepository {
         return CardSetTagRepository(dashboardRepository)
+    }
+
+    @AppComp
+    @Provides
+    fun symSpellRepository(
+        dictRepository: DictRepository,
+        misspellingDatabase: MisspellingDatabase,
+    ): SymSpellRepository {
+        val spellCheckSettings = SpellCheckSettings()
+        return SymSpellRepository(
+            symSpell = SymSpell(
+                dictionaryHolder = SymSpellDictionaryHolder(
+                    spellCheckSettings,
+                    Murmur3HashFunction(),
+                    misspellingDatabase,
+                ),
+            ),
+            dictRepository = dictRepository,
+        )
     }
 }

@@ -1,5 +1,14 @@
 package com.aglushkov.wordteacher.shared.repository.suggestion
 
+import com.aglushkov.wordteacher.shared.dicts.Dict
+import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
+import com.aglushkov.wordteacher.shared.dicts.dsl.DslIndex
+import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDict
+import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDictIndex
+import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.v
+import com.aglushkov.wordteacher.shared.repository.db.MisspellingDatabase
 import com.darkrockstudios.symspellkt.api.DictionaryHolder
 import com.darkrockstudios.symspellkt.api.HashFunction
 import com.darkrockstudios.symspellkt.common.DictionaryItem
@@ -9,6 +18,7 @@ import com.darkrockstudios.symspellkt.common.SpellHelper.getEditDeletes
 class SymSpellDictionaryHolder(
     private val spellCheckSettings: SpellCheckSettings,
     private val hashFunction: HashFunction,
+    private val misspellingDB: MisspellingDatabase,
 ): DictionaryHolder {
 
     override val wordCount: Int
@@ -16,12 +26,46 @@ class SymSpellDictionaryHolder(
             return 0
         }
 
-    override fun addItem(dictionaryItem: DictionaryItem): Boolean {
-        if (dictionaryItem.frequency <= 0 && spellCheckSettings.countThreshold > 0) {
-            return false
-        }
+//    suspend fun fillFromDictionaries() {
+//        dictRepository.dicts.waitUntilLoaded()
+//        val dicts = dictRepository.dicts.value.asLoaded() ?: return
+//        val dict = dicts.data.firstOrNull { it.name.endsWith(WORDLIST_EXTENSION) } ?: return
+//        dict.index.allEntries().onEach { entry ->
+//            addItem(DictionaryItem(entry.word, 0.0))
+//        }
+//    }
 
-        var key = dictionaryItem.term
+    fun fillFromDict(dict: Dict) {
+        val wordCount = (dict.index as WordListDictIndex).wordCount
+        val deletes: MutableMap<Long, ArrayList<String>> = mutableMapOf()
+        dict.index.allEntries().mapIndexed { i, entry ->
+            addItem(entry.word, deletes)
+
+            val size = deletes.values.sumOf { it.size }
+            if (size > 200000) {
+//                misspellingDB.transaction {
+//                    deletes.onEach { e ->
+//                        misspellingDB.upsert(e.key, e.value)
+//                    }
+//                }
+                Logger.v("start at index $i")
+                misspellingDB.upsert(deletes)
+                deletes.clear()
+                Logger.v("upsert completed at index $i, ${i.toFloat()/wordCount.toFloat()}")
+            }
+//            Logger.v("size is $size")
+        }.toList()
+
+        misspellingDB.upsert(deletes)
+    }
+
+    override fun addItem(dictionaryItem: DictionaryItem): Boolean {
+        //return addItem(dictionaryItem.term)
+        TODO("not supported")
+    }
+
+    fun addItem(term: String, deletes: MutableMap<Long, ArrayList<String>>): Boolean {
+        var key = term
         if (spellCheckSettings.lowerCaseTerms) {
             key = key.lowercase()
         }
@@ -45,11 +89,11 @@ class SymSpellDictionaryHolder(
         for (delete in editDeletes) {
             val hash = hashFunction.hash(delete)
             if (hash != null) {
-//                if (deletes.containsKey(hash)) {
-//                    deletes[hash]!!.add(key)
-//                } else {
-//                    deletes[hash] = arrayListOf(key)
-//                }
+                if (deletes.containsKey(hash)) {
+                    deletes[hash]!!.add(key)
+                } else {
+                    deletes[hash] = arrayListOf(key)
+                }
             }
         }
         return true
@@ -60,7 +104,9 @@ class SymSpellDictionaryHolder(
     }
 
     override fun getDeletes(key: String): ArrayList<String>? {
-        TODO("Not yet implemented")
+        return ArrayList(
+            misspellingDB.select(hashFunction.hash(key)!!)
+        )
     }
 
     override fun getItemFrequency(term: String): Double? {

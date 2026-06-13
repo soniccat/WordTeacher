@@ -49,6 +49,7 @@ class WordListDictIndex(
 ): DictTrieIndex {
     override val index = DictTrie()
     private val wordListWordData = DictWordData(emptyList(), null, dict)
+    var wordCount = 0
 
     init {
         if (fileSystem.exists(path)) {
@@ -65,6 +66,7 @@ class WordListDictIndex(
             while(!exhausted()) {
                 readUtf8Line()?.let { word ->
                     index.put(word, wordListWordData)
+                    ++wordCount
                 }
             }
         }

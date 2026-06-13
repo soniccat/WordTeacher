@@ -54,12 +54,12 @@ kotlin {
             api(libs.ktorContentEncoding)
             api(libs.mokoResourcesLib)
             api(libs.decompose)
+            api("com.darkrockstudios:symspellkt:3.4.0")
             implementation(libs.ktorAuth)
             implementation(libs.kotlinxDateTime)
             implementation(libs.statelyCommon)
             implementation(libs.statelyConcurrency)
             implementation(libs.datastorePreference)
-            implementation("com.darkrockstudios:symspellkt:3.4.0")
 
             val version = "0.5.0"
 

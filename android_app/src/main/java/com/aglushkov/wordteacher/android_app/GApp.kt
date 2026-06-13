@@ -15,9 +15,11 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.setAnalytics
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.tasks.Task
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
@@ -49,6 +51,7 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var wordDefinitionRepository: WordDefinitionRepository
     @Inject lateinit var fileLogger: FileLogger
     @Inject lateinit var tasks: Array<Task>
+    @Inject lateinit var symSpellRepository: SymSpellRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -87,19 +90,25 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         appComponent.connectivityManager().checkNetworkState()
 
         mainScope.launch(Dispatchers.IO) {
-            val taskChannel = Channel<Task>(UNLIMITED)
-            launch {
-                taskChannel.receiveAsFlow().collect {
-                    launch {
-                        it.run(taskChannel)
-                    }
-                }
-            }
-            tasks.onEach {
+            if (BuildConfig.DEBUG) {
                 launch {
-                    it.run(taskChannel)
+                    symSpellRepository.load(Unit).waitUntilDone()
                 }
             }
+
+//            val taskChannel = Channel<Task>(UNLIMITED)
+//            launch {
+//                taskChannel.receiveAsFlow().collect {
+//                    launch {
+//                        it.run(taskChannel)
+//                    }
+//                }
+//            }
+//            tasks.onEach {
+//                launch {
+//                    it.run(taskChannel)
+//                }
+//            }
         }
     }
 

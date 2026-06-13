@@ -4,6 +4,7 @@ import android.content.Context
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.aglushkov.wordteacher.maindb.MainDB
+import com.aglushkov.wordteacher.misspellingdb.MisspellingDB
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.wordfrequencydb.WordFrequencyDB
@@ -49,11 +50,11 @@ actual class DatabaseDriverFactory(private val context: Context) {
 
     private fun createMisspellingDBDriverByName(name: String): SqlDriver {
         return AndroidSqliteDriver(
-            WordFrequencyDB.Schema,
+            MisspellingDB.Schema,
             context,
             name,
             callback = AndroidSqliteDriver.Callback(
-                schema = WordFrequencyDB.Schema,
+                schema = MisspellingDB.Schema,
             )
         )
     }

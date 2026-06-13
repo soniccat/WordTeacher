@@ -3,8 +3,8 @@ import kotlin.String;
 import kotlin.collections.List;
 
 CREATE TABLE IF NOT EXISTS misspelling (
-  hash INTEGER AS Long NOT NULL,
-  candidates TEXT AS List<String> NOT NULL
+  hash INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  candidates TEXT AS List<String> NOT NULL DEFAULT ""
 );
 
 selectCandidates:
@@ -12,7 +12,16 @@ SELECT candidates
 FROM misspelling
 WHERE hash = ?;
 
+selectCandidatesIn:
+SELECT hash, candidates
+FROM misspelling
+WHERE hash IN ?;
+
 insert:
 INSERT INTO misspelling(hash, candidates)
 VALUES (?, ?);
 
+update:
+UPDATE misspelling
+SET candidates = ?
+WHERE hash = ?;
