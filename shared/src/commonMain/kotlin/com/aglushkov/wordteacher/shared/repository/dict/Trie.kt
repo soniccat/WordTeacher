@@ -134,6 +134,9 @@ abstract class Trie<T, D>: Iterable<T> {
             node = node?.findChild(ch)
         }
 
+        if (node?.isEnd == false) {
+            return emptyList()
+        }
         return node?.dictIndexEntries.orEmpty()
     }
 

@@ -10,8 +10,10 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
+import com.aglushkov.wordteacher.shared.repository.db.MisspellingDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
@@ -47,4 +49,5 @@ interface DefinitionsDependencies {
     fun clipboardRepository(): ClipboardRepository
     fun wordDefinitionHistoryRepository(): WordDefinitionHistoryRepository
     fun audioService(): AudioService
+    fun symSpellRepository(): SymSpellRepository
 }

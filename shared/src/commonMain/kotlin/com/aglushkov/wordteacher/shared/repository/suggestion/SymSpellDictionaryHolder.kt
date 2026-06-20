@@ -1,12 +1,8 @@
 package com.aglushkov.wordteacher.shared.repository.suggestion
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
-import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
-import com.aglushkov.wordteacher.shared.dicts.dsl.DslIndex
-import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDict
 import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDictIndex
 import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.repository.db.MisspellingDatabase
 import com.darkrockstudios.symspellkt.api.DictionaryHolder
@@ -19,21 +15,17 @@ class SymSpellDictionaryHolder(
     private val spellCheckSettings: SpellCheckSettings,
     private val hashFunction: HashFunction,
     private val misspellingDB: MisspellingDatabase,
+    private val dictProvider: () -> Dict?
 ): DictionaryHolder {
+    val isReady: Boolean
+        get() {
+            return dictProvider() != null
+        }
 
     override val wordCount: Int
         get() {
             return 0
         }
-
-//    suspend fun fillFromDictionaries() {
-//        dictRepository.dicts.waitUntilLoaded()
-//        val dicts = dictRepository.dicts.value.asLoaded() ?: return
-//        val dict = dicts.data.firstOrNull { it.name.endsWith(WORDLIST_EXTENSION) } ?: return
-//        dict.index.allEntries().onEach { entry ->
-//            addItem(DictionaryItem(entry.word, 0.0))
-//        }
-//    }
 
     fun fillFromDict(dict: Dict) {
         val wordCount = (dict.index as WordListDictIndex).wordCount
@@ -43,17 +35,11 @@ class SymSpellDictionaryHolder(
 
             val size = deletes.values.sumOf { it.size }
             if (size > 200000) {
-//                misspellingDB.transaction {
-//                    deletes.onEach { e ->
-//                        misspellingDB.upsert(e.key, e.value)
-//                    }
-//                }
                 Logger.v("start at index $i")
                 misspellingDB.upsert(deletes)
                 deletes.clear()
                 Logger.v("upsert completed at index $i, ${i.toFloat()/wordCount.toFloat()}")
             }
-//            Logger.v("size is $size")
         }.toList()
 
         misspellingDB.upsert(deletes)
@@ -110,11 +96,17 @@ class SymSpellDictionaryHolder(
     }
 
     override fun getItemFrequency(term: String): Double? {
+        val dict = dictProvider() ?: return null
+        val e = dict.index.indexEntry(term)
+        if (e == null) {
+            return null // entry doesn't exist
+        }
+
         return 0.0 // calc frequency later using WordFrequencyDatabase
     }
 
     override fun getItemFrequencyBiGram(term: String): Double? {
-        return 0.0
+        return getItemFrequency(term)
     }
 
     // redundant

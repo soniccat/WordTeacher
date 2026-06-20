@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.di
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
+import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDict
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.auth.GoogleAuthController
@@ -10,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.auth.TelegramAuthController
 import com.aglushkov.wordteacher.shared.general.auth.VKAuthController
 import com.aglushkov.wordteacher.shared.general.auth.YandexAuthController
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
+import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.service.SpaceHttpClientBuilder
@@ -565,13 +567,18 @@ class SharedAppModule {
         dictRepository: DictRepository,
         misspellingDatabase: MisspellingDatabase,
     ): SymSpellRepository {
-        val spellCheckSettings = SpellCheckSettings()
+        val spellCheckSettings = SpellCheckSettings().copy(lowerCaseTerms = false)
         return SymSpellRepository(
             symSpell = SymSpell(
                 dictionaryHolder = SymSpellDictionaryHolder(
                     spellCheckSettings,
                     Murmur3HashFunction(),
                     misspellingDatabase,
+                    {
+                        dictRepository.dicts.value.asLoaded()?.data?.firstOrNull {
+                            it is WordListDict
+                        }
+                    }
                 ),
             ),
             dictRepository = dictRepository,

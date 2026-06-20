@@ -13,6 +13,8 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SuggestionRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.arkivanov.decompose.ComponentContext
 
@@ -21,6 +23,15 @@ import dagger.Provides
 
 @Module
 class DefinitionsModule {
+
+    @Provides
+    fun suggestionRepository(
+        symSpellRepository: SymSpellRepository,
+    ): SuggestionRepository {
+        return SuggestionRepository(symSpellRepository)
+    }
+
+
     @Provides
     fun definitionsDecomposeComponent(
         componentContext: ComponentContext,
@@ -38,6 +49,7 @@ class DefinitionsModule {
         settings: SettingStore,
         wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
         audioService: AudioService,
+        suggestionRepository: SuggestionRepository,
     ) = DefinitionsDecomposeComponent(
         componentContext,
         initialState,
@@ -54,5 +66,6 @@ class DefinitionsModule {
         settings,
         wordDefinitionHistoryRepository,
         audioService,
+        suggestionRepository,
     )
 }

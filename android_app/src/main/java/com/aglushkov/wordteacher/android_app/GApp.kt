@@ -90,25 +90,25 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         appComponent.connectivityManager().checkNetworkState()
 
         mainScope.launch(Dispatchers.IO) {
-            if (BuildConfig.DEBUG) {
-                launch {
-                    symSpellRepository.load(Unit).waitUntilDone()
+//            if (BuildConfig.DEBUG) {
+//                launch {
+//                    symSpellRepository.load(Unit).waitUntilDone()
+//                }
+//            }
+
+            val taskChannel = Channel<Task>(UNLIMITED)
+            launch {
+                taskChannel.receiveAsFlow().collect {
+                    launch {
+                        it.run(taskChannel)
+                    }
                 }
             }
-
-//            val taskChannel = Channel<Task>(UNLIMITED)
-//            launch {
-//                taskChannel.receiveAsFlow().collect {
-//                    launch {
-//                        it.run(taskChannel)
-//                    }
-//                }
-//            }
-//            tasks.onEach {
-//                launch {
-//                    it.run(taskChannel)
-//                }
-//            }
+            tasks.onEach {
+                launch {
+                    it.run(taskChannel)
+                }
+            }
         }
     }
 

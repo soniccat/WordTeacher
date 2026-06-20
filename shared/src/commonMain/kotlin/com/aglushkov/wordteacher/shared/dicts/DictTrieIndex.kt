@@ -13,13 +13,24 @@ interface DictTrieIndex: Dict.Index {
     }
 
     override fun indexEntry(word: String): Dict.Index.Entry? {
-        return index.word(word).firstOrNull() ?: run {
-            if (word.firstOrNull() != word.firstOrNull()?.lowercaseChar()) {
-                index.word(word.lowercase()).firstOrNull()
-            } else {
-                null
+        return index.word(word).firstOrNull()/* ?: run {
+            // search for different first letter
+            val capitalized = word.replaceFirstChar {
+                if (it.isLowerCase()) {
+                    it.uppercaseChar()
+                } else {
+                    it.lowercaseChar()
+                }
             }
-        }
+            index.word(capitalized).firstOrNull() ?: run {
+                val abbreviation = if (word[0].isLowerCase()) {
+                    word.uppercase(Locale.getDefault())
+                } else {
+                    word.lowercase(Locale.getDefault())
+                }
+                index.word(abbreviation).firstOrNull()
+            }
+        }*/
     }
 
     override fun entriesStartWith(prefix: String, limit: Int): List<Dict.Index.Entry> {

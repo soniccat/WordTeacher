@@ -27,7 +27,11 @@ class SymSpellRepository(
     }
 
     fun lookup(value: String): List<String> {
-        val r = symSpell.lookupCompound(value)
+        if (!(symSpell.dictionary as SymSpellDictionaryHolder).isReady) {
+            return emptyList()
+        }
+
+        val r = symSpell.lookup(value)
         return r.map {
             it.term
         }

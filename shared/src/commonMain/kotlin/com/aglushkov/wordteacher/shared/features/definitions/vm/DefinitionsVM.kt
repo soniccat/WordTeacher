@@ -36,6 +36,7 @@ import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SuggestionRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -51,6 +52,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
+import kotlin.collections.emptyList
 
 interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
@@ -151,6 +153,7 @@ open class DefinitionsVMImpl(
     private val settings: SettingStore,
     private val wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
     private val audioService: AudioService,
+    private val suggestionRepository: SuggestionRepository?,
 ): ViewModel(), DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
@@ -209,12 +212,12 @@ open class DefinitionsVMImpl(
         }.flatten().distinct()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String> { word ->
-        dictRepository.wordsStartWith(word, 60)
-    }
-    private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String> { text ->
-        wordTeacherDictService.textSearch(text).toOkResponse().words.orEmpty()
-    }
+//    private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String> { word ->
+//        dictRepository.wordsStartWith(word, 60)
+//    }
+//    private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String> { text ->
+//        wordTeacherDictService.textSearch(text).toOkResponse().words.orEmpty()
+//    }
 
     private val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     private var loadJob: Job? = null
@@ -410,8 +413,7 @@ open class DefinitionsVMImpl(
             items += WordLoadingViewItem()
         }
 
-        generateIds(items)
-        return items
+        return items.generateIds()
     }
 
     private fun getPartOfSpeechChipText(
@@ -425,8 +427,12 @@ open class DefinitionsVMImpl(
         }
     }
 
-    private fun generateIds(items: MutableList<BaseViewItem<*>>) {
-        generateViewItemIds(items, definitions.value.data().orEmpty(), idGenerator)
+//    private fun generateIds(items: List<BaseViewItem<*>>): List<BaseViewItem<*>> {
+//        return generateViewItemIds(items, definitions.value.data().orEmpty(), idGenerator)
+//    }
+
+    fun List<BaseViewItem<*>>.generateIds(): List<BaseViewItem<*>> {
+        return generateViewItemIds(this, definitions.value.data().orEmpty(), idGenerator)
     }
 
     private fun addMergedWords(
@@ -724,63 +730,77 @@ open class DefinitionsVMImpl(
     }
 
     // suggests
-    override val suggests = combine(
-        suggestedDictEntryRepository.stateFlow,
-        wordTextSearchRepository.stateFlow,
-    ) { dictEntries, wordTextSearch ->
-        dictEntries.merge(if (wordTextSearch.isUninitialized()){
-            wordTextSearch.toLoaded(emptyList()) // treat unitialized as loaded not to get unitialized during merge
-        } else {
-            wordTextSearch
-        }) { dictEntryList, dictTextSearchList ->
-            val viewItems = dictEntryList.orEmpty().map {
-                WordSuggestDictEntryViewItem(
-                    word = it.word,
-                    definition = "", // TODO: support first definition
-                    source = it.dict.name
-                )
-            }.distinctBy { it.firstItem() } + // here we loose source to avoid duplications
-            if (wordTextSearch.isLoading()) {
-                listOf(WordLoadingViewItem())
-            } else {
-                dictTextSearchList.orEmpty().mapIndexed { wordIndex, word ->
-                    word.defPairs.mapIndexed { defPairIndex, defPair ->
-                        defPair.defEntries.mapIndexed { defEntryIndex, defEntry ->
-                            defEntry.examples.orEmpty()
-                                .mapIndexed { exampleIndex, example ->
-                                    WordSuggestByTextViewItem(
-                                        foundText = example,
-                                        wordIndex = wordIndex,
-                                        defPairIndex = defPairIndex,
-                                        defEntryIndex = defEntryIndex,
-                                        exampleIndex = exampleIndex,
-                                        source = ""
-                                    ) as BaseViewItem<*>
-                                }
-                        }.flatten()
-                    }.flatten()
-                }.flatten()
-                .let {
-                    if (it.isNotEmpty()) {
-                        listOf(
-                            WordTextSearchHeaderViewItem(
-                                StringDesc.Resource(MR.strings.definitions_textsearch_title),
-                                StringDesc.Resource(MR.strings.definitions_textsearch_showAllWords),
-                                isTop = dictEntryList.orEmpty().isEmpty(),
-                            )
-                        ) + it
-                    } else {
-                        it
-                    }
-                }
+    override val suggests: StateFlow<Resource<List<BaseViewItem<*>>>> = if (suggestionRepository != null) {
+        suggestionRepository.stateFlow.map {
+            it.mapLoadedData {
+                it.corrections.map {
+                    WordSuggestDictEntryViewItem(
+                        word = it,
+                        definition = "",
+                        source = ""
+                    ) as BaseViewItem<*>
+                }.generateIds()
             }
-            viewItems.onEachIndexed { index, item -> item.id = index.toLong() }
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
+    } else {
+        MutableStateFlow(Resource.Uninitialized())
+    }
+//    override val suggests = combine(
+//        suggestionRepository.stateFlow,
+//        wordTextSearchRepository.stateFlow,
+//    ) { dictEntries, wordTextSearch ->
+//        dictEntries.merge(if (wordTextSearch.isUninitialized()){
+//            wordTextSearch.toLoaded(emptyList()) // treat unitialized as loaded not to get unitialized during merge
+//        } else {
+//            wordTextSearch
+//        }) { dictEntryList, dictTextSearchList ->
+//            val viewItems = dictEntryList.orEmpty().map {
+//                WordSuggestDictEntryViewItem(
+//                    word = it.word,
+//                    definition = "", // TODO: support first definition
+//                    source = it.dict.name
+//                )
+//            }.distinctBy { it.firstItem() } + // here we loose source to avoid duplications
+//            if (wordTextSearch.isLoading()) {
+//                listOf(WordLoadingViewItem())
+//            } else {
+//                dictTextSearchList.orEmpty().mapIndexed { wordIndex, word ->
+//                    word.defPairs.mapIndexed { defPairIndex, defPair ->
+//                        defPair.defEntries.mapIndexed { defEntryIndex, defEntry ->
+//                            defEntry.examples.orEmpty()
+//                                .mapIndexed { exampleIndex, example ->
+//                                    WordSuggestByTextViewItem(
+//                                        foundText = example,
+//                                        wordIndex = wordIndex,
+//                                        defPairIndex = defPairIndex,
+//                                        defEntryIndex = defEntryIndex,
+//                                        exampleIndex = exampleIndex,
+//                                        source = ""
+//                                    ) as BaseViewItem<*>
+//                                }
+//                        }.flatten()
+//                    }.flatten()
+//                }.flatten()
+//                .let {
+//                    if (it.isNotEmpty()) {
+//                        listOf(
+//                            WordTextSearchHeaderViewItem(
+//                                StringDesc.Resource(MR.strings.definitions_textsearch_title),
+//                                StringDesc.Resource(MR.strings.definitions_textsearch_showAllWords),
+//                                isTop = dictEntryList.orEmpty().isEmpty(),
+//                            )
+//                        ) + it
+//                    } else {
+//                        it
+//                    }
+//                }
+//            }
+//            viewItems.onEachIndexed { index, item -> item.id = index.toLong() }
+//        }
+//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
     override fun clearSuggests() {
-        suggestedDictEntryRepository.clear()
-        wordTextSearchRepository.clear()
+        suggestionRepository?.clear()
     }
 
     private var suggestJob: Job? = null
@@ -794,38 +814,38 @@ open class DefinitionsVMImpl(
 
         suggestJob = viewModelScope.launch(Dispatchers.IO) {
             delay(200)
-            suggestedDictEntryRepository.load(word)
-                .waitUntilDone {
-                    if (it.size in 0..30) {
-                        launch {
-                            wordTextSearchRepository.load(word).collect()
-                        }
-                    }
-                }
+            suggestionRepository?.load(word)?.collect()
+//                .waitUntilDone {
+//                    if (it.size in 0..30) {
+//                        launch {
+//                            wordTextSearchRepository.load(word).collect()
+//                        }
+//                    }
+//                }
         }
     }
 
     override fun onSuggestedSearchWordClicked(item: WordSuggestByTextViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.suggestedSearchWordClicked"))
-        wordTextSearchRepository.value.onData { textSearchItems ->
-            textSearchItems.getOrNull(item.wordIndex)?.let { word ->
-                definitionWords.update {
-                    Resource.Loaded(listOf(word.toWordTeacherWord()))
-                }
-            }
-        }
+//        wordTextSearchRepository.value.onData { textSearchItems ->
+//            textSearchItems.getOrNull(item.wordIndex)?.let { word ->
+//                definitionWords.update {
+//                    Resource.Loaded(listOf(word.toWordTeacherWord()))
+//                }
+//            }
+//        }
     }
 
     override fun onSuggestedShowAllSearchWordClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.suggestedShowAllSearchWordClicked"))
-        wordTextSearchRepository.value.onData { textSearchItems ->
-            wordFrequency.update { Resource.Uninitialized() }
-            definitionWords.update {
-                Resource.Loaded(
-                    textSearchItems.map { it.toWordTeacherWord() }
-                )
-            }
-        }
+//        wordTextSearchRepository.value.onData { textSearchItems ->
+//            wordFrequency.update { Resource.Uninitialized() }
+//            definitionWords.update {
+//                Resource.Loaded(
+//                    textSearchItems.map { it.toWordTeacherWord() }
+//                )
+//            }
+//        }
     }
 
     // word history
