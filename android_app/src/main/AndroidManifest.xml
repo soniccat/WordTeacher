@@ -35,10 +35,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https"
-                    android:host="app2176426288-login.tg.dev"
+                    android:host="@string/telegram_redirect_release"
                     android:pathPrefix="/tglogin"/>
                 <data android:scheme="https"
-                    android:host="app947223760-login.tg.dev"
+                    android:host="@string/telegram_redirect_debug"
                     android:pathPrefix="/tglogin"/>
             </intent-filter>
         </activity>
@@ -70,6 +70,24 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/log_fileprovider_paths" />
+        </provider>
+
+        <service
+            android:name="androidx.work.multiprocess.RemoteWorkerService"
+            android:exported="false"
+            android:process=":worker1" />
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+
+            <!-- Remove the default WorkManager initializer -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="removed"
+                tools:node="remove" />
         </provider>
     </application>
 

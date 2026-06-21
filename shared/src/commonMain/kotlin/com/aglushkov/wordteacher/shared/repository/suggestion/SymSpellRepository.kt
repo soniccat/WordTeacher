@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepositor
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.darkrockstudios.symspellkt.impl.SymSpell
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,7 +23,11 @@ class SymSpellRepository(
         val dict = dicts.data.firstOrNull { it.path.name.endsWith(WORDLIST_EXTENSION) }
             ?: throw RuntimeException("no wordlilst dict")
 
-        (symSpell.dictionary as SymSpellDictionaryHolder).fillFromDict(dict)
+        val isCompleted = (symSpell.dictionary as SymSpellDictionaryHolder).fillFromDict(dict)
+        if (!isCompleted) {
+            throw CancellationException()
+        }
+
         return symSpell
     }
 

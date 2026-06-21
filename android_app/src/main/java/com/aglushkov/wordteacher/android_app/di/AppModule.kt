@@ -20,6 +20,7 @@ import com.aglushkov.wordteacher.android_app.helper.TelegramAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.WebLinkOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.YandexAuthControllerImpl
+import com.aglushkov.wordteacher.android_app.tasks.FillMisspellingDBTaskImpl
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.analytics.AppMetricaEngine
@@ -73,7 +74,7 @@ import okio.source
 import okio.use
 
 
-@Module(includes = [SharedAppModule::class])
+@Module(includes = [SharedAppModule::class, CustomWorkerModule::class])
 class AppModule {
 
     @IsDebug
@@ -430,7 +431,12 @@ class AppModule {
                 context.resources.openRawResource(R.raw.cardset_sample).use {
                     it.readBytes().commonToUtf8String()
                 }
-            }
+            },
+            FillMisspellingDBTaskImpl(
+                context,
+                settings,
+                BuildConfig.misspellingDbVersion,
+            )
         )
     }
 

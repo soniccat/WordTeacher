@@ -85,6 +85,8 @@ kotlin {
             implementation(libs.playServicesAuth)
             implementation(libs.androidXBrowser)
             implementation(libs.telegramLogin)
+            implementation(libs.workManagerRuntime)
+            implementation(libs.workManagerMultiprocess)
         }
     }
 }
@@ -137,6 +139,7 @@ android {
             }
 
             buildConfigField("int", "defaultWordlistVersion", "1")
+            buildConfigField("int", "misspellingDbVersion", "1")
         }
 
         getByName("release") {

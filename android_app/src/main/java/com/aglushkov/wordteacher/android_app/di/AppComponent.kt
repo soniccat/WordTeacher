@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.android_app.di
 
 import com.aglushkov.wordteacher.android_app.GApp
+import com.aglushkov.wordteacher.android_app.GAppNonMainProccess
 import com.aglushkov.wordteacher.android_app.features.learning.di.LearningDependencies
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.di.LearningSessionResultDependencies
 import com.aglushkov.wordteacher.android_app.features.notes.di.NotesDependencies
@@ -89,6 +90,7 @@ interface AppComponent:
     fun webLinkOpenerImpl(): WebLinkOpenerImpl
 
     fun injectApplication(app: GApp)
+    fun injectAppNonMainProccess(app: GAppNonMainProccess)
 
     @IsDebug fun isDebug(): Boolean
     @Platform fun platform(): String

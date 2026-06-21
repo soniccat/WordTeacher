@@ -22,6 +22,7 @@ class SuggestionRepository(
         loadResourceWithProgress(
             loader = channelFlow {
                 val r = symSpellRepository.lookup(arg)
+
                 send(1.0f to SuggestionResult(emptyList(), r, emptyList()))
             }
         ).collect(stateFlow)

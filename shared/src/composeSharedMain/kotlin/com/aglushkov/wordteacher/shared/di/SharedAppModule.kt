@@ -566,6 +566,7 @@ class SharedAppModule {
     fun symSpellRepository(
         dictRepository: DictRepository,
         misspellingDatabase: MisspellingDatabase,
+        settingStore: SettingStore,
     ): SymSpellRepository {
         val spellCheckSettings = SpellCheckSettings().copy(lowerCaseTerms = false)
         return SymSpellRepository(
@@ -574,6 +575,7 @@ class SharedAppModule {
                     spellCheckSettings,
                     Murmur3HashFunction(),
                     misspellingDatabase,
+                    settingStore,
                     {
                         dictRepository.dicts.value.asLoaded()?.data?.firstOrNull {
                             it is WordListDict

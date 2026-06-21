@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.repository.suggestion
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDictIndex
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.repository.db.MisspellingDatabase
 import com.darkrockstudios.symspellkt.api.DictionaryHolder
@@ -10,12 +11,19 @@ import com.darkrockstudios.symspellkt.api.HashFunction
 import com.darkrockstudios.symspellkt.common.DictionaryItem
 import com.darkrockstudios.symspellkt.common.SpellCheckSettings
 import com.darkrockstudios.symspellkt.common.SpellHelper.getEditDeletes
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 
 class SymSpellDictionaryHolder(
     private val spellCheckSettings: SpellCheckSettings,
     private val hashFunction: HashFunction,
     private val misspellingDB: MisspellingDatabase,
-    private val dictProvider: () -> Dict?
+    private val settingStore: SettingStore,
+    private val dictProvider: () -> Dict?,
 ): DictionaryHolder {
     val isReady: Boolean
         get() {
@@ -27,22 +35,31 @@ class SymSpellDictionaryHolder(
             return 0
         }
 
-    fun fillFromDict(dict: Dict) {
+    suspend fun fillFromDict(dict: Dict) = withContext(Dispatchers.IO) {
+        val offset = settingStore.int(SYMSPELL_DB_ENTRIES_OFFSET_KEY) ?: 0
+
         val wordCount = (dict.index as WordListDictIndex).wordCount
         val deletes: MutableMap<Long, ArrayList<String>> = mutableMapOf()
-        dict.index.allEntries().mapIndexed { i, entry ->
-            addItem(entry.word, deletes)
 
+        for (entry in dict.index.allEntries().withIndex().drop(offset)) {
+            if (!isActive) {
+                return@withContext false
+            }
+
+            addItem(entry.value.word, deletes)
             val size = deletes.values.sumOf { it.size }
-            if (size > 200000) {
+            if (size > 10000) {
+                val i = entry.index
                 Logger.v("start at index $i")
                 misspellingDB.upsert(deletes)
                 deletes.clear()
-                Logger.v("upsert completed at index $i, ${i.toFloat()/wordCount.toFloat()}")
+                Logger.v("upsert completed at index $i, ${i.toFloat() / wordCount.toFloat()}")
+                settingStore[SYMSPELL_DB_ENTRIES_OFFSET_KEY] = i+1
             }
-        }.toList()
+        }
 
         misspellingDB.upsert(deletes)
+        return@withContext true
     }
 
     override fun addItem(dictionaryItem: DictionaryItem): Boolean {
@@ -117,3 +134,6 @@ class SymSpellDictionaryHolder(
 
     override fun getExclusionItem(key: String): String? { return null }
 }
+
+private const val SYMSPELL_DB_ENTRIES_OFFSET_KEY = "SYMSPELL_DB_ENTRIES_OFFSET_KEY"
+private const val SYMSPELL_DB_VERSION_KEY = "SYMSPELL_DB_VERSION_KEY"

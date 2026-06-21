@@ -1,16 +1,21 @@
 package com.aglushkov.wordteacher.android_app
 
+import android.app.ActivityManager
 import android.app.Application
 import android.content.res.Resources
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
+import android.os.Process
+import androidx.work.Configuration
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.android_app.di.DaggerAppComponent
 import com.aglushkov.wordteacher.android_app.di.GeneralModule
 import com.aglushkov.wordteacher.android_app.general.ActivityVisibilityResolver
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
+import com.aglushkov.wordteacher.android_app.tasks.CompositeWorkerFactory
+import com.aglushkov.wordteacher.android_app.tasks.CustomWorkerFactory
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.IsDebug
 import com.aglushkov.wordteacher.shared.general.FileLogger
@@ -35,7 +40,14 @@ import kotlinx.coroutines.launch
 import org.telegram.login.TelegramLogin
 import javax.inject.Inject
 
-class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listener {
+// to inject some fields for non main process
+class GAppNonMainProccess {
+    @Inject
+    lateinit var workerFactory: CompositeWorkerFactory
+
+}
+
+class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listener, Configuration.Provider {
     override lateinit var appComponent: AppComponent
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -43,7 +55,10 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var routerResolver: RouterResolver
     @Inject lateinit var activityVisibilityResolver: ActivityVisibilityResolver
 
-    // declare here to force initialization on startup
+    @Inject
+    lateinit var workerFactory: CompositeWorkerFactory
+
+    // declare here to force initialization on startup (main process only)
     @Inject lateinit var analytics: Analytics
     @Inject lateinit var databaseCardWorker: DatabaseCardWorker
     @Inject lateinit var cookieStorage: CookiesStorage
@@ -53,9 +68,19 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var tasks: Array<Task>
     @Inject lateinit var symSpellRepository: SymSpellRepository
 
+    private var nonMainProcessDeps: GAppNonMainProccess? = null
+
     override fun onCreate() {
         super.onCreate()
 
+        if (isMainProcess()) {
+            onMainProcessCreated()
+        }else {
+            onNonMainProcessCreated()
+        }
+    }
+
+    private fun onMainProcessCreated() {
         appComponent = DaggerAppComponent.builder()
             .generalModule(GeneralModule(this))
             .build()
@@ -90,12 +115,6 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         appComponent.connectivityManager().checkNetworkState()
 
         mainScope.launch(Dispatchers.IO) {
-//            if (BuildConfig.DEBUG) {
-//                launch {
-//                    symSpellRepository.load(Unit).waitUntilDone()
-//                }
-//            }
-
             val taskChannel = Channel<Task>(UNLIMITED)
             launch {
                 taskChannel.receiveAsFlow().collect {
@@ -112,6 +131,31 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         }
     }
 
+    private fun onNonMainProcessCreated() {
+        nonMainProcessDeps = GAppNonMainProccess().apply {
+            DaggerAppComponent.builder()
+                .generalModule(GeneralModule(this@GApp))
+                .build()
+                .injectAppNonMainProccess(this)
+        }
+    }
+
+    private fun isMainProcess(): Boolean {
+        return packageName == myProcessName()
+    }
+
+    private fun myProcessName(): String? {
+        val mypid = Process.myPid()
+        val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        val infos = manager.runningAppProcesses
+        for (info in infos) {
+            if (info.pid == mypid) {
+                return info.processName
+            }
+        }
+        return null
+    }
+
     override fun onFirstActivityStarted() {
         appComponent.connectivityManager().register()
     }
@@ -119,6 +163,11 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     override fun onLastActivityStopped() {
         appComponent.connectivityManager().unregister()
     }
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }
 
 fun getTelegramRedirect(res: Resources, isDebug: Boolean) =
