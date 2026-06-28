@@ -106,6 +106,7 @@ telegramLogin = { module = "org.telegram:login-sdk", version.ref = "telegramLogi
 androidXBrowser = { module = "androidx.browser:browser", version.ref = "browser" }
 exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "exoplayer" }
 exoplayerDatabase = { module = "androidx.media3:media3-database", version.ref = "exoplayer" }
+coroutinesGuava = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref="coroutines"}
 
 # for android tests
 kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

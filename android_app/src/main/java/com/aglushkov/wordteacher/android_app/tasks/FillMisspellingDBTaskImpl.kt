@@ -12,18 +12,23 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.BackoffPolicy
 import androidx.work.Data
+import androidx.work.DirectExecutor
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.impl.WorkerStoppedException
+import androidx.work.impl.awaitWithin
 import androidx.work.impl.foreground.SystemForegroundService
 import androidx.work.impl.utils.ForceStopRunnable
 import androidx.work.multiprocess.RemoteCoroutineWorker
 import androidx.work.multiprocess.RemoteListenableWorker.ARGUMENT_CLASS_NAME
 import androidx.work.multiprocess.RemoteListenableWorker.ARGUMENT_PACKAGE_NAME
+import androidx.work.multiprocess.RemoteWorkManager
 import androidx.work.multiprocess.RemoteWorkerService
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.analytics.Analytics
@@ -31,15 +36,22 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.tasks.FillMisspellingDBTask
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.guava.await
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
+import kotlin.coroutines.resumeWithException
 import kotlin.time.measureTime
 
 class FillMisspellingDBTaskImpl(
@@ -49,7 +61,7 @@ class FillMisspellingDBTaskImpl(
     private val analytics: Analytics,
 ): FillMisspellingDBTask(settings, lastVersion, analytics) {
     override suspend fun process() {
-        val workManager = WorkManager.getInstance(context)
+        val workManager = RemoteWorkManager.getInstance(context)
         val componentName = ComponentName(context.packageName, RemoteWorkerService::class.java.name)
 
         val data: Data = Data.Builder()
@@ -67,17 +79,18 @@ class FillMisspellingDBTaskImpl(
 //                    .build())
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.MINUTES)
                 .setInputData(data)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
         )
         val operation = continuation.enqueue()
 
-        workManager.getWorkInfosForUniqueWorkFlow(FILL_MISSPELLING_DB_WORK).collect {
-            if (it.isNotEmpty()) {
-                if (it.first().state == WorkInfo.State.SUCCEEDED) {
-                    markAsComplete()
-                }
-            }
-        }
+//        workManager.getWorkInfosForUniqueWorkFlow(FILL_MISSPELLING_DB_WORK).collect {
+//            if (it.isNotEmpty()) {
+//                if (it.first().state == WorkInfo.State.SUCCEEDED) {
+//                    markAsComplete()
+//                }
+//            }
+//        }
     }
 }
 
@@ -91,7 +104,12 @@ class FillMisspellingDBWorker @AssistedInject constructor(
     val logger = java.util.logging.Logger.getLogger("fillingMisspellingDB")
 
     override suspend fun doRemoteWork(): Result {
-        setForegroundAsync(createForegroundInfo("Start text"))
+        delay(10000)
+        try {
+            setForegroundAsync(createForegroundInfo("Start text")).await()
+        } catch (e: Throwable) {
+            return Result.failure()
+        }
 
         try {
             val currentDateTime = LocalDateTime.now()
@@ -137,7 +155,7 @@ class FillMisspellingDBWorker @AssistedInject constructor(
         val cancel = applicationContext.getString(R.string.misspelling_notification_cancel)
 
         // This PendingIntent can be used to cancel the worker
-        val intent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
+//        val intent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
 
         // Create the NotificationChannel.
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -196,6 +214,6 @@ interface CustomWorkerFactory {
     fun create(context: Context, params: WorkerParameters): ListenableWorker
 }
 
-private const val FILL_MISSPELLING_DB_WORK = "FILL_MISSPELLING_DB_WORK"
+private const val FILL_MISSPELLING_DB_WORK = "FILL_MISSPELLING_DB_WORK6"
 private const val FILL_MISSPELLING_NOTIFICATION_ID = 1000
 private const val FILL_MISSPELLING_CHANNEL_ID = "FILL_MISSPELLING_DB"

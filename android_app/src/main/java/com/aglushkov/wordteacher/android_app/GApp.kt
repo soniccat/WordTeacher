@@ -9,6 +9,7 @@ import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
 import android.os.Process
+import android.util.Log
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.multiprocess.RemoteWorkManager
@@ -196,7 +197,21 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
-//            .setDefaultProcessName(packageName + getString(R.string.misspelling_worker))
+            // without that has "The default process name was not specified."
+            // and stopReason 1
+            //.setDefaultProcessName(packageName)
+            // with that see these in logs "Ignoring schedule request in non-main process" and "Ignoring schedule request in a secondary process"
+            // and stopReason 1
+            .apply {
+                if (!isMainProcess()) {
+                    setDefaultProcessName(getString(R.string.misspelling_worker))
+                }
+            }
+            .apply {
+                if(BuildConfig.DEBUG) {
+                    setMinimumLoggingLevel(Log.DEBUG)
+                }
+            }
             .setWorkerFactory(
                 if (isMainProcess()) {
                     workerFactory

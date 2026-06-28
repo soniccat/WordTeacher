@@ -78,14 +78,16 @@
         <service
             android:name="androidx.work.multiprocess.RemoteWorkerService"
             android:exported="false"
-            android:process="@string/misspelling_worker"/>
+            android:process="@string/misspelling_worker"
+            tools:replace="android:process"/>
 
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
             tools:node="merge"
-            android:process="@string/misspelling_worker"/>
+            android:process="@string/misspelling_worker"
+            tools:replace="android:process"/>
 
         <provider
             android:name="androidx.startup.InitializationProvider"

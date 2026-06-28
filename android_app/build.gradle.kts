@@ -87,6 +87,7 @@ kotlin {
             implementation(libs.telegramLogin)
             implementation(libs.workManagerRuntime)
             implementation(libs.workManagerMultiprocess)
+            implementation(libs.coroutinesGuava)
         }
     }
 }
