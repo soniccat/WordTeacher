@@ -46,7 +46,7 @@ class SettingStore(
         prefs = dataStore.data
             .stateIn(
                 settingScope,
-                SharingStarted.WhileSubscribed(),
+                SharingStarted.Eagerly,
                 perfSnapshot,
             )
     }

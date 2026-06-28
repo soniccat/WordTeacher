@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
     <application
         android:name="com.aglushkov.wordteacher.android_app.GApp"
@@ -75,7 +78,14 @@
         <service
             android:name="androidx.work.multiprocess.RemoteWorkerService"
             android:exported="false"
-            android:process=":worker1" />
+            android:process="@string/misspelling_worker"/>
+
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge"
+            android:process="@string/misspelling_worker"/>
 
         <provider
             android:name="androidx.startup.InitializationProvider"

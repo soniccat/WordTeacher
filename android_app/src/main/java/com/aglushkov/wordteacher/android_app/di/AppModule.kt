@@ -74,13 +74,8 @@ import okio.source
 import okio.use
 
 
-@Module(includes = [SharedAppModule::class, CustomWorkerModule::class])
+@Module//(includes = [SharedAppModule::class])
 class AppModule {
-
-    @IsDebug
-    @AppComp
-    @Provides
-    fun isDebug(): Boolean = BuildConfig.DEBUG
 
     @Platform
     @AppComp
@@ -399,6 +394,7 @@ class AppModule {
         timeSource: TimeSource,
         fileSystem: FileSystem,
         settings: SettingStore,
+        analytics: Analytics,
     ): Array<Task> {
         return arrayOf(
             CopyDictTask(
@@ -436,6 +432,7 @@ class AppModule {
                 context,
                 settings,
                 BuildConfig.misspellingDbVersion,
+                analytics,
             )
         )
     }

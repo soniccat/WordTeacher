@@ -2,12 +2,16 @@ package com.aglushkov.wordteacher.android_app
 
 import android.app.ActivityManager
 import android.app.Application
+import android.app.usage.UsageStatsManager
 import android.content.res.Resources
+import android.os.Build
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
 import android.os.Process
 import androidx.work.Configuration
+import androidx.work.WorkManager
+import androidx.work.multiprocess.RemoteWorkManager
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.android_app.di.DaggerAppComponent
@@ -18,8 +22,10 @@ import com.aglushkov.wordteacher.android_app.tasks.CompositeWorkerFactory
 import com.aglushkov.wordteacher.android_app.tasks.CustomWorkerFactory
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.IsDebug
+import com.aglushkov.wordteacher.shared.di.Worker
 import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.Logger
+import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.setAnalytics
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
@@ -45,6 +51,8 @@ class GAppNonMainProccess {
     @Inject
     lateinit var workerFactory: CompositeWorkerFactory
 
+    @Worker
+    @Inject lateinit var fileLogger: FileLogger
 }
 
 class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listener, Configuration.Provider {
@@ -77,6 +85,16 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
             onMainProcessCreated()
         }else {
             onNonMainProcessCreated()
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            Logger.e("isBackgroundRestricted:${manager.isBackgroundRestricted}", "GApp")
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            (getSystemService(USAGE_STATS_SERVICE) as? UsageStatsManager)?.let {
+                Logger.e("appStandbyBucket:${it.appStandbyBucket}", "GApp")
+            }
         }
     }
 
@@ -132,28 +150,40 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     }
 
     private fun onNonMainProcessCreated() {
-        nonMainProcessDeps = GAppNonMainProccess().apply {
-            DaggerAppComponent.builder()
-                .generalModule(GeneralModule(this@GApp))
-                .build()
-                .injectAppNonMainProccess(this)
-        }
+        val nonMainProcess = GAppNonMainProccess()
+        appComponent = DaggerAppComponent.builder()
+            .generalModule(GeneralModule(this))
+            .build()
+        appComponent.injectAppNonMainProccess(nonMainProcess)
+        nonMainProcessDeps = nonMainProcess
+
+        Logger().setupDebug(
+            StaticConfig(
+                Severity.Verbose,
+                buildList {
+                    if (appComponent.isDebug()) {
+                        add(CommonWriter())
+                    }
+                    add(nonMainProcessDeps!!.fileLogger)
+                }
+            )
+        )
     }
 
     private fun isMainProcess(): Boolean {
-        return packageName == myProcessName()
+        return packageName == myProcessName
     }
 
-    private fun myProcessName(): String? {
+    private val myProcessName: String by lazy {
         val mypid = Process.myPid()
         val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
         val infos = manager.runningAppProcesses
         for (info in infos) {
             if (info.pid == mypid) {
-                return info.processName
+                return@lazy info.processName
             }
         }
-        return null
+        return@lazy "undefined"
     }
 
     override fun onFirstActivityStarted() {
@@ -166,7 +196,14 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
+//            .setDefaultProcessName(packageName + getString(R.string.misspelling_worker))
+            .setWorkerFactory(
+                if (isMainProcess()) {
+                    workerFactory
+                } else {
+                    nonMainProcessDeps!!.workerFactory
+                }
+            )
             .build()
 }
 

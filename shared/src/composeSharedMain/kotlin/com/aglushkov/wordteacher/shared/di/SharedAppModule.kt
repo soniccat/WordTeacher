@@ -441,6 +441,28 @@ class SharedAppModule {
 
     @AppComp
     @Provides
+    @Worker
+    fun workerFileLogger(
+        @BasePath basePath: Path,
+        fileSystem: FileSystem,
+        timeSource: TimeSource,
+        logsRepository: LogsRepository,
+    ): FileLogger {
+        val dirPath = basePath.div("workerLogs")
+        if (!fileSystem.exists(dirPath)) {
+            fileSystem.createDirectory(dirPath)
+        }
+
+        return FileLogger(
+            dirPath,
+            fileSystem,
+            timeSource,
+            isEnabledProvider = { logsRepository.isLoggingEnabledState.value }
+        )
+    }
+
+    @AppComp
+    @Provides
     fun logsRepository(
         @BasePath basePath: Path,
         fileSystem: FileSystem,

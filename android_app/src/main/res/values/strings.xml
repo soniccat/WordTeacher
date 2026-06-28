@@ -2,4 +2,9 @@
 <resources>
     <string name="android_text_selection_action">@string/app_name</string>
     <integer name="com_vk_sdk_AppId">51867938</integer>
+    <string name="misspelling_worker">:misspelling_worker</string>
+
+    <string name="misspelling_notification_title">Initializing misspelling database</string>
+    <string name="misspelling_notification_description">A prepared database is required for suggesting corrected words and phrases on Words screen event when a user input has mistakes</string>
+    <string name="misspelling_notification_cancel">Later</string>
 </resources>

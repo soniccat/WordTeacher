@@ -56,11 +56,8 @@ class MisspellingDatabase(
         db.dBMisspellingQueries.insert(hash, candidates)
 
     // insert or update if exists
-    // it's required only for generating a db on a simulator/device
     fun upsert(map: Map<Long, ArrayList<String>>) {
-        val selectHashes = map.keys.toList().splitByChunks(30000).map { chunk ->
-            db.dBMisspellingQueries.selectCandidatesIn(chunk).executeAsList()
-        }.flatten()
+        val selectHashes = db.dBMisspellingQueries.selectCandidatesIn(map.keys).executeAsList()
 
         transaction {
             // update
@@ -80,26 +77,6 @@ class MisspellingDatabase(
             }
         }
     }
-
-//    fun upsert(hash: Long, currentCandidates: List<String>, candidates: List<String>) {
-//        val resultCandidates = if (currentCandidates.isEmpty()) {
-//            if (candidates.isEmpty()) {
-//                return
-//            }
-//
-//            candidates
-//        } else {
-//            (currentCandidates + candidates).toSet().toList()
-//        }
-//
-//        if (candidates.toSet().subtract(currentCandidates.toSet()).isNotEmpty()) {
-//            if (currentCandidates.isEmpty()) {
-//                db.dBMisspellingQueries.update(resultCandidates, hash)
-//            } else {
-//                db.dBMisspellingQueries.insert(hash, resultCandidates)
-//            }
-//        }
-//    }
 
     fun transaction(
         noEnclosing: Boolean = false,

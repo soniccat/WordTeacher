@@ -49,6 +49,9 @@ annotation class DslFileOpener
 @Qualifier
 annotation class ArticleSettingStore
 
+@Qualifier
+annotation class Worker
+
 val LocalIsDebug = staticCompositionLocalOf { false }
 
 val LocalIsDarkTheme = staticCompositionLocalOf { false }
