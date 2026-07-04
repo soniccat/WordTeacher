@@ -85,6 +85,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), Router {
@@ -115,12 +116,12 @@ class MainActivity : AppCompatActivity(), Router {
         appComponent().yandexAuthController().bind(this)
         appComponent().webLinkOpenerImpl().bind(this)
         (appComponent().emailOpener() as EmailOpenerImpl).bind(this)
+        appComponent().notificationPermissionRepository().bind(this)
         setupComposeLayout()
         handleIntent()
 
         lifecycleScope.launch {
-            delay(200)
-            requestNotificationPermission()
+            appComponent().fillMisspellingDBController().load(Unit).collect()
         }
     }
 

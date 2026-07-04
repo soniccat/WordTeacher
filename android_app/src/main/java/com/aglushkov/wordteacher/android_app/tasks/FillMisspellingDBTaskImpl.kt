@@ -1,57 +1,33 @@
 package com.aglushkov.wordteacher.android_app.tasks
 
+import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.work.BackoffPolicy
-import androidx.work.Data
-import androidx.work.DirectExecutor
-import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import androidx.work.impl.WorkerStoppedException
-import androidx.work.impl.awaitWithin
-import androidx.work.impl.foreground.SystemForegroundService
-import androidx.work.impl.utils.ForceStopRunnable
 import androidx.work.multiprocess.RemoteCoroutineWorker
-import androidx.work.multiprocess.RemoteListenableWorker.ARGUMENT_CLASS_NAME
-import androidx.work.multiprocess.RemoteListenableWorker.ARGUMENT_PACKAGE_NAME
-import androidx.work.multiprocess.RemoteWorkManager
-import androidx.work.multiprocess.RemoteWorkerService
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.tasks.FillMisspellingDBTask
-import com.google.common.util.concurrent.ListenableFuture
-import com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.guava.await
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.TimeUnit
-import java.util.logging.Level
-import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.measureTime
 
 class FillMisspellingDBTaskImpl(
@@ -61,52 +37,25 @@ class FillMisspellingDBTaskImpl(
     private val analytics: Analytics,
 ): FillMisspellingDBTask(settings, lastVersion, analytics) {
     override suspend fun process() {
-        val workManager = RemoteWorkManager.getInstance(context)
-        val componentName = ComponentName(context.packageName, RemoteWorkerService::class.java.name)
 
-        val data: Data = Data.Builder()
-            .putString(ARGUMENT_PACKAGE_NAME, componentName.packageName)
-            .putString(ARGUMENT_CLASS_NAME, componentName.className)
-            .build()
-        val continuation = workManager.beginUniqueWork(
-            FILL_MISSPELLING_DB_WORK,
-            ExistingWorkPolicy.KEEP,
-            OneTimeWorkRequestBuilder<FillMisspellingDBWorker>()
-//                .setInitialDelay(1, TimeUnit.MINUTES)
-//                .setConstraints(Constraints.Builder()
-//                    .setRequiresBatteryNotLow(true)
-//                    .setRequiresStorageNotLow(true)
-//                    .build())
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.MINUTES)
-                .setInputData(data)
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .build()
-        )
-        val operation = continuation.enqueue()
-
-//        workManager.getWorkInfosForUniqueWorkFlow(FILL_MISSPELLING_DB_WORK).collect {
-//            if (it.isNotEmpty()) {
-//                if (it.first().state == WorkInfo.State.SUCCEEDED) {
-//                    markAsComplete()
-//                }
-//            }
-//        }
     }
 }
 
 class FillMisspellingDBWorker @AssistedInject constructor(
-    @Assisted context: Context,
+    @Assisted val context: Context,
     @Assisted params: WorkerParameters,
-//    private val symSpellRepository: SymSpellRepository,
+    private val symSpellRepository: SymSpellRepository, // TODO: get rid of this deps in favour of manual parsing
 ) : RemoteCoroutineWorker(context, params) {
 
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.US)
-    val logger = java.util.logging.Logger.getLogger("fillingMisspellingDB")
+//    val logger = java.util.logging.Logger.getLogger("fillingMisspellingDB")
 
     override suspend fun doRemoteWork(): Result {
-        delay(10000)
+//        delay(10000)
         try {
-            setForegroundAsync(createForegroundInfo("Start text")).await()
+            if (isAppInForeground(context)) {
+                setForegroundAsync(createForegroundInfo("Start text")).await()
+            }
         } catch (e: Throwable) {
             return Result.failure()
         }
@@ -117,30 +66,32 @@ class FillMisspellingDBWorker @AssistedInject constructor(
 
             Logger.e("$formattedDate: start", "FillMisspellingDBWorker")
             val d = measureTime {
-                while(true) {
-                    delay(100)
-                    logger.log(Level.WARNING, "in worker")
-                    if (isStopped) {
-                        break
+//                while(true) {
+//                    delay(100)
+//                    logger.log(Level.WARNING, "in worker")
+//                    if (isStopped) {
+//                        break
+//                    }
+//                }
+
+                try {
+                    symSpellRepository.load(Unit).waitUntilDone()
+                } catch (e: Throwable) {
+                    if (e is CancellationException) {
+                        return Result.retry()
                     }
+                    return Result.failure()
                 }
+
+                symSpellRepository.value.onError {
+                    if (it is CancellationException) {
+                        return Result.retry()
+                    }
+                    return Result.failure()
+                }
+
             }
             Logger.e("in worker: ${d.inWholeMilliseconds}", "FillMisspellingDBWorker")
-//            try {
-//                symSpellRepository.load(Unit).collect()
-//            } catch (e: Throwable) {
-//                if (e is CancellationException) {
-//                    return Result.retry()
-//                }
-//                return Result.failure()
-//            }
-//
-//            symSpellRepository.value.onError {
-//                if (it is CancellationException) {
-//                    return Result.retry()
-//                }
-//                return Result.failure()
-//            }
 
             return Result.retry()
         } finally {
@@ -214,6 +165,11 @@ interface CustomWorkerFactory {
     fun create(context: Context, params: WorkerParameters): ListenableWorker
 }
 
-private const val FILL_MISSPELLING_DB_WORK = "FILL_MISSPELLING_DB_WORK6"
+fun isAppInForeground(context: Context): Boolean {
+    val am = context.getSystemService (Context.ACTIVITY_SERVICE) as ActivityManager
+    val appProcess = am.runningAppProcesses.firstOrNull { it.processName == context.packageName }
+    return appProcess?.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+}
+
 private const val FILL_MISSPELLING_NOTIFICATION_ID = 1000
 private const val FILL_MISSPELLING_CHANNEL_ID = "FILL_MISSPELLING_DB"

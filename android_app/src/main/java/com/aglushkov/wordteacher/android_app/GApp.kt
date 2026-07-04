@@ -199,14 +199,15 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         get() = Configuration.Builder()
             // without that has "The default process name was not specified."
             // and stopReason 1
-            //.setDefaultProcessName(packageName)
+            .setDefaultProcessName(packageName) // TODO: figure out how to change it to misspelling_worker and make it working. On any change need to update isBackgroundRunning accordingly
             // with that see these in logs "Ignoring schedule request in non-main process" and "Ignoring schedule request in a secondary process"
             // and stopReason 1
-            .apply {
-                if (!isMainProcess()) {
-                    setDefaultProcessName(getString(R.string.misspelling_worker))
-                }
-            }
+//            .apply {
+//                if (!isMainProcess()) {
+//                    setDefaultProcessName(getString(R.string.misspelling_worker))
+//                }
+//            }
+//            .setDefaultProcessName(packageName + getString(R.string.misspelling_worker))
             .apply {
                 if(BuildConfig.DEBUG) {
                     setMinimumLoggingLevel(Log.DEBUG)

@@ -11,6 +11,8 @@ import com.aglushkov.wordteacher.android_app.helper.TelegramAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.WebLinkOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.YandexAuthControllerImpl
+import com.aglushkov.wordteacher.android_app.repository.NotificationPermissionRepository
+import com.aglushkov.wordteacher.android_app.worker.FillMisspellingDBController
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.di.AppComp
 import com.aglushkov.wordteacher.shared.di.IsDebug
@@ -76,6 +78,8 @@ interface AppComponent:
 
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
+    fun fillMisspellingDBController(): FillMisspellingDBController
+    fun notificationPermissionRepository(): NotificationPermissionRepository
 
     fun googleAuthRepository(): GoogleAuthControllerImpl
     fun vkAuthController(): VKAuthControllerImpl

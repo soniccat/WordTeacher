@@ -10,14 +10,16 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 interface ResourceRepository<T, A> {
     val value: Resource<T>
     val stateFlow: StateFlow<Resource<T>>
 
+    suspend fun loadIfNotLoaded(arg: A, initialValue: Resource<T> = stateFlow.value): Flow<Resource<T>>
     fun load(arg: A, initialValue: Resource<T> = stateFlow.value): Flow<Resource<T>>
 }
 
@@ -31,6 +33,17 @@ abstract class SimpleResourceRepository<T, A>(
         get() = stateFlow.value
     override val stateFlow = MutableStateFlow(initialValue)
     private var loadJob: Job? = null
+    private val loadIfNotLoadedMutex = Mutex()
+
+    override suspend fun loadIfNotLoaded(arg: A, initialValue: Resource<T>): Flow<Resource<T>> {
+        return loadIfNotLoadedMutex.withLock {
+            if (value.isNotLoadedAndNotLoading()) {
+                load(arg, initialValue)
+            } else {
+                stateFlow.takeUntilLoadedOrErrorForVersion()
+            }
+        }
+    }
 
     override fun load(arg: A, initialValue: Resource<T>): Flow<Resource<T>> {
         loadJob?.cancel()

@@ -20,7 +20,9 @@ import com.aglushkov.wordteacher.android_app.helper.TelegramAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.WebLinkOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.YandexAuthControllerImpl
+import com.aglushkov.wordteacher.android_app.repository.NotificationPermissionRepository
 import com.aglushkov.wordteacher.android_app.tasks.FillMisspellingDBTaskImpl
+import com.aglushkov.wordteacher.android_app.worker.FillMisspellingDBController
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.analytics.AppMetricaEngine
@@ -394,7 +396,6 @@ class AppModule {
         timeSource: TimeSource,
         fileSystem: FileSystem,
         settings: SettingStore,
-        analytics: Analytics,
     ): Array<Task> {
         return arrayOf(
             CopyDictTask(
@@ -428,12 +429,29 @@ class AppModule {
                     it.readBytes().commonToUtf8String()
                 }
             },
-            FillMisspellingDBTaskImpl(
-                context,
-                settings,
-                BuildConfig.misspellingDbVersion,
-                analytics,
-            )
+//            FillMisspellingDBTaskImpl(
+//                context,
+//                settings,
+//                BuildConfig.misspellingDbVersion,
+//                analytics,
+//            )
+        )
+    }
+
+    @AppComp
+    @Provides
+    fun fillMisspellingDBController(
+        context: Context,
+        settings: SettingStore,
+        analytics: Analytics,
+        notificationPermissionRepository: NotificationPermissionRepository,
+    ): FillMisspellingDBController {
+        return FillMisspellingDBController(
+            context,
+            settings,
+            BuildConfig.misspellingDbVersion,
+            analytics,
+            notificationPermissionRepository,
         )
     }
 

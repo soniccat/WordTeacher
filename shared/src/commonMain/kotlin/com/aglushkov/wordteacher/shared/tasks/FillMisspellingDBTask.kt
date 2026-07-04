@@ -11,11 +11,11 @@ abstract class FillMisspellingDBTask(
     private val analytics: Analytics,
 ): Task {
     override suspend fun run(nextTasksChannel: Channel<Task>) {
-        val currentVersion = settings.int(MISSPELLING_FILLED_DB_VERSION_KEY, -1)
-        val isFilled = currentVersion == lastVersion
-        if (isFilled) {
-            return
-        }
+//        val currentVersion = settings.int(MISSPELLING_FILLED_DB_VERSION_KEY, -1)
+//        val isFilled = currentVersion == lastVersion
+//        if (isFilled) {
+//            return
+//        }
 
         process()
 
@@ -24,15 +24,15 @@ abstract class FillMisspellingDBTask(
 
     abstract suspend fun process()
 
-    fun markAsComplete() {
-        settings[MISSPELLING_FILLED_DB_VERSION_KEY] = lastVersion
-        analytics.send(
-            AnalyticEvent.createActionEvent(
-                "FillMisspellingDB.complete",
-                mapOf("version" to lastVersion),
-            )
-        )
-    }
+//    fun markAsComplete() {
+//        settings[MISSPELLING_FILLED_DB_VERSION_KEY] = lastVersion
+//        analytics.send(
+//            AnalyticEvent.createActionEvent(
+//                "FillMisspellingDB.complete",
+//                mapOf("version" to lastVersion),
+//            )
+//        )
+//    }
 }
 
-private const val MISSPELLING_FILLED_DB_VERSION_KEY = "MISSPELLING_FILLED_DB_VERSION_KEY"
+//private const val MISSPELLING_FILLED_DB_VERSION_KEY = "MISSPELLING_FILLED_DB_VERSION_KEY"
