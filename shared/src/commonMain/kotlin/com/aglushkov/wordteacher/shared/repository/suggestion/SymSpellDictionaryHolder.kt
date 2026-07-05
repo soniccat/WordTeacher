@@ -13,6 +13,7 @@ import com.darkrockstudios.symspellkt.common.SpellCheckSettings
 import com.darkrockstudios.symspellkt.common.SpellHelper.getEditDeletes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
@@ -35,7 +36,7 @@ class SymSpellDictionaryHolder(
             return 0
         }
 
-    suspend fun fillFromDict(dict: Dict) = withContext(Dispatchers.IO) {
+    suspend fun fillFromDict(dict: Dict) = coroutineScope {
         val offset = settingStore.int(SYMSPELL_DB_ENTRIES_OFFSET_KEY) ?: 0
 
         val wordCount = (dict.index as WordListDictIndex).wordCount
@@ -43,7 +44,7 @@ class SymSpellDictionaryHolder(
 
         for (entry in dict.index.allEntries().withIndex().drop(offset)) {
             if (!isActive) {
-                return@withContext false
+                return@coroutineScope false
             }
 
             addItem(entry.value.word, deletes)
@@ -59,7 +60,7 @@ class SymSpellDictionaryHolder(
         }
 
         misspellingDB.upsert(deletes)
-        return@withContext true
+        return@coroutineScope true
     }
 
     override fun addItem(dictionaryItem: DictionaryItem): Boolean {

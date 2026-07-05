@@ -9,9 +9,7 @@ import androidx.core.content.FileProvider
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import okio.Path
 import java.io.File
 
@@ -37,7 +35,7 @@ class FileSharerRepository(
 
 fun FileSharerRepository.toFileSharer(): FileSharer {
     return object : FileSharer {
-        override fun share(path: Path): Flow<Resource<Unit>> {
+        override suspend fun share(path: Path): Flow<Resource<Unit>> {
             return load(path, Resource.Uninitialized())
         }
     }

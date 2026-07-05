@@ -63,7 +63,6 @@ playServicesAuth = { module = "com.google.android.gms:play-services-auth", versi
 kotlinxDateTime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
 datastorePreference = { module= "androidx.datastore:datastore-preferences", version.ref="datastore-preferences" }
 workManagerRuntime = {module = "androidx.work:work-runtime-ktx", version.ref="work-manager"}
-workManagerMultiprocess = {module = "androidx.work:work-multiprocess", version.ref="work-manager"}
 
 dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 daggerCompiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
@@ -106,7 +105,6 @@ telegramLogin = { module = "org.telegram:login-sdk", version.ref = "telegramLogi
 androidXBrowser = { module = "androidx.browser:browser", version.ref = "browser" }
 exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "exoplayer" }
 exoplayerDatabase = { module = "androidx.media3:media3-database", version.ref = "exoplayer" }
-coroutinesGuava = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref="coroutines"}
 
 # for android tests
 kotlinTestJUnit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

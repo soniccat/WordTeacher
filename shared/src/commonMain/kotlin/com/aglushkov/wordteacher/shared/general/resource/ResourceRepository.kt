@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,16 +17,35 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 interface ResourceRepository<T, A> {
+//    val scope: CoroutineScope
     val value: Resource<T>
     val stateFlow: StateFlow<Resource<T>>
 
     suspend fun loadIfNotLoaded(arg: A, initialValue: Resource<T> = stateFlow.value): Flow<Resource<T>>
-    fun load(arg: A, initialValue: Resource<T> = stateFlow.value): Flow<Resource<T>>
+    fun launchLoadInScope(arg: A, initialValue: Resource<T> = stateFlow.value, launchScope: CoroutineScope)
+    fun loadInScope(
+        arg: A,
+        initialValue: Resource<T> = stateFlow.value,
+        launchScope: CoroutineScope,
+    ): Flow<Resource<T>> {
+        launchLoadInScope(arg, initialValue, launchScope)
+        return stateFlow.takeUntilLoadedOrErrorForVersion()
+    }
+
+    suspend fun load(arg: A, initialValue: Resource<T> = stateFlow.value): Flow<Resource<T>> =
+        coroutineScope {
+            loadInScope(arg, initialValue, this)
+        }
+
+    suspend fun launchLoad(arg: A, initialValue: Resource<T> = stateFlow.value) =
+        coroutineScope {
+            launchLoadInScope(arg, initialValue, this)
+        }
 }
 
 abstract class SimpleResourceRepository<T, A>(
     initialValue: Resource<T> = Resource.Uninitialized(),
-    protected val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+//    override val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     private val canTryAgain: Boolean = true,
     private val needPreload: Boolean = false,
 ): ResourceRepository<T, A> {
@@ -45,7 +65,11 @@ abstract class SimpleResourceRepository<T, A>(
         }
     }
 
-    override fun load(arg: A, initialValue: Resource<T>): Flow<Resource<T>> {
+    override fun launchLoadInScope(
+        arg: A,
+        initialValue: Resource<T>,
+        launchScope: CoroutineScope,
+    ) {
         loadJob?.cancel()
 
         // Keep version for Uninitialized to support flow collecting in advance when services aren't loaded
@@ -57,7 +81,7 @@ abstract class SimpleResourceRepository<T, A>(
 
         val resultNeedPreload = stateFlow.value.isUninitialized() && needPreload
         stateFlow.update { bumpedValue.toLoading() }
-        loadJob = scope.launch {
+        loadJob = launchScope.launch {
             if (resultNeedPreload) {
                 loadResource { preload(arg) }
                     .waitUntilDone()
@@ -66,8 +90,6 @@ abstract class SimpleResourceRepository<T, A>(
 
             handleLoading(arg)
         }
-
-        return stateFlow.takeUntilLoadedOrErrorForVersion()
     }
 
     protected open suspend fun handleLoading(arg: A) {
@@ -86,12 +108,12 @@ abstract class SimpleResourceRepository<T, A>(
 }
 
 fun <T, A> buildSimpleResourceRepository(
-    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+//    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     preload: (suspend (arg: A) -> T?)? = null,
     load: suspend (arg: A) -> T
 ): SimpleResourceRepository<T, A> {
     return object : SimpleResourceRepository<T,A>(
-        scope = scope,
+//        scope = scope,
     ) {
         override suspend fun preload(arg: A): T? {
             return preload?.invoke(arg)

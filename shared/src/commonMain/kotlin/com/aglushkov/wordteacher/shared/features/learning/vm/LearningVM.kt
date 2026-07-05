@@ -22,6 +22,7 @@ import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.extensions.addElements
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoaded
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
@@ -186,7 +187,9 @@ open class LearningVMImpl(
     }
 
     init {
-        cardRepository.load(state)
+        viewModelScope.launch {
+            cardRepository.launchLoad(state)
+        }
         startLearning(state)
 
         // update settings
@@ -500,7 +503,9 @@ open class LearningVMImpl(
 
     override fun onTryAgainClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Learning.onTryAgainClicked"))
-        cardRepository.load(state)
+        viewModelScope.launch {
+            cardRepository.launchLoad(state)
+        }
     }
 
     override fun onClosePressed() {

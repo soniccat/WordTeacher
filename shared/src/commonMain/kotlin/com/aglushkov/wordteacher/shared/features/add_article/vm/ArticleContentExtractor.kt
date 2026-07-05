@@ -15,7 +15,7 @@ data class ArticleContent(
 
 interface ArticleContentExtractor {
     fun canExtract(uri: String): Boolean
-    fun extract(uri: String): Flow<Resource<ArticleContent>>
+    suspend fun extract(uri: String): Flow<Resource<ArticleContent>>
 }
 
 fun <T> ResourceRepository<T, String>.toArticleContentExtractor(
@@ -27,7 +27,7 @@ fun <T> ResourceRepository<T, String>.toArticleContentExtractor(
             return canExtract(uri)
         }
 
-        override fun extract(uri: String): Flow<Resource<ArticleContent>> {
+        override suspend fun extract(uri: String): Flow<Resource<ArticleContent>> {
             return this@toArticleContentExtractor.load(uri).map {
                 it.mapLoadedData(loadedDataTransformer = transformer)
             }

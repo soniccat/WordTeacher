@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.shared.repository.config
 
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
-import com.aglushkov.wordteacher.shared.general.extensions.forward
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
@@ -64,7 +63,7 @@ class ConfigRepository(
             } else {
                 it
             }
-        }.forward(stateFlow)
+        }.collect(stateFlow)
     }
 
     fun save(configs: List<Config>) {

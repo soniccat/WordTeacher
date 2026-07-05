@@ -9,9 +9,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import androidx.work.multiprocess.RemoteListenableWorker.ARGUMENT_CLASS_NAME
-import androidx.work.multiprocess.RemoteListenableWorker.ARGUMENT_PACKAGE_NAME
-import androidx.work.multiprocess.RemoteWorkerService
 import com.aglushkov.wordteacher.android_app.repository.NotificationPermissionRepository
 import com.aglushkov.wordteacher.android_app.tasks.FillMisspellingDBWorker
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
@@ -23,6 +20,9 @@ import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepositor
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,6 +35,7 @@ class FillMisspellingDBController(
     private val analytics: Analytics,
     private val notificationPermissionRepository: NotificationPermissionRepository,
 ): SimpleResourceRepository<Boolean, Unit>() {
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val workManager = WorkManager.getInstance(context)
     private val workState = MutableStateFlow<Resource<WorkInfo>>(Resource.Uninitialized())
 
@@ -71,6 +72,11 @@ class FillMisspellingDBController(
         }
     }
 
+    fun launchLoadInScope(
+        arg: Unit,
+        initialValue: Resource<Boolean> = stateFlow.value,
+    ) = launchLoadInScope(arg, initialValue, scope)
+
     override suspend fun loadInternal(arg: Unit): Boolean {
         notificationPermissionRepository.loadIfNotLoaded(Unit).waitUntilDone()
 
@@ -93,11 +99,6 @@ class FillMisspellingDBController(
     }
 
     private fun enqueueWork() {
-        val componentName = ComponentName(context.packageName, RemoteWorkerService::class.java.name)
-        val data: Data = Data.Builder()
-            .putString(ARGUMENT_PACKAGE_NAME, componentName.packageName)
-            .putString(ARGUMENT_CLASS_NAME, componentName.className)
-            .build()
         workManager.beginUniqueWork(
             FILL_MISSPELLING_DB_WORK,
             ExistingWorkPolicy.KEEP,
@@ -107,8 +108,7 @@ class FillMisspellingDBController(
 //                    .setRequiresBatteryNotLow(true)
 //                    .setRequiresStorageNotLow(true)
 //                    .build())
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.MINUTES)
-                .setInputData(data)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
         ).enqueue()

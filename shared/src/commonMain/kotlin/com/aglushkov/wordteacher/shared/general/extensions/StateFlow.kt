@@ -8,25 +8,6 @@ import com.aglushkov.wordteacher.shared.general.v
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 
-// TODO: replace with simple .collect(stateFlow)
-suspend fun <T> Flow<T>.forward(stateFlow: MutableStateFlow<T>) {
-    collect { newRes ->
-        stateFlow.value = newRes
-    }
-}
-
-suspend fun <T> StateFlow<Resource<T>>.forwardForVersion(
-    stateFlow: MutableStateFlow<Resource<T>>
-) = forward(value.version, stateFlow)
-
-suspend fun <T> Flow<Resource<T>>.forward(version: Int, stateFlow: MutableStateFlow<Resource<T>>) {
-    collect { newRes ->
-        applyResValueIfNeeded(version, newRes) {
-            stateFlow.value = newRes
-        }
-    }
-}
-
 // Take until a resource operation is completed, the last state is emitted
 fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(
     version: Int = value.version
@@ -57,16 +38,6 @@ fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(
                 throw e
             }
         }
-    }
-}
-
-suspend fun <T> applyResValueIfNeeded(
-    startVersion: Int,
-    newRes: Resource<T>,
-    applyFun: suspend () -> Unit
-) {
-    applyResValueIfNeeded(startVersion, newRes, applyFun) {
-        CancellationException("Version ${startVersion} is outdated with version ${newRes.version}")
     }
 }
 
@@ -171,6 +142,6 @@ fun <T> MutableStateFlow<Resource<T>>.updateWithLoadingData(
     this.update { Resource.Loading(data) }
 }
 
-class AbortFlowException constructor(
+class AbortFlowException(
     val owner: FlowCollector<*>
 ) : CancellationException("Flow was aborted, no more elements needed")

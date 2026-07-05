@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
+import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.getAppInfo
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
@@ -68,7 +69,7 @@ interface SettingsVM: Clearable {
 }
 
 interface FileSharer {
-    fun share(path: Path): Flow<Resource<Unit>>
+    suspend fun share(path: Path): Flow<Resource<Unit>>
 }
 
 open class SettingsVMImpl (
@@ -90,7 +91,7 @@ open class SettingsVMImpl (
     private val settingStore: SettingStore,
 ): ViewModel(), SettingsVM {
 
-    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+//    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     override var router: SettingsRouter? = null
     final override val state: SettingsVM.State = restoredState
 
@@ -188,7 +189,7 @@ open class SettingsVMImpl (
     override fun onSignOutClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Settings.signOutClicked"))
         spaceAuthRepository.networkType?.let {
-            mainScope.launch {
+            viewModelScope.launch {
                 // TODO: consider extracting this logic in signOut usecase
                 databaseCardWorker.waitUntilEditingIsDone()
                 databaseCardWorker.waitUntilSyncIsDone()
@@ -204,7 +205,7 @@ open class SettingsVMImpl (
 
     override fun onUploadWordFrequencyFileClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Settings.uploadWordFrequencyFileClicked"))
-        mainScope.launch {
+        viewModelScope.launch {
             wordFrequencyFileOpenController.chooseFile()
                 .onError {
                     router?.onError(it.toStringDesc())
@@ -221,8 +222,8 @@ open class SettingsVMImpl (
 
     override fun onLogFileShareClicked(path: Path) {
         analytics.send(AnalyticEvent.createActionEvent("Settings.logFileShareClicked"))
-        mainScope.launch {
-            fileSharer?.share(path)?.collect()
+        viewModelScope.launch {
+            fileSharer?.share(path)?.waitUntilDone()
         }
     }
 

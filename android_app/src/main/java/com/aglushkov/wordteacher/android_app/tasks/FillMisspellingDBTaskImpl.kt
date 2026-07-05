@@ -7,10 +7,11 @@ import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import androidx.work.multiprocess.RemoteCoroutineWorker
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.Logger
@@ -23,7 +24,6 @@ import com.aglushkov.wordteacher.shared.tasks.FillMisspellingDBTask
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.guava.await
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -45,16 +45,16 @@ class FillMisspellingDBWorker @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted params: WorkerParameters,
     private val symSpellRepository: SymSpellRepository, // TODO: get rid of this deps in favour of manual parsing
-) : RemoteCoroutineWorker(context, params) {
+) : CoroutineWorker(context, params) {
 
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.US)
 //    val logger = java.util.logging.Logger.getLogger("fillingMisspellingDB")
 
-    override suspend fun doRemoteWork(): Result {
+    override suspend fun doWork(): Result {
 //        delay(10000)
         try {
             if (isAppInForeground(context)) {
-                setForegroundAsync(createForegroundInfo("Start text")).await()
+                setForeground(createForegroundInfo("Start text"))
             }
         } catch (e: Throwable) {
             return Result.failure()
@@ -106,7 +106,7 @@ class FillMisspellingDBWorker @AssistedInject constructor(
         val cancel = applicationContext.getString(R.string.misspelling_notification_cancel)
 
         // This PendingIntent can be used to cancel the worker
-//        val intent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
+        val intent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
 
         // Create the NotificationChannel.
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -125,9 +125,10 @@ class FillMisspellingDBWorker @AssistedInject constructor(
             .setContentText(progress)
             .setSmallIcon(R.drawable.ic_error_24)
             .setOngoing(true)
+            .setDeleteIntent(intent)
             // Add the cancel action to the notification which can
             // be used to cancel the worker
-//            .addAction(R.drawable.ic_error_24, "cancel", intent)
+            .addAction(R.drawable.ic_error_24, "cancel", intent)
 //            .addAction(0, cancel,
 //                PendingIntent.getBroadcast(
 //                    applicationContext,

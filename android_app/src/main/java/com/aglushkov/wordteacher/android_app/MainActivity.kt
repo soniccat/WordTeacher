@@ -1,7 +1,6 @@
 package com.aglushkov.wordteacher.android_app
 
 import android.Manifest
-import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -35,7 +34,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
@@ -84,9 +82,6 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import dev.icerock.moko.resources.desc.StringDesc
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), Router {
     private val bottomBarTabs = listOf(
@@ -120,9 +115,7 @@ class MainActivity : AppCompatActivity(), Router {
         setupComposeLayout()
         handleIntent()
 
-        lifecycleScope.launch {
-            appComponent().fillMisspellingDBController().load(Unit).collect()
-        }
+        appComponent().fillMisspellingDBController().launchLoadInScope(Unit)
     }
 
     private val requestPermissionLauncher = registerForActivityResult(

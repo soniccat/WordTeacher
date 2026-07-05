@@ -8,13 +8,10 @@ import com.aglushkov.wordteacher.shared.general.serialization.SerializableFileCa
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardResponse
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import okio.FileSystem
 import okio.Path
 import kotlin.let
 import kotlin.reflect.typeOf
-import kotlin.time.Duration
 import kotlin.time.Instant
 
 class DashboardRepository(
@@ -38,11 +35,10 @@ class DashboardRepository(
     }
 
     suspend fun reloadIfNeeded() {
-        loadDate?.let { loadDate ->
-            if (timeSource.timeInstant().minus(loadDate).inWholeMinutes >= 15) {
-                if (!stateFlow.value.isLoading()) {
-                    load(Unit).waitUntilDone()
-                }
+        val safeLoadDate = loadDate ?: return
+        if (timeSource.timeInstant().minus(safeLoadDate).inWholeMinutes >= 15) {
+            if (!stateFlow.value.isLoading()) {
+                load(Unit).waitUntilDone()
             }
         }
     }
