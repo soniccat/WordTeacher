@@ -72,6 +72,7 @@ import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
+import com.aglushkov.wordteacher.shared.general.resource.onUnitialized
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPadding
 import com.aglushkov.wordteacher.shared.res.MR
@@ -115,7 +116,7 @@ class MainActivity : AppCompatActivity(), Router {
         setupComposeLayout()
         handleIntent()
 
-        appComponent().fillMisspellingDBController().launchLoadInScope(Unit)
+        appComponent().fillMisspellingDBController().loadIfNotLoaded()
     }
 
     private val requestPermissionLauncher = registerForActivityResult(

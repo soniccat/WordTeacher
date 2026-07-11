@@ -11,13 +11,8 @@ import com.darkrockstudios.symspellkt.api.HashFunction
 import com.darkrockstudios.symspellkt.common.DictionaryItem
 import com.darkrockstudios.symspellkt.common.SpellCheckSettings
 import com.darkrockstudios.symspellkt.common.SpellHelper.getEditDeletes
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class SymSpellDictionaryHolder(
     private val spellCheckSettings: SpellCheckSettings,
@@ -36,17 +31,15 @@ class SymSpellDictionaryHolder(
             return 0
         }
 
-    suspend fun fillFromDict(dict: Dict) = coroutineScope {
+    fun fillFromDict(dict: Dict): Flow<Pair<Float, Unit>> = flow {
         val offset = settingStore.int(SYMSPELL_DB_ENTRIES_OFFSET_KEY) ?: 0
-
         val wordCount = (dict.index as WordListDictIndex).wordCount
         val deletes: MutableMap<Long, ArrayList<String>> = mutableMapOf()
 
-        for (entry in dict.index.allEntries().withIndex().drop(offset)) {
-            if (!isActive) {
-                return@coroutineScope false
-            }
+        val progress = offset.toFloat() / wordCount.toFloat()
+        emit(progress to Unit)
 
+        for (entry in dict.index.allEntries().withIndex().drop(offset)) {
             addItem(entry.value.word, deletes)
             val size = deletes.values.sumOf { it.size }
             if (size > 10000) {
@@ -54,13 +47,16 @@ class SymSpellDictionaryHolder(
                 Logger.v("start at index $i")
                 misspellingDB.upsert(deletes)
                 deletes.clear()
-                Logger.v("upsert completed at index $i, ${i.toFloat() / wordCount.toFloat()}")
+
+                val progress = (i+1).toFloat() / wordCount.toFloat()
+                Logger.v("upsert completed at index $i, $progress")
                 settingStore[SYMSPELL_DB_ENTRIES_OFFSET_KEY] = i+1
+                emit(progress to Unit)
             }
         }
 
         misspellingDB.upsert(deletes)
-        return@coroutineScope true
+        emit(1.0f to Unit)
     }
 
     override fun addItem(dictionaryItem: DictionaryItem): Boolean {
@@ -137,4 +133,3 @@ class SymSpellDictionaryHolder(
 }
 
 private const val SYMSPELL_DB_ENTRIES_OFFSET_KEY = "SYMSPELL_DB_ENTRIES_OFFSET_KEY"
-private const val SYMSPELL_DB_VERSION_KEY = "SYMSPELL_DB_VERSION_KEY"

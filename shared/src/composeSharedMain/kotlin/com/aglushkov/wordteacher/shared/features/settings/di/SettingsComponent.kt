@@ -22,7 +22,6 @@ import com.arkivanov.decompose.ComponentContext
 
 import dagger.BindsInstance
 import dagger.Component
-import javax.inject.Qualifier
 
 @Component(dependencies = [SettingsDependencies::class], modules = [SettingsModule::class])
 interface SettingsComponent {

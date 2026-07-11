@@ -16,7 +16,8 @@ import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
+import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgress
 import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
@@ -24,6 +25,7 @@ import com.aglushkov.wordteacher.shared.tasks.FillMisspellingDBTask
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.collect
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -44,17 +46,15 @@ class FillMisspellingDBTaskImpl(
 class FillMisspellingDBWorker @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted params: WorkerParameters,
-    private val symSpellRepository: SymSpellRepository, // TODO: get rid of this deps in favour of manual parsing
+    private val symSpellRepository: SymSpellRepository,
 ) : CoroutineWorker(context, params) {
 
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.US)
-//    val logger = java.util.logging.Logger.getLogger("fillingMisspellingDB")
 
     override suspend fun doWork(): Result {
-//        delay(10000)
         try {
             if (isAppInForeground(context)) {
-                setForeground(createForegroundInfo("Start text"))
+                setForeground(createForegroundInfo(0.0f))
             }
         } catch (e: Throwable) {
             return Result.failure()
@@ -66,33 +66,20 @@ class FillMisspellingDBWorker @AssistedInject constructor(
 
             Logger.e("$formattedDate: start", "FillMisspellingDBWorker")
             val d = measureTime {
-//                while(true) {
-//                    delay(100)
-//                    logger.log(Level.WARNING, "in worker")
-//                    if (isStopped) {
-//                        break
-//                    }
-//                }
-
                 try {
-                    symSpellRepository.load(Unit).waitUntilDone()
+                    loadResourceWithProgress(
+                        loader = symSpellRepository.load()
+                    ).collect {
+                        setForeground(createForegroundInfo(it.progress()))
+                    }
                 } catch (e: Throwable) {
                     if (e is CancellationException) {
                         return Result.retry()
                     }
                     return Result.failure()
                 }
-
-                symSpellRepository.value.onError {
-                    if (it is CancellationException) {
-                        return Result.retry()
-                    }
-                    return Result.failure()
-                }
-
             }
             Logger.e("in worker: ${d.inWholeMilliseconds}", "FillMisspellingDBWorker")
-
             return Result.retry()
         } finally {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -101,7 +88,7 @@ class FillMisspellingDBWorker @AssistedInject constructor(
         }
     }
 
-    private fun createForegroundInfo(progress: String): ForegroundInfo {
+    private fun createForegroundInfo(progress: Float): ForegroundInfo {
         val title = applicationContext.getString(R.string.misspelling_notification_title)
         val cancel = applicationContext.getString(R.string.misspelling_notification_cancel)
 
@@ -109,8 +96,7 @@ class FillMisspellingDBWorker @AssistedInject constructor(
         val intent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
 
         // Create the NotificationChannel.
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val mChannel = NotificationChannel(FILL_MISSPELLING_CHANNEL_ID, title, importance)
+        val mChannel = NotificationChannel(FILL_MISSPELLING_CHANNEL_ID, title, NotificationManager.IMPORTANCE_LOW)
         mChannel.description = applicationContext.getString(R.string.misspelling_notification_description)
 
         // Register the channel with the system. You can't change the importance
@@ -122,13 +108,17 @@ class FillMisspellingDBWorker @AssistedInject constructor(
         val notification = NotificationCompat.Builder(applicationContext, FILL_MISSPELLING_CHANNEL_ID)
             .setContentTitle(title)
             .setTicker(title)
-            .setContentText(progress)
             .setSmallIcon(R.drawable.ic_error_24)
-            .setOngoing(true)
             .setDeleteIntent(intent)
+            .setSilent(true)
+            .setProgress(
+                100,
+                (100*progress).toInt(),
+                false,
+            )
             // Add the cancel action to the notification which can
             // be used to cancel the worker
-            .addAction(R.drawable.ic_error_24, "cancel", intent)
+            .addAction(R.drawable.ic_error_24, cancel, intent)
 //            .addAction(0, cancel,
 //                PendingIntent.getBroadcast(
 //                    applicationContext,

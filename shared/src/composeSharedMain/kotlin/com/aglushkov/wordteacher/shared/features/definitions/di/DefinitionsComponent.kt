@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.MisspellingDatabase
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
@@ -50,4 +51,5 @@ interface DefinitionsDependencies {
     fun wordDefinitionHistoryRepository(): WordDefinitionHistoryRepository
     fun audioService(): AudioService
     fun symSpellRepository(): SymSpellRepository
+    fun wordFrequencyDatabase(): WordFrequencyDatabase
 }

@@ -50,3 +50,12 @@ class WordTextSearchHeaderViewItem(
         const val Type = 1003
     }
 }
+
+class WordCorrectionsHeaderViewItem(
+    titleText: StringDesc,
+    val isTop: Boolean,
+): BaseViewItem<StringDesc>(titleText, Type) {
+    companion object {
+        const val Type = 1010
+    }
+}

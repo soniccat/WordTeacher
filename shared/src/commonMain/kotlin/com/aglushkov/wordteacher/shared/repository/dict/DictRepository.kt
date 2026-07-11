@@ -3,6 +3,7 @@ package com.aglushkov.wordteacher.shared.repository.dict
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
+import com.aglushkov.wordteacher.shared.general.extensions.updateWithLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isUninitialized
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -67,9 +68,7 @@ class DictRepositoryImpl(
         val currentDicts = dicts
         val filePaths = fileSystem.listOrNull(path).orEmpty()
         if (filePaths.isEmpty()) {
-            dicts.update {
-                Resource.Loaded( emptyList())
-            }
+            dicts.updateWithLoadedData(emptyList())
         } else {
             filePaths.onEach { filePath ->
                 val isDictLoaded = currentDicts.value.data()?.firstOrNull {

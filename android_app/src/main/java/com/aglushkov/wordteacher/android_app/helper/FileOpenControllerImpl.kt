@@ -8,7 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.aglushkov.wordteacher.shared.general.FileOpenController
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.okio.useAsTmp
 import com.aglushkov.wordteacher.shared.general.okio.writeTo
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -80,7 +80,7 @@ class FileOpenControllerImpl(
     override suspend fun chooseFile(): Resource<Unit> {
         state.update { Resource.Loading() }
         openDocumentLauncher?.launch(mimeTypes.toTypedArray())
-        return state.waitUntilDone()
+        return state.collectUntilDone()
     }
 }
 

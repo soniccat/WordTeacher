@@ -22,8 +22,7 @@ import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.extensions.addElements
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoaded
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilLoaded
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -212,7 +211,7 @@ open class LearningVMImpl(
         // TODO: consider updating span priority to calculate required card spans first and skip not required for now
         addClearable(databaseCardWorker.updateSpansAndStartEditing())
 
-        val cards = cardRepository.stateFlow.waitUntilLoaded().data().orEmpty()
+        val cards = cardRepository.stateFlow.collectUntilLoaded().data().orEmpty()
         state = state.copy(cardIds = cards.map { it.id })
 
         val teacher = createTeacher(cards, aState.teacherState)

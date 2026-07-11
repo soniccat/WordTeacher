@@ -70,15 +70,15 @@ fun <T> StateFlow<T?>.takeWhileNonNull(
         takeWhile { it != null }.collect(this as FlowCollector<T?>)
     }
 
-suspend fun Flow<Boolean>.waitUntilFalse() {
+suspend fun Flow<Boolean>.collectUntilFalse() {
     takeWhile { it }.collect()
 }
 
-suspend fun Flow<Boolean>.waitUntilTrue() {
+suspend fun Flow<Boolean>.collectUntilTrue() {
     takeWhile { !it }.collect()
 }
 
-suspend fun <T> Flow<Resource<T>>.waitUntilLoaded(): Resource<T> {
+suspend fun <T> Flow<Resource<T>>.collectUntilLoaded(): Resource<T> {
     var res: Resource<T> = Resource.Uninitialized()
     takeWhile {
         val needTake = !it.isLoaded()
@@ -90,7 +90,7 @@ suspend fun <T> Flow<Resource<T>>.waitUntilLoaded(): Resource<T> {
     return res
 }
 
-suspend fun <T> Flow<Resource<T>>.waitUntilDone(): Resource<T> {
+suspend fun <T> Flow<Resource<T>>.collectUntilDone(): Resource<T> {
     var res: Resource<T> = Resource.Uninitialized()
     takeWhile {
         val needTake = !it.isLoadedOrError()
@@ -102,11 +102,11 @@ suspend fun <T> Flow<Resource<T>>.waitUntilDone(): Resource<T> {
     return res
 }
 
-suspend fun <T> Flow<Resource<T>>.waitUntilDone(
+suspend fun <T> Flow<Resource<T>>.collectUntilDone(
     error: suspend (Throwable) -> Unit = {},
     loaded: suspend (T) -> Unit,
 ) {
-    val res = waitUntilDone()
+    val res = collectUntilDone()
     if (res is Resource.Loaded) {
         try {
             loaded(res.data)

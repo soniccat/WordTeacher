@@ -64,7 +64,6 @@ class ArticleModule {
         dictRepository,
         cardSetsRepository,
         wordFrequencyGradationProvider,
-        wordTeacherDictService,
         DefinitionsVM.Settings(
             needStoreDefinedWordInSettings = true,
         ),

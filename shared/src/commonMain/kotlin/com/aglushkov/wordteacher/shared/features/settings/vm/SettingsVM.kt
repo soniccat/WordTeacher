@@ -11,7 +11,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.getAppInfo
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
@@ -38,9 +38,6 @@ import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 
 
 import dev.icerock.moko.resources.desc.ResourceFormatted
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import okio.Path
 import kotlinx.serialization.Serializable
@@ -223,7 +220,7 @@ open class SettingsVMImpl (
     override fun onLogFileShareClicked(path: Path) {
         analytics.send(AnalyticEvent.createActionEvent("Settings.logFileShareClicked"))
         viewModelScope.launch {
-            fileSharer?.share(path)?.waitUntilDone()
+            fileSharer?.share(path)?.collectUntilDone()
         }
     }
 

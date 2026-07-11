@@ -18,7 +18,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.extensions.combine7
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -137,7 +137,7 @@ open class DashboardVMIMpl(
 
     private fun loadDashboard() {
         viewModelScope.launch {
-            dashboardRepository.load(Unit).waitUntilDone()
+            dashboardRepository.load(Unit).collectUntilDone()
         }
     }
 

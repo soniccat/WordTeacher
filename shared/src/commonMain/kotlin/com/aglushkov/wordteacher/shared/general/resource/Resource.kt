@@ -409,6 +409,28 @@ fun <T> loadResource(
     }
 }
 
+fun <T> loadResourceWithFlow(
+    initialValue: Resource<T> = Resource.Uninitialized(),
+    canTryAgain: Boolean = true,
+    flow: Flow<T>
+): Flow<Resource<T>> = flow {
+    try {
+        emit(initialValue.toLoading())
+        var lastValue: T? = null
+        flow.collect {
+            lastValue = it
+            emit(Resource.Loading(it))
+        }
+        emit(initialValue.toLoaded(lastValue!!))
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Throwable) {
+        Logger.e(e.message.orEmpty(), "loadResourceWithFlow")
+        e.printStackTrace()
+        emit(initialValue.toError(e, canTryAgain))
+    }
+}
+
 fun <T> loadResourceWithProgress(
     initialValue: Resource<T> = Resource.Uninitialized(),
     canTryAgain: Boolean = true,

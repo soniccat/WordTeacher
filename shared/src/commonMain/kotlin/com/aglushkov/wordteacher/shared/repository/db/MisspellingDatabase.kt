@@ -3,16 +3,8 @@ package com.aglushkov.wordteacher.shared.repository.db
 import app.cash.sqldelight.TransactionWithoutReturn
 import com.aglushkov.wordteacher.db.Misspelling
 import com.aglushkov.wordteacher.misspellingdb.MisspellingDB
-import com.aglushkov.wordteacher.shared.dicts.wordlist.WORDLIST_EXTENSION
-import com.aglushkov.wordteacher.shared.general.extensions.splitByChunks
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoaded
 import com.aglushkov.wordteacher.shared.general.resource.Resource
-import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
-import com.aglushkov.wordteacher.shared.general.settings.SettingStore
-import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
-import com.aglushkov.wordteacher.wordfrequencydb.WordFrequencyDB
-import com.aglushkov.wordteacher.wordfrequencydb.WordFrequencyDB.Companion.invoke
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

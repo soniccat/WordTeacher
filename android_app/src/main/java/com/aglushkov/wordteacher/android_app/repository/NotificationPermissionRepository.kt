@@ -9,7 +9,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.aglushkov.wordteacher.shared.general.extensions.updateWithLoadedData
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
 
 class NotificationPermissionRepository(
@@ -29,7 +29,7 @@ class NotificationPermissionRepository(
                 true
             } else {
                 requestPermissionLauncher?.launch(Manifest.permission.POST_NOTIFICATIONS)
-                stateFlow.waitUntilDone().data() ?: false
+                stateFlow.collectUntilDone().data() ?: false
             }
         } else {
             true

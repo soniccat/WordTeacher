@@ -5,7 +5,7 @@ import com.aglushkov.wordteacher.shared.general.StringsReader
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.extensions.asFlow
 import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoaded
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilLoaded
 import com.aglushkov.wordteacher.shared.general.resource.RESOURCE_UNDEFINED_PROGRESS
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgress
@@ -89,7 +89,7 @@ class ArticlesRepository(
 
     fun updateLastFirstVisibleItem(id: Long, itemIndex: Int) {
         scope.launch(Dispatchers.IO) {
-            lastFirstVisibleItemMap.waitUntilLoaded()
+            lastFirstVisibleItemMap.collectUntilLoaded()
             lastFirstVisibleItemMap.value.onData { data ->
                 if (data[id] != itemIndex) {
                     lastFirstVisibleItemMap.updateLoadedData(defaultData = emptyMap()) {
@@ -102,7 +102,7 @@ class ArticlesRepository(
 
     fun offsetLastFirstVisibleItem(offset: Int) {
         scope.launch(Dispatchers.IO) {
-            lastFirstVisibleItemMap.waitUntilLoaded()
+            lastFirstVisibleItemMap.collectUntilLoaded()
             lastFirstVisibleItemMap.value.onData { data ->
                 lastFirstVisibleItemMap.updateLoadedData(defaultData = emptyMap()) {
                     it.mapValues { entry -> maxOf(0, entry.value + offset) }

@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
+import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SuggestionRepository
@@ -27,8 +28,11 @@ class DefinitionsModule {
     @Provides
     fun suggestionRepository(
         symSpellRepository: SymSpellRepository,
+        dictRepository: DictRepository,
+        wordTeacherDictService: WordTeacherDictService,
+        wordFrequencyDatabase: WordFrequencyDatabase,
     ): SuggestionRepository {
-        return SuggestionRepository(symSpellRepository)
+        return SuggestionRepository(symSpellRepository, dictRepository, wordTeacherDictService, wordFrequencyDatabase)
     }
 
 
@@ -59,7 +63,6 @@ class DefinitionsModule {
         dictRepository,
         cardSetsRepository,
         wordFrequencyGradationProvider,
-        wordTeacherDictService,
         clipboardRepository,
         idGenerator,
         analytics,

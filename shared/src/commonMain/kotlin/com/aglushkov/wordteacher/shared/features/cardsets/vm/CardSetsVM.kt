@@ -11,7 +11,7 @@ import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -347,9 +347,9 @@ open class CardSetsVMImpl(
     private fun loadCardSetAndAdd(remoteId: String) {
         viewModelScope.launch {
             cardSetSearchRepository.loadRemoteCardSet(remoteId)
-                .waitUntilDone(
+                .collectUntilDone(
                     error = { _ ->
-                        val cardSet = cardSetSearchRepository.cardSetByRemoteId(remoteId) ?: return@waitUntilDone
+                        val cardSet = cardSetSearchRepository.cardSetByRemoteId(remoteId) ?: return@collectUntilDone
                         router?.onCardSetLoadingError(remoteId, cardSet.name) {
                             loadCardSetAndAdd(remoteId)
                         }

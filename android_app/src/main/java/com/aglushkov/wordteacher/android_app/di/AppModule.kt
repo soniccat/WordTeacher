@@ -22,7 +22,7 @@ import com.aglushkov.wordteacher.android_app.helper.WebLinkOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.YandexAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.repository.NotificationPermissionRepository
 import com.aglushkov.wordteacher.android_app.tasks.FillMisspellingDBTaskImpl
-import com.aglushkov.wordteacher.android_app.worker.FillMisspellingDBController
+import com.aglushkov.wordteacher.android_app.worker.FillMisspellingDBControllerImpl
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.analytics.AppMetricaEngine
@@ -63,6 +63,7 @@ import com.aglushkov.wordteacher.shared.tasks.ArticleSample
 import com.aglushkov.wordteacher.shared.tasks.CopyDictTask
 import com.aglushkov.wordteacher.shared.tasks.LoadNLPCoreTask
 import com.aglushkov.wordteacher.shared.tasks.Task
+import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -440,13 +441,13 @@ class AppModule {
 
     @AppComp
     @Provides
-    fun fillMisspellingDBController(
+    fun fillMisspellingDBControllerImpl(
         context: Context,
         settings: SettingStore,
         analytics: Analytics,
         notificationPermissionRepository: NotificationPermissionRepository,
-    ): FillMisspellingDBController {
-        return FillMisspellingDBController(
+    ): FillMisspellingDBControllerImpl {
+        return FillMisspellingDBControllerImpl(
             context,
             settings,
             BuildConfig.misspellingDbVersion,
@@ -454,6 +455,11 @@ class AppModule {
             notificationPermissionRepository,
         )
     }
+
+    @AppComp
+    @Provides
+    // TODO: replace with bind
+    fun FillMisspellingDBController(impl: FillMisspellingDBControllerImpl): FillMisspellingDBController = impl
 
     @AppComp
     @Provides

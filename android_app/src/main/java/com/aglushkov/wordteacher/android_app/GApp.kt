@@ -1,18 +1,12 @@
 package com.aglushkov.wordteacher.android_app
 
-import android.app.ActivityManager
 import android.app.Application
-import android.app.usage.UsageStatsManager
 import android.content.res.Resources
-import android.os.Build
 import co.touchlab.kermit.CommonWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
-import android.os.Process
 import android.util.Log
 import androidx.work.Configuration
-import androidx.work.WorkManager
-import androidx.work.multiprocess.RemoteWorkManager
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
 import com.aglushkov.wordteacher.android_app.di.DaggerAppComponent
@@ -20,14 +14,9 @@ import com.aglushkov.wordteacher.android_app.di.GeneralModule
 import com.aglushkov.wordteacher.android_app.general.ActivityVisibilityResolver
 import com.aglushkov.wordteacher.android_app.general.RouterResolver
 import com.aglushkov.wordteacher.android_app.tasks.CompositeWorkerFactory
-import com.aglushkov.wordteacher.android_app.tasks.CustomWorkerFactory
 import com.aglushkov.wordteacher.shared.analytics.Analytics
-import com.aglushkov.wordteacher.shared.di.IsDebug
-import com.aglushkov.wordteacher.shared.di.Worker
 import com.aglushkov.wordteacher.shared.general.FileLogger
 import com.aglushkov.wordteacher.shared.general.Logger
-import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
 import com.aglushkov.wordteacher.shared.general.setAnalytics
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
@@ -46,15 +35,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.telegram.login.TelegramLogin
 import javax.inject.Inject
-
-// to inject some fields for non main process
-class GAppNonMainProccess {
-    @Inject
-    lateinit var workerFactory: CompositeWorkerFactory
-
-    @Worker
-    @Inject lateinit var fileLogger: FileLogger
-}
 
 class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listener, Configuration.Provider {
     override lateinit var appComponent: AppComponent
@@ -77,29 +57,9 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
     @Inject lateinit var tasks: Array<Task>
     @Inject lateinit var symSpellRepository: SymSpellRepository
 
-    private var nonMainProcessDeps: GAppNonMainProccess? = null
-
     override fun onCreate() {
         super.onCreate()
 
-        if (isMainProcess()) {
-            onMainProcessCreated()
-        }else {
-            onNonMainProcessCreated()
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-            Logger.e("isBackgroundRestricted:${manager.isBackgroundRestricted}", "GApp")
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            (getSystemService(USAGE_STATS_SERVICE) as? UsageStatsManager)?.let {
-                Logger.e("appStandbyBucket:${it.appStandbyBucket}", "GApp")
-            }
-        }
-    }
-
-    private fun onMainProcessCreated() {
         appComponent = DaggerAppComponent.builder()
             .generalModule(GeneralModule(this))
             .build()
@@ -150,43 +110,6 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
         }
     }
 
-    private fun onNonMainProcessCreated() {
-        val nonMainProcess = GAppNonMainProccess()
-        appComponent = DaggerAppComponent.builder()
-            .generalModule(GeneralModule(this))
-            .build()
-        appComponent.injectAppNonMainProccess(nonMainProcess)
-        nonMainProcessDeps = nonMainProcess
-
-        Logger().setupDebug(
-            StaticConfig(
-                Severity.Verbose,
-                buildList {
-                    if (appComponent.isDebug()) {
-                        add(CommonWriter())
-                    }
-                    add(nonMainProcessDeps!!.fileLogger)
-                }
-            )
-        )
-    }
-
-    private fun isMainProcess(): Boolean {
-        return packageName == myProcessName
-    }
-
-    private val myProcessName: String by lazy {
-        val mypid = Process.myPid()
-        val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        val infos = manager.runningAppProcesses
-        for (info in infos) {
-            if (info.pid == mypid) {
-                return@lazy info.processName
-            }
-        }
-        return@lazy "undefined"
-    }
-
     override fun onFirstActivityStarted() {
         appComponent.connectivityManager().register()
     }
@@ -197,29 +120,13 @@ class GApp: Application(), AppComponentOwner, ActivityVisibilityResolver.Listene
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
-            // without that has "The default process name was not specified."
-            // and stopReason 1
-            .setDefaultProcessName(packageName) // TODO: figure out how to change it to misspelling_worker and make it working. On any change need to update isBackgroundRunning accordingly
-            // with that see these in logs "Ignoring schedule request in non-main process" and "Ignoring schedule request in a secondary process"
-            // and stopReason 1
-//            .apply {
-//                if (!isMainProcess()) {
-//                    setDefaultProcessName(getString(R.string.misspelling_worker))
-//                }
-//            }
-//            .setDefaultProcessName(packageName + getString(R.string.misspelling_worker))
+            .setDefaultProcessName(packageName)
             .apply {
                 if(BuildConfig.DEBUG) {
                     setMinimumLoggingLevel(Log.DEBUG)
                 }
             }
-            .setWorkerFactory(
-                if (isMainProcess()) {
-                    workerFactory
-                } else {
-                    nonMainProcessDeps!!.workerFactory
-                }
-            )
+            .setWorkerFactory(workerFactory)
             .build()
 }
 

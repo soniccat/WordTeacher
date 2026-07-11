@@ -1,7 +1,7 @@
 package com.aglushkov.wordteacher.shared.general
 
 import co.touchlab.stately.concurrency.AtomicLong
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilLoaded
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilLoaded
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import io.ktor.client.plugins.cookies.*
 import io.ktor.http.*
@@ -15,8 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import okio.Path
@@ -53,7 +51,7 @@ public class FileCookieStorage(
     }
 
     override suspend fun get(requestUrl: Url): List<Cookie> {
-        containerState.waitUntilLoaded()
+        containerState.collectUntilLoaded()
         return mutex.withLock {
             val date = GMTDate()
             if (date.timestamp >= oldestCookie.get()) cleanup(date.timestamp)
@@ -63,7 +61,7 @@ public class FileCookieStorage(
     }
 
     override suspend fun addCookie(requestUrl: Url, cookie: Cookie) {
-        containerState.waitUntilLoaded()
+        containerState.collectUntilLoaded()
         mutex.withLock {
             with(cookie) {
                 if (name.isBlank()) return@withLock

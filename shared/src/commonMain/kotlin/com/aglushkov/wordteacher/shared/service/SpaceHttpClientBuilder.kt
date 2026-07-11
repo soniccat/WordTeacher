@@ -1,7 +1,5 @@
 package com.aglushkov.wordteacher.shared.service
 
-import co.touchlab.stately.concurrency.AtomicBoolean
-import co.touchlab.stately.concurrency.synchronize
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.*
@@ -10,7 +8,7 @@ import com.aglushkov.wordteacher.shared.general.serialization.GZip
 import com.aglushkov.wordteacher.shared.repository.deviceid.DeviceIdRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilFalse
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilFalse
 import io.ktor.client.*
 import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.compression.*
@@ -22,15 +20,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.util.decodeBase64Bytes
-import io.ktor.util.reflect.instanceOf
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.flow.updateAndGet
-import kotlinx.coroutines.internal.synchronized
 
 class SpaceHttpClientBuilder(
     private val deviceIdRepository: DeviceIdRepository,
@@ -146,7 +137,7 @@ class SpaceHttpClientBuilder(
                                     unauthHandlingIsInProgress.compareAndSet(true, false)
                                     newCall ?: originalCall
                                 } else {
-                                    unauthHandlingIsInProgress.waitUntilFalse()
+                                    unauthHandlingIsInProgress.collectUntilFalse()
 
                                     val newAutData = spaceRepository.currentAuthData.asLoaded()
                                     val newCall = if (newAutData?.data?.user == oldAutData?.data?.user) {

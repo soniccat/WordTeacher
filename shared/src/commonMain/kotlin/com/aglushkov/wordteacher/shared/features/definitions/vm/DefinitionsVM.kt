@@ -9,7 +9,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrColl
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
@@ -39,7 +39,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -138,7 +137,6 @@ open class DefinitionsVMImpl(
     private val dictRepository: DictRepository,
     private val cardSetsRepository: CardSetsRepository,
     private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
-    private val wordTeacherDictService: WordTeacherDictService,
     private val definitionsSettings: DefinitionsVM.Settings,
     private val clipboardRepository: ClipboardRepository,
     private val idGenerator: IdGenerator,
@@ -726,13 +724,34 @@ open class DefinitionsVMImpl(
     override val suggests: StateFlow<Resource<List<BaseViewItem<*>>>> = if (suggestionRepository != null) {
         suggestionRepository.stateFlow.map {
             it.mapLoadedData {
-                it.corrections.map {
+                val fromDicts = it.fromDicts.map {
+                    WordSuggestDictEntryViewItem(
+                        word = it.word,
+                        definition = "", // TODO: support first definition
+                        source = it.dict.name
+                    )
+                }.distinctBy { it.firstItem() }  // here we loose source to avoid duplications
+
+                val correctionHeader = if (it.corrections.isNotEmpty()) {
+                    listOf(
+                        WordCorrectionsHeaderViewItem(
+                            StringDesc.Resource(MR.strings.definitions_corrections_title),
+                            isTop = fromDicts.isEmpty(),
+                        )
+                    )
+                } else {
+                    emptyList()
+                }
+
+                val correctionItems = it.corrections.map {
                     WordSuggestDictEntryViewItem(
                         word = it,
                         definition = "",
                         source = ""
                     ) as BaseViewItem<*>
-                }.generateIds()
+                }
+
+                (fromDicts + correctionHeader + correctionItems).generateIds()
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
     } else {
@@ -807,14 +826,7 @@ open class DefinitionsVMImpl(
 
         suggestJob = viewModelScope.launch(Dispatchers.IO) {
             delay(200)
-            suggestionRepository?.load(word)?.waitUntilDone()
-//                .waitUntilDone {
-//                    if (it.size in 0..30) {
-//                        launch {
-//                            wordTextSearchRepository.load(word).collect()
-//                        }
-//                    }
-//                }
+            suggestionRepository?.load(word)?.collectUntilDone()
         }
     }
 

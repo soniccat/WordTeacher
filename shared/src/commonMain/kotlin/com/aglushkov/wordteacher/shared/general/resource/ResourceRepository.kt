@@ -2,11 +2,9 @@ package com.aglushkov.wordteacher.shared.general.resource
 
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import com.aglushkov.wordteacher.shared.general.extensions.updateWithLoadingData
-import com.aglushkov.wordteacher.shared.general.extensions.waitUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +15,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 interface ResourceRepository<T, A> {
-//    val scope: CoroutineScope
     val value: Resource<T>
     val stateFlow: StateFlow<Resource<T>>
 
@@ -45,7 +42,6 @@ interface ResourceRepository<T, A> {
 
 abstract class SimpleResourceRepository<T, A>(
     initialValue: Resource<T> = Resource.Uninitialized(),
-//    override val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     private val canTryAgain: Boolean = true,
     private val needPreload: Boolean = false,
 ): ResourceRepository<T, A> {
@@ -84,7 +80,7 @@ abstract class SimpleResourceRepository<T, A>(
         loadJob = launchScope.launch {
             if (resultNeedPreload) {
                 loadResource { preload(arg) }
-                    .waitUntilDone()
+                    .collectUntilDone()
                     .onData(stateFlow::updateWithLoadingData)
             }
 

@@ -52,6 +52,7 @@ import com.aglushkov.wordteacher.shared.service.*
 import com.aglushkov.wordteacher.shared.workers.CardFrequencyUpdateWorker
 import com.aglushkov.wordteacher.shared.workers.CardSetSyncWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import com.aglushkov.wordteacher.shared.workers.SpanUpdateWorker
 import com.darkrockstudios.symspellkt.common.Murmur3HashFunction
 import com.darkrockstudios.symspellkt.common.SpellCheckSettings
@@ -589,8 +590,12 @@ class SharedAppModule {
         dictRepository: DictRepository,
         misspellingDatabase: MisspellingDatabase,
         settingStore: SettingStore,
+        controller: FillMisspellingDBController,
     ): SymSpellRepository {
-        val spellCheckSettings = SpellCheckSettings().copy(lowerCaseTerms = false)
+        val spellCheckSettings = SpellCheckSettings().copy(
+            lowerCaseTerms = false,
+            topK = 20
+        )
         return SymSpellRepository(
             symSpell = SymSpell(
                 dictionaryHolder = SymSpellDictionaryHolder(
@@ -606,6 +611,7 @@ class SharedAppModule {
                 ),
             ),
             dictRepository = dictRepository,
+            isDBReady = { controller.isReady }
         )
     }
 }

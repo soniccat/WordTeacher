@@ -420,6 +420,12 @@ private fun showSuggestItem(
             text = { Text(item.firstItem()) }
         )
     }
+    is WordCorrectionsHeaderViewItem -> ListSectionCell(
+        item.firstItem().localized(),
+        Modifier.padding(
+            top = if (item.isTop) 0.dp else 16.dp
+        ),
+    )
     is WordTextSearchHeaderViewItem -> ListSectionCell(
         item.firstItem().localized(),
         Modifier.padding(

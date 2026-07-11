@@ -49,6 +49,7 @@
     <string name="definitions_displayMode_bySource">By Source</string>
     <string name="definitions_displayMode_merge">Combined</string>
     <string name="definitions_open_cardsets">Open Card Sets screen</string>
+    <string name="definitions_corrections_title">Probably you meant:</string>
     <string name="definitions_textsearch_title">Text Search Result</string>
     <string name="definitions_textsearch_showAllWords">Show All</string>
     <string name="definitions_cardsets_expand">Show all Card Sets</string>
