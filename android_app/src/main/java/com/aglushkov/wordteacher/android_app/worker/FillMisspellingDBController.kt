@@ -14,15 +14,21 @@ import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.extensions.updateWithLoadedData
 import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
+import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
 import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -39,10 +45,19 @@ class FillMisspellingDBControllerImpl(
     private val workManager = WorkManager.getInstance(context)
     private val workState = MutableStateFlow<Resource<WorkInfo>>(Resource.Uninitialized())
 
-    override val isReady: Boolean
-        get() {
-            return settings.boolean(MISSPELLING_FILLED_DB_VERSION_KEY, false)
-        }
+    override val isLoaded: Boolean
+        get() = settings.int(MISSPELLING_FILLED_DB_VERSION_KEY, -1) == lastVersion
+
+    override val loadingFlow: Flow<Resource<Unit>>
+        get() = if (isLoaded) {
+                flowOf(Resource.Loaded(Unit))
+            } else {
+                workState.map { it.map { Unit } }
+            }
+
+    override fun reset() {
+        settings[MISSPELLING_FILLED_DB_VERSION_KEY] = -1
+    }
 
     init {
         val currentVersion = settings.int(MISSPELLING_FILLED_DB_VERSION_KEY, -1)
@@ -110,10 +125,11 @@ class FillMisspellingDBControllerImpl(
         }
         notificationPermissionRepository.loadIfNotLoaded(Unit).collectUntilDone()
 
-        workState.update { it.toLoading() }
+        reset()
+        workState.update { it.bumpVersion().toLoading() }
         enqueueWork()
 
-        return workState.collectUntilDone().onLoaded {
+        return workState.takeUntilLoadedOrErrorForVersion().collectUntilDone().onLoaded {
             markAsComplete()
         }
     }

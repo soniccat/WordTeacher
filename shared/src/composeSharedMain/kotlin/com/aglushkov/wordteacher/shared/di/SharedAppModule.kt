@@ -611,7 +611,7 @@ class SharedAppModule {
                 ),
             ),
             dictRepository = dictRepository,
-            isDBReady = { controller.isReady }
+            isDBReady = { controller.isLoaded }
         )
     }
 }

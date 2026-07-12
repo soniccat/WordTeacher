@@ -17,6 +17,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
+import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import com.arkivanov.decompose.ComponentContext
 
 import dagger.BindsInstance
@@ -52,4 +53,5 @@ interface DefinitionsDependencies {
     fun audioService(): AudioService
     fun symSpellRepository(): SymSpellRepository
     fun wordFrequencyDatabase(): WordFrequencyDatabase
+    fun fillMisspellingDBController(): FillMisspellingDBController
 }

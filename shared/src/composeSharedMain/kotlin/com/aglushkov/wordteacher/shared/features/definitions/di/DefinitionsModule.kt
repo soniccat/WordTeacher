@@ -17,6 +17,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SuggestionRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
+import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import com.arkivanov.decompose.ComponentContext
 
 import dagger.Module
@@ -31,8 +32,9 @@ class DefinitionsModule {
         dictRepository: DictRepository,
         wordTeacherDictService: WordTeacherDictService,
         wordFrequencyDatabase: WordFrequencyDatabase,
+        fillMisspellingDBController: FillMisspellingDBController,
     ): SuggestionRepository {
-        return SuggestionRepository(symSpellRepository, dictRepository, wordTeacherDictService, wordFrequencyDatabase)
+        return SuggestionRepository(symSpellRepository, dictRepository, wordTeacherDictService, wordFrequencyDatabase, fillMisspellingDBController)
     }
 
 

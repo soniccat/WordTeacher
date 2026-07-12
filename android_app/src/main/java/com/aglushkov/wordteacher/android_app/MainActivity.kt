@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity(), Router {
         setupComposeLayout()
         handleIntent()
 
-        appComponent().fillMisspellingDBController().loadIfNotLoaded()
+        appComponent().fillMisspellingDBControllerImpl().loadIfNotLoaded()
     }
 
     private val requestPermissionLauncher = registerForActivityResult(

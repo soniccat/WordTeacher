@@ -16,8 +16,11 @@ import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellDictionaryHolder
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import com.arkivanov.decompose.ComponentContext
 
 import dagger.BindsInstance
@@ -53,4 +56,6 @@ interface SettingsDependencies {
     fun webLinkOpener(): WebLinkOpener
     fun databaseCardWorker(): DatabaseCardWorker
     fun settings(): SettingStore
+    fun misspellingDBController(): FillMisspellingDBController
+    fun symSpellRepository(): SymSpellRepository
 }

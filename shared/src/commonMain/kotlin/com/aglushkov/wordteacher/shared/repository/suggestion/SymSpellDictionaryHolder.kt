@@ -31,6 +31,11 @@ class SymSpellDictionaryHolder(
             return 0
         }
 
+    suspend fun resetProgress() {
+        settingStore[SYMSPELL_DB_ENTRIES_OFFSET_KEY] = 0
+        misspellingDB.deleteAll()
+    }
+
     fun fillFromDict(dict: Dict): Flow<Pair<Float, Unit>> = flow {
         val offset = settingStore.int(SYMSPELL_DB_ENTRIES_OFFSET_KEY) ?: 0
         val wordCount = (dict.index as WordListDictIndex).wordCount
@@ -42,7 +47,7 @@ class SymSpellDictionaryHolder(
         for (entry in dict.index.allEntries().withIndex().drop(offset)) {
             addItem(entry.value.word, deletes)
             val size = deletes.values.sumOf { it.size }
-            if (size > 10000) {
+            if (size > 20000) {
                 val i = entry.index
                 Logger.v("start at index $i")
                 misspellingDB.upsert(deletes)

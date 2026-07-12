@@ -121,38 +121,6 @@ sealed interface Resource<T> {
         )
     }
 
-    // take state from another resource
-//    fun <R> mergeWith(
-//        res: Resource<R>,
-//        canLoadNextPageTransformer: (Boolean, Boolean) -> Boolean = { a, _ -> a },
-//        versionTransformer: (Int, Int) -> Int = { a, _ -> a },
-//        throwableTransformer: (Throwable?, Throwable) -> Throwable = { a, b -> a ?: b },
-//        canTryAgainTransformer: (Boolean, Boolean) -> Boolean = { a, _ -> a },
-//        dataTransformer: (T?, R) -> T?
-//    ): Resource<T> = when (res) {
-//        is Loaded -> this.toLoaded(
-//            data = dataTransformer(data(), res.data) ?: throw RuntimeException("mergeWith: nil data for Loaded resource isn't supported"),
-//            canLoadNext = canLoadNextPageTransformer(canLoadNextPage, res.canLoadNextPage),
-//            version = versionTransformer(version, res.version)
-//        )
-//        is Loading -> this.toLoading(
-//            data = res.data?.let { dataTransformer(data(), it) } ?: data(),
-//            canLoadNext = canLoadNextPageTransformer(canLoadNextPage, res.canLoadNextPage),
-//            version = versionTransformer(version, res.version)
-//        )
-//        is Error -> this.toError(
-//            throwable = throwable()?.let { throwableTransformer(it, res.throwable) } ?: res.throwable,
-//            data = res.data?.let { dataTransformer(data(), it) } ?: data(),
-//            canTryAgain = canTryAgainTransformer(canTryAgain(), res.canTryAgain),
-//            canLoadNext = canLoadNextPageTransformer(canLoadNextPage, res.canLoadNextPage),
-//            version = versionTransformer(version, res.version)
-//        )
-//        is Uninitialized -> this.toUninitialized(
-//            canLoadNextPage = canLoadNextPageTransformer(canLoadNextPage, res.canLoadNextPage),
-//            version = versionTransformer(version, res.version)
-//        )
-//    }
-
     // TODO: remove and replace with map
     fun updateData(
         block: (T?) -> T?

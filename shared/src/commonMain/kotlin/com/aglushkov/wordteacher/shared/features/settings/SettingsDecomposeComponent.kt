@@ -26,9 +26,12 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProv
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellDictionaryHolder
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import com.arkivanov.decompose.ComponentContext
 
 
@@ -50,7 +53,9 @@ class SettingsDecomposeComponent (
     emailOpener: EmailOpener,
     webLinkOpener: WebLinkOpener,
     databaseCardWorker: DatabaseCardWorker,
-    settings: SettingStore
+    settings: SettingStore,
+    misspellingDBController: FillMisspellingDBController,
+    symSpellRepository: SymSpellRepository,
 ) : SettingsVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -71,6 +76,8 @@ class SettingsDecomposeComponent (
     webLinkOpener,
     databaseCardWorker,
     settings,
+    misspellingDBController,
+    symSpellRepository,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Settings"
 

@@ -21,7 +21,6 @@ import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgres
 import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
-import com.aglushkov.wordteacher.shared.tasks.FillMisspellingDBTask
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -32,17 +31,6 @@ import java.util.Locale
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.measureTime
 
-class FillMisspellingDBTaskImpl(
-    private val context: Context,
-    private val settings: SettingStore,
-    private val lastVersion: Int,
-    private val analytics: Analytics,
-): FillMisspellingDBTask(settings, lastVersion, analytics) {
-    override suspend fun process() {
-
-    }
-}
-
 class FillMisspellingDBWorker @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted params: WorkerParameters,
@@ -52,8 +40,10 @@ class FillMisspellingDBWorker @AssistedInject constructor(
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.US)
 
     override suspend fun doWork(): Result {
+        var isForegroundServiceAvailable = false
         try {
             if (isAppInForeground(context)) {
+                isForegroundServiceAvailable = true
                 setForeground(createForegroundInfo(0.0f))
             }
         } catch (e: Throwable) {
@@ -70,7 +60,9 @@ class FillMisspellingDBWorker @AssistedInject constructor(
                     loadResourceWithProgress(
                         loader = symSpellRepository.load()
                     ).collect {
-                        setForeground(createForegroundInfo(it.progress()))
+                        if (isForegroundServiceAvailable) {
+                            setForeground(createForegroundInfo(it.progress()))
+                        }
                     }
                 } catch (e: Throwable) {
                     if (e is CancellationException) {
@@ -80,7 +72,7 @@ class FillMisspellingDBWorker @AssistedInject constructor(
                 }
             }
             Logger.e("in worker: ${d.inWholeMilliseconds}", "FillMisspellingDBWorker")
-            return Result.retry()
+            return Result.success()
         } finally {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Logger.e("stopReason: $stopReason", "FillMisspellingDBWorker")
@@ -108,9 +100,9 @@ class FillMisspellingDBWorker @AssistedInject constructor(
         val notification = NotificationCompat.Builder(applicationContext, FILL_MISSPELLING_CHANNEL_ID)
             .setContentTitle(title)
             .setTicker(title)
-            .setSmallIcon(R.drawable.ic_error_24)
             .setDeleteIntent(intent)
             .setSilent(true)
+            .setSmallIcon(R.drawable.ic_statusbar)
             .setProgress(
                 100,
                 (100*progress).toInt(),
@@ -118,15 +110,7 @@ class FillMisspellingDBWorker @AssistedInject constructor(
             )
             // Add the cancel action to the notification which can
             // be used to cancel the worker
-            .addAction(R.drawable.ic_error_24, cancel, intent)
-//            .addAction(0, cancel,
-//                PendingIntent.getBroadcast(
-//                    applicationContext,
-//                    100,
-//                    Intent(applicationContext, NotificationActionReceiver::class.java),
-//                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-//                )
-//            )
+            .addAction(R.drawable.ic_close_18, cancel, intent)
             .build()
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

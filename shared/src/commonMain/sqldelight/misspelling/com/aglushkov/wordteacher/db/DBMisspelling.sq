@@ -25,3 +25,6 @@ update:
 UPDATE misspelling
 SET candidates = ?
 WHERE hash = ?;
+
+deletAll:
+DELETE FROM misspelling;

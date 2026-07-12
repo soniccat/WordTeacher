@@ -171,6 +171,14 @@ private fun showSettingsItem(
             Text(text = item.firstItem().localized())
         }
     }
+    is SettingsResetMisspellingDBItem -> {
+        Button(
+            onClick = { vm.onResetMisspellingDBClicked() },
+            modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
+        ) {
+            Text(text = item.firstItem().localized())
+        }
+    }
     is SettingsLogsConfigsItem -> {
         CustomListItem(
             modifier = Modifier

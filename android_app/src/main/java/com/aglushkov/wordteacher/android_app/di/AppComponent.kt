@@ -77,7 +77,7 @@ interface AppComponent:
 
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory
-    fun fillMisspellingDBController(): FillMisspellingDBControllerImpl
+    fun fillMisspellingDBControllerImpl(): FillMisspellingDBControllerImpl
     fun notificationPermissionRepository(): NotificationPermissionRepository
 
     fun googleAuthRepository(): GoogleAuthControllerImpl

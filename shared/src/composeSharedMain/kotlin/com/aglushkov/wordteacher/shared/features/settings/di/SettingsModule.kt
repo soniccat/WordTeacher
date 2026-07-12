@@ -16,8 +16,11 @@ import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellDictionaryHolder
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import com.arkivanov.decompose.ComponentContext
 
 import dagger.Module
@@ -44,6 +47,8 @@ class SettingsModule {
         webLinkOpener: WebLinkOpener,
         databaseCardWorker: DatabaseCardWorker,
         settings: SettingStore,
+        misspellingDBController: FillMisspellingDBController,
+        symSpellRepository: SymSpellRepository,
     ) = SettingsDecomposeComponent(
         componentContext,
         state,
@@ -62,5 +67,7 @@ class SettingsModule {
         webLinkOpener,
         databaseCardWorker,
         settings,
+        misspellingDBController,
+        symSpellRepository,
     )
 }

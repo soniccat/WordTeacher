@@ -26,6 +26,8 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellDictionaryHolder
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.service.SpaceAuthData
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
@@ -35,10 +37,14 @@ import kotlinx.coroutines.flow.*
 import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
+import dev.icerock.moko.resources.desc.RawStringDesc
 
 
 import dev.icerock.moko.resources.desc.ResourceFormatted
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okio.Path
 import kotlinx.serialization.Serializable
 
@@ -57,6 +63,7 @@ interface SettingsVM: Clearable {
     fun onEmailClicked()
     fun onPrivacyPolicyClicked()
     fun onResetHintsClicked()
+    fun onResetMisspellingDBClicked()
 
     // Created to use in future
     @Serializable
@@ -86,6 +93,8 @@ open class SettingsVMImpl (
     private val webLinkOpener: WebLinkOpener,
     private val databaseCardWorker: DatabaseCardWorker,
     private val settingStore: SettingStore,
+    private val misspellingDBController: FillMisspellingDBController,
+    private val symSpellRepository: SymSpellRepository,
 ): ViewModel(), SettingsVM {
 
 //    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -157,6 +166,10 @@ open class SettingsVMImpl (
 
         resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_hints_title))
         resultItems += SettingsResetHintsItem(StringDesc.Resource(MR.strings.settings_hints_reset))
+
+        if (isDebug) {
+            resultItems += SettingsResetMisspellingDBItem(StringDesc.Resource(MR.strings.settings_remove_misspelling_db))
+        }
 
         resultItems += SettingsPrivacyPolicyItem()
         resultItems += SettingsAbout(
@@ -234,5 +247,13 @@ open class SettingsVMImpl (
 
     override fun onResetHintsClicked() {
         settingStore.resetHint()
+    }
+
+    override fun onResetMisspellingDBClicked() {
+        viewModelScope.launch {
+            symSpellRepository.dictHolder.resetProgress()
+            misspellingDBController.reset()
+            router?.onError(RawStringDesc("Misspelling db cleared"))
+        }
     }
 }

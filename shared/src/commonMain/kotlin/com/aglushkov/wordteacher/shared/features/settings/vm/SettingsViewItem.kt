@@ -109,3 +109,11 @@ class SettingsResetHintsItem(
         const val Type = 1012
     }
 }
+
+class SettingsResetMisspellingDBItem(
+    text: StringDesc,
+) : BaseViewItem<StringDesc>(text, Type) {
+    companion object {
+        const val Type = 1013
+    }
+}

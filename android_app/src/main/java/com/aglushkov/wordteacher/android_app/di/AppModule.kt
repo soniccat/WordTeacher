@@ -21,7 +21,6 @@ import com.aglushkov.wordteacher.android_app.helper.VKAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.helper.WebLinkOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.YandexAuthControllerImpl
 import com.aglushkov.wordteacher.android_app.repository.NotificationPermissionRepository
-import com.aglushkov.wordteacher.android_app.tasks.FillMisspellingDBTaskImpl
 import com.aglushkov.wordteacher.android_app.worker.FillMisspellingDBControllerImpl
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEngine
 import com.aglushkov.wordteacher.shared.analytics.Analytics

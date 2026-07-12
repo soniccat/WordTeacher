@@ -11,6 +11,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okio.Path
 
 class MisspellingDatabase(
@@ -68,6 +69,10 @@ class MisspellingDatabase(
                 db.dBMisspellingQueries.insert(it, map[it]!!)
             }
         }
+    }
+
+    suspend fun deleteAll() = withContext(Dispatchers.IO) {
+        db.dBMisspellingQueries.deletAll()
     }
 
     fun transaction(
