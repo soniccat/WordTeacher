@@ -59,3 +59,19 @@ class WordCorrectionsHeaderViewItem(
         const val Type = 1010
     }
 }
+
+class WordCorrectionsMisspellingDBFillProgress(
+    val titleText: StringDesc,
+    val isLoading: Boolean,
+    val progress: Float
+): BaseViewItem<StringDesc>(titleText, Type) {
+    companion object {
+        const val Type = 1011
+    }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) &&
+                isLoading == (other as WordCorrectionsMisspellingDBFillProgress).isLoading &&
+                progress == other.progress
+    }
+}

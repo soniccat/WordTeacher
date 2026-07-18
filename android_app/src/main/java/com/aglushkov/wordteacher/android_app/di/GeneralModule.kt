@@ -33,7 +33,7 @@ class GeneralModule(private val application: Application) {
     @IsDebug
     @AppComp
     @Provides
-    fun isDebug(): Boolean = BuildConfig.DEBUG
+    fun isDebug(): Boolean = false// BuildConfig.DEBUG
 
     @AppComp
     @Provides

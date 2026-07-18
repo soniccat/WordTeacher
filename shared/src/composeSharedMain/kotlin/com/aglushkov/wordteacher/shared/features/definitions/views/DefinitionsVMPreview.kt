@@ -126,6 +126,9 @@ open class DefinitionsVMPreview(
     override fun onDslHintClicked() {
     }
 
+    override fun onStartLoadMisspellingDBClicked() {
+    }
+
     override val needShowDslHintOnEmptyResult = MutableStateFlow<Boolean>(true)
     override val wordStack = MutableStateFlow<List<String>>(emptyList())
 }

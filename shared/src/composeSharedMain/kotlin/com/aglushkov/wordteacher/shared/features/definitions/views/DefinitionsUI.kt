@@ -46,6 +46,7 @@ import com.aglushkov.wordteacher.shared.general.views.ListSectionCell
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusViewWithErrorContent
 import com.aglushkov.wordteacher.shared.general.views.SearchView
+import com.aglushkov.wordteacher.shared.general.views.StartLearningButton
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserUI
 import com.aglushkov.wordteacher.shared.general.views.chooser_dialog.ChooserViewItem
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
@@ -364,7 +365,7 @@ private fun suggestListUI(
             bottom = listBottomPadding()
         )
     ) {
-        items(suggestsData, key = { it.id }) { item ->
+        items(suggestsData, key = { it.id }, contentType = { it.type }) { item ->
             showSuggestItem(
                 Modifier.animateItem(),
                 item,
@@ -446,6 +447,43 @@ private fun showSuggestItem(
             )
         }
     )
+    is WordCorrectionsMisspellingDBFillProgress -> Row(
+        modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = LocalDimens.current.contentPadding, vertical = LocalDimens.current.halfOfContentPadding),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = item.firstItem().localized(),
+            modifier = Modifier.weight(1.0f).padding(end = 5.dp),
+        )
+
+        Box(modifier = Modifier.height(50.dp)) {
+            if (item.isLoading) {
+                val side = 40.dp
+                Box(
+                    modifier = Modifier.size(side, side)
+                ) {
+                    CircularProgressIndicator(
+                        progress = 1.0f,
+                        modifier = Modifier.padding(5.dp),
+                        color = Color.LightGray.copy(alpha = 0.2f)
+                    )
+                    CircularProgressIndicator(
+                        progress = item.progress,
+                        modifier = Modifier.padding(5.dp),
+                    )
+                }
+            } else {
+                Button(
+                    onClick = {
+                        vm.onStartLoadMisspellingDBClicked()
+                    }
+                ) {
+                    Text("Start")
+                }
+            }
+        }
+    }
     is WordSuggestByTextViewItem -> {
         ListItem (
             modifier = modifier

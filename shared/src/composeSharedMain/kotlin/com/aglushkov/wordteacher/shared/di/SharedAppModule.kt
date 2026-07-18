@@ -594,7 +594,7 @@ class SharedAppModule {
     ): SymSpellRepository {
         val spellCheckSettings = SpellCheckSettings().copy(
             lowerCaseTerms = false,
-            topK = 20
+            topK = 20,
         )
         return SymSpellRepository(
             symSpell = SymSpell(

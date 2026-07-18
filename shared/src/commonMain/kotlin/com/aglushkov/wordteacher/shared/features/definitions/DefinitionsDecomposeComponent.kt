@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SuggestionRepository
+import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.arkivanov.decompose.ComponentContext
@@ -46,6 +47,7 @@ class DefinitionsDecomposeComponent (
     wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
     audioService: AudioService,
     suggestionRepository: SuggestionRepository,
+    togglesRepository: ToggleRepository?,
 ) : DefinitionsVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -64,6 +66,7 @@ class DefinitionsDecomposeComponent (
     wordDefinitionHistoryRepository,
     audioService,
     suggestionRepository,
+    togglesRepository,
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_Definitions"
 

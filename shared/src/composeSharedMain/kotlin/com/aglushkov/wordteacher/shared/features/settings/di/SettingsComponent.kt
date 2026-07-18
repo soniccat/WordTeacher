@@ -34,7 +34,6 @@ interface SettingsComponent {
     interface Builder {
         @BindsInstance fun setComponentContext(context: ComponentContext): Builder
         @BindsInstance fun setState(state: SettingsVM.State): Builder
-        @BindsInstance fun setIsDebug(@IsDebug isDebug: Boolean): Builder
 
         fun setDeps(deps: SettingsDependencies): Builder
         fun build(): SettingsComponent
@@ -58,4 +57,6 @@ interface SettingsDependencies {
     fun settings(): SettingStore
     fun misspellingDBController(): FillMisspellingDBController
     fun symSpellRepository(): SymSpellRepository
+    @IsDebug
+    fun isDebug(): Boolean
 }

@@ -3,28 +3,27 @@ package com.aglushkov.wordteacher.android_app.tasks
 import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.aglushkov.wordteacher.android_app.MainActivity
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
-import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgress
-import com.aglushkov.wordteacher.shared.general.resource.onError
-import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.collect
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -60,6 +59,9 @@ class FillMisspellingDBWorker @AssistedInject constructor(
                     loadResourceWithProgress(
                         loader = symSpellRepository.load()
                     ).collect {
+                        setProgressAsync(
+                            Data.Builder().putFloat(FILL_MISSPELLING_DATA_PROGRESS_KEY, it.progress()).build()
+                        )
                         if (isForegroundServiceAvailable) {
                             setForeground(createForegroundInfo(it.progress()))
                         }
@@ -85,7 +87,8 @@ class FillMisspellingDBWorker @AssistedInject constructor(
         val cancel = applicationContext.getString(R.string.misspelling_notification_cancel)
 
         // This PendingIntent can be used to cancel the worker
-        val intent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
+        val cancelIntent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
+        val appIntent = PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
         // Create the NotificationChannel.
         val mChannel = NotificationChannel(FILL_MISSPELLING_CHANNEL_ID, title, NotificationManager.IMPORTANCE_LOW)
@@ -99,8 +102,9 @@ class FillMisspellingDBWorker @AssistedInject constructor(
 
         val notification = NotificationCompat.Builder(applicationContext, FILL_MISSPELLING_CHANNEL_ID)
             .setContentTitle(title)
+            .setContentIntent(appIntent)
             .setTicker(title)
-            .setDeleteIntent(intent)
+            .setDeleteIntent(cancelIntent)
             .setSilent(true)
             .setSmallIcon(R.drawable.ic_statusbar)
             .setProgress(
@@ -110,7 +114,7 @@ class FillMisspellingDBWorker @AssistedInject constructor(
             )
             // Add the cancel action to the notification which can
             // be used to cancel the worker
-            .addAction(R.drawable.ic_close_18, cancel, intent)
+            .addAction(R.drawable.ic_close_18, cancel, cancelIntent)
             .build()
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -148,3 +152,4 @@ fun isAppInForeground(context: Context): Boolean {
 
 private const val FILL_MISSPELLING_NOTIFICATION_ID = 1000
 private const val FILL_MISSPELLING_CHANNEL_ID = "FILL_MISSPELLING_DB"
+const val FILL_MISSPELLING_DATA_PROGRESS_KEY = "progress"

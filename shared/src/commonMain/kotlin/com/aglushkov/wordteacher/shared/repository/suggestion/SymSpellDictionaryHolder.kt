@@ -45,6 +45,10 @@ class SymSpellDictionaryHolder(
         emit(progress to Unit)
 
         for (entry in dict.index.allEntries().withIndex().drop(offset)) {
+            if (entry.value.word.length > 15) {
+                continue
+            }
+
             addItem(entry.value.word, deletes)
             val size = deletes.values.sumOf { it.size }
             if (size > 20000) {

@@ -111,8 +111,8 @@ android {
         applicationId = "com.aglushkov.wordteacher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 17
-        versionName = "1.17"
+        versionCode = 18
+        versionName = "1.18"
 
         addManifestPlaceholders(
             buildMap {
@@ -153,11 +153,13 @@ android {
             dimension = "auth"
             buildConfigField("boolean", "isGoogleAuthEnabled", "false")
             buildConfigField("boolean", "isTelegramAuthEnabled", "false")
+            buildConfigField("boolean", "useRuEmail", "true")
         }
         create("full") {
             dimension = "auth"
             buildConfigField("boolean", "isGoogleAuthEnabled", "true")
             buildConfigField("boolean", "isTelegramAuthEnabled", "true")
+            buildConfigField("boolean", "useRuEmail", "false")
         }
     }
 

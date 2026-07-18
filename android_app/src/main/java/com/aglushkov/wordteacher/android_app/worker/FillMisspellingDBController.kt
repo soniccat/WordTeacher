@@ -7,8 +7,10 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
+import androidx.work.WorkInfo.Companion.STOP_REASON_NOT_STOPPED
 import androidx.work.WorkManager
 import com.aglushkov.wordteacher.android_app.repository.NotificationPermissionRepository
+import com.aglushkov.wordteacher.android_app.tasks.FILL_MISSPELLING_DATA_PROGRESS_KEY
 import com.aglushkov.wordteacher.android_app.tasks.FillMisspellingDBWorker
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
@@ -17,10 +19,16 @@ import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
+import com.aglushkov.wordteacher.shared.general.resource.isError
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.onData
+import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
+import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -29,6 +37,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -40,7 +49,8 @@ class FillMisspellingDBControllerImpl(
     private val lastVersion: Int,
     private val analytics: Analytics,
     private val notificationPermissionRepository: NotificationPermissionRepository,
-): FillMisspellingDBController, SimpleResourceRepository<Boolean, Unit>() {
+    private val toggles: ToggleRepository,
+): FillMisspellingDBController, SimpleResourceRepository<Unit, Unit>() {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val workManager = WorkManager.getInstance(context)
     private val workState = MutableStateFlow<Resource<WorkInfo>>(Resource.Uninitialized())
@@ -48,39 +58,43 @@ class FillMisspellingDBControllerImpl(
     override val isLoaded: Boolean
         get() = settings.int(MISSPELLING_FILLED_DB_VERSION_KEY, -1) == lastVersion
 
-    override val loadingFlow: Flow<Resource<Unit>>
+    override val loadingFlow: Flow<Resource<Float>>
         get() = if (isLoaded) {
-                flowOf(Resource.Loaded(Unit))
+                flowOf(Resource.Loaded(1.0f))
             } else {
-                workState.map { it.map { Unit } }
+                workState.map { work ->
+                    work.map {
+                        work.data()?.progress?.getFloat(FILL_MISSPELLING_DATA_PROGRESS_KEY, 0.0f)
+                    }
+                }
             }
-
-    override fun reset() {
-        settings[MISSPELLING_FILLED_DB_VERSION_KEY] = -1
-    }
 
     init {
         val currentVersion = settings.int(MISSPELLING_FILLED_DB_VERSION_KEY, -1)
         val isFilled = currentVersion == lastVersion
         if (isFilled) {
-            stateFlow.updateWithLoadedData(true)
-        } else {
+            stateFlow.updateWithLoadedData(Unit)
+        } else if (!toggles.toggles.disableMisspellingDB) {
             startObserveWorkManager()
         }
     }
 
+    override fun reset() {
+        settings[MISSPELLING_FILLED_DB_VERSION_KEY] = -1
+    }
+
     private fun startObserveWorkManager() = scope.launch {
-        workManager.getWorkInfosForUniqueWorkFlow(FILL_MISSPELLING_DB_WORK).collect {
-            if (it.isNotEmpty()) {
-                val workInfo = it.first()
+        workManager.getWorkInfosForUniqueWorkFlow(FILL_MISSPELLING_DB_WORK).collect { workInfos ->
+            if (workInfos.isNotEmpty()) {
+                val workInfo = workInfos.first()
                 workState.update {
                     when (workInfo.state) {
                         WorkInfo.State.SUCCEEDED -> {
-                            Resource.Loaded(workInfo)
+                            it.toLoaded(workInfo)
                         }
 
                         WorkInfo.State.FAILED, WorkInfo.State.CANCELLED -> {
-                            Resource.Error(
+                            it.toError(
                                 RuntimeException("StopReason: ${workInfo.stopReason}"),
                                 true,
                                 workInfo
@@ -88,7 +102,7 @@ class FillMisspellingDBControllerImpl(
                         }
 
                         else -> {
-                            Resource.Loading(workInfo)
+                            it.toLoading(workInfo)
                         }
                     }
                 }
@@ -96,7 +110,11 @@ class FillMisspellingDBControllerImpl(
         }
     }
 
-    fun loadIfNotLoaded() {
+    override fun loadIfNotLoaded() {
+        if (toggles.toggles.disableMisspellingDB) {
+            return
+        }
+
         scope.launch {
             loadIfNotLoaded(Unit).collectUntilDone()
         }
@@ -119,9 +137,17 @@ class FillMisspellingDBControllerImpl(
         }
     }
 
-    override suspend fun loadInternal(arg: Unit): Boolean {
+    override suspend fun loadInternal(arg: Unit): Unit {
         if (!tryToAllocateRequiredSpace()) {
-            return false
+            val message = "FillMisspellingDB.tryToAllocateRequiredSpace is false"
+            val error = RuntimeException(message)
+            analytics.send(
+                AnalyticEvent.createErrorEvent(
+                    message,
+                    error,
+                )
+            )
+            throw error
         }
         notificationPermissionRepository.loadIfNotLoaded(Unit).collectUntilDone()
 
@@ -129,8 +155,23 @@ class FillMisspellingDBControllerImpl(
         workState.update { it.bumpVersion().toLoading() }
         enqueueWork()
 
-        return workState.takeUntilLoadedOrErrorForVersion().collectUntilDone().onLoaded {
-            markAsComplete()
+        workState.takeUntilLoadedOrErrorForVersion().collectUntilDone().apply {
+            onError {
+                if (it !is CancellationException) {
+                    val stopReason = data()?.stopReason
+                    if (stopReason != STOP_REASON_NOT_STOPPED) {
+                        analytics.send(
+                            AnalyticEvent.createErrorEvent(
+                                "FillMisspellingDB.error stopReason: ${data()?.stopReason ?: 0}",
+                                it,
+                            )
+                        )
+                    }
+                }
+
+                throw it // to propagate status to stateFlow
+            }
+            onData { markAsComplete() }
         }
     }
 

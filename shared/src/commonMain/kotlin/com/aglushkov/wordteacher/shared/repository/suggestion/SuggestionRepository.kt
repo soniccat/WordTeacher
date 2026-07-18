@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithFlow
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.Flow
@@ -31,11 +32,16 @@ class SuggestionRepository(
     private val misspellingDBController: FillMisspellingDBController,
 ): SimpleResourceRepository<SuggestionResult, String>() {
 
-    val loadingMisspellingDBFlow: Flow<Resource<Unit>>
+    val loadingMisspellingDBFlow: Flow<Resource<Float>>
         get() = misspellingDBController.loadingFlow
+
+    fun loadMisspellingDB() {
+        misspellingDBController.loadIfNotLoaded()
+    }
 
     override suspend fun handleLoading(arg: String) {
         loadResourceWithFlow(
+            initialValue = stateFlow.value,
             flow = combine(
                 flow = flow {
                     val entries = dictRepository.wordsStartWith(arg, 60)

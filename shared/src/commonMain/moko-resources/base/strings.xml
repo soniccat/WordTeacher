@@ -6,6 +6,7 @@
     <string name="toggles_url2">https://aglushkov.ru/toggles/main.json</string>
     <string name="app_name">Word Teacher</string>
     <string name="support_email">soniccat2@gmail.com</string>
+    <string name="support_email_ru">soniccat@list.ru</string>
     <string name="privacy_policy_url">https://aglushkov.ru/docs/privacy_policy.html</string>
 
     <string name="tab_definitions">Words</string>
@@ -50,6 +51,7 @@
     <string name="definitions_displayMode_merge">Combined</string>
     <string name="definitions_open_cardsets">Open Card Sets screen</string>
     <string name="definitions_corrections_title">Probably you meant:</string>
+    <string name="definitions_corrections_filling_db">Corrections will appear here when misspelling database is ready</string>
     <string name="definitions_textsearch_title">Text Search Result</string>
     <string name="definitions_textsearch_showAllWords">Show All</string>
     <string name="definitions_cardsets_expand">Show all Card Sets</string>

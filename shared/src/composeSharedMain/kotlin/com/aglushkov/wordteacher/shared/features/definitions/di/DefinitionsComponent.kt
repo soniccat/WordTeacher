@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyDatabase
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
+import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
@@ -54,4 +55,5 @@ interface DefinitionsDependencies {
     fun symSpellRepository(): SymSpellRepository
     fun wordFrequencyDatabase(): WordFrequencyDatabase
     fun fillMisspellingDBController(): FillMisspellingDBController
+    fun togglesRepository(): ToggleRepository
 }

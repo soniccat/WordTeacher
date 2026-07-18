@@ -16,6 +16,7 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProv
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SuggestionRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
+import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import com.arkivanov.decompose.ComponentContext
@@ -48,7 +49,6 @@ class DefinitionsModule {
         dictRepository: DictRepository,
         cardSetsRepository: CardSetsRepository,
         wordFrequencyGradationProvider: WordFrequencyGradationProvider,
-        wordTeacherDictService: WordTeacherDictService,
         clipboardRepository: ClipboardRepository,
         idGenerator: IdGenerator,
         analytics: Analytics,
@@ -56,6 +56,7 @@ class DefinitionsModule {
         wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
         audioService: AudioService,
         suggestionRepository: SuggestionRepository,
+        toggleRepository: ToggleRepository?,
     ) = DefinitionsDecomposeComponent(
         componentContext,
         initialState,
@@ -72,5 +73,6 @@ class DefinitionsModule {
         wordDefinitionHistoryRepository,
         audioService,
         suggestionRepository,
+        toggleRepository,
     )
 }

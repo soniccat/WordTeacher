@@ -5,7 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface FillMisspellingDBController {
     val isLoaded: Boolean
-    val loadingFlow: Flow<Resource<Unit>>
+    val loadingFlow: Flow<Resource<Float>>
 
+    fun loadIfNotLoaded()
     fun reset()
 }

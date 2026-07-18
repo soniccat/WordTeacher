@@ -25,6 +25,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class Toggles(
     @SerialName("topLevelDomain") val topLevelDomain: String = "com",
+    @SerialName("disableMisspellingDB") val disableMisspellingDB: Boolean = false,
 )
 
 class ToggleRepository(

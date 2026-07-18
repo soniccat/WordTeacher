@@ -76,7 +76,7 @@ import okio.source
 import okio.use
 
 
-@Module//(includes = [SharedAppModule::class])
+@Module
 class AppModule {
 
     @Platform
@@ -139,7 +139,11 @@ class AppModule {
     @Provides
     fun email(
         context: Context
-    ): String = context.getString(MR.strings.support_email.resourceId)
+    ): String = if (BuildConfig.useRuEmail) {
+        context.getString(MR.strings.support_email_ru.resourceId)
+    } else {
+        context.getString(MR.strings.support_email.resourceId)
+    }
 
     @PrivacyPolicyUrl
     @AppComp
@@ -175,7 +179,12 @@ class AppModule {
         @Platform platform: String,
         @Email email: String,
         @PrivacyPolicyUrl privacyPolicyUrl: String,
-    ): AppInfo = AppInfo(BuildConfig.VERSION_NAME, platform, email, privacyPolicyUrl)
+    ): AppInfo = AppInfo(
+        BuildConfig.VERSION_NAME,
+        platform,
+        email,
+        privacyPolicyUrl,
+    )
 
     // TODO: replace with bind
     @AppComp
@@ -445,6 +454,7 @@ class AppModule {
         settings: SettingStore,
         analytics: Analytics,
         notificationPermissionRepository: NotificationPermissionRepository,
+        toggleRepository: ToggleRepository,
     ): FillMisspellingDBControllerImpl {
         return FillMisspellingDBControllerImpl(
             context,
@@ -452,6 +462,7 @@ class AppModule {
             BuildConfig.misspellingDbVersion,
             analytics,
             notificationPermissionRepository,
+            toggleRepository,
         )
     }
 

@@ -2,7 +2,6 @@ package com.aglushkov.wordteacher.shared.features.definitions.vm
 
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
-import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
@@ -14,6 +13,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.merge
@@ -33,6 +33,7 @@ import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProv
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SuggestionRepository
+import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
@@ -50,7 +51,7 @@ import kotlin.collections.emptyList
 interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
 
-    fun restore(state: DefinitionsVM.State)
+    fun restore(state: State)
     fun onWordTextUpdated(newText: String)
     fun onWordSubmitted(
         word: String?,
@@ -73,6 +74,7 @@ interface DefinitionsVM: Clearable {
     fun onCloseClicked()
     fun onHintHidden(hintType: HintType)
     fun onDslHintClicked()
+    fun onStartLoadMisspellingDBClicked()
 
     val wordTextValue: StateFlow<String?>
     val state: State
@@ -146,6 +148,7 @@ open class DefinitionsVMImpl(
     private val wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
     private val audioService: AudioService,
     private val suggestionRepository: SuggestionRepository?,
+    private val togglesRepository: ToggleRepository?,
 ): ViewModel(), DefinitionsVM {
 
     override var router: DefinitionsRouter? = null
@@ -603,7 +606,8 @@ open class DefinitionsVMImpl(
             allTranscriptions,
             allDefinitions,
             sourceNames,
-            allAudioFiles)
+            allAudioFiles
+        )
     }
 
     override fun getErrorText(res: Resource<*>): StringDesc? {
@@ -723,8 +727,11 @@ open class DefinitionsVMImpl(
 
     // suggests
     override val suggests: StateFlow<Resource<List<BaseViewItem<*>>>> = if (suggestionRepository != null) {
-        suggestionRepository.stateFlow.map { res ->
-            res.mapLoadedData { data ->
+        combine(
+            suggestionRepository.stateFlow,
+            suggestionRepository.loadingMisspellingDBFlow,
+        ) { dataRes, misspellingDBLoadingRes ->
+            dataRes.mapLoadedData { data ->
                 val fromDicts = data.fromDicts.map {
                     WordSuggestDictEntryViewItem(
                         word = it.word,
@@ -733,10 +740,16 @@ open class DefinitionsVMImpl(
                     )
                 }.distinctBy { it.firstItem() }  // here we loose source to avoid duplications
 
-                val correctionHeader = if (data.corrections.isNotEmpty()) {
+                val isMisspellingDisabled = togglesRepository?.toggles?.disableMisspellingDB == true
+                val correctionHeader = if (
+                    !isMisspellingDisabled && (
+                        data.corrections.isNotEmpty() ||
+                        !misspellingDBLoadingRes.isLoaded()
+                    )
+                ) {
                     listOf(
                         WordCorrectionsHeaderViewItem(
-                            StringDesc.Resource(MR.strings.definitions_corrections_title),
+                            titleText = StringDesc.Resource(MR.strings.definitions_corrections_title),
                             isTop = fromDicts.isEmpty(),
                         )
                     )
@@ -744,22 +757,35 @@ open class DefinitionsVMImpl(
                     emptyList()
                 }
 
-                val correctionItems = data.corrections.map {
-                    WordSuggestDictEntryViewItem(
-                        word = it,
-                        definition = "",
-                        source = ""
-                    ) as BaseViewItem<*>
+                val correctionItems: List<BaseViewItem<*>>
+                if (isMisspellingDisabled)  {
+                    correctionItems = emptyList()
+                } else if (misspellingDBLoadingRes.isLoaded()) {
+                    correctionItems = data.corrections.map {
+                        WordSuggestDictEntryViewItem(
+                            word = it,
+                            definition = "",
+                            source = ""
+                        ) as BaseViewItem<*>
+                    }
+                } else {
+                    correctionItems = listOf(
+                        WordCorrectionsMisspellingDBFillProgress(
+                            titleText = StringDesc.Resource(MR.strings.definitions_corrections_filling_db),
+                            isLoading = misspellingDBLoadingRes.isLoading(),
+                            progress = misspellingDBLoadingRes.data() ?: 0.0f
+                        )
+                    )
                 }
 
                 val textSearchHeader = if (data.texts.data()?.isNotEmpty() == true) {
                     listOf(
-                            WordTextSearchHeaderViewItem(
-                                StringDesc.Resource(MR.strings.definitions_textsearch_title),
-                                StringDesc.Resource(MR.strings.definitions_textsearch_showAllWords),
-                                isTop = fromDicts.isEmpty() && correctionItems.isEmpty(),
-                            )
+                        WordTextSearchHeaderViewItem(
+                            StringDesc.Resource(MR.strings.definitions_textsearch_title),
+                            StringDesc.Resource(MR.strings.definitions_textsearch_showAllWords),
+                            isTop = fromDicts.isEmpty() && correctionItems.isEmpty(),
                         )
+                    )
                 } else {
                     emptyList()
                 }
@@ -783,7 +809,9 @@ open class DefinitionsVMImpl(
                         }
                     }
 
-                (fromDicts + correctionHeader + correctionItems + textSearchHeader + textSearchItems).generateIds()
+                val newItems = fromDicts + correctionHeader + correctionItems + textSearchHeader + textSearchItems
+                generateViewItemIds(newItems, suggests.value.data().orEmpty(), idGenerator)
+                newItems
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
     } else {
@@ -871,6 +899,11 @@ open class DefinitionsVMImpl(
 
     override fun onDslHintClicked() {
         router?.openDictConfigs()
+    }
+
+    override fun onStartLoadMisspellingDBClicked() {
+        analytics.send(AnalyticEvent.createActionEvent("Definitions.onStartLoadMisspellingDBClicked"))
+        suggestionRepository?.loadMisspellingDB()
     }
 }
 

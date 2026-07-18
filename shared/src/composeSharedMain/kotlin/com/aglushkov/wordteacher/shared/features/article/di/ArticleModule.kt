@@ -74,6 +74,7 @@ class ArticleModule {
         wordDefinitionHistoryRepository,
         audioService,
         null,
+        null,
     )
 
     @Provides

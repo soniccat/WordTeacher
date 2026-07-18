@@ -94,7 +94,6 @@ interface AppComponent:
 
     fun injectApplication(app: GApp)
 
-    @IsDebug fun isDebug(): Boolean
     @Platform fun platform(): String
 
     @Component.Builder
