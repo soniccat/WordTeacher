@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.playServicesPlugin)
     alias(libs.plugins.kapt)
+    alias(libs.plugins.baselineprofile)
 }
 
 // Telegram props
@@ -142,7 +143,7 @@ android {
         }
 
         getByName("release") {
-            isMinifyEnabled = true
+//            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -189,5 +190,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.profileinstaller)
+    "baselineProfile"(project(":baselineprofile"))
     configurations["kapt"](libs.daggerCompiler)
 }
