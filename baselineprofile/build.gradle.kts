@@ -35,7 +35,7 @@ repositories {
 
 android {
     namespace = "com.aglushkov.wordteacher.baselineprofile"
-    compileSdk = 37
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -47,8 +47,8 @@ android {
     }
 
     defaultConfig {
-        minSdk = 28
-        targetSdk = 37
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.junit)
     implementation(libs.androidx.uiautomator)
+    implementation("androidx.test.uiautomator:uiautomator:2.4.0")
 }
 
 androidComponents {

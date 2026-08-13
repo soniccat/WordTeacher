@@ -30,8 +30,11 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
@@ -301,13 +304,15 @@ class MainActivity : AppCompatActivity(), Router {
                 )
             ) {
                 when (val instance = it.instance) {
-                    is TabDecomposeComponent.Child.Dashboard -> DashboardUI(
-                        vm = instance.vm.apply {
-                            router = mainDecomposeComponent
-                        },
-                        modifier = Modifier.padding(innerPadding),
-                        //contentModifier = Modifier.withWindowInsetsHorizontalPadding()
-                    )
+                    is TabDecomposeComponent.Child.Dashboard -> {
+                        DashboardUI(
+                            vm = instance.vm.apply {
+                                router = mainDecomposeComponent
+                            },
+                            modifier = Modifier.padding(innerPadding),
+                            //contentModifier = Modifier.withWindowInsetsHorizontalPadding()
+                        )
+                    }
                     is TabDecomposeComponent.Child.Definitions -> DefinitionsUI(
                         vm = instance.vm.apply {
                             router = object : DefinitionsRouter {
@@ -465,7 +470,10 @@ class MainActivity : AppCompatActivity(), Router {
             }
         }
         BottomNavigation(
-            modifier = Modifier.requiredHeight(56.dp),
+            modifier = Modifier.requiredHeight(56.dp)
+                .semantics{
+                    testTagsAsResourceId = true
+                },
             elevation = TopAppBarElevation
         ) {
             bottomBarTabs.forEachIndexed { index, tab ->
@@ -503,7 +511,9 @@ class MainActivity : AppCompatActivity(), Router {
                             stringResource(id = tab.nameRes),
                             color = color
                         )
-                    }
+                    },
+                    modifier = Modifier
+                        .testTag("tab_$index")
                 )
             }
         }

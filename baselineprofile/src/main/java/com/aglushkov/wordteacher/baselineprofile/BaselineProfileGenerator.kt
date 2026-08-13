@@ -6,9 +6,13 @@ import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiSelector
+import androidx.test.uiautomator.uiAutomator
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.lang.Thread.sleep
 
 /**
  * This test class generates a basic startup baseline profile for the target package.
@@ -54,17 +58,34 @@ class BaselineProfileGenerator {
             // optimizing for app startup. But you can also navigate and scroll through your most important UI.
 
             // Start default activity for your app
-//            pressHome()
-            killProcess()
-//            startActivityAndWait()
-            val intent = Intent()
-                .setComponent(
-                    ComponentName(
-                        "com.aglushkov.wordteacher",
-                        "com.aglushkov.wordteacher.android_app.MainActivity"
-                    )
-                )
-            startActivityAndWait(intent)
+            pressHome()
+//            killProcess()
+            startActivityAndWait()
+//            val intent = Intent()
+//                .setComponent(
+//                    ComponentName(
+//                        "com.aglushkov.wordteacher",
+//                        "com.aglushkov.wordteacher.android_app.MainActivity"
+//                    )
+//                )
+            startActivityAndWait()
+
+            uiAutomator {
+                device.findObject(UiSelector().resourceId("com.android.permissioncontroller:id/permission_allow_button"))
+                sleep(5000)
+
+                onElement(1000) { viewIdResourceName == "tab_1" }.click()
+                sleep(5000)
+
+                onElement(1000) { viewIdResourceName == "tab_2" }.click()
+                sleep(5000)
+
+                onElement(1000) { viewIdResourceName == "tab_3" }.click()
+                sleep(5000)
+
+                onElement(1000) { viewIdResourceName == "tab_0" }.click()
+                sleep(5000)
+            }
 
             // TODO Write more interactions to optimize advanced journeys of your app.
             // For example:
