@@ -59,15 +59,6 @@ class BaselineProfileGenerator {
 
             // Start default activity for your app
             pressHome()
-//            killProcess()
-            startActivityAndWait()
-//            val intent = Intent()
-//                .setComponent(
-//                    ComponentName(
-//                        "com.aglushkov.wordteacher",
-//                        "com.aglushkov.wordteacher.android_app.MainActivity"
-//                    )
-//                )
             startActivityAndWait()
 
             uiAutomator {

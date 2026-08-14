@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +27,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -75,7 +77,7 @@ import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
-import com.aglushkov.wordteacher.shared.general.resource.onUnitialized
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPadding
 import com.aglushkov.wordteacher.shared.res.MR
@@ -310,6 +312,14 @@ class MainActivity : AppCompatActivity(), Router {
                                 router = mainDecomposeComponent
                             },
                             modifier = Modifier.padding(innerPadding),
+                            fullyDrawnBlock = if (fullyDrawnReporter.isFullyDrawnReported) {
+                                null
+                            } else {
+                                {
+                                    val isDataLoaded by instance.vm.isDataLoaded.collectAsState()
+                                    ReportDrawnWhen { isDataLoaded }
+                                }
+                            },
                             //contentModifier = Modifier.withWindowInsetsHorizontalPadding()
                         )
                     }

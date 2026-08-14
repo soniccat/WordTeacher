@@ -22,6 +22,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
@@ -47,14 +48,18 @@ import kotlinx.serialization.Serializable
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 interface DashboardVM: Clearable {
     var router: Router?
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
     val state: State
+    val isDataLoaded: StateFlow<Boolean>
 
     fun onStart()
     fun onResume()
@@ -118,6 +123,10 @@ open class DashboardVMIMpl(
         settingStore.prefs,
         ::buildViewItems,
     ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Loading())
+
+    override val isDataLoaded: StateFlow<Boolean> =
+        viewItems.map { it.isLoaded() && it.data()?.lastOrNull() !is WordLoadingViewItem }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     init {
         loadDashboard()

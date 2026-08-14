@@ -11,24 +11,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.add
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.windowInsetsEndWidth
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.windowInsetsStartWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -69,7 +56,6 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordLoadingViewI
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
-import com.aglushkov.wordteacher.shared.general.extensions.replaceFirstToCapital
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.settings.HintType
@@ -89,10 +75,12 @@ import dev.icerock.moko.resources.compose.localized
 fun DashboardUI(
     vm: DashboardVM,
     modifier: Modifier = Modifier,
+    fullyDrawnBlock: @Composable (()->Unit)? = null
 ) {
     val itemsState by vm.viewItems.collectAsState()
     val items = itemsState.data()
 
+    fullyDrawnBlock?.invoke()
     Box(
         modifier = modifier
             .fillMaxSize()
