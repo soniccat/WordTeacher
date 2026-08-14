@@ -10,6 +10,8 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.uiAutomator
+import androidx.test.uiautomator.watcher.PermissionDialog
+import androidx.test.uiautomator.watcher.PermissionDialog.Scope.clickAllow
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,7 +67,9 @@ class StartupBenchmarks {
                 startActivityAndWait()
 
                 uiAutomator {
-                    device.findObject(UiSelector().resourceId("com.android.permissioncontroller:id/permission_allow_button"))
+                    watchFor(PermissionDialog) {
+                        clickAllow()
+                    }
                 }
 
                 // TODO Add interactions to wait for when your app is fully drawn.
