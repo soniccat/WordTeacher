@@ -58,7 +58,6 @@ import kotlin.time.Duration.Companion.milliseconds
 interface DashboardVM: Clearable {
     var router: Router?
     val viewItems: StateFlow<Resource<List<BaseViewItem<*>>>>
-    val state: State
     val isDataLoaded: StateFlow<Boolean>
 
     fun onStart()
@@ -110,7 +109,7 @@ open class DashboardVMIMpl(
 ): ViewModel(), DashboardVM {
     override var router: DashboardVM.Router? = null
     private val stateFlow = MutableStateFlow<DashboardVM.State>(restoredState)
-    override val state: DashboardVM.State
+    val state: DashboardVM.State
         get() = stateFlow.value
 
     override val viewItems = combine7(

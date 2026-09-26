@@ -64,7 +64,7 @@ open class ArticlesVMImpl(
 
     override fun onCreateTextArticleClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Articles.createTextArticleClicked"))
-        router?.openAddArticle()
+        router?.openFindArticle()
     }
 
     override fun onArticleClicked(item: ArticleViewItem) {

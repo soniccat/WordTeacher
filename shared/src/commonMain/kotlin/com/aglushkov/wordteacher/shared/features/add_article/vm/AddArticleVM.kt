@@ -10,6 +10,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.resource.onError
@@ -98,21 +99,7 @@ open class AddArticleVMImpl(
     override val addingStateFlow = MutableStateFlow<Resource<Article>>(Resource.Uninitialized())
 
     init {
-        val dataFromState = AddArticleVM.UIState(
-            title = state.title.orEmpty(),
-            titleError = null,
-            text = state.text.orEmpty(),
-            needToCreateSet = state.needToCreateSet,
-            showNeedToCreateCardSet = state.showNeedToCreateCardSet,
-            canShowHint = !settingStore.isHintClosed(HintType.AddArticle),
-        )
-
-        state.uri?.let { uri ->
-            extractContent(uri, dataFromState)
-        } ?: run {
-            uiStateFlow.update { it.toLoaded(dataFromState) }
-        }
-
+        load()
         viewModelScope.launch {
             settingStore.prefs.collect { prefs ->
                 uiStateFlow.update {
@@ -123,6 +110,22 @@ open class AddArticleVMImpl(
                     }
                 }
             }
+        }
+    }
+
+    private fun load() {
+        val dataFromState = AddArticleVM.UIState(
+            title = state.title.orEmpty(),
+            titleError = null,
+            text = state.text.orEmpty(),
+            needToCreateSet = state.needToCreateSet,
+            showNeedToCreateCardSet = state.showNeedToCreateCardSet,
+            canShowHint = !settingStore.isHintClosed(HintType.AddArticle),
+        )
+        state.uri?.let { uri ->
+            extractContent(uri, dataFromState)
+        } ?: run {
+            uiStateFlow.update { it.toLoaded(dataFromState) }
         }
     }
 
@@ -149,21 +152,22 @@ open class AddArticleVMImpl(
 
             uiStateFlow.update { uiStateRes ->
                 res.map { articleContent ->
-                    dataFromState.copy(
-                        title = articleContent?.title.orEmpty(),
-                        text = articleContent?.text.orEmpty(),
-                        contentUri = uri
-                    )
+                    if (!res.isError()) {
+                        dataFromState.copy(
+                            title = articleContent?.title.orEmpty(),
+                            text = articleContent?.text.orEmpty(),
+                            contentUri = uri
+                        )
+                    } else {
+                        null
+                    }
                 }
             }
         }
     }
 
     override fun onTryAgainPressed() {
-        val uiStateData = uiStateFlow.value.data() ?: return
-        val uri = this.state.uri ?: return
-
-        extractContent(uri, uiStateData)
+        load()
     }
 
     override fun onTitleChanged(title: String) {

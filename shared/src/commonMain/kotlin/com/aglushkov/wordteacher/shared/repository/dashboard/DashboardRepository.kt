@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.general.serialization.SerializableFileCa
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardResponse
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
+import kotlinx.coroutines.flow.collect
 import okio.FileSystem
 import okio.Path
 import kotlin.reflect.typeOf
@@ -37,7 +38,7 @@ class DashboardRepository(
         val safeLoadDate = loadDate ?: return
         if (timeSource.timeInstant().minus(safeLoadDate).inWholeMinutes >= 15) {
             if (!stateFlow.value.isLoading()) {
-                load(Unit).collectUntilDone()
+                load(Unit).collect()
             }
         }
     }

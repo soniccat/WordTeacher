@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.general.item
 
 import androidx.compose.runtime.Stable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import kotlin.collections.orEmpty
 
 @Stable
 abstract class BaseViewItem<T> {
@@ -109,4 +110,8 @@ fun generateViewItemIds(
     }
 
     return items
+}
+
+fun List<BaseViewItem<*>>.generateIds(prevItems: List<BaseViewItem<*>>, idGenerator: IdGenerator): List<BaseViewItem<*>> {
+    return generateViewItemIds(this, prevItems, idGenerator)
 }

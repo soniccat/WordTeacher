@@ -11,12 +11,17 @@ import kotlinx.coroutines.flow.*
 // Take until a resource operation is completed, the last state is emitted
 fun <T> StateFlow<Resource<T>>.takeUntilLoadedOrErrorForVersion(
     version: Int = value.version
+): Flow<Resource<T>> =
+    untilLoadedOrErrorForVersion(version)
+
+fun <T> Flow<Resource<T>>.untilLoadedOrErrorForVersion(
+    version: Int
 ): Flow<Resource<T>> {
     return flow {
         try {
             // TODO: replace with transformWhile if possible
             collect { newRes ->
-                Logger.v("got value.version(${value.version}) with version(${version}) " + value)
+                Logger.v("got res with version(${newRes.version}), expecting (${version}):" + newRes)
                 applyResValueIfNeeded(
                     startVersion = version,
                     newRes = newRes,

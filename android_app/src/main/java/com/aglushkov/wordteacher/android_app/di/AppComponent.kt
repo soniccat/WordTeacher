@@ -28,6 +28,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.di.CardSetsDependencie
 import com.aglushkov.wordteacher.shared.features.dashboard.di.DashboardDependencies
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
 import com.aglushkov.wordteacher.shared.features.dict_configs.di.DictConfigsDependencies
+import com.aglushkov.wordteacher.shared.features.find_article.FindArticleDependencies
 import com.aglushkov.wordteacher.shared.features.settings.di.SettingsDependencies
 import com.aglushkov.wordteacher.shared.features.settings.vm.FileSharer
 import com.aglushkov.wordteacher.shared.general.AppInfo
@@ -73,7 +74,8 @@ interface AppComponent:
     LearningDependencies,
     LearningSessionResultDependencies,
     CardSetJsonImportDependencies,
-    SettingsDependencies {
+    SettingsDependencies,
+    FindArticleDependencies {
 
     fun serviceRepository(): ServiceRepository
     fun wordTeacherWordServiceFactory(): WordTeacherWordServiceFactory

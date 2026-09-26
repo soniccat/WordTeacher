@@ -69,6 +69,8 @@ import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsRouter
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.views.DictConfigsUI
+import com.aglushkov.wordteacher.shared.features.find_article.FindArticleUIDialog
+import com.aglushkov.wordteacher.shared.features.find_article.FindArticleVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningRouter
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
@@ -401,6 +403,27 @@ class MainActivity : AppCompatActivity(), Router {
                             }
                         },
                     )
+                is MainDecomposeComponent.Child.FindArticle ->
+                    FindArticleUIDialog(
+                        vm = instance.vm.apply {
+                            router = object : FindArticleVM.Router {
+                                override fun openAddArticle(
+                                    url: String?,
+                                    showNeedToCreateCardSet: Boolean
+                                ) {
+                                    mainDecomposeComponent.openAddArticle(url, showNeedToCreateCardSet)
+                                }
+
+                                override fun openArticle(state: ArticleVM.State) {
+                                    mainDecomposeComponent.openArticle(state)
+                                }
+
+                                override fun onClosed() {
+                                    mainDecomposeComponent.popDialog(child.configuration)
+                                }
+                            }
+                        }
+                    )
                 is MainDecomposeComponent.Child.Learning ->
                     LearningUIDialog(
                         vm = instance.vm.apply {
@@ -531,8 +554,12 @@ class MainActivity : AppCompatActivity(), Router {
 
     // Router
 
-    override fun openAddArticle() {
-        mainDecomposeComponent.openAddArticle()
+//    override fun openAddArticle() {
+//        mainDecomposeComponent.openAddArticle()
+//    }
+
+    override fun openFindArticle() {
+        mainDecomposeComponent.openFindArticle()
     }
 
     override fun openArticle(state: ArticleVM.State) {

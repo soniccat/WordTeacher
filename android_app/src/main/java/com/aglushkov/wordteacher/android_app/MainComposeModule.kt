@@ -18,6 +18,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.di.DaggerCardSetIn
 import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
+import com.aglushkov.wordteacher.shared.features.find_article.DaggerFindArticleComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.arkivanov.decompose.ComponentContext
@@ -75,6 +76,13 @@ class MainComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .addArticleDecomposeComponent()
+                is MainDecomposeComponent.ChildConfiguration.FindArticleConfiguration ->
+                    DaggerFindArticleComponent.builder()
+                        .setComponentContext(context)
+                        .setInitialState(configuration.state)
+                        .setDeps(appComponent)
+                        .build()
+                        .findArticleDecomposeComponent()
                 is MainDecomposeComponent.ChildConfiguration.LearningConfiguration ->
                     DaggerLearningComponent.builder()
                         .setState(configuration.state)

@@ -1,0 +1,59 @@
+package com.aglushkov.wordteacher.shared.features.find_article
+
+import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.article.ArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.article.di.ArticleModule
+import com.aglushkov.wordteacher.shared.features.cardset_info.CardSetInfoDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVM
+import com.aglushkov.wordteacher.shared.features.dashboard.DashboardDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.dashboard.di.DashboardModule
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
+import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsDependencies
+import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsModule
+import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.WebLinkOpener
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
+import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
+import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.DashboardRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
+import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
+import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
+import com.aglushkov.wordteacher.shared.service.SpaceDashboardService
+import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
+import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
+import com.arkivanov.decompose.ComponentContext
+
+import dagger.BindsInstance
+import dagger.Component
+
+@Component(
+    dependencies = [FindArticleDependencies::class],
+    modules = [FindArticleModule::class]
+)
+interface FindArticleComponent {
+    fun findArticleDecomposeComponent(): FindArticleDecomposeComponent
+
+    @Component.Builder
+    interface Builder {
+        @BindsInstance
+        fun setComponentContext(context: ComponentContext): Builder
+        @BindsInstance
+        fun setInitialState(state: FindArticleVM.State): Builder
+
+        fun setDeps(deps: FindArticleDependencies): Builder
+        fun build(): FindArticleComponent
+    }
+}
+
+interface FindArticleDependencies {
+    fun dashboardRepository(): DashboardRepository
+    fun readHeadlineRepository(): ReadHeadlineRepository
+    fun webLinkOpener(): WebLinkOpener
+    fun idGenerator(): IdGenerator
+    fun analytics(): Analytics
+}

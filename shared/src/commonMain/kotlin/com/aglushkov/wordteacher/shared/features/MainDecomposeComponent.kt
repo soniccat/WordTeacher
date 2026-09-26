@@ -21,6 +21,8 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.DictConfigsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsRouter
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
+import com.aglushkov.wordteacher.shared.features.find_article.FindArticleDecomposeComponent
+import com.aglushkov.wordteacher.shared.features.find_article.FindArticleVM
 import com.aglushkov.wordteacher.shared.features.learning.LearningDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
@@ -85,6 +87,7 @@ interface MainDecomposeComponent:
         data class Tabs(val vm: TabDecomposeComponent): Child(vm)
 
         data class AddArticle(val vm: AddArticleDecomposeComponent): Child(vm)
+        data class FindArticle(val vm: FindArticleDecomposeComponent): Child(vm)
         data class WebAuth(val vm: WebAuthVM): Child(vm)
         data class CardSetJsonImport(val vm: CardSetJsonImportVM): Child(vm)
         data class DictConfigs(val vm: DictConfigsVM): Child(vm)
@@ -109,6 +112,7 @@ interface MainDecomposeComponent:
         @Serializable data class CardSetsConfiguration(val state: CardSetsVM.State) : ChildConfiguration()
         @Serializable data object TabsConfiguration : ChildConfiguration()
         @Serializable data class AddArticleConfiguration(val state: AddArticleVM.State = AddArticleVM.State()) : ChildConfiguration()
+        @Serializable data class FindArticleConfiguration(val state: FindArticleVM.State = FindArticleVM.State()) : ChildConfiguration()
         @Serializable data class DefinitionConfiguration(val state: DefinitionsVM.State) : ChildConfiguration()
         @Serializable data object EmptyDialogConfiguration : ChildConfiguration() // TODO: it seems we can remove that
     }
@@ -183,6 +187,9 @@ class MainDecomposeComponentImpl(
             )
         is MainDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> MainDecomposeComponent.Child.AddArticle(
             vm = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
+        )
+        is MainDecomposeComponent.ChildConfiguration.FindArticleConfiguration -> MainDecomposeComponent.Child.FindArticle(
+            vm = childComponentFactory(componentContext, configuration) as FindArticleDecomposeComponent
         )
         is MainDecomposeComponent.ChildConfiguration.DefinitionConfiguration -> MainDecomposeComponent.Child.Definitions(
             vm = childComponentFactory(componentContext, configuration) as DefinitionsDecomposeComponent
@@ -292,8 +299,14 @@ class MainDecomposeComponentImpl(
         ))
     }
 
-    override fun openAddArticle() {
+    fun openAddArticle() {
         openAddArticle(null, true)
+    }
+
+    override fun openFindArticle() {
+        addDialogConfigIfNotAtTop(MainDecomposeComponent.ChildConfiguration.FindArticleConfiguration(
+            state = FindArticleVM.State()
+        ))
     }
 
     override fun openDefinitions(state: DefinitionsVM.State) {
