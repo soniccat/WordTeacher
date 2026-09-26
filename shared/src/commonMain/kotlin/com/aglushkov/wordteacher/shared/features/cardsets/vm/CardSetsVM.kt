@@ -42,6 +42,7 @@ interface CardSetsVM: Clearable {
     val searchCardSets: StateFlow<Resource<List<BaseViewItem<*>>>>
     val searchTags: StateFlow<Resource<List<CardSetTag>>>
     val availableFeatures: Features
+    val eventFlow: Flow<List<Event>>
 
     fun onCardSetAdded(name: String)
     fun onNewCardSetTextChange(text: String)
@@ -63,6 +64,7 @@ interface CardSetsVM: Clearable {
     fun onHintClicked(hintType: HintType)
     fun onCardSetTagClicked(tag: CardSetTag)
     fun onFocusEventHandled()
+    fun onEventsHandled()
 
     @Serializable
     data class State(
@@ -141,6 +143,8 @@ open class CardSetsVMImpl(
             buildViewItems(it, uiStateFlow.value.newCardSetText, prefs)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
+
+    override val eventFlow: MutableStateFlow<List<Event>> = MutableStateFlow(emptyList())
 
     init {
         uiStateFlow.value.searchQuery?.let {
@@ -313,11 +317,13 @@ open class CardSetsVMImpl(
     }
 
     private fun startSearch(query: String) {
+        eventFlow.update { it + UpdateText(query) }
         cardSetSearchRepository.search(query)
         uiStateFlow.update { it.copy(searchQuery = query, needShowSearchResult = true) }
     }
 
     override fun onSearchClosed() {
+        eventFlow.update { it + UpdateText("") }
         cardSetSearchRepository.clear()
         uiStateFlow.update {
             it.copy(
@@ -380,4 +386,10 @@ open class CardSetsVMImpl(
     override fun onFocusEventHandled() {
         uiStateFlow.update { it.copy(focusEvent = null) }
     }
+
+    override fun onEventsHandled() {
+        eventFlow.update { emptyList() }
+    }
 }
+
+data class UpdateText(val text: String) : Event

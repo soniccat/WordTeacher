@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -29,6 +30,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetsVM
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CreateCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.SectionViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.UpdateText
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.general.BackHandler
 import com.aglushkov.wordteacher.shared.general.LocalDimens
@@ -66,6 +68,18 @@ fun CardSetsUI(
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val searchSelectionKey = remember { mutableIntStateOf(0) }
+
+    LaunchedEffect("events") {
+        vm.eventFlow.collect {
+            it.onEach {
+                if (it is UpdateText) {
+                    searchTextState.setTextAndPlaceCursorAtEnd(it.text)
+                }
+                it.markAsHandled()
+            }
+            vm.onEventsHandled()
+        }
+    }
 
     LaunchedEffect(searchTextState) {
         snapshotFlow { searchTextState.text }

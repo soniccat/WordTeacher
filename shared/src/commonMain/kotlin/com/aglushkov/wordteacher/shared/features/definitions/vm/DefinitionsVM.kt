@@ -2,10 +2,12 @@ package com.aglushkov.wordteacher.shared.features.definitions.vm
 
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.events.Event
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.UpdateText
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
@@ -38,6 +40,7 @@ import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinition
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
 import com.aglushkov.wordteacher.shared.res.MR
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +53,7 @@ import kotlin.collections.emptyList
 
 interface DefinitionsVM: Clearable {
     var router: DefinitionsRouter?
+    val eventFlow: Flow<List<Event>>
 
     fun restore(state: State)
     fun onWordTextUpdated(newText: String)
@@ -75,6 +79,7 @@ interface DefinitionsVM: Clearable {
     fun onHintHidden(hintType: HintType)
     fun onDslHintClicked()
     fun onStartLoadMisspellingDBClicked()
+    fun onEventsHandled()
 
 //    val wordTextValue: StateFlow<String?>
     val state: State
@@ -159,6 +164,8 @@ open class DefinitionsVMImpl(
             restoredState.word
         }
     )
+
+    override val eventFlow: MutableStateFlow<List<Event>> = MutableStateFlow(emptyList())
 
     private val wordTextValue = MutableStateFlow(initialState.word)
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
@@ -248,6 +255,7 @@ open class DefinitionsVMImpl(
     // Events
     override fun onWordTextUpdated(newText: String) {
         wordTextValue.update { newText }
+
         if (newText.trim().isEmpty()) {
             clearSuggests()
         } else {
@@ -261,6 +269,7 @@ open class DefinitionsVMImpl(
         definitionsContext: DefinitionsContext?
     ) {
         if (word == null) {
+            eventFlow.update { it + UpdateText("") }
             wordTextValue.update { null }
             selectedPartsOfSpeechStateFlow.value = emptyList()
             this.definitionsContext = null
@@ -284,6 +293,7 @@ open class DefinitionsVMImpl(
         putInWordStack: Boolean = true,
         clearStack: Boolean = false,
     ) {
+        eventFlow.update { it + UpdateText(word) }
         wordTextValue.update { word }
         selectedPartsOfSpeechStateFlow.value = filter
         this.definitionsContext = definitionsContext
@@ -904,6 +914,10 @@ open class DefinitionsVMImpl(
     override fun onStartLoadMisspellingDBClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.onStartLoadMisspellingDBClicked"))
         suggestionRepository?.loadMisspellingDB()
+    }
+
+    override fun onEventsHandled() {
+        eventFlow.update { emptyList() }
     }
 }
 

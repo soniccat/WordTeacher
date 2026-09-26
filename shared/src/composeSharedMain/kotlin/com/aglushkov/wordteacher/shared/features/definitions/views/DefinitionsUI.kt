@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
+import com.aglushkov.wordteacher.shared.features.cardsets.vm.UpdateText
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -155,6 +157,18 @@ private fun DefinitionsWordUI(
     val needShowWordHistory by vm.isWordHistorySelected.collectAsState()
     val needShowDslHintOnEmptyResult by vm.needShowDslHintOnEmptyResult.collectAsState()
     val wordStack by vm.wordStack.collectAsState()
+
+    LaunchedEffect("events") {
+        vm.eventFlow.collect {
+            it.onEach {
+                if (it is UpdateText) {
+                    searchTextState.setTextAndPlaceCursorAtEnd(it.text)
+                }
+                it.markAsHandled()
+            }
+            vm.onEventsHandled()
+        }
+    }
 
     LaunchedEffect(searchTextState) {
         snapshotFlow { searchTextState.text }

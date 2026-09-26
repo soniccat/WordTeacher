@@ -6,7 +6,6 @@ import com.aglushkov.wordteacher.shared.features.dashboard.DashboardDecomposeCom
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.DashboardVM
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.settings.SettingsDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.RouterStateChangeHandler
@@ -32,7 +31,6 @@ interface TabDecomposeComponent: Clearable, BackHandlerOwner {
     fun openCardSets()
     fun openArticles()
     fun openSettings()
-    fun openNotes()
     fun back()
 
     sealed class Child(
@@ -43,7 +41,6 @@ interface TabDecomposeComponent: Clearable, BackHandlerOwner {
         data class CardSets(val vm: CardSetsDecomposeComponent): Child(vm)
         data class Articles(val vm: ArticlesDecomposeComponent): Child(vm)
         data class Settings(val vm: SettingsDecomposeComponent): Child(vm)
-        data class Notes(val vm: NotesDecomposeComponent): Child(vm)
 
         override fun onCleared() {
             inner.onCleared()
@@ -57,7 +54,6 @@ interface TabDecomposeComponent: Clearable, BackHandlerOwner {
         @Serializable data object CardSetsConfiguration : ChildConfiguration()
         @Serializable data object ArticlesConfiguration : ChildConfiguration()
         @Serializable data object SettingsConfiguration : ChildConfiguration()
-        @Serializable data object NotesConfiguration : ChildConfiguration()
     }
 }
 
@@ -97,9 +93,6 @@ class TabDecomposeComponentImpl(
         is TabDecomposeComponent.ChildConfiguration.SettingsConfiguration -> TabDecomposeComponent.Child.Settings(
             vm = childComponentFactory(componentContext, configuration) as SettingsDecomposeComponent
         )
-        is TabDecomposeComponent.ChildConfiguration.NotesConfiguration -> TabDecomposeComponent.Child.Notes(
-            vm = childComponentFactory(componentContext, configuration) as NotesDecomposeComponent
-        )
     }
 
     override fun openDashboard() = navigation.popToRoot()
@@ -117,9 +110,6 @@ class TabDecomposeComponentImpl(
 
     override fun openSettings() =
         navigation.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.SettingsConfiguration)
-
-    override fun openNotes() =
-        navigation.pushChildConfigurationOrPopIfExists(TabDecomposeComponent.ChildConfiguration.NotesConfiguration)
 
     override fun back() = navigation.popIfNotEmpty()
 

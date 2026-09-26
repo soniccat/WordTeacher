@@ -8,8 +8,6 @@ import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVM
 import com.aglushkov.wordteacher.shared.features.definitions.DefinitionsDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.notes.NotesDecomposeComponent
-import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.RouterDecomposeComponent
 import com.aglushkov.wordteacher.shared.general.popIfNotEmpty
@@ -37,7 +35,6 @@ interface TextActionDecomposeComponent
 
     fun openDefinitions()
     fun openAddArticle(url: String? = null)
-    fun openAddNote()
     fun back()
     fun setMode(mode: Mode)
     fun needShowTabs(): Boolean
@@ -55,7 +52,6 @@ interface TextActionDecomposeComponent
     ): Clearable {
         data class Definitions(val vm: DefinitionsVM): Child(vm)
         data class AddArticle(val vm: AddArticleVM): Child(vm)
-        data class AddNote(val vm: NotesVM): Child(vm)
 
         override fun onCleared() {
             inner.onCleared()
@@ -66,7 +62,6 @@ interface TextActionDecomposeComponent
     sealed class ChildConfiguration {
         @Serializable object DefinitionConfiguration : ChildConfiguration()
         @Serializable data class AddArticleConfiguration(val url: String? = null) : ChildConfiguration()
-        @Serializable object AddNoteConfiguration : ChildConfiguration()
     }
 }
 
@@ -112,9 +107,6 @@ class TextActionDecomposeComponentImpl(
         is TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration -> TextActionDecomposeComponent.Child.AddArticle(
             vm = childComponentFactory(componentContext, configuration) as AddArticleDecomposeComponent
         )
-        is TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration -> TextActionDecomposeComponent.Child.AddNote(
-            vm = childComponentFactory(componentContext, configuration) as NotesDecomposeComponent
-        )
     }
 
     override fun setMode(mode: TextActionDecomposeComponent.Mode) {
@@ -144,11 +136,6 @@ class TextActionDecomposeComponentImpl(
     override fun openAddArticle(url: String?) =
         navigation.pushChildConfigurationOrPopIfExists(
             TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration(url = url)
-        )
-
-    override fun openAddNote() =
-        navigation.pushChildConfigurationOrPopIfExists(
-            TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration
         )
 
     override fun openCardSets() {

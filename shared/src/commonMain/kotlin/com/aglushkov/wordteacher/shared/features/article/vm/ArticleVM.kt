@@ -54,7 +54,6 @@ interface ArticleVM: Clearable {
 
     var router: ArticleRouter?
 
-    fun onWordDefinitionHidden()
     fun onBackPressed()
     fun onTextClicked(sentence: NLPSentence, offset: Int)
     fun onTextLongPressed(sentence: NLPSentence, offset: Int)
@@ -509,10 +508,6 @@ open class ArticleVMImpl(
     override fun onTryAgainClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Article.onTryAgainClicked"))
         articleRepository.loadArticle(state.value.id)
-    }
-
-    override fun onWordDefinitionHidden() {
-        definitionsVM.onWordSubmitted(null)
     }
 
     override fun onMarkAsReadUnreadClicked() {

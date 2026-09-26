@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldLineLimits.Companion
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
@@ -98,7 +99,7 @@ fun SearchView(
                     modifier = Modifier
                         .clip(CircleShape)
                         .clickable {
-                            state.edit { "" }
+                            state.clearText()
                             focusRequester?.requestFocus()
                         },
                     tint = LocalContentColor.current

@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.EXTRA_ARTICLE_ID
 import com.aglushkov.wordteacher.android_app.MainActivity
 import com.aglushkov.wordteacher.android_app.compose.ComposeAppTheme
-import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
 import com.aglushkov.wordteacher.android_app.features.textaction.di.DaggerTextActionComponent
 import com.aglushkov.wordteacher.android_app.features.textaction.di.TextActionComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponentOwner
@@ -225,10 +224,6 @@ class TextActionActivity: AppCompatActivity() {
                                 modifier = Modifier.padding(innerPadding),
                             )
                         }
-                        is TextActionDecomposeComponent.Child.AddNote -> NotesUI(
-                            vm = instance.vm,
-                            modifier = Modifier.padding(innerPadding)
-                        )
                     }
                 }
             }

@@ -46,7 +46,6 @@ import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUI
 import com.aglushkov.wordteacher.android_app.features.learning.views.LearningUIDialog
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUI
 import com.aglushkov.wordteacher.android_app.features.learning_session_result.views.LearningSessionResultUIDialog
-import com.aglushkov.wordteacher.android_app.features.notes.NotesUI
 import com.aglushkov.wordteacher.android_app.helper.EmailOpenerImpl
 import com.aglushkov.wordteacher.android_app.helper.FileOpenControllerImpl
 import com.aglushkov.wordteacher.shared.features.MainDecomposeComponent
@@ -365,10 +364,6 @@ class MainActivity : AppCompatActivity(), Router {
                         },
                         modifier = Modifier.padding(innerPadding)
                     )
-                    is TabDecomposeComponent.Child.Notes -> NotesUI(
-                        vm = instance.vm,
-                        modifier = Modifier.padding(innerPadding)
-                    )
                 }
             }
 
@@ -529,7 +524,6 @@ class MainActivity : AppCompatActivity(), Router {
                             is ScreenTab.CardSets -> component.openCardSets()
                             is ScreenTab.Articles -> component.openArticles()
                             is ScreenTab.Settings -> component.openSettings()
-                            is ScreenTab.Notes -> component.openNotes()
                         }
                     },
                     icon = {
@@ -577,7 +571,6 @@ sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: In
     data object CardSets : ScreenTab(MR.strings.tab_learning.resourceId, R.drawable.ic_learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
     data object Articles : ScreenTab(MR.strings.tab_articles.resourceId, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
     data object Settings : ScreenTab(MR.strings.tab_settings.resourceId, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
-    data object Notes : ScreenTab(MR.strings.tab_notes.resourceId, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }
 
 const val EXTRA_ARTICLE_ID = "articleId"

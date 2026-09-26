@@ -24,6 +24,8 @@ open class DefinitionsVMPreview(
 
     override var router: DefinitionsRouter? = null
 
+    override val eventFlow: Flow<List<Event>> = MutableStateFlow(emptyList())
+
     override fun restore(state: DefinitionsVM.State) {
     }
 
@@ -125,6 +127,9 @@ open class DefinitionsVMPreview(
     }
 
     override fun onStartLoadMisspellingDBClicked() {
+    }
+
+    override fun onEventsHandled() {
     }
 
     override val needShowDslHintOnEmptyResult = MutableStateFlow<Boolean>(true)

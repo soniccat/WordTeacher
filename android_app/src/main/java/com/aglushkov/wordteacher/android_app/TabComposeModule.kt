@@ -1,6 +1,5 @@
 package com.aglushkov.wordteacher.android_app
 
-import com.aglushkov.wordteacher.android_app.features.notes.di.DaggerNotesComponent
 import com.aglushkov.wordteacher.android_app.di.AppComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.TabDecomposeComponentImpl
@@ -11,7 +10,6 @@ import com.aglushkov.wordteacher.shared.features.definitions.di.DaggerDefinition
 import com.aglushkov.wordteacher.shared.features.dashboard.di.DaggerDashboardComponent
 import com.aglushkov.wordteacher.shared.features.definitions.di.DefinitionsComposeComponent
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
-import com.aglushkov.wordteacher.shared.features.notes.vm.NotesVM
 import com.aglushkov.wordteacher.shared.features.settings.di.DaggerSettingsComponent
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsVM
 import com.arkivanov.decompose.ComponentContext
@@ -67,13 +65,6 @@ class TabComposeModule {
                         .setDeps(appComponent)
                         .build()
                         .settingsDecomposeComponent()
-                is TabDecomposeComponent.ChildConfiguration.NotesConfiguration ->
-                    DaggerNotesComponent.builder()
-                        .setComponentContext(context)
-                        .setState(NotesVM.State())
-                        .setDeps(appComponent)
-                        .build()
-                        .notesDecomposeComponent()
                 else ->
                     throw RuntimeException("Unsupported configuration $configuration")
             }

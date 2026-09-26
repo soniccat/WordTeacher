@@ -40,7 +40,6 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictFactory
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepositoryImpl
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
-import com.aglushkov.wordteacher.shared.repository.note.NotesRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
@@ -172,15 +171,6 @@ class SharedAppModule {
         nlpSentenceProcessor: NLPSentenceProcessor,
     ): CardSetsRepository {
         return CardSetsRepository(databaseWorker, timeSource, nlpCore, nlpSentenceProcessor)
-    }
-
-    @AppComp
-    @Provides
-    fun notesRepository(
-        database: AppDatabase,
-        nlpCore: NLPCore,
-    ): NotesRepository {
-        return NotesRepository(database, nlpCore)
     }
 
     @AppComp
