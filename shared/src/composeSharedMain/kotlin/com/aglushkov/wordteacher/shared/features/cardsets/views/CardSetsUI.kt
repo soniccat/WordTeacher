@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -46,6 +47,7 @@ import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
 import kotlinx.coroutines.launch
 import dev.icerock.moko.resources.compose.localized
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CardSetsUI(
@@ -59,10 +61,21 @@ fun CardSetsUI(
     val searchTags by vm.searchTags.collectAsState()
 
     val uiState by vm.uiStateFlow.collectAsState()
+    val searchTextState = rememberTextFieldState(vm.state.searchQuery.orEmpty())
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { uiState.newCardSetText }) }
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val searchSelectionKey = remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(searchTextState) {
+        snapshotFlow { searchTextState.text }
+            .collectLatest { text ->
+                vm.onSearchTextChanged(text.toString())
+                if (text.isEmpty()) {
+                    vm.onSearchClosed()
+                }
+            }
+    }
 
     BackHandler(enabled = uiState.needShowSearch) {
         coroutineScope.launch {
@@ -92,20 +105,14 @@ fun CardSetsUI(
 
                 SearchView(
                     modifier = Modifier.weight(1.0f),
-                    uiState.searchQuery.orEmpty(),
-                    selectionKey = searchSelectionKey.value,
+                    searchTextState,
+//                    selectionKey = searchSelectionKey.value,
                     focusRequester = run {
                         val event = uiState.focusEvent
                         if (event is CardSetsVM.FocusEvent && event.type == CardSetsVM.ElementType.Search) {
                             focusRequester
                         } else {
                             null
-                        }
-                    },
-                    onTextChanged = {
-                        vm.onSearchTextChanged(it)
-                        if (it.isEmpty()) {
-                            vm.onSearchClosed()
                         }
                     },
                     onFocusChanged = {

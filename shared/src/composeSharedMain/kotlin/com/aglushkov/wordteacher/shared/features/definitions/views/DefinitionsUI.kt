@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,6 +61,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.localized
+import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
@@ -145,7 +147,7 @@ private fun DefinitionsWordUI(
     onPartOfSpeechFilterClicked: (item: DefinitionsDisplayModeViewItem) -> Unit
 ) {
     val defs = vm.definitions.collectAsState()
-    val searchText = vm.wordTextValue.collectAsState()
+    val searchTextState = rememberTextFieldState(vm.state.word.orEmpty())
     var needShowSuggests by remember { mutableStateOf(false) }
     val suggests = vm.suggests.collectAsState()
     val focusManager = LocalFocusManager.current
@@ -153,6 +155,13 @@ private fun DefinitionsWordUI(
     val needShowWordHistory by vm.isWordHistorySelected.collectAsState()
     val needShowDslHintOnEmptyResult by vm.needShowDslHintOnEmptyResult.collectAsState()
     val wordStack by vm.wordStack.collectAsState()
+
+    LaunchedEffect(searchTextState) {
+        snapshotFlow { searchTextState.text }
+            .collectLatest { text ->
+                vm.onWordTextUpdated(text.toString())
+            }
+    }
 
     if (withSearchBar) {
         BackHandler(enabled = needShowSuggests || needShowWordHistory || wordStack.size > 1) {
@@ -226,19 +235,16 @@ private fun DefinitionsWordUI(
             ) {
                 SearchView(
                     Modifier.weight(1.0f),
-                    searchText.value.orEmpty(),
+                    searchTextState,
                     focusRequester = focusRequester,
-                    onTextChanged = {
-                        vm.onWordTextUpdated(it)
-                    },
                     onFocusChanged = {
                         needShowSuggests = it.isFocused
                         if (it.isFocused) {
                             vm.onSuggestsAppeared()
                         }
-                    }
+                    },
                 ) {
-                    vm.onWordSubmitted(searchText.value)
+                    vm.onWordSubmitted(searchTextState.text.toString())
                     focusManager.clearFocus()
                 }
             }

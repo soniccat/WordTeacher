@@ -8,6 +8,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldLineLimits.Companion
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
@@ -34,35 +38,26 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.res.MR
 import dev.icerock.moko.resources.compose.painterResource
+import java.awt.TextField
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchView(
     modifier: Modifier = Modifier,
-    text: String,
+    state: TextFieldState,
     focusRequester: FocusRequester? = remember { FocusRequester() },
-    selectionKey: Int = 0,
-    onTextChanged: (String) -> Unit,
+//    selectionKey: Int = 0,
     onFocusChanged: (FocusState) -> Unit = {},
     onImeAction: () -> Unit,
 ) {
     // to put cursor at the end
-    var searchRange by remember(selectionKey) {
-        mutableStateOf(
-            TextRange(text.length)
-        )
-    }
+//    var searchRange by remember(selectionKey) {
+//        mutableStateOf(
+//            TextRange(s.length)
+//        )
+//    }
     TextField(
-        value = TextFieldValue(
-            text,
-            searchRange
-        ),
-        onValueChange = {
-            searchRange = it.selection
-            if (text != it.text) {
-                onTextChanged(it.text)
-            }
-        },
+        state = state,
         modifier = modifier
             .padding(8.dp)
             //.fillMaxWidth()
@@ -95,28 +90,24 @@ fun SearchView(
                 tint = LocalContentColor.current
             )
         },
-    trailingIcon = {
-        if (text.isNotEmpty()) {
-            Icon(
-                painter = painterResource(MR.images.field_close_24),
-                contentDescription = null,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable {
-                        onTextChanged("")
-                        focusRequester?.requestFocus()
-                    },
-                tint = LocalContentColor.current
-            )
-        }
-    },
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(
-            onSearch = {
-                onImeAction()
+        trailingIcon = {
+            if (state.text.isNotEmpty()) {
+                Icon(
+                    painter = painterResource(MR.images.field_close_24),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable {
+                            state.edit { "" }
+                            focusRequester?.requestFocus()
+                        },
+                    tint = LocalContentColor.current
+                )
             }
-        ),
-        singleLine = true,
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+        onKeyboardAction = KeyboardActionHandler { onImeAction() },
+        lineLimits = TextFieldLineLimits.SingleLine,
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,

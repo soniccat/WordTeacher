@@ -76,7 +76,7 @@ interface DefinitionsVM: Clearable {
     fun onDslHintClicked()
     fun onStartLoadMisspellingDBClicked()
 
-    val wordTextValue: StateFlow<String?>
+//    val wordTextValue: StateFlow<String?>
     val state: State
     val definitions: StateFlow<Resource<List<BaseViewItem<*>>>>
     val partsOfSpeechFilterStateFlow: StateFlow<List<WordTeacherWord.PartOfSpeech>>
@@ -160,7 +160,7 @@ open class DefinitionsVMImpl(
         }
     )
 
-    override val wordTextValue = MutableStateFlow(initialState.word)
+    private val wordTextValue = MutableStateFlow(initialState.word)
     private val definitionWords = MutableStateFlow<Resource<List<WordTeacherWord>>>(Resource.Uninitialized())
     private val wordFrequency = MutableStateFlow<Resource<Double>>(Resource.Uninitialized())
 
