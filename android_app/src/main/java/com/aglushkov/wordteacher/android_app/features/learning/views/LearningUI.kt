@@ -13,6 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -612,7 +615,7 @@ fun TermInput(
     focusRequester: FocusRequester,
     onDone: (value: String) -> Unit,
 ) {
-    var textValue by remember(term) { mutableStateOf("") }
+    val textState = rememberTextFieldState()
     val hasError = remember(errorString) { errorString != null }
 
     Column(
@@ -623,8 +626,7 @@ fun TermInput(
             )
     ) {
         TextField(
-            value = textValue,
-            onValueChange = { textValue = it },
+            state = textState,
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
@@ -639,12 +641,10 @@ fun TermInput(
                 }
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    onDone(textValue)
-                }
-            ),
-            singleLine = true,
+            onKeyboardAction = KeyboardActionHandler {
+                onDone(textState.text.toString())
+            },
+            lineLimits = TextFieldLineLimits.SingleLine,
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = MaterialTheme.colors.onSurface.copy(alpha = 0.05f)
             )
