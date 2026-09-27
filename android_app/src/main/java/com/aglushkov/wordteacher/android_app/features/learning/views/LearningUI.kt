@@ -80,7 +80,6 @@ fun LearningUIDialog(
             vm = vm,
             modifier = modifier,
             actions = {
-
                 if (isCardVisible) {
                     Box(
                         modifier = Modifier

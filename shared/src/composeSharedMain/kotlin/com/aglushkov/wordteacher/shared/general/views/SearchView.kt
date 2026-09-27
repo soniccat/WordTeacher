@@ -47,21 +47,13 @@ fun SearchView(
     modifier: Modifier = Modifier,
     state: TextFieldState,
     focusRequester: FocusRequester? = remember { FocusRequester() },
-//    selectionKey: Int = 0,
     onFocusChanged: (FocusState) -> Unit = {},
     onImeAction: () -> Unit,
 ) {
-    // to put cursor at the end
-//    var searchRange by remember(selectionKey) {
-//        mutableStateOf(
-//            TextRange(s.length)
-//        )
-//    }
     TextField(
         state = state,
         modifier = modifier
             .padding(8.dp)
-            //.fillMaxWidth()
             .background(
                 color = MaterialTheme.colors.surface,
                 shape = RoundedCornerShape(2.dp)

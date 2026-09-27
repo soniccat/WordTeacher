@@ -161,7 +161,7 @@ private fun DefinitionsWordUI(
     LaunchedEffect("events") {
         vm.eventFlow.collect {
             it.onEach {
-                if (it is UpdateText) {
+                if (it is UpdateText && searchTextState.text.toString() != it.text) {
                     searchTextState.setTextAndPlaceCursorAtEnd(it.text)
                 }
                 it.markAsHandled()

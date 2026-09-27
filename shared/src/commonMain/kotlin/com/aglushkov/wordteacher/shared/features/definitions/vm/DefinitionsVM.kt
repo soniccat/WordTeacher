@@ -255,7 +255,6 @@ open class DefinitionsVMImpl(
     // Events
     override fun onWordTextUpdated(newText: String) {
         wordTextValue.update { newText }
-
         if (newText.trim().isEmpty()) {
             clearSuggests()
         } else {

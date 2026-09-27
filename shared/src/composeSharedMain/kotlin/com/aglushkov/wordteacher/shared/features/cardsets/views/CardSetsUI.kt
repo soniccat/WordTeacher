@@ -67,12 +67,11 @@ fun CardSetsUI(
     val newCardSetState by remember { mutableStateOf(TextFieldCellStateImpl { uiState.newCardSetText }) }
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
-    val searchSelectionKey = remember { mutableIntStateOf(0) }
 
     LaunchedEffect("events") {
         vm.eventFlow.collect {
             it.onEach {
-                if (it is UpdateText) {
+                if (it is UpdateText && searchTextState.text.toString() != it.text) {
                     searchTextState.setTextAndPlaceCursorAtEnd(it.text)
                 }
                 it.markAsHandled()
@@ -120,7 +119,6 @@ fun CardSetsUI(
                 SearchView(
                     modifier = Modifier.weight(1.0f),
                     searchTextState,
-//                    selectionKey = searchSelectionKey.value,
                     focusRequester = run {
                         val event = uiState.focusEvent
                         if (event is CardSetsVM.FocusEvent && event.type == CardSetsVM.ElementType.Search) {
@@ -174,7 +172,7 @@ fun CardSetsUI(
                 // show tags
                 } else if (uiState.needShowCardSetTags) {
                     searchTags.onData {
-                        ShowCardSetTags(it, vm, searchSelectionKey)
+                        ShowCardSetTags(it, vm)
                     }
                 }
             } else {
@@ -260,7 +258,6 @@ private fun ShowSearchCardSets(
 private fun ShowCardSetTags(
     tags: List<CardSetTag>,
     vm: CardSetsVM,
-    searchSelectionKey: MutableIntState
 ) {
     Box(
         modifier = Modifier.fillMaxWidth()
@@ -274,7 +271,6 @@ private fun ShowCardSetTags(
             tags.onEach {
                 Chip(
                     onClick = {
-                        searchSelectionKey.intValue += 1
                         vm.onCardSetTagClicked(it)
                     },
                     modifier = Modifier.padding(end = 4.dp)
