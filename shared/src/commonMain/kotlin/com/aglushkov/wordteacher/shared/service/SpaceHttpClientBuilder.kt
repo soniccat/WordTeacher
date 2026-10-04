@@ -10,6 +10,8 @@ import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.general.crypto.SecureCodec
 import com.aglushkov.wordteacher.shared.general.extensions.collectUntilFalse
 import io.ktor.client.*
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.cookies.*
@@ -40,6 +42,20 @@ class SpaceHttpClientBuilder(
         installHeaders()
         install401Handler()
         installErrorTracker(analyticsProvider)
+        install(HttpRequestRetry) {
+            maxRetries = 2
+            retryIf { req, resp ->
+                req.method == HttpMethod.Get &&
+                        resp.status != HttpStatusCode.NotModified &&
+                        !resp.status.isSuccess()
+            }
+            retryOnException(retryOnTimeout = true)
+        }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 10000
+            connectTimeoutMillis = 5000
+            socketTimeoutMillis = 5000
+        }
     }
 
     private fun HttpClientConfig<*>.installGzipForResponse() {

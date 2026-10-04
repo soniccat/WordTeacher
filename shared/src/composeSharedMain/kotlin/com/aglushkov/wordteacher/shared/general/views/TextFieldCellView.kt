@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.input.key.*
@@ -114,18 +116,15 @@ fun TextFieldCellView(
 @Composable
 fun InlineTextField(
     modifier: Modifier,
-    value: TextFieldValue,
+    state: TextFieldState,
     placeholder: String,
     textStyle: TextStyle,
     focusManager: FocusManager?,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
     readOnly: Boolean = false,
-    onValueChange: (TextFieldValue) -> Unit,
 ) {
     BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
+        state = state,
         modifier = modifier.let {
           if (focusManager != null) {
               it.onPreviewKeyEvent {
@@ -142,23 +141,20 @@ fun InlineTextField(
         },
         textStyle = textStyle,
         keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions.apply {
+        onKeyboardAction =
           if (focusManager != null) {
-              KeyboardActions(
-                  onNext = {
+              KeyboardActionHandler {
                       focusManager.moveFocus(FocusDirection.Down)
                   }
-              )
-          }
-        },
+          } else { null },
         readOnly = readOnly,
         cursorBrush = SolidColor(MaterialTheme.colors.secondary),
-        decorationBox = @Composable { coreTextField ->
+        decorator = @Composable { coreTextField ->
             Box(
                 contentAlignment = Alignment.CenterStart
             ) {
                 coreTextField()
-                if (value.text.isEmpty() && placeholder.isNotEmpty()) {
+                if (state.text.isEmpty() && placeholder.isNotEmpty()) {
                     Text(
                         text = placeholder,
                         color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)

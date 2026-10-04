@@ -50,6 +50,7 @@ import dev.icerock.moko.resources.compose.painterResource
 import kotlinx.coroutines.launch
 import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 
 @Composable
 fun CardSetsUI(
@@ -82,6 +83,7 @@ fun CardSetsUI(
 
     LaunchedEffect(searchTextState) {
         snapshotFlow { searchTextState.text }
+            .drop(1)
             .collectLatest { text ->
                 vm.onSearchTextChanged(text.toString())
                 if (text.isEmpty()) {

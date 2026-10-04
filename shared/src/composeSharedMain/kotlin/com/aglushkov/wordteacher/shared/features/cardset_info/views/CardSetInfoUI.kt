@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
@@ -40,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,6 +79,8 @@ import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import java.awt.event.FocusEvent
 
@@ -133,12 +137,32 @@ fun CardSetInfoFieldsUI(
     val focusRequester = remember { FocusRequester() }
     val scrollableState = rememberScrollState()
     val focusManager = LocalFocusManager.current
-    var nameState by remember { mutableStateOf(TextFieldValue(uiState.name, TextRange(uiState.name.length))) }
-    var descriptionState by remember { mutableStateOf(TextFieldValue(uiState.description, TextRange(uiState.description.length))) }
-    var sourceState by remember {
-        mutableStateOf(TextFieldValue(uiState.source.orEmpty(),
-            TextRange(uiState.source.orEmpty().length))) }
+    val nameState = rememberTextFieldState(uiState.name)
+    val descriptionState = rememberTextFieldState(uiState.description)
+    val sourceState = rememberTextFieldState(uiState.source.orEmpty())
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(nameState) {
+        snapshotFlow { nameState.text }
+            .drop(1)
+            .collectLatest { text ->
+                vm.onNameChanged(text.toString())
+            }
+    }
+    LaunchedEffect(descriptionState) {
+        snapshotFlow { descriptionState.text }
+            .drop(1)
+            .collectLatest { text ->
+                vm.onDescriptionChanged(text.toString())
+            }
+    }
+    LaunchedEffect(sourceState) {
+        snapshotFlow { sourceState.text }
+            .drop(1)
+            .collectLatest { text ->
+                vm.onSourceChanged(text.toString())
+            }
+    }
 
     Column(
         modifier = Modifier
@@ -151,11 +175,7 @@ fun CardSetInfoFieldsUI(
             )
     ) {
         OutlinedTextFieldWithError(
-            value = nameState,
-            onValueChange = {
-                nameState = it
-                vm.onNameChanged(it.text)
-            },
+            state = nameState,
             modifier = Modifier.padding(
                 start = LocalDimens.current.contentPadding,
                 end = LocalDimens.current.contentPadding,
@@ -175,11 +195,7 @@ fun CardSetInfoFieldsUI(
         )
 
         OutlinedTextField(
-            value = descriptionState,
-            onValueChange = {
-                descriptionState = it
-                vm.onDescriptionChanged(it.text)
-            },
+            state = descriptionState,
             modifier = Modifier
                 .padding(
                     start = LocalDimens.current.contentPadding,
@@ -196,11 +212,7 @@ fun CardSetInfoFieldsUI(
         Spacer(modifier = Modifier.height(10.dp))
 
         OutlinedTextField(
-            value = sourceState,
-            onValueChange = {
-                sourceState = it
-                vm.onSourceChanged(it.text)
-            },
+            state = sourceState,
             modifier = Modifier
                 .padding(
                     start = LocalDimens.current.contentPadding,

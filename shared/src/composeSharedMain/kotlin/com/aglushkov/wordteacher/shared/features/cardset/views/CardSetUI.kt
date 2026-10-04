@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -58,6 +59,8 @@ import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -655,10 +658,25 @@ fun CardTextField(
     onValueChanged: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    var textState by remember { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
+    val textState = rememberTextFieldState(text)
+
+    LaunchedEffect(textState) {
+        snapshotFlow { textState.text }
+            .drop(1)
+            .collectLatest { newText ->
+                if (!readOnly) { // filter cursor position change in readOnly mode
+                    val hasTextChanged = newText != text
+                    if (hasTextChanged) {
+                        onValueChanged(newText.toString())
+                    }
+//                vm.onItemTextChanged(it.text, item, cardId)
+                }
+            }
+    }
+
     InlineTextField(
         modifier = modifier,
-        value = textState,
+        state = textState,
         placeholder = placeholder,
         textStyle = if (!textStyle.color.isSpecified) {
             textStyle.copy(
@@ -670,16 +688,6 @@ fun CardTextField(
         focusManager = focusManager,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         readOnly = readOnly,
-        onValueChange = {
-            if (!readOnly) { // filter cursor position change in readOnly mode
-                val hasTextChanged = textState.text != it.text
-                textState = it
-                if (hasTextChanged) {
-                    onValueChanged(it.text)
-                }
-//                vm.onItemTextChanged(it.text, item, cardId)
-            }
-        }
     )
 }
 

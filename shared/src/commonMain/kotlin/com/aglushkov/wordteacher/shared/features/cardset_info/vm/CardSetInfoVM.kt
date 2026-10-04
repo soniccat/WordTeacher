@@ -185,6 +185,8 @@ open class CardSetInfoVMImpl(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Uninitialized())
 
+    private val loggedFieldTypeChanges = mutableSetOf<String>()
+
     init {
         addClearable(databaseCardWorker.startEditing())
         loadCardSet()
@@ -258,7 +260,15 @@ open class CardSetInfoVMImpl(
     }
 
     private fun logChange(fieldType: String) {
-        analytics.send(AnalyticEvent.createActionEvent("CardSetInfo.change", mapOf("fieldType" to fieldType)))
+        if (!loggedFieldTypeChanges.contains(fieldType)) {
+            loggedFieldTypeChanges.add(fieldType)
+            analytics.send(
+                AnalyticEvent.createActionEvent(
+                    "CardSetInfo.change",
+                    mapOf("fieldType" to fieldType)
+                )
+            )
+        }
     }
 
     private fun loadCardSet() {

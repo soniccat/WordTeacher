@@ -37,6 +37,7 @@ import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrColl
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.UpdateText
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
+import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM.Companion.DefinitionSource
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
@@ -64,6 +65,7 @@ import java.util.*
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 
 
 @Composable
@@ -172,6 +174,7 @@ private fun DefinitionsWordUI(
 
     LaunchedEffect(searchTextState) {
         snapshotFlow { searchTextState.text }
+            .drop(1)
             .collectLatest { text ->
                 vm.onWordTextUpdated(text.toString())
             }
@@ -258,7 +261,7 @@ private fun DefinitionsWordUI(
                         }
                     },
                 ) {
-                    vm.onWordSubmitted(searchTextState.text.toString())
+                    vm.onWordSubmitted(searchTextState.text.toString(), source = DefinitionSource.Input.value)
                     focusManager.clearFocus()
                 }
             }
@@ -434,7 +437,7 @@ private fun showSuggestItem(
         ListItem (
             modifier = modifier
                 .clickable {
-                    vm.onWordSubmitted(item.firstItem())
+                    vm.onWordSubmitted(item.firstItem(), source = DefinitionSource.Suggestion.value)
                     onClicked.invoke()
                 },
             secondaryText = { Text(item.source) },

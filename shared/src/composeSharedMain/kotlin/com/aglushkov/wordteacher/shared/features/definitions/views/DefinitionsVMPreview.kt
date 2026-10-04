@@ -32,7 +32,8 @@ open class DefinitionsVMPreview(
     override fun onWordSubmitted(
         word: String?,
         filter: List<WordTeacherWord.PartOfSpeech>,
-        definitionsContext: DefinitionsContext?
+        definitionsContext: DefinitionsContext?,
+        surce: String,
     ) {
     }
 

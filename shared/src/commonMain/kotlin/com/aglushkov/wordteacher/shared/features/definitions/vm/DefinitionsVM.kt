@@ -60,7 +60,8 @@ interface DefinitionsVM: Clearable {
     fun onWordSubmitted(
         word: String?,
         filter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
-        definitionsContext: DefinitionsContext? = null
+        definitionsContext: DefinitionsContext? = null,
+        source: String,
     )
     fun onWordClicked(
         word: String,
@@ -122,6 +123,13 @@ interface DefinitionsVM: Clearable {
         val needShowLastDefinedWord: Boolean = false,
         val supportDslHint: Boolean = true,
     )
+
+    companion object {
+        enum class DefinitionSource(val value: String) {
+            Suggestion("Definitions.Suggestion"),
+            Input("Definitions.Input"),
+        }
+    }
 }
 
 fun List<WordTeacherWord.PartOfSpeech>.toPartsOfSpeechFilter(): List<WordTeacherWord.PartOfSpeech> {
@@ -265,7 +273,8 @@ open class DefinitionsVMImpl(
     override fun onWordSubmitted(
         word: String?,
         filter: List<WordTeacherWord.PartOfSpeech>,
-        definitionsContext: DefinitionsContext?
+        definitionsContext: DefinitionsContext?,
+        source: String
     ) {
         if (word == null) {
             eventFlow.update { it + UpdateText("") }
@@ -273,6 +282,7 @@ open class DefinitionsVMImpl(
             selectedPartsOfSpeechStateFlow.value = emptyList()
             this.definitionsContext = null
         } else {
+            analytics.send(AnalyticEvent.createActionEvent(source))
             updateCurrentWord(word, filter, definitionsContext, clearStack = true)
         }
     }

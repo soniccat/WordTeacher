@@ -155,6 +155,14 @@ interface ArticleVM: Clearable {
         val sentence: NLPSentence,
         val sentenceSlice: NLPSentenceSlice,
     )
+
+    companion object {
+        enum class DefinitionSource(val value: String) {
+            LongPress("ArticleDefinitions.LongPress"),
+            TextTap("ArticleDefinitions.TextTap"),
+            AnnotationChooser("ArticleDefinitions.AnnotationChooser"),
+        }
+    }
 }
 
 open class ArticleVMImpl(
@@ -386,7 +394,7 @@ open class ArticleVMImpl(
             }
 
             val firstAnnotation = annotations.firstOrNull()
-            showDefinition(firstAnnotation, sentence, slice)
+            showDefinition(firstAnnotation, sentence, slice, source = ArticleVM.Companion.DefinitionSource.TextTap.value)
         }
     }
 
@@ -396,7 +404,7 @@ open class ArticleVMImpl(
         // get the direct word below
         val slice = sentence.sliceFromTextIndex(offset, true)
         if (slice != null && slice.tokenSpan.length > 1 && annotations.value.isNotEmpty()) {
-            showDefinition(null, sentence, slice)
+            showDefinition(null, sentence, slice, source = ArticleVM.Companion.DefinitionSource.LongPress.value)
         }
     }
 
@@ -404,6 +412,7 @@ open class ArticleVMImpl(
         firstAnnotation: ArticleAnnotation.DictWord?,
         sentence: NLPSentence,
         slice: NLPSentenceSlice,
+        source: String,
     ) {
         val resultWord = firstAnnotation?.entry?.word ?: slice.tokenString
         val resultPartOfSpeeches = firstAnnotation?.entry?.partOfSpeeches ?: listOf(slice.partOfSpeech())
@@ -419,7 +428,8 @@ open class ArticleVMImpl(
                         )
                     }.toTypedArray()
                 )
-            )
+            ),
+            source,
         )
 
         stateController.updateNeedShowWordDefinition(true)
@@ -433,7 +443,7 @@ open class ArticleVMImpl(
         stateController.updateAnnotationChooserState { null }
 
         annotation?.let { a ->
-            showDefinition(a, chooserState.sentence, chooserState.sentenceSlice)
+            showDefinition(a, chooserState.sentence, chooserState.sentenceSlice, source = ArticleVM.Companion.DefinitionSource.AnnotationChooser.value)
         }
     }
 

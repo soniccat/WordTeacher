@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -33,8 +36,7 @@ import dev.icerock.moko.resources.compose.localized
 
 @Composable
 fun OutlinedTextFieldWithError(
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    state: TextFieldState,
     modifier: Modifier = Modifier,
     hint: String,
     errorText: StringDesc?,
@@ -48,8 +50,7 @@ fun OutlinedTextFieldWithError(
         modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
+            state = state,
             modifier = Modifier
                 .fillMaxWidth()
                 .let {
@@ -74,12 +75,10 @@ fun OutlinedTextFieldWithError(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Next
             ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(FocusDirection.Down)
-                }
-            ),
-            singleLine = true,
+            onKeyboardAction = KeyboardActionHandler {
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+            lineLimits = TextFieldLineLimits.SingleLine,
             readOnly = readOnly,
         )
 

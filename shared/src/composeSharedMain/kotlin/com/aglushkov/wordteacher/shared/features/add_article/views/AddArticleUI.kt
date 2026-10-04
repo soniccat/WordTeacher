@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -41,6 +42,8 @@ import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadd
 import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 @Composable
@@ -151,7 +154,23 @@ private fun AddArticlesFieldsUI(
         val scrollableState = rememberScrollState()
         var wasTitleFocused by remember { mutableStateOf(false) }
         val focusManager = LocalFocusManager.current
-        var titleState by remember { mutableStateOf(TextFieldValue(data.title, TextRange(data.title.length))) }
+        val titleState = rememberTextFieldState(data.title)
+        val textState = rememberTextFieldState(data.text)
+
+        LaunchedEffect(titleState) {
+            snapshotFlow { titleState.text }
+                .drop(1)
+                .collectLatest { text ->
+                    vm.onTitleChanged(text.toString())
+                }
+        }
+        LaunchedEffect(textState) {
+            snapshotFlow { textState.text }
+                .drop(1)
+                .collectLatest { text ->
+                    vm.onTextChanged(text.toString())
+                }
+        }
 
         Column(
             modifier = Modifier
@@ -173,11 +192,7 @@ private fun AddArticlesFieldsUI(
             }
 
             OutlinedTextFieldWithError(
-                value = titleState,
-                onValueChange = {
-                    titleState = it
-                    vm.onTitleChanged(titleState.text)
-                },
+                state = titleState,
                 modifier = Modifier.padding(
                     start = LocalDimens.current.contentPadding,
                     end = LocalDimens.current.contentPadding,
@@ -223,8 +238,7 @@ private fun AddArticlesFieldsUI(
             }
 
             OutlinedTextField(
-                value = data.text,
-                onValueChange = { vm.onTextChanged(it) },
+                state = textState,
                 modifier = Modifier
                     .padding(
                         start = LocalDimens.current.contentPadding,
