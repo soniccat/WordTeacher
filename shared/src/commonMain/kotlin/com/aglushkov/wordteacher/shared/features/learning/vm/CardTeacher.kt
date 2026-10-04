@@ -20,16 +20,16 @@ class CardTeacher(
 ) {
     private var testSessions = mutableListOf<TestSession>()
     private var currentTestSession: TestSession? = null
-    private var currentTestCardStateFlow = MutableStateFlow<TestSession.TestCard?>(null)
-    val currentTestCard: TestSession.TestCard?
+    private var currentTestCardStateFlow = MutableStateFlow<Pair<Int,TestSession.TestCard>?>(null)
+    val currentTestCard: Pair<Int,TestSession.TestCard>?
         get() = currentTestCardStateFlow.value
 
     private var matchSession: MatchSession? = null
 
     private var sessions = mutableListOf<LearningSession>()
     private var currentSession: LearningSession? = null
-    private var currentCardStateFlow = MutableStateFlow<Card?>(null)
-    val currentCard: Card?
+    private var currentCardStateFlow = MutableStateFlow<Pair<Int,Card>?>(null)
+    val currentCard: Pair<Int,Card>?
         get() = currentCardStateFlow.value
 
     private var hintStringStateFlow = MutableStateFlow<List<Char>>(emptyList())
@@ -54,12 +54,18 @@ class CardTeacher(
     suspend fun runSession(
         block: suspend (
             matchSessionFlow:  Flow<List<MatchSession.MatchPair>>?,
-            testCards: Flow<TestSession.TestCard>?,
-            cards: Flow<Card>
+            testCards: Flow<Pair<Int,TestSession.TestCard>>?,
+            cards: Flow<Pair<Int,Card>>,
         ) -> Unit
     ): List<SessionCardResult>? {
         // null check currentSession/matchSession/currentTestSession to handle restoration
+        val isRestored = currentSession != null
         val session = currentSession ?: buildLearnSession() ?: return null
+        scope.launch {
+            session.currentCardFlow.collect(currentCardStateFlow)
+            currentCardStateFlow.value = null // to propagate cancellation
+        }
+
         val warmupSession = if (matchSession != null) {
             0
         } else if (currentTestSession != null) {
@@ -68,17 +74,17 @@ class CardTeacher(
             Random.nextInt(2)
         }
 
-        if (matchSession == null && MatchSession.isValid(session.cards) && warmupSession == 0 && session.cards.size >= MATCH_SESSION_OPTION_COUNT) {
+        if (!isRestored && MatchSession.isValid(session.cards) && warmupSession == 0 && session.cards.size >= MATCH_SESSION_OPTION_COUNT) {
             matchSession = MatchSession(session.cards)
         }
 
-        if ((matchSession == null || warmupSession == 1) && session.cards.size >= TEST_SESSION_OPTION_COUNT) {
+        if (!isRestored && (matchSession == null || warmupSession == 1) && session.cards.size >= TEST_SESSION_OPTION_COUNT) {
             val testSession = currentTestSession ?: TestSession(session.cards, cards.map { it.term })
             currentTestSession = testSession
-            scope.launch {
-                testSession.currentTestCardFlow.collect(currentTestCardStateFlow) // TODO: simplify this, try to use only testSession.currentTestCardFlow
-                currentTestCardStateFlow.value = null // to propagate cancellation
-            }
+        }
+        scope.launch {
+            currentTestSession?.currentTestCardFlow?.collect(currentTestCardStateFlow) // TODO: simplify this, try to use only testSession.currentTestCardFlow
+            currentTestCardStateFlow.value = null // to propagate cancellation
         }
 
         block(
@@ -108,11 +114,6 @@ class CardTeacher(
         } else {
             val session = LearningSession(sessionCards.shuffled())
             currentSession = session
-
-            scope.launch {
-                session.currentCardFlow.collect(currentCardStateFlow)
-                currentCardStateFlow.value = null // to propagate cancellation
-            }
         }
 
         return currentSession
@@ -142,7 +143,7 @@ class CardTeacher(
     suspend fun onCheckInput(answer: String): Boolean {
         ++checkCount
 
-        val isRight = currentCard!!.term == answer
+        val isRight = currentCard!!.second.term == answer
         if (isRight) {
             if (!isWrongAnswerCounted) {
                 countRightAnswer()
@@ -157,7 +158,7 @@ class CardTeacher(
     }
 
     suspend fun onGiveUp() {
-        val termChars = currentCard!!.term.map { it }
+        val termChars = currentCard!!.second.term.map { it }
         if (hintStringStateFlow.value != termChars) {
             hintStringStateFlow.value = termChars
             countWrongAnswer()
@@ -176,7 +177,7 @@ class CardTeacher(
     }
 
     private fun updateHintString() {
-        val term = currentCard!!.term
+        val term = currentCard!!.second.term
         val currentHint = if (hintStringStateFlow.value.isEmpty()) {
             term.map { HINT_HIDDEN_CHAR }
         } else {
@@ -198,13 +199,13 @@ class CardTeacher(
     suspend fun countWrongAnswer() {
         if (isWrongAnswerCounted) return
 
-        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.withWrongAnswer(timeSource), timeSource.timeInMilliseconds())
+        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.second.withWrongAnswer(timeSource), timeSource.timeInMilliseconds())
         currentSession!!.updateProgress(updatedCard, false)
         isWrongAnswerCounted = true
     }
 
     private suspend fun countRightAnswer() {
-        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.withRightAnswer(timeSource), timeSource.timeInMilliseconds())
+        val updatedCard = databaseCardWorker.updateCardAndWait(currentCard!!.second.withRightAnswer(timeSource), timeSource.timeInMilliseconds())
         currentSession!!.updateProgress(updatedCard, true)
     }
 
@@ -222,7 +223,7 @@ class CardTeacher(
     }
 
     fun onTestOptionSelected(option: String): Boolean {
-        return if (currentTestCard?.card?.term == option) {
+        return if (currentTestCard?.second?.card?.term == option) {
             switchToNextTestCard()
             true
         } else {
@@ -236,9 +237,9 @@ class CardTeacher(
         currentTestSession?.deleteCard(id)
         currentSession?.deleteCard(id)
 
-        if (currentTestCard?.card?.id == id) {
+        if (currentTestCard?.second?.card?.id == id) {
             switchToNextTestCard()
-        } else if (currentCard?.id == id) {
+        } else if (currentCard?.second?.id == id) {
             switchToNextCard()
         }
     }
@@ -265,6 +266,7 @@ class CardTeacher(
 
     fun save() = State(
         currentTestSessionState = currentTestSession?.save(),
+        matchSessionState = matchSession?.save(),
         sessionStates = sessions.map { it.save() },
         currentSessionState = currentSession?.save(),
         checkCount = checkCount,
@@ -274,6 +276,7 @@ class CardTeacher(
 
     fun restore(state: State) {
         currentTestSession = state.currentTestSessionState?.let(::createTestSession)
+        matchSession = state.matchSessionState?.let(::createMatchSession)
         sessions = state.sessionStates.map(::createLearningSession).toMutableList()
         currentSession = state.currentSessionState?.let(::createLearningSession)
         checkCount = state.checkCount
@@ -300,9 +303,19 @@ class CardTeacher(
             it.restore(sessionState)
         }
 
+    private fun createMatchSession(sessionState: MatchSession.State) =
+        MatchSession(
+            cards = sessionState.cardIds.mapNotNull { cardId ->
+                cards.firstOrNull { it.id == cardId }
+            },
+        ).also {
+            it.restore(sessionState)
+        }
+
     @Serializable
     data class State(
         val currentTestSessionState: TestSession.State?,
+        val matchSessionState: MatchSession.State?,
         val sessionStates: List<LearningSession.State>,
         val currentSessionState: LearningSession.State?,
         val checkCount: Int,

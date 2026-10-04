@@ -13,12 +13,11 @@ class TestSession(
     private var testCards: List<TestCard>
     private var currentIndex = 0
 
-    private val currentTestCardStateFlow = MutableStateFlow<TestCard?>(null)
-    val currentCard: TestCard?
+    private val currentTestCardStateFlow = MutableStateFlow<Pair<Int,TestCard>?>(null)
+    val currentCard: Pair<Int,TestCard>?
         get() = currentTestCardStateFlow.value
-    val currentTestCardFlow: Flow<TestCard>
+    val currentTestCardFlow: Flow<Pair<Int,TestCard>>
         get() = currentTestCardStateFlow.takeWhileNonNull()
-
     val size: Int
         get() = testCards.size
 
@@ -34,7 +33,9 @@ class TestSession(
             )
         }
 
-        currentTestCardStateFlow.value = testCards.getOrNull(currentIndex)
+        currentTestCardStateFlow.value = testCards.getOrNull(currentIndex)?.let {
+            currentIndex to it
+        }
     }
 
     fun switchToNextCard(): TestCard? {
@@ -45,7 +46,9 @@ class TestSession(
             result = testCards[currentIndex]
         }
 
-        currentTestCardStateFlow.value = result
+        currentTestCardStateFlow.value = result?.let {
+            currentIndex to it
+        }
         return result
     }
 
@@ -67,7 +70,9 @@ class TestSession(
                     pair.second
                 )
             }
-        currentTestCardStateFlow.value = testCards[currentIndex]
+        currentTestCardStateFlow.value = testCards.getOrNull(currentIndex)?.let {
+            currentIndex to it
+        }
     }
 
     fun deleteCard(id: Long) {
@@ -82,7 +87,9 @@ class TestSession(
         cards = cards.filter { it.id != id }
         testCards = testCards.filter { it.card.id != id }
 
-        currentTestCardStateFlow.value = testCards.getOrNull(currentIndex)
+        currentTestCardStateFlow.value = testCards.getOrNull(currentIndex)?.let {
+            currentIndex to it
+        }
     }
 
     @Serializable

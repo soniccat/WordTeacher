@@ -273,19 +273,19 @@ open class LearningVMImpl(
                 // test session
                 if (testCards != null) {
                     analytics.send(AnalyticEvent.createActionEvent("Learning.session.test.started"))
-                    testCards.collectIndexed { index, testCard ->
+                    testCards.collect { (index, textCard) ->
                         playPrevAudioFile()
-                        prevAudioFile = testCard.card.audioFiles.firstOrNull()
+                        prevAudioFile = textCard.card.audioFiles.firstOrNull()
                         challengeState.update {
                             Resource.Loaded(
                                 LearningVM.Challenge.Test(
                                     instruction = StringDesc.Resource(MR.strings.learning_instruction_challenge_test),
-                                    term = testCard.card.term,
+                                    term = textCard.card.term,
                                     index = index,
                                     count = teacher.sessionCardCount,
-                                    testOptions = testCard.options,
-                                    termViewItems = buildCardItem(testCard.card),
-                                    audioFiles = audioFilesViewItemFromCard(testCard.card),
+                                    testOptions = textCard.options,
+                                    termViewItems = buildCardItem(textCard.card),
+                                    audioFiles = audioFilesViewItemFromCard(textCard.card),
                                 )
                             )
                         }
@@ -296,7 +296,7 @@ open class LearningVMImpl(
 
                 // type session
                 analytics.send(AnalyticEvent.createActionEvent("Learning.session.typing.started"))
-                sessionCards.collectIndexed { index, card ->
+                sessionCards.collect { (index, card) ->
                     playPrevAudioFile()
                     prevAudioFile = card.audioFiles.firstOrNull()
                     challengeState.update {
@@ -531,7 +531,7 @@ open class LearningVMImpl(
 
     override fun onOpenDefinitionsClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Learning.onOpenDefinitionsClicked"))
-        val card = teacher?.currentTestCard?.card ?: teacher?.currentCard ?: return
+        val card = teacher?.currentTestCard?.second?.card ?: teacher?.currentCard?.second ?: return
         viewModelScope.launch {
             teacher?.countWrongAnswer()
             router?.openDefinitions(
@@ -555,12 +555,10 @@ open class LearningVMImpl(
     override fun onDeleteCardClicked() {
         analytics.send(AnalyticEvent.createActionEvent("Learning.onDeleteCardClicked"))
 
-        val card = teacher?.currentTestCard?.card ?: teacher?.currentCard ?: return
+        val card = teacher?.currentTestCard?.second?.card ?: teacher?.currentCard?.second ?: return
         teacher?.onCardDeleted(card.id)
         databaseCardWorker.deleteCard(card, timeSource.timeInMilliseconds())
     }
-
-
 
     override fun getErrorText(res: Resource<*>): StringDesc? {
         return StringDesc.Resource(MR.strings.learning_error)

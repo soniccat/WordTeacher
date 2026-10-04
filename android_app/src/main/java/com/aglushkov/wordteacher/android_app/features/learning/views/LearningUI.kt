@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
 import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.shared.features.definitions.views.*
+import com.aglushkov.wordteacher.shared.features.definitions.vm.WordAntonymViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordAudioFilesViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordDefinitionViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordExampleViewItem
@@ -686,6 +687,7 @@ fun LearningViewItems(
         )
         is WordSubHeaderViewItem -> WordSubHeaderView(item, modifier)
         is WordSynonymViewItem -> WordSynonymView(item, modifier)
+        is WordAntonymViewItem -> WordAntonymView(item, modifier)
         is WordExampleViewItem -> WordExampleView(item, modifier)
         else -> {
             Text(

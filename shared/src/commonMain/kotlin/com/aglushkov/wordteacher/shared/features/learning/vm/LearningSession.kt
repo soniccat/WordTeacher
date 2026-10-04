@@ -16,17 +16,19 @@ class LearningSession(
 
     private var currentIndex = 0
 
-    private val currentCardStateFlow = MutableStateFlow<Card?>(null)
-    val currentCard: Card?
+    private val currentCardStateFlow = MutableStateFlow<Pair<Int,Card>?>(null)
+    val currentCard: Pair<Int,Card>?
         get() = currentCardStateFlow.value
-    val currentCardFlow: Flow<Card>
+    val currentCardFlow: Flow<Pair<Int,Card>>
         get() = currentCardStateFlow.takeWhileNonNull()
 
     val size: Int
         get() = cards.size
 
     init {
-        currentCardStateFlow.value = cards.getOrNull(currentIndex)
+        currentCardStateFlow.value = cards.getOrNull(currentIndex)?.let {
+            currentIndex to it
+        }
     }
 
     fun updateProgress(card: Card, isRight: Boolean) =
@@ -45,7 +47,9 @@ class LearningSession(
             result = cards[currentIndex]
         }
 
-        currentCardStateFlow.value = result
+        currentCardStateFlow.value = result?.let {
+            currentIndex to it
+        }
         return result
     }
 
@@ -80,7 +84,9 @@ class LearningSession(
     fun restore(state: State) {
         currentIndex = state.currentIndex
         results = state.results
-        currentCardStateFlow.value = cards[currentIndex]
+        currentCardStateFlow.value = cards.getOrNull(currentIndex)?.let {
+            currentIndex to it
+        }
     }
 
     fun deleteCard(id: Long) {
@@ -95,7 +101,9 @@ class LearningSession(
         cards = cards.filter { it.id != id }
         results = results.filter { it.cardId != id }
 
-        currentCardStateFlow.value = cards.getOrNull(currentIndex)
+        currentCardStateFlow.value = cards.getOrNull(currentIndex)?.let {
+            currentIndex to it
+        }
     }
 
     @Serializable

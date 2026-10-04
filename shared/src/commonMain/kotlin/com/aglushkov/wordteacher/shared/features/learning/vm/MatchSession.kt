@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.learning.vm
 
+import com.aglushkov.wordteacher.shared.features.learning.vm.TestSession.State
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.resolveStringWithHiddenSpans
 import com.aglushkov.wordteacher.shared.model.resolveStringsWithHiddenSpans
@@ -10,7 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
 class MatchSession(
-    cards: List<Card>,
+    private val cards: List<Card>,
 ) {
     companion object {
         fun isValid(cards: List<Card>): Boolean =
@@ -207,11 +208,31 @@ class MatchSession(
         matchPairStateFlow.update { it?.mapIndexed(transform) }
     }
 
+    fun save() = State(
+        cardIds = cards.map { it.id },
+        matchPairs = matchPairStateFlow.value,
+        currentSelectionGroup = currentSelectionGroup,
+        lastSelectedTermIndex = lastSelectedTermIndex,
+        lastSelectedExampleIndex = lastSelectedExampleIndex,
+    )
+
+    fun restore(state: State) {
+        matchPairStateFlow.value = state.matchPairs
+        currentSelectionGroup = state.currentSelectionGroup
+        lastSelectedTermIndex = state.lastSelectedTermIndex
+        lastSelectedExampleIndex = state.lastSelectedExampleIndex
+    }
+
     @Serializable
     data class State(
         val cardIds: List<Long>,
+        val matchPairs: List<MatchPair>?,
+        val currentSelectionGroup: Int = 0,
+        val lastSelectedTermIndex: Int = -1,
+        val lastSelectedExampleIndex: Int = -1,
     )
 
+    @Serializable
     data class MatchPair(
         val term: String,
         val example: String,
@@ -238,6 +259,7 @@ class MatchSession(
         }
     }
 
+    @Serializable
     data class MatchSelection(
         val oppositeSelectedIndex: Int = -1,
         val group: Int = -1,
