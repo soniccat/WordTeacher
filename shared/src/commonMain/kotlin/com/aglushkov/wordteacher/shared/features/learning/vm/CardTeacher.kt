@@ -58,15 +58,22 @@ class CardTeacher(
             cards: Flow<Card>
         ) -> Unit
     ): List<SessionCardResult>? {
-        val session = buildLearnSession() ?: return null
-        val warmupSession = Random.nextInt(2)
+        // null check currentSession/matchSession/currentTestSession to handle restoration
+        val session = currentSession ?: buildLearnSession() ?: return null
+        val warmupSession = if (matchSession != null) {
+            0
+        } else if (currentTestSession != null) {
+            1
+        } else  {
+            Random.nextInt(2)
+        }
 
-        if (MatchSession.isValid(session.cards) && warmupSession == 0 && session.cards.size >= MATCH_SESSION_OPTION_COUNT) {
+        if (matchSession == null && MatchSession.isValid(session.cards) && warmupSession == 0 && session.cards.size >= MATCH_SESSION_OPTION_COUNT) {
             matchSession = MatchSession(session.cards)
         }
 
         if ((matchSession == null || warmupSession == 1) && session.cards.size >= TEST_SESSION_OPTION_COUNT) {
-            val testSession = TestSession(session.cards, cards.map { it.term })
+            val testSession = currentTestSession ?: TestSession(session.cards, cards.map { it.term })
             currentTestSession = testSession
             scope.launch {
                 testSession.currentTestCardFlow.collect(currentTestCardStateFlow) // TODO: simplify this, try to use only testSession.currentTestCardFlow

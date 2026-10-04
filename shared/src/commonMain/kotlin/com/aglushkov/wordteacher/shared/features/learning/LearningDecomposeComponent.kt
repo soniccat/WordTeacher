@@ -41,7 +41,7 @@ class LearningDecomposeComponent (
         stateKeeper.register(
             KEY_STATE,
             strategy = LearningVM.State.serializer()
-        ) { this.state }
+        ) { this.save() }
     }
 
     private companion object {
