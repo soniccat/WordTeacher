@@ -1,10 +1,11 @@
+import com.android.build.api.dsl.androidLibrary
 import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
 
@@ -13,7 +14,7 @@ plugins {
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.mokoResources)
 
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.daggerKsp)
 }
 
 kotlin {
@@ -21,8 +22,15 @@ kotlin {
         freeCompilerArgs.add("-Xopt-in=kotlin.time.ExperimentalTime")
     }
 
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    android {
+        namespace = "com.aglushkov.wordteacher.shared"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
@@ -71,6 +79,10 @@ kotlin {
             api(libs.uuid)
         }
 
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+
         val composeSharedMain by creating {
             dependsOn(commonMain.get())
             dependencies {
@@ -90,6 +102,7 @@ kotlin {
         val androidMain by getting {
             dependsOn(composeSharedMain)
             dependencies {
+                implementation(libs.dagger)
                 implementation(libs.androidx.material) // for colorOnPrimary in xmls
                 implementation(libs.sqlDelightAndroidDriver)
                 api(libs.androidx.activity.compose)
@@ -100,7 +113,7 @@ kotlin {
                 api(libs.androidx.ui.tooling)
             }
         }
-        val androidUnitTest by getting {
+        val androidHostTest by getting {
             dependencies {
                 implementation(libs.okioFakeFileSystem)
                 implementation(libs.kotlinTestJUnit)
@@ -120,24 +133,6 @@ kotlin {
         }
     }
 }
-
-android {
-    namespace = "com.aglushkov.wordteacher.shared"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-}
-
 
 // from convention
 
@@ -168,6 +163,25 @@ multiplatformResources {
 
 // For now you have to comment this to be able to build desktop... I'm investigating...
 dependencies {
-    configurations["kapt"](libs.daggerCompiler)
+//    add("kapt", libs.daggerCompiler)
+    add("kspAndroid", libs.daggerCompiler)
 }
 
+//tasks.named { it.startsWith("preAndroidMainBuild") }.configureEach {
+//    doLast {
+//        tasks.withType<org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask>().configureEach {
+//            // .convention() sets the baseline value so Gradle validation passes,
+//            // then we pass our required experimental flag cleanly.
+////    dependsOn("generateMRandroidMain")
+////    compilerOptions.freeCompilerArgs.convention(emptyList())
+//            this.compilerOptions.freeCompilerArgs.set(listOf("-Xcontext-parameters"))
+//        }
+//    }
+//}
+
+//afterEvaluate {
+//    tasks.withType<org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask>().configureEach {
+//        // Explicitly initialize the property to an empty list, then bind your arguments
+//        this.compilerOptions.freeCompilerArgs.set(listOf("-Xcontext-parameters"))
+//    }
+//}

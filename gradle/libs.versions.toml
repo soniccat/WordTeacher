@@ -29,13 +29,14 @@ okio = "3.18.2"
 opennlp = "1.9.4"
 sqlDelight = "2.4.1"
 ktor = "3.6.0"
-mokoResources = "0.25.0"
+mokoResources = "0.27.1"
 decomposeVersion = "3.3.0"
 stately = "2.1.0"
 uuid = "0.8.4"
 dagger = "2.60.1"
 kmpZip = "1.0.0"
 telegramLogin = "1.0.0"
+daggerKsp = "2.3.12"
 
 # android
 browser = "1.10.0"
@@ -134,7 +135,7 @@ androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profi
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -144,6 +145,7 @@ sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 mokoResources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "mokoResources"}
 playServicesPlugin = { id = "com.google.gms.google-services", version.ref = "playServicesPlugin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+daggerKsp = { id = "com.google.devtools.ksp", version.ref = "daggerKsp" }
 android-test = { id = "com.android.test", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }
