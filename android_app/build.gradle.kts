@@ -1,11 +1,9 @@
 import java.io.FileInputStream
 import java.util.Properties
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-//import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
@@ -60,20 +58,22 @@ if (yandexPropFile.exists()) {
 }
 
 kotlin {
-    androidTarget {
-//        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
     }
+}
 
-    jvm("desktop")
+// Signing file
+var debugKeystoreProps: Properties? = null
+val debugKeystorePropFile = file("${project.rootDir}/android_app/keystore.properties")
+if (debugKeystorePropFile.exists()) {
+    debugKeystoreProps = Properties().apply {
+        load(FileInputStream(debugKeystorePropFile))
+    }
+}
 
-    sourceSets {
-        val desktopMain by getting
-
-        androidMain.dependencies {
-            implementation(compose.preview)
+dependencies{
+        implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
             implementation(projects.shared)
@@ -85,18 +85,6 @@ kotlin {
             implementation(libs.androidXBrowser)
             implementation(libs.telegramLogin)
             implementation(libs.workManagerRuntime)
-            
-        }
-    }
-}
-
-// Signing file
-var debugKeystoreProps: Properties? = null
-val debugKeystorePropFile = file("${project.rootDir}/android_app/keystore.properties")
-if (debugKeystorePropFile.exists()) {
-    debugKeystoreProps = Properties().apply {
-        load(FileInputStream(debugKeystorePropFile))
-    }
 }
 
 android {
@@ -143,6 +131,7 @@ android {
 
         getByName("release") {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
