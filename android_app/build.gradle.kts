@@ -1,7 +1,7 @@
 import java.io.FileInputStream
 import java.util.Properties
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+//import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -28,9 +28,7 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
-    maven("https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-andorid/")
-    maven("https://artifactory-external.vkpartner.ru/artifactory/maven/")
-    maven("https://artifactory-external.vkpartner.ru/artifactory/vk-id-captcha/android/")
+    maven("https://nexus-external.vkteam.ru/repository/maven/")
     maven {
         url = uri("https://maven.pkg.github.com/TelegramMessenger/telegram-login-android")
         credentials {
@@ -63,7 +61,7 @@ if (yandexPropFile.exists()) {
 
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+//        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }

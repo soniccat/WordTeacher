@@ -71,7 +71,6 @@ import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
-import okio.internal.commonToUtf8String
 import okio.source
 import okio.use
 
@@ -424,7 +423,7 @@ class AppModule {
                 ArticleSample(
                     "Article Sample. CORECURSIVE #099, Code, Kickflips and Crunch Time",
                     context.resources.openRawResource(R.raw.article_sample).use {
-                        it.readBytes().commonToUtf8String()
+                        it.readBytes().decodeToString()
                     },
                     context.getString(MR.strings.sample_article_url.resourceId)
                 )
@@ -435,7 +434,7 @@ class AppModule {
                 timeSource
             ) {
                 context.resources.openRawResource(R.raw.cardset_sample).use {
-                    it.readBytes().commonToUtf8String()
+                    it.readBytes().decodeToString()
                 }
             },
 //            FillMisspellingDBTaskImpl(

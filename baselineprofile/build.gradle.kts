@@ -1,3 +1,5 @@
+import org.jetbrains.compose.reload.gradle.forAllJvmTargets
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 import kotlin.apply
@@ -33,6 +35,12 @@ repositories {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("11")
+    }
+}
+
 android {
     namespace = "com.aglushkov.wordteacher.baselineprofile"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -42,9 +50,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+//    kotlinOptions {
+//        compileOptions {
+//            jvmTarget = JvmTarget.fromTarget("17")
+//        }
+//        jvmTarget = "11"
+//    }
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

@@ -10,7 +10,7 @@ version = 0.1
 
 dependencies {
     implementation(gradleKotlinDsl())
-    compileOnly(libs.kotlinGradlePlugin)
+//    compileOnly(libs.kotlinGradlePlugin)
 //    compileOnly(libs.androidGradlePlugin)
 //    compileOnly(libs.kotlinCompilerEmbeddable)
 //    compileOnly(libs.androidSdkCommon)
