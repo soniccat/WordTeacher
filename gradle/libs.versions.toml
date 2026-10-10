@@ -34,7 +34,7 @@ decomposeVersion = "3.3.0"
 stately = "2.1.0"
 uuid = "0.8.4"
 dagger = "2.59.2"
-kmpZip = "0.11.2"
+kmpZip = "1.0.0"
 telegramLogin = "1.0.0"
 
 # android
