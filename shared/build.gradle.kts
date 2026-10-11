@@ -11,7 +11,6 @@ plugins {
     // from convention
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
-//    alias(libs.plugins.mokoResources)
 
     alias(libs.plugins.kapt)
 }
@@ -56,7 +55,6 @@ kotlin {
             implementation(libs.ktorCommonCore)
             api(libs.ktorLogging)
             api(libs.ktorContentEncoding)
-//            api(libs.mokoResourcesLib)
             api(libs.decompose)
             api("com.darkrockstudios:symspellkt:3.4.0")
             api(compose.components.resources)

@@ -29,7 +29,6 @@ okio = "3.18.2"
 opennlp = "1.9.4"
 sqlDelight = "2.4.1"
 ktor = "3.6.0"
-mokoResources = "0.25.0"
 decomposeVersion = "3.3.0"
 stately = "2.1.0"
 uuid = "0.8.4"
@@ -93,8 +92,6 @@ ktorLogging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktorContentEncoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
 kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
-#mokoResourcesLib = { module = "dev.icerock.moko:resources", version.ref = "mokoResources"}
-#mokoCompose = { module = "dev.icerock.moko:resources-compose", version.ref = "mokoResources"}
 
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decomposeVersion" }
 decomposeComposeExtensions = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decomposeVersion" }
@@ -141,7 +138,6 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
-mokoResources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "mokoResources"}
 playServicesPlugin = { id = "com.google.gms.google-services", version.ref = "playServicesPlugin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 android-test = { id = "com.android.test", version.ref = "agp" }
