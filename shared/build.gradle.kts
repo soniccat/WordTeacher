@@ -12,7 +12,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
 
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
 }
 
 compose.resources {
@@ -171,6 +171,7 @@ sqldelight {
 
 // For now you have to comment this to be able to build desktop... I'm investigating...
 dependencies {
-    configurations["kapt"](libs.daggerCompiler)
+    add("kspAndroid", libs.daggerCompiler)
+//    configurations["kapt"](libs.daggerCompiler)
 }
 
