@@ -80,7 +80,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.arrow_back_24
 import wordteacher.shared.generated.resources.cardset_add_label
 import wordteacher.shared.generated.resources.cardset_info_enable_sharing
 import wordteacher.shared.generated.resources.cardset_info_field_description_hint
@@ -88,6 +90,7 @@ import wordteacher.shared.generated.resources.cardset_info_field_name_hint
 import wordteacher.shared.generated.resources.cardset_info_field_source_hint
 import wordteacher.shared.generated.resources.cardset_info_tag_title
 import wordteacher.shared.generated.resources.cardset_info_title
+import wordteacher.shared.generated.resources.close_18
 import java.awt.event.FocusEvent
 
 
@@ -113,7 +116,7 @@ fun CardSetInfoUI(
                         onClick = { vm.router?.onClosed() }
                     ) {
                         Icon(
-                            painter = painterResource(MR.images.arrow_back_24),
+                            painter = painterResource(Res.drawable.arrow_back_24),
                             contentDescription = null,
                             tint = LocalContentColor.current
                         )
@@ -339,7 +342,7 @@ fun CardSetInfoFieldsUI(
 
                         if (uiState.isEditable) {
                             Icon(
-                                painter = painterResource(MR.images.close_18),
+                                painter = painterResource(Res.drawable.close_18),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .clip(CircleShape)

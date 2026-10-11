@@ -50,6 +50,9 @@ import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
+import org.jetbrains.compose.resources.painterResource
+import wordteacher.shared.generated.resources.arrow_back_24
+import wordteacher.shared.generated.resources.start_learning_24
 
 @Composable
 fun CardSetsUI(
@@ -110,7 +113,7 @@ fun CardSetsUI(
                         onClick = { onBackHandler() }
                     ) {
                         Icon(
-                            painter = painterResource(MR.images.arrow_back_24),
+                            painter = painterResource(Res.drawable.arrow_back_24),
                             contentDescription = null,
                             tint = LocalContentColor.current
                         )
@@ -217,7 +220,7 @@ fun CardSetsUI(
                     modifier = Modifier.padding(LocalDimensWord.current.articleHorizontalPadding)
                 ) {
                     Icon(
-                        painter = painterResource(MR.images.start_learning_24),
+                        painter = painterResource(Res.drawable.start_learning_24),
                         contentDescription = null
                     )
                 }

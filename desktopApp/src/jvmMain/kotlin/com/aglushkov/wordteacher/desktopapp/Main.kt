@@ -355,10 +355,10 @@ private fun BottomNavigationBarUI(component: TabDecomposeComponent) {
 }
 
 sealed class ScreenTab(val nameRes: StringResourceWrapper, val iconRes: ImageResource, val decomposeChildConfigClass: Class<*>) {
-    object Definitions : ScreenTab(Res.string.tab_definitions, MR.images.field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
-    object CardSets : ScreenTab(Res.string.tab_learning, MR.images.learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
-    object Articles : ScreenTab(Res.string.tab_articles, MR.images.tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
-    object Settings : ScreenTab(Res.string.tab_settings, MR.images.tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
+    object Definitions : ScreenTab(Res.string.tab_definitions, Res.drawable.field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+    object CardSets : ScreenTab(Res.string.tab_learning, Res.drawable.learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
+    object Articles : ScreenTab(Res.string.tab_articles, Res.drawable.tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
+    object Settings : ScreenTab(Res.string.tab_settings, Res.drawable.tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
 //    object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }
 

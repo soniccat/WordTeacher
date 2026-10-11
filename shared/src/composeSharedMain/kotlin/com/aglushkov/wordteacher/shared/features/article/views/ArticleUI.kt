@@ -76,8 +76,11 @@ import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.arrow_back_24
 import wordteacher.shared.generated.resources.article_empty
+import wordteacher.shared.generated.resources.article_filter_24
 import wordteacher.shared.generated.resources.article_mark_as_read
 import wordteacher.shared.generated.resources.article_mark_as_unread
 import wordteacher.shared.generated.resources.article_side_sheet_part_of_speech_title
@@ -401,7 +404,7 @@ private fun ArticleTopBar(
                 onClick = onBackPressed
             ) {
                 Icon(
-                    painter = painterResource(MR.images.arrow_back_24),
+                    painter = painterResource(Res.drawable.arrow_back_24),
                     contentDescription = null,
                     tint = LocalContentColor.current
                 )
@@ -412,7 +415,7 @@ private fun ArticleTopBar(
                 onClick = onSideSheetPressed
             ) {
                 Icon(
-                    painter = painterResource(MR.images.article_filter_24),
+                    painter = painterResource(Res.drawable.article_filter_24),
                     contentDescription = null,
                     tint = LocalContentColor.current
                 )

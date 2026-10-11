@@ -12,7 +12,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import wordteacher.shared.generated.resources.Res
-import dev.icerock.moko.resources.compose.painterResource
+import org.jetbrains.compose.resources.painterResource
+import wordteacher.shared.generated.resources.plus_medium
+import wordteacher.shared.generated.resources.plus_small
 
 enum class AddIconStyle{
     Small,
@@ -35,9 +37,9 @@ fun AddIcon(
     Icon(
         painter = painterResource(
             if (style == AddIconStyle.Small) {
-                MR.images.plus_small
+                Res.drawable.plus_small
             } else {
-                MR.images.plus_medium
+                Res.drawable.plus_medium
             }
         ),
         contentDescription = null,

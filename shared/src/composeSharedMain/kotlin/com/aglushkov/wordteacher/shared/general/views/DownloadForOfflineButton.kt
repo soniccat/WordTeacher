@@ -10,7 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import wordteacher.shared.generated.resources.Res
-import dev.icerock.moko.resources.compose.painterResource
+import org.jetbrains.compose.resources.painterResource
+import wordteacher.shared.generated.resources.download_for_offline
 
 @Composable
 fun DownloadForOfflineButton(
@@ -20,7 +21,7 @@ fun DownloadForOfflineButton(
     )
 ) {
     Icon(
-        painterResource(MR.images.download_for_offline),
+        painterResource(Res.drawable.download_for_offline),
         null,
         modifier = Modifier.clip(CircleShape).then(modifier).padding(contentPadding),
         tint = MaterialTheme.colors.secondary

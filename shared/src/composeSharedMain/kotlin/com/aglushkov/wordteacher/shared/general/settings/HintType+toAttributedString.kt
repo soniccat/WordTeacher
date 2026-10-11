@@ -15,9 +15,14 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.em
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import wordteacher.shared.generated.resources.Res
-import dev.icerock.moko.resources.ImageResource
-import dev.icerock.moko.resources.compose.painterResource
+import wordteacher.shared.generated.resources.add_white_24
+import wordteacher.shared.generated.resources.article_filter_24
+import wordteacher.shared.generated.resources.close_18
+import wordteacher.shared.generated.resources.download_for_offline
+import wordteacher.shared.generated.resources.start_learning_rounded_24
 
 private const val HintIntroduction_Close = "Hint_Close"
 private const val DashboardArticles_Download = "DashboardArticles_Download"
@@ -35,35 +40,35 @@ val HintInlineContent = mapOf(
     HintIntroduction_Close to
     InlineTextContent(inlineTextPlaceholder) {
         TextIcon(
-            imageResource = MR.images.close_18,
+            imageResource = Res.drawable.close_18,
             tint = MaterialTheme.colors.onSurface.copy(alpha = 0.87f),
         )
     },
     DashboardArticles_Download to
     InlineTextContent(inlineTextPlaceholder) {
         TextIcon(
-            imageResource = MR.images.download_for_offline,
+            imageResource = Res.drawable.download_for_offline,
             tint = MaterialTheme.colors.secondary,
         )
     },
     DashboardCardsets_Add to
     InlineTextContent(inlineTextPlaceholder) {
         TextIcon(
-            imageResource = MR.images.add_white_24,
+            imageResource = Res.drawable.add_white_24,
             tint = MaterialTheme.colors.onSurface.copy(alpha = 0.87f),
         )
     },
     DashboardCardsets_Learn to
     InlineTextContent(inlineTextPlaceholder) {
         TextIcon(
-            imageResource = MR.images.start_learning_rounded_24,
+            imageResource = Res.drawable.start_learning_rounded_24,
             tint = MaterialTheme.colors.secondary,
         )
     },
     Article_Menu to
     InlineTextContent(inlineTextPlaceholder) {
         TextIcon(
-            imageResource = MR.images.article_filter_24,
+            imageResource = Res.drawable.article_filter_24,
             tint = MaterialTheme.colors.onSurface.copy(alpha = 0.87f),
         )
     },
@@ -71,7 +76,7 @@ val HintInlineContent = mapOf(
 
 @Composable
 fun TextIcon(
-    imageResource: ImageResource,
+    imageResource: DrawableResource,
     modifier: Modifier = Modifier,
     tint: Color = Color.Unspecified
 ) {

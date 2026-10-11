@@ -67,12 +67,24 @@ import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.runBlocking
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 import okio.source
 import okio.use
+import org.jetbrains.compose.resources.getString
+import wordteacher.shared.generated.resources.api_base_url
+import wordteacher.shared.generated.resources.api_base_url_com
+import wordteacher.shared.generated.resources.privacy_policy_url
+import wordteacher.shared.generated.resources.sample_article_url
+import wordteacher.shared.generated.resources.support_email
+import wordteacher.shared.generated.resources.support_email_ru
+import wordteacher.shared.generated.resources.toggles_url
+import wordteacher.shared.generated.resources.toggles_url2
+import java.io.File
+import java.io.InputStream
 
 
 @Module
@@ -93,28 +105,32 @@ class AppModule {
     @ToggleUrl
     @AppComp
     @Provides
-    fun togglesUrl(
-        context: Context
-    ): String = context.getString(Res.string.toggles_url.resourceId)
+    fun togglesUrl(): String = runBlocking {
+        getString(Res.string.toggles_url)
+    }
 
     @ToggleUrl2
     @AppComp
     @Provides
     fun togglesUrl2(
-        context: Context
-    ): String = context.getString(Res.string.toggles_url2.resourceId)
+    ): String = runBlocking {
+        getString(Res.string.toggles_url2)
+    }
 
     @ApiBaseUrl
     @AppComp
     @Provides
     fun apiBaseUrl(
-        context: Context,
         toggleRepository: ToggleRepository
     ): String {
-        return if (toggleRepository.toggles.topLevelDomain == "com") {
-            context.getString(Res.string.api_base_url_com.resourceId)
-        } else {
-            context.getString(Res.string.api_base_url.resourceId)
+        return runBlocking{
+            getString(
+                if (toggleRepository.toggles.topLevelDomain == "com") {
+                    Res.string.api_base_url_com
+                } else {
+                    Res.string.api_base_url
+                }
+            )
         }
     }
 
@@ -136,20 +152,23 @@ class AppModule {
     @Email
     @AppComp
     @Provides
-    fun email(
-        context: Context
-    ): String = if (BuildConfig.useRuEmail) {
-        context.getString(Res.string.support_email_ru.resourceId)
-    } else {
-        context.getString(Res.string.support_email.resourceId)
+    fun email(): String = runBlocking {
+        getString(
+            if (BuildConfig.useRuEmail) {
+                Res.string.support_email_ru
+            } else {
+                Res.string.support_email
+            }
+        )
     }
 
     @PrivacyPolicyUrl
     @AppComp
     @Provides
     fun privacyPolicy(
-        context: Context
-    ): String = context.getString(Res.string.privacy_policy_url.resourceId)
+    ): String = runBlocking{
+        getString(Res.string.privacy_policy_url)
+    }
 
     @AppComp
     @Provides
@@ -299,7 +318,8 @@ class AppModule {
             val dbPath = context.getDatabasePath("word_frequency.db").toOkioPath()
             if (!fileSystem.exists(dbPath)) {
                 fileSystem.write(dbPath) {
-                    MR.assets.word_frequency_db.getInputStream(context).source().writeTo(this)
+                    val uri = Res.getUri("files/word_frequency.db").replace("file:///android_asset/", "")
+                    context.assets.open(uri).source().writeTo(this)
                 }
             }
             "".toPath()
@@ -425,7 +445,7 @@ class AppModule {
                     context.resources.openRawResource(R.raw.article_sample).use {
                         it.readBytes().decodeToString()
                     },
-                    context.getString(Res.string.sample_article_url.resourceId)
+                    runBlocking{ getString(Res.string.sample_article_url) }
                 )
             },
             AddCardSetSampleTask(

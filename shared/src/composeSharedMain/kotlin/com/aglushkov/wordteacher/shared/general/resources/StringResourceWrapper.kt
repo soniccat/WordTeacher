@@ -8,5 +8,5 @@ import org.jetbrains.compose.resources.stringResource
 fun StringResourceWrapper.resolve(): String = when(this) {
         is StringResourceWrapper.Raw -> string
         is StringResourceWrapper.String -> stringResource(stringResource)
-        is StringResourceWrapper.FormattedString -> stringResource(stringResource, formatArgs)
+        is StringResourceWrapper.FormattedString -> stringResource(stringResource, *formatArgs.toTypedArray())
     }

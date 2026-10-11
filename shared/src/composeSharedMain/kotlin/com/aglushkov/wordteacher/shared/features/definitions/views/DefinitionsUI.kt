@@ -64,10 +64,16 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.audio_small
+import wordteacher.shared.generated.resources.check
+import wordteacher.shared.generated.resources.close_18
+import wordteacher.shared.generated.resources.close_24
 import wordteacher.shared.generated.resources.error_empty_wordhistory
 import wordteacher.shared.generated.resources.error_no_definitions
 import wordteacher.shared.generated.resources.error_try_again
+import wordteacher.shared.generated.resources.word_history_menu
 import wordteacher.shared.generated.resources.word_providedBy_template
 
 
@@ -225,7 +231,7 @@ private fun DefinitionsWordUI(
                             }
                         ) {
                             Icon(
-                                painter = painterResource(MR.images.close_24),
+                                painter = painterResource(Res.drawable.close_24),
                                 contentDescription = null,
                                 tint = LocalContentColor.current
                             )
@@ -237,7 +243,7 @@ private fun DefinitionsWordUI(
                             }
                         ) {
                             Icon(
-                                painter = painterResource(MR.images.word_history_menu),
+                                painter = painterResource(Res.drawable.word_history_menu),
                                 contentDescription = null,
                                 tint = if (needShowWordHistory) {
                                     if (MaterialTheme.colors.isLight) {
@@ -703,7 +709,7 @@ private fun DefinitionsDisplayModeView(
                 trailingIcon = if (item.canClearPartsOfSpeechFilter) {
                     {
                         Icon(
-                            painter = painterResource(MR.images.close_18),
+                            painter = painterResource(Res.drawable.close_18),
                             contentDescription = null,
                             modifier = Modifier
                                 .padding(end = 2.dp)
@@ -743,7 +749,7 @@ private fun DefinitionsDisplayModeView(
                     leadingIcon = if (mode == selectedMode) {
                         {
                             Icon(
-                                painter = painterResource(MR.images.check),
+                                painter = painterResource(Res.drawable.check),
                                 contentDescription = null,
                                 tint = Color.Unspecified
                             )
@@ -803,7 +809,7 @@ fun WordTitleView(
         textContent(viewItem.firstItem(), textStyle)
         if (viewItem.sourceNames.isNotEmpty()) {
             Text(
-                text = stringResource(Res.string.word_providedBy_template, listOf(viewItem.sourceNames.joinToString())),
+                text = stringResource(Res.string.word_providedBy_template, viewItem.sourceNames.joinToString()),
                 modifier = Modifier.width(IntrinsicSize.Min).requiredWidthIn(max = 200.dp),
                 textAlign = TextAlign.End,
                 style = LocalAppTypography.current.wordDefinitionProvidedBy
@@ -917,7 +923,7 @@ fun WordAudioFileView(
             style = LocalAppTypography.current.wordDefinition,
         )
         Icon(
-            painter = painterResource(MR.images.audio_small),
+            painter = painterResource(Res.drawable.audio_small),
             contentDescription = null,
             tint = MaterialTheme.colors.secondary
         )

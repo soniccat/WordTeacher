@@ -59,7 +59,10 @@ import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadd
 import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.arrow_back_24
+import wordteacher.shared.generated.resources.create_note
 import wordteacher.shared.generated.resources.dictconfigs_word_count
 import wordteacher.shared.generated.resources.dictconfigs_yandex_api_token_doesnt_exist_placeholder
 import wordteacher.shared.generated.resources.dictconfigs_yandex_api_token_exists_placeholder
@@ -92,7 +95,7 @@ fun DictConfigsUI(
                         onClick = { onBackPressed() }
                     ) {
                         Icon(
-                            painter = painterResource(MR.images.arrow_back_24),
+                            painter = painterResource(Res.drawable.arrow_back_24),
                             contentDescription = null,
                             tint = LocalContentColor.current
                         )
@@ -295,7 +298,7 @@ private fun AddConfigItemUI(
                 }
             ) {
                 Icon(
-                    painter = painterResource(MR.images.create_note),
+                    painter = painterResource(Res.drawable.create_note),
                     contentDescription = null,
                     tint = MaterialTheme.colors.secondary
                 )

@@ -28,11 +28,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import wordteacher.shared.generated.resources.Res
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.StringResource
-import dev.icerock.moko.resources.compose.localized
+import org.jetbrains.compose.resources.painterResource
+import wordteacher.shared.generated.resources.error_24
 
 @Composable
 fun OutlinedTextFieldWithError(
@@ -66,7 +67,7 @@ fun OutlinedTextFieldWithError(
             trailingIcon = {
                 if (hasTitleError) {
                     Icon(
-                        painter = painterResource(MR.images.error_24),
+                        painter = painterResource(Res.drawable.error_24),
                         contentDescription = null
                     )
                 }

@@ -43,12 +43,14 @@ import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadd
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import wordteacher.shared.generated.resources.add_article_create_set_option
 import wordteacher.shared.generated.resources.add_article_done
 import wordteacher.shared.generated.resources.add_article_field_text_hint
 import wordteacher.shared.generated.resources.add_article_field_title_hint
 import wordteacher.shared.generated.resources.add_article_title
+import wordteacher.shared.generated.resources.close_24
 
 @Composable
 fun AddArticleUIDialog(
@@ -66,7 +68,7 @@ fun AddArticleUIDialog(
                     onClick = { vm.onCancelPressed() }
                 ) {
                     Icon(
-                        painter = painterResource(MR.images.close_24),
+                        painter = painterResource(Res.drawable.close_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )

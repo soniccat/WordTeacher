@@ -79,7 +79,9 @@ import com.aglushkov.wordteacher.shared.general.views.StartLearningButton
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.close_24
 import wordteacher.shared.generated.resources.find_article_title
 
 @Composable
@@ -98,7 +100,7 @@ fun FindArticleUIDialog(
                     onClick = { vm.onClosed() }
                 ) {
                     Icon(
-                        painter = painterResource(MR.images.close_24),
+                        painter = painterResource(Res.drawable.close_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )

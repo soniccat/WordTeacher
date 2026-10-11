@@ -9,3 +9,6 @@ val secondaryLight = Color(0xff6495ed)
 val primaryDark = Color(0xff009394)
 val primaryVariantDark = Color(0xff009394)
 val secondaryDark = Color(0xff6495ed)
+
+val providedByColor = Color(0xff888888)
+val hintColor = Color(0xff888888)

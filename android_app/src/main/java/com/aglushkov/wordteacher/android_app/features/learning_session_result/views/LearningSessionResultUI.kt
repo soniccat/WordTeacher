@@ -15,23 +15,27 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionTermResultViewItem
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.done
+import wordteacher.shared.generated.resources.ic_close_24
+import wordteacher.shared.generated.resources.learning_session_result_title
 import java.util.*
+import androidx.compose.ui.platform.LocalLocale
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 //@ExperimentalUnitApi
 //@ExperimentalComposeUiApi
@@ -52,7 +56,7 @@ fun LearningSessionResultUIDialog(
                     onClick = { vm.onCloseClicked() }
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_close_24),
+                        painter = painterResource(Res.drawable.ic_close_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )
@@ -83,7 +87,7 @@ fun LearningSessionResultUI(
         ) {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = Res.string.learning_session_result_title.resourceId))
+                    Text(text = stringResource(Res.string.learning_session_result_title))
                 },
                 actions = actions
             )
@@ -103,7 +107,7 @@ fun LearningSessionResultUI(
                 LoadingStatusView(
                     resource = viewItemsRes,
                     loadingText = null,
-                    errorText = vm.getErrorText(viewItemsRes)?.resolveString()
+                    errorText = vm.getErrorText(viewItemsRes)?.resolve()
                 ) {
                     vm.onTryAgainClicked()
                 }
@@ -112,7 +116,7 @@ fun LearningSessionResultUI(
 
         ExtendedFloatingActionButton(
             text = {
-                Text(stringResource(id = Res.string.done.resourceId).uppercase(Locale.getDefault()))
+                Text(stringResource(Res.string.done).uppercase(LocalLocale.current.platformLocale))
             },
             onClick = { onClose() },
             modifier = Modifier

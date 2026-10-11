@@ -31,17 +31,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.R
-import com.aglushkov.wordteacher.android_app.general.extensions.resolveString
 import com.aglushkov.wordteacher.shared.features.definitions.views.*
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordAntonymViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordAudioFilesViewItem
@@ -55,13 +53,26 @@ import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import wordteacher.shared.generated.resources.Res
-import org.jetbrains.compose.resources.StringResource
-import dev.icerock.moko.resources.compose.localized
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.audio_24
+import wordteacher.shared.generated.resources.audio_muted_24
+import wordteacher.shared.generated.resources.delete_24
+import wordteacher.shared.generated.resources.field_search_24
+import wordteacher.shared.generated.resources.learning_give_up
+import wordteacher.shared.generated.resources.learning_show_hint
+import wordteacher.shared.generated.resources.learning_title
 import java.util.*
+import androidx.compose.ui.platform.LocalLocale
+import wordteacher.shared.generated.resources.ic_close_24
+import wordteacher.shared.generated.resources.ic_error_24
+import wordteacher.shared.generated.resources.learning_term_title_hint
 
 @Composable
 fun LearningUIDialog(
@@ -101,7 +112,7 @@ fun LearningUIDialog(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            painter = dev.icerock.moko.resources.compose.painterResource(MR.images.delete_24),
+                            painter = painterResource(Res.drawable.delete_24),
                             contentDescription = null,
                             tint = LocalContentColor.current
                         )
@@ -113,11 +124,11 @@ fun LearningUIDialog(
                         onClick = { vm.onPlaySoundOnChallengeCompletionClicked() }
                     ) {
                         Icon(
-                            painter = dev.icerock.moko.resources.compose.painterResource(
+                            painter = painterResource(
                                 if (playSoundOnChallengeCompletion) {
-                                    MR.images.audio_24
+                                    Res.drawable.audio_24
                                 } else {
-                                    MR.images.audio_muted_24
+                                    Res.drawable.audio_muted_24
                                 }
                             ),
                             contentDescription = null,
@@ -130,7 +141,7 @@ fun LearningUIDialog(
                     onClick = { vm.onClosePressed() }
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_close_24),
+                        painter = painterResource(Res.drawable.ic_close_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )
@@ -170,13 +181,13 @@ fun LearningUI(
                     data?.let {
                         if (data.count() != 0) {
                             Text(
-                                text = stringResource(id = Res.string.learning_title.resourceId)
+                                text = stringResource(Res.string.learning_title)
                                     .format(data.index() + 1, data.count())
                             )
                         } else if (data is LearningVM.Challenge.Match) {
                             val readyMatches = data.rows.filter { it.matchPair.termSelection.hasMatch() }.size
                             Text(
-                                text = stringResource(id = Res.string.learning_title.resourceId)
+                                text = stringResource(Res.string.learning_title)
                                     .format(readyMatches, data.rows.size)
                             )
                         }
@@ -201,7 +212,7 @@ fun LearningUI(
                 LoadingStatusView(
                     resource = challengeState,
                     loadingText = null,
-                    errorText = vm.getErrorText(challengeState)?.resolveString()
+                    errorText = vm.getErrorText(challengeState)?.resolve()
                 ) {
                     vm.onTryAgainClicked()
                 }
@@ -230,7 +241,7 @@ private fun typeChallengeUI(
     TermInput(
         modifier = Modifier.windowInsetsHorizontalPadding(),
         term = data.term,
-        errorString = errorString?.resolveString(),
+        errorString = errorString?.resolve(),
         focusRequester = focusRequester,
         onDone = { value ->
             vm.onCheckPressed(value)
@@ -288,7 +299,7 @@ private fun BoxScope.testBottomButtons(
                 backgroundColor = MaterialTheme.colors.primarySurface,
             ) {
                 Icon(
-                    painter = dev.icerock.moko.resources.compose.painterResource(MR.images.field_search_24),
+                    painter = painterResource(Res.drawable.field_search_24),
                     contentDescription = null
                 )
             }
@@ -322,7 +333,7 @@ private fun BoxScope.typeBottomButtons(
             backgroundColor = MaterialTheme.colors.primarySurface,
         ) {
             Icon(
-                painter = dev.icerock.moko.resources.compose.painterResource(MR.images.field_search_24),
+                painter = painterResource(Res.drawable.field_search_24),
                 contentDescription = null
             )
         }
@@ -357,12 +368,12 @@ private fun BoxScope.typeBottomButtons(
                 text = {
                     Text(
                         text = stringResource(
-                            id = if (canShowHint) {
-                                Res.string.learning_show_hint.resourceId
+                            if (canShowHint) {
+                                Res.string.learning_show_hint
                             } else {
-                                Res.string.learning_give_up.resourceId
+                                Res.string.learning_give_up
                             }
-                        ).uppercase(Locale.getDefault()),
+                        ).uppercase(LocalLocale.current.platformLocale),
                         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
                     )
                 },
@@ -468,9 +479,9 @@ private fun matchRowUI(
                 .background(
                     color = matchRow.termColor?.let {
                         val alpha = if (matchRow.matchPair.termSelection.hasMatch()) {
-                            153
+                            153/255.0f
                         } else {
-                            80
+                            80/255.0f
                         }
                         Color(it.red, it.green, it.blue, alpha)
                     } ?: Color.Transparent,
@@ -501,9 +512,9 @@ private fun matchRowUI(
                 .background(
                     color = matchRow.exampleColor?.let {
                         val alpha = if (matchRow.matchPair.exampleSelection.hasMatch()) {
-                            153
+                            153/255.0f
                         } else {
-                            80
+                            80/255.0f
                         }
                         Color(it.red, it.green, it.blue, alpha)
                     } ?: Color.Transparent,
@@ -631,12 +642,12 @@ fun TermInput(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            label = { Text(stringResource(id = Res.string.learning_term_title_hint.resourceId)) },
+            label = { Text(stringResource(Res.string.learning_term_title_hint)) },
             isError = hasError,
             trailingIcon = {
                 if (hasError) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_error_24),
+                        painter = painterResource(Res.drawable.ic_error_24),
                         contentDescription = null
                     )
                 }

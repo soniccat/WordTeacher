@@ -33,8 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
@@ -78,6 +76,7 @@ import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPadding
@@ -88,7 +87,20 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.dashboard_title
+import wordteacher.shared.generated.resources.ic_field_search_24
+import wordteacher.shared.generated.resources.ic_learning
+import wordteacher.shared.generated.resources.ic_tab_article_24
+import wordteacher.shared.generated.resources.ic_tab_settings_24
+import wordteacher.shared.generated.resources.tab_articles
+import wordteacher.shared.generated.resources.tab_dashboard_24
+import wordteacher.shared.generated.resources.tab_definitions
+import wordteacher.shared.generated.resources.tab_learning
+import wordteacher.shared.generated.resources.tab_settings
 
 class MainActivity : AppCompatActivity(), Router {
     private val bottomBarTabs = listOf(
@@ -535,7 +547,7 @@ class MainActivity : AppCompatActivity(), Router {
                     },
                     label = {
                         Text(
-                            stringResource(id = tab.nameRes),
+                            stringResource(tab.name),
                             color = color
                         )
                     },
@@ -565,12 +577,12 @@ class MainActivity : AppCompatActivity(), Router {
     }
 }
 
-sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
-    data object Dashboard : ScreenTab(Res.string.dashboard_title.resourceId, MR.images.tab_dashboard_24.drawableResId, TabDecomposeComponent.ChildConfiguration.DashboardConfiguration::class.java)
-    data object Definitions : ScreenTab(Res.string.tab_definitions.resourceId, R.drawable.ic_field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
-    data object CardSets : ScreenTab(Res.string.tab_learning.resourceId, R.drawable.ic_learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
-    data object Articles : ScreenTab(Res.string.tab_articles.resourceId, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
-    data object Settings : ScreenTab(Res.string.tab_settings.resourceId, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
+sealed class ScreenTab(val name: StringResource, val iconRes: DrawableResource, val decomposeChildConfigClass: Class<*>) {
+    data object Dashboard : ScreenTab(Res.string.dashboard_title, Res.drawable.tab_dashboard_24, TabDecomposeComponent.ChildConfiguration.DashboardConfiguration::class.java)
+    data object Definitions : ScreenTab(Res.string.tab_definitions, Res.drawable.ic_field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+    data object CardSets : ScreenTab(Res.string.tab_learning, Res.drawable.ic_learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
+    data object Articles : ScreenTab(Res.string.tab_articles, Res.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
+    data object Settings : ScreenTab(Res.string.tab_settings, Res.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
 }
 
 const val EXTRA_ARTICLE_ID = "articleId"

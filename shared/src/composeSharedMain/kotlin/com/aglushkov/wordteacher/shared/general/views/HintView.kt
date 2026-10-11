@@ -33,8 +33,9 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.settings.HintInlineContent
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.toAttributedString
+import org.jetbrains.compose.resources.painterResource
 import wordteacher.shared.generated.resources.Res
-import dev.icerock.moko.resources.compose.painterResource
+import wordteacher.shared.generated.resources.close_18
 
 @Composable
 fun HintView(
@@ -81,7 +82,7 @@ fun HintView(
                     inlineContent = HintInlineContent,
                 )
                 Icon(
-                    painter = painterResource(MR.images.close_18),
+                    painter = painterResource(Res.drawable.close_18),
                     contentDescription = null,
                     modifier = Modifier
                         .clip(CircleShape)

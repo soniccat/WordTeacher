@@ -19,9 +19,6 @@ import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resources.resolve
 import wordteacher.shared.generated.resources.Res
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.compose.localized
-import wordteacher.shared.generated.resources.Res
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import wordteacher.shared.generated.resources.error_default_loading_error

@@ -18,13 +18,23 @@ import com.aglushkov.wordteacher.shared.features.settings.vm.*
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.compose.localized
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.arrow_right_24
+import wordteacher.shared.generated.resources.google
+import wordteacher.shared.generated.resources.settings_dictconfigs
+import wordteacher.shared.generated.resources.settings_logging_enabled
+import wordteacher.shared.generated.resources.settings_logging_share
+import wordteacher.shared.generated.resources.settings_open_privacy_policy
+import wordteacher.shared.generated.resources.settings_title
+import wordteacher.shared.generated.resources.telegram
+import wordteacher.shared.generated.resources.vk
+import wordteacher.shared.generated.resources.yandex
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -101,10 +111,10 @@ private fun showSettingsItem(
                 Image(
                     painter = painterResource(
                         when (networkType) {
-                            SpaceAuthService.NetworkType.Google -> MR.images.google
-                            SpaceAuthService.NetworkType.VKID -> MR.images.vk
-                            SpaceAuthService.NetworkType.YandexId -> MR.images.yandex
-                            SpaceAuthService.NetworkType.Telegram -> MR.images.telegram
+                            SpaceAuthService.NetworkType.Google -> Res.drawable.google
+                            SpaceAuthService.NetworkType.VKID -> Res.drawable.vk
+                            SpaceAuthService.NetworkType.YandexId -> Res.drawable.yandex
+                            SpaceAuthService.NetworkType.Telegram -> Res.drawable.telegram
                         }
                     ),
                     contentDescription = null,
@@ -143,7 +153,7 @@ private fun showSettingsItem(
                 },
             trailing = {
                 Icon(
-                    painter = painterResource(MR.images.arrow_right_24),
+                    painter = painterResource(Res.drawable.arrow_right_24),
                     contentDescription = null,
                     tint = LocalContentColor.current
                 )

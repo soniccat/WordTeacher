@@ -23,7 +23,6 @@
 
         <!-- Styles -->
         <item name="toolbarStyle">@style/MyToolbarStyle</item>
-        <item name="android:searchViewStyle">@style/SearchViewStyle</item>
 
         <!-- Word Card Style -->
         <item name="wordTitleTextAppearance">@style/TextAppearance.MaterialComponents.Headline5</item>
@@ -40,12 +39,6 @@
 
         <!-- Compose Dialog -->
         <item name="android:dialogTheme">@style/DialogWindowTheme</item>
-    </style>
-
-    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
-        <item name="android:searchIcon">@drawable/ic_field_search_24</item>
-        <item name="android:closeIcon">@drawable/ic_field_close_24</item>
-        <item name="android:hint">@string/search</item>
     </style>
 
     <style name="MyToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
@@ -80,6 +73,5 @@
 
         <!-- Styles -->
         <item name="toolbarStyle">@style/MyToolbarStyle</item>
-        <item name="android:searchViewStyle">@style/SearchViewStyle</item>
     </style>
 </resources>

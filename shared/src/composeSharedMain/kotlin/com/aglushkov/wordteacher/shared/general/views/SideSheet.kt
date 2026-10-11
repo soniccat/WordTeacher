@@ -45,11 +45,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.sidesheet_close
+import wordteacher.shared.generated.resources.sidesheet_default_error_message
+import wordteacher.shared.generated.resources.sidesheet_exposed_dropdown
+import wordteacher.shared.generated.resources.sidesheet_navigation_menu
+import wordteacher.shared.generated.resources.sidesheet_side_sheet
 
 // The code is based on Drawer.kt
 

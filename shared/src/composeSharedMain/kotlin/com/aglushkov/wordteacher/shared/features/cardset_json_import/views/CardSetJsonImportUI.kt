@@ -26,12 +26,14 @@ import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import wordteacher.shared.generated.resources.add_article_done
 import wordteacher.shared.generated.resources.add_article_field_text_hint
 import wordteacher.shared.generated.resources.cardset_json_import_check
 import wordteacher.shared.generated.resources.cardset_json_import_enrich
 import wordteacher.shared.generated.resources.cardset_json_import_title
+import wordteacher.shared.generated.resources.close_24
 
 @Composable
 fun CardSetJsonImportUIDialog(
@@ -50,7 +52,7 @@ fun CardSetJsonImportUIDialog(
                     onClick = { vm.onCancelPressed() }
                 ) {
                     Icon(
-                        painter = painterResource(MR.images.close_24),
+                        painter = painterResource(Res.drawable.close_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )

@@ -27,7 +27,10 @@ import com.aglushkov.wordteacher.android_app.features.textaction.TextActionActiv
 import com.aglushkov.wordteacher.shared.general.DarkWindowBackground
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.views.dpToPx
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getString
 import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.cardset_info_import_action
 import java.lang.ref.WeakReference
 
 
@@ -70,7 +73,7 @@ class WebLinkOpenerImpl: WebLinkOpener {
                             }
                         )
                     }!!.toBitmap(),
-                    Res.string.cardset_info_import_action.getString(activity),
+                    runBlocking { getString(Res.string.cardset_info_import_action) },
                     PendingIntent.getActivity(
                         activity.applicationContext,
                         0,

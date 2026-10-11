@@ -9,8 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import com.aglushkov.wordteacher.shared.general.LocalDimens
+import org.jetbrains.compose.resources.painterResource
 import wordteacher.shared.generated.resources.Res
-import dev.icerock.moko.resources.compose.painterResource
+import wordteacher.shared.generated.resources.start_learning_rounded_24
 
 @Composable
 fun StartLearningButton(
@@ -20,7 +21,7 @@ fun StartLearningButton(
     )
 ) {
     Icon(
-        painterResource(MR.images.start_learning_rounded_24),
+        painterResource(Res.drawable.start_learning_rounded_24),
         null,
         modifier = Modifier.clip(CircleShape).then(modifier).padding(contentPadding),
         tint = MaterialTheme.colors.secondary

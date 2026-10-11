@@ -16,6 +16,10 @@ plugins {
     alias(libs.plugins.kapt)
 }
 
+compose.resources {
+    publicResClass = true
+}
+
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xopt-in=kotlin.time.ExperimentalTime")

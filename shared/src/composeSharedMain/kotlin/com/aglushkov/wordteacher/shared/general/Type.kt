@@ -11,7 +11,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import dev.icerock.moko.resources.compose.colorResource
 import wordteacher.shared.generated.resources.Res
 
 // Set of Material typography styles to start with
@@ -65,12 +64,12 @@ data class AppTypography(
         listItemSubtitle = materialTypography.body2.copy(color = colors.onBackground.copy(alpha = ContentAlpha.medium))
 
         wordDefinitionTitle = materialTypography.h5.copy(color = colors.secondary)
-        wordDefinitionProvidedBy = materialTypography.subtitle2.copy(color = colorResource(MR.colors.word_provided_by))
+        wordDefinitionProvidedBy = materialTypography.subtitle2.copy(color = providedByColor)
         wordDefinitionPartOfSpeech = materialTypography.subtitle2//.copy(color = colorResource(MR.colors.word_partOfSpeech))
         articleDate = wordDefinitionProvidedBy
         noteDate = wordDefinitionProvidedBy
         notePlaceholder = noteText.copy(color = colors.secondary)
-        learningHint = materialTypography.body2.copy(color = colorResource(MR.colors.hintColor))
+        learningHint = materialTypography.body2.copy(color = hintColor)
 
         hintStyle = materialTypography.subtitle1.copy(
             color = colors.onSurface

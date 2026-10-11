@@ -24,9 +24,12 @@ import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.add_white_24
 import wordteacher.shared.generated.resources.articles_no_articles
+import wordteacher.shared.generated.resources.articles_title
 
 @Composable
 fun ArticlesUI(
@@ -86,7 +89,7 @@ fun ArticlesUI(
                 )
             ) {
                 Icon(
-                    painter = painterResource(MR.images.add_white_24),
+                    painter = painterResource(Res.drawable.add_white_24),
                     contentDescription = null
                 )
             }

@@ -22,8 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.android_app.EXTRA_ARTICLE_ID
 import com.aglushkov.wordteacher.android_app.MainActivity
@@ -43,12 +41,20 @@ import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
 import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeComponentRouter
 import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPaddingWithIME
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.create_note
+import wordteacher.shared.generated.resources.field_search_24
+import wordteacher.shared.generated.resources.tab_add_article
+import wordteacher.shared.generated.resources.tab_definitions
 
 class TextActionActivity: AppCompatActivity() {
     private lateinit var textActionDecomposeComponent: TextActionDecomposeComponent
@@ -264,14 +270,14 @@ class TextActionActivity: AppCompatActivity() {
                     },
                     icon = {
                         Icon(
-                            painter = painterResource(tab.iconRes),
+                            painter = painterResource(tab.icon),
                             contentDescription = null,
                             tint = color
                         )
                     },
                     label = {
                         Text(
-                            stringResource(id = tab.nameRes),
+                            stringResource(tab.name),
                             color = color
                         )
                     }
@@ -292,9 +298,9 @@ class TextActionActivity: AppCompatActivity() {
         this@TextActionActivity.finish()
     }
 
-    sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
-        object Definitions : ScreenTab(Res.string.tab_definitions.resourceId, MR.images.field_search_24.drawableResId, TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
-        object AddArticle : ScreenTab(Res.string.tab_add_article.resourceId, MR.images.create_note.drawableResId, TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration::class.java)
+    sealed class ScreenTab(val name: StringResource, val icon: DrawableResource, val decomposeChildConfigClass: Class<*>) {
+        object Definitions : ScreenTab(Res.string.tab_definitions, Res.drawable.field_search_24, TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+        object AddArticle : ScreenTab(Res.string.tab_add_article, Res.drawable.create_note, TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration::class.java)
 //        object Notes : ScreenTab(Res.string.tab_notes.resourceId, R.drawable.ic_tab_notes, TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration::class.java)
     }
 }

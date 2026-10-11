@@ -60,8 +60,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.add_white_24
+import wordteacher.shared.generated.resources.arrow_back_24
 import wordteacher.shared.generated.resources.cardset_add_label
+import wordteacher.shared.generated.resources.close_18
+import wordteacher.shared.generated.resources.create_note
+import wordteacher.shared.generated.resources.info_24
+import wordteacher.shared.generated.resources.start_learning_24
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -101,7 +108,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                     onClick = { vm.onBackPressed() }
                 ) {
                     Icon(
-                        painter = painterResource(MR.images.arrow_back_24),
+                        painter = painterResource(Res.drawable.arrow_back_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )
@@ -120,7 +127,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                     onClick = { vm.onInfoPressed() }
                 ) {
                     Icon(
-                        painter = painterResource(MR.images.info_24),
+                        painter = painterResource(Res.drawable.info_24),
                         contentDescription = null,
                         tint = LocalContentColor.current
                     )
@@ -199,7 +206,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                         )
                     ) {
                         Icon(
-                            painter = painterResource(MR.images.add_white_24),
+                            painter = painterResource(Res.drawable.add_white_24),
                             contentDescription = null
                         )
                     }
@@ -211,7 +218,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                         )
                     ) {
                         Icon(
-                            painter = painterResource(MR.images.start_learning_24),
+                            painter = painterResource(Res.drawable.start_learning_24),
                             contentDescription = null
                         )
                     }
@@ -586,7 +593,7 @@ private fun CardSetDefinitionView(
             )
             if (isEditable) {
                 Icon(
-                    painter = painterResource(MR.images.close_18),
+                    painter = painterResource(Res.drawable.close_18),
                     contentDescription = null,
                     modifier = Modifier
                         .clip(CircleShape)
@@ -705,7 +712,7 @@ private fun CreateCardView(
             onClick = onClicked
         ) {
             Icon(
-                painter = painterResource(MR.images.create_note),
+                painter = painterResource(Res.drawable.create_note),
                 contentDescription = null,
                 tint = MaterialTheme.colors.secondary
             )

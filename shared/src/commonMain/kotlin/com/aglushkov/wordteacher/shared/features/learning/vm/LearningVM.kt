@@ -25,6 +25,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.addElements
 import com.aglushkov.wordteacher.shared.general.extensions.collectUntilLoaded
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
+import com.aglushkov.wordteacher.shared.general.resource.Color
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepository
@@ -571,18 +572,18 @@ open class LearningVMImpl(
 }
 
 private val MatchColors = listOf(
-    Color(0xCE00F1FF),
-    Color(0xD8302BFF),
-    Color(0x584383FF),
-    Color(0xE06F1FFF),
-    Color(0xDF3E6DFF),
-    Color(0xEDD32FFF),
-    Color(0x309449FF),
-    Color(0x98F0AEFF),
-    Color(0xBEAE13FF),
-    Color(0xE40202FF),
-    Color(0x14E2B9FF),
-    Color(0x5F5D5DFF),
+    Color(0xFFCE00F1),
+    Color(0xFFD8302B),
+    Color(0xFF584383),
+    Color(0xFFE06F1F),
+    Color(0xFFDF3E6D),
+    Color(0xFFEDD32F),
+    Color(0xFF309449),
+    Color(0xFF98F0AE),
+    Color(0xFFBEAE13),
+    Color(0xFFE40202),
+    Color(0xFF14E2B9),
+    Color(0xFF5F5D5D),
 )
 
 private const val SETTING_PLAY_SOUND_ON_CHALLENGE_COMPLETION = "playSoundOnTypingCompletion"
