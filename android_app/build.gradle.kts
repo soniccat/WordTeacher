@@ -21,7 +21,6 @@ if (telegramPropFile.exists()) {
     }
 }
 
-
 repositories {
     google()
     mavenCentral()
@@ -74,17 +73,17 @@ if (debugKeystorePropFile.exists()) {
 
 dependencies{
         implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.appcompat)
-            implementation(projects.shared)
-            implementation(libs.dagger)
-            implementation(libs.datastorePreference)
-            implementation(libs.vkId)
-            implementation(libs.yandexId)
-            implementation(libs.playServicesAuth)
-            implementation(libs.androidXBrowser)
-            implementation(libs.telegramLogin)
-            implementation(libs.workManagerRuntime)
+        implementation(libs.androidx.activity.compose)
+        implementation(libs.androidx.appcompat)
+        implementation(projects.shared)
+        implementation(libs.dagger)
+        implementation(libs.datastorePreference)
+        implementation(libs.vkId)
+        implementation(libs.yandexId)
+        implementation(libs.playServicesAuth)
+        implementation(libs.androidXBrowser)
+        implementation(libs.telegramLogin)
+        implementation(libs.workManagerRuntime)
 }
 
 android {

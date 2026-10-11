@@ -144,4 +144,5 @@ playServicesPlugin = { id = "com.google.gms.google-services", version.ref = "pla
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 android-test = { id = "com.android.test", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }

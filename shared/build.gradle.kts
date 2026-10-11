@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
 
@@ -23,11 +23,21 @@ kotlin {
         freeCompilerArgs.add("-Xopt-in=kotlin.time.ExperimentalTime")
     }
 
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    android {
+        namespace = "com.aglushkov.wordteacher.shared"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
+        androidResources.enable = true
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
+
+        withJava() // to repair ksp task running (:kspAndroidMain)
     }
 
     jvm()
@@ -71,6 +81,10 @@ kotlin {
             // Only for encoding and decoding HTML entities
             implementation("com.mohamedrejeb.ksoup:ksoup-entities:$version")
             api(libs.uuid)
+
+            commonTest.dependencies {
+                implementation(kotlin("test"))
+            }
         }
 
         val composeSharedMain by creating {
@@ -100,7 +114,7 @@ kotlin {
                 api(libs.androidx.ui.tooling)
             }
         }
-        val androidUnitTest by getting {
+        val androidHostTest by getting {
             dependencies {
                 implementation(libs.okioFakeFileSystem)
                 implementation(libs.kotlinTestJUnit)
@@ -119,24 +133,6 @@ kotlin {
             }
         }
     }
-}
-
-android {
-    namespace = "com.aglushkov.wordteacher.shared"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-    androidResources.enable = true
 }
 
 
