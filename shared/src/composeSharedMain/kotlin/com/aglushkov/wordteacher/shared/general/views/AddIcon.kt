@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.general.LocalDimens
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import dev.icerock.moko.resources.compose.painterResource
 
 enum class AddIconStyle{

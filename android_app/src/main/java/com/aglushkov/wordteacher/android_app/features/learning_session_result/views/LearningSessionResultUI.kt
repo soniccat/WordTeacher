@@ -30,7 +30,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import java.util.*
 
 //@ExperimentalUnitApi
@@ -83,7 +83,7 @@ fun LearningSessionResultUI(
         ) {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = MR.strings.learning_session_result_title.resourceId))
+                    Text(text = stringResource(id = Res.string.learning_session_result_title.resourceId))
                 },
                 actions = actions
             )
@@ -112,7 +112,7 @@ fun LearningSessionResultUI(
 
         ExtendedFloatingActionButton(
             text = {
-                Text(stringResource(id = MR.strings.done.resourceId).uppercase(Locale.getDefault()))
+                Text(stringResource(id = Res.string.done.resourceId).uppercase(Locale.getDefault()))
             },
             onClick = { onClose() },
             modifier = Modifier

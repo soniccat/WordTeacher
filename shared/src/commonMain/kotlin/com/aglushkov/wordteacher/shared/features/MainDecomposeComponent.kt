@@ -33,6 +33,7 @@ import com.aglushkov.wordteacher.shared.features.webauth.WebAuthDecomposeCompone
 import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthRouter
 import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthVM
 import com.aglushkov.wordteacher.shared.general.*
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
@@ -42,9 +43,9 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
-import dev.icerock.moko.resources.desc.StringDesc
 import io.ktor.util.reflect.instanceOf
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.StringResource
 
 interface MainDecomposeComponent:
     CardSetsRouter,
@@ -73,7 +74,7 @@ interface MainDecomposeComponent:
     fun back()
     fun popToRoot()
     override fun openWebAuth(networkType: SpaceAuthService.NetworkType)
-    override fun onError(text: StringDesc)
+    override fun onError(text: StringResourceWrapper)
 
     sealed class Child(
         val inner: Clearable?
@@ -262,7 +263,7 @@ class MainDecomposeComponentImpl(
         )
     }
 
-    override fun onError(text: StringDesc) {
+    override fun onError(text: StringResourceWrapper) {
         onError(text, null, null)
     }
 

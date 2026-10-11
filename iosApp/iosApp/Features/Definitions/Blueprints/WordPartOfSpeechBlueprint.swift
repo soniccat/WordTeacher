@@ -19,6 +19,6 @@ class WordPartOfSpeechBlueprint: Blueprint {
         view.contentView.layoutMargins.top = Style.cellPartOfSpeechTopMargin
         view.contentView.layoutMargins.bottom = Style.cellHeaderBottomMargin
         view.label.applyTextAppearance(Style.wordPartOfSpeechTextAppearance)
-        view.label.text = viewItem.firstItem()?.localized()
+        view.label.text = viewItem.firstItem()?.resolve()
     }
 }

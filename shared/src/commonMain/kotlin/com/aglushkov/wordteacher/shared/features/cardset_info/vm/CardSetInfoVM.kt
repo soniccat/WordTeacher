@@ -9,19 +9,18 @@ import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl.FocusL
 import com.aglushkov.wordteacher.shared.features.cardset.vm.CardSetVMImpl.PendingEvent
 import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
-import com.aglushkov.wordteacher.shared.general.StringDescThrowable
+import com.aglushkov.wordteacher.shared.general.StringResourceThrowable
 import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.CardSetInfo
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.ResourceStringDesc
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +34,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable
+import wordteacher.shared.generated.resources.cardset_info_error
+import wordteacher.shared.generated.resources.cardset_info_error_empty_name
 import kotlin.time.ExperimentalTime
 
 interface CardSetInfoVM: Clearable {
@@ -96,7 +97,7 @@ interface CardSetInfoVM: Clearable {
 
     data class UIState(
         val name: String,
-        val nameError: StringDesc?,
+        val nameError: StringResourceWrapper?,
         val description: String,
         val source: String?,
         val sourceLinks: List<Link>,
@@ -157,7 +158,7 @@ open class CardSetInfoVMImpl(
     ) { cardSetRes, inputState, focusEvent ->
         cardSetRes.mapLoadedData(
             errorTransformer = {
-                StringDescThrowable(ResourceStringDesc(MR.strings.cardset_info_error), it)
+                StringResourceThrowable(StringResourceWrapper.String(Res.string.cardset_info_error), it)
             }
         ) { cardSet: CardSet ->
             val source = inputState.source ?: cardSet.info.source
@@ -167,7 +168,7 @@ open class CardSetInfoVMImpl(
                 nameError = if (inputState.isNameValid) {
                     null
                 } else {
-                    StringDesc.Resource(MR.strings.cardset_info_error_empty_name)
+                    StringResourceWrapper.String(Res.string.cardset_info_error_empty_name)
                 },
                 description = inputState.description ?: cardSet.info.description,
                 source = source,

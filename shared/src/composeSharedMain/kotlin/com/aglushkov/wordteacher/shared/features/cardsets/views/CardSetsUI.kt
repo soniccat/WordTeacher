@@ -42,13 +42,12 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
 import com.aglushkov.wordteacher.shared.general.resource.onData
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.general.views.*
 import com.aglushkov.wordteacher.shared.model.CardSetTag
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.painterResource
+import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.launch
-import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 
@@ -166,8 +165,8 @@ fun CardSetsUI(
                     LoadingStatusView(
                         resource = searchCardSets,
                         loadingText = null,
-                        errorText = vm.getErrorText().localized(),
-                        emptyText = vm.getEmptySearchText().localized(),
+                        errorText = vm.getErrorText().resolve(),
+                        emptyText = vm.getEmptySearchText().resolve(),
                     ) {
                         vm.onTryAgainSearchClicked()
                     }
@@ -200,7 +199,7 @@ fun CardSetsUI(
                     LoadingStatusView(
                         resource = cardSets,
                         loadingText = null,
-                        errorText = vm.getErrorText().localized(),
+                        errorText = vm.getErrorText().resolve(),
                     ) {
                         vm.onTryAgainClicked()
                     }
@@ -293,7 +292,7 @@ private fun CardSetsViewItem(
     newCardSetState: TextFieldCellState,
 ) = when (item) {
     is CreateCardSetViewItem -> TextFieldCellView(
-        placeholder = item.placeholder.localized(),
+        placeholder = item.placeholder.resolve(),
         textFieldValue = newCardSetState.rememberTextFieldValueState(),
         focusRequester = newCardSetState.focusRequester,
         onTextChanged = {
@@ -305,7 +304,7 @@ private fun CardSetsViewItem(
         }
     )
     is SectionViewItem -> ListSectionCell(
-        item.name.localized(),
+        item.name.resolve(),
         Modifier.padding(
             top = if (item.isTop) 0.dp else 16.dp
         )

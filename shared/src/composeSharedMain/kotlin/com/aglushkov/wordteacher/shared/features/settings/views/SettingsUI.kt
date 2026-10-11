@@ -13,7 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.features.settings.vm.*
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
@@ -41,7 +41,7 @@ fun SettingsUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(stringResource(MR.strings.settings_title)) },
+                title = { Text(stringResource(Res.string.settings_title)) },
             )
 
             LazyColumn(
@@ -71,7 +71,7 @@ private fun showSettingsItem(
 ) = when (item) {
     is SettingsViewTitleItem -> {
         ListItem (
-            text = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsTitle) }
+            text = { Text(item.firstItem().resolve(), style = LocalAppTypography.current.settingsTitle) }
         )
     }
     is SettingsViewTextItem -> {
@@ -85,7 +85,7 @@ private fun showSettingsItem(
                     0.dp
                 }
             ),
-            content = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsText) }
+            content = { Text(item.firstItem().resolve(), style = LocalAppTypography.current.settingsText) }
         )
     }
     is SettingsViewLoading -> {
@@ -124,7 +124,7 @@ private fun showSettingsItem(
             onClick = { vm.onSignOutClicked() },
             modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
         ) {
-            Text(text = item.firstItem().localized())
+            Text(text = item.firstItem().resolve())
         }
     }
     is SettingsViewAuthRefreshButtonItem -> {
@@ -132,7 +132,7 @@ private fun showSettingsItem(
             onClick = { vm.onAuthRefreshClicked() },
             modifier = Modifier.padding(start = LocalDimens.current.contentPadding, bottom = LocalDimens.current.contentPadding)
         ) {
-            Text(text = item.firstItem().localized())
+            Text(text = item.firstItem().resolve())
         }
     }
     is SettingsOpenDictConfigsItem -> {
@@ -150,7 +150,7 @@ private fun showSettingsItem(
             },
         ){
             Text(
-                stringResource(MR.strings.settings_dictconfigs),
+                stringResource(Res.string.settings_dictconfigs),
                 style = LocalAppTypography.current.settingsTitle
             )
         }
@@ -160,7 +160,7 @@ private fun showSettingsItem(
             onClick = { vm.onUploadWordFrequencyFileClicked() },
             modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
         ) {
-            Text(text = item.firstItem().localized())
+            Text(text = item.firstItem().resolve())
         }
     }
     is SettingsResetHintsItem -> {
@@ -168,7 +168,7 @@ private fun showSettingsItem(
             onClick = { vm.onResetHintsClicked() },
             modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
         ) {
-            Text(text = item.firstItem().localized())
+            Text(text = item.firstItem().resolve())
         }
     }
     is SettingsResetMisspellingDBItem -> {
@@ -176,7 +176,7 @@ private fun showSettingsItem(
             onClick = { vm.onResetMisspellingDBClicked() },
             modifier = Modifier.padding(start = LocalDimens.current.contentPadding)
         ) {
-            Text(text = item.firstItem().localized())
+            Text(text = item.firstItem().resolve())
         }
     }
     is SettingsLogsConfigsItem -> {
@@ -196,7 +196,7 @@ private fun showSettingsItem(
                     onCheckedChange = null
                 )
             },
-            content = { Text(stringResource(MR.strings.settings_logging_enabled)) },
+            content = { Text(stringResource(Res.string.settings_logging_enabled)) },
         )
 
         if (item.paths.isNotEmpty()) {
@@ -223,7 +223,7 @@ private fun showSettingsItem(
                         start = LocalDimens.current.contentPadding,
                     )
                 ) {
-                    Text(stringResource(MR.strings.settings_logging_share))
+                    Text(stringResource(Res.string.settings_logging_share))
                 }
             }
         } else {
@@ -238,7 +238,7 @@ private fun showSettingsItem(
                 },
             contentPadding = PaddingValues(LocalDimens.current.contentPadding),
             content = {
-                Text(stringResource(MR.strings.settings_open_privacy_policy))
+                Text(stringResource(Res.string.settings_open_privacy_policy))
             },
         )
     }

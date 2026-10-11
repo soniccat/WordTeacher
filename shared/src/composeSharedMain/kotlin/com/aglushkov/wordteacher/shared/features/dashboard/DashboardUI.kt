@@ -57,7 +57,9 @@ import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleIt
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.toAnnotatedString
 import com.aglushkov.wordteacher.shared.general.views.CustomAnnotatedTextListItem
@@ -66,10 +68,12 @@ import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.StartLearningButton
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.desc.ResourceStringDesc
-import dev.icerock.moko.resources.compose.localized
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.dashboard_open_cardsets
+import wordteacher.shared.generated.resources.dashboard_title
+import wordteacher.shared.generated.resources.default_collapse
+import wordteacher.shared.generated.resources.default_expand
 
 @Composable
 fun DashboardUI(
@@ -86,7 +90,7 @@ fun DashboardUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(stringResource(MR.strings.dashboard_title)) },
+                title = { Text(stringResource(Res.string.dashboard_title)) },
             )
 
             if (items?.isNotEmpty() == true) {
@@ -117,7 +121,7 @@ fun DashboardUI(
                 LoadingStatusView(
                     modifier = modifier,
                     resource = itemsState,
-                    errorText = vm.getErrorText(itemsState)?.localized()
+                    errorText = vm.getErrorText(itemsState)?.resolve()
                 )
             }
         }
@@ -230,9 +234,9 @@ fun dashboardItem(
         ) {
             Text(
                 if (item.isExpanded) {
-                    ResourceStringDesc(MR.strings.default_collapse).localized()
+                    stringResource(Res.string.default_collapse)
                 } else {
-                    ResourceStringDesc(MR.strings.default_expand).localized()
+                    stringResource(Res.string.default_expand)
                 },
                 color = contentColorFor(MaterialTheme.colors.primarySurface)
             )
@@ -258,7 +262,7 @@ fun dashboardItem(
             )
         ) {
             Text(
-                ResourceStringDesc(MR.strings.dashboard_open_cardsets).localized(),
+                StringResourceWrapper.String(Res.string.dashboard_open_cardsets).resolve(),
                 color = contentColorFor(MaterialTheme.colors.primarySurface)
             )
         }
@@ -269,11 +273,11 @@ fun dashboardItem(
             modifier = Modifier.padding(LocalDimens.current.contentPadding).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(item.errorText.localized(), style = LocalAppTypography.current.settingsText)
+            Text(item.errorText.resolve(), style = LocalAppTypography.current.settingsText)
             Button(
                 onClick = { vm.onDashboardTryAgainClicked() },
             ) {
-                Text(text = item.tryAgainActionText.localized())
+                Text(text = item.tryAgainActionText.resolve())
             }
         }
     }
@@ -311,7 +315,7 @@ fun dashboardItem(
         ListItem (
             modifier = Modifier.padding(top = 8.dp),
             text = {
-                Text(item.firstItem().localized(),
+                Text(item.firstItem().resolve(),
                 style = LocalAppTypography.current.settingsTitle)
             }
         )

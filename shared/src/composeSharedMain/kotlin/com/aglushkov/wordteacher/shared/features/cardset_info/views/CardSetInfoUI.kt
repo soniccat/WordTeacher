@@ -74,14 +74,20 @@ import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.OutlinedTextFieldWithError
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.desc.StringDesc
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.cardset_add_label
+import wordteacher.shared.generated.resources.cardset_info_enable_sharing
+import wordteacher.shared.generated.resources.cardset_info_field_description_hint
+import wordteacher.shared.generated.resources.cardset_info_field_name_hint
+import wordteacher.shared.generated.resources.cardset_info_field_source_hint
+import wordteacher.shared.generated.resources.cardset_info_tag_title
+import wordteacher.shared.generated.resources.cardset_info_title
 import java.awt.event.FocusEvent
 
 
@@ -101,7 +107,7 @@ fun CardSetInfoUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(text = stringResource(MR.strings.cardset_info_title)) },
+                title = { Text(text = stringResource(Res.string.cardset_info_title)) },
                 navigationIcon = {
                     IconButton(
                         onClick = { vm.router?.onClosed() }
@@ -180,7 +186,7 @@ fun CardSetInfoFieldsUI(
                 start = LocalDimens.current.contentPadding,
                 end = LocalDimens.current.contentPadding,
             ),
-            hint = stringResource(MR.strings.cardset_info_field_name_hint),
+            hint = stringResource(Res.string.cardset_info_field_name_hint),
             errorText = uiState.nameError,
             focusRequester = run {
                 val event = uiState.focusEvent
@@ -205,7 +211,7 @@ fun CardSetInfoFieldsUI(
                 .sizeIn(minHeight = with(LocalDensity.current) {
                     (42 * 2).sp.toDp()
                 }),
-            label = { Text(stringResource(MR.strings.cardset_info_field_description_hint)) },
+            label = { Text(stringResource(Res.string.cardset_info_field_description_hint)) },
             readOnly = !uiState.isEditable,
         )
 
@@ -219,7 +225,7 @@ fun CardSetInfoFieldsUI(
                     end = LocalDimens.current.contentPadding,
                 )
                 .fillMaxWidth(),
-            label = { Text(stringResource(MR.strings.cardset_info_field_source_hint)) },
+            label = { Text(stringResource(Res.string.cardset_info_field_source_hint)) },
             readOnly = !uiState.isEditable,
         )
 
@@ -246,7 +252,7 @@ fun CardSetInfoFieldsUI(
                         }
                     )
 //                    Icon(
-//                        painterResource(MR.images.download_for_offline),
+//                        painterResource(MR.drawable.download_for_offline),
 //                        null,
 //                        modifier = Modifier
 //                            .padding(top = 6.dp)
@@ -272,7 +278,7 @@ fun CardSetInfoFieldsUI(
                     )
             ) {
                 Text(
-                    text = stringResource(MR.strings.cardset_info_enable_sharing),
+                    text = stringResource(Res.string.cardset_info_enable_sharing),
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .weight(1.0f)
@@ -287,7 +293,7 @@ fun CardSetInfoFieldsUI(
         // tags
         if (uiState.tags.isNotEmpty() || uiState.isEditable) {
             Text(
-                text = stringResource(MR.strings.cardset_info_tag_title),
+                text = stringResource(Res.string.cardset_info_tag_title),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 style = LocalAppTypography.current.listItemTitle
             )
@@ -357,7 +363,7 @@ fun CardSetInfoFieldsUI(
                                 contentColor = MaterialTheme.colors.onSecondary,
                                 content = {
                                     Text(
-                                        text = stringResource(MR.strings.cardset_add_label),
+                                        text = stringResource(Res.string.cardset_add_label),
                                         modifier = Modifier.padding(horizontal = 4.dp)
                                     )
                                 }

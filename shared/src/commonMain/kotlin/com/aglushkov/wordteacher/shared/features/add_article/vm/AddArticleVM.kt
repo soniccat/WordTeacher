@@ -4,12 +4,11 @@ import androidx.datastore.preferences.core.Preferences
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.*
-import dev.icerock.moko.resources.desc.Raw
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.onData
@@ -22,7 +21,6 @@ import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.Article
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
-import com.aglushkov.wordteacher.shared.res.MR
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -32,10 +30,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.add_article_error_empty_title
+import wordteacher.shared.generated.resources.article_error
+import wordteacher.shared.generated.resources.error_default
 
 interface AddArticleRouter {
     fun onArticleCreated(createdArticleId: Long?)
-    fun onError(text: StringDesc)
+    fun onError(text: StringResourceWrapper)
 }
 
 interface AddArticleVM: Clearable {
@@ -52,7 +54,7 @@ interface AddArticleVM: Clearable {
     fun onCompletePressed()
     fun onNeedToCreateSetPressed()
     fun onTryAgainPressed()
-    fun getErrorText(): StringDesc?
+    fun getErrorText(): StringResourceWrapper?
     fun onHintClicked(hintType: HintType)
 
     @Serializable
@@ -66,7 +68,7 @@ interface AddArticleVM: Clearable {
 
     data class UIState(
         val title: String,
-        val titleError: StringDesc?,
+        val titleError: StringResourceWrapper?,
         val text: String,
         val needToCreateSet: Boolean,
         val showNeedToCreateCardSet: Boolean = true,
@@ -220,8 +222,8 @@ open class AddArticleVMImpl(
                     addingStateFlow.value.onError { e ->
                         Logger.exception("AddArticleVM.createArticle", e, TAG)
                         val errorText = e.message?.let {
-                            StringDesc.Raw(it)
-                        } ?: StringDesc.Resource(MR.strings.error_default)
+                            StringResourceWrapper.Raw(it)
+                        } ?: StringResourceWrapper.String(Res.string.error_default)
 
                         router?.onError(errorText)
                     }
@@ -247,14 +249,14 @@ open class AddArticleVMImpl(
     private fun updateTitleErrorFlow() {
         val data = uiStateFlow.value.data()
         if (data != null && data.title.isBlank()) {
-            uiStateFlow.updateLoadedData { it.copy(titleError = StringDesc.Resource(MR.strings.add_article_error_empty_title)) }
+            uiStateFlow.updateLoadedData { it.copy(titleError = StringResourceWrapper.String(Res.string.add_article_error_empty_title)) }
         } else {
             uiStateFlow.updateLoadedData { it.copy(titleError = null) }
         }
     }
 
-    override fun getErrorText(): StringDesc? {
-        return StringDesc.Resource(MR.strings.article_error)
+    override fun getErrorText(): StringResourceWrapper? {
+        return StringResourceWrapper.String(Res.string.article_error)
     }
 
     override fun onHintClicked(hintType: HintType) {

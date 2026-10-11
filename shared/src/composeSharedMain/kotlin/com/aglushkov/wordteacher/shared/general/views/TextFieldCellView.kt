@@ -25,8 +25,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.painterResource
+import org.jetbrains.compose.resources.painterResource
+import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.create_note
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -64,7 +65,7 @@ fun TextFieldCellView(
             if (!focusState.isFocused) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        painterResource(MR.images.create_note),
+                        painterResource(Res.drawable.create_note),
                         null,
                         Modifier.padding(end = 8.dp),
                         LocalAppTypography.current.notePlaceholder.color

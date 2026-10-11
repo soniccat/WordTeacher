@@ -49,7 +49,7 @@
     </style>
 
     <style name="MyToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
-        <!-- The base style relies on textColorPrimary and we just can't change it to white not to break
+        <!-- The values style relies on textColorPrimary and we just can't change it to white not to break
          text color in EditText and so on -->
         <item name="titleTextColor">?colorOnPrimary</item>
     </style>

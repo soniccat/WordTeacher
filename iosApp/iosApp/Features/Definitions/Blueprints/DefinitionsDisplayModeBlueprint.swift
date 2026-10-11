@@ -23,7 +23,7 @@ class DefinitionsDisplayModeBlueprint: Blueprint {
     func bind(view: V, viewItem: T) {
         let items = viewItem.items as! [DefinitionsDisplayMode]
         items.forEachIndexed { (mode, i) in
-            view.segmentedControl.setTitle(mode.toStringDesc().localized(), forSegmentAt: i)
+            view.segmentedControl.setTitle(mode.toStringResource().resolve(), forSegmentAt: i)
         }
         
         view.segmentedControl.selectedSegmentIndex = Int(viewItem.selectedIndex)

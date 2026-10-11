@@ -49,7 +49,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 
 // The code is based on Drawer.kt
 
@@ -408,11 +408,11 @@ private class Strings private constructor(@Suppress("unused") private val value:
 @Composable
 private fun getString(string: Strings): String {
     return when (string) {
-        Strings.NavigationMenu -> stringResource(MR.strings.sidesheet_navigation_menu)
-        Strings.CloseSideSheet -> stringResource(MR.strings.sidesheet_side_sheet)
-        Strings.CloseSheet -> stringResource(MR.strings.sidesheet_close)
-        Strings.DefaultErrorMessage -> stringResource(MR.strings.sidesheet_default_error_message)
-        Strings.ExposedDropdownMenu -> stringResource(MR.strings.sidesheet_exposed_dropdown)
+        Strings.NavigationMenu -> stringResource(Res.string.sidesheet_navigation_menu)
+        Strings.CloseSideSheet -> stringResource(Res.string.sidesheet_side_sheet)
+        Strings.CloseSheet -> stringResource(Res.string.sidesheet_close)
+        Strings.DefaultErrorMessage -> stringResource(Res.string.sidesheet_default_error_message)
+        Strings.ExposedDropdownMenu -> stringResource(Res.string.sidesheet_exposed_dropdown)
         else -> ""
     }
 }

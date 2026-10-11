@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.article_parser.ParsedArticle
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.exception
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.CardProgress
@@ -29,11 +30,9 @@ import com.aglushkov.wordteacher.shared.model.nlp.toPartOfSpeech
 import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.UNDEFINED_FREQUENCY
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.benasher44.uuid.Uuid
-import dev.icerock.moko.resources.desc.Raw
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -56,11 +55,12 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import wordteacher.shared.generated.resources.error_default
 import kotlin.time.ExperimentalTime
 
 interface CardSetJsonImportVM: Clearable {
     val jsonText: StateFlow<String>
-    val jsonTextErrorFlow: Flow<StringDesc?>
+    val jsonTextErrorFlow: Flow<StringResourceWrapper?>
     val eventFlow: Flow<Event>
 
     fun onJsonTextChanged(text: String)
@@ -141,7 +141,7 @@ open class CardSetJsonImportVMImpl(
     private val cardEnricher: CardEnricher,
 ): ViewModel(), CardSetJsonImportVM {
     override val jsonText = MutableStateFlow("")
-    override val jsonTextErrorFlow = MutableStateFlow<StringDesc?>(null)
+    override val jsonTextErrorFlow = MutableStateFlow<StringResourceWrapper?>(null)
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED) // TODO: replace with a list of strings
     override val eventFlow = eventChannel.receiveAsFlow()
@@ -168,7 +168,7 @@ open class CardSetJsonImportVMImpl(
                     val loadedText = loadText(text)
                     jsonText.value = loadedText
                 } catch (e: Throwable) {
-                    jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
+                    jsonTextErrorFlow.value = StringResourceWrapper.Raw(e.message.orEmpty())
                     e.printStackTrace()
                 }
             }
@@ -206,7 +206,7 @@ open class CardSetJsonImportVMImpl(
 
             } catch (e: Throwable) {
                 Logger.e(e.message.orEmpty(), TAG)
-                jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
+                jsonTextErrorFlow.value = StringResourceWrapper.Raw(e.message.orEmpty())
                 e.printStackTrace()
             }
         }
@@ -233,7 +233,7 @@ open class CardSetJsonImportVMImpl(
             )
         } catch (e: Throwable) {
             Logger.e(e.message.orEmpty(), TAG)
-            jsonTextErrorFlow.value = StringDesc.Raw(e.message.orEmpty())
+            jsonTextErrorFlow.value = StringResourceWrapper.Raw(e.message.orEmpty())
             return null
         }
     }
@@ -258,8 +258,8 @@ open class CardSetJsonImportVMImpl(
         } catch (e: Throwable) {
             Logger.exception("CardSetJsonImportVM.runSafely", e, TAG)
             val errorText = e.message?.let {
-                StringDesc.Raw(it)
-            } ?: StringDesc.Resource(MR.strings.error_default)
+                StringResourceWrapper.Raw(it)
+            } ?: StringResourceWrapper.String(Res.string.error_default)
 
             eventChannel.trySend(ErrorEvent(errorText))
         }

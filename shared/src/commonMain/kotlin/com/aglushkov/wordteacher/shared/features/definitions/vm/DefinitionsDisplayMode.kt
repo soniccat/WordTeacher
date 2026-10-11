@@ -1,15 +1,17 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
-import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
+import wordteacher.shared.generated.resources.definitions_displayMode_bySource
+import wordteacher.shared.generated.resources.definitions_displayMode_merge
 
 enum class DefinitionsDisplayMode {
     BySource,
     Merged;
 
-    fun toStringDesc() = when (this) {
-        BySource -> StringDesc.Resource(MR.strings.definitions_displayMode_bySource)
-        Merged -> StringDesc.Resource(MR.strings.definitions_displayMode_merge)
+    fun toStringResource() = when (this) {
+        BySource -> StringResourceWrapper.String(Res.string.definitions_displayMode_bySource)
+        Merged -> StringResourceWrapper.String(Res.string.definitions_displayMode_merge)
     }
 }

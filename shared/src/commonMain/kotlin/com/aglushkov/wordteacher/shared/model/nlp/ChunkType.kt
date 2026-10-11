@@ -1,8 +1,14 @@
 package com.aglushkov.wordteacher.shared.model.nlp
 
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
+import wordteacher.shared.generated.resources.word_phrase_adjective
+import wordteacher.shared.generated.resources.word_phrase_adverb
+import wordteacher.shared.generated.resources.word_phrase_noun
+import wordteacher.shared.generated.resources.word_phrase_preposition
+import wordteacher.shared.generated.resources.word_phrase_unknown
+import wordteacher.shared.generated.resources.word_phrase_verb
 
 enum class ChunkType {
     NP,     // Noun Phrase
@@ -23,14 +29,14 @@ fun chunkEnum(it: String) = try {
     ChunkType.X
 }
 
-fun ChunkType.toStringDesc(): StringDesc {
+fun ChunkType.toStringResource(): StringResourceWrapper {
     val res = when(this) {
-        ChunkType.NP -> MR.strings.word_phrase_noun
-        ChunkType.VP -> MR.strings.word_phrase_verb
-        ChunkType.PP -> MR.strings.word_phrase_preposition
-        ChunkType.ADJP -> MR.strings.word_phrase_adjective
-        ChunkType.ADVP -> MR.strings.word_phrase_adverb
-        else -> MR.strings.word_phrase_unknown
+        ChunkType.NP -> Res.string.word_phrase_noun
+        ChunkType.VP -> Res.string.word_phrase_verb
+        ChunkType.PP -> Res.string.word_phrase_preposition
+        ChunkType.ADJP -> Res.string.word_phrase_adjective
+        ChunkType.ADVP -> Res.string.word_phrase_adverb
+        else -> Res.string.word_phrase_unknown
     }
-    return StringDesc.Resource(res)
+    return StringResourceWrapper.String(res)
 }

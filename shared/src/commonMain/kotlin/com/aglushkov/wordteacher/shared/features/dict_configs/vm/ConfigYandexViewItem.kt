@@ -1,7 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.dict_configs.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import dev.icerock.moko.resources.desc.StringDesc
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import org.jetbrains.compose.resources.StringResource
 import okio.Path
 
 class ConfigYandexViewItem(
@@ -23,16 +24,16 @@ class ConfigYandexViewItem(
 }
 
 class ConfigHeaderViewItem(
-    text: StringDesc
-): BaseViewItem<StringDesc>(text, Type) {
+    text: StringResourceWrapper
+): BaseViewItem<StringResourceWrapper>(text, Type) {
     companion object {
         const val Type = 1101
     }
 }
 
 class ConfigTextViewItem(
-    text: StringDesc
-): BaseViewItem<StringDesc>(text, Type) {
+    text: StringResourceWrapper
+): BaseViewItem<StringResourceWrapper>(text, Type) {
     companion object {
         const val Type = 1102
     }

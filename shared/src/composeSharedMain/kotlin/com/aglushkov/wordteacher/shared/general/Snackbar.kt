@@ -21,9 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.aglushkov.wordteacher.shared.features.SnackbarEventHolderItem
 import com.aglushkov.wordteacher.shared.features.SnackbarEventHolder
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.benasher44.uuid.uuid4
 import kotlinx.coroutines.launch
-import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.CoroutineExceptionHandler
 
 private var snackBarUICount by mutableStateOf(0)
@@ -88,8 +88,8 @@ fun BoxScope.SnackbarUI(
             Snackbar(snackbarData = it,)
         }
 
-        val snackBarMessage = eventToShow?.text?.localized().orEmpty()
-        val snackBarActionText = eventToShow?.actionText?.localized().orEmpty()
+        val snackBarMessage = eventToShow?.text?.resolve().orEmpty()
+        val snackBarActionText = eventToShow?.actionText?.resolve()
         LaunchedEffect(eventToShow) {
             eventToShow?.let { event ->
                 coroutineScope.launch(CoroutineExceptionHandler { coroutineContext, throwable ->

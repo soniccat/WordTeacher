@@ -46,7 +46,7 @@ import com.aglushkov.wordteacher.shared.features.webauth.vm.WebAuthVM
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
@@ -347,18 +347,18 @@ private fun BottomNavigationBarUI(component: TabDecomposeComponent) {
                     )
                 },
                 label = {
-                    Text(tab.nameRes.localized())
+                    Text(tab.nameRes.resolve())
                 }
             )
         }
     }
 }
 
-sealed class ScreenTab(val nameRes: StringResource, val iconRes: ImageResource, val decomposeChildConfigClass: Class<*>) {
-    object Definitions : ScreenTab(MR.strings.tab_definitions, MR.images.field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
-    object CardSets : ScreenTab(MR.strings.tab_learning, MR.images.learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
-    object Articles : ScreenTab(MR.strings.tab_articles, MR.images.tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
-    object Settings : ScreenTab(MR.strings.tab_settings, MR.images.tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
+sealed class ScreenTab(val nameRes: StringResourceWrapper, val iconRes: ImageResource, val decomposeChildConfigClass: Class<*>) {
+    object Definitions : ScreenTab(Res.string.tab_definitions, MR.images.field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+    object CardSets : ScreenTab(Res.string.tab_learning, MR.images.learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
+    object Articles : ScreenTab(Res.string.tab_articles, MR.images.tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
+    object Settings : ScreenTab(Res.string.tab_settings, MR.images.tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
 //    object Notes : ScreenTab(R.string.tab_notes, R.drawable.ic_tab_notes, TabDecomposeComponent.ChildConfiguration.NotesConfiguration::class.java)
 }
 

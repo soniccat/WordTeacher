@@ -16,14 +16,15 @@ import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onError
-import com.aglushkov.wordteacher.shared.general.toStringDesc
+import com.aglushkov.wordteacher.shared.general.toStringResource
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
-import dev.icerock.moko.resources.desc.ResourceStringDesc
+import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -32,8 +33,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
+import wordteacher.shared.generated.resources.dictconfigs_offline_section_title
+import wordteacher.shared.generated.resources.dictconfigs_online_section_title
 
 // https://yandex.com/dev/dictionary/doc/dg/reference/lookup.html
 data class YandexSettings(
@@ -67,7 +69,7 @@ data class YandexSettings(
 }
 
 interface DictConfigsRouter {
-    fun onError(text: StringDesc)
+    fun onError(text: StringResourceWrapper)
 }
 
 interface DictConfigsVM: Clearable {
@@ -114,7 +116,7 @@ open class DictConfigsVMImpl(
         dicts: Resource<List<Dict>>,
         dictImportProgress: Resource<Unit>,
     ): List<BaseViewItem<*>> = buildList<BaseViewItem<*>> {
-        add(ConfigHeaderViewItem(ResourceStringDesc(MR.strings.dictconfigs_online_section_title)))
+        add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_online_section_title)))
         configs.on(
             loaded = {
                 it.onEach { config ->
@@ -135,12 +137,12 @@ open class DictConfigsVMImpl(
                 add(ConfigLoadingViewItem())
             },
             error = {
-                add(ConfigTextViewItem(it.toStringDesc()))
+                add(ConfigTextViewItem(it.toStringResource()))
             }
         )
 
         add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Online))
-        add(ConfigHeaderViewItem(ResourceStringDesc(MR.strings.dictconfigs_offline_section_title)))
+        add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_offline_section_title)))
         dicts.on(
             data = {
                 it.onEach { dict ->
@@ -159,7 +161,7 @@ open class DictConfigsVMImpl(
                 add(ConfigLoadingViewItem())
             },
             error = {
-                add(ConfigTextViewItem(it.toStringDesc()))
+                add(ConfigTextViewItem(it.toStringResource()))
             }
         )
         dictImportProgress.on(
@@ -229,7 +231,7 @@ open class DictConfigsVMImpl(
         mainScope.launch(Dispatchers.Default) {
             dslDictOpenController.chooseFile()
                 .onError {
-                    router?.onError(it.toStringDesc())
+                    router?.onError(it.toStringResource())
                 }
         }
     }

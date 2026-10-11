@@ -21,17 +21,16 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateIds
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.repository.dashboard.DashboardRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardResponse
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.ResourceStringDesc
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -42,6 +41,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import wordteacher.shared.generated.resources.error_default_loading_error
 import kotlin.collections.map
 import kotlin.collections.orEmpty
 
@@ -54,7 +54,7 @@ interface FindArticleVM: Clearable {
     fun onHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onAddHeadlineClicked(item: DashboardHeadlineViewItem)
     fun onLinkClicked(link: String)
-    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper?
     fun onClosed()
 
     interface Router {
@@ -158,8 +158,8 @@ open class FindArticleVMImpl(
         webLinkOpener.open(link)
     }
 
-    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
-        return StringDesc.Resource(MR.strings.error_default_loading_error)
+    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper? {
+        return StringResourceWrapper.String(Res.string.error_default_loading_error)
     }
 
     override fun onClosed() {

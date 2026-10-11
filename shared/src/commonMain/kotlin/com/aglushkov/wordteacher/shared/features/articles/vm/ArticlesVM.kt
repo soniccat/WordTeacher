@@ -7,8 +7,8 @@ import com.aglushkov.wordteacher.shared.features.article.vm.ArticleVM
 import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.ViewModel
@@ -16,20 +16,21 @@ import com.aglushkov.wordteacher.shared.general.exception
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
 import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.ShortArticle
 import com.aglushkov.wordteacher.shared.repository.article.ArticlesRepository
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.Raw
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import wordteacher.shared.generated.resources.articles_error
+import wordteacher.shared.generated.resources.error_default
 
 interface ArticlesVM {
     var router: ArticlesRouter?
@@ -39,7 +40,7 @@ interface ArticlesVM {
     fun onArticleClicked(item: ArticleViewItem)
     fun onArticleRemoved(item: ArticleViewItem)
 
-    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper?
     fun onTryAgainClicked()
     fun onHintClicked(hintType: HintType)
 
@@ -81,8 +82,8 @@ open class ArticlesVMImpl(
             } catch (e: Throwable) {
                 Logger.exception("ArticlesVM.onArticleRemoved", e)
                 val errorText = e.message?.let {
-                    StringDesc.Raw(it)
-                } ?: StringDesc.Resource(MR.strings.error_default)
+                    StringResourceWrapper.Raw(it)
+                } ?: StringResourceWrapper.String(Res.string.error_default)
 
                 // TODO: pass an error message
                 //eventChannel.offer(ErrorEvent(errorText))
@@ -108,8 +109,8 @@ open class ArticlesVMImpl(
         generateViewItemIds(items, articles.value.data().orEmpty(), idGenerator)
     }
 
-    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
-        return StringDesc.Resource(MR.strings.articles_error)
+    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper? {
+        return StringResourceWrapper.String(Res.string.articles_error)
     }
 
     override fun onTryAgainClicked() {

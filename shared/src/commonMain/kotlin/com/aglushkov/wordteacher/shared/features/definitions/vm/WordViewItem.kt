@@ -1,7 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
@@ -43,10 +44,10 @@ class WordAudioFilesViewItem(
 }
 
 class WordPartOfSpeechViewItem(
-    partOfSpeechString: StringDesc,
+    partOfSpeechString: StringResourceWrapper,
     val partOfSpeech: WordTeacherWord.PartOfSpeech,
     val cardId: Long = -1
-): BaseViewItem<StringDesc>(partOfSpeechString, Type) {
+): BaseViewItem<StringResourceWrapper>(partOfSpeechString, Type) {
     companion object {
         const val Type = 103
     }
@@ -99,19 +100,19 @@ class WordAntonymViewItem(synonym: String, val indent: Indent = Indent.NONE, val
     }
 }
 
-class WordHeaderViewItem(name: StringDesc): BaseViewItem<StringDesc>(name, Type) {
+class WordHeaderViewItem(name: StringResourceWrapper): BaseViewItem<StringResourceWrapper>(name, Type) {
     companion object {
         const val Type = 107
     }
 }
 
 class WordSubHeaderViewItem(
-    name: StringDesc,
+    name: StringResourceWrapper,
     val indent: Indent = Indent.NONE,
     val isOnlyHeader: Boolean = false,
     val contentType: ContentType = ContentType.UNKNOWN,
     val cardId: Long = -1
-): BaseViewItem<StringDesc>(name, Type) {
+): BaseViewItem<StringResourceWrapper>(name, Type) {
     companion object {
         const val Type = 108
     }

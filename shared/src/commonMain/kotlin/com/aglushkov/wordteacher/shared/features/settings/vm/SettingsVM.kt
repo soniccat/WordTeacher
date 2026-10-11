@@ -16,12 +16,13 @@ import com.aglushkov.wordteacher.shared.general.getAppInfo
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.downgradeToErrorOrLoading
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.general.settings.resetHint
-import com.aglushkov.wordteacher.shared.general.toStringDesc
+import com.aglushkov.wordteacher.shared.general.toStringResource
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
@@ -29,24 +30,31 @@ import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellDictionaryHolder
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.service.SpaceAuthData
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.*
-import com.aglushkov.wordteacher.shared.res.MR
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
-import dev.icerock.moko.resources.desc.RawStringDesc
-
-
-import dev.icerock.moko.resources.desc.ResourceFormatted
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.Path
 import kotlinx.serialization.Serializable
+import wordteacher.shared.generated.resources.error_default
+import wordteacher.shared.generated.resources.settings_auth_refresh
+import wordteacher.shared.generated.resources.settings_auth_signin
+import wordteacher.shared.generated.resources.settings_auth_signout
+import wordteacher.shared.generated.resources.settings_auth_title
+import wordteacher.shared.generated.resources.settings_frequency_gradation_info_format
+import wordteacher.shared.generated.resources.settings_frequency_title
+import wordteacher.shared.generated.resources.settings_frequency_upload_file
+import wordteacher.shared.generated.resources.settings_hints_reset
+import wordteacher.shared.generated.resources.settings_hints_title
+import wordteacher.shared.generated.resources.settings_logging_title
+import wordteacher.shared.generated.resources.settings_remove_misspelling_db
 
 interface SettingsVM: Clearable {
     var router: SettingsRouter?
@@ -125,36 +133,36 @@ open class SettingsVMImpl (
     ): List<BaseViewItem<*>> {
         val resultItems: MutableList<BaseViewItem<*>> = mutableListOf()
 
-        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_auth_title))
+        resultItems += SettingsViewTitleItem(StringResourceWrapper.String(Res.string.settings_auth_title))
         when(authDataRes) {
             is Resource.Error,
             is Resource.Uninitialized -> {
-                resultItems += SettingsViewTextItem(StringDesc.Resource(MR.strings.settings_auth_signin), withBottomPadding = false)
+                resultItems += SettingsViewTextItem(StringResourceWrapper.String(Res.string.settings_auth_signin), withBottomPadding = false)
                 resultItems += SettingsSignInItem(authNetworkTypes.toList())
             }
             is Resource.Loaded -> {
-                resultItems += SettingsSignOutItem(StringDesc.ResourceFormatted(MR.strings.settings_auth_signout, authDataRes.data.user.networkType.toString()))
+                resultItems += SettingsSignOutItem(StringResourceWrapper.FormattedString(Res.string.settings_auth_signout, listOf(authDataRes.data.user.networkType.toString())))
                 if (isDebug) {
-                    resultItems += SettingsViewAuthRefreshButtonItem(StringDesc.Resource(MR.strings.settings_auth_refresh))
+                    resultItems += SettingsViewAuthRefreshButtonItem(StringResourceWrapper.String(Res.string.settings_auth_refresh))
                 }
             }
             is Resource.Loading -> resultItems += SettingsViewLoading()
         }
 
         resultItems += SettingsOpenDictConfigsItem()
-        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_frequency_title))
+        resultItems += SettingsViewTitleItem(StringResourceWrapper.String(Res.string.settings_frequency_title))
         val wordFrequencyGradationData = gradationState.data()
         if (gradationState.isLoading()) {
             resultItems += SettingsViewLoading()
         } else if (wordFrequencyGradationData != null) {
-            resultItems += SettingsViewTextItem(StringDesc.ResourceFormatted(MR.strings.settings_frequency_gradation_info_format, wordFrequencyGradationData.levels.size + 1))
-            resultItems += SettingsWordFrequencyUploadFileItem(StringDesc.Resource(MR.strings.settings_frequency_upload_file))
+            resultItems += SettingsViewTextItem(StringResourceWrapper.FormattedString(Res.string.settings_frequency_gradation_info_format, listOf(wordFrequencyGradationData.levels.size + 1)))
+            resultItems += SettingsWordFrequencyUploadFileItem(StringResourceWrapper.String(Res.string.settings_frequency_upload_file))
         } else {
-            resultItems += SettingsViewTextItem(StringDesc.Resource(MR.strings.error_default))
-            resultItems += SettingsWordFrequencyUploadFileItem(StringDesc.Resource(MR.strings.settings_frequency_upload_file))
+            resultItems += SettingsViewTextItem(StringResourceWrapper.String(Res.string.error_default))
+            resultItems += SettingsWordFrequencyUploadFileItem(StringResourceWrapper.String(Res.string.settings_frequency_upload_file))
         }
 
-        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_logging_title))
+        resultItems += SettingsViewTitleItem(StringResourceWrapper.String(Res.string.settings_logging_title))
         resultItems += SettingsLogsConfigsItem(
             isLoggingEnabled,
             if (canShareLogs) {
@@ -164,11 +172,11 @@ open class SettingsVMImpl (
             }
         )
 
-        resultItems += SettingsViewTitleItem(StringDesc.Resource(MR.strings.settings_hints_title))
-        resultItems += SettingsResetHintsItem(StringDesc.Resource(MR.strings.settings_hints_reset))
+        resultItems += SettingsViewTitleItem(StringResourceWrapper.String(Res.string.settings_hints_title))
+        resultItems += SettingsResetHintsItem(StringResourceWrapper.String(Res.string.settings_hints_reset))
 
         if (isDebug) {
-            resultItems += SettingsResetMisspellingDBItem(StringDesc.Resource(MR.strings.settings_remove_misspelling_db))
+            resultItems += SettingsResetMisspellingDBItem(StringResourceWrapper.String(Res.string.settings_remove_misspelling_db))
         }
 
         resultItems += SettingsPrivacyPolicyItem()
@@ -218,7 +226,7 @@ open class SettingsVMImpl (
         viewModelScope.launch {
             wordFrequencyFileOpenController.chooseFile()
                 .onError {
-                    router?.onError(it.toStringDesc())
+                    router?.onError(it.toStringResource())
                 }
         }
     }
@@ -253,7 +261,7 @@ open class SettingsVMImpl (
         viewModelScope.launch {
             symSpellRepository.dictHolder.resetProgress()
             misspellingDBController.reset()
-            router?.onError(RawStringDesc("Misspelling db cleared"))
+            router?.onError(StringResourceWrapper.Raw("Misspelling db cleared"))
         }
     }
 }

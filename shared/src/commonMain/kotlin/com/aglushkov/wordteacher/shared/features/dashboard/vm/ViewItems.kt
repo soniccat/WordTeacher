@@ -3,10 +3,11 @@ package com.aglushkov.wordteacher.shared.features.dashboard.vm
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.RemoteCardSetViewItem
 import com.aglushkov.wordteacher.shared.general.HtmlString
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 
 
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -47,8 +48,8 @@ class DashboardHeadlineViewItem(
 }
 
 class DashboardTryAgainViewItem(
-    val errorText: StringDesc,
-    val tryAgainActionText: StringDesc,
+    val errorText: StringResourceWrapper,
+    val tryAgainActionText: StringResourceWrapper,
 ): BaseViewItem<Unit>(Unit, Type) {
     companion object {
         const val Type = 1202

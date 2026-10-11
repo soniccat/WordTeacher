@@ -40,8 +40,10 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM.Companion.DefinitionSource
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.CustomTopAppBar
@@ -57,15 +59,16 @@ import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.format
+import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.launch
 import java.util.*
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.error_empty_wordhistory
+import wordteacher.shared.generated.resources.error_no_definitions
+import wordteacher.shared.generated.resources.error_try_again
+import wordteacher.shared.generated.resources.word_providedBy_template
 
 
 @Composable
@@ -294,13 +297,13 @@ private fun DefinitionsWordUI(
                         )
                     }
                 }
-            } else {
+            } else
                 LoadingStatusViewWithErrorContent(
                     resource = defsValue,
                     loadingText = null,
-                    errorText = vm.getErrorText(defsValue)?.localized(),
-                    tryAgainText = stringResource(MR.strings.error_try_again),
-                    emptyText = stringResource(MR.strings.error_no_definitions)
+                    errorText = vm.getErrorText(defsValue)?.resolve(),
+                    tryAgainText = stringResource(Res.string.error_try_again),
+                    emptyText = stringResource(Res.string.error_no_definitions)
                 ) { errorState ->
                     Column(
                         modifier = Modifier.padding(bottom = 50.dp),
@@ -336,7 +339,6 @@ private fun DefinitionsWordUI(
                         }
                     }
                 }
-            }
         }
     }
 }
@@ -366,9 +368,9 @@ private fun wordHistoryUI(
         LoadingStatusView(
             resource = words,
             loadingText = null,
-            errorText = vm.getErrorText(words)?.localized(),
+            errorText = vm.getErrorText(words)?.resolve(),
             tryAgainText = null,
-            emptyText = stringResource(MR.strings.error_empty_wordhistory)
+            emptyText = stringResource(Res.string.error_empty_wordhistory)
         ) {
             vm.onTryAgainClicked()
         }
@@ -445,19 +447,19 @@ private fun showSuggestItem(
         )
     }
     is WordCorrectionsHeaderViewItem -> ListSectionCell(
-        item.firstItem().localized(),
+        item.firstItem().resolve(),
         Modifier.padding(
             top = if (item.isTop) 0.dp else 16.dp
         ),
     )
     is WordTextSearchHeaderViewItem -> ListSectionCell(
-        item.firstItem().localized(),
+        item.firstItem().resolve(),
         Modifier.padding(
             top = if (item.isTop) 0.dp else 16.dp
         ),
         actionBlock = {
             Text(
-                text = item.showAllWordsActionText.localized(),
+                text = item.showAllWordsActionText.resolve(),
                 modifier = Modifier.clickable {
                         vm.onSuggestedShowAllSearchWordClicked()
                         onClicked.invoke()
@@ -476,7 +478,7 @@ private fun showSuggestItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = item.firstItem().localized(),
+            text = item.firstItem().resolve(),
             modifier = Modifier.weight(1.0f).padding(end = 5.dp),
         )
 
@@ -645,7 +647,7 @@ private fun AddToSet(vm: DefinitionsVM, wordDefinitionViewItem: WordDefinitionVi
                             },
                         ) {
                             Text(
-                                it.text.localized(),
+                                it.text.resolve(),
                                 color = MaterialTheme.colors.secondary
                             )
                         }
@@ -656,7 +658,7 @@ private fun AddToSet(vm: DefinitionsVM, wordDefinitionViewItem: WordDefinitionVi
                             }
                         ) {
                             Text(
-                                it.text.localized(),
+                                it.text.resolve(),
                                 color = MaterialTheme.colors.secondary
                             )
                         }
@@ -716,7 +718,7 @@ private fun DefinitionsDisplayModeView(
                 },
             ) {
                 Text(
-                    text = item.partsOfSpeechFilterText.localized(),
+                    text = item.partsOfSpeechFilterText.resolve(),
                     overflow = TextOverflow.Clip,
                     softWrap = false,
                     maxLines = 1
@@ -751,7 +753,7 @@ private fun DefinitionsDisplayModeView(
                     }
                 ) {
                     Text(
-                        text = mode.toStringDesc().localized(),
+                        text = mode.toStringResource().resolve(),
                         overflow = TextOverflow.Clip,
                         softWrap = false,
                         maxLines = 1
@@ -801,7 +803,7 @@ fun WordTitleView(
         textContent(viewItem.firstItem(), textStyle)
         if (viewItem.sourceNames.isNotEmpty()) {
             Text(
-                text = MR.strings.word_providedBy_template.format(viewItem.sourceNames.joinToString()).localized(),
+                text = stringResource(Res.string.word_providedBy_template, listOf(viewItem.sourceNames.joinToString())),
                 modifier = Modifier.width(IntrinsicSize.Min).requiredWidthIn(max = 200.dp),
                 textAlign = TextAlign.End,
                 style = LocalAppTypography.current.wordDefinitionProvidedBy
@@ -929,7 +931,7 @@ fun WordPartOfSpeechView(
     topPadding: Dp = LocalDimensWord.current.wordPartOfSpeechTopMargin
 ) {
     Text(
-        text = viewItem.firstItem().localized().uppercase(Locale.getDefault()),
+        text = viewItem.firstItem().resolve().uppercase(Locale.getDefault()),
         modifier = Modifier
             .then(modifier)
             .padding(
@@ -1056,7 +1058,7 @@ fun WordSubHeaderView(
                 top = LocalDimensWord.current.wordSubHeaderTopMargin
             ),
     ) {
-        textContent(viewItem.firstItem().localized(), LocalAppTypography.current.wordDefinitionSubHeader)
+        textContent(viewItem.firstItem().resolve(), LocalAppTypography.current.wordDefinitionSubHeader)
     }
 }
 

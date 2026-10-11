@@ -49,10 +49,12 @@ import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.hasData
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.on
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
@@ -67,17 +69,23 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.ChunkType
 import com.aglushkov.wordteacher.shared.model.nlp.NLPSentence
 import com.aglushkov.wordteacher.shared.model.nlp.chunkEnum
-import com.aglushkov.wordteacher.shared.model.nlp.toStringDesc
+import com.aglushkov.wordteacher.shared.model.nlp.toStringResource
 import com.aglushkov.wordteacher.shared.model.partOfSpeechEnum
-import com.aglushkov.wordteacher.shared.model.toStringDesc
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.desc.ResourceStringDesc
+import com.aglushkov.wordteacher.shared.model.toStringResource
+import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
-import dev.icerock.moko.resources.compose.localized
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.article_empty
+import wordteacher.shared.generated.resources.article_mark_as_read
+import wordteacher.shared.generated.resources.article_mark_as_unread
+import wordteacher.shared.generated.resources.article_side_sheet_part_of_speech_title
+import wordteacher.shared.generated.resources.article_side_sheet_selection_cardset_words
+import wordteacher.shared.generated.resources.article_side_sheet_selection_dicts
+import wordteacher.shared.generated.resources.article_side_sheet_selection_filter_dict_single_word_entries
+import wordteacher.shared.generated.resources.article_side_sheet_selection_phrases
+import wordteacher.shared.generated.resources.article_side_sheet_title
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -188,8 +196,8 @@ fun ArticleUI(
                     LoadingStatusView(
                         resource = paragraphs,
                         loadingText = null,
-                        errorText = vm.getErrorText(paragraphs)?.localized(),
-                        emptyText = stringResource(MR.strings.article_empty)
+                        errorText = vm.getErrorText(paragraphs)?.resolve(),
+                        emptyText = stringResource(Res.string.article_empty)
                     ) {
                         vm.onTryAgainClicked()
                     }
@@ -216,11 +224,11 @@ fun ArticleUI(
                         vm.onMarkAsReadUnreadClicked()
                     }) {
                         Text(
-                            text = ResourceStringDesc(if (state.isRead) {
-                                MR.strings.article_mark_as_unread
+                            text = StringResourceWrapper.String(if (state.isRead) {
+                                Res.string.article_mark_as_unread
                             } else {
-                                MR.strings.article_mark_as_read
-                            }).localized(),
+                                Res.string.article_mark_as_read
+                            }).resolve(),
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center
                         )
@@ -261,20 +269,20 @@ private fun ArticleSideSheetContent(
 
     Text(
         modifier = Modifier.padding(all = LocalDimens.current.contentPadding).windowInsetsRightPadding(),
-        text = stringResource(MR.strings.article_side_sheet_title),
+        text = stringResource(Res.string.article_side_sheet_title),
         style = LocalAppTypography.current.articleSideSheetSection
     )
 
     CheckableListItem(
         modifier = Modifier.windowInsetsRightPadding(),
         isChecked = state.selectionState.cardSetWords,
-        text = stringResource(MR.strings.article_side_sheet_selection_cardset_words),
+        text = stringResource(Res.string.article_side_sheet_selection_cardset_words),
         onClicked = { vm.onCardSetWordSelectionChanged() }
     )
 
     Text(
         modifier = Modifier.padding(all = LocalDimens.current.contentPadding).windowInsetsRightPadding(),
-        text = stringResource(MR.strings.article_side_sheet_selection_dicts),
+        text = stringResource(Res.string.article_side_sheet_selection_dicts),
         style = LocalAppTypography.current.articleSideSheetSection
     )
     if (dictPaths.hasData()) {
@@ -282,7 +290,7 @@ private fun ArticleSideSheetContent(
             CheckableListItem(
                 modifier = Modifier.windowInsetsRightPadding(),
                 isChecked = state.selectionState.filterDictSingleWordEntries,
-                text = stringResource(MR.strings.article_side_sheet_selection_filter_dict_single_word_entries),
+                text = stringResource(Res.string.article_side_sheet_selection_filter_dict_single_word_entries),
                 onClicked = { vm.onFilterDictSingleWordEntriesChanged() }
             )
         }
@@ -305,28 +313,28 @@ private fun ArticleSideSheetContent(
 
     Text(
         modifier = Modifier.padding(all = LocalDimens.current.contentPadding).windowInsetsRightPadding(),
-        text = stringResource(MR.strings.article_side_sheet_selection_phrases),
+        text = stringResource(Res.string.article_side_sheet_selection_phrases),
         style = LocalAppTypography.current.articleSideSheetSection
     )
     ChunkType.entries.toTypedArray().onEach { chunkType ->
         CheckableListItem(
             modifier = Modifier.windowInsetsRightPadding(),
             isChecked = state.selectionState.phrases.contains(chunkType),
-            text = chunkType.toStringDesc().localized(),
+            text = chunkType.toStringResource().resolve(),
             onClicked = { vm.onPhraseSelectionChanged(chunkType) }
         )
     }
 
     Text(
         modifier = Modifier.padding(all = LocalDimens.current.contentPadding).windowInsetsRightPadding(),
-        text = stringResource(MR.strings.article_side_sheet_part_of_speech_title),
+        text = stringResource(Res.string.article_side_sheet_part_of_speech_title),
         style = LocalAppTypography.current.articleSideSheetSection
     )
     WordTeacherWord.PartOfSpeech.values().onEach { partOfSpeech ->
         CheckableListItem(
             modifier = Modifier.windowInsetsRightPadding(),
             isChecked = state.selectionState.partsOfSpeech.contains(partOfSpeech),
-            text = partOfSpeech.toStringDesc().localized(),
+            text = partOfSpeech.toStringResource().resolve(),
             onClicked = { vm.onPartOfSpeechSelectionChanged(partOfSpeech) }
         )
     }

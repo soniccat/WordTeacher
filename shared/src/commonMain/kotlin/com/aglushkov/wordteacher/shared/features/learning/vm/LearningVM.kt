@@ -26,27 +26,32 @@ import com.aglushkov.wordteacher.shared.general.extensions.collectUntilLoaded
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepository
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.model.toStringDesc
-import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.model.toStringResource
+import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
-import dev.icerock.moko.graphics.Color
-import dev.icerock.moko.resources.desc.Raw
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import wordteacher.shared.generated.resources.learning_delete_hint
+import wordteacher.shared.generated.resources.learning_error
+import wordteacher.shared.generated.resources.learning_instruction_challenge_match
+import wordteacher.shared.generated.resources.learning_instruction_challenge_test
+import wordteacher.shared.generated.resources.learning_wrong_input
+import wordteacher.shared.generated.resources.word_section_examples
+import wordteacher.shared.generated.resources.word_section_synonyms
 import kotlin.collections.fold
 
 interface LearningVM: Clearable {
     var router: LearningRouter?
 
     val challengeState: StateFlow<Resource<Challenge>>
-    val titleErrorFlow: StateFlow<StringDesc?>
+    val titleErrorFlow: StateFlow<StringResourceWrapper?>
     val canShowHint: StateFlow<Boolean>
     val hintString: StateFlow<Hint?>
     val playSoundOnChallengeCompletion: StateFlow<Boolean>
@@ -69,16 +74,16 @@ interface LearningVM: Clearable {
     fun onDeleteCardClicked()
 
     fun save(): State
-    fun getErrorText(res: Resource<*>): StringDesc?
+    fun getErrorText(res: Resource<*>): StringResourceWrapper?
 
     data class Hint(
         val id: Int, // to bypass unique check
-        val value: StringDesc,
+        val value: StringResourceWrapper,
     )
 
     sealed interface Challenge {
         data class Match(
-            val instruction: StringDesc,
+            val instruction: StringResourceWrapper,
             val rows: List<MatchRow>
         ): Challenge
 
@@ -90,7 +95,7 @@ interface LearningVM: Clearable {
         )
 
         data class Test(
-            val instruction: StringDesc,
+            val instruction: StringResourceWrapper,
             val term: String,
             val index: Int,
             val count: Int,
@@ -158,7 +163,7 @@ open class LearningVMImpl(
     var state: LearningVM.State = restoredState
 
     override val challengeState = MutableStateFlow<Resource<LearningVM.Challenge>>(Resource.Uninitialized())
-    override val titleErrorFlow = MutableStateFlow<StringDesc?>(null)
+    override val titleErrorFlow = MutableStateFlow<StringResourceWrapper?>(null)
     override val canShowHint = MutableStateFlow(true)
     override val hintString = MutableStateFlow<Hint?>(null)
     override val playSoundOnChallengeCompletion = MutableStateFlow(
@@ -219,7 +224,7 @@ open class LearningVMImpl(
             teacher.hintString.map {
                 Hint(
                     id = 0,
-                    value = StringDesc.Raw(
+                    value = StringResourceWrapper.Raw(
                         it.fold("") { str, char ->
                             "$str $char"
                         }
@@ -244,7 +249,7 @@ open class LearningVMImpl(
                         challengeState.update {
                             Resource.Loaded(
                                 LearningVM.Challenge.Match(
-                                    instruction = StringDesc.Resource(MR.strings.learning_instruction_challenge_match),
+                                    instruction = StringResourceWrapper.String(Res.string.learning_instruction_challenge_match),
                                     rows = pairs.mapIndexed { index, matchPair ->
                                         LearningVM.Challenge.MatchRow(
                                             index,
@@ -279,7 +284,7 @@ open class LearningVMImpl(
                         challengeState.update {
                             Resource.Loaded(
                                 LearningVM.Challenge.Test(
-                                    instruction = StringDesc.Resource(MR.strings.learning_instruction_challenge_test),
+                                    instruction = StringResourceWrapper.String(Res.string.learning_instruction_challenge_test),
                                     term = textCard.card.term,
                                     index = index,
                                     count = teacher.sessionCardCount,
@@ -395,7 +400,7 @@ open class LearningVMImpl(
 
     private fun buildCardItem(card: Card): List<BaseViewItem<*>> {
         val viewItems = mutableListOf(
-            WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech),
+            WordPartOfSpeechViewItem(card.partOfSpeech.toStringResource(), card.partOfSpeech),
             *card.resolveDefinitionsWithHiddenTerm().mapIndexed { index, def ->
                 WordDefinitionViewItem(
                     definition = def,
@@ -408,7 +413,7 @@ open class LearningVMImpl(
             val examples = card.resolveExamplesWithHiddenTerm()
             viewItems.addElements(
                 WordSubHeaderViewItem(
-                    StringDesc.Resource(MR.strings.word_section_examples),
+                    StringResourceWrapper.String(Res.string.word_section_examples),
                     Indent.SMALL
                 ),
                 *examples.mapIndexed { index, ex ->
@@ -420,7 +425,7 @@ open class LearningVMImpl(
         if (card.synonyms.isNotEmpty()) {
             viewItems.addElements(
                 WordSubHeaderViewItem(
-                    StringDesc.Resource(MR.strings.word_section_synonyms),
+                    StringResourceWrapper.String(Res.string.word_section_synonyms),
                     Indent.SMALL
                 ),
                 *card.synonyms.map { synonym ->
@@ -470,7 +475,7 @@ open class LearningVMImpl(
         titleErrorFlow.value = if (isRight) {
             null
         } else {
-            StringDesc.Resource(MR.strings.learning_wrong_input)
+            StringResourceWrapper.String(Res.string.learning_wrong_input)
         }
     }
 
@@ -547,7 +552,7 @@ open class LearningVMImpl(
         hintString.update {
             Hint(
                 id = it?.let { it.id + 1 } ?: 0,
-                value = StringDesc.Resource(MR.strings.learning_delete_hint)
+                value = StringResourceWrapper.String(Res.string.learning_delete_hint)
             )
         }
     }
@@ -560,8 +565,8 @@ open class LearningVMImpl(
         databaseCardWorker.deleteCard(card, timeSource.timeInMilliseconds())
     }
 
-    override fun getErrorText(res: Resource<*>): StringDesc? {
-        return StringDesc.Resource(MR.strings.learning_error)
+    override fun getErrorText(res: Resource<*>): StringResourceWrapper? {
+        return StringResourceWrapper.String(Res.string.learning_error)
     }
 }
 

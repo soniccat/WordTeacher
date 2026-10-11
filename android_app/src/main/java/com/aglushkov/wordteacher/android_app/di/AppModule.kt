@@ -54,7 +54,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import com.aglushkov.wordteacher.shared.tasks.AddArticleSampleTask
 import com.aglushkov.wordteacher.shared.tasks.AddCardSetSampleTask
@@ -95,14 +95,14 @@ class AppModule {
     @Provides
     fun togglesUrl(
         context: Context
-    ): String = context.getString(MR.strings.toggles_url.resourceId)
+    ): String = context.getString(Res.string.toggles_url.resourceId)
 
     @ToggleUrl2
     @AppComp
     @Provides
     fun togglesUrl2(
         context: Context
-    ): String = context.getString(MR.strings.toggles_url2.resourceId)
+    ): String = context.getString(Res.string.toggles_url2.resourceId)
 
     @ApiBaseUrl
     @AppComp
@@ -112,9 +112,9 @@ class AppModule {
         toggleRepository: ToggleRepository
     ): String {
         return if (toggleRepository.toggles.topLevelDomain == "com") {
-            context.getString(MR.strings.api_base_url_com.resourceId)
+            context.getString(Res.string.api_base_url_com.resourceId)
         } else {
-            context.getString(MR.strings.api_base_url.resourceId)
+            context.getString(Res.string.api_base_url.resourceId)
         }
     }
 
@@ -139,9 +139,9 @@ class AppModule {
     fun email(
         context: Context
     ): String = if (BuildConfig.useRuEmail) {
-        context.getString(MR.strings.support_email_ru.resourceId)
+        context.getString(Res.string.support_email_ru.resourceId)
     } else {
-        context.getString(MR.strings.support_email.resourceId)
+        context.getString(Res.string.support_email.resourceId)
     }
 
     @PrivacyPolicyUrl
@@ -149,7 +149,7 @@ class AppModule {
     @Provides
     fun privacyPolicy(
         context: Context
-    ): String = context.getString(MR.strings.privacy_policy_url.resourceId)
+    ): String = context.getString(Res.string.privacy_policy_url.resourceId)
 
     @AppComp
     @Provides
@@ -425,7 +425,7 @@ class AppModule {
                     context.resources.openRawResource(R.raw.article_sample).use {
                         it.readBytes().decodeToString()
                     },
-                    context.getString(MR.strings.sample_article_url.resourceId)
+                    context.getString(Res.string.sample_article_url.resourceId)
                 )
             },
             AddCardSetSampleTask(

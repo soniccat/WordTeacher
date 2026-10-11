@@ -11,7 +11,7 @@ plugins {
     // from convention
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
-    alias(libs.plugins.mokoResources)
+//    alias(libs.plugins.mokoResources)
 
     alias(libs.plugins.kapt)
 }
@@ -52,9 +52,10 @@ kotlin {
             implementation(libs.ktorCommonCore)
             api(libs.ktorLogging)
             api(libs.ktorContentEncoding)
-            api(libs.mokoResourcesLib)
+//            api(libs.mokoResourcesLib)
             api(libs.decompose)
             api("com.darkrockstudios:symspellkt:3.4.0")
+            api(compose.components.resources)
             implementation(libs.ktorAuth)
             implementation(libs.kotlinxDateTime)
             implementation(libs.statelyCommon)
@@ -80,11 +81,10 @@ kotlin {
                 api(compose.material)
                 api(compose.materialIconsExtended)
                 api(compose.ui)
-                api(compose.components.resources)
                 implementation(libs.jsoup)
                 implementation(libs.opennlp)
                 api(libs.decomposeComposeExtensions)
-                api(libs.mokoCompose)
+//                api(libs.mokoCompose)
             }
         }
         val androidMain by getting {
@@ -136,6 +136,7 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    androidResources.enable = true
 }
 
 
@@ -161,10 +162,10 @@ sqldelight {
     }
 }
 
-multiplatformResources {
-    resourcesPackage.set("com.aglushkov.wordteacher.shared.res") // required
-    iosBaseLocalizationRegion = "en" // optional, default "en"
-}
+//multiplatformResources {
+//    resourcesPackage.set("com.aglushkov.wordteacher.shared.res") // required
+//    iosBaseLocalizationRegion = "en" // optional, default "en"
+//}
 
 // For now you have to comment this to be able to build desktop... I'm investigating...
 dependencies {

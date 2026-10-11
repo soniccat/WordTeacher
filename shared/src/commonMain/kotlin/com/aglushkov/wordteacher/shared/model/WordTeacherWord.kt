@@ -2,15 +2,28 @@ package com.aglushkov.wordteacher.shared.model
 
 import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
 import com.aglushkov.wordteacher.shared.general.extensions.unbreakable
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.serialization.EnumAsIntSerializer
 import com.aglushkov.wordteacher.shared.model.label_map.labelMap
 import com.aglushkov.wordteacher.shared.model.label_map.labelToPartOfSpeechMap
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import wordteacher.shared.generated.resources.word_partofspeech_abbreviation
+import wordteacher.shared.generated.resources.word_partofspeech_adjective
+import wordteacher.shared.generated.resources.word_partofspeech_adverb
+import wordteacher.shared.generated.resources.word_partofspeech_conjunction
+import wordteacher.shared.generated.resources.word_partofspeech_determiner
+import wordteacher.shared.generated.resources.word_partofspeech_exclamation
+import wordteacher.shared.generated.resources.word_partofspeech_interjection
+import wordteacher.shared.generated.resources.word_partofspeech_noun
+import wordteacher.shared.generated.resources.word_partofspeech_phrasalVerb
+import wordteacher.shared.generated.resources.word_partofspeech_preposition
+import wordteacher.shared.generated.resources.word_partofspeech_pronoun
+import wordteacher.shared.generated.resources.word_partofspeech_unknown
+import wordteacher.shared.generated.resources.word_partofspeech_verb
 import kotlin.collections.mutableListOf
 
 @Serializable
@@ -265,21 +278,21 @@ fun WordTeacherWord.PartOfSpeech.Companion.fromString(string: String?): WordTeac
     }
 }
 
-fun WordTeacherWord.PartOfSpeech.toStringDesc(): StringDesc {
+fun WordTeacherWord.PartOfSpeech.toStringResource(): StringResourceWrapper {
     val res = when(this) {
-        WordTeacherWord.PartOfSpeech.Noun -> MR.strings.word_partofspeech_noun
-        WordTeacherWord.PartOfSpeech.Verb -> MR.strings.word_partofspeech_verb
-        WordTeacherWord.PartOfSpeech.Adjective -> MR.strings.word_partofspeech_adjective
-        WordTeacherWord.PartOfSpeech.Adverb -> MR.strings.word_partofspeech_adverb
-        WordTeacherWord.PartOfSpeech.Pronoun -> MR.strings.word_partofspeech_pronoun
-        WordTeacherWord.PartOfSpeech.Preposition -> MR.strings.word_partofspeech_preposition
-        WordTeacherWord.PartOfSpeech.Conjunction -> MR.strings.word_partofspeech_conjunction
-        WordTeacherWord.PartOfSpeech.Interjection -> MR.strings.word_partofspeech_interjection
-        WordTeacherWord.PartOfSpeech.Abbreviation -> MR.strings.word_partofspeech_abbreviation
-        WordTeacherWord.PartOfSpeech.Exclamation -> MR.strings.word_partofspeech_exclamation
-        WordTeacherWord.PartOfSpeech.Determiner -> MR.strings.word_partofspeech_determiner
-        WordTeacherWord.PartOfSpeech.PhrasalVerb -> MR.strings.word_partofspeech_phrasalVerb
-        else -> MR.strings.word_partofspeech_unknown
+        WordTeacherWord.PartOfSpeech.Noun -> Res.string.word_partofspeech_noun
+        WordTeacherWord.PartOfSpeech.Verb -> Res.string.word_partofspeech_verb
+        WordTeacherWord.PartOfSpeech.Adjective -> Res.string.word_partofspeech_adjective
+        WordTeacherWord.PartOfSpeech.Adverb -> Res.string.word_partofspeech_adverb
+        WordTeacherWord.PartOfSpeech.Pronoun -> Res.string.word_partofspeech_pronoun
+        WordTeacherWord.PartOfSpeech.Preposition -> Res.string.word_partofspeech_preposition
+        WordTeacherWord.PartOfSpeech.Conjunction -> Res.string.word_partofspeech_conjunction
+        WordTeacherWord.PartOfSpeech.Interjection -> Res.string.word_partofspeech_interjection
+        WordTeacherWord.PartOfSpeech.Abbreviation -> Res.string.word_partofspeech_abbreviation
+        WordTeacherWord.PartOfSpeech.Exclamation -> Res.string.word_partofspeech_exclamation
+        WordTeacherWord.PartOfSpeech.Determiner -> Res.string.word_partofspeech_determiner
+        WordTeacherWord.PartOfSpeech.PhrasalVerb -> Res.string.word_partofspeech_phrasalVerb
+        else -> Res.string.word_partofspeech_unknown
     }
-    return StringDesc.Resource(res)
+    return StringResourceWrapper.String(res)
 }

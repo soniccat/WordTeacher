@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.model.*
 import com.aglushkov.wordteacher.shared.repository.cardset.CardEnricher
@@ -19,14 +20,21 @@ import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
 import com.aglushkov.wordteacher.shared.workers.UPDATE_DELAY
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import wordteacher.shared.generated.resources.article_error
+import wordteacher.shared.generated.resources.card_title_placeholder
+import wordteacher.shared.generated.resources.card_title_placeholder_readonly
+import wordteacher.shared.generated.resources.card_transcription_placeholder
+import wordteacher.shared.generated.resources.card_transcription_placeholder_readonly
+import wordteacher.shared.generated.resources.word_section_antonyms
+import wordteacher.shared.generated.resources.word_section_examples
+import wordteacher.shared.generated.resources.word_section_synonyms
 
 interface CardSetVM: Clearable {
     var router: CardSetRouter?
@@ -54,8 +62,8 @@ interface CardSetVM: Clearable {
     fun onBackPressed()
     fun onTryAgainClicked()
     fun onInfoPressed()
-    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
-    fun getPlaceholder(viewItem: BaseViewItem<*>): StringDesc?
+    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper?
+    fun getPlaceholder(viewItem: BaseViewItem<*>): StringResourceWrapper?
     fun onStartLearningClicked()
     fun onAddClicked()
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
@@ -220,7 +228,7 @@ open class CardSetVMImpl(
                     audioFile.toViewItemAudioFile()
                 })
             }
-            cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringDesc(), card.partOfSpeech, cardId = card.id)
+            cardViewItems += WordPartOfSpeechViewItem(card.partOfSpeech.toStringResource(), card.partOfSpeech, cardId = card.id)
 
             if (card.definitions.isEmpty()) {
                 cardViewItems += WordDefinitionViewItem("", index = 0, isLast = true, cardId = card.id)
@@ -244,7 +252,7 @@ open class CardSetVMImpl(
 
             // Examples
             cardViewItems += WordSubHeaderViewItem(
-                StringDesc.Resource(MR.strings.word_section_examples),
+                StringResourceWrapper.String(Res.string.word_section_examples),
                 Indent.SMALL,
                 isOnlyHeader = card.examples.isEmpty(),
                 contentType = WordSubHeaderViewItem.ContentType.EXAMPLES,
@@ -259,8 +267,8 @@ open class CardSetVMImpl(
 
             // Synonyms
             cardViewItems += WordSubHeaderViewItem(
-                StringDesc.Resource(MR.strings.word_section_synonyms),
-                Indent.SMALL,
+                name = StringResourceWrapper.String(Res.string.word_section_synonyms),
+                indent = Indent.SMALL,
                 isOnlyHeader = card.synonyms.isEmpty(),
                 contentType = WordSubHeaderViewItem.ContentType.SYNONYMS,
                 cardId = card.id
@@ -275,7 +283,7 @@ open class CardSetVMImpl(
             // Antnonyms
 
             cardViewItems += WordSubHeaderViewItem(
-                StringDesc.Resource(MR.strings.word_section_antonyms),
+                StringResourceWrapper.String(Res.string.word_section_antonyms),
                 Indent.SMALL,
                 isOnlyHeader = card.antonyms.isEmpty(),
                 contentType = WordSubHeaderViewItem.ContentType.ANTONYMS,
@@ -766,21 +774,21 @@ open class CardSetVMImpl(
         router?.closeCardSet()
     }
 
-    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
-        return StringDesc.Resource(MR.strings.article_error)
+    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper? {
+        return StringResourceWrapper.String(Res.string.article_error)
     }
 
-    override fun getPlaceholder(viewItem: BaseViewItem<*>): StringDesc? {
+    override fun getPlaceholder(viewItem: BaseViewItem<*>): StringResourceWrapper? {
         return when (val v = viewItem) {
             is WordTitleViewItem -> if (state.value.isRemoteCardSet) {
-                StringDesc.Resource(MR.strings.card_title_placeholder_readonly)
+                StringResourceWrapper.String(Res.string.card_title_placeholder_readonly)
             } else {
-                StringDesc.Resource(MR.strings.card_title_placeholder)
+                StringResourceWrapper.String(Res.string.card_title_placeholder)
             }
             is WordTranscriptionViewItem -> if (state.value.isRemoteCardSet) {
-                StringDesc.Resource(MR.strings.card_transcription_placeholder_readonly)
+                StringResourceWrapper.String(Res.string.card_transcription_placeholder_readonly)
             } else {
-                StringDesc.Resource(MR.strings.card_transcription_placeholder)
+                StringResourceWrapper.String(Res.string.card_transcription_placeholder)
             }
             else -> null
         }

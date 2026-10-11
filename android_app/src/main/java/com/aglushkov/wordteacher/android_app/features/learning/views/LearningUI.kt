@@ -58,8 +58,8 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.StringDesc
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import dev.icerock.moko.resources.compose.localized
 import java.util.*
 
@@ -170,13 +170,13 @@ fun LearningUI(
                     data?.let {
                         if (data.count() != 0) {
                             Text(
-                                text = stringResource(id = MR.strings.learning_title.resourceId)
+                                text = stringResource(id = Res.string.learning_title.resourceId)
                                     .format(data.index() + 1, data.count())
                             )
                         } else if (data is LearningVM.Challenge.Match) {
                             val readyMatches = data.rows.filter { it.matchPair.termSelection.hasMatch() }.size
                             Text(
-                                text = stringResource(id = MR.strings.learning_title.resourceId)
+                                text = stringResource(id = Res.string.learning_title.resourceId)
                                     .format(readyMatches, data.rows.size)
                             )
                         }
@@ -223,7 +223,7 @@ fun LearningUI(
 @Composable
 private fun typeChallengeUI(
     data: LearningVM.Challenge.Type,
-    errorString: StringDesc?,
+    errorString: StringResourceWrapper?,
     focusRequester: FocusRequester,
     vm: LearningVM
 ) {
@@ -358,9 +358,9 @@ private fun BoxScope.typeBottomButtons(
                     Text(
                         text = stringResource(
                             id = if (canShowHint) {
-                                MR.strings.learning_show_hint.resourceId
+                                Res.string.learning_show_hint.resourceId
                             } else {
-                                MR.strings.learning_give_up.resourceId
+                                Res.string.learning_give_up.resourceId
                             }
                         ).uppercase(Locale.getDefault()),
                         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.content_padding))
@@ -395,7 +395,7 @@ private fun SnackbarUI(
         Snackbar(snackbarData = it)
     }
 
-    val text = hint?.value?.localized()
+    val text = hint?.value?.resolve()
     if (text?.isNotEmpty() == true) {
         LaunchedEffect(key1 = hint) {
             snackbarHostState.showSnackbar(text)
@@ -408,7 +408,7 @@ private fun matchChallengeUI(
     data: LearningVM.Challenge.Match,
     vm: LearningVM
 ) {
-    val instructionString = data.instruction.localized()
+    val instructionString = data.instruction.resolve()
     LazyColumn(
         modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
         contentPadding = PaddingValues(
@@ -539,7 +539,7 @@ private fun testChallengeUI(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = data.instruction.localized(),
+                    text = data.instruction.resolve(),
                     modifier = Modifier.padding(
                         start = LocalDimens.current.contentPadding,
                         top = LocalDimens.current.contentPadding,
@@ -631,7 +631,7 @@ fun TermInput(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            label = { Text(stringResource(id = MR.strings.learning_term_title_hint.resourceId)) },
+            label = { Text(stringResource(id = Res.string.learning_term_title_hint.resourceId)) },
             isError = hasError,
             trailingIcon = {
                 if (hasError) {

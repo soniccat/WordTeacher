@@ -36,7 +36,7 @@ import com.aglushkov.wordteacher.shared.features.textaction.TextActionDecomposeC
 import com.arkivanov.decompose.defaultComponentContext
 import java.net.URL
 import kotlinx.coroutines.launch
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.features.add_article.views.AddArticleUI
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleRouter
 import com.aglushkov.wordteacher.shared.features.definitions.views.DefinitionsUI
@@ -48,7 +48,7 @@ import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 
 class TextActionActivity: AppCompatActivity() {
     private lateinit var textActionDecomposeComponent: TextActionDecomposeComponent
@@ -216,7 +216,7 @@ class TextActionActivity: AppCompatActivity() {
                                             }
                                         }
 
-                                        override fun onError(text: StringDesc) {
+                                        override fun onError(text: StringResourceWrapper) {
                                             textActionDecomposeComponent.onError(text)
                                         }
                                     }
@@ -293,8 +293,8 @@ class TextActionActivity: AppCompatActivity() {
     }
 
     sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
-        object Definitions : ScreenTab(MR.strings.tab_definitions.resourceId, MR.images.field_search_24.drawableResId, TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
-        object AddArticle : ScreenTab(MR.strings.tab_add_article.resourceId, MR.images.create_note.drawableResId, TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration::class.java)
-//        object Notes : ScreenTab(MR.strings.tab_notes.resourceId, R.drawable.ic_tab_notes, TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration::class.java)
+        object Definitions : ScreenTab(Res.string.tab_definitions.resourceId, MR.images.field_search_24.drawableResId, TextActionDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+        object AddArticle : ScreenTab(Res.string.tab_add_article.resourceId, MR.images.create_note.drawableResId, TextActionDecomposeComponent.ChildConfiguration.AddArticleConfiguration::class.java)
+//        object Notes : ScreenTab(Res.string.tab_notes.resourceId, R.drawable.ic_tab_notes, TextActionDecomposeComponent.ChildConfiguration.AddNoteConfiguration::class.java)
     }
 }

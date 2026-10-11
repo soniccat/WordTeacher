@@ -1,13 +1,13 @@
 package com.aglushkov.wordteacher.shared.features.definitions.views
 
-import dev.icerock.moko.resources.desc.Raw
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import kotlinx.coroutines.flow.Flow
@@ -56,8 +56,8 @@ open class DefinitionsVMPreview(
     override fun onDisplayModeChanged(mode: DefinitionsDisplayMode) {
     }
 
-    override fun getErrorText(res: Resource<*>): StringDesc? {
-        return StringDesc.Raw("Error Text")
+    override fun getErrorText(res: Resource<*>): StringResourceWrapper? {
+        return StringResourceWrapper.Raw("Error Text")
     }
 
     override fun onWordTextUpdated(newText: String) {

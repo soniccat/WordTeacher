@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kotlinx.serialization) apply false
     alias(libs.plugins.sqlDelight) apply false
-    alias(libs.plugins.mokoResources) apply false
+//    alias(libs.plugins.mokoResources) apply false
     alias(libs.plugins.playServicesPlugin) apply false
     alias(libs.plugins.kapt) apply false
     alias(libs.plugins.android.test) apply false

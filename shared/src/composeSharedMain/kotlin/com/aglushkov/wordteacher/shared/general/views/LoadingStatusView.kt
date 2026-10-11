@@ -12,15 +12,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.shared.general.StringDescThrowable
+import com.aglushkov.wordteacher.shared.general.StringResourceThrowable
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
-import com.aglushkov.wordteacher.shared.res.MR
+import com.aglushkov.wordteacher.shared.general.resources.resolve
+import wordteacher.shared.generated.resources.Res
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.compose.localized
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.error_default_loading_error
+import wordteacher.shared.generated.resources.error_try_again
 
 @Composable
 fun <T> LoadingStatusView(
@@ -105,7 +110,7 @@ fun <T> LoadingStatusView(
     modifier: Modifier = Modifier,
     resource: Resource<T>,
     loadingText: String? = null,
-    errorText: String? = StringDesc.Resource(MR.strings.error_default_loading_error).localized(),
+    errorText: String? = stringResource(Res.string.error_default_loading_error),
     tryAgainBlock: (() -> Unit)? = null
 ) {
     val data = resource.data()
@@ -134,15 +139,15 @@ private fun <T> Resource<T>.toLoadingStatusViewState(
         }
 
         this is Resource.Error -> {
-            val text = if (throwable is StringDescThrowable) {
-                throwable.stringDesc.localized()
+            val text = if (throwable is StringResourceThrowable) {
+                throwable.stringResource.resolve()
             } else {
                 errorText
             }
 
             LoadingStatusViewState.Error(
                 text = text,
-                tryAgainText = stringResource(MR.strings.error_try_again)
+                tryAgainText = stringResource(Res.string.error_try_again)
             )
         }
 

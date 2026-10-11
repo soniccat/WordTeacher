@@ -22,6 +22,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -39,19 +40,23 @@ import com.aglushkov.wordteacher.shared.repository.dashboard.DashboardRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadCardSetRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.ReadHeadlineRepository
 import com.aglushkov.wordteacher.shared.service.SpaceDashboardResponse
-import dev.icerock.moko.resources.desc.ResourceStringDesc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.Serializable
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import wordteacher.shared.generated.resources.dashboard_cardsets_title
+import wordteacher.shared.generated.resources.dashboard_headline_title
+import wordteacher.shared.generated.resources.dashboard_reading_articles
+import wordteacher.shared.generated.resources.dashboard_ready_to_learn_cardsets_title
+import wordteacher.shared.generated.resources.error_default_loading_error
+import wordteacher.shared.generated.resources.error_try_again
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -70,7 +75,7 @@ interface DashboardVM: Clearable {
     fun onCardSetStartLearningClicked(item: CardSetViewItem)
     fun onArticleClicked(item: ArticleViewItem)
     fun onRemoteCardSetClicked(item: RemoteCardSetViewItem)
-    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper?
     fun onExpandClicked(item: DashboardExpandViewItem)
     fun onLinkClicked(link: String)
     fun onDashboardTryAgainClicked()
@@ -206,8 +211,8 @@ open class DashboardVMIMpl(
         router?.openCardSet(CardSetVM.State.RemoteCardSet(item.remoteCardSetId))
     }
 
-    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
-        return StringDesc.Resource(MR.strings.error_default_loading_error)
+    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper? {
+        return StringResourceWrapper.String(Res.string.error_default_loading_error)
     }
 
     override fun onExpandClicked(item: DashboardExpandViewItem) {
@@ -284,7 +289,7 @@ open class DashboardVMIMpl(
             ?.let { cardSets ->
                 resultList.add(
                     SettingsViewTitleItem(
-                        ResourceStringDesc(MR.strings.dashboard_ready_to_learn_cardsets_title)
+                        StringResourceWrapper.String(Res.string.dashboard_ready_to_learn_cardsets_title)
                     )
                 )
                 if (wereInitialHintsClosed && !prefs.isHintClosed(HintType.DashboardUsersCardSets)) {
@@ -307,7 +312,7 @@ open class DashboardVMIMpl(
                 ?.let { articles ->
                     resultList.add(
                         SettingsViewTitleItem(
-                            ResourceStringDesc(MR.strings.dashboard_reading_articles)
+                            StringResourceWrapper.String(Res.string.dashboard_reading_articles)
                         )
                     )
                     if (wereInitialHintsClosed && !prefs.isHintClosed(HintType.DashboardUsersArticles)) {
@@ -336,7 +341,7 @@ open class DashboardVMIMpl(
                 it.headlineBlock.categories.getOrNull(state.selectedCategoryIndex)?.let { selectedCategory ->
                     resultList.add(
                         SettingsViewTitleItem(
-                            ResourceStringDesc(MR.strings.dashboard_headline_title)
+                            StringResourceWrapper.String(Res.string.dashboard_headline_title)
                         )
                     )
                     if (!prefs.isHintClosed(HintType.DashboardArticles)) {
@@ -379,7 +384,7 @@ open class DashboardVMIMpl(
                 if (it.newCardSetBlock.cardSets.isNotEmpty()) {
                     resultList.add(
                         SettingsViewTitleItem(
-                            ResourceStringDesc(MR.strings.dashboard_cardsets_title)
+                            StringResourceWrapper.String(Res.string.dashboard_cardsets_title)
                         )
                     )
                     if (!prefs.isHintClosed(HintType.DashboardCardSets)) {
@@ -447,8 +452,8 @@ open class DashboardVMIMpl(
             },
             error = {
                 resultList.add(DashboardTryAgainViewItem(
-                    errorText = ResourceStringDesc(MR.strings.error_default_loading_error),
-                    tryAgainActionText = ResourceStringDesc(MR.strings.error_try_again),
+                    errorText = StringResourceWrapper.String(Res.string.error_default_loading_error),
+                    tryAgainActionText = StringResourceWrapper.String(Res.string.error_try_again),
                 ))
             }
         )

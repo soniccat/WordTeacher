@@ -28,10 +28,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import dev.icerock.moko.resources.compose.localized
 
 @Composable
@@ -39,7 +39,7 @@ fun OutlinedTextFieldWithError(
     state: TextFieldState,
     modifier: Modifier = Modifier,
     hint: String,
-    errorText: StringDesc?,
+    errorText: StringResourceWrapper?,
     onFocusChanged: (FocusState) -> Unit = {},
     focusRequester: FocusRequester?,
     focusManager: FocusManager = LocalFocusManager.current,
@@ -89,7 +89,7 @@ fun OutlinedTextFieldWithError(
         ) {
             if (errorText != null) {
                 Text(
-                    errorText.localized(),
+                    errorText.resolve(),
                     color = MaterialTheme.colors.error,
                     style = MaterialTheme.typography.caption
                 )

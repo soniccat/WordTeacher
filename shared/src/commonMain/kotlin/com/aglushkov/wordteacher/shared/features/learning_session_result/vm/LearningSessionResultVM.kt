@@ -12,11 +12,11 @@ import com.aglushkov.wordteacher.shared.general.ViewModel
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ interface LearningSessionResultVM: Clearable {
     fun onTryAgainClicked()
     fun onCloseClicked()
 
-    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc?
+    fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper?
 
     @Serializable
     data class State(
@@ -124,8 +124,8 @@ open class LearningSessionResultVMImpl(
         router?.onScreenFinished(this, SimpleRouter.Result(true))
     }
 
-    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringDesc? {
-        return StringDesc.Resource(MR.strings.learning_session_result_error)
+    override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper? {
+        return StringResourceWrapper.String(Res.string.learning_session_result_error)
     }
 
     private data class LoadedSessionCardResult(

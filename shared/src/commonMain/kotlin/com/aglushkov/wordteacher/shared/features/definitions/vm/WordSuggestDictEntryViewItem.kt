@@ -1,7 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import dev.icerock.moko.resources.desc.StringDesc
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import org.jetbrains.compose.resources.StringResource
 
 class WordSuggestDictEntryViewItem(
     word: String,
@@ -42,29 +43,29 @@ class WordSuggestByTextViewItem(
 }
 
 class WordTextSearchHeaderViewItem(
-    titleText: StringDesc,
-    val showAllWordsActionText: StringDesc,
+    titleText: StringResourceWrapper,
+    val showAllWordsActionText: StringResourceWrapper,
     val isTop: Boolean,
-): BaseViewItem<StringDesc>(titleText, Type) {
+): BaseViewItem<StringResourceWrapper>(titleText, Type) {
     companion object {
         const val Type = 1003
     }
 }
 
 class WordCorrectionsHeaderViewItem(
-    titleText: StringDesc,
+    titleText: StringResourceWrapper,
     val isTop: Boolean,
-): BaseViewItem<StringDesc>(titleText, Type) {
+): BaseViewItem<StringResourceWrapper>(titleText, Type) {
     companion object {
         const val Type = 1010
     }
 }
 
 class WordCorrectionsMisspellingDBFillProgress(
-    val titleText: StringDesc,
+    val titleText: StringResourceWrapper,
     val isLoading: Boolean,
     val progress: Float
-): BaseViewItem<StringDesc>(titleText, Type) {
+): BaseViewItem<StringResourceWrapper>(titleText, Type) {
     companion object {
         const val Type = 1011
     }

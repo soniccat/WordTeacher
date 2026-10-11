@@ -42,6 +42,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.views.AddIcon
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.InlineTextField
@@ -51,17 +52,16 @@ import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.pxToDp
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.model.toStringDesc
+import com.aglushkov.wordteacher.shared.model.toStringResource
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevel
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.localized
-import dev.icerock.moko.resources.compose.stringResource
+import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.cardset_add_label
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -181,7 +181,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 LoadingStatusView(
                     resource = viewItemsRes,
                     loadingText = null,
-                    errorText = vm.getErrorText(viewItemsRes)?.localized()
+                    errorText = vm.getErrorText(viewItemsRes)?.resolve()
                 ) {
                     vm.onTryAgainClicked()
                 }
@@ -609,7 +609,7 @@ private fun CardSetDefinitionView(
                         contentColor = MaterialTheme.colors.onSecondary,
                         content = {
                             Text(
-                                text = stringResource(MR.strings.cardset_add_label),
+                                text = stringResource(Res.string.cardset_add_label),
                                 modifier = Modifier.padding(horizontal = 4.dp)
                             )
                         }
@@ -640,7 +640,7 @@ private fun CardItemTextField(
         modifier = modifier,
         text = text,
         textStyle = textStyle,
-        placeholder = vm.getPlaceholder(item)?.localized().orEmpty(),
+        placeholder = vm.getPlaceholder(item)?.resolve().orEmpty(),
         readOnly = readOnly,
         onValueChanged = {
             vm.onItemTextChanged(it, item, cardId)
@@ -736,7 +736,7 @@ private fun PartOfSpeechSelectPopup(
                             vm.onPartOfSpeechChanged(it, cardId)
                         }
                     ) {
-                        Text(it.toStringDesc().localized())
+                        Text(it.toStringResource().resolve())
                     }
                 }
         }

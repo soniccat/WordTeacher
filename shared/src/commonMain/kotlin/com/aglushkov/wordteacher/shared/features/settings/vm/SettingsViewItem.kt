@@ -1,22 +1,23 @@
 package com.aglushkov.wordteacher.shared.features.settings.vm
 
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradation
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
 import okio.Path
 
 
-class SettingsViewTitleItem(title: StringDesc) : BaseViewItem<StringDesc>(title, Type) {
+class SettingsViewTitleItem(title: StringResourceWrapper) : BaseViewItem<StringResourceWrapper>(title, Type) {
     companion object {
         const val Type = 1000
     }
 }
 
 class SettingsViewTextItem(
-    title: StringDesc,
+    title: StringResourceWrapper,
     val withBottomPadding: Boolean = true,
-) : BaseViewItem<StringDesc>(title, Type) {
+) : BaseViewItem<StringResourceWrapper>(title, Type) {
     companion object {
         const val Type = 1001
     }
@@ -41,13 +42,13 @@ class SettingsSignInItem(
     }
 }
 
-class SettingsSignOutItem(text: StringDesc) : BaseViewItem<StringDesc>(text, Type) {
+class SettingsSignOutItem(text: StringResourceWrapper) : BaseViewItem<StringResourceWrapper>(text, Type) {
     companion object {
         const val Type = 1009
     }
 }
 
-class SettingsViewAuthRefreshButtonItem(text: StringDesc) : BaseViewItem<StringDesc>(text, Type) {
+class SettingsViewAuthRefreshButtonItem(text: StringResourceWrapper) : BaseViewItem<StringResourceWrapper>(text, Type) {
     companion object {
         const val Type = 1004
     }
@@ -79,8 +80,8 @@ class SettingsWordFrequencyGradationItem(
 }
 
 class SettingsWordFrequencyUploadFileItem(
-    text: StringDesc,
-) : BaseViewItem<StringDesc>(text, Type) {
+    text: StringResourceWrapper,
+) : BaseViewItem<StringResourceWrapper>(text, Type) {
     companion object {
         const val Type = 1008
     }
@@ -103,16 +104,16 @@ class SettingsPrivacyPolicyItem(
 }
 
 class SettingsResetHintsItem(
-    text: StringDesc,
-) : BaseViewItem<StringDesc>(text, Type) {
+    text: StringResourceWrapper,
+) : BaseViewItem<StringResourceWrapper>(text, Type) {
     companion object {
         const val Type = 1012
     }
 }
 
 class SettingsResetMisspellingDBItem(
-    text: StringDesc,
-) : BaseViewItem<StringDesc>(text, Type) {
+    text: StringResourceWrapper,
+) : BaseViewItem<StringResourceWrapper>(text, Type) {
     companion object {
         const val Type = 1013
     }

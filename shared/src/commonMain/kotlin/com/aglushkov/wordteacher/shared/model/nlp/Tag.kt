@@ -6,7 +6,7 @@ enum class Tag(val value: String) {
     NNP("NNP"),     // Proper noun, singular
     NNPS("NNPS"),   // Proper noun, plural
 
-    VB("VB"),       // Verb, base form
+    VB("VB"),       // Verb, values form
     VBD("VBD"),     // Verb, past tense
     VBG("VBG"),     // Verb, gerund or present participle
     VBN("VBN"),     // Verb, past participle

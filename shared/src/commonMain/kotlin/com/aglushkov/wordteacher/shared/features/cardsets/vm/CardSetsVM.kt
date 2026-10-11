@@ -15,6 +15,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
@@ -26,13 +27,18 @@ import com.aglushkov.wordteacher.shared.model.toCardSetTag
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.cardsetsearch.CardSetSearchRepository
 import com.aglushkov.wordteacher.shared.repository.dashboard.CardSetTagRepository
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.Raw
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import wordteacher.shared.generated.resources.cardsets_create_cardset
+import wordteacher.shared.generated.resources.cardsets_error
+import wordteacher.shared.generated.resources.cardsets_section_done
+import wordteacher.shared.generated.resources.cardsets_section_not_ready_to_learn
+import wordteacher.shared.generated.resources.cardsets_section_ready_to_learn
+import wordteacher.shared.generated.resources.empty_search_result
+import wordteacher.shared.generated.resources.error_default
 
 interface CardSetsVM: Clearable {
     var router: CardSetsRouter?
@@ -50,8 +56,8 @@ interface CardSetsVM: Clearable {
     fun onCardSetStartLearningClicked(item: CardSetViewItem)
     fun onCardSetClicked(item: CardSetViewItem)
     fun onCardSetRemoved(item: CardSetViewItem)
-    fun getErrorText(): StringDesc
-    fun getEmptySearchText(): StringDesc
+    fun getErrorText(): StringResourceWrapper
+    fun getEmptySearchText(): StringResourceWrapper
     fun onTryAgainClicked()
     fun onSearchFocusChanged(isFocused: Boolean)
     fun onSearchTextChanged(query: String)
@@ -241,16 +247,16 @@ open class CardSetsVMImpl(
             }
         }
         val titles = mapOf(
-            SectionType.READY to StringDesc.Resource(MR.strings.cardsets_section_ready_to_learn),
-            SectionType.NOT_READY to StringDesc.Resource(MR.strings.cardsets_section_not_ready_to_learn),
-            SectionType.DONE to StringDesc.Resource(MR.strings.cardsets_section_done),
+            SectionType.READY to StringResourceWrapper.String(Res.string.cardsets_section_ready_to_learn),
+            SectionType.NOT_READY to StringResourceWrapper.String(Res.string.cardsets_section_not_ready_to_learn),
+            SectionType.DONE to StringResourceWrapper.String(Res.string.cardsets_section_done),
         )
         val resultList = mutableListOf<BaseViewItem<*>>()
         if (!prefs.isHintClosed(HintType.CardSets)) {
             resultList.add(HintViewItem(HintType.CardSets))
         }
         resultList += CreateCardSetViewItem(
-            placeholder = StringDesc.Resource(MR.strings.cardsets_create_cardset),
+            placeholder = StringResourceWrapper.String(Res.string.cardsets_create_cardset),
             text = newCardSetText.orEmpty()
         )
 
@@ -281,12 +287,12 @@ open class CardSetsVMImpl(
         )
     }
 
-    override fun getErrorText(): StringDesc {
-        return StringDesc.Resource(MR.strings.cardsets_error)
+    override fun getErrorText(): StringResourceWrapper {
+        return StringResourceWrapper.String(Res.string.cardsets_error)
     }
 
-    override fun getEmptySearchText(): StringDesc {
-        return StringDesc.Resource(MR.strings.empty_search_result)
+    override fun getEmptySearchText(): StringResourceWrapper {
+        return StringResourceWrapper.String(Res.string.empty_search_result)
     }
 
     override fun onTryAgainClicked() {
@@ -296,8 +302,8 @@ open class CardSetsVMImpl(
 
     private fun showError(e: Throwable) {
         val errorText = e.message?.let {
-            StringDesc.Raw(it)
-        } ?: StringDesc.Resource(MR.strings.error_default)
+            StringResourceWrapper.Raw(it)
+        } ?: StringResourceWrapper.String(Res.string.error_default)
 
         router?.onError(errorText)
     }

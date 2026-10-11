@@ -68,6 +68,7 @@ import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.toAnnotatedString
 import com.aglushkov.wordteacher.shared.general.views.CustomAnnotatedTextListItem
@@ -76,12 +77,10 @@ import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.StartLearningButton
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.desc.ResourceStringDesc
-import dev.icerock.moko.resources.compose.localized
-import dev.icerock.moko.resources.compose.painterResource
+import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.find_article_title
 
 @Composable
 fun FindArticleUIDialog(
@@ -124,7 +123,7 @@ fun FindArticleUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(stringResource(MR.strings.find_article_title)) },
+                title = { Text(stringResource(Res.string.find_article_title)) },
                 actions = actions
             )
 
@@ -175,7 +174,7 @@ fun FindArticleUI(
                 LoadingStatusView(
                     modifier = modifier,
                     resource = itemsState,
-                    errorText = vm.getErrorText(itemsState)?.localized()
+                    errorText = vm.getErrorText(itemsState)?.resolve()
                 )
             }
         }

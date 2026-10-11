@@ -12,7 +12,7 @@ import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyLevelAndRatio
 import dev.icerock.moko.resources.desc.Raw
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import java.io.IOException
 
 @ExperimentalFoundationApi
@@ -25,7 +25,7 @@ private fun DefinitionsUIPreviewWithResponse() {
                 Resource.Loaded(
                     listOf(
                         DefinitionsDisplayModeViewItem(
-                            partsOfSpeechFilterText = StringDesc.Raw("Noun"),
+                            partsOfSpeechFilterText = StringResourceWrapper.Raw("Noun"),
                             canClearPartsOfSpeechFilter = true,
                             modes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged),
                             selectedIndex = 0
@@ -42,15 +42,15 @@ private fun DefinitionsUIPreviewWithResponse() {
                             frequencyLevelAndRatio = WordFrequencyLevelAndRatio(0, 0.1f),
                         ),
                         WordTranscriptionViewItem("[omg]"),
-                        WordPartOfSpeechViewItem(StringDesc.Raw("Noun"), WordTeacherWord.PartOfSpeech.Noun),
+                        WordPartOfSpeechViewItem(StringResourceWrapper.Raw("Noun"), WordTeacherWord.PartOfSpeech.Noun),
                         WordDefinitionViewItem("* definition 1"),
                         WordDefinitionViewItem("* definition 2"),
                         WordSynonymViewItem("synonym 1", Indent.NONE),
                         WordSynonymViewItem("synonym 2", Indent.SMALL),
                         WordExampleViewItem("example 1", Indent.NONE),
                         WordExampleViewItem("example 2", Indent.SMALL),
-                        WordSubHeaderViewItem(StringDesc.Raw("Subheader 1"), Indent.NONE),
-                        WordSubHeaderViewItem(StringDesc.Raw("Subheader 2"), Indent.SMALL),
+                        WordSubHeaderViewItem(StringResourceWrapper.Raw("Subheader 1"), Indent.NONE),
+                        WordSubHeaderViewItem(StringResourceWrapper.Raw("Subheader 2"), Indent.SMALL),
                     )
                 )
             )

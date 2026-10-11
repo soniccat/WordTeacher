@@ -49,19 +49,26 @@ import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleIt
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.compose.localized
-import dev.icerock.moko.resources.format
+import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.dictconfigs_word_count
+import wordteacher.shared.generated.resources.dictconfigs_yandex_api_token_doesnt_exist_placeholder
+import wordteacher.shared.generated.resources.dictconfigs_yandex_api_token_exists_placeholder
+import wordteacher.shared.generated.resources.dictconfigs_yandex_language_placeholder
+import wordteacher.shared.generated.resources.dictconfigs_yandex_param_family_search_filter
+import wordteacher.shared.generated.resources.dictconfigs_yandex_param_require_matching_parts
+import wordteacher.shared.generated.resources.dictconfigs_yandex_param_search_by_word_form
+import wordteacher.shared.generated.resources.dictconfigs_yandex_title
+import wordteacher.shared.generated.resources.settings_title
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -79,7 +86,7 @@ fun DictConfigsUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(stringResource(MR.strings.settings_title)) },
+                title = { Text(stringResource(Res.string.settings_title)) },
                 navigationIcon = {
                     IconButton(
                         onClick = { onBackPressed() }
@@ -130,7 +137,7 @@ private fun showDictConfigsItem(
     }
     is ConfigHeaderViewItem -> {
         ListItem (
-            text = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsTitle) }
+            text = { Text(item.firstItem().resolve(), style = LocalAppTypography.current.settingsTitle) }
         )
     }
     is ConfigTextViewItem -> {
@@ -140,7 +147,7 @@ private fun showDictConfigsItem(
                 end = LocalDimens.current.contentPadding,
                 bottom = LocalDimens.current.contentPadding
             ),
-            content = { Text(item.firstItem().localized(), style = LocalAppTypography.current.settingsText) }
+            content = { Text(item.firstItem().resolve(), style = LocalAppTypography.current.settingsText) }
         )
     }
     is ConfigDictViewItem -> {
@@ -152,7 +159,7 @@ private fun showDictConfigsItem(
         ) {
             CustomListItem(
                 secondaryContent = {
-                    Text(MR.strings.dictconfigs_word_count.format(item.wordCount ?: 0).localized(), style = LocalAppTypography.current.listItemSubtitle)
+                    Text(stringResource(Res.string.dictconfigs_word_count, item.wordCount ?: 0), style = LocalAppTypography.current.listItemSubtitle)
                 }
             ) {
                 Text(item.firstItem(), style = LocalAppTypography.current.settingsText)
@@ -189,7 +196,7 @@ private fun YandexConfigViewItemUI(
             modifier = modifier.fillMaxWidth(),
         ) {
             Text(
-                stringResource(MR.strings.dictconfigs_yandex_title),
+                stringResource(Res.string.dictconfigs_yandex_title),
                 modifier = Modifier.padding(vertical = LocalDimens.current.contentPadding),
                 style = LocalAppTypography.current.dictConfigTitle
             )
@@ -197,9 +204,9 @@ private fun YandexConfigViewItemUI(
                 modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding),
                 initialText = "",
                 placeholder = if (item.hasToken) {
-                    stringResource(MR.strings.dictconfigs_yandex_api_token_exists_placeholder)
+                    stringResource(Res.string.dictconfigs_yandex_api_token_exists_placeholder)
                 } else {
-                    stringResource(MR.strings.dictconfigs_yandex_api_token_doesnt_exist_placeholder)
+                    stringResource(Res.string.dictconfigs_yandex_api_token_doesnt_exist_placeholder)
                 }
             ) {
                 vm.onYandexConfigChanged(item, it, null, null)
@@ -209,7 +216,7 @@ private fun YandexConfigViewItemUI(
                 modifier = Modifier.padding(bottom = LocalDimens.current.contentPadding),
                 initialText = item.lang,
                 placeholder = if (item.lang.isEmpty()) {
-                    stringResource(MR.strings.dictconfigs_yandex_language_placeholder)
+                    stringResource(Res.string.dictconfigs_yandex_language_placeholder)
                 } else {
                     ""
                 }
@@ -231,7 +238,7 @@ private fun YandexConfigViewItemUI(
                         onCheckedChange = null
                     )
                 },
-                content = { Text(stringResource(MR.strings.dictconfigs_yandex_param_family_search_filter)) },
+                content = { Text(stringResource(Res.string.dictconfigs_yandex_param_family_search_filter)) },
             )
             CustomListItem(
                 modifier = Modifier.clickable {
@@ -248,7 +255,7 @@ private fun YandexConfigViewItemUI(
                         onCheckedChange = null
                     )
                 },
-                content = { Text(stringResource(MR.strings.dictconfigs_yandex_param_search_by_word_form)) },
+                content = { Text(stringResource(Res.string.dictconfigs_yandex_param_search_by_word_form)) },
             )
             CustomListItem(
                 modifier = Modifier
@@ -266,7 +273,7 @@ private fun YandexConfigViewItemUI(
                         onCheckedChange = null
                     )
                 },
-                content = { Text(stringResource(MR.strings.dictconfigs_yandex_param_require_matching_parts)) },
+                content = { Text(stringResource(Res.string.dictconfigs_yandex_param_require_matching_parts)) },
             )
         }
     }

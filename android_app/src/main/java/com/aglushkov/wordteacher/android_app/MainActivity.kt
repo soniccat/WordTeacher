@@ -81,14 +81,14 @@ import com.aglushkov.wordteacher.shared.general.SnackbarUI
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.views.slideFromRight
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsVerticalPadding
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 
 class MainActivity : AppCompatActivity(), Router {
     private val bottomBarTabs = listOf(
@@ -392,7 +392,7 @@ class MainActivity : AppCompatActivity(), Router {
                                     }
                                 }
 
-                                override fun onError(text: StringDesc) {
+                                override fun onError(text: StringResourceWrapper) {
                                     mainDecomposeComponent.onError(text)
                                 }
                             }
@@ -566,11 +566,11 @@ class MainActivity : AppCompatActivity(), Router {
 }
 
 sealed class ScreenTab(@StringRes val nameRes: Int, @DrawableRes val iconRes: Int, val decomposeChildConfigClass: Class<*>) {
-    data object Dashboard : ScreenTab(MR.strings.dashboard_title.resourceId, MR.images.tab_dashboard_24.drawableResId, TabDecomposeComponent.ChildConfiguration.DashboardConfiguration::class.java)
-    data object Definitions : ScreenTab(MR.strings.tab_definitions.resourceId, R.drawable.ic_field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
-    data object CardSets : ScreenTab(MR.strings.tab_learning.resourceId, R.drawable.ic_learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
-    data object Articles : ScreenTab(MR.strings.tab_articles.resourceId, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
-    data object Settings : ScreenTab(MR.strings.tab_settings.resourceId, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
+    data object Dashboard : ScreenTab(Res.string.dashboard_title.resourceId, MR.images.tab_dashboard_24.drawableResId, TabDecomposeComponent.ChildConfiguration.DashboardConfiguration::class.java)
+    data object Definitions : ScreenTab(Res.string.tab_definitions.resourceId, R.drawable.ic_field_search_24, TabDecomposeComponent.ChildConfiguration.DefinitionConfiguration::class.java)
+    data object CardSets : ScreenTab(Res.string.tab_learning.resourceId, R.drawable.ic_learning, TabDecomposeComponent.ChildConfiguration.CardSetsConfiguration::class.java)
+    data object Articles : ScreenTab(Res.string.tab_articles.resourceId, R.drawable.ic_tab_article_24, TabDecomposeComponent.ChildConfiguration.ArticlesConfiguration::class.java)
+    data object Settings : ScreenTab(Res.string.tab_settings.resourceId, R.drawable.ic_tab_settings_24, TabDecomposeComponent.ChildConfiguration.SettingsConfiguration::class.java)
 }
 
 const val EXTRA_ARTICLE_ID = "articleId"

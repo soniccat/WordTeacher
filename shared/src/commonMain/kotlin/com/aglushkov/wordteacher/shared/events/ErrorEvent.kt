@@ -1,6 +1,7 @@
 package com.aglushkov.wordteacher.shared.events
 
-import dev.icerock.moko.resources.desc.StringDesc
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+
 
 // TODO: replace with SnackbarEventHolder
-data class ErrorEvent(val text: StringDesc) : Event
+data class ErrorEvent(val text: StringResourceWrapper) : Event

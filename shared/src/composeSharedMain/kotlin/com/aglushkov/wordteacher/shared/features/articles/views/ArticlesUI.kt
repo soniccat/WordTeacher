@@ -17,16 +17,16 @@ import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.views.CustomAnnotatedTextListItem
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
 import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.compose.localized
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.articles_no_articles
 
 @Composable
 fun ArticlesUI(
@@ -48,7 +48,7 @@ fun ArticlesUI(
 //                }
 //            }
             TopAppBar(
-                title = { Text(text = stringResource(MR.strings.articles_title)) }
+                title = { Text(text = stringResource(Res.string.articles_title)) }
             )
 
             val data = articles.data()
@@ -67,8 +67,8 @@ fun ArticlesUI(
                 LoadingStatusView(
                     resource = articles,
                     loadingText = null,
-                    errorText = vm.getErrorText(articles)?.localized(),
-                    emptyText = stringResource(MR.strings.articles_no_articles)
+                    errorText = vm.getErrorText(articles)?.resolve(),
+                    emptyText = stringResource(Res.string.articles_no_articles)
                 ) {
                     vm.onTryAgainClicked()
                 }

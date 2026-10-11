@@ -3,8 +3,8 @@ package com.aglushkov.wordteacher.shared.features.definitions.vm
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.events.Event
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.UpdateText
@@ -14,6 +14,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.getErrorString
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -28,7 +29,7 @@ import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.ShortCardSet
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
-import com.aglushkov.wordteacher.shared.model.toStringDesc
+import com.aglushkov.wordteacher.shared.model.toStringResource
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetsRepository
 import com.aglushkov.wordteacher.shared.repository.clipboard.ClipboardRepository
 import com.aglushkov.wordteacher.shared.repository.db.WordFrequencyGradationProvider
@@ -38,7 +39,6 @@ import com.aglushkov.wordteacher.shared.repository.suggestion.SuggestionReposito
 import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionRepository
-import com.aglushkov.wordteacher.shared.res.MR
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +49,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
+import wordteacher.shared.generated.resources.definitions_add_filter
+import wordteacher.shared.generated.resources.definitions_cardsets_collapse
+import wordteacher.shared.generated.resources.definitions_cardsets_expand
+import wordteacher.shared.generated.resources.definitions_corrections_filling_db
+import wordteacher.shared.generated.resources.definitions_corrections_title
+import wordteacher.shared.generated.resources.definitions_open_cardsets
+import wordteacher.shared.generated.resources.definitions_textsearch_showAllWords
+import wordteacher.shared.generated.resources.definitions_textsearch_title
+import wordteacher.shared.generated.resources.word_section_antonyms
+import wordteacher.shared.generated.resources.word_section_examples
+import wordteacher.shared.generated.resources.word_section_synonyms
 import kotlin.collections.emptyList
 
 interface DefinitionsVM: Clearable {
@@ -72,7 +83,7 @@ interface DefinitionsVM: Clearable {
     fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
-    fun getErrorText(res: Resource<*>): StringDesc?
+    fun getErrorText(res: Resource<*>): StringResourceWrapper?
     fun onSuggestsAppeared()
     fun onBackPressed(): Boolean
     fun onAudioFileClicked(audioFile: WordAudioFilesViewItem.AudioFile)
@@ -432,12 +443,12 @@ open class DefinitionsVMImpl(
 
     private fun getPartOfSpeechChipText(
         partOfSpeechFilter: Set<WordTeacherWord.PartOfSpeech>,
-    ): StringDesc {
+    ): StringResourceWrapper {
         return if (partOfSpeechFilter.isEmpty()) {
-            StringDesc.Resource(MR.strings.definitions_add_filter)
+            StringResourceWrapper.String(Res.string.definitions_add_filter)
         } else {
             val firstFilter = partOfSpeechFilter.first()
-            firstFilter.toStringDesc()
+            firstFilter.toStringResource()
         }
     }
 
@@ -503,7 +514,7 @@ open class DefinitionsVMImpl(
         for (partOfSpeech in word.definitions.keys.filter {
             partsOfSpeechFilter.isEmpty() || partsOfSpeechFilter.contains(it)
         }) {
-            items.add(WordPartOfSpeechViewItem(partOfSpeech.toStringDesc(), partOfSpeech))
+            items.add(WordPartOfSpeechViewItem(partOfSpeech.toStringResource(), partOfSpeech))
 
             for (def in word.definitions[partOfSpeech].orEmpty()) {
                 var isFirstDef = true
@@ -525,7 +536,7 @@ open class DefinitionsVMImpl(
 
                 if (def.examples?.isNotEmpty() == true) {
                     items.add(WordSubHeaderViewItem(
-                        StringDesc.Resource(MR.strings.word_section_examples),
+                        StringResourceWrapper.String(Res.string.word_section_examples),
                         Indent.SMALL
                     ))
                     def.examples.onEachIndexed { index, ex ->
@@ -535,7 +546,7 @@ open class DefinitionsVMImpl(
 
                 if (def.synonyms?.isNotEmpty() == true) {
                     items.add(WordSubHeaderViewItem(
-                        StringDesc.Resource(MR.strings.word_section_synonyms),
+                        StringResourceWrapper.String(Res.string.word_section_synonyms),
                         Indent.SMALL
                     ))
                     for (synonym in def.synonyms) {
@@ -545,7 +556,7 @@ open class DefinitionsVMImpl(
 
                 if (def.antonyms?.isNotEmpty() == true) {
                     items.add(WordSubHeaderViewItem(
-                        StringDesc.Resource(MR.strings.word_section_antonyms),
+                        StringResourceWrapper.String(Res.string.word_section_antonyms),
                         Indent.SMALL
                     ))
                     for (synonym in def.antonyms) {
@@ -629,7 +640,7 @@ open class DefinitionsVMImpl(
         )
     }
 
-    override fun getErrorText(res: Resource<*>): StringDesc? {
+    override fun getErrorText(res: Resource<*>): StringResourceWrapper? {
         val hasConnection = connectivityManager.isDeviceOnline
         val hasResponse = true // TODO: handle error server response
         return res.getErrorString(hasConnection, hasResponse)
@@ -677,19 +688,19 @@ open class DefinitionsVMImpl(
         if (needExpandViewItem) {
             items += CardSetExpandOrCollapseViewItem(
                 isExpanded = false,
-                text = StringDesc.Resource(MR.strings.definitions_cardsets_expand)
+                text = StringResourceWrapper.String(Res.string.definitions_cardsets_expand)
             )
         } else if (needCollapseViewItem) {
             items += CardSetExpandOrCollapseViewItem(
                 isExpanded = true,
-                text = StringDesc.Resource(MR.strings.definitions_cardsets_collapse)
+                text = StringResourceWrapper.String(Res.string.definitions_cardsets_collapse)
             )
         }
 
         return listOf(
             *items.toTypedArray(),
             OpenCardSetViewItem(
-                text = StringDesc.Resource(MR.strings.definitions_open_cardsets)
+                text = StringResourceWrapper.String(Res.string.definitions_open_cardsets)
             )
         )
     }
@@ -768,7 +779,7 @@ open class DefinitionsVMImpl(
                 ) {
                     listOf(
                         WordCorrectionsHeaderViewItem(
-                            titleText = StringDesc.Resource(MR.strings.definitions_corrections_title),
+                            titleText = StringResourceWrapper.String(Res.string.definitions_corrections_title),
                             isTop = fromDicts.isEmpty(),
                         )
                     )
@@ -790,7 +801,7 @@ open class DefinitionsVMImpl(
                 } else {
                     correctionItems = listOf(
                         WordCorrectionsMisspellingDBFillProgress(
-                            titleText = StringDesc.Resource(MR.strings.definitions_corrections_filling_db),
+                            titleText = StringResourceWrapper.String(Res.string.definitions_corrections_filling_db),
                             isLoading = misspellingDBLoadingRes.isLoading(),
                             progress = misspellingDBLoadingRes.data() ?: 0.0f
                         )
@@ -800,8 +811,8 @@ open class DefinitionsVMImpl(
                 val textSearchHeader = if (data.texts.data()?.isNotEmpty() == true) {
                     listOf(
                         WordTextSearchHeaderViewItem(
-                            StringDesc.Resource(MR.strings.definitions_textsearch_title),
-                            StringDesc.Resource(MR.strings.definitions_textsearch_showAllWords),
+                            StringResourceWrapper.String(Res.string.definitions_textsearch_title),
+                            StringResourceWrapper.String(Res.string.definitions_textsearch_showAllWords),
                             isTop = fromDicts.isEmpty() && correctionItems.isEmpty(),
                         )
                     )

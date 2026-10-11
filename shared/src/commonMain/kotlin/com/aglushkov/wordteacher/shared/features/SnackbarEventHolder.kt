@@ -1,12 +1,18 @@
 package com.aglushkov.wordteacher.shared.features
 
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.ResourceFormatted
-import dev.icerock.moko.resources.desc.StringDesc
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import wordteacher.shared.generated.resources.Res
+import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import wordteacher.shared.generated.resources.articles_action_article_created
+import wordteacher.shared.generated.resources.articles_action_open
+import wordteacher.shared.generated.resources.cardsets_search_added
+import wordteacher.shared.generated.resources.cardsets_search_added_open
+import wordteacher.shared.generated.resources.cardsets_search_try_again
+import wordteacher.shared.generated.resources.definitions_cardsets_card_added
+import wordteacher.shared.generated.resources.definitions_cardsets_open
 
 interface SnackbarEventHolderRouter {
     fun openArticle(id: Long)
@@ -36,59 +42,59 @@ interface SnackbarEventHolder {
 
     fun onArticleCreated(articleId: Long)
     fun onCardSetUpdated(cardSetId: Long)
-    fun onError(text: StringDesc, actionText: StringDesc? = null, onActionCalled: (() -> Unit)? = null)
+    fun onError(text: StringResourceWrapper, actionText: StringResourceWrapper? = null, onActionCalled: (() -> Unit)? = null)
     fun onCardSetCreated(cardSetId: Long, name: String)
     fun onCardSetLoadingError(remoteId: String, name: String, onActionCalled: (() -> Unit)?)
 
     fun onEventHandled(event: Event, withAction: Boolean)
 
     sealed interface Event {
-        val text: StringDesc
-        val actionText: StringDesc?
+        val text: StringResourceWrapper
+        val actionText: StringResourceWrapper?
             get() = null
         val onActionCalled: (() -> Unit)?
             get() = null
 
         data class OpenArticleEvent(
-            override val text: StringDesc,
-            val openText: StringDesc,
+            override val text: StringResourceWrapper,
+            val openText: StringResourceWrapper,
             val id: Long,
         ) : Event {
-            override val actionText: StringDesc
+            override val actionText: StringResourceWrapper
                 get() = openText
         }
 
         data class CardSetUpdatedEvent(
-            override val text: StringDesc,
-            val openText: StringDesc,
+            override val text: StringResourceWrapper,
+            val openText: StringResourceWrapper,
             val id: Long,
         ): Event {
-            override val actionText: StringDesc
+            override val actionText: StringResourceWrapper
                 get() = openText
         }
 
         data class OpenCardSetEvent(
-            override val text: StringDesc,
-            val openText: StringDesc,
+            override val text: StringResourceWrapper,
+            val openText: StringResourceWrapper,
             val id: Long,
         ): Event {
-            override val actionText: StringDesc
+            override val actionText: StringResourceWrapper
                 get() = openText
         }
 
         data class CardSetLoadingError(
-            override val text: StringDesc,
+            override val text: StringResourceWrapper,
             val remoteId: String,
-            val reloadText: StringDesc,
+            val reloadText: StringResourceWrapper,
             override val onActionCalled: (() -> Unit)? = null,
         ): Event {
-            override val actionText: StringDesc
+            override val actionText: StringResourceWrapper
                 get() = reloadText
         }
 
         data class ErrorEvent(
-            override val text: StringDesc,
-            override val actionText: StringDesc? = null,
+            override val text: StringResourceWrapper,
+            override val actionText: StringResourceWrapper? = null,
             override val onActionCalled: (() -> Unit)? = null,
         ): Event
     }
@@ -110,7 +116,7 @@ class SnackbarEventHolderImpl: SnackbarEventHolder {
         }
     }
 
-    override fun onError(text: StringDesc, actionText: StringDesc?, onActionCalled: (() -> Unit)?) {
+    override fun onError(text: StringResourceWrapper, actionText: StringResourceWrapper?, onActionCalled: (() -> Unit)?) {
         events.update {
             it + SnackbarEventHolder.Event.ErrorEvent(text, actionText, onActionCalled)
         }
@@ -119,8 +125,8 @@ class SnackbarEventHolderImpl: SnackbarEventHolder {
     override fun onCardSetCreated(cardSetId: Long, name: String) {
         events.update {
             it + SnackbarEventHolder.Event.OpenCardSetEvent(
-                text = StringDesc.ResourceFormatted(MR.strings.cardsets_search_added, name),
-                openText = StringDesc.Resource(MR.strings.cardsets_search_added_open),
+                text = StringResourceWrapper.FormattedString(Res.string.cardsets_search_added, listOf(name)),
+                openText = StringResourceWrapper.String(Res.string.cardsets_search_added_open),
                 id = cardSetId,
             )
         }
@@ -129,9 +135,9 @@ class SnackbarEventHolderImpl: SnackbarEventHolder {
     override fun onCardSetLoadingError(remoteId: String, name: String, onActionCalled: (() -> Unit)?) {
         events.update {
             it + SnackbarEventHolder.Event.CardSetLoadingError(
-                text = StringDesc.ResourceFormatted(MR.strings.cardsets_search_added, name),
+                text = StringResourceWrapper.FormattedString(Res.string.cardsets_search_added, listOf(name)),
                 remoteId = remoteId,
-                reloadText = StringDesc.Resource(MR.strings.cardsets_search_try_again),
+                reloadText = StringResourceWrapper.String(Res.string.cardsets_search_try_again),
                 onActionCalled = onActionCalled
              )
         }
@@ -153,14 +159,14 @@ class SnackbarEventHolderImpl: SnackbarEventHolder {
     }
 
     private fun createOpenArticleEvent(id: Long) = SnackbarEventHolder.Event.OpenArticleEvent(
-        text = StringDesc.Resource(MR.strings.articles_action_article_created),
-        openText = StringDesc.Resource(MR.strings.articles_action_open),
+        text = StringResourceWrapper.String(Res.string.articles_action_article_created),
+        openText = StringResourceWrapper.String(Res.string.articles_action_open),
         id = id,
     )
 
     private fun createCardSetUpdatedEvent(id: Long) = SnackbarEventHolder.Event.CardSetUpdatedEvent(
-        text = StringDesc.Resource(MR.strings.definitions_cardsets_card_added),
-        openText = StringDesc.Resource(MR.strings.definitions_cardsets_open),
+        text = StringResourceWrapper.String(Res.string.definitions_cardsets_card_added),
+        openText = StringResourceWrapper.String(Res.string.definitions_cardsets_open),
         id = id
     )
 }

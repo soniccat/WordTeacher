@@ -43,7 +43,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import dagger.Module
 import dagger.Provides
 import io.ktor.http.Url
@@ -74,12 +74,12 @@ class AppModule {
     @ApiBaseUrl
     @AppComp
     @Provides
-    fun apiBaseUrl(): String = MR.strings.api_base_url.localized()
+    fun apiBaseUrl(): String = Res.string.api_base_url.resolve()
 
     @Email
     @AppComp
     @Provides
-    fun email(): String = MR.strings.support_email.localized()
+    fun email(): String = Res.string.support_email.resolve()
 
     @AppComp
     @Provides

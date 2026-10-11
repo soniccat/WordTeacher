@@ -121,7 +121,7 @@ class DictAnnotationResolverTest {
             }
         )
 
-        val nlpSentence = nlpSentenceProcessor.processString("In fact, many phrasal verbs are distinct variations on the same base verb, which can add to the confusion", nlpCore)
+        val nlpSentence = nlpSentenceProcessor.processString("In fact, many phrasal verbs are distinct variations on the same values verb, which can add to the confusion", nlpCore)
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,

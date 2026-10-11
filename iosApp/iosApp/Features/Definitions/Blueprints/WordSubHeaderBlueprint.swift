@@ -19,6 +19,6 @@ class WordSubHeaderBlueprint: Blueprint {
         view.contentView.layoutMargins.top = Style.cellSubHeaderTopMargin
         view.contentView.layoutMargins.bottom = Style.cellHeaderBottomMargin
         view.label.applyTextAppearance(Style.wordSubHeaderTextAppearance)
-        view.label.text = viewItem.firstItem()?.localized()
+        view.label.text = viewItem.firstItem()?.resolve()
     }
 }

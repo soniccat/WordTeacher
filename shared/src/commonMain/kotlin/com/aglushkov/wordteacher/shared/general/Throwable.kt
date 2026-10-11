@@ -1,19 +1,18 @@
 package com.aglushkov.wordteacher.shared.general
 
-import com.aglushkov.wordteacher.shared.res.MR
-import dev.icerock.moko.resources.desc.RawStringDesc
-import dev.icerock.moko.resources.desc.ResourceStringDesc
-import dev.icerock.moko.resources.desc.StringDesc
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.error_default
 
-fun Throwable.toStringDesc(): StringDesc {
+fun Throwable.toStringResource(): StringResourceWrapper {
     return message?.let {
-        RawStringDesc(it)
+        StringResourceWrapper.Raw(it)
     } ?: run {
-        ResourceStringDesc(MR.strings.error_default)
+        StringResourceWrapper.String(Res.string.error_default)
     }
 }
 
-class StringDescThrowable(
-    val stringDesc: StringDesc,
+class StringResourceThrowable(
+    val stringResource: StringResourceWrapper,
     cause: Throwable? = null,
 ): Throwable(null, cause)

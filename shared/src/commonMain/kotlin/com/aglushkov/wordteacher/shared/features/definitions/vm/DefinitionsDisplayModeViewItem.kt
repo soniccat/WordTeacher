@@ -1,10 +1,11 @@
 package com.aglushkov.wordteacher.shared.features.definitions.vm
 
-import dev.icerock.moko.resources.desc.StringDesc
+import org.jetbrains.compose.resources.StringResource
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 
 class DefinitionsDisplayModeViewItem(
-    val partsOfSpeechFilterText: StringDesc,
+    val partsOfSpeechFilterText: StringResourceWrapper,
     val canClearPartsOfSpeechFilter: Boolean,
     modes: List<DefinitionsDisplayMode>,
     val selectedIndex: Int

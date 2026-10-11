@@ -27,7 +27,7 @@ import com.aglushkov.wordteacher.android_app.features.textaction.TextActionActiv
 import com.aglushkov.wordteacher.shared.general.DarkWindowBackground
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.views.dpToPx
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import java.lang.ref.WeakReference
 
 
@@ -70,7 +70,7 @@ class WebLinkOpenerImpl: WebLinkOpener {
                             }
                         )
                     }!!.toBitmap(),
-                    MR.strings.cardset_info_import_action.getString(activity),
+                    Res.string.cardset_info_import_action.getString(activity),
                     PendingIntent.getActivity(
                         activity.applicationContext,
                         0,

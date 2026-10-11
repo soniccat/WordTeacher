@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.features.add_article.vm.AddArticleVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalDimens
@@ -34,17 +34,21 @@ import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.OutlinedTextFieldWithError
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
-import dev.icerock.moko.resources.compose.localized
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.add_article_create_set_option
+import wordteacher.shared.generated.resources.add_article_done
+import wordteacher.shared.generated.resources.add_article_field_text_hint
+import wordteacher.shared.generated.resources.add_article_field_title_hint
+import wordteacher.shared.generated.resources.add_article_title
 
 @Composable
 fun AddArticleUIDialog(
@@ -91,7 +95,7 @@ fun AddArticleUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(text = stringResource(MR.strings.add_article_title)) },
+                title = { Text(text = stringResource(Res.string.add_article_title)) },
                 actions = actions
             )
 
@@ -119,7 +123,7 @@ fun AddArticleUI(
                         }
                     } else {
                         Text(
-                            text = stringResource(MR.strings.add_article_done),
+                            text = stringResource(Res.string.add_article_done),
                             modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
                         )
                     }
@@ -145,7 +149,7 @@ private fun AddArticlesFieldsUI(
         LoadingStatusView(
             resource = uiState,
             loadingText = null,
-            errorText = vm.getErrorText()?.localized(),
+            errorText = vm.getErrorText()?.resolve(),
         ) {
             vm.onTryAgainPressed()
         }
@@ -197,7 +201,7 @@ private fun AddArticlesFieldsUI(
                     start = LocalDimens.current.contentPadding,
                     end = LocalDimens.current.contentPadding,
                 ),
-                hint = stringResource(MR.strings.add_article_field_title_hint),
+                hint = stringResource(Res.string.add_article_field_title_hint),
                 errorText = data.titleError,
                 onFocusChanged = {
                     if (it.isFocused) {
@@ -225,7 +229,7 @@ private fun AddArticlesFieldsUI(
                         )
                 ) {
                     Text(
-                        text = stringResource(MR.strings.add_article_create_set_option),
+                        text = stringResource(Res.string.add_article_create_set_option),
                         modifier = Modifier
                             .padding(end = 16.dp)
                             .weight(1.0f)
@@ -252,7 +256,7 @@ private fun AddArticlesFieldsUI(
                         maxHeight = 600.dp
                     ),
                 label = {
-                    Text(stringResource(MR.strings.add_article_field_text_hint))
+                    Text(stringResource(Res.string.add_article_field_text_hint))
                 }
             )
         }

@@ -1,7 +1,8 @@
 package com.aglushkov.wordteacher.shared.features.cardsets.vm
 
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
-import dev.icerock.moko.resources.desc.StringDesc
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import org.jetbrains.compose.resources.StringResource
 
 class CardSetViewItem(
     val cardSetId: Long,
@@ -27,7 +28,7 @@ class CardSetViewItem(
 
 class CardSetExpandOrCollapseViewItem(
     val isExpanded: Boolean,
-    val text: StringDesc,
+    val text: StringResourceWrapper,
 ): BaseViewItem<Boolean>(isExpanded, Type) {
     companion object {
         const val Type = 402
@@ -54,9 +55,9 @@ class RemoteCardSetViewItem(
 }
 
 class SectionViewItem(
-    val name: StringDesc,
+    val name: StringResourceWrapper,
     val isTop: Boolean,
-): BaseViewItem<StringDesc>(name, Type) {
+): BaseViewItem<StringResourceWrapper>(name, Type) {
     companion object {
         const val Type = 402
     }

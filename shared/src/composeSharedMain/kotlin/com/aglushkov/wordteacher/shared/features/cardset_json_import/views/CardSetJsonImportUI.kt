@@ -14,19 +14,24 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aglushkov.wordteacher.shared.res.MR
+import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.events.CompletionData
 import com.aglushkov.wordteacher.shared.events.CompletionEvent
 import com.aglushkov.wordteacher.shared.events.ErrorEvent
 import com.aglushkov.wordteacher.shared.features.cardset_json_import.vm.CardSetJsonImportVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.compose.localized
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import wordteacher.shared.generated.resources.add_article_done
+import wordteacher.shared.generated.resources.add_article_field_text_hint
+import wordteacher.shared.generated.resources.cardset_json_import_check
+import wordteacher.shared.generated.resources.cardset_json_import_enrich
+import wordteacher.shared.generated.resources.cardset_json_import_title
 
 @Composable
 fun CardSetJsonImportUIDialog(
@@ -65,7 +70,7 @@ fun CardSetJsonImportUI(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val focusRequester = remember { FocusRequester() }
-    val snackbarStringDesc = remember { mutableStateOf<dev.icerock.moko.resources.desc.StringDesc?>(null) }
+    val snackbarStringResource = remember { mutableStateOf<StringResourceWrapper?>(null) }
 
     Box(
         modifier = Modifier
@@ -75,7 +80,7 @@ fun CardSetJsonImportUI(
     ) {
         Column {
             TopAppBar(
-                title = { Text(text = stringResource(MR.strings.cardset_json_import_title)) },
+                title = { Text(text = stringResource(Res.string.cardset_json_import_title)) },
                 actions = actions
             )
 
@@ -93,7 +98,7 @@ fun CardSetJsonImportUI(
             ExtendedFloatingActionButton(
                 text = {
                     Text(
-                        text = stringResource(MR.strings.cardset_json_import_enrich),
+                        text = stringResource(Res.string.cardset_json_import_enrich),
                         modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
                     )
                 },
@@ -103,7 +108,7 @@ fun CardSetJsonImportUI(
             ExtendedFloatingActionButton(
                 text = {
                     Text(
-                        text = stringResource(MR.strings.cardset_json_import_check),
+                        text = stringResource(Res.string.cardset_json_import_check),
                         modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
                     )
                 },
@@ -113,7 +118,7 @@ fun CardSetJsonImportUI(
             ExtendedFloatingActionButton(
                 text = {
                     Text(
-                        text = stringResource(MR.strings.add_article_done),
+                        text = stringResource(Res.string.add_article_done),
                         modifier = Modifier.padding(horizontal = LocalDimens.current.contentPadding)
                     )
                 },
@@ -127,7 +132,7 @@ fun CardSetJsonImportUI(
             modifier = Modifier.Companion.align(Alignment.BottomCenter)
         ) {
             CustomSnackbar(
-                message = snackbarStringDesc.value?.localized(),
+                message = snackbarStringResource.value?.resolve(),
                 snackbarData = it,
             )
         }
@@ -143,7 +148,7 @@ fun CardSetJsonImportUI(
                 }
                 is ErrorEvent -> {
                     launch {
-                        snackbarStringDesc.value = it.text
+                        snackbarStringResource.value = it.text
                         snackbarHostState.showSnackbar("")
                     }
                 }
@@ -184,7 +189,7 @@ private fun CardSetJsonImportFieldsUI(
                     },
                     maxHeight = listBottomPadding()
                 ),
-            label = { Text(stringResource(MR.strings.add_article_field_text_hint)) }
+            label = { Text(stringResource(Res.string.add_article_field_text_hint)) }
         )
         Box(
             modifier = Modifier
@@ -194,7 +199,7 @@ private fun CardSetJsonImportFieldsUI(
             val titleErrorDesc = jsonTextError
             if (titleErrorDesc != null) {
                 Text(
-                    titleErrorDesc.localized(),
+                    titleErrorDesc.resolve(),
                     color = MaterialTheme.colors.error,
                     style = MaterialTheme.typography.caption
                 )
