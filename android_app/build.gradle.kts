@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.playServicesPlugin)
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.baselineprofile)
 }
 
@@ -184,5 +184,5 @@ baselineProfile {
 dependencies {
     implementation(libs.androidx.profileinstaller)
     "baselineProfile"(project(":baselineprofile"))
-    configurations["kapt"](libs.daggerCompiler)
+    add("ksp", libs.daggerCompiler)
 }

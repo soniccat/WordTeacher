@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -86,7 +85,6 @@ kotlin {
                 implementation(libs.jsoup)
                 implementation(libs.opennlp)
                 api(libs.decomposeComposeExtensions)
-//                api(libs.mokoCompose)
             }
         }
         val androidMain by getting {
@@ -164,14 +162,8 @@ sqldelight {
     }
 }
 
-//multiplatformResources {
-//    resourcesPackage.set("com.aglushkov.wordteacher.shared.res") // required
-//    iosBaseLocalizationRegion = "en" // optional, default "en"
-//}
-
 // For now you have to comment this to be able to build desktop... I'm investigating...
 dependencies {
     add("kspAndroid", libs.daggerCompiler)
-//    configurations["kapt"](libs.daggerCompiler)
 }
 
