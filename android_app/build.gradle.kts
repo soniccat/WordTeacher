@@ -1,6 +1,5 @@
 import java.io.FileInputStream
 import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -110,6 +109,16 @@ android {
                 put("YANDEX_CLIENT_ID", yandexProps!!["yandex_id_client_id"]!!)
             }
         )
+
+        yandexProps?.onEach {
+            resValue("string", it.key.toString(), it.value.toString())
+        }
+        telegramProps?.onEach {
+            resValue("string", it.key.toString(), it.value.toString())
+        }
+
+        buildConfigField("int", "defaultWordlistVersion", "1")
+        buildConfigField("int", "misspellingDbVersion", "1")
     }
     packaging {
         resources {
@@ -117,18 +126,6 @@ android {
         }
     }
     buildTypes {
-        defaultConfig {
-            yandexProps?.onEach {
-                resValue("string", it.key.toString(), it.value.toString())
-            }
-            telegramProps?.onEach {
-                resValue("string", it.key.toString(), it.value.toString())
-            }
-
-            buildConfigField("int", "defaultWordlistVersion", "1")
-            buildConfigField("int", "misspellingDbVersion", "1")
-        }
-
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -161,10 +158,6 @@ android {
         compose = true
         buildConfig = true
     }
-    dependencies {
-        debugImplementation(compose.uiTooling)
-        coreLibraryDesugaring(libs.desugar.jdk.libs)
-    }
     signingConfigs {
         getByName("debug") {
             debugKeystoreProps?.let { props ->
@@ -185,4 +178,6 @@ dependencies {
     implementation(libs.androidx.profileinstaller)
     "baselineProfile"(project(":baselineprofile"))
     add("ksp", libs.daggerCompiler)
+    debugImplementation(compose.uiTooling)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
