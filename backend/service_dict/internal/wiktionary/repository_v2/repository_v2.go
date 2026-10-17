@@ -129,7 +129,22 @@ func (r *Repository) DefinitionsForTerms(ctx context.Context, terms []string) ([
 		return nil, logger.WrapError(ctx, err)
 	}
 
-	return result, nil
+	// put exact match first
+	termsMap := make(map[string]bool, len(result))
+	for _, t := range terms {
+		termsMap[t] = true
+	}
+	exactMatch := make([]WordEntry, 0, len(result))
+	other := make([]WordEntry, 0, len(result)/2)
+	for _, r := range result {
+		if _, ok := termsMap[r.Term]; ok {
+			exactMatch = append(exactMatch, r)
+		} else {
+			other = append(other, r)
+		}
+	}
+
+	return append(exactMatch, other...), nil
 }
 
 func (m *Repository) CreateIndexIfNeeded() error {
