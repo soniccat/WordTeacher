@@ -3,7 +3,6 @@ import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
@@ -56,11 +55,13 @@ if (yandexPropFile.exists()) {
     }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
-    }
-}
+//kotlin {
+//    target {
+//        compilerOptions {
+//            jvmTarget = JvmTarget.JVM_11
+//        }
+//    }
+//}
 
 // Signing file
 var debugKeystoreProps: Properties? = null

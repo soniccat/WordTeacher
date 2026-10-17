@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.0"
+agp = "9.4.0"
 android-compileSdk = "37"
 android-minSdk = "26"
 android-targetSdk = "37"
@@ -143,6 +143,5 @@ sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 playServicesPlugin = { id = "com.google.gms.google-services", version.ref = "playServicesPlugin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 android-test = { id = "com.android.test", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }

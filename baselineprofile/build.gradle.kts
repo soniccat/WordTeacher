@@ -1,12 +1,9 @@
-import org.jetbrains.compose.reload.gradle.forAllJvmTargets
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 import kotlin.apply
 
 plugins {
     alias(libs.plugins.android.test)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.baselineprofile)
 }
 
@@ -35,11 +32,11 @@ repositories {
     }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.fromTarget("11")
-    }
-}
+//kotlin {
+//    compilerOptions {
+//        jvmTarget = JvmTarget.fromTarget("11")
+//    }
+//}
 
 android {
     namespace = "com.aglushkov.wordteacher.baselineprofile"

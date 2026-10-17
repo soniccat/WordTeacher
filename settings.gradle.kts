@@ -28,7 +28,7 @@ dependencyResolutionManagement {
     }
 }
 
-includeBuild("config-generator")
+//includeBuild("config-generator")
 
 include(":android_app")
 include(":shared")
