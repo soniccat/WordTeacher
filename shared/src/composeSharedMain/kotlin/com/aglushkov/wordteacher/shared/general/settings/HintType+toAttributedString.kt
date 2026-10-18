@@ -17,11 +17,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.em
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import wordteacher.shared.generated.resources.Res
 import wordteacher.shared.generated.resources.add_white_24
 import wordteacher.shared.generated.resources.article_filter_24
 import wordteacher.shared.generated.resources.close_18
 import wordteacher.shared.generated.resources.download_for_offline
+import wordteacher.shared.generated.resources.learning_instruction_challenge_test
 import wordteacher.shared.generated.resources.start_learning_rounded_24
 
 private const val HintIntroduction_Close = "Hint_Close"
@@ -88,6 +90,7 @@ fun TextIcon(
     )
 }
 
+@Composable
 fun HintType.toAttributedString(): AnnotatedString {
     return when (this) {
         HintType.Introduction -> buildAnnotatedString {
@@ -147,6 +150,12 @@ fun HintType.toAttributedString(): AnnotatedString {
         }
         HintType.DefinitionEmptyResult -> buildAnnotatedString {
             append("Or consider adding DSL dictionaries in any language for access in offline. Tap to open settings.")
+        }
+        HintType.LearningTestHint -> {
+            val instruction = stringResource(Res.string.learning_instruction_challenge_test)
+            buildAnnotatedString {
+                append(instruction)
+            }
         }
     }
 }

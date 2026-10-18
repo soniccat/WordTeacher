@@ -55,6 +55,8 @@ import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resources.resolve
+import com.aglushkov.wordteacher.shared.general.settings.HintType
+import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
@@ -539,6 +541,8 @@ private fun testChallengeUI(
     data: LearningVM.Challenge.Test,
     vm: LearningVM
 ) {
+    val needShowHint by vm.needShowTestHint.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -546,17 +550,15 @@ private fun testChallengeUI(
             .padding(dimensionResource(id = R.dimen.learning_testOption_margin))
     ) {
         Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = data.instruction.resolve(),
-                    modifier = Modifier.padding(
+            if (needShowHint) {
+                HintView(
+                    hintType = HintType.LearningTestHint,
+                    contentPadding = PaddingValues(
                         start = LocalDimens.current.contentPadding,
                         top = LocalDimens.current.contentPadding,
-                        end = LocalDimens.current.contentPadding
+                        end = LocalDimens.current.contentPadding,
                     ),
-                    style = LocalAppTypography.current.learningHint
+                    onHidden = { vm.onHintHidden(HintType.LearningTestHint) }
                 )
             }
 

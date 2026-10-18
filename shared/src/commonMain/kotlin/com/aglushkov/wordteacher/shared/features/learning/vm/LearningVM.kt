@@ -29,7 +29,10 @@ import com.aglushkov.wordteacher.shared.general.resource.Color
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.buildSimpleResourceRepository
+import com.aglushkov.wordteacher.shared.general.settings.HintType
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
+import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.toStringResource
@@ -42,7 +45,6 @@ import kotlinx.serialization.Serializable
 import wordteacher.shared.generated.resources.learning_delete_hint
 import wordteacher.shared.generated.resources.learning_error
 import wordteacher.shared.generated.resources.learning_instruction_challenge_match
-import wordteacher.shared.generated.resources.learning_instruction_challenge_test
 import wordteacher.shared.generated.resources.learning_wrong_input
 import wordteacher.shared.generated.resources.word_section_examples
 import wordteacher.shared.generated.resources.word_section_synonyms
@@ -56,6 +58,7 @@ interface LearningVM: Clearable {
     val canShowHint: StateFlow<Boolean>
     val hintString: StateFlow<Hint?>
     val playSoundOnChallengeCompletion: StateFlow<Boolean>
+    val needShowTestHint: StateFlow<Boolean>
 
     fun onMatchTermPressed(matchRow: Challenge.MatchRow)
     fun onMatchExamplePressed(matchRow: Challenge.MatchRow)
@@ -73,6 +76,7 @@ interface LearningVM: Clearable {
     fun onPlaySoundOnChallengeCompletionClicked()
     fun onShowDeleteCardHintClicked()
     fun onDeleteCardClicked()
+    fun onHintHidden(hintType: HintType)
 
     fun save(): State
     fun getErrorText(res: Resource<*>): StringResourceWrapper?
@@ -96,7 +100,6 @@ interface LearningVM: Clearable {
         )
 
         data class Test(
-            val instruction: StringResourceWrapper,
             val term: String,
             val index: Int,
             val count: Int,
@@ -170,6 +173,7 @@ open class LearningVMImpl(
     override val playSoundOnChallengeCompletion = MutableStateFlow(
         settings.boolean(SETTING_PLAY_SOUND_ON_CHALLENGE_COMPLETION, true)
     )
+    override val needShowTestHint = MutableStateFlow(!settings.isHintClosed(HintType.LearningTestHint))
     private val matchColorMap: MutableMap<Int, Int> = mutableMapOf() // selection group to color index from MatchColors
 
     private var teacher: CardTeacher? = null
@@ -285,7 +289,6 @@ open class LearningVMImpl(
                         challengeState.update {
                             Resource.Loaded(
                                 LearningVM.Challenge.Test(
-                                    instruction = StringResourceWrapper.String(Res.string.learning_instruction_challenge_test),
                                     term = textCard.card.term,
                                     index = index,
                                     count = teacher.sessionCardCount,
@@ -556,6 +559,12 @@ open class LearningVMImpl(
                 value = StringResourceWrapper.String(Res.string.learning_delete_hint)
             )
         }
+    }
+
+    override fun onHintHidden(hintType: HintType) {
+        analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
+        settings.setHintClosed(hintType)
+        needShowTestHint.update { false }
     }
 
     override fun onDeleteCardClicked() {
