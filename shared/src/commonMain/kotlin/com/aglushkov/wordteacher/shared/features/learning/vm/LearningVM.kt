@@ -44,7 +44,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import wordteacher.shared.generated.resources.learning_delete_hint
 import wordteacher.shared.generated.resources.learning_error
-import wordteacher.shared.generated.resources.learning_instruction_challenge_match
 import wordteacher.shared.generated.resources.learning_wrong_input
 import wordteacher.shared.generated.resources.word_section_examples
 import wordteacher.shared.generated.resources.word_section_synonyms
@@ -59,6 +58,7 @@ interface LearningVM: Clearable {
     val hintString: StateFlow<Hint?>
     val playSoundOnChallengeCompletion: StateFlow<Boolean>
     val needShowTestHint: StateFlow<Boolean>
+    val needShowMatchHint: StateFlow<Boolean>
 
     fun onMatchTermPressed(matchRow: Challenge.MatchRow)
     fun onMatchExamplePressed(matchRow: Challenge.MatchRow)
@@ -88,7 +88,6 @@ interface LearningVM: Clearable {
 
     sealed interface Challenge {
         data class Match(
-            val instruction: StringResourceWrapper,
             val rows: List<MatchRow>
         ): Challenge
 
@@ -174,6 +173,7 @@ open class LearningVMImpl(
         settings.boolean(SETTING_PLAY_SOUND_ON_CHALLENGE_COMPLETION, true)
     )
     override val needShowTestHint = MutableStateFlow(!settings.isHintClosed(HintType.LearningTestHint))
+    override val needShowMatchHint = MutableStateFlow(!settings.isHintClosed(HintType.LearningMatchHint))
     private val matchColorMap: MutableMap<Int, Int> = mutableMapOf() // selection group to color index from MatchColors
 
     private var teacher: CardTeacher? = null
@@ -254,7 +254,6 @@ open class LearningVMImpl(
                         challengeState.update {
                             Resource.Loaded(
                                 LearningVM.Challenge.Match(
-                                    instruction = StringResourceWrapper.String(Res.string.learning_instruction_challenge_match),
                                     rows = pairs.mapIndexed { index, matchPair ->
                                         LearningVM.Challenge.MatchRow(
                                             index,
@@ -564,7 +563,11 @@ open class LearningVMImpl(
     override fun onHintHidden(hintType: HintType) {
         analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
         settings.setHintClosed(hintType)
-        needShowTestHint.update { false }
+        when (hintType) {
+            HintType.LearningTestHint -> needShowTestHint.update { false }
+            HintType.LearningMatchHint -> needShowMatchHint.update { false }
+            else -> {}
+        }
     }
 
     override fun onDeleteCardClicked() {

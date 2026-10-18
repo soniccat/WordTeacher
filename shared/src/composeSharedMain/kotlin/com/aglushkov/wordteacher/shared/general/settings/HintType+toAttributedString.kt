@@ -23,6 +23,7 @@ import wordteacher.shared.generated.resources.add_white_24
 import wordteacher.shared.generated.resources.article_filter_24
 import wordteacher.shared.generated.resources.close_18
 import wordteacher.shared.generated.resources.download_for_offline
+import wordteacher.shared.generated.resources.learning_instruction_challenge_match
 import wordteacher.shared.generated.resources.learning_instruction_challenge_test
 import wordteacher.shared.generated.resources.start_learning_rounded_24
 
@@ -153,6 +154,12 @@ fun HintType.toAttributedString(): AnnotatedString {
         }
         HintType.LearningTestHint -> {
             val instruction = stringResource(Res.string.learning_instruction_challenge_test)
+            buildAnnotatedString {
+                append(instruction)
+            }
+        }
+        HintType.LearningMatchHint -> {
+            val instruction = stringResource(Res.string.learning_instruction_challenge_match)
             buildAnnotatedString {
                 append(instruction)
             }

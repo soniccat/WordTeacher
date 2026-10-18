@@ -15,7 +15,8 @@ enum class HintType {
     Article,
     CardSets,
     DefinitionEmptyResult,
-    LearningTestHint;
+    LearningTestHint,
+    LearningMatchHint;
 
     override fun toString() = this.ordinal.toString()
 }

@@ -50,7 +50,6 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSubHeaderVie
 import com.aglushkov.wordteacher.shared.features.definitions.vm.WordSynonymViewItem
 import com.aglushkov.wordteacher.shared.features.learning.vm.LearningVM
 import com.aglushkov.wordteacher.shared.general.CustomDialogUI
-import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
@@ -72,6 +71,7 @@ import wordteacher.shared.generated.resources.learning_show_hint
 import wordteacher.shared.generated.resources.learning_title
 import java.util.*
 import androidx.compose.ui.platform.LocalLocale
+import com.aglushkov.wordteacher.shared.general.LocalDimensWord
 import wordteacher.shared.generated.resources.ic_close_24
 import wordteacher.shared.generated.resources.ic_error_24
 import wordteacher.shared.generated.resources.learning_term_title_hint
@@ -421,37 +421,37 @@ private fun matchChallengeUI(
     data: LearningVM.Challenge.Match,
     vm: LearningVM
 ) {
-    val instructionString = data.instruction.resolve()
+    val needShowHint by vm.needShowMatchHint.collectAsState()
+
     LazyColumn(
         modifier = Modifier.fillMaxWidth().windowInsetsHorizontalPadding(),
         contentPadding = PaddingValues(
             bottom = listBottomPadding()
         )
     ) {
-        items(
-            listOf(instructionString) + data.rows,
-            key = {
-                if (it is LearningVM.Challenge.MatchRow) {
-                    it.id
-                } else it
-            }) { item ->
-            if (item is LearningVM.Challenge.MatchRow) {
-                matchRowUI(
-                    item,
-                    { vm.onMatchTermPressed(item) },
-                    { vm.onMatchExamplePressed(item)}
-                )
-            } else if (item is String) {
-                Text(
-                    text = item,
-                    modifier = Modifier.padding(
+        if (needShowHint) {
+            item(key = "LearningMatchHint") {
+                HintView(
+                    hintType = HintType.LearningMatchHint,
+                    contentPadding = PaddingValues(
                         start = LocalDimens.current.contentPadding,
                         top = LocalDimens.current.contentPadding,
-                        end = LocalDimens.current.contentPadding
+                        end = LocalDimens.current.contentPadding,
                     ),
-                    style = LocalAppTypography.current.learningHint
+                    onHidden = { vm.onHintHidden(HintType.LearningMatchHint) }
                 )
             }
+        }
+
+        items(
+            data.rows,
+            key = { it.id }
+        ) { item ->
+            matchRowUI(
+                item,
+                { vm.onMatchTermPressed(item) },
+                { vm.onMatchExamplePressed(item)}
+            )
         }
     }
 }
@@ -554,9 +554,9 @@ private fun testChallengeUI(
                 HintView(
                     hintType = HintType.LearningTestHint,
                     contentPadding = PaddingValues(
-                        start = LocalDimens.current.contentPadding,
+                        start = LocalDimens.current.halfOfContentPadding,
+                        end = LocalDimens.current.halfOfContentPadding,
                         top = LocalDimens.current.contentPadding,
-                        end = LocalDimens.current.contentPadding,
                     ),
                     onHidden = { vm.onHintHidden(HintType.LearningTestHint) }
                 )
