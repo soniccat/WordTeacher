@@ -33,9 +33,9 @@ kotlin {
         }
         androidResources.enable = true
 
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
+//        compilerOptions {
+//            jvmTarget.set(JvmTarget.JVM_11)
+//        }
 
         withJava() // to repair ksp task running (:kspAndroidMain)
     }
