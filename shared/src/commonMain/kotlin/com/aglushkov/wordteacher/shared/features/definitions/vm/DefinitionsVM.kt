@@ -719,6 +719,10 @@ open class DefinitionsVMImpl(
         val contextExamples = definitionsContext?.wordContexts?.get(viewData.partOfSpeech)?.examples ?:
         definitionsContext?.wordContexts?.values?.map { it.examples }?.flatten() ?: emptyList()
 
+        val allAudioFiles = definitionWords.value.data()?.flatMap {
+            it.audioFiles
+        }.orEmpty().distinct()
+
         viewModelScope.launch {
             cardSetsRepository.addCard(
                 setId = cardSetViewItem.cardSetId,
@@ -731,7 +735,7 @@ open class DefinitionsVMImpl(
                 examples = viewData.def.examples.orEmpty() + contextExamples,
                 antonyms = viewData.def.antonyms.orEmpty(),
                 termFrequency = wordFrequency.value.data(),
-                audioFiles = viewData.word.audioFiles,
+                audioFiles = allAudioFiles,
             )
             router?.onLocalCardSetUpdated(cardSetViewItem.cardSetId)
         }
