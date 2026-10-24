@@ -85,6 +85,7 @@ import org.jetbrains.compose.resources.stringResource
 import wordteacher.shared.generated.resources.arrow_back_24
 import wordteacher.shared.generated.resources.cardset_add_label
 import wordteacher.shared.generated.resources.cardset_info_enable_sharing
+import wordteacher.shared.generated.resources.cardset_info_enable_sharing_notice
 import wordteacher.shared.generated.resources.cardset_info_field_description_hint
 import wordteacher.shared.generated.resources.cardset_info_field_name_hint
 import wordteacher.shared.generated.resources.cardset_info_field_source_hint
@@ -269,7 +270,7 @@ fun CardSetInfoFieldsUI(
         }
 
         if (uiState.isEditable) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = { vm.onIsAvailableInSearchChanged(!uiState.isAvailableInSearch) })
@@ -280,15 +281,26 @@ fun CardSetInfoFieldsUI(
                         end = LocalDimens.current.contentPadding,
                     )
             ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ){
+                    Text(
+                        text = stringResource(Res.string.cardset_info_enable_sharing),
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .weight(1.0f)
+                    )
+                    Checkbox(
+                        checked = uiState.isAvailableInSearch,
+                        onCheckedChange = null
+                    )
+                }
                 Text(
-                    text = stringResource(Res.string.cardset_info_enable_sharing),
+                    text = stringResource(Res.string.cardset_info_enable_sharing_notice),
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
                     modifier = Modifier
                         .padding(end = 16.dp)
-                        .weight(1.0f)
-                )
-                Checkbox(
-                    checked = uiState.isAvailableInSearch,
-                    onCheckedChange = null
                 )
             }
         }

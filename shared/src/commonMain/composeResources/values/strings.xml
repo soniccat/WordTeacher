@@ -79,6 +79,7 @@
     <string name="cardset_info_field_description_hint">Description</string>
     <string name="cardset_info_field_source_hint">Source</string>
     <string name="cardset_info_enable_sharing">Share with other users in search</string>
+    <string name="cardset_info_enable_sharing_notice">Starts working after signing in</string>
     <string name="cardset_info_error">Can't load card set</string>
     <string name="cardset_info_open_link">Open %1$s</string>
     <string name="cardset_info_import_article">Import</string>
