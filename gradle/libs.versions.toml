@@ -30,7 +30,8 @@ okio = "3.18.2"
 # blocker to update https://github.com/GrapheneOS/SpeechServices/issues/32
 opennlp = "2.5.10"
 sqlDelight = "2.4.1"
-ktor = "3.6.0"
+# bloker to update https://youtrack.jetbrains.com/issue/KTOR-9848/Android-The-Android-engine-crashes-with-Unbalanced-enter-exit-on-response-read-cancellation
+ktor = "3.4.3"
 decomposeVersion = "3.3.0"
 stately = "2.1.0"
 uuid = "0.8.4"

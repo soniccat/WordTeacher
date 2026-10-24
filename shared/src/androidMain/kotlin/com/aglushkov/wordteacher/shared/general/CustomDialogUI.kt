@@ -117,8 +117,8 @@ actual fun CustomDialogUI(
                 color = MaterialTheme.colors.background
             ) {
                 content()
-                SnackbarUI()
             }
+            SnackbarUI()
         }
     }
 }
