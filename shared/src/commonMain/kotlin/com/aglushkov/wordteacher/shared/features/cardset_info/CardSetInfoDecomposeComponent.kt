@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.cardset_info.vm.CardSetInfoVMIm
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
+import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
@@ -17,6 +18,7 @@ class CardSetInfoDecomposeComponent(
     databaseCardWorker: DatabaseCardWorker,
     cardSetRepository: CardSetRepository,
     webLinkOpener: WebLinkOpener,
+    spaceAuthRepository: SpaceAuthRepository,
     analytics: Analytics,
     idGenerator: IdGenerator,
 ) : CardSetInfoVMImpl(
@@ -27,6 +29,7 @@ class CardSetInfoDecomposeComponent(
     databaseCardWorker,
     cardSetRepository,
     webLinkOpener,
+    spaceAuthRepository,
     analytics,
     idGenerator,
 ), ComponentContext by componentContext, BaseDecomposeComponent {

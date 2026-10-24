@@ -296,12 +296,14 @@ fun CardSetInfoFieldsUI(
                         onCheckedChange = null
                     )
                 }
-                Text(
-                    text = stringResource(Res.string.cardset_info_enable_sharing_notice),
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
-                    modifier = Modifier
-                        .padding(end = 16.dp)
-                )
+                if (!uiState.isAuthorized) {
+                    Text(
+                        text = stringResource(Res.string.cardset_info_enable_sharing_notice),
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                    )
+                }
             }
         }
 

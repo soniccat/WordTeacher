@@ -15,9 +15,11 @@ import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.model.CardSet
 import com.aglushkov.wordteacher.shared.model.CardSetInfo
 import com.aglushkov.wordteacher.shared.repository.cardset.CardSetRepository
+import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import org.jetbrains.compose.resources.StringResource
@@ -103,6 +105,7 @@ interface CardSetInfoVM: Clearable {
         val sourceLinks: List<Link>,
         val isAvailableInSearch: Boolean,
         val isEditable: Boolean,
+        val isAuthorized: Boolean,
         val tags: List<Tag>,
         val focusEvent: Event?
     )
@@ -128,6 +131,7 @@ open class CardSetInfoVMImpl(
     private val databaseCardWorker: DatabaseCardWorker,
     private val cardSetRepository: CardSetRepository,
     private val webLinkOpener: WebLinkOpener,
+    private val spaceAuthRepository: SpaceAuthRepository,
     private val analytics: Analytics,
     private val idGenerator: IdGenerator,
 ): ViewModel(), CardSetInfoVM {
@@ -155,7 +159,8 @@ open class CardSetInfoVMImpl(
         },
         inputState,
         focusEvent,
-    ) { cardSetRes, inputState, focusEvent ->
+        spaceAuthRepository.authDataFlow,
+    ) { cardSetRes, inputState, focusEvent, authRes ->
         cardSetRes.mapLoadedData(
             errorTransformer = {
                 StringResourceThrowable(StringResourceWrapper.String(Res.string.cardset_info_error), it)
@@ -180,6 +185,7 @@ open class CardSetInfoVMImpl(
                 },
                 isAvailableInSearch = inputState.isAvailableInSearch ?: cardSet.isAvailableInSearch,
                 isEditable = !state.isRemoteCardSet,
+                isAuthorized = authRes.isLoaded(),
                 tags = inputState.tags ?: cardSet.tags.toStateTags(),
                 focusEvent = focusEvent,
             )

@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.general.TimeSource
 import com.aglushkov.wordteacher.shared.general.WebLinkOpener
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
+import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.aglushkov.wordteacher.shared.service.SpaceCardSetService
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
@@ -46,6 +47,7 @@ interface CardSetInfoDependencies {
     fun databaseWorker(): DatabaseWorker
     fun timeSource(): TimeSource
     fun webLinkOpener(): WebLinkOpener
+    fun spaceAuthRepository(): SpaceAuthRepository
     fun analytics(): Analytics
     fun idGenerator(): IdGenerator
 }
