@@ -233,13 +233,6 @@ open class DefinitionsVMImpl(
         }.flatten().distinct()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-//    private val suggestedDictEntryRepository = buildSimpleResourceRepository<List<Dict.Index.Entry>, String> { word ->
-//        dictRepository.wordsStartWith(word, 60)
-//    }
-//    private val wordTextSearchRepository = buildSimpleResourceRepository<List<WordTeacherDictWord>, String> { text ->
-//        wordTeacherDictService.textSearch(text).toOkResponse().words.orEmpty()
-//    }
-
     private val displayModes = listOf(DefinitionsDisplayMode.BySource, DefinitionsDisplayMode.Merged)
     private var loadJob: Job? = null
     private var observeJob: Job? = null

@@ -59,6 +59,11 @@ class WordCorrectionsHeaderViewItem(
     companion object {
         const val Type = 1010
     }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) &&
+                isTop == (other as WordCorrectionsHeaderViewItem).isTop
+    }
 }
 
 class WordCorrectionsMisspellingDBFillProgress(
