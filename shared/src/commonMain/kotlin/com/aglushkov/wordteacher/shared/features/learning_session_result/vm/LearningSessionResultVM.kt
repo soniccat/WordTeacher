@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.features.learning_session_result.vm
 
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM
 import com.aglushkov.wordteacher.shared.features.definitions.vm.toPartsOfSpeechFilter
 import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
@@ -9,16 +10,22 @@ import com.aglushkov.wordteacher.shared.general.Clearable
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.ViewModel
+import com.aglushkov.wordteacher.shared.general.extensions.updateLoadedData
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import com.aglushkov.wordteacher.shared.general.settings.HintType
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
+import com.aglushkov.wordteacher.shared.general.settings.isHintClosed
+import com.aglushkov.wordteacher.shared.general.settings.setHintClosed
 import com.aglushkov.wordteacher.shared.model.Card
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import wordteacher.shared.generated.resources.Res
 import org.jetbrains.compose.resources.StringResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import wordteacher.shared.generated.resources.learning_session_result_error
@@ -31,6 +38,7 @@ interface LearningSessionResultVM: Clearable {
     fun onTermClicked(item: LearningSessionTermResultViewItem)
     fun onTryAgainClicked()
     fun onCloseClicked()
+    fun onHintClicked(hintType: HintType)
 
     fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper?
 
@@ -45,6 +53,7 @@ open class LearningSessionResultVMImpl(
     private val cardLoader: CardLoader,
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
+    private val settingStore: SettingStore,
 ) : ViewModel(), LearningSessionResultVM {
 
     override var router: LearningSessionResultRouter? = null
@@ -91,7 +100,8 @@ open class LearningSessionResultVMImpl(
     }
 
     private fun buildItems(results: List<LoadedSessionCardResult>): List<BaseViewItem<*>> {
-        val viewItems = results.map {
+        val newViewItems = mutableListOf<BaseViewItem<*>>()
+        newViewItems += results.map {
             LearningSessionTermResultViewItem(
                 cardId = it.card.id,
                 term = it.card.term,
@@ -100,9 +110,12 @@ open class LearningSessionResultVMImpl(
                 isRight = it.isRight
             )
         }
+        if (!settingStore.isHintClosed(HintType.LearningResult)) {
+            newViewItems.add(HintViewItem(HintType.LearningResult))
+        }
 
-        generateIds(viewItems)
-        return viewItems
+        generateIds(newViewItems)
+        return newViewItems
     }
 
     private fun generateIds(items: List<BaseViewItem<*>>) {
@@ -123,6 +136,15 @@ open class LearningSessionResultVMImpl(
 
     override fun onCloseClicked() {
         router?.onScreenFinished(this, SimpleRouter.Result(true))
+    }
+
+    override fun onHintClicked(hintType: HintType) {
+        analytics.send(AnalyticEvent.createActionEvent("Hint_" + hintType.name))
+        settingStore.setHintClosed(hintType)
+
+        viewItems.updateLoadedData {
+            it.filterNot { it is HintViewItem }
+        }
     }
 
     override fun getErrorText(res: Resource<List<BaseViewItem<*>>>): StringResourceWrapper? {

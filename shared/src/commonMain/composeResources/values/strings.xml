@@ -103,6 +103,7 @@
 
     <string name="learning_session_result_title">Results</string>
     <string name="learning_session_result_error">Something went wrong :(</string>
+    <string name="learning_session_result_hint">Tap on a word to open its definition</string>
 
     <string name="empty_search_result">Can't find anything :(</string>
     <string name="error_default">Something went wrong :(</string>

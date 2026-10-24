@@ -25,6 +25,7 @@ import wordteacher.shared.generated.resources.close_18
 import wordteacher.shared.generated.resources.download_for_offline
 import wordteacher.shared.generated.resources.learning_instruction_challenge_match
 import wordteacher.shared.generated.resources.learning_instruction_challenge_test
+import wordteacher.shared.generated.resources.learning_session_result_hint
 import wordteacher.shared.generated.resources.start_learning_rounded_24
 
 private const val HintIntroduction_Close = "Hint_Close"
@@ -160,6 +161,12 @@ fun HintType.toAttributedString(): AnnotatedString {
         }
         HintType.LearningMatchHint -> {
             val instruction = stringResource(Res.string.learning_instruction_challenge_match)
+            buildAnnotatedString {
+                append(instruction)
+            }
+        }
+        HintType.LearningResult -> {
+            val instruction = stringResource(Res.string.learning_session_result_hint)
             buildAnnotatedString {
                 append(instruction)
             }

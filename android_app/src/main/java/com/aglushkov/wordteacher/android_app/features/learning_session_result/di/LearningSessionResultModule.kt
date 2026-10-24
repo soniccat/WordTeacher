@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.analytics.Analytics
 import com.aglushkov.wordteacher.shared.features.learning_session_result.LearningSessionResultDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
@@ -19,11 +20,13 @@ class LearningSessionResultModule {
         cardLoader: CardLoader,
         idGenerator: IdGenerator,
         analytics: Analytics,
+        settings: SettingStore,
     ) = LearningSessionResultDecomposeComponent(
         state,
         componentContext,
         cardLoader,
         idGenerator,
         analytics,
+        settings,
     )
 }

@@ -39,11 +39,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import wordteacher.shared.generated.resources.Res
+import wordteacher.shared.generated.resources.close_18
 import wordteacher.shared.generated.resources.field_close_24
 import wordteacher.shared.generated.resources.field_search_24
 import java.awt.TextField
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchView(
     modifier: Modifier = Modifier,
@@ -88,14 +88,15 @@ fun SearchView(
         trailingIcon = {
             if (state.text.isNotEmpty()) {
                 Icon(
-                    painter = painterResource(Res.drawable.field_close_24),
+                    painter = painterResource(Res.drawable.close_18),
                     contentDescription = null,
                     modifier = Modifier
                         .clip(CircleShape)
                         .clickable {
                             state.clearText()
                             focusRequester?.requestFocus()
-                        },
+                        }
+                        .padding(4.dp),
                     tint = LocalContentColor.current
                 )
             }

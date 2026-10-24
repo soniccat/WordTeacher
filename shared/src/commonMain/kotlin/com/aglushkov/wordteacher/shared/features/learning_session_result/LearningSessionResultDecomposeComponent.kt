@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.features.BaseDecomposeComponent
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVMImpl
 import com.aglushkov.wordteacher.shared.general.IdGenerator
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.data_loader.CardLoader
 import com.arkivanov.decompose.ComponentContext
 
@@ -14,6 +15,7 @@ class LearningSessionResultDecomposeComponent (
     cardLoader: CardLoader,
     idGenerator: IdGenerator,
     analytics: Analytics,
+    settingStore: SettingStore,
 ) : LearningSessionResultVMImpl(
     componentContext.stateKeeper.consume(
         key = KEY_STATE,
@@ -21,7 +23,8 @@ class LearningSessionResultDecomposeComponent (
     ) ?: initialState,
     cardLoader,
     idGenerator,
-    analytics
+    analytics,
+    settingStore
 ), ComponentContext by componentContext, BaseDecomposeComponent {
     override val componentName: String = "Screen_LearningSession"
 

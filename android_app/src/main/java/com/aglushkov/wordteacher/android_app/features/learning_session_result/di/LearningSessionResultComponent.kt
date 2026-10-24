@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.features.learning_session_result.Learnin
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultVM
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.TimeSource
+import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.db.AppDatabase
 import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.arkivanov.decompose.ComponentContext
@@ -38,4 +39,5 @@ interface LearningSessionResultDependencies {
     fun timeSource(): TimeSource
     fun routerResolver(): RouterResolver
     fun analytics(): Analytics
+    fun settings(): SettingStore
 }

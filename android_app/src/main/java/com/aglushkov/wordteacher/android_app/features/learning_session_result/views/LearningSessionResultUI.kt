@@ -25,6 +25,9 @@ import com.aglushkov.wordteacher.shared.general.CustomDialogUI
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resources.resolve
+import com.aglushkov.wordteacher.shared.features.dashboard.vm.HintViewItem
+import com.aglushkov.wordteacher.shared.general.LocalDimens
+import com.aglushkov.wordteacher.shared.general.views.HintView
 import com.aglushkov.wordteacher.shared.general.views.LoadingStatusView
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
 import com.aglushkov.wordteacher.shared.general.views.windowInsetsHorizontalPadding
@@ -139,6 +142,17 @@ fun LearningSessionResultViewItems(
             modifier,
             vm,
         )
+        is HintViewItem -> {
+            HintView(
+                hintType = item.firstItem(),
+                contentPadding = PaddingValues(
+                    top = LocalDimens.current.contentPadding,
+                    start = LocalDimens.current.contentPadding,
+                    end = LocalDimens.current.contentPadding,
+                ),
+                onHidden = { vm.onHintClicked(item.firstItem()) }
+            )
+        }
         else -> {
             Text(
                 text = "unknown item $item",
