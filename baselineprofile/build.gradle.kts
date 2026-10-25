@@ -20,9 +20,7 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
-    maven("https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-andorid/")
-    maven("https://artifactory-external.vkpartner.ru/artifactory/maven/")
-    maven("https://artifactory-external.vkpartner.ru/artifactory/vk-id-captcha/android/")
+    maven("https://nexus-external.vkteam.ru/repository/maven/")
     maven {
         url = uri("https://maven.pkg.github.com/TelegramMessenger/telegram-login-android")
         credentials {

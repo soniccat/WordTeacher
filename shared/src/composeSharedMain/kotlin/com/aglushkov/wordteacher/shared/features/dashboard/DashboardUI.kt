@@ -84,6 +84,7 @@ fun DashboardUI(
     val itemsState by vm.viewItems.collectAsState()
     val items = itemsState.data()
 
+    fullyDrawnBlock?.invoke()
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -115,8 +116,6 @@ fun DashboardUI(
                         )
                     }
                 }
-
-                fullyDrawnBlock?.invoke()
             } else {
                 LoadingStatusView(
                     modifier = modifier,
