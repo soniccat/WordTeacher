@@ -78,6 +78,16 @@
         "-mongoURI=mongodb://192.168.0.78:27017/?directConnection=true&replicaSet=rs0",
       ]
     },
+        {
+      "name": "Script WordList local filter",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/scripts/wordlistfilter/cmd",
+      "args": [
+        "-mongoURI=mongodb://127.0.0.1:27017/?directConnection=true&replicaSet=rs0",
+      ]
+    },
     {
       "name": "Script Phrase exporter",
       "type": "go",
@@ -86,6 +96,16 @@
       "program": "${workspaceFolder}/scripts/phrase_exporter/cmd",
       "args": [
         "-mongoURI=mongodb://192.168.0.78:27017/?directConnection=true&replicaSet=rs0",
+      ]
+    },
+    {
+      "name": "Script Phrase local exporter",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/scripts/phrase_exporter/cmd",
+      "args": [
+        "-mongoURI=mongodb://127.0.0.1:27017/?directConnection=true&replicaSet=rs0",
       ]
     }
   ]

@@ -65,7 +65,7 @@ fun FileSystem.writeToWithVersioning(
     val currentVersion = settings.int(versionKey) ?: -1
     return if (!exists(outputPath) || currentVersion != lastVersion) {
         if (src != null) {
-            writeToWithLockFile(src, outputPath)
+            writeToWithLockFile(src, outputPath, skipIfFileExists = false)
             settings[versionKey] = lastVersion
             true
         } else {

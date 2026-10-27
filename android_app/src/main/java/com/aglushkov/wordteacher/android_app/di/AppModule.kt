@@ -53,6 +53,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DslDictConverter
 import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.dict.OnNewDictAddedHandler
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import wordteacher.shared.generated.resources.Res
 import com.aglushkov.wordteacher.shared.service.SpaceAuthService
@@ -474,6 +475,7 @@ class AppModule {
         analytics: Analytics,
         notificationPermissionRepository: NotificationPermissionRepository,
         toggleRepository: ToggleRepository,
+        symSpellRepository: SymSpellRepository,
     ): FillMisspellingDBControllerImpl {
         return FillMisspellingDBControllerImpl(
             context,
@@ -482,6 +484,7 @@ class AppModule {
             analytics,
             notificationPermissionRepository,
             toggleRepository,
+            symSpellRepository,
         )
     }
 

@@ -117,8 +117,8 @@ android {
             resValue("string", it.key.toString(), it.value.toString())
         }
 
-        buildConfigField("int", "defaultWordlistVersion", "1")
-        buildConfigField("int", "misspellingDbVersion", "1")
+        buildConfigField("int", "defaultWordlistVersion", "2")
+        buildConfigField("int", "misspellingDbVersion", "2")
     }
     packaging {
         resources {

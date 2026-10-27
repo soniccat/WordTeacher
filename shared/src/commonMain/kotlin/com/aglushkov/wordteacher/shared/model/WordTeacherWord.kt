@@ -42,7 +42,7 @@ data class WordTeacherWord(
         @SerialName("text") val text: String?,
     )
 
-    private class PartOfSpeechSerializer: EnumAsIntSerializer<PartOfSpeech>(
+    class PartOfSpeechSerializer: EnumAsIntSerializer<PartOfSpeech>(
         "partOfSpeech",
         { it.value },
         { v -> PartOfSpeech.values().first { it.value == v } }

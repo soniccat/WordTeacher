@@ -19,11 +19,8 @@ import com.aglushkov.wordteacher.shared.general.extensions.collectUntilDone
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
-import com.aglushkov.wordteacher.shared.general.resource.isError
-import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.onData
 import com.aglushkov.wordteacher.shared.general.resource.onError
-import com.aglushkov.wordteacher.shared.general.resource.onLoaded
 import com.aglushkov.wordteacher.shared.general.settings.SettingStore
 import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
@@ -34,10 +31,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -50,6 +45,7 @@ class FillMisspellingDBControllerImpl(
     private val analytics: Analytics,
     private val notificationPermissionRepository: NotificationPermissionRepository,
     private val toggles: ToggleRepository,
+    private val symSpellRepository: SymSpellRepository,
 ): FillMisspellingDBController, SimpleResourceRepository<Unit, Unit>() {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val workManager = WorkManager.getInstance(context)
@@ -70,8 +66,8 @@ class FillMisspellingDBControllerImpl(
             }
 
     init {
-        val currentVersion = settings.int(MISSPELLING_FILLED_DB_VERSION_KEY, -1)
-        val isFilled = currentVersion == lastVersion
+        val filledVersion = settings.int(MISSPELLING_FILLED_DB_VERSION_KEY, -1)
+        val isFilled = filledVersion == lastVersion
         if (isFilled) {
             stateFlow.updateWithLoadedData(Unit)
         } else if (!toggles.toggles.disableMisspellingDB) {
@@ -149,6 +145,12 @@ class FillMisspellingDBControllerImpl(
             )
             throw error
         }
+
+        val fillingVersion = settings.int(MISSPELLING_FILLING_DB_VERSION_KEY, -1)
+        if (fillingVersion != lastVersion) {
+            symSpellRepository.dictHolder.resetProgress()
+            settings[MISSPELLING_FILLING_DB_VERSION_KEY] = lastVersion
+        }
         notificationPermissionRepository.loadIfNotLoaded(Unit).collectUntilDone()
 
         reset()
@@ -203,5 +205,6 @@ class FillMisspellingDBControllerImpl(
 }
 
 private const val FILL_MISSPELLING_DB_WORK = "FILL_MISSPELLING_DB_WORK"
+private const val MISSPELLING_FILLING_DB_VERSION_KEY = "MISSPELLING_FILLING_DB_VERSION_KEY"
 private const val MISSPELLING_FILLED_DB_VERSION_KEY = "MISSPELLING_FILLED_DB_VERSION_KEY"
 private const val MISSPELLING_DB_SIZE = 1024*1024*100L
