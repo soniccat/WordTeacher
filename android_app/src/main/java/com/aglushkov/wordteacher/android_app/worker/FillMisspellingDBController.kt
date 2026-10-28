@@ -146,16 +146,22 @@ class FillMisspellingDBControllerImpl(
             throw error
         }
 
-        val fillingVersion = settings.int(MISSPELLING_FILLING_DB_VERSION_KEY, -1)
-        if (fillingVersion != lastVersion) {
-            symSpellRepository.dictHolder.resetProgress()
-            settings[MISSPELLING_FILLING_DB_VERSION_KEY] = lastVersion
-        }
         notificationPermissionRepository.loadIfNotLoaded(Unit).collectUntilDone()
 
+        var existingWorkPolicy = ExistingWorkPolicy.KEEP
+        val fillingVersion = settings.int(MISSPELLING_FILLING_DB_VERSION_KEY, -1)
+        if (fillingVersion != lastVersion) {
+            existingWorkPolicy = ExistingWorkPolicy.REPLACE
+            symSpellRepository.dictHolder.resetProgress()
+        }
         reset()
         workState.update { it.bumpVersion().toLoading() }
-        enqueueWork()
+        enqueueWork(existingWorkPolicy)
+
+        if (fillingVersion != lastVersion) {
+            // updates only after enqueueWork to avoid workmanager wrong task status because of crashing in between
+            settings[MISSPELLING_FILLING_DB_VERSION_KEY] = lastVersion
+        }
 
         workState.takeUntilLoadedOrErrorForVersion().collectUntilDone().apply {
             onError {
@@ -187,10 +193,10 @@ class FillMisspellingDBControllerImpl(
         )
     }
 
-    private fun enqueueWork() {
+    private fun enqueueWork(existingWorkPolicy: ExistingWorkPolicy) {
         workManager.beginUniqueWork(
             FILL_MISSPELLING_DB_WORK,
-            ExistingWorkPolicy.KEEP,
+            existingWorkPolicy,
             OneTimeWorkRequestBuilder<FillMisspellingDBWorker>()
 //                .setInitialDelay(1, TimeUnit.MINUTES)
 //                .setConstraints(Constraints.Builder()
