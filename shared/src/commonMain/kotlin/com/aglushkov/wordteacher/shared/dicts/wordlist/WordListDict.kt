@@ -46,6 +46,7 @@ class WordListDictIndex(
     private val dict: Dict,
     override val path: Path,
     private val fileSystem: FileSystem,
+    var version: Int = -1,
 ): DictTrieIndex {
     override val index = DictTrie()
     private val wordListWordData = DictWordData(emptyList(), null, dict)
@@ -63,8 +64,20 @@ class WordListDictIndex(
 
     private fun loadIndex() {
         fileSystem.read(path) {
+            var isFirstLine = true
+
             while(!exhausted()) {
-                readUtf8Line()?.let { word ->
+                val line = readUtf8Line()
+                if (isFirstLine) {
+                    isFirstLine = false
+                    if (line?.startsWith(WORDLIST_VERSION_PREFIX) == true) {
+                        val v = line.substring(WORDLIST_VERSION_PREFIX.length).toInt()
+                        version = v
+                        continue
+                    }
+                }
+
+                line?.let { word ->
                     index.put(word, wordListWordData)
                     ++wordCount
                 }
@@ -74,3 +87,4 @@ class WordListDictIndex(
 }
 
 const val WORDLIST_EXTENSION = "wordlist"
+const val WORDLIST_VERSION_PREFIX = "version:"

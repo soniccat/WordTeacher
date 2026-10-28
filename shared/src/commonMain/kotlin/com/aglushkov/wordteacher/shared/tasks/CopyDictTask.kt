@@ -24,10 +24,14 @@ class CopyDictTask(
                 copyPath,
                 COPY_DICT_TASK_VERSION + copyPath.name,
                 lastVersion,
-                settings
+                settings,
             )
         ) {
-            dictRepository.importDicts()
+            dictRepository.importDicts(
+                onPreImport = {
+                    dictRepository.delete(copyPath)
+                }
+            )
         }
     }
 }

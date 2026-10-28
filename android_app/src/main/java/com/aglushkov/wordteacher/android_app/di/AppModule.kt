@@ -118,6 +118,13 @@ class AppModule {
         getString(Res.string.toggles_url2)
     }
 
+    @WordListLastVersion
+    @AppComp
+    @Provides
+    fun wordlistLastVersion(): Int {
+        return BuildConfig.defaultWordlistVersion
+    }
+
     @ApiBaseUrl
     @AppComp
     @Provides

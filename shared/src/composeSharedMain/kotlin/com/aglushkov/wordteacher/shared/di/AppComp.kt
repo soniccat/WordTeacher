@@ -52,6 +52,9 @@ annotation class ArticleSettingStore
 @Qualifier
 annotation class Worker
 
+@Qualifier
+annotation class WordListLastVersion
+
 val LocalIsDebug = staticCompositionLocalOf { false }
 
 val LocalIsDarkTheme = staticCompositionLocalOf { false }

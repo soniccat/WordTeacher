@@ -22,7 +22,7 @@ import okio.Path
 interface DictRepository {
     val dicts: StateFlow<Resource<List<Dict>>>
 
-    suspend fun importDicts()
+    suspend fun importDicts(onPreImport: () -> Unit = {})
     fun wordsStartWith(prefix: String, limit: Int): List<Dict.Index.Entry>
     suspend fun define(word: String): Flow<Resource<List<WordTeacherWord>>>
     fun delete(path: Path)
@@ -48,7 +48,7 @@ class DictRepositoryImpl(
         }
     }
 
-    override suspend fun importDicts() {
+    override suspend fun importDicts(onPreImport: () -> Unit) {
         // wait until the current import finishes
         while (isImporting.value) {
             isImporting.takeWhile { it }.collect()
@@ -56,6 +56,7 @@ class DictRepositoryImpl(
                 break
             }
         }
+        onPreImport()
         importDictsInternal()
         isImporting.compareAndSet(true, false)
     }

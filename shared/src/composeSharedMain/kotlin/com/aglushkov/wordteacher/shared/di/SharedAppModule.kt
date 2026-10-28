@@ -581,6 +581,7 @@ class SharedAppModule {
         misspellingDatabase: MisspellingDatabase,
         settingStore: SettingStore,
         controller: Lazy<FillMisspellingDBController>,
+        @WordListLastVersion wordListLastVersion: Int,
     ): SymSpellRepository {
         val spellCheckSettings = SpellCheckSettings().copy(
             lowerCaseTerms = false,
@@ -601,7 +602,8 @@ class SharedAppModule {
                 ),
             ),
             dictRepository = dictRepository,
-            isDBReady = { controller.get().isLoaded }
+            isDBReady = { controller.get().isLoaded },
+            wordListLastVersion = wordListLastVersion
         )
     }
 }

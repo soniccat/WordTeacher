@@ -2,6 +2,7 @@ package com.aglushkov.wordteacher.shared.repository.suggestion
 
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.wordlist.WORDLIST_EXTENSION
+import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDictIndex
 import com.aglushkov.wordteacher.shared.general.extensions.collectUntilLoaded
 import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepository
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
@@ -16,7 +17,8 @@ import kotlinx.coroutines.flow.takeWhile
 class SymSpellRepository(
     private val symSpell: SymSpell,
     private val dictRepository: DictRepository,
-    private val isDBReady: () -> Boolean
+    private val isDBReady: () -> Boolean,
+    private val wordListLastVersion: Int,
 ) {
     val dictHolder: SymSpellDictionaryHolder
         get() {
@@ -29,7 +31,10 @@ class SymSpellRepository(
         var dict: Dict? = null
         dictRepository.dicts.takeWhile {
             val dicts = it.data().orEmpty()
-            dict = dicts.firstOrNull { it.path.name.endsWith(WORDLIST_EXTENSION) }
+            dict = dicts.firstOrNull {
+                val index = it.index
+                index is WordListDictIndex && index.version == wordListLastVersion
+            }
             dict == null
         }.collect()
 
