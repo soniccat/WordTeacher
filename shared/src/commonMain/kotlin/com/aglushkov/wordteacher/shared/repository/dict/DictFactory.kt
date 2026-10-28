@@ -9,11 +9,12 @@ import okio.Path
 
 class DictFactory(
     private val fileSystem: FileSystem,
+    private val wordListLastVersion: Int,
 ) {
     fun createDict(path: Path): Dict? {
         return when {
             path.name.endsWith("dsl") -> DslDict(path, fileSystem)
-            path.name.endsWith(WORDLIST_EXTENSION) -> WordListDict(path, fileSystem)
+            path.name.endsWith(WORDLIST_EXTENSION) -> WordListDict(path, fileSystem, wordListLastVersion)
             else -> null
         }
     }

@@ -27,11 +27,7 @@ class CopyDictTask(
                 settings,
             )
         ) {
-            dictRepository.importDicts(
-                onPreImport = {
-                    dictRepository.delete(copyPath)
-                }
-            )
+            dictRepository.importDicts()
         }
     }
 }

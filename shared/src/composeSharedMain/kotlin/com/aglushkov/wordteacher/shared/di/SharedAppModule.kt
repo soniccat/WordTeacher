@@ -103,9 +103,10 @@ class SharedAppModule {
     @AppComp
     @Provides
     fun dictFactory(
-        fileSystem: FileSystem
+        fileSystem: FileSystem,
+        @WordListLastVersion wordListLastVersion: Int,
     ): DictFactory {
-        return DictFactory(fileSystem)
+        return DictFactory(fileSystem, wordListLastVersion)
     }
 
     @AppComp

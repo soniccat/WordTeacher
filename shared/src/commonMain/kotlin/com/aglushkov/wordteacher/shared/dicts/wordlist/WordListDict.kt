@@ -18,7 +18,8 @@ import java.util.Locale
 // without definitions
 class WordListDict(
     override val path: Path,
-    private val fileSystem: FileSystem
+    private val fileSystem: FileSystem,
+    private val lastVersion: Int,
 ): Dict {
     override var type = Config.Type.Local
     override var name = ""
@@ -28,7 +29,7 @@ class WordListDict(
     override lateinit var index: WordListDictIndex
 
     override suspend fun load() {
-        this.index = WordListDictIndex(this, (path.toString()).toPath(), fileSystem)
+        this.index = WordListDictIndex(this, (path.toString()).toPath(), fileSystem, lastVersion)
     }
 
     override suspend fun define(word: String, indexEntry: Dict.Index.Entry): List<WordTeacherWord> {
@@ -46,6 +47,7 @@ class WordListDictIndex(
     private val dict: Dict,
     override val path: Path,
     private val fileSystem: FileSystem,
+    lastVersion: Int,
     var version: Int = -1,
 ): DictTrieIndex {
     override val index = DictTrie()
@@ -55,29 +57,28 @@ class WordListDictIndex(
     init {
         if (fileSystem.exists(path)) {
             try {
-                loadIndex()
+                loadIndex(lastVersion)
             } catch (e: Throwable) {
                 fileSystem.delete(path)
             }
         }
     }
 
-    private fun loadIndex() {
+    private fun loadIndex(lastVersion: Int) {
         fileSystem.read(path) {
-            var isFirstLine = true
+            val line = readUtf8Line()
+            if (line?.startsWith(WORDLIST_VERSION_PREFIX) == true) {
+                val v = line.substring(WORDLIST_VERSION_PREFIX.length).toInt()
+                version = v
+            }
+
+            if (line == null || version != lastVersion) {
+                // skip loading outdated version, expect new version after importDicts in CopyDictTask
+                throw RuntimeException("WordListDictIndex: outdated version $version, expect $lastVersion")
+            }
 
             while(!exhausted()) {
-                val line = readUtf8Line()
-                if (isFirstLine) {
-                    isFirstLine = false
-                    if (line?.startsWith(WORDLIST_VERSION_PREFIX) == true) {
-                        val v = line.substring(WORDLIST_VERSION_PREFIX.length).toInt()
-                        version = v
-                        continue
-                    }
-                }
-
-                line?.let { word ->
+                readUtf8Line()?.let { word ->
                     index.put(word, wordListWordData)
                     ++wordCount
                 }
