@@ -60,6 +60,7 @@ class WordListDictIndex(
                 loadIndex(lastVersion)
             } catch (e: Throwable) {
                 fileSystem.delete(path)
+                throw e
             }
         }
     }
