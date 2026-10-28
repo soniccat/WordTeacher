@@ -59,7 +59,6 @@ interface FindArticleVM: Clearable {
 
     interface Router {
         fun openAddArticle(url: String?, showNeedToCreateCardSet: Boolean)
-        fun openArticle(state: ArticleVM.State)
         fun onClosed()
     }
 

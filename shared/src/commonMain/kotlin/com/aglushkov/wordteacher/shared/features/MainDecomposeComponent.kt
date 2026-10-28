@@ -129,6 +129,7 @@ class MainDecomposeComponentImpl(
     init {
         snackbarEventRouter = object : SnackbarEventHolderRouter {
             override fun openArticle(id: Long) {
+                closeDialogs()
                 this@MainDecomposeComponentImpl.openArticle(
                     ArticleVM.State(id = id)
                 )

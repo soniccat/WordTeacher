@@ -421,10 +421,6 @@ class MainActivity : AppCompatActivity(), Router {
                                     mainDecomposeComponent.openAddArticle(url, showNeedToCreateCardSet)
                                 }
 
-                                override fun openArticle(state: ArticleVM.State) {
-                                    mainDecomposeComponent.openArticle(state)
-                                }
-
                                 override fun onClosed() {
                                     mainDecomposeComponent.popDialog(child.configuration)
                                 }
