@@ -59,14 +59,14 @@ func (m *Repository) CreateTextIndexIfNeeded(ctx context.Context) error {
 		Keys: bson.D{
 			{Key: "name", Value: "text"},
 			{Key: "info.description", Value: "text"},
-			{Key: "info.terms", Value: "text"},
+			{Key: "terms", Value: "text"},
 		},
 		Options: &options.IndexOptions{
 			Name: &textIndexName,
 			Weights: bson.D{
 				{Key: "name", Value: 3},
 				{Key: "info.description", Value: 3},
-				{Key: "info.terms", Value: 1},
+				{Key: "terms", Value: 1},
 			},
 		},
 	}
