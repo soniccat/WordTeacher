@@ -367,8 +367,17 @@ fun CardSetWithTotalProgressItemView(
     CardSetItemView(
         modifier = modifier,
         item = item,
+        subtitlePrefix = { size: Int ->
+            if (item.readyToLearnProgress >= 1.0f) {
+                "$size words:"
+            } else if (size > 0) {
+                "$size ready words:"
+            } else {
+                "Empty"
+            }
+        },
         trailing = {
-            if (item.readyToLearnProgress < 1.0f) {
+            if (item.readyToLearnProgress < 1.0f && item.terms.isNotEmpty()) {
                 val side = 40.dp
                 Box(
                     modifier = Modifier.size(side, side)
@@ -397,15 +406,22 @@ fun CardSetWithTotalProgressItemView(
 fun CardSetItemView(
     modifier: Modifier = Modifier,
     item: CardSetViewItem,
+    subtitlePrefix: (Int) -> String = { size: Int ->
+        if (size > 0) {
+            "$size ready words:"
+        } else {
+            "Empty"
+        }
+    },
     trailing: @Composable (CardSetViewItem) -> Unit
 ) {
     CustomTextListItem(
         modifier = modifier,
         title = item.name,
         subtitle = if (item.terms.isNotEmpty()) {
-            "${item.terms.size} words: " + item.terms.joinToString()
+            "${subtitlePrefix(item.terms.size)} ${item.terms.joinToString()}"
         } else {
-            ""
+            subtitlePrefix(0)
         },
         trailing = {
             trailing(item)

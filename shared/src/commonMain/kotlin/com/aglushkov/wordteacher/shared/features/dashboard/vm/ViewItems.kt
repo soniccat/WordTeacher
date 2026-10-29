@@ -68,6 +68,12 @@ class DashboardExpandViewItem(
     companion object {
         const val Type = 1203
     }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) &&
+                other is DashboardExpandViewItem &&
+                isExpanded == other.isExpanded
+    }
 }
 
 class DashboardOpenCardSetsItem(

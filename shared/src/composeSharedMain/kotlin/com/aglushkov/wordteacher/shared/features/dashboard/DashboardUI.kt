@@ -139,6 +139,13 @@ fun dashboardItem(
             vm.onCardSetClicked(item)
         },
         item,
+        subtitlePrefix = { size: Int ->
+            if (size > 0) {
+                "$size words:"
+            } else {
+                ""
+            }
+        },
         trailing = {
             val side = 40.dp
             Box(
