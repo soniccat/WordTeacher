@@ -50,12 +50,13 @@ class DictRepositoryImpl(
 
     override suspend fun importDicts(onPreImport: () -> Unit) {
         // wait until the current import finishes
-        while (isImporting.value) {
-            isImporting.takeWhile { it }.collect()
+        while(true) {
             if (isImporting.compareAndSet(false, true)) {
                 break
             }
+            isImporting.takeWhile { it }.collect()
         }
+
         onPreImport()
         importDictsInternal()
         isImporting.compareAndSet(true, false)
