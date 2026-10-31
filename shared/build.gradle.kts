@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
@@ -87,7 +84,7 @@ kotlin {
             }
         }
 
-        val composeSharedMain by creating {
+        val composeSharedMain = create("composeSharedMain") {
             dependsOn(commonMain.get())
             dependencies {
                 api(libs.dagger)
@@ -101,7 +98,7 @@ kotlin {
                 api(libs.decomposeComposeExtensions)
             }
         }
-        val androidMain by getting {
+        androidMain {
             dependsOn(composeSharedMain)
             dependencies {
                 implementation(libs.androidx.material) // for colorOnPrimary in xmls
@@ -114,17 +111,15 @@ kotlin {
                 api(libs.androidx.ui.tooling)
             }
         }
-        val androidHostTest by getting {
-            dependencies {
-                implementation(libs.okioFakeFileSystem)
-                implementation(libs.kotlinTestJUnit)
-                implementation(libs.junit)
-                implementation(libs.mockitoKotlin)
-                implementation(libs.robolectric)
-                implementation(libs.coroutinesCommonTest)
-            }
+        androidUnitTest.dependencies {
+            implementation(libs.okioFakeFileSystem)
+            implementation(libs.kotlinTestJUnit)
+            implementation(libs.junit)
+            implementation(libs.mockitoKotlin)
+            implementation(libs.robolectric)
+            implementation(libs.coroutinesCommonTest)
         }
-        val jvmMain by getting {
+        jvmMain {
             dependsOn(composeSharedMain)
             dependencies {
                 implementation(libs.ktorDesktop)

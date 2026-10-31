@@ -4,6 +4,7 @@ use (
 	./scripts/ipset-filler
 	./scripts/phrase_exporter
 	./scripts/wordlistfilter
+	./scripts/wordlist_to_dsl
 	./service_articles
 	./service_auth
 	./service_cardsets
