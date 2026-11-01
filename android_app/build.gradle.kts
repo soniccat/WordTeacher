@@ -98,8 +98,8 @@ android {
         applicationId = "com.aglushkov.wordteacher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 19
-        versionName = "1.19"
+        versionCode = 20
+        versionName = "1.20"
 
         addManifestPlaceholders(
             buildMap {
