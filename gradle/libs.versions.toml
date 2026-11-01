@@ -20,7 +20,7 @@ kotlinxDateTime = "0.8.0"
 playServicesPlugin = "4.5.0"
 playServicesAuth = "21.4.0"
 
-robolectric = "4.13"
+robolectric = "4.17"
 vkId = "2.7.1"
 yandexId = "3.3.0"
 appmetrica = "8.6.0"

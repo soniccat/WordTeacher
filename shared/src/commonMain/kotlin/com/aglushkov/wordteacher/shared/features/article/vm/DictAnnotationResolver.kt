@@ -18,6 +18,8 @@ class DictAnnotationResolver {
 
             while (i < sentence.lemmas.size) {
                 val firstWord = sentence.lemmaOrToken(i).toString().replace("\"", "") // TODO: try to train a better tokenizer model
+
+
                 val isVerb = sentence.tagEnum(i).isVerb()
                 var skippedNounPhrase = false
 
@@ -94,7 +96,7 @@ class DictAnnotationResolver {
                     }
                 )
 
-                // we might went too deep in the dictionary
+                // we might go too deep in the dictionary
                 // try to treat the next word as not a part of the verb phrase, let's assume it's a part of the next noun phrase
                 // For example look at testPhraseHighlightWithNounPhraseInTheMiddle test
                 if (foundList.isEmpty() && isVerb && ci > i + 1) {

@@ -166,6 +166,7 @@ class DslDict(
         var isLabel = false
         val label = StringBuilder()
         val value = StringBuilder()
+        val labels = mutableListOf<String>() // to handle labels before and after trn tag to proper definition
 
         stringReader.read(line) {
             skip()
@@ -184,7 +185,7 @@ class DslDict(
                                 } else {
                                     val l = label.toString().lowercase().trimNonLetterNonDigit()
                                     if (l.isNotEmpty()) {
-                                        builder.addLabel(l)
+                                        labels.add(l)
                                         label.clear()
                                     }
                                 }
@@ -249,6 +250,11 @@ class DslDict(
                     }
                 }
             }
+        }
+
+        if (labels.isNotEmpty()) {
+            labels.onEach(builder::addLabel)
+            labels.clear()
         }
     }
 

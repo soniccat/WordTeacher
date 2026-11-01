@@ -25,6 +25,7 @@ import opennlp.tools.chunker.ChunkerME
 import opennlp.tools.chunker.ChunkerModel
 import opennlp.tools.lemmatizer.Lemmatizer
 import opennlp.tools.postag.POSModel
+import opennlp.tools.postag.POSTagFormat
 import opennlp.tools.postag.POSTaggerME
 import opennlp.tools.sentdetect.SentenceDetectorME
 import opennlp.tools.sentdetect.SentenceModel
@@ -183,7 +184,7 @@ actual class NLPCore(
     private fun createMEObjects() {
         sentenceDetector = SentenceDetectorME(sentenceModel)
         tokenizer = TokenizerME(tokenModel)
-        tagger = POSTaggerME(posModel)
+        tagger = POSTaggerME(posModel, POSTagFormat.PENN)
         chunker = ChunkerME(chunkerModel)
     }
 
@@ -203,7 +204,7 @@ actual class NLPCore(
         ).apply {
             sentenceDetector = SentenceDetectorME(this@NLPCore.sentenceModel)
             tokenizer = TokenizerME(this@NLPCore.tokenModel)
-            tagger = POSTaggerME(this@NLPCore.posModel)
+            tagger = POSTaggerME(this@NLPCore.posModel, POSTagFormat.PENN)
             chunker = ChunkerME(this@NLPCore.chunkerModel)
             lemmatizer = this@NLPCore.lemmatizer
             state.value = this@NLPCore.state.value

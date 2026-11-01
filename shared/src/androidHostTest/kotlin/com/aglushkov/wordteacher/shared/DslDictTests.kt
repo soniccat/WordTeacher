@@ -153,7 +153,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                sourceNames = emptyList()
+                sourceNames = listOf("testname")
             ),
             word
         )
@@ -173,10 +173,9 @@ class DslDictTests {
                 #CONTENTS_LANGUAGE	"Russian"
 
                 term1
-                	[m1]1) [p][i][trn]label[/i][/p] If something [b]absorbs[/b] a liquid, gas, or other substance, it soaks it up or takes it in.[/trn][/m]
-                	[m1]2) [trn]def2[/trn][/m]
+                	[m1]1) [p][i][trn]label1[/i][/p] If something [b]absorbs[/b] a liquid, gas, or other substance, it soaks it up or takes it in.[/trn][/m]
+                	[m1]2) [p]label2[/p][trn]def2[/trn][/m]
                 	[m1]3) [trn]def3 [com]([i]comment3[/i])[/com][/trn][/m]
-                	[m1]4) [trn]def4[/trn][/m]
                 	[m1][*]•[/*][/m]
                 	[m1][*][ex][lang id=1033]ex1[/lang] — ex1_1[/ex][/*][/m]
                 """.trimIndent()
@@ -195,16 +194,32 @@ class DslDictTests {
                 definitions = linkedMapOf(
                     WordTeacherWord.PartOfSpeech.Undefined to listOf(
                         WordTeacherDefinition(
-                            definitions = listOf(" If something absorbs a liquid, gas, or other substance, it soaks it up or takes it in.", "def2", "def3 (comment3)", "def4"),
+                            definitions = listOf("If something absorbs a liquid, gas, or other substance, it soaks it up or takes it in."),
+                            examples = listOf(),
+                            synonyms = listOf(),
+                            antonyms = listOf(),
+                            imageUrl = null,
+                            labels = listOf("label1"),
+                        ),
+                        WordTeacherDefinition(
+                            definitions = listOf("def2"),
+                            examples = listOf(),
+                            synonyms = listOf(),
+                            antonyms = listOf(),
+                            imageUrl = null,
+                            labels = listOf("label2"),
+                        ),
+                        WordTeacherDefinition(
+                            definitions = listOf("def3 (comment3)"),
                             examples = listOf("ex1 — ex1_1"),
                             synonyms = listOf(),
                             antonyms = listOf(),
                             imageUrl = null,
-                            labels = listOf("label"),
+                            labels = listOf(),
                         )
                     )
                 ),
-                sourceNames = emptyList()
+                sourceNames = listOf("testname")
             ),
             word
         )
@@ -263,7 +278,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                sourceNames = emptyList()
+                sourceNames = listOf("testname")
             ),
             word
         )
@@ -320,7 +335,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                sourceNames = emptyList()
+                sourceNames = listOf("testname")
             ),
             word1
         )
@@ -340,7 +355,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                sourceNames = emptyList()
+                sourceNames = listOf("testname")
             ),
             word2
         )
@@ -378,7 +393,7 @@ class DslDictTests {
         assertEquals(
             DictWordData(
                 listOf(WordTeacherWord.PartOfSpeech.PhrasalVerb),
-                73,
+                79,
                 dslDict
             ),
             dslDict.index.allEntries().first().toWordData()
@@ -411,7 +426,7 @@ class DslDictTests {
                         )
                     )
                 ),
-                sourceNames = emptyList()
+                sourceNames = listOf("testname")
             ),
             word
         )

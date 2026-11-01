@@ -23,6 +23,9 @@ import org.robolectric.annotation.Config
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
+// workaround for: Failed to create a Robolectric sandbox: Android SDK 37 requires Java 21 (have Java 17)
+//java.lang.UnsupportedOperationException: Failed to create a Robolectric sandbox: Android SDK 37 requires Java 21 (have Java 17)
+@Config(sdk = [35])
 class DictAnnotationResolverTest {
 
     val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -217,6 +220,24 @@ class DictAnnotationResolverTest {
         )
 
         val nlpSentence = nlpSentenceProcessor.processString("Phrasal verbs are two or more words", nlpCore)
+        val annotations = dictAnnotationResolver.resolve(
+            listOf(dict),
+            nlpSentence,
+            nlpSentence.phrases()
+        )
+
+        assertEquals(1, annotations.size)
+    }
+
+    @Test
+    fun testNounPhraseHighlight() {
+        val dict = createFakeDict(
+            buildDictContent {
+                addTerm("rising star", listOf("def1"))
+            }
+        )
+
+        val nlpSentence = nlpSentenceProcessor.processString("One key is you gotta catch a rising star at just the right moment.", nlpCore)
         val annotations = dictAnnotationResolver.resolve(
             listOf(dict),
             nlpSentence,

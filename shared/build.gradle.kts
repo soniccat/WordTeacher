@@ -111,7 +111,7 @@ kotlin {
                 api(libs.androidx.ui.tooling)
             }
         }
-        androidUnitTest.dependencies {
+        commonTest.dependencies {
             implementation(libs.okioFakeFileSystem)
             implementation(libs.kotlinTestJUnit)
             implementation(libs.junit)
