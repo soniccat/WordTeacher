@@ -164,6 +164,7 @@ class DslDict(
         var isExample = false
         var isTranscription = false
         var isLabel = false
+        var audioText = ""
         val label = StringBuilder()
         val value = StringBuilder()
         val labels = mutableListOf<String>() // to handle labels before and after trn tag to proper definition
@@ -180,16 +181,23 @@ class DslDict(
                         if (tag == "p") {
                             isLabel = false
                             if (label.isNotEmpty()) {
-                                if (tryToAddPartOfSpeech(label.toString().trimNonLetterNonDigit(), builder)) {
+                                if (tryToAddPartOfSpeech(
+                                        label.toString().trimNonLetterNonDigit(),
+                                        builder
+                                    )
+                                ) {
                                     label.clear()
                                 } else {
-                                    val l = label.toString().lowercase().trimNonLetterNonDigit()
+                                    val l = label.toString().trimNonLetterNonDigit()
                                     if (l.isNotEmpty()) {
                                         labels.add(l)
                                         label.clear()
                                     }
                                 }
                             }
+                        } else if (tag == "s") {
+                            builder.addAudioFile(value.toString(), audioText)
+                            value.clear()
                         } else if (tag == "trn" || tag == "ex" || tag == "t") {
                             break
                         }
@@ -212,6 +220,15 @@ class DslDict(
                                     value.clear()
                                     isLabel = true
                                 }
+                            }
+                            "s" -> {
+                                if (labels.isNotEmpty()) {
+                                    audioText = labels[0]
+                                    labels.removeAt(0)
+                                } else {
+                                    audioText = value.toString().dictTrim()
+                                }
+                                value.clear()
                             }
                         }
                     }
@@ -253,7 +270,9 @@ class DslDict(
         }
 
         if (labels.isNotEmpty()) {
-            labels.onEach(builder::addLabel)
+            labels.onEach {
+                builder.addLabel(it.lowercase())
+            }
             labels.clear()
         }
     }
@@ -313,14 +332,17 @@ class DslDict(
     }
 }
 
-fun String.dictTrim(): String {
-    val trimmed = trim()
-    return if (trimmed.startsWith("- ")) {
-        trimmed.substring(2)
-    } else if (trimmed.startsWith("-")) {
-        trimmed.substring(1)
-    } else {
-        trimmed
+fun String.dictTrim(): String =
+    trim(Char::isWhitespace)
+        .trimStart {
+            it.isWhitespace() || it.isPunctuation()
+        }
+
+fun Char.isPunctuation(): Boolean {
+    return when (this.category) {
+        CharCategory.DASH_PUNCTUATION,
+        CharCategory.OTHER_PUNCTUATION -> true
+        else -> false
     }
 }
 

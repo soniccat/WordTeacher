@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"tools/mongowrapper"
@@ -87,7 +88,7 @@ func run() int {
 	}
 	exPath := filepath.Dir(ex) + "/"
 
-	outF, e := os.OpenFile(exPath+*outputFilePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	outF, e := os.OpenFile(exPath+*outputFilePath, os.O_WRONLY|os.O_CREATE, 0600)
 	if e != nil {
 		log.Fatalln(e)
 	}
@@ -150,52 +151,50 @@ func writeDslEntry(wordEntries []WordEntry, f *os.File) {
 		if len(e.Audios) > 0 {
 			f.WriteString("\t")
 			for _, a := range e.Audios {
-				f.WriteString("[s]" + "https://aglushkov.ru/" + a.FileName + "[/s]")
-
 				resultText := a.Accent
 				if resultText == nil {
 					resultText = a.Text
 				}
+				if resultText != nil {
+					f.WriteString("[p]" + *resultText + "[/p]")
+				}
+				f.WriteString(" [s]" + "https://aglushkov.ru/" + a.FileName + "[/s]")
 
 				if a.Transcription != nil {
-					f.WriteString("[t]" + *a.Transcription + "[/t]")
-				}
-
-				if resultText != nil {
-					f.WriteString(*resultText)
+					f.WriteString(" [t]" + *a.Transcription + "[/t]")
 				}
 			}
 			f.WriteString("\n")
 		}
 
 		for _, dp := range e.DefPairs {
-			f.WriteString("\t[p]" + dp.PartOfSpeech + "[/p]\n")
-			for _, de := range dp.DefEntries {
-				f.WriteString("\t")
+			f.WriteString("\t[m0][p]" + dp.PartOfSpeech + "[/p]\n")
+			for dei, de := range dp.DefEntries {
+				f.WriteString("\t[m1][b]" + strconv.Itoa(dei+1) + ". [/b]")
 				f.WriteString("[trn]")
 				for _, l := range de.Def.Labels {
-					f.WriteString("[p]" + l + "[/p]")
+					f.WriteString("[p]" + l + "[/p], ")
 				}
-				f.WriteString(strings.Replace(de.Def.Value, "\n", "\\n", -1))
+				f.WriteString(strings.ReplaceAll(de.Def.Value, "\n", "\\n"))
 				f.WriteString("[/trn]\n")
 
 				for _, e := range de.Examples {
 					f.WriteString("\t")
-					f.WriteString("[ex]" + strings.Replace(e, "\n", "\\n", -1) + "[/ex]")
+					f.WriteString("[m3][ex]" + strings.ReplaceAll(e, "\n", "\\n") + "[/ex]")
 					f.WriteString("\n")
 				}
 
 				if len(de.Synonyms) > 0 {
-					f.WriteString("\tSyn:\n")
+					f.WriteString("\t[m1]Syn:\n")
 					for _, s := range de.Synonyms {
-						f.WriteString("\t" + s + "\n")
+						f.WriteString("\t[m3]" + s + "\n")
 					}
 				}
 
 				if len(de.Antonyms) > 0 {
-					f.WriteString("\tAnt:\n")
+					f.WriteString("\t[m1]Ant:\n")
 					for _, a := range de.Antonyms {
-						f.WriteString("\t" + a + "\n")
+						f.WriteString("\t[m3]" + a + "\n")
 					}
 				}
 			}

@@ -112,6 +112,67 @@ class DslDictTests {
     }
 
     @Test
+    fun testAudioParsing() = runTest {
+        val fakeFileSystem = FakeFileSystem()
+        val dirPath = "/test".toPath()
+        val dictPath = dirPath.div("dict.dsl")
+        fakeFileSystem.createDirectories(dirPath)
+        fakeFileSystem.write(dictPath, true) {
+            writeUtf8(
+                """
+                #NAME	"testname"
+                #INDEX_LANGUAGE	"English"
+                #CONTENTS_LANGUAGE	"Russian"
+
+                term1
+                	[p]AU[/p] [s]https://aglushkov.ru/audio/en-au-come_across.ogg[/s][p]UK[/p] [s]https://aglushkov.ru/externalAudio/come across.wav[/s]
+                	[m1]1) [trn]def1[/trn][/m]
+                """.trimIndent()
+            )
+        }
+
+        val dslDict = DslDict(dictPath, fakeFileSystem)
+        dslDict.load()
+
+        val word = dslDict.define(listOf("term1")).firstOrNull()
+        assertNotNull(word)
+        assertEquals(
+            WordTeacherWord(
+                word = "term1",
+                transcriptions = emptyList(),
+                definitions = linkedMapOf(
+                    WordTeacherWord.PartOfSpeech.Undefined to listOf(
+                        WordTeacherDefinition(
+                            definitions = listOf("def1"),
+                            examples = listOf(),
+                            synonyms = listOf(),
+                            antonyms = listOf(),
+                            imageUrl = null,
+                            labels = listOf(),
+                        ),
+                    )
+                ),
+                sourceNames = listOf("testname"),
+                audioFiles = listOf(
+                    WordTeacherWord.AudioFile(
+                        "https://aglushkov.ru/audio/en-au-come_across.ogg",
+                        "AU",
+                        null,
+                        null,
+                    ),
+                    WordTeacherWord.AudioFile(
+                        "https://aglushkov.ru/externalAudio/come across.wav",
+                        "UK",
+                        null,
+                        null,
+                    )
+                )
+            ),
+            word
+        )
+    }
+
+    @Test
     fun testWordParsingWithExamplesWithLabelTag() = runTest {
         val fakeFileSystem = FakeFileSystem()
         val dirPath = "/test".toPath()

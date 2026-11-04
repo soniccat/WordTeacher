@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.extensions.trimNonLetterNonDigit
 import com.aglushkov.wordteacher.shared.general.extensions.unbreakable
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.serialization.EnumAsIntSerializer
+import com.aglushkov.wordteacher.shared.model.WordTeacherWord.AudioFile
 import com.aglushkov.wordteacher.shared.model.label_map.labelMap
 import com.aglushkov.wordteacher.shared.model.label_map.labelToPartOfSpeechMap
 import wordteacher.shared.generated.resources.Res
@@ -74,6 +75,7 @@ class WordTeacherWordBuilder {
     private var word: String = ""
     private var sourceNames = mutableListOf<String>()
     private var transcriptions = mutableListOf<String>()
+    private var audioFiles = mutableListOf<AudioFile>()
     private var wordDefinitions = mutableMapOf<WordTeacherWord.PartOfSpeech, MutableList<WordTeacherDefinition>>()
 
     // current def
@@ -97,6 +99,7 @@ class WordTeacherWordBuilder {
         return this
     }
 
+    // TODO: support several transcriptions
     fun setTranscription(v: String): WordTeacherWordBuilder {
         transcriptions = mutableListOf(v)
         return this
@@ -105,6 +108,14 @@ class WordTeacherWordBuilder {
     fun setTranscriptions(v: List<String>): WordTeacherWordBuilder {
         transcriptions = v.toMutableList()
         return this
+    }
+
+    fun addAudioFile(url: String, text: String?, ) {
+        if (hasWordDefinition()) {
+            addWordDefinition()
+        }
+
+        audioFiles.add(AudioFile(url, text, null, null))
     }
 
     fun addLabel(label: String) {
@@ -229,7 +240,8 @@ class WordTeacherWordBuilder {
                 word,
                 transcriptions,
                 LinkedHashMap(wordDefinitions),
-                sourceNames.toList()
+                sourceNames.toList(),
+                audioFiles,
             )
         } else {
             null
