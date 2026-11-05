@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	"service_dict/internal/routing/files"
 	"service_dict/internal/routing/text_search"
 	"service_dict/internal/routing/word"
 	"service_dict/internal/routing/word_v2"
@@ -37,6 +38,11 @@ func (app *application) routes() *mux.Router {
 		app.sessionValidator,
 		&app.wiktionaryRepositoryV2,
 	)
+	filesHandler := files.NewHandler(
+		app.logger,
+		app.timeProvider,
+		app.sessionValidator,
+	)
 
 	// Register handler functions.
 	r := mux.NewRouter()
@@ -55,6 +61,10 @@ func (app *application) routes() *mux.Router {
 	r.Handle(
 		"/api/v2/dict/words/textsearch/{text}",
 		app.sessionManager.LoadAndSave(http.HandlerFunc(examplesHandlerV2.WordTextSearch)),
+	).Methods("GET")
+	r.Handle(
+		"/api/v1/dict/files",
+		app.sessionManager.LoadAndSave(http.HandlerFunc(filesHandler.Files)),
 	).Methods("GET")
 
 	r.Handle(
