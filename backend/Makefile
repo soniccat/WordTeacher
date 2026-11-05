@@ -36,7 +36,7 @@ downtest:
 # update domain in ./cron/wordteacher_renew_cert.sh to yours
 cronsetup:
 	sudo mkdir -p /var/spool/cron/crontabs/$(USER) &&\
-	sudo ln -s ./cron/crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab &&\
+	sudo ln -s /home/$(USER)/backend/WordTeacher/backend/cron/crontab /var/spool/cron/crontabs/$(USER)/wordteacher_crontab &&\
 	sudo mkdir -p /Users/Shared/WordTeacher/certbot/logs &&\
 	sudo mkdir -p /Users/Shared/WordTeacher/backups/mongo/logs
 
