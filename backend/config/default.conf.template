@@ -166,4 +166,7 @@ server {
 
     location /toggles/ {
     }
+
+    location /dicts/ {
+    }
 }

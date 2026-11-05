@@ -115,7 +115,7 @@ func run() int {
 	}
 	defer f.Close()
 
-	outF.WriteString("#NAME	\"Wiktionary EN-EN base\"\n")
+	outF.WriteString("#NAME	\"Wiktionary EN-EN Core\"\n")
 	outF.WriteString("#INDEX_LANGUAGE	\"English\"\n")
 	outF.WriteString("#CONTENTS_LANGUAGE	\"English\"\n")
 	outF.WriteString("\n")
