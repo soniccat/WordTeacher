@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.general.AppInfo
 import com.aglushkov.wordteacher.shared.general.Response
 import com.aglushkov.wordteacher.shared.general.extensions.unbreakable
 import com.aglushkov.wordteacher.shared.general.getUserAgent
+import com.aglushkov.wordteacher.shared.general.serialization.InstantIso8601Serializer
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import com.aglushkov.wordteacher.shared.model.WordTeacherDefinition
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
@@ -38,6 +39,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import java.util.Locale
+import kotlin.time.Instant
 
 @Serializable
 data class WordTeacherDictWordsResponse(
@@ -124,6 +126,23 @@ data class WordTeacherDictWord(
     }
 }
 
+@Serializable
+data class WordTeacherDictFilesResponse(
+    @SerialName("dicts") val dicts: List<WordTeacherDict>?,
+)
+
+@Serializable
+data class WordTeacherDict(
+    @SerialName("name") val name: String,
+    @SerialName("description") val description: String,
+    @SerialName("url") val url: String,
+    @SerialName("fromLang") val fromLang: String,
+    @SerialName("toLang") val toLang: String,
+    @SerialName("size") val size: Long,
+    @Serializable(with = InstantIso8601Serializer::class)
+    @SerialName("modificationDate") val modificationDate: Instant,
+)
+
 class WordTeacherDictService (
     private val baseUrl: String,
     private val deviceIdRepository: DeviceIdRepository,
@@ -193,6 +212,29 @@ class WordTeacherDictService (
             val responseString: String = res.body()
             logger.logLoadingCompleted(text, res, responseString)
             dictTextSearchJson.decodeFromString(responseString)
+        }
+    }
+
+    private val dictFilesJson by lazy {
+        Json {
+            ignoreUnknownKeys = true
+            classDiscriminator = "status"
+            explicitNulls = false
+            coerceInputValues = true
+            serializersModule = SerializersModule {
+                polymorphic(Response::class) {
+                    subclass(Response.Ok.serializer(WordTeacherDictFilesResponse.serializer()))
+                    subclass(Response.Err.serializer())
+                }
+            }
+        }
+    }
+
+    suspend fun files(): Response<WordTeacherDictFilesResponse> {
+        return withContext(Dispatchers.IO) {
+            val res: HttpResponse = httpClient.get("${baseUrl}/api/v2/dict/files")
+            val responseString: String = res.body()
+            dictFilesJson.decodeFromString(responseString)
         }
     }
 

@@ -5,10 +5,11 @@ type Files struct {
 }
 
 type Dict struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Url         string `json:"url"`
-	FromLang    string `json:"fromLang"`
-	ToLang      string `json:"toLang"`
-	Size        int    `json:"size"`
+	Name             string `json:"name"`
+	Description      string `json:"description"`
+	Url              string `json:"url"`
+	FromLang         string `json:"fromLang"`
+	ToLang           string `json:"toLang"`
+	Size             int64  `json:"size"`
+	ModificationDate string `json:"modificationDate"`
 }

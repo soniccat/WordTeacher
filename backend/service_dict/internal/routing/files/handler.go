@@ -42,12 +42,13 @@ func (h *Handler) Files(w http.ResponseWriter, r *http.Request) {
 	response := api_dict.Files{
 		Dicts: []api_dict.Dict{
 			{
-				Name:        "Wiktionary EN-EN Core",
-				Description: "Common Wiktionary words and phrases",
-				Url:         "https://aglushkov.ru/dicts/Wiktionary_EN-EN_Core.dsl.gz",
-				FromLang:    "EN",
-				ToLang:      "EN",
-				Size:        19854421,
+				Name:             "Wiktionary EN-EN Core",
+				Description:      "Common Wiktionary words and phrases",
+				Url:              "https://aglushkov.ru/dicts/Wiktionary_EN-EN_Core.dsl.gz",
+				FromLang:         "EN",
+				ToLang:           "EN",
+				Size:             19854421,
+				ModificationDate: "2026-11-05T12:34:02Z",
 			},
 		},
 	}
