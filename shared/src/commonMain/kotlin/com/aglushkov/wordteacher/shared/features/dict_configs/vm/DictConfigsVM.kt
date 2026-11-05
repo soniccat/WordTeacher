@@ -6,6 +6,7 @@ import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.YandexServic
 import com.aglushkov.wordteacher.shared.apiproviders.yandex.service.YandexService.Companion.LookupLangDefault
 import com.aglushkov.wordteacher.shared.analytics.AnalyticEvent
 import com.aglushkov.wordteacher.shared.analytics.Analytics
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDict
 import com.aglushkov.wordteacher.shared.dicts.Dict
 import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
 import com.aglushkov.wordteacher.shared.dicts.wordlist.WordListDict
@@ -17,6 +18,10 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
+import com.aglushkov.wordteacher.shared.general.resource.data
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.toStringResource
@@ -24,12 +29,14 @@ import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
 import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -86,6 +93,7 @@ open class DictConfigsVMImpl(
     private val configRepository: ConfigRepository,
     private val dslDictOpenController: FileOpenController,
     private val dictRepository: DictRepository,
+    private val remoteDictRepository: RemoteDictRepository,
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
 ): ViewModel(), DictConfigsVM {
@@ -94,11 +102,36 @@ open class DictConfigsVMImpl(
 
     override val viewItems = combine(
         configRepository.flow,
-        dictRepository.dicts,
+        combine(dictRepository.dicts,
+            remoteDictRepository.stateFlow) { dicts, remoteDicts ->
+            if (dicts.isLoaded() && remoteDicts.isLoaded()) {
+                // filter remote dicts by already loaded ones
+                dicts to remoteDicts.mapLoadedData {
+                    it.filter { remoteDict ->
+                        dicts.data().orEmpty().firstOrNull { dict ->
+                            val dslDict = dict as? DslDict ?: return@firstOrNull false
+                            val modificationDate = dslDict.modificationDate ?: return@firstOrNull false
+                            dict.name == remoteDict.name &&
+                                    modificationDate < remoteDict.modificationDate
+                        } == null
+                    }
+                }
+            } else if (dicts.isLoading() || remoteDicts.isLoading()) {
+                dicts.mapLoadedData<List<Dict>> { emptyList() } to remoteDicts.mapLoadedData { emptyList() }
+            } else {
+                dicts to remoteDicts
+            }
+        },
         dslDictOpenController.state,
-    ) { configs, dicts, dictImportProgress ->
-        buildViewItems(configs, dicts, dictImportProgress)
+    ) { configs, (dicts, remoteDicts), dictImportProgress ->
+        buildViewItems(configs, dicts, remoteDicts, dictImportProgress)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    init {
+        viewModelScope.launch {
+            remoteDictRepository.loadIfNotLoaded(Unit).collect()
+        }
+    }
 
     override fun onConfigDeleteClicked(item: ConfigYandexViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("DictConfigs.configDeleteClicked"))
@@ -114,6 +147,7 @@ open class DictConfigsVMImpl(
     private fun buildViewItems(
         configs: Resource<List<Config>>,
         dicts: Resource<List<Dict>>,
+        remoteDicts: Resource<List<WordTeacherDict>>,
         dictImportProgress: Resource<Unit>,
     ): List<BaseViewItem<*>> = buildList<BaseViewItem<*>> {
         add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_online_section_title)))
@@ -143,6 +177,16 @@ open class DictConfigsVMImpl(
 
         add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Online))
         add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_offline_section_title)))
+        remoteDicts.on(
+            data = {
+                it.onEach { remoteDict ->
+                    add(RemoteDictViewItem(remoteDict.name, remoteDict.size))
+                }
+            },
+            error = {
+                // TODO:
+            }
+        )
         dicts.on(
             data = {
                 it.onEach { dict ->
@@ -157,18 +201,13 @@ open class DictConfigsVMImpl(
                 }
             },
             breakOnDataCall = false,
-            loading = {
-                add(ConfigLoadingViewItem())
-            },
             error = {
                 add(ConfigTextViewItem(it.toStringResource()))
             }
         )
-        dictImportProgress.on(
-            loading = {
-                add(ConfigLoadingViewItem())
-            }
-        )
+        if (remoteDicts.isLoading() || dicts.isLoading() || dictImportProgress.isLoading()) {
+            add(ConfigLoadingViewItem())
+        }
         add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Offline))
     }.let {
         generateViewItemIds(it, viewItems.value, idGenerator)

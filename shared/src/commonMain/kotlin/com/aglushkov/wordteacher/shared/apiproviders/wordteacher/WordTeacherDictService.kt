@@ -232,7 +232,7 @@ class WordTeacherDictService (
 
     suspend fun files(): Response<WordTeacherDictFilesResponse> {
         return withContext(Dispatchers.IO) {
-            val res: HttpResponse = httpClient.get("${baseUrl}/api/v2/dict/files")
+            val res: HttpResponse = httpClient.get("${baseUrl}/api/v1/dict/files")
             val responseString: String = res.body()
             dictFilesJson.decodeFromString(responseString)
         }

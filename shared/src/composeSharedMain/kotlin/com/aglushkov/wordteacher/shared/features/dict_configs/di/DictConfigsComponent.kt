@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
@@ -36,4 +37,5 @@ interface DictConfigsDependencies {
     fun dslDictOpenController(): FileOpenController
     fun dictRepository(): DictRepository
     fun analytics(): Analytics
+    fun remoteDictRepository(): RemoteDictRepository
 }

@@ -198,11 +198,6 @@ class FillMisspellingDBControllerImpl(
             FILL_MISSPELLING_DB_WORK,
             existingWorkPolicy,
             OneTimeWorkRequestBuilder<FillMisspellingDBWorker>()
-//                .setInitialDelay(1, TimeUnit.MINUTES)
-//                .setConstraints(Constraints.Builder()
-//                    .setRequiresBatteryNotLow(true)
-//                    .setRequiresStorageNotLow(true)
-//                    .build())
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()

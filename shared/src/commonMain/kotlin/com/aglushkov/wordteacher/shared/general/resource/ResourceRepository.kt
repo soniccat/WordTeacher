@@ -104,13 +104,10 @@ abstract class SimpleResourceRepository<T, A>(
 }
 
 fun <T, A> buildSimpleResourceRepository(
-//    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     preload: (suspend (arg: A) -> T?)? = null,
     load: suspend (arg: A) -> T
 ): SimpleResourceRepository<T, A> {
-    return object : SimpleResourceRepository<T,A>(
-//        scope = scope,
-    ) {
+    return object : SimpleResourceRepository<T,A>() {
         override suspend fun preload(arg: A): T? {
             return preload?.invoke(arg)
         }

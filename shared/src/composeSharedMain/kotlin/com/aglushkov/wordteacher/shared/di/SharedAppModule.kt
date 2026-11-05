@@ -40,6 +40,7 @@ import com.aglushkov.wordteacher.shared.repository.dict.DictFactory
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepositoryImpl
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
+import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.repository.service.WordTeacherWordServiceFactory
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
@@ -129,6 +130,14 @@ class SharedAppModule {
             fileSystem.createDirectory(dictPath)
         }
         return DictRepositoryImpl(dictPath, dictFactory, fileSystem)
+    }
+
+    @AppComp
+    @Provides
+    fun remoteDictRepository(
+        wordTeacherDictService: WordTeacherDictService,
+    ): RemoteDictRepository {
+        return RemoteDictRepository(wordTeacherDictService)
     }
 
     @AppComp

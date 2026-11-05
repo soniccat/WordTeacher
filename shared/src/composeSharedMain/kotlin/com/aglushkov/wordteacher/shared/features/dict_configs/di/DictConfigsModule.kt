@@ -11,6 +11,7 @@ import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.connectivity.ConnectivityManager
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
 import com.arkivanov.decompose.ComponentContext
 import dagger.Module
@@ -24,6 +25,7 @@ class DictConfigsModule {
         configRepository: ConfigRepository,
         @DslFileOpener dslDictOpenController: FileOpenController,
         dictRepository: DictRepository,
+        remoteDictRepository: RemoteDictRepository,
         idGenerator: IdGenerator,
         analytics: Analytics,
     ) = DictConfigsDecomposeComponent(
@@ -31,6 +33,7 @@ class DictConfigsModule {
         configRepository,
         dslDictOpenController,
         dictRepository,
+        remoteDictRepository,
         idGenerator,
         analytics,
     )

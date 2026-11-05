@@ -17,6 +17,7 @@ import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 import okio.utf8Size
+import kotlin.time.Instant
 
 class DslDict(
     override val path: Path,
@@ -26,6 +27,7 @@ class DslDict(
     override var name = ""
     override var fromLang = Language.EN
     override var toLang = Language.EN
+    var modificationDate: Instant? = null
 
     private val stringReader = StringReader()
     private val wordTeacherWordBuilder = WordTeacherWordBuilder()
@@ -46,6 +48,7 @@ class DslDict(
         }
 
         this.dslIndex = dslIndex
+        this.modificationDate = Instant.fromEpochMilliseconds(fileSystem.metadata(path).lastModifiedAtMillis ?: 0)
     }
 
     fun validate(): Boolean {

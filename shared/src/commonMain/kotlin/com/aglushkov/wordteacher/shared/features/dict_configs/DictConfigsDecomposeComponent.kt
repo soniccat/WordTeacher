@@ -7,6 +7,7 @@ import com.aglushkov.wordteacher.shared.general.FileOpenController
 import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
+import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 
@@ -15,12 +16,14 @@ class DictConfigsDecomposeComponent (
     configRepository: ConfigRepository,
     dslDictOpenController: FileOpenController,
     dictRepository: DictRepository,
+    remoteDictRepository: RemoteDictRepository,
     idGenerator: IdGenerator,
     analytics: Analytics,
 ) : DictConfigsVMImpl(
     configRepository,
     dslDictOpenController,
     dictRepository,
+    remoteDictRepository,
     idGenerator,
     analytics,
 ), ComponentContext by componentContext, BaseDecomposeComponent {

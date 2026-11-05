@@ -44,6 +44,7 @@ import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigLoadingVi
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigTextViewItem
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.DictConfigsVM
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigYandexViewItem
+import com.aglushkov.wordteacher.shared.features.dict_configs.vm.RemoteDictViewItem
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTextItem
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
@@ -167,7 +168,11 @@ private fun showDictConfigsItem(
             ) {
                 Text(item.firstItem(), style = LocalAppTypography.current.settingsText)
             }
-
+        }
+    }
+    is RemoteDictViewItem -> {
+        CustomListItem() {
+            Text(item.firstItem(), style = LocalAppTypography.current.settingsText)
         }
     }
     is ConfigLoadingViewItem -> {
@@ -181,7 +186,6 @@ private fun showDictConfigsItem(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun YandexConfigViewItemUI(
     item: ConfigYandexViewItem,

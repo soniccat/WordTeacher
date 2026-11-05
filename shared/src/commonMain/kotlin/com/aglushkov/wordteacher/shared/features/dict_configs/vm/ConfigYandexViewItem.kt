@@ -72,3 +72,16 @@ class ConfigCreateViewItem(
         Offline
     }
 }
+
+class RemoteDictViewItem(
+    name: String,
+    val size: Long,
+): BaseViewItem<String>(name, Type) {
+    companion object {
+        const val Type = 1106
+    }
+
+    override fun equalsByContent(other: BaseViewItem<*>): Boolean {
+        return super.equalsByContent(other) && size == (other as RemoteDictViewItem).size
+    }
+}
