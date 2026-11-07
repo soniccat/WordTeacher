@@ -69,6 +69,7 @@ kotlin {
             implementation(libs.statelyCommon)
             implementation(libs.statelyConcurrency)
             implementation(libs.datastorePreference)
+            implementation(libs.kotlinxIo.okio)
 
             val version = "0.5.0"
 

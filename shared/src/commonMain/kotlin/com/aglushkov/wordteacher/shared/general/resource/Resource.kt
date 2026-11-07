@@ -188,6 +188,13 @@ fun <T> Resource<T>.asLoaded(): Resource.Loaded<T>? {
     }
 }
 
+fun <T> Resource<T>.asLoading(): Resource.Loading<T>? {
+    return when(this) {
+        is Resource.Loading -> this
+        else -> null
+    }
+}
+
 fun <T> Resource<T>.asError(): Resource.Error<T>? {
     return when(this) {
         is Resource.Error -> this

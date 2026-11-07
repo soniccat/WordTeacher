@@ -63,6 +63,8 @@ import com.aglushkov.wordteacher.shared.tasks.ArticleSample
 import com.aglushkov.wordteacher.shared.tasks.CopyDictTask
 import com.aglushkov.wordteacher.shared.tasks.LoadNLPCoreTask
 import com.aglushkov.wordteacher.shared.tasks.Task
+import com.aglushkov.wordteacher.shared.usecase.dsl_dict_import_use_case.DslDictImportUseCase
+import com.aglushkov.wordteacher.shared.usecase.dsl_dict_import_use_case.DslDictImportUseCaseImpl
 import com.aglushkov.wordteacher.shared.workers.FillMisspellingDBController
 import dagger.Lazy
 import dagger.Module
@@ -367,8 +369,9 @@ class AppModule {
     fun dslFileOpener(
         @DictPath dictPath: Path,
         context: Context,
-        fileSystem: FileSystem,
         dictRepository: DictRepository,
+        dslDictConverter: DslDictConverter,
+        dslDictValidator: DslDictValidator,
         analytics: Analytics,
     ): FileOpenController {
         val tmpDestinationPath = context.cacheDir.toOkioPath()
@@ -377,10 +380,8 @@ class AppModule {
             mimeTypes = listOf("application/octet-stream", "application/gzip"),
             tmpPath = tmpDestinationPath,
             dstPath = dictPath,
-            converter = DslDictConverter(
-                fileSystem,
-            ),
-            validator = DslDictValidator(fileSystem),
+            converter = dslDictConverter,
+            validator = dslDictValidator,
             successHandler = FileOpenCompositeSuccessHandler(
                 listOf(
                     OnNewDictAddedHandler(dictRepository, analytics)

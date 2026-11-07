@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -32,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
@@ -171,7 +174,33 @@ private fun showDictConfigsItem(
         }
     }
     is RemoteDictViewItem -> {
-        CustomListItem() {
+        CustomListItem(
+            modifier = Modifier.clickable {
+                if (!item.isLoading()) {
+                    vm.onRemoteDictStartLoadingClicked(item)
+                }
+            },
+            trailing = if (item.isLoading()) {
+                {
+                    val side = 40.dp
+                    Box(
+                        modifier = Modifier.size(side, side)
+                    ) {
+                        CircularProgressIndicator(
+                            progress = 1.0f,
+                            modifier = Modifier.padding(5.dp),
+                            color = Color.LightGray.copy(alpha = 0.2f)
+                        )
+                        CircularProgressIndicator(
+                            progress = item.progress,
+                            modifier = Modifier.padding(5.dp),
+                        )
+                    }
+                }
+            } else {
+                null
+            }
+        ) {
             Text(item.firstItem(), style = LocalAppTypography.current.settingsText)
         }
     }

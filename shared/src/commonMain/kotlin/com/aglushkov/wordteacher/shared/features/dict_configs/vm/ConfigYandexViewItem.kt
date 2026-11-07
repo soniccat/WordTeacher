@@ -1,5 +1,6 @@
 package com.aglushkov.wordteacher.shared.features.dict_configs.vm
 
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDict
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import org.jetbrains.compose.resources.StringResource
@@ -75,13 +76,19 @@ class ConfigCreateViewItem(
 
 class RemoteDictViewItem(
     name: String,
-    val size: Long,
+    val progress: Float,
+    val dict: WordTeacherDict,
 ): BaseViewItem<String>(name, Type) {
     companion object {
         const val Type = 1106
+        const val NOT_LOADING = -1.0f
     }
 
+    fun isLoading() = progress != NOT_LOADING
+
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
-        return super.equalsByContent(other) && size == (other as RemoteDictViewItem).size
+        return super.equalsByContent(other) &&
+                dict.size == (other as RemoteDictViewItem).dict.size &&
+                progress == other.progress
     }
 }

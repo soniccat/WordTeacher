@@ -14,7 +14,7 @@ if [ -z ${WT_FTP_PASS+x} ]; then
 fi
 
 date=$(date '+%Y-%m-%d_%H-%M-%S')
-uri="mongodb://192.168.0.78:27017/?directConnection=true&replicaSet=rs0"
+uri="mongodb://127.0.0.1:27017/?directConnection=true&replicaSet=rs0"
 out="/Users/Shared/WordTeacher/backups/mongo/$date"
 
 echo $date

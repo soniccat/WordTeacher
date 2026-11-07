@@ -39,6 +39,8 @@ import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import com.aglushkov.wordteacher.shared.repository.dict.DictFactory
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepositoryImpl
+import com.aglushkov.wordteacher.shared.repository.dict.DslDictConverter
+import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
 import com.aglushkov.wordteacher.shared.repository.logs.LogsRepository
 import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
@@ -49,6 +51,8 @@ import com.aglushkov.wordteacher.shared.repository.suggestion.SymSpellRepository
 import com.aglushkov.wordteacher.shared.repository.toggles.ToggleRepository
 import com.aglushkov.wordteacher.shared.repository.worddefinition.WordDefinitionHistoryRepository
 import com.aglushkov.wordteacher.shared.service.*
+import com.aglushkov.wordteacher.shared.usecase.dsl_dict_import_use_case.DslDictImportUseCase
+import com.aglushkov.wordteacher.shared.usecase.dsl_dict_import_use_case.DslDictImportUseCaseImpl
 import com.aglushkov.wordteacher.shared.workers.CardFrequencyUpdateWorker
 import com.aglushkov.wordteacher.shared.workers.CardSetSyncWorker
 import com.aglushkov.wordteacher.shared.workers.DatabaseCardWorker
@@ -121,6 +125,20 @@ class SharedAppModule {
 
     @AppComp
     @Provides
+    @LoadingDictPath
+    fun loadingDictPath(
+        @BasePath basePath: Path,
+        fileSystem: FileSystem,
+    ): Path {
+        val loadingDictPath = basePath.div("loading_dicts")
+        if (!fileSystem.exists(loadingDictPath)) {
+            fileSystem.createDirectory(loadingDictPath)
+        }
+        return loadingDictPath
+    }
+
+    @AppComp
+    @Provides
     fun dictRepository(
         @DictPath dictPath: Path,
         dictFactory: DictFactory,
@@ -136,8 +154,9 @@ class SharedAppModule {
     @Provides
     fun remoteDictRepository(
         wordTeacherDictService: WordTeacherDictService,
+        @LoadingDictPath loadingDictPath: Path,
     ): RemoteDictRepository {
-        return RemoteDictRepository(wordTeacherDictService)
+        return RemoteDictRepository(wordTeacherDictService, loadingDictPath)
     }
 
     @AppComp
@@ -615,5 +634,37 @@ class SharedAppModule {
             isDBReady = { controller.get().isLoaded },
             wordListLastVersion = wordListLastVersion
         )
+    }
+
+    @AppComp
+    @Provides
+    fun dslDictImportUseCase(
+        @DictPath dictPath: Path,
+        dslDictConverter: DslDictConverter,
+        dslDictValidator: DslDictValidator,
+        dictRepository: DictRepository,
+    ): DslDictImportUseCase {
+        return DslDictImportUseCaseImpl(
+            dictPath,
+            dslDictConverter,
+            dslDictValidator,
+            dictRepository
+        )
+    }
+
+    @AppComp
+    @Provides
+    fun dslDictConverter(
+        fileSystem: FileSystem
+    ): DslDictConverter {
+        return DslDictConverter(fileSystem)
+    }
+
+    @AppComp
+    @Provides
+    fun dslDictValidator(
+        fileSystem: FileSystem
+    ): DslDictValidator {
+        return DslDictValidator(fileSystem)
     }
 }

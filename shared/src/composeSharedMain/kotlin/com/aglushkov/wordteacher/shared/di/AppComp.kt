@@ -14,6 +14,9 @@ annotation class BasePath
 annotation class DictPath
 
 @Qualifier
+annotation class LoadingDictPath
+
+@Qualifier
 annotation class SpaceHttpClient
 
 @Qualifier

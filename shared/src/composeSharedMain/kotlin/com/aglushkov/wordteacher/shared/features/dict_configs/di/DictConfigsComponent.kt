@@ -13,6 +13,7 @@ import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
 import com.aglushkov.wordteacher.shared.repository.space.SpaceAuthRepository
+import com.aglushkov.wordteacher.shared.usecase.dsl_dict_import_use_case.DslDictImportUseCase
 import com.arkivanov.decompose.ComponentContext
 import dagger.BindsInstance
 import dagger.Component
@@ -38,4 +39,5 @@ interface DictConfigsDependencies {
     fun dictRepository(): DictRepository
     fun analytics(): Analytics
     fun remoteDictRepository(): RemoteDictRepository
+    fun dslDictImportUseCase(): DslDictImportUseCase
 }

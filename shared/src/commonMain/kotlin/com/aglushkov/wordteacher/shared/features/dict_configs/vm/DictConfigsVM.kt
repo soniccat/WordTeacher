@@ -30,6 +30,7 @@ import com.aglushkov.wordteacher.shared.repository.config.ConfigConnectParams
 import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
+import com.aglushkov.wordteacher.shared.usecase.dsl_dict_import_use_case.DslDictImportUseCase
 import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.StringResource
 import wordteacher.shared.generated.resources.dictconfigs_offline_section_title
 import wordteacher.shared.generated.resources.dictconfigs_online_section_title
@@ -87,6 +89,7 @@ interface DictConfigsVM: Clearable {
     fun onYandexConfigChanged(item: ConfigYandexViewItem, key: String?, lang: String?, settings: YandexSettings?)
     fun onConfigAddClicked(type: ConfigCreateViewItem.Type)
     fun onDictDeleted(item: ConfigDictViewItem)
+    fun onRemoteDictStartLoadingClicked(item: RemoteDictViewItem)
 }
 
 open class DictConfigsVMImpl(
@@ -96,14 +99,17 @@ open class DictConfigsVMImpl(
     private val remoteDictRepository: RemoteDictRepository,
     private val idGenerator: IdGenerator,
     private val analytics: Analytics,
+    private val dslDictImportUseCase: DslDictImportUseCase,
 ): ViewModel(), DictConfigsVM {
     override var router: DictConfigsRouter? = null
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override val viewItems = combine(
         configRepository.flow,
-        combine(dictRepository.dicts,
-            remoteDictRepository.stateFlow) { dicts, remoteDicts ->
+        combine(
+            dictRepository.dicts,
+            remoteDictRepository.remoteDictWithProgress
+        ) { dicts, remoteDicts ->
             if (dicts.isLoaded() && remoteDicts.isLoaded()) {
                 // filter remote dicts by already loaded ones
                 dicts to remoteDicts.mapLoadedData {
@@ -111,8 +117,8 @@ open class DictConfigsVMImpl(
                         dicts.data().orEmpty().firstOrNull { dict ->
                             val dslDict = dict as? DslDict ?: return@firstOrNull false
                             val modificationDate = dslDict.modificationDate ?: return@firstOrNull false
-                            dict.name == remoteDict.name &&
-                                    modificationDate < remoteDict.modificationDate
+                            dict.name == remoteDict.first.name &&
+                                    modificationDate < remoteDict.first.modificationDate
                         } == null
                     }
                 }
@@ -147,7 +153,7 @@ open class DictConfigsVMImpl(
     private fun buildViewItems(
         configs: Resource<List<Config>>,
         dicts: Resource<List<Dict>>,
-        remoteDicts: Resource<List<WordTeacherDict>>,
+        remoteDicts: Resource<List<Pair<WordTeacherDict, Float>>>,
         dictImportProgress: Resource<Unit>,
     ): List<BaseViewItem<*>> = buildList<BaseViewItem<*>> {
         add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_online_section_title)))
@@ -180,7 +186,13 @@ open class DictConfigsVMImpl(
         remoteDicts.on(
             data = {
                 it.onEach { remoteDict ->
-                    add(RemoteDictViewItem(remoteDict.name, remoteDict.size))
+                    add(
+                        RemoteDictViewItem(
+                            remoteDict.first.name,
+                            remoteDict.second,
+                            remoteDict.first,
+                        )
+                    )
                 }
             },
             error = {
@@ -278,6 +290,19 @@ open class DictConfigsVMImpl(
     override fun onDictDeleted(item: ConfigDictViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("DictConfigs.dictDeleted"))
         dictRepository.delete(item.path)
+    }
+
+    override fun onRemoteDictStartLoadingClicked(item: RemoteDictViewItem) {
+        mainScope.launch {
+            remoteDictRepository.loadDict(item.dict).collect {
+                if (it.progress() == 1.0f) {
+                    val path = remoteDictRepository.loadedDictPath(item.dict)
+                    withContext(Dispatchers.IO) {
+                        dslDictImportUseCase.run(path)
+                    }
+                }
+            }
+        }
     }
 
     override fun onCleared() {
