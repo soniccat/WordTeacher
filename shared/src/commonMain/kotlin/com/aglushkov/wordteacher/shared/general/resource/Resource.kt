@@ -4,6 +4,7 @@ import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlin.js.JsName
 import kotlin.math.min
@@ -371,17 +372,17 @@ fun <T> loadResource(
     canTryAgain: Boolean = true,
     loader: suspend () -> T
 ): Flow<Resource<T>> = flow {
-    try {
-        emit(initialValue.toLoading())
-        val result = loader()
-        emit(initialValue.toLoaded(result))
-    } catch (e: CancellationException) {
+    emit(initialValue.toLoading())
+    val result = loader()
+    emit(initialValue.toLoaded(result))
+}.catch { e ->
+    if (e is CancellationException) {
         throw e
-    } catch (e: Throwable) {
-        Logger.e(e.message.orEmpty(), "loadResource")
-        e.printStackTrace()
-        emit(initialValue.toError(e, canTryAgain))
     }
+
+    Logger.e(e.message.orEmpty(), "loadResource")
+    e.printStackTrace()
+    emit(initialValue.toError(e, canTryAgain))
 }
 
 fun <T> loadResourceWithFlow(
@@ -389,21 +390,21 @@ fun <T> loadResourceWithFlow(
     canTryAgain: Boolean = true,
     flow: Flow<T>
 ): Flow<Resource<T>> = flow {
-    try {
-        emit(initialValue.toLoading())
-        var lastValue: T? = null
-        flow.collect {
-            lastValue = it
-            emit(Resource.Loading(it))
-        }
-        emit(initialValue.toLoaded(lastValue!!))
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Throwable) {
-        Logger.e(e.message.orEmpty(), "loadResourceWithFlow")
-        e.printStackTrace()
-        emit(initialValue.toError(e, canTryAgain))
+    emit(initialValue.toLoading())
+    var lastValue: T? = null
+    flow.collect {
+        lastValue = it
+        emit(Resource.Loading(it))
     }
+    emit(initialValue.toLoaded(lastValue!!))
+}.catch { e ->
+    if (e is CancellationException) {
+        throw e
+    }
+
+    Logger.e(e.message.orEmpty(), "loadResourceWithFlow")
+    e.printStackTrace()
+    emit(initialValue.toError(e, canTryAgain))
 }
 
 fun <T> loadResourceWithProgress(
@@ -411,21 +412,21 @@ fun <T> loadResourceWithProgress(
     canTryAgain: Boolean = true,
     loader: Flow<Pair<Float, T?>>
 ): Flow<Resource<T>> = flow {
-    try {
-        emit(initialValue.toLoading())
-        var lastValue: T? = null
-        loader.collect { (progress, result) ->
-            lastValue = result
-            emit(initialValue.toLoading(result, progress))
-        }
-        emit(Resource.Loaded(lastValue ?: throw RuntimeException("loadResourceWithProgress: loaded data is null")))
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Throwable) {
-        Logger.e(e.message.orEmpty(), "loadResource")
-        e.printStackTrace()
-        emit(initialValue.toError(e, canTryAgain))
+    emit(initialValue.toLoading())
+    var lastValue: T? = null
+    loader.collect { (progress, result) ->
+        lastValue = result
+        emit(initialValue.toLoading(result, progress))
     }
+    emit(initialValue.toLoaded(lastValue ?: throw RuntimeException("loadResourceWithProgress: loaded data is null")))
+}.catch { e ->
+    if (e is CancellationException) {
+        throw e
+    }
+
+    Logger.e(e.message.orEmpty(), "loadResource")
+    e.printStackTrace()
+    emit(initialValue.toError(e, canTryAgain))
 }
 
 const val RESOURCE_UNDEFINED_PROGRESS = -1.0f

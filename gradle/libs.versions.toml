@@ -91,10 +91,11 @@ sqlDelightJvmDriver = { module = "app.cash.sqldelight:sqlite-driver", version.re
 
 ktorCommonCore = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktorAuth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
-ktorAndroidClient = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+#ktorAndroidClient = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktoriOSClient = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
 ktorLogging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktorContentEncoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
+ktorOkHttp = {module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
 

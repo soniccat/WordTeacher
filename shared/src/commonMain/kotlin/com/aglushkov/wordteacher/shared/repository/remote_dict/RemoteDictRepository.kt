@@ -10,6 +10,7 @@ import com.aglushkov.wordteacher.shared.general.resource.SimpleResourceRepositor
 import com.aglushkov.wordteacher.shared.general.resource.asLoaded
 import com.aglushkov.wordteacher.shared.general.resource.asLoading
 import com.aglushkov.wordteacher.shared.general.resource.isError
+import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
 import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgress
 import com.aglushkov.wordteacher.shared.general.toOkResponse
@@ -20,11 +21,16 @@ import io.ktor.http.Url
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.asSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.io.okio.asOkioSource
 import okio.Path
@@ -32,6 +38,7 @@ import okio.Sink
 import okio.buffer
 import okio.sink
 import java.net.URL
+import kotlin.time.Duration.Companion.milliseconds
 
 class RemoteDictRepository(
     private val dictService: WordTeacherDictService,
@@ -59,17 +66,24 @@ class RemoteDictRepository(
         return obtainLoadingProgress(dict)
     }
 
-    fun loadedDictPath(dict: WordTeacherDict): Path {
-        val url = Url(dict.url)
-        return loadingDictPath.div(url.segments.last())
+    fun clear(dict: WordTeacherDict) {
+        loadingProgress.update { map ->
+            map.filter { it.key != dict }
+        }
     }
 
-    private suspend fun obtainLoadingProgress(
+    fun loadedDictPath(dict: WordTeacherDict): Path {
+        return loadingDictPath.div(dict.url.segments.last())
+    }
+
+    private fun obtainLoadingProgress(
         dict: WordTeacherDict
     ): Flow<Resource<Unit>> {
         val dictLoadingRes = loadingProgress.value[dict]
         if (dictLoadingRes != null) {
-            return loadingProgress.map {
+            return loadingProgress.takeWhile {
+                it.contains(dict)
+            }.map {
                 it[dict] ?: Resource.Uninitialized()
             }
         }
@@ -80,14 +94,15 @@ class RemoteDictRepository(
         loadingProgress.update {
             it + (dict to Resource.Loading(Unit))
         }
-        loadResourceWithProgress(
+
+        return loadResourceWithProgress(
             loader = downloadFileFromUrl(
                 remoteUrl = dict.url,
                 destination = loadedPath.toFile().sink(),
             ).map { 
                 it to Unit
             }
-        ).collect { dictProgress ->
+        ).onEach { dictProgress ->
             loadingProgress.update { map ->
                 map.mapValues { entry ->
                     if (entry.key == dict) {
@@ -101,11 +116,7 @@ class RemoteDictRepository(
             if (dictProgress.isError()) {
                 loadedPath.deleteIfExists()
             }
-        }
-
-        return loadingProgress.map {
-            it[dict] ?: Resource.Uninitialized()
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     val client = HttpClient {
@@ -114,8 +125,8 @@ class RemoteDictRepository(
         }
     }
 
-    suspend fun downloadFileFromUrl(
-        remoteUrl: String,
+    fun downloadFileFromUrl(
+        remoteUrl: Url,
         destination: Sink
     ): Flow<Float> = channelFlow {
         client.prepareGet(remoteUrl).execute { response ->

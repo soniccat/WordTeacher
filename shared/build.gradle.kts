@@ -106,7 +106,7 @@ kotlin {
                 implementation(libs.sqlDelightAndroidDriver)
                 api(libs.androidx.activity.compose)
                 api(libs.appmetrica)
-                api(libs.ktorAndroidClient)
+                api(libs.ktorOkHttp)
                 api(libs.exoplayer)
                 api(libs.exoplayerDatabase)
                 api(libs.androidx.ui.tooling)

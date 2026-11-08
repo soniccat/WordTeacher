@@ -8,6 +8,7 @@ import com.aglushkov.wordteacher.shared.workers.DatabaseWorker
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 
@@ -48,17 +49,16 @@ class CardLoader(
         retryStatFlow.value++
     }
 
-    private suspend fun loadCards(cardIds: List<Long>): Flow<Resource<List<Card>>> = flow {
+    private fun loadCards(cardIds: List<Long>): Flow<Resource<List<Card>>> = flow {
         emit(Resource.Loading())
-        try {
-            val cards = databaseWorker.run {
-                database.cards.selectCards(cardIds).executeAsList()
-            }
-            emit(Resource.Loaded(cards))
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Throwable) {
-            emit(Resource.Error(e, canTryAgain = true))
+        val cards = databaseWorker.run {
+            database.cards.selectCards(cardIds).executeAsList()
         }
+        emit(Resource.Loaded(cards))
+    }.catch { e ->
+        if (e is CancellationException) {
+            throw e
+        }
+        emit(Resource.Error(e, canTryAgain = true))
     }
 }

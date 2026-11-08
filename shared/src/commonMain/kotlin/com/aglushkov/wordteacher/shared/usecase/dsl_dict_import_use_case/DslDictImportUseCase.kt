@@ -5,12 +5,18 @@ import com.aglushkov.wordteacher.shared.general.okio.writeTo
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DslDictConverter
 import com.aglushkov.wordteacher.shared.repository.dict.DslDictValidator
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import okio.Path
 import okio.sink
 import okio.source
 
 interface DslDictImportUseCase {
+    val isInProgress: Flow<Boolean>
     suspend fun run(srcPath: Path)
+    fun isPathInProgress(srcPath: Path): Boolean
 }
 
 class DslDictImportUseCaseImpl(
@@ -19,18 +25,31 @@ class DslDictImportUseCaseImpl(
     private val dslDictValidator: DslDictValidator,
     private val dictRepository: DictRepository,
 ): DslDictImportUseCase {
+    private var runPaths = MutableStateFlow<Set<Path>>(emptySet())
+
+    override val isInProgress: Flow<Boolean> =
+        runPaths.map { it.isNotEmpty() }
+
+    override fun isPathInProgress(srcPath: Path) =
+        runPaths.value.contains(srcPath)
+
     override suspend fun run(srcPath: Path) {
-        val pathName = srcPath.name
-        val newName = dslDictConverter.convert(srcPath)
-        val resolvedName = newName ?: pathName
-//        val covertedPath = srcPath.parent!!.div(resolvedName)
-        val importedPath = dictPath.div(resolvedName)
+        try {
+            runPaths.update { it + srcPath }
 
-        if (dslDictValidator.validateFile(srcPath)) {
-            srcPath.toFile().source().writeTo(importedPath.toFile().sink())
-            dictRepository.importDicts()
+            val pathName = srcPath.name
+            val newName = dslDictConverter.convert(srcPath)
+
+            if (dslDictValidator.validateFile(srcPath)) {
+                val resolvedName = newName ?: pathName
+                val importedPath = dictPath.div(resolvedName)
+                srcPath.toFile().source().writeTo(importedPath.toFile().sink())
+                dictRepository.importDicts()
+            }
+
+            srcPath.deleteIfExists()
+        } finally {
+            runPaths.update { it - srcPath }
         }
-
-        srcPath.deleteIfExists()
     }
 }

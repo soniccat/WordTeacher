@@ -29,6 +29,8 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
+import io.ktor.http.Url
+import io.ktor.http.UrlSerializer
 import io.ktor.http.encodeURLQueryComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -135,7 +137,8 @@ data class WordTeacherDictFilesResponse(
 data class WordTeacherDict(
     @SerialName("name") val name: String,
     @SerialName("description") val description: String,
-    @SerialName("url") val url: String,
+    @Serializable(with = UrlSerializer::class)
+    @SerialName("url") val url: Url,
     @SerialName("fromLang") val fromLang: String,
     @SerialName("toLang") val toLang: String,
     @SerialName("size") val size: Long,

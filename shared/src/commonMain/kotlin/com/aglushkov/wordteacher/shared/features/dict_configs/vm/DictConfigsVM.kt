@@ -21,6 +21,7 @@ import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.data
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
+import com.aglushkov.wordteacher.shared.general.resource.loadResource
 import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onError
@@ -31,10 +32,12 @@ import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
 import com.aglushkov.wordteacher.shared.usecase.dsl_dict_import_use_case.DslDictImportUseCase
+import io.ktor.http.Url
 import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
@@ -118,19 +121,20 @@ open class DictConfigsVMImpl(
                             val dslDict = dict as? DslDict ?: return@firstOrNull false
                             val modificationDate = dslDict.modificationDate ?: return@firstOrNull false
                             dict.name == remoteDict.first.name &&
-                                    modificationDate < remoteDict.first.modificationDate
+                                    modificationDate > remoteDict.first.modificationDate
                         } == null
                     }
                 }
             } else if (dicts.isLoading() || remoteDicts.isLoading()) {
-                dicts.mapLoadedData<List<Dict>> { emptyList() } to remoteDicts.mapLoadedData { emptyList() }
+                dicts to remoteDicts.mapLoadedData { emptyList() }
             } else {
                 dicts to remoteDicts
             }
         },
         dslDictOpenController.state,
-    ) { configs, (dicts, remoteDicts), dictImportProgress ->
-        buildViewItems(configs, dicts, remoteDicts, dictImportProgress)
+        dslDictImportUseCase.isInProgress,
+    ) { configs, (dicts, remoteDicts), dictImportProgress, dslDictImportUseCaseLoading ->
+        buildViewItems(configs, dicts, remoteDicts, dictImportProgress.isLoading() || dslDictImportUseCaseLoading)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     init {
@@ -154,7 +158,7 @@ open class DictConfigsVMImpl(
         configs: Resource<List<Config>>,
         dicts: Resource<List<Dict>>,
         remoteDicts: Resource<List<Pair<WordTeacherDict, Float>>>,
-        dictImportProgress: Resource<Unit>,
+        isDictImporting: Boolean,
     ): List<BaseViewItem<*>> = buildList<BaseViewItem<*>> {
         add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_online_section_title)))
         configs.on(
@@ -217,7 +221,7 @@ open class DictConfigsVMImpl(
                 add(ConfigTextViewItem(it.toStringResource()))
             }
         )
-        if (remoteDicts.isLoading() || dicts.isLoading() || dictImportProgress.isLoading()) {
+        if (remoteDicts.isLoading() || dicts.isLoading() || isDictImporting) {
             add(ConfigLoadingViewItem())
         }
         add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Offline))
@@ -293,12 +297,21 @@ open class DictConfigsVMImpl(
     }
 
     override fun onRemoteDictStartLoadingClicked(item: RemoteDictViewItem) {
+        val path = remoteDictRepository.loadedDictPath(item.dict)
+        if (dslDictImportUseCase.isPathInProgress(path)) {
+            return
+        }
+
         mainScope.launch {
             remoteDictRepository.loadDict(item.dict).collect {
                 if (it.progress() == 1.0f) {
-                    val path = remoteDictRepository.loadedDictPath(item.dict)
                     withContext(Dispatchers.IO) {
-                        dslDictImportUseCase.run(path)
+                        try {
+                            dslDictImportUseCase.run(path)
+                            remoteDictRepository.clear(item.dict)
+                        } catch (e: Throwable) {
+                            analytics.send(AnalyticEvent.createErrorEvent("DictConfigsVM.onRemoteDictStartLoadingClicked", e))
+                        }
                     }
                 }
             }
