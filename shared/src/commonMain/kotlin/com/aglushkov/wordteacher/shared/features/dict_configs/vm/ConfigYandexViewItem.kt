@@ -82,9 +82,11 @@ class RemoteDictViewItem(
     companion object {
         const val Type = 1106
         const val NOT_LOADING = -1.0f
+        const val IS_IMPORTING = -2.0f
     }
 
-    fun isLoading() = progress != NOT_LOADING
+    fun isLoading() = progress != NOT_LOADING && !isImporting()
+    fun isImporting() = progress == IS_IMPORTING
 
     override fun equalsByContent(other: BaseViewItem<*>): Boolean {
         return super.equalsByContent(other) &&

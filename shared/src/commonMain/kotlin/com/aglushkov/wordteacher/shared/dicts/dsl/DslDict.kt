@@ -374,6 +374,9 @@ fun String.dictTitleTrim(): String {
     }
 }
 
+fun DslDict.isWTDict() =
+    name.startsWith("WT ")
+
 fun String.hasLetters(): Boolean {
     return trim { !it.isLetter() }.isNotEmpty()
 }

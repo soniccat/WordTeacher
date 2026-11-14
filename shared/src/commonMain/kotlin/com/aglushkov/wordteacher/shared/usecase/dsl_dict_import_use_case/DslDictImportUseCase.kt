@@ -14,7 +14,7 @@ import okio.sink
 import okio.source
 
 interface DslDictImportUseCase {
-    val isInProgress: Flow<Boolean>
+    val loadingPaths: Flow<Set<Path>>
     suspend fun run(srcPath: Path)
     fun isPathInProgress(srcPath: Path): Boolean
 }
@@ -25,17 +25,14 @@ class DslDictImportUseCaseImpl(
     private val dslDictValidator: DslDictValidator,
     private val dictRepository: DictRepository,
 ): DslDictImportUseCase {
-    private var runPaths = MutableStateFlow<Set<Path>>(emptySet())
-
-    override val isInProgress: Flow<Boolean> =
-        runPaths.map { it.isNotEmpty() }
+    override var loadingPaths = MutableStateFlow<Set<Path>>(emptySet())
 
     override fun isPathInProgress(srcPath: Path) =
-        runPaths.value.contains(srcPath)
+        loadingPaths.value.contains(srcPath)
 
     override suspend fun run(srcPath: Path) {
         try {
-            runPaths.update { it + srcPath }
+            loadingPaths.update { it + srcPath }
 
             val pathName = srcPath.name
             val newName = dslDictConverter.convert(srcPath)
@@ -49,7 +46,7 @@ class DslDictImportUseCaseImpl(
 
             srcPath.deleteIfExists()
         } finally {
-            runPaths.update { it - srcPath }
+            loadingPaths.update { it - srcPath }
         }
     }
 }

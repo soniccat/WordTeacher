@@ -1,5 +1,8 @@
 package com.aglushkov.wordteacher.shared.repository.worddefinition
 
+import com.aglushkov.wordteacher.shared.apiproviders.wordteacher.WordTeacherDictService
+import com.aglushkov.wordteacher.shared.dicts.dsl.DslDict
+import com.aglushkov.wordteacher.shared.dicts.dsl.isWTDict
 import com.aglushkov.wordteacher.shared.general.Logger
 import com.aglushkov.wordteacher.shared.general.e
 import com.aglushkov.wordteacher.shared.general.extensions.takeUntilLoadedOrErrorForVersion
@@ -9,6 +12,7 @@ import com.aglushkov.wordteacher.shared.general.v
 import com.aglushkov.wordteacher.shared.model.WordTeacherWord
 import com.aglushkov.wordteacher.shared.model.nlp.NLPCore
 import com.aglushkov.wordteacher.shared.model.nlp.allLemmas
+import com.aglushkov.wordteacher.shared.repository.config.Config
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.service.ServiceRepository
 import com.aglushkov.wordteacher.shared.service.WordTeacherWordService
@@ -23,6 +27,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 
 class WordDefinitionRepository(
@@ -135,23 +141,49 @@ class WordDefinitionRepository(
         supervisorScope {
             val tag = "WordDefinitionRepository.loadDefinitionsFlow"
             val words = mutableListOf<Pair<WordTeacherWordService, List<WordTeacherWord>>>()
+            val wordMutex = Mutex()
             val jobs: MutableList<Job> = mutableListOf()
 
             send(Resource.Loading(version = version))
             Logger.v("send Loading", tag)
 
             val lemmatizer = nlpCore.waitUntilLemmatizerInitialized()
-            for (service in services) {
+            val (localWTDict, otherServices) = services.partition {
+                it is DslDict && it.isWTDict()
+            }
+            val (wtDictService, other) = otherServices.partition {
+                it.type == Config.Type.WordTeacher
+            }
+
+            for (service in listOf(
+                    localWTDict + wtDictService,
+                    *other.map { listOf(it) }.toTypedArray()
+                )
+            ) {
                 // launch instead of async/await to get results as soon as possible in a completion order
                 val job = launch(CoroutineExceptionHandler { _, throwable ->
-                    Logger.e("loadDefinitionsFlow Exception: " + throwable.message, service.type.toString())
+                    Logger.e("loadDefinitionsFlow Exception: " + throwable.message, service.map { it.type }.joinToString(","))
                 }) {
                     val wordsToDefine = mutableListOf(word)
                     val lemmas = withContext(Dispatchers.Default) {
                         lemmatizer.allLemmas(word)
                     }
+
+                    // in service list words found in the first service aren't searched in the next service
+                    // not to call word teacher service if definition is found in wt dsl dict
                     wordsToDefine.addAll(lemmas)
-                    words.add(service to service.define(wordsToDefine))
+                    for (s in service) {
+                        val defs = s.define(wordsToDefine)
+                        val foundWords = defs.map { it.word }
+                        wordMutex.withLock {
+                            words.add(s to defs)
+                        }
+                        wordsToDefine.removeIf { foundWords.contains(it) }
+                        if (wordsToDefine.isEmpty()) {
+                            break
+                        }
+                    }
+
                     send(Resource.Loading(words.toList(), version = version))
                 }
 

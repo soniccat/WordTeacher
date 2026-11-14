@@ -132,9 +132,9 @@ open class DictConfigsVMImpl(
             }
         },
         dslDictOpenController.state,
-        dslDictImportUseCase.isInProgress,
-    ) { configs, (dicts, remoteDicts), dictImportProgress, dslDictImportUseCaseLoading ->
-        buildViewItems(configs, dicts, remoteDicts, dictImportProgress.isLoading() || dslDictImportUseCaseLoading)
+        dslDictImportUseCase.loadingPaths,
+    ) { configs, (dicts, remoteDicts), dictImportProgress, _ ->
+        buildViewItems(configs, dicts, remoteDicts, dictImportProgress.isLoading())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     init {
@@ -193,7 +193,17 @@ open class DictConfigsVMImpl(
                     add(
                         RemoteDictViewItem(
                             remoteDict.first.name,
-                            remoteDict.second,
+                            remoteDict.second.let { progress ->
+                                if (dslDictImportUseCase.isPathInProgress(
+                                        remoteDictRepository.loadedDictPath(remoteDict.first)
+                                    )) {
+                                    RemoteDictViewItem.IS_IMPORTING
+                                } else if (progress == -1.0f) {
+                                    RemoteDictViewItem.NOT_LOADING
+                                } else {
+                                    progress
+                                }
+                            },
                             remoteDict.first,
                         )
                     )

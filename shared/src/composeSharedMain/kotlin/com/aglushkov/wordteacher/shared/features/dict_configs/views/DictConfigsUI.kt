@@ -56,6 +56,7 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.aglushkov.wordteacher.shared.general.views.CustomListItem
 import com.aglushkov.wordteacher.shared.general.views.DeletableCell
+import com.aglushkov.wordteacher.shared.general.views.DownloadForOfflineButton
 import com.aglushkov.wordteacher.shared.general.views.InlineTextField
 import com.aglushkov.wordteacher.shared.general.views.LoadingViewItemUI
 import com.aglushkov.wordteacher.shared.general.views.listBottomPadding
@@ -175,13 +176,22 @@ private fun showDictConfigsItem(
     }
     is RemoteDictViewItem -> {
         CustomListItem(
-            modifier = Modifier.clickable {
+            modifier = Modifier.clickable(
+                enabled = !item.isLoading() && !item.isImporting(),
+            ) {
                 if (!item.isLoading()) {
                     vm.onRemoteDictStartLoadingClicked(item)
                 }
             },
-            trailing = if (item.isLoading()) {
-                {
+            trailing = {
+                if (item.isImporting()) {
+                    val side = 40.dp
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(side, side)
+                            .padding(5.dp)
+                            .align(Alignment.Center)
+                    )
+                } else if (item.isLoading()) {
                     val side = 40.dp
                     Box(
                         modifier = Modifier.size(side, side)
@@ -196,9 +206,9 @@ private fun showDictConfigsItem(
                             modifier = Modifier.padding(5.dp),
                         )
                     }
+                } else {
+                    DownloadForOfflineButton()
                 }
-            } else {
-                null
             }
         ) {
             Text(item.firstItem(), style = LocalAppTypography.current.settingsText)
