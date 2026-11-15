@@ -12,6 +12,7 @@ import com.aglushkov.wordteacher.shared.general.resource.asLoading
 import com.aglushkov.wordteacher.shared.general.resource.isError
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedOrError
+import com.aglushkov.wordteacher.shared.general.resource.isLoading
 import com.aglushkov.wordteacher.shared.general.resource.loadResourceWithProgress
 import com.aglushkov.wordteacher.shared.general.toOkResponse
 import io.ktor.client.*
@@ -81,10 +82,12 @@ class RemoteDictRepository(
     ): Flow<Resource<Unit>> {
         val dictLoadingRes = loadingProgress.value[dict]
         if (dictLoadingRes != null) {
-            return loadingProgress.takeWhile {
-                it.contains(dict)
-            }.map {
-                it[dict] ?: Resource.Uninitialized()
+            if (dictLoadingRes.isLoading()) {
+                return loadingProgress.takeWhile {
+                    it.contains(dict)
+                }.map {
+                    it[dict] ?: Resource.Uninitialized()
+                }
             }
         }
 
