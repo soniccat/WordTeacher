@@ -22,6 +22,8 @@ import com.aglushkov.wordteacher.shared.service.installLogger
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.request.get
@@ -29,9 +31,12 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.UrlSerializer
 import io.ktor.http.encodeURLQueryComponent
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -162,6 +167,20 @@ class WordTeacherDictService (
         installErrorTracker(analyticsProvider)
         install(ContentEncoding) {
             gzip(0.9F)
+        }
+        install(HttpRequestRetry) {
+            maxRetries = 2
+            retryIf { req, resp ->
+                req.method == HttpMethod.Get &&
+                        resp.status != HttpStatusCode.NotModified &&
+                        !resp.status.isSuccess()
+            }
+            retryOnException(retryOnTimeout = true)
+        }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 10000
+            connectTimeoutMillis = 5000
+            socketTimeoutMillis = 5000
         }
     }
 
