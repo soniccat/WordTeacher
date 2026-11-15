@@ -40,6 +40,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.aglushkov.wordteacher.shared.features.definitions.views.CustomBadge
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigCreateViewItem
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigDictViewItem
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigHeaderViewItem
@@ -67,7 +68,9 @@ import kotlinx.coroutines.flow.drop
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import wordteacher.shared.generated.resources.arrow_back_24
+import wordteacher.shared.generated.resources.cardset_add_label
 import wordteacher.shared.generated.resources.create_note
+import wordteacher.shared.generated.resources.dictconfigs_new_dsl_dict_version
 import wordteacher.shared.generated.resources.dictconfigs_word_count
 import wordteacher.shared.generated.resources.dictconfigs_yandex_api_token_doesnt_exist_placeholder
 import wordteacher.shared.generated.resources.dictconfigs_yandex_api_token_exists_placeholder
@@ -209,6 +212,22 @@ private fun showDictConfigsItem(
                 } else {
                     DownloadForOfflineButton()
                 }
+            },
+            secondaryContent = if (item.isNewVersion) {
+                {
+                    CustomBadge(
+                        backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.8f),
+                        contentColor = MaterialTheme.colors.onSecondary,
+                        content = {
+                            Text(
+                                text = stringResource(Res.string.dictconfigs_new_dsl_dict_version),
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            )
+                        }
+                    )
+                }
+            } else {
+                null
             }
         ) {
             Text(item.firstItem(), style = LocalAppTypography.current.settingsText)

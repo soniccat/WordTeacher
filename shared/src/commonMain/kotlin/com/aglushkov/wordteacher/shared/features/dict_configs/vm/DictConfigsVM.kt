@@ -104,6 +104,12 @@ open class DictConfigsVMImpl(
     private val analytics: Analytics,
     private val dslDictImportUseCase: DslDictImportUseCase,
 ): ViewModel(), DictConfigsVM {
+    data class WordTeacherDictExt(
+        val remoteDict: WordTeacherDict,
+        val loadingProgress: Float,
+        val isNewVersion: Boolean = false
+    )
+
     override var router: DictConfigsRouter? = null
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -116,19 +122,45 @@ open class DictConfigsVMImpl(
             if (dicts.isLoaded() && remoteDicts.isLoaded()) {
                 // filter remote dicts by already loaded ones
                 dicts to remoteDicts.mapLoadedData {
-                    it.filter { remoteDict ->
-                        dicts.data().orEmpty().firstOrNull { dict ->
+                    it.mapNotNull { remoteDict ->
+                        // look for already downloaded version by name
+                        val loadedDictVersion = dicts.data().orEmpty().firstOrNull { dict ->
                             val dslDict = dict as? DslDict ?: return@firstOrNull false
-                            val modificationDate = dslDict.modificationDate ?: return@firstOrNull false
-                            dict.name == remoteDict.first.name &&
-                                    modificationDate > remoteDict.first.modificationDate
-                        } == null
+                            dslDict.name == remoteDict.first.name
+                        } as? DslDict
+
+                        // check if online version is newer
+                        if (loadedDictVersion != null) {
+                            val modificationDate = loadedDictVersion.modificationDate ?: return@mapNotNull null
+                            if (modificationDate > remoteDict.first.modificationDate) {
+                                null
+                            } else {
+                                WordTeacherDictExt(
+                                    remoteDict = remoteDict.first,
+                                    loadingProgress = remoteDict.second,
+                                    isNewVersion = true
+                                )
+                            }
+                        } else {
+                            WordTeacherDictExt(
+                                remoteDict = remoteDict.first,
+                                loadingProgress = remoteDict.second,
+                                isNewVersion = false
+                            )
+                        }
                     }
                 }
             } else if (dicts.isLoading() || remoteDicts.isLoading()) {
                 dicts to remoteDicts.mapLoadedData { emptyList() }
             } else {
-                dicts to remoteDicts
+                dicts to remoteDicts.mapLoadedData {
+                    it.map {
+                        WordTeacherDictExt(
+                            remoteDict = it.first,
+                            loadingProgress = it.second,
+                        )
+                    }
+                }
             }
         },
         dslDictOpenController.state,
@@ -157,7 +189,7 @@ open class DictConfigsVMImpl(
     private fun buildViewItems(
         configs: Resource<List<Config>>,
         dicts: Resource<List<Dict>>,
-        remoteDicts: Resource<List<Pair<WordTeacherDict, Float>>>,
+        remoteDicts: Resource<List<WordTeacherDictExt>>,
         isDictImporting: Boolean,
     ): List<BaseViewItem<*>> = buildList<BaseViewItem<*>> {
         add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_online_section_title)))
@@ -192,10 +224,10 @@ open class DictConfigsVMImpl(
                 it.onEach { remoteDict ->
                     add(
                         RemoteDictViewItem(
-                            remoteDict.first.name,
-                            remoteDict.second.let { progress ->
+                            remoteDict.remoteDict.name,
+                            remoteDict.loadingProgress.let { progress ->
                                 if (dslDictImportUseCase.isPathInProgress(
-                                        remoteDictRepository.loadedDictPath(remoteDict.first)
+                                        remoteDictRepository.loadedDictPath(remoteDict.remoteDict)
                                     )) {
                                     RemoteDictViewItem.IS_IMPORTING
                                 } else if (progress == -1.0f) {
@@ -204,7 +236,8 @@ open class DictConfigsVMImpl(
                                     progress
                                 }
                             },
-                            remoteDict.first,
+                            remoteDict.remoteDict,
+                            remoteDict.isNewVersion,
                         )
                     )
                 }
