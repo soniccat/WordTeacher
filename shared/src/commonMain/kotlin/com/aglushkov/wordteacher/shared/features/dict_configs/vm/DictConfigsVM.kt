@@ -18,11 +18,8 @@ import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.item.generateViewItemIds
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
-import com.aglushkov.wordteacher.shared.general.resource.data
 import com.aglushkov.wordteacher.shared.general.resource.isLoaded
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
-import com.aglushkov.wordteacher.shared.general.resource.loadResource
-import com.aglushkov.wordteacher.shared.general.resource.merge
 import com.aglushkov.wordteacher.shared.general.resource.on
 import com.aglushkov.wordteacher.shared.general.resource.onError
 import com.aglushkov.wordteacher.shared.general.toStringResource
@@ -32,7 +29,6 @@ import com.aglushkov.wordteacher.shared.repository.config.ConfigRepository
 import com.aglushkov.wordteacher.shared.repository.dict.DictRepository
 import com.aglushkov.wordteacher.shared.repository.remote_dict.RemoteDictRepository
 import com.aglushkov.wordteacher.shared.usecase.dsl_dict_import_use_case.DslDictImportUseCase
-import io.ktor.http.Url
 import wordteacher.shared.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -336,7 +332,9 @@ open class DictConfigsVMImpl(
 
     override fun onDictDeleted(item: ConfigDictViewItem) {
         analytics.send(AnalyticEvent.createActionEvent("DictConfigs.dictDeleted"))
-        dictRepository.delete(item.path)
+        mainScope.launch(Dispatchers.IO) {
+            dictRepository.delete(item.path)
+        }
     }
 
     override fun onRemoteDictStartLoadingClicked(item: RemoteDictViewItem) {
@@ -345,17 +343,43 @@ open class DictConfigsVMImpl(
             return
         }
 
-        mainScope.launch {
+        analytics.send(AnalyticEvent.createActionEvent("DictConfigs.onRemoteDictLoadingStart", mapOf("name" to path.name)))
+        mainScope.launch(Dispatchers.IO) {
             remoteDictRepository.loadDict(item.dict).collect {
                 if (it.progress() == 1.0f) {
-                    withContext(Dispatchers.IO) {
-                        try {
-                            dslDictImportUseCase.run(path)
-                            remoteDictRepository.clear(item.dict)
-                        } catch (e: Throwable) {
-                            analytics.send(AnalyticEvent.createErrorEvent("DictConfigsVM.onRemoteDictStartLoadingClicked", e))
-                        }
+                    analytics.send(
+                        AnalyticEvent.createActionEvent(
+                            "DictConfigs.onRemoteDictLoadingComplete",
+                            mapOf("name" to path.name)
+                        )
+                    )
+                    try {
+                        dslDictImportUseCase.run(path)
+                        remoteDictRepository.clear(item.dict)
+                        analytics.send(
+                            AnalyticEvent.createActionEvent(
+                                "DictConfigs.onRemoteDictImportComplete",
+                                mapOf("name" to path.name)
+                            )
+                        )
+                    } catch (e: Throwable) {
+                        analytics.send(
+                            AnalyticEvent.createErrorEvent(
+                                "DictConfigsVM.onRemoteDictImportError",
+                                e
+                            )
+                        )
                     }
+                } else if (
+                        it.onError {
+                            analytics.send(
+                                AnalyticEvent.createErrorEvent(
+                                    "DictConfigsVM.onRemoteDictLoadingError",
+                                    it
+                                )
+                            )
+                        }
+                    ) {
                 }
             }
         }

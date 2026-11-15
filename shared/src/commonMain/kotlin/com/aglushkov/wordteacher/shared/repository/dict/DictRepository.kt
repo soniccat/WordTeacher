@@ -114,7 +114,7 @@ class DictRepositoryImpl(
         return wordStateFlow
     }
 
-    private suspend fun defineInternal(word: String): Flow<Resource<List<WordTeacherWord>>> = channelFlow {
+    private fun defineInternal(word: String): Flow<Resource<List<WordTeacherWord>>> = channelFlow {
         // ChannelFlow to be able to emit from different coroutines
         // SupervisorScope not to interrupt when a service fails
         supervisorScope {
@@ -145,10 +145,8 @@ class DictRepositoryImpl(
 
     override fun delete(path: Path) {
         val dict = dicts.value.data()?.firstOrNull { it.path == path } ?: return
-        scope.launch(Dispatchers.IO) {
-            fileSystem.delete(dict.index.path)
-            fileSystem.delete(dict.path)
-            dicts.update { it.mapLoadedData { it.filter { it != dict } } }
-        }
+        fileSystem.delete(dict.index.path)
+        fileSystem.delete(dict.path)
+        dicts.update { it.mapLoadedData { it.filter { it != dict } } }
     }
 }

@@ -40,6 +40,7 @@ class DslDictImportUseCaseImpl(
             if (dslDictValidator.validateFile(srcPath)) {
                 val resolvedName = newName ?: pathName
                 val importedPath = dictPath.div(resolvedName)
+                dictRepository.delete(importedPath)
                 srcPath.toFile().source().writeTo(importedPath.toFile().sink())
                 dictRepository.importDicts()
             }

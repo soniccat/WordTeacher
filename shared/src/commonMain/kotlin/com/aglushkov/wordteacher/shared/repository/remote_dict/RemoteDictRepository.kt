@@ -116,7 +116,7 @@ class RemoteDictRepository(
             if (dictProgress.isError()) {
                 loadedPath.deleteIfExists()
             }
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
     val client = HttpClient {

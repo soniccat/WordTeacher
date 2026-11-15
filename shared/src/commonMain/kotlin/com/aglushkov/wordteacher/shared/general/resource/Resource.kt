@@ -317,10 +317,15 @@ inline fun <T> Resource<T>.onData(block: (T) -> Unit): Boolean {
     } ?: false
 }
 
-inline fun Resource<*>.onError(block: (Throwable) -> Unit) {
+inline fun Resource<*>.onError(block: (Throwable) -> Unit): Boolean {
     when (this) {
-        is Resource.Error -> block(throwable)
-        else -> return
+        is Resource.Error -> {
+            block(throwable)
+            return true
+        }
+        else -> {
+            return false
+        }
     }
 }
 
