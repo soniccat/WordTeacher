@@ -29,6 +29,7 @@ func run() int {
 	mongoURI := flag.String("mongoURI", "mongodb://localhost:27017/?directConnection=true&replicaSet=rs0", "Database hostname url")
 	inputFilePath := flag.String("input", "./default.wordlist", "Input wordlist file path")
 	outputFilePath := flag.String("output", "./default_filtered.wordlist", "Output wordlist file path")
+	filterWordlistPath := flag.String("filterWordlist", "", "Filter wordlist file path (if set, filter by this wordlist instead of mongo)")
 	flag.Parse()
 
 	ex, err := os.Executable()
@@ -55,38 +56,14 @@ func run() int {
 	}
 	defer outF2.Close()
 
-	mw, e := mongowrapper.New(*mongoURI, false)
+	var dbTermSet map[string]bool
+	if *filterWordlistPath != "" {
+		dbTermSet, e = loadTermSetFromWordlist(exPath + *filterWordlistPath)
+	} else {
+		dbTermSet, e = loadTermSetFromMongo(*mongoURI)
+	}
 	if e != nil {
 		log.Fatalln(e)
-	}
-	defer mw.Stop()
-
-	e = mw.Connect()
-	if e != nil {
-		log.Fatalln(e)
-	}
-
-	ctx := context.Background()
-	collection := mw.Client.Database("wiktionary").Collection("words2")
-	c, e := collection.Find(ctx, bson.M{}, &options.FindOptions{
-		Projection: bson.M{"term_lowercased": 1},
-	})
-	if e != nil {
-		log.Fatalln(e)
-	}
-	var mongoResult MongoTermWrapperList
-	e = c.All(ctx, &mongoResult)
-	if e != nil {
-		log.Fatalln(e)
-	}
-
-	dbTermSet := make(map[string]bool)
-	for _, r := range mongoResult {
-		if _, ok := dbTermSet[r.TermLowercased]; !ok {
-			if !strings.Contains(r.TermLowercased, " ") {
-				dbTermSet[r.TermLowercased] = true
-			}
-		}
 	}
 
 	scanner := bufio.NewScanner(f)
@@ -100,4 +77,64 @@ func run() int {
 	}
 
 	return 1
+}
+
+func loadTermSetFromWordlist(path string) (map[string]bool, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	termSet := make(map[string]bool)
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		t := strings.ToLower(scanner.Text())
+		if _, ok := termSet[t]; !ok {
+			termSet[t] = true
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return termSet, nil
+}
+
+func loadTermSetFromMongo(mongoURI string) (map[string]bool, error) {
+	mw, err := mongowrapper.New(mongoURI, false)
+	if err != nil {
+		return nil, err
+	}
+	defer mw.Stop()
+
+	err = mw.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := context.Background()
+	collection := mw.Client.Database("wiktionary").Collection("words2")
+	c, err := collection.Find(ctx, bson.M{}, &options.FindOptions{
+		Projection: bson.M{"term_lowercased": 1},
+	})
+	if err != nil {
+		return nil, err
+	}
+	var mongoResult MongoTermWrapperList
+	err = c.All(ctx, &mongoResult)
+	if err != nil {
+		return nil, err
+	}
+
+	termSet := make(map[string]bool)
+	for _, r := range mongoResult {
+		if _, ok := termSet[r.TermLowercased]; !ok {
+			if !strings.Contains(r.TermLowercased, " ") {
+				termSet[r.TermLowercased] = true
+			}
+		}
+	}
+
+	return termSet, nil
 }

@@ -50,6 +50,15 @@ func (h *Handler) Files(w http.ResponseWriter, r *http.Request) {
 				Size:             19854421,
 				ModificationDate: "2026-11-15T07:23:26Z",
 			},
+			{
+				Name:             "WT Wiktionary EN-EN Phrasal Verbs and Idioms",
+				Description:      "Wiktionary phrasal verbs and idioms",
+				Url:              "https://aglushkov.ru/dicts/Wiktionary_EN-EN_Phrasal_Verbs_and_Idioms.dsl.gz",
+				FromLang:         "EN",
+				ToLang:           "EN",
+				Size:             1329354,
+				ModificationDate: "2026-11-20T12:24:44Z",
+			},
 		},
 	}
 
