@@ -56,7 +56,7 @@ func (h *Handler) Files(w http.ResponseWriter, r *http.Request) {
 				Url:              "https://aglushkov.ru/dicts/Wiktionary_EN-EN_Phrasal_Verbs_and_Idioms.dsl.gz",
 				FromLang:         "EN",
 				ToLang:           "EN",
-				Size:             1329354,
+				Size:             7260267,
 				ModificationDate: "2026-11-20T12:24:44Z",
 			},
 		},
