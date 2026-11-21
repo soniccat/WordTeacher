@@ -116,22 +116,20 @@ fun DefinitionsUI(
             .fillMaxSize()
             .background(color = MaterialTheme.colors.background)
     ) {
-        // TODO: consider moving chooser outside...
         var prevItems by remember{
             mutableStateOf<List<ChooserViewItem>>(emptyList())
         }
         val resultItems by remember(selectedPartsOfSpeeches) {
             derivedStateOf {
-                val newItems = partsOfSpeech.map { partOfSpeech ->
+                prevItems = partsOfSpeech.map { partOfSpeech ->
                     val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
                     ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
-                }
-                newItems.generateIds(prevItems, vm.idGenerator)
-                prevItems = newItems
-                newItems
+                }.generateIds(prevItems, vm.idGenerator)
+                prevItems
             }
         }
 
+        // TODO: consider moving chooser outside...
         ChooserUI(
             state = partOfSpeechFilterBottomSheetState,
             items = resultItems,
