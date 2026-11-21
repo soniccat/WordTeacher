@@ -10,38 +10,30 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.aglushkov.wordteacher.shared.features.SnackbarEventHolderItem
 import com.aglushkov.wordteacher.shared.features.SnackbarEventHolder
+import com.aglushkov.wordteacher.shared.features.SnackbarEventHolderItem
 import com.aglushkov.wordteacher.shared.general.resources.resolve
 import com.benasher44.uuid.uuid4
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineExceptionHandler
 
-private var snackBarUICount by mutableStateOf(0)
-
-val LocalSnackbarUUID = staticCompositionLocalOf {
-    uuid4().toString()
-}
+private val LocalSnackbarEventHolder = staticCompositionLocalOf<SnackbarEventHolder?> { null }
 
 @Composable
 fun BindSnackbarEventHolder(
     eventsHolder: SnackbarEventHolder,
     content: @Composable () -> Unit
 ) {
-    val snackbarUUID = uuid4().toString()
+    val snackbarUUID = remember { uuid4().toString() }
     CompositionLocalProvider(
-        LocalSnackbarUUID provides snackbarUUID
+        LocalSnackbarEventHolder provides eventsHolder
     ) {
-        DisposableEffect(key1 = "disposable") {
+        DisposableEffect(key1 = snackbarUUID) {
             SnackbarEventHolder.addSource(snackbarUUID, SnackbarEventHolderItem(
                 flow = eventsHolder.events,
                 handler = { event, withAction ->
@@ -62,47 +54,34 @@ fun BindSnackbarEventHolder(
 fun BoxScope.SnackbarUI(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-    DisposableEffect("dispose") {
-        snackBarUICount += 1
-        Logger.v("snackBarUICount = $snackBarUICount", TAG)
-        onDispose {
-            snackBarUICount -= 1
-            Logger.v("snackBarUICount = $snackBarUICount", TAG)
-        }
-    }
-
-    val currentSnackbarUICount = remember { Logger.v("currentSnackbarUICount = ${snackBarUICount+1}", TAG)
-        snackBarUICount + 1 }
+    // The holder is provided by BindSnackbarEventHolder and is available
+    // during the first composition, so there is no subscription race
+    val eventsHolder = LocalSnackbarEventHolder.current ?: return
     val coroutineScope = rememberCoroutineScope()
-    val eventHolderItem = SnackbarEventHolder.map[LocalSnackbarUUID.current] ?: return
-    val events = eventHolderItem.flow.collectAsState()
-    val eventToShow by remember(events) {
-        derivedStateOf { events.value.firstOrNull() }
+    val events = eventsHolder.events.collectAsState()
+    val eventToShow = events.value.firstOrNull()
+
+    SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier.align(Alignment.BottomCenter)
+    ) {
+        Snackbar(snackbarData = it,)
     }
 
-    if (currentSnackbarUICount == snackBarUICount) {
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            Snackbar(snackbarData = it,)
-        }
-
-        val snackBarMessage = eventToShow?.text?.resolve().orEmpty()
-        val snackBarActionText = eventToShow?.actionText?.resolve()
-        LaunchedEffect(eventToShow) {
-            eventToShow?.let { event ->
-                coroutineScope.launch(CoroutineExceptionHandler { coroutineContext, throwable ->
-                    Logger.v("exceptionHandler: " + throwable.message.orEmpty(), TAG)
-                }) {
-                    Logger.v("showSnackbar $snackBarMessage", TAG)
-                    val result = snackbarHostState.showSnackbar(
-                        snackBarMessage,
-                        snackBarActionText
-                    )
-                    eventHolderItem.handler(event, result == SnackbarResult.ActionPerformed)
-                    Logger.v("handled $snackBarMessage", TAG)
-                }
+    val snackBarMessage = eventToShow?.text?.resolve().orEmpty()
+    val snackBarActionText = eventToShow?.actionText?.resolve()
+    LaunchedEffect(eventToShow) {
+        eventToShow?.let { event ->
+            coroutineScope.launch(CoroutineExceptionHandler { coroutineContext, throwable ->
+                Logger.v("exceptionHandler: " + throwable.message.orEmpty(), TAG)
+            }) {
+                Logger.v("showSnackbar $snackBarMessage", TAG)
+                val result = snackbarHostState.showSnackbar(
+                    snackBarMessage,
+                    snackBarActionText
+                )
+                eventsHolder.onEventHandled(event, result == SnackbarResult.ActionPerformed)
+                Logger.v("handled $snackBarMessage", TAG)
             }
         }
     }
