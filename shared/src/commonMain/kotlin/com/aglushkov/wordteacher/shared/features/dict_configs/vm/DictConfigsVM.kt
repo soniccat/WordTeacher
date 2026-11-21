@@ -103,6 +103,7 @@ open class DictConfigsVMImpl(
     data class WordTeacherDictExt(
         val remoteDict: WordTeacherDict,
         val loadingProgress: Float,
+        val sizeText: String,
         val isNewVersion: Boolean = false
     )
 
@@ -134,6 +135,7 @@ open class DictConfigsVMImpl(
                                 WordTeacherDictExt(
                                     remoteDict = remoteDict.first,
                                     loadingProgress = remoteDict.second,
+                                    sizeText = remoteDict.first.size.formatBytes(),
                                     isNewVersion = true
                                 )
                             }
@@ -141,6 +143,7 @@ open class DictConfigsVMImpl(
                             WordTeacherDictExt(
                                 remoteDict = remoteDict.first,
                                 loadingProgress = remoteDict.second,
+                                sizeText = remoteDict.first.size.formatBytes(),
                                 isNewVersion = false
                             )
                         }
@@ -150,10 +153,11 @@ open class DictConfigsVMImpl(
                 dicts to remoteDicts.mapLoadedData { emptyList() }
             } else {
                 dicts to remoteDicts.mapLoadedData {
-                    it.map {
+                    it.map { (remoteDict, loadingProgress) ->
                         WordTeacherDictExt(
-                            remoteDict = it.first,
-                            loadingProgress = it.second,
+                            remoteDict = remoteDict,
+                            loadingProgress = loadingProgress,
+                            sizeText = remoteDict.size.formatBytes(),
                         )
                     }
                 }
@@ -233,6 +237,7 @@ open class DictConfigsVMImpl(
                                 }
                             },
                             remoteDict.remoteDict,
+                            sizeText = remoteDict.sizeText,
                             remoteDict.isNewVersion,
                         )
                     )
@@ -387,4 +392,20 @@ open class DictConfigsVMImpl(
 
     override fun onCleared() {
     }
+}
+
+private fun Long.formatBytes(): String {
+    if (this < 0) return "0 B"
+    if (this < 1024) return "$this B"
+
+    val units = arrayOf("KB", "MB", "GB", "TB", "PB", "EB")
+    var value = this.toDouble()
+    var unitIndex = -1
+
+    while (value >= 1024 && unitIndex < units.size - 1) {
+        value /= 1024
+        unitIndex++
+    }
+
+    return "%.1f %s".format(value, units[unitIndex])
 }

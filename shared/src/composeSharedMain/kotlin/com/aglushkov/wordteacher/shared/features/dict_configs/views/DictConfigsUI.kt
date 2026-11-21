@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -187,34 +188,43 @@ private fun showDictConfigsItem(
                 }
             },
             trailing = {
-                if (item.isImporting()) {
-                    val side = 40.dp
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(side, side)
-                            .padding(5.dp)
-                            .align(Alignment.Center)
-                    )
-                } else if (item.isLoading()) {
-                    val side = 40.dp
-                    Box(
-                        modifier = Modifier.size(side, side)
-                    ) {
+                Row {
+                    Text(item.sizeText)
+                    if (item.isImporting()) {
+                        val side = 40.dp
                         CircularProgressIndicator(
-                            progress = 1.0f,
-                            modifier = Modifier.padding(5.dp),
-                            color = Color.LightGray.copy(alpha = 0.2f)
+                            modifier = Modifier.size(side, side)
+                                .padding(5.dp)
+                                .align(Alignment.CenterVertically)
                         )
-                        CircularProgressIndicator(
-                            progress = item.progress,
-                            modifier = Modifier.padding(5.dp),
-                        )
+                    } else if (item.isLoading()) {
+                        val side = 40.dp
+                        Box(
+                            modifier = Modifier.size(side, side)
+                        ) {
+                            CircularProgressIndicator(
+                                progress = 1.0f,
+                                modifier = Modifier.padding(5.dp),
+                                color = Color.LightGray.copy(alpha = 0.2f)
+                            )
+                            CircularProgressIndicator(
+                                progress = item.progress,
+                                modifier = Modifier.padding(5.dp),
+                            )
+                        }
+                    } else {
+                        DownloadForOfflineButton()
                     }
-                } else {
-                    DownloadForOfflineButton()
                 }
             },
-            secondaryContent = if (item.isNewVersion) {
-                {
+            secondaryContent = {
+                Text(
+                    text = item.dict.description
+                )
+            }
+        ) {
+            Column {
+                if (item.isNewVersion) {
                     CustomBadge(
                         backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.8f),
                         contentColor = MaterialTheme.colors.onSecondary,
@@ -226,11 +236,8 @@ private fun showDictConfigsItem(
                         }
                     )
                 }
-            } else {
-                null
+                Text(item.firstItem(), style = LocalAppTypography.current.settingsText)
             }
-        ) {
-            Text(item.firstItem(), style = LocalAppTypography.current.settingsText)
         }
     }
     is ConfigLoadingViewItem -> {

@@ -78,6 +78,7 @@ class RemoteDictViewItem(
     name: String,
     val progress: Float,
     val dict: WordTeacherDict,
+    val sizeText: String,
     val isNewVersion: Boolean,
 ): BaseViewItem<String>(name, Type) {
     companion object {
@@ -93,6 +94,7 @@ class RemoteDictViewItem(
         return super.equalsByContent(other) &&
                 dict.size == (other as RemoteDictViewItem).dict.size &&
                 progress == other.progress &&
-                isNewVersion == other.isNewVersion
+                isNewVersion == other.isNewVersion &&
+                sizeText == other.sizeText
     }
 }

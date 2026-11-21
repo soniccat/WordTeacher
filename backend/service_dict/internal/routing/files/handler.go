@@ -74,7 +74,7 @@ func (h *Handler) Files(w http.ResponseWriter, r *http.Request) {
 				Url:              "https://aglushkov.ru/dicts/Wiktionary_EN-EN_arts_entertainment.dsl.gz",
 				FromLang:         "EN",
 				ToLang:           "EN",
-				Size:             1151964,
+				Size:             1151969,
 				ModificationDate: "2026-11-20T16:48:46Z",
 			},
 			{
