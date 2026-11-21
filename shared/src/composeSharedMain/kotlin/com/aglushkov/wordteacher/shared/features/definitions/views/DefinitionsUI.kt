@@ -119,13 +119,15 @@ fun DefinitionsUI(
         var prevItems by remember{
             mutableStateOf<List<ChooserViewItem>>(emptyList())
         }
-        val resultItems by remember(selectedPartsOfSpeeches) {
-            derivedStateOf {
-                prevItems = partsOfSpeech.map { partOfSpeech ->
-                    val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
-                    ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
-                }.generateIds(prevItems, vm.idGenerator)
-                prevItems
+        val resultItems = remember(selectedPartsOfSpeeches, partsOfSpeech) {
+            partsOfSpeech.map { partOfSpeech ->
+                val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
+                ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
+            }.generateIds(prevItems, vm.idGenerator)
+        }
+        SideEffect {
+            if (prevItems != resultItems) {
+                prevItems = resultItems
             }
         }
 
