@@ -378,6 +378,12 @@ class MainActivity : AppCompatActivity(), Router {
                     )
                 }
             }
+
+            // shown above the bottom bar, takes precedence over the root SnackbarUI
+            // as it's nested deeper in the layout hierarchy
+            Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+                SnackbarUI()
+            }
         }
     }
 
