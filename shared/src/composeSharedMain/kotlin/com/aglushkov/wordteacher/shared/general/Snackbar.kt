@@ -26,11 +26,20 @@ import kotlinx.coroutines.launch
 
 private val LocalSnackbarEventHolder = staticCompositionLocalOf<SnackbarEventHolder?> { null }
 
+// Dialog nesting level of the current composition, zero for the main window.
+// CustomDialogUI provides level + 1 for its content: a SnackbarUI inside
+// a dialog takes precedence over all the SnackbarUIs below the dialog
+// (a dialog is a separate window with a short layout tree, so its layout
+// depth is small and depth alone can't detect it); a dialog shown above
+// another dialog takes precedence over the snackbar of the dialog below.
+val LocalSnackbarDialogLevel = staticCompositionLocalOf { 0 }
+
 // Registry of SnackbarUI instances composed within a single composition
-// (a single activity or window). The SnackbarUI laid out deepest in the
+// (a single activity or window). The registered SnackbarUI with the
+// highest dialog level and, among them, the one laid out deepest in the
 // layout hierarchy is the top one: only it calls
-// snackbarHostState.showSnackbar, all the SnackbarUIs above it are ignored.
-// When it leaves composition the next deepest one takes over and shows any
+// snackbarHostState.showSnackbar, all the SnackbarUIs below it are ignored.
+// When it leaves composition the next one takes over and shows any
 // not yet handled event.
 //
 // Unlike the old global snackBarUICount counter the registry is remembered
@@ -41,20 +50,24 @@ private val LocalSnackbarUIRegistry = staticCompositionLocalOf<SnackbarUIRegistr
 private class SnackbarUIRegistry {
     private class Registration(
         val id: Any,
+        val dialogLevel: Int,
         val depth: Int,
     )
 
     private var registrations by mutableStateOf(listOf<Registration>())
 
     val topId: Any?
-        get() = registrations.asReversed().maxByOrNull { it.depth }?.id
+        get() = registrations.asReversed().maxWithOrNull(
+            compareBy({ it.dialogLevel }, { it.depth })
+        )?.id
 
-    fun register(id: Any) {
-        update(id, 0)
+    fun register(id: Any, dialogLevel: Int) {
+        update(id, dialogLevel, 0)
     }
 
     fun updateDepth(id: Any, depth: Int) {
-        update(id, depth)
+        val registration = registrations.firstOrNull { it.id === id } ?: return
+        update(id, registration.dialogLevel, depth)
     }
 
     fun unregister(id: Any) {
@@ -62,9 +75,9 @@ private class SnackbarUIRegistry {
         registrations = registrations.filter { it.id !== id }
     }
 
-    private fun update(id: Any, depth: Int) {
-        if (registrations.any { it.id === id && it.depth == depth }) return
-        registrations = registrations.filter { it.id !== id } + Registration(id, depth)
+    private fun update(id: Any, dialogLevel: Int, depth: Int) {
+        if (registrations.any { it.id === id && it.dialogLevel == dialogLevel && it.depth == depth }) return
+        registrations = registrations.filter { it.id !== id } + Registration(id, dialogLevel, depth)
     }
 }
 
@@ -87,12 +100,13 @@ fun BindSnackbarEventHolder(
  * BindSnackbarEventHolder.
  *
  * If several SnackbarUIs are composed at the same time only the top one
- * calls snackbarHostState.showSnackbar, all the instances above it in the
- * layout hierarchy are ignored. The top one is resolved automatically:
- * the deeper a SnackbarUI is placed in the layout hierarchy the more
- * priority it has, so a SnackbarUI placed inside a screen (for example
- * above a bottom bar) takes precedence over a SnackbarUI placed at the
- * root of an activity.
+ * calls snackbarHostState.showSnackbar, all the instances below it are
+ * ignored. The top one is resolved automatically: a SnackbarUI inside
+ * a dialog (see LocalSnackbarDialogLevel) wins over the SnackbarUIs below
+ * the dialog, otherwise the deeper a SnackbarUI is placed in the layout
+ * hierarchy the more priority it has, so a SnackbarUI placed inside a
+ * screen (for example above a bottom bar) takes precedence over a
+ * SnackbarUI placed at the root of an activity.
  */
 @Composable
 fun BoxScope.SnackbarUI(
@@ -102,10 +116,11 @@ fun BoxScope.SnackbarUI(
     // during the first composition, so there is no subscription race
     val eventsHolder = LocalSnackbarEventHolder.current ?: return
     val registry = LocalSnackbarUIRegistry.current ?: return
+    val dialogLevel = LocalSnackbarDialogLevel.current
     val id = remember { Any() }
 
-    DisposableEffect(id) {
-        registry.register(id)
+    DisposableEffect(id, dialogLevel) {
+        registry.register(id, dialogLevel)
         onDispose {
             registry.unregister(id)
         }

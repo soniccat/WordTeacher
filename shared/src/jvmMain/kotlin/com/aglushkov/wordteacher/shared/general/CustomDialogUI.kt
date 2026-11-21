@@ -18,17 +18,20 @@ actual fun CustomDialogUI(
     onDismissRequest: () -> Unit,
     content: @Composable BoxScope.() -> Unit
 ) {
-    Dialog(
-        onCloseRequest = onDismissRequest,
-        state = rememberDialogState(size = DpSize(400.dp, 500.dp),)
-    ) {
-        Surface(
-            color = MaterialTheme.colors.background
+    // snackbars of a dialog are shown instead of the ones on the screens below
+    CompositionLocalProvider(LocalSnackbarDialogLevel provides LocalSnackbarDialogLevel.current + 1) {
+        Dialog(
+            onCloseRequest = onDismissRequest,
+            state = rememberDialogState(size = DpSize(400.dp, 500.dp),)
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
+            Surface(
+                color = MaterialTheme.colors.background
             ) {
-                content()
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    content()
+                }
             }
         }
     }
