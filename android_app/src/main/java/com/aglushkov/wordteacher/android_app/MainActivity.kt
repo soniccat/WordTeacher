@@ -27,6 +27,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -74,6 +75,7 @@ import com.aglushkov.wordteacher.shared.features.learning.vm.SessionCardResult
 import com.aglushkov.wordteacher.shared.features.learning_session_result.vm.LearningSessionResultRouter
 import com.aglushkov.wordteacher.shared.features.settings.views.SettingsUI
 import com.aglushkov.wordteacher.shared.general.BindSnackbarEventHolder
+import com.aglushkov.wordteacher.shared.general.LocalSnackbarLevel
 import com.aglushkov.wordteacher.shared.general.SimpleRouter
 import com.aglushkov.wordteacher.shared.general.SnackbarUI
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
@@ -380,9 +382,10 @@ class MainActivity : AppCompatActivity(), Router {
             }
 
             // shown above the bottom bar, takes precedence over the root SnackbarUI
-            // as it's nested deeper in the layout hierarchy
-            Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-                SnackbarUI()
+            CompositionLocalProvider(LocalSnackbarLevel provides LocalSnackbarLevel.current + 1) {
+                Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+                    SnackbarUI()
+                }
             }
         }
     }

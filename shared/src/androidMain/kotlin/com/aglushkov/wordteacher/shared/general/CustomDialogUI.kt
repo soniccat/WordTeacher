@@ -49,7 +49,7 @@ actual fun CustomDialogUI(
     content: @Composable BoxScope.() -> Unit
 ) {
     // snackbars of a dialog are shown instead of the ones on the screens below
-    CompositionLocalProvider(LocalSnackbarDialogLevel provides LocalSnackbarDialogLevel.current + 1) {
+    CompositionLocalProvider(LocalSnackbarLevel provides LocalSnackbarLevel.current + 1) {
         Dialog(
             onDismissRequest = onDismissRequest,
             properties = DialogProperties(

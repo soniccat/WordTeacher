@@ -17,8 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.onGloballyPositioned
 import com.aglushkov.wordteacher.shared.features.SnackbarEventHolder
 import com.aglushkov.wordteacher.shared.general.resources.resolve
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -26,21 +24,20 @@ import kotlinx.coroutines.launch
 
 private val LocalSnackbarEventHolder = staticCompositionLocalOf<SnackbarEventHolder?> { null }
 
-// Dialog nesting level of the current composition, zero for the main window.
-// CustomDialogUI provides level + 1 for its content: a SnackbarUI inside
-// a dialog takes precedence over all the SnackbarUIs below the dialog
-// (a dialog is a separate window with a short layout tree, so its layout
-// depth is small and depth alone can't detect it); a dialog shown above
-// another dialog takes precedence over the snackbar of the dialog below.
-val LocalSnackbarDialogLevel = staticCompositionLocalOf { 0 }
+// Snackbar nesting level of the current composition, zero at the root of
+// an activity. A container which shows snackbars above its content
+// provides level + 1 for the content: CustomDialogUI does it for dialogs,
+// TabsUI for the content above the bottom bar. The composed SnackbarUI
+// with the highest level takes precedence over all the SnackbarUIs below.
+val LocalSnackbarLevel = staticCompositionLocalOf { 0 }
 
 // Registry of SnackbarUI instances composed within a single composition
 // (a single activity or window). The registered SnackbarUI with the
-// highest dialog level and, among them, the one laid out deepest in the
-// layout hierarchy is the top one: only it calls
+// highest level is the top one: only it calls
 // snackbarHostState.showSnackbar, all the SnackbarUIs below it are ignored.
 // When it leaves composition the next one takes over and shows any
-// not yet handled event.
+// not yet handled event. Among SnackbarUIs with the same level the last
+// registered one wins.
 //
 // Unlike the old global snackBarUICount counter the registry is remembered
 // inside BindSnackbarEventHolder, so instances of different activities
@@ -50,34 +47,22 @@ private val LocalSnackbarUIRegistry = staticCompositionLocalOf<SnackbarUIRegistr
 private class SnackbarUIRegistry {
     private class Registration(
         val id: Any,
-        val dialogLevel: Int,
-        val depth: Int,
+        val level: Int,
     )
 
     private var registrations by mutableStateOf(listOf<Registration>())
 
     val topId: Any?
-        get() = registrations.asReversed().maxWithOrNull(
-            compareBy({ it.dialogLevel }, { it.depth })
-        )?.id
+        get() = registrations.asReversed().maxByOrNull { it.level }?.id
 
-    fun register(id: Any, dialogLevel: Int) {
-        update(id, dialogLevel, 0)
-    }
-
-    fun updateDepth(id: Any, depth: Int) {
-        val registration = registrations.firstOrNull { it.id === id } ?: return
-        update(id, registration.dialogLevel, depth)
+    fun register(id: Any, level: Int) {
+        if (registrations.any { it.id === id && it.level == level }) return
+        registrations = registrations.filter { it.id !== id } + Registration(id, level)
     }
 
     fun unregister(id: Any) {
         if (registrations.none { it.id === id }) return
         registrations = registrations.filter { it.id !== id }
-    }
-
-    private fun update(id: Any, dialogLevel: Int, depth: Int) {
-        if (registrations.any { it.id === id && it.dialogLevel == dialogLevel && it.depth == depth }) return
-        registrations = registrations.filter { it.id !== id } + Registration(id, dialogLevel, depth)
     }
 }
 
@@ -101,12 +86,11 @@ fun BindSnackbarEventHolder(
  *
  * If several SnackbarUIs are composed at the same time only the top one
  * calls snackbarHostState.showSnackbar, all the instances below it are
- * ignored. The top one is resolved automatically: a SnackbarUI inside
- * a dialog (see LocalSnackbarDialogLevel) wins over the SnackbarUIs below
- * the dialog, otherwise the deeper a SnackbarUI is placed in the layout
- * hierarchy the more priority it has, so a SnackbarUI placed inside a
- * screen (for example above a bottom bar) takes precedence over a
- * SnackbarUI placed at the root of an activity.
+ * ignored. The top one is resolved automatically: the composed SnackbarUI
+ * with the highest LocalSnackbarLevel wins, so place a SnackbarUI deeper
+ * in the screen hierarchy into a container providing a higher level
+ * (CustomDialogUI does it for dialogs, TabsUI for the content above
+ * the bottom bar).
  */
 @Composable
 fun BoxScope.SnackbarUI(
@@ -116,25 +100,19 @@ fun BoxScope.SnackbarUI(
     // during the first composition, so there is no subscription race
     val eventsHolder = LocalSnackbarEventHolder.current ?: return
     val registry = LocalSnackbarUIRegistry.current ?: return
-    val dialogLevel = LocalSnackbarDialogLevel.current
+    val level = LocalSnackbarLevel.current
     val id = remember { Any() }
 
-    DisposableEffect(id, dialogLevel) {
-        registry.register(id, dialogLevel)
+    DisposableEffect(id, level) {
+        registry.register(id, level)
         onDispose {
             registry.unregister(id)
         }
     }
 
-    // reports the depth of this SnackbarUI in the layout hierarchy,
-    // the deepest SnackbarUI becomes the top one
     SnackbarHost(
         hostState = snackbarHostState,
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .onGloballyPositioned { coordinates ->
-                registry.updateDepth(id, coordinates.layoutDepth())
-            }
+        modifier = Modifier.align(Alignment.BottomCenter)
     ) {
         Snackbar(snackbarData = it,)
     }
@@ -172,16 +150,6 @@ fun BoxScope.SnackbarUI(
             }
         }
     }
-}
-
-private fun LayoutCoordinates.layoutDepth(): Int {
-    var depth = 0
-    var coordinates = parentCoordinates
-    while (coordinates != null) {
-        depth += 1
-        coordinates = coordinates.parentCoordinates
-    }
-    return depth
 }
 
 private const val TAG = "Snackbar"
