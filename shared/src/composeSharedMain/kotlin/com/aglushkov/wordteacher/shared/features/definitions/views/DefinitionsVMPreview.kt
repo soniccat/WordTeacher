@@ -5,6 +5,7 @@ import com.aglushkov.wordteacher.shared.events.Event
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetExpandOrCollapseViewItem
 import com.aglushkov.wordteacher.shared.features.cardsets.vm.CardSetViewItem
 import com.aglushkov.wordteacher.shared.features.definitions.vm.*
+import com.aglushkov.wordteacher.shared.general.IdGenerator
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
 import com.aglushkov.wordteacher.shared.general.resource.Resource
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
@@ -21,6 +22,9 @@ open class DefinitionsVMPreview(
     val partsOfSpeechFilter: List<WordTeacherWord.PartOfSpeech> = emptyList(),
     val selectedPartsOfSpeech: List<WordTeacherWord.PartOfSpeech> = emptyList(),
 ) : DefinitionsVM {
+
+    override val idGenerator: IdGenerator
+        get() = IdGenerator()
 
     override var router: DefinitionsRouter? = null
 
@@ -47,7 +51,7 @@ open class DefinitionsVMPreview(
     override fun onTryAgainClicked() {
     }
 
-    override fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>) {
+    override fun onPartOfSpeechFilterUpdated(filter: WordTeacherWord.PartOfSpeech) {
     }
 
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {

@@ -60,12 +60,12 @@ abstract class BaseViewItem<T> {
 }
 
 // Set unique id taking into account that for the same items id shouldn't change
-fun generateViewItemIds(
-    items: List<BaseViewItem<*>>,
-    prevItems: List<BaseViewItem<*>> = emptyList(),
+fun <T: BaseViewItem<*>> generateViewItemIds(
+    items: List<T>,
+    prevItems: List<T> = emptyList(),
     idGenerator: IdGenerator,
     onIdSet: (newItem: BaseViewItem<*>, oldItem: BaseViewItem<*>?) -> Unit = { a, b -> }
-): List<BaseViewItem<*>> {
+): List<T> {
     val map: MutableMap<Int, MutableList<BaseViewItem<*>>> = mutableMapOf()
 
     // Put items with ids in map
@@ -112,6 +112,6 @@ fun generateViewItemIds(
     return items
 }
 
-fun List<BaseViewItem<*>>.generateIds(prevItems: List<BaseViewItem<*>>, idGenerator: IdGenerator): List<BaseViewItem<*>> {
+fun <T:BaseViewItem<*>> List<T>.generateIds(prevItems: List<T>, idGenerator: IdGenerator): List<T> {
     return generateViewItemIds(this, prevItems, idGenerator)
 }

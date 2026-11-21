@@ -6,7 +6,7 @@ class ChooserViewItem (
     anId: Long,
     val name: String,
     val obj: Any,
-    var isSelected: Boolean
+    val isSelected: Boolean
 ): BaseViewItem<String>(name, Type, anId) {
     companion object {
         const val Type = 301

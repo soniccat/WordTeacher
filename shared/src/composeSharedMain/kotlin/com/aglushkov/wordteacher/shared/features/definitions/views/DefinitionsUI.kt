@@ -40,6 +40,7 @@ import com.aglushkov.wordteacher.shared.features.definitions.vm.*
 import com.aglushkov.wordteacher.shared.features.definitions.vm.DefinitionsVM.Companion.DefinitionSource
 import com.aglushkov.wordteacher.shared.general.*
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
+import com.aglushkov.wordteacher.shared.general.item.generateIds
 import com.aglushkov.wordteacher.shared.general.resource.StringResourceWrapper
 import com.aglushkov.wordteacher.shared.general.resource.isLoadedAndNotEmpty
 import com.aglushkov.wordteacher.shared.general.resource.isLoading
@@ -116,19 +117,27 @@ fun DefinitionsUI(
             .background(color = MaterialTheme.colors.background)
     ) {
         // TODO: consider moving chooser outside...
+        var prevItems by remember{
+            mutableStateOf<List<ChooserViewItem>>(emptyList())
+        }
+        val resultItems by remember(selectedPartsOfSpeeches) {
+            derivedStateOf {
+                val newItems = partsOfSpeech.map { partOfSpeech ->
+                    val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
+                    ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
+                }
+                newItems.generateIds(prevItems, vm.idGenerator)
+                prevItems = newItems
+                newItems
+            }
+        }
+
         ChooserUI(
             state = partOfSpeechFilterBottomSheetState,
-            items = partsOfSpeech.map { partOfSpeech ->
-                val isSelected = selectedPartsOfSpeeches.contains(partOfSpeech)
-                ChooserViewItem(0, partOfSpeech.name, partOfSpeech, isSelected)
-            },
-            onSelected = { items ->
+            items = resultItems,
+            onSelected = { item ->
                 vm.onPartOfSpeechFilterUpdated(
-                    items.filter { option ->
-                        option.isSelected
-                    }.map { option ->
-                        option.obj as WordTeacherWord.PartOfSpeech
-                    }
+                    item.obj as WordTeacherWord.PartOfSpeech
                 )
             }
         ) {

@@ -22,7 +22,7 @@ fun ChooserUI(
     state: ModalBottomSheetState,
     items: List<ChooserViewItem>,
     modifier: Modifier = Modifier,
-    onSelected: (selected: List<ChooserViewItem>) -> Unit,
+    onSelected: (selected: ChooserViewItem) -> Unit,
     content: @Composable () -> Unit
 ) {
     ModalBottomSheetLayout(
@@ -33,13 +33,10 @@ fun ChooserUI(
                 modifier = Modifier.padding(top = 16.dp).windowInsetsHorizontalPadding()
             ) {
                 LazyColumn{
-                    items(items) { item ->
+                    items(items, key = { it.id }) { item ->
                         ListItem(
                             modifier = Modifier.clickable {
-                                item.isSelected = !item.isSelected
-                                onSelected(
-                                    items.filter { it.isSelected }
-                                )
+                                onSelected(item)
                             },
                             trailing = {
                                 Checkbox(

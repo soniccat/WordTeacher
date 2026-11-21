@@ -63,6 +63,7 @@ import wordteacher.shared.generated.resources.word_section_synonyms
 import kotlin.collections.emptyList
 
 interface DefinitionsVM: Clearable {
+    val idGenerator: IdGenerator
     var router: DefinitionsRouter?
     val eventFlow: Flow<List<Event>>
 
@@ -80,7 +81,7 @@ interface DefinitionsVM: Clearable {
         definitionsContext: DefinitionsContext? = null
     )
     fun onTryAgainClicked()
-    fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>)
+    fun onPartOfSpeechFilterUpdated(filter: WordTeacherWord.PartOfSpeech)
     fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem)
     fun onDisplayModeChanged(mode: DefinitionsDisplayMode)
     fun getErrorText(res: Resource<*>): StringResourceWrapper?
@@ -166,7 +167,7 @@ open class DefinitionsVMImpl(
     private val wordFrequencyGradationProvider: WordFrequencyGradationProvider,
     private val definitionsSettings: DefinitionsVM.Settings,
     private val clipboardRepository: ClipboardRepository,
-    private val idGenerator: IdGenerator,
+    override val idGenerator: IdGenerator,
     private val analytics: Analytics,
     private val settings: SettingStore,
     private val wordDefinitionHistoryRepository: WordDefinitionHistoryRepository,
@@ -320,9 +321,15 @@ open class DefinitionsVMImpl(
         }
     }
 
-    override fun onPartOfSpeechFilterUpdated(filter: List<WordTeacherWord.PartOfSpeech>) {
+    override fun onPartOfSpeechFilterUpdated(filter: WordTeacherWord.PartOfSpeech) {
         analytics.send(AnalyticEvent.createActionEvent("Definitions.partOfSpeechFilterUpdated"))
-        selectedPartsOfSpeechStateFlow.value = filter
+        selectedPartsOfSpeechStateFlow.update {
+            if (it.contains(filter)) {
+                it - filter
+            } else {
+                it + filter
+            }
+        }
     }
 
     override fun onPartOfSpeechFilterCloseClicked(item: DefinitionsDisplayModeViewItem) {
