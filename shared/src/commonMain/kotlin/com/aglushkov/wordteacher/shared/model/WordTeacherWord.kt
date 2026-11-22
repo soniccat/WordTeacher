@@ -115,7 +115,9 @@ class WordTeacherWordBuilder {
             addWordDefinition()
         }
 
-        audioFiles.add(AudioFile(url, text, null, null))
+        if (url.startsWith("https")) {
+            audioFiles.add(AudioFile(url, text, null, null))
+        }
     }
 
     fun addLabel(label: String) {

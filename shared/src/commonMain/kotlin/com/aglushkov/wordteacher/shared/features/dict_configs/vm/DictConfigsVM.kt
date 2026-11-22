@@ -192,32 +192,6 @@ open class DictConfigsVMImpl(
         remoteDicts: Resource<List<WordTeacherDictExt>>,
         isDictImporting: Boolean,
     ): List<BaseViewItem<*>> = buildList<BaseViewItem<*>> {
-        add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_online_section_title)))
-        configs.on(
-            loaded = {
-                it.onEach { config ->
-                    if (config.type == Config.Type.Yandex) {
-                        val flag = config.methods[Lookup]?.get(LookupFlags)?.toIntOrNull() ?: 0
-                        add(
-                            ConfigYandexViewItem(
-                                id = config.id.toLong(),
-                                hasToken = config.connectParams.securedKey.isNotEmpty(),
-                                lang = config.methods[Lookup]?.get(LookupLang) ?: LookupLangDefault,
-                                settings = YandexSettings.fromInt(flag)
-                            )
-                        )
-                    }
-                }
-            },
-            loading = {
-                add(ConfigLoadingViewItem())
-            },
-            error = {
-                add(ConfigTextViewItem(it.toStringResource()))
-            }
-        )
-
-        add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Online))
         add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_offline_section_title)))
         remoteDicts.on(
             data = {
@@ -269,6 +243,34 @@ open class DictConfigsVMImpl(
             add(ConfigLoadingViewItem())
         }
         add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Offline))
+
+        // yandex api
+        add(ConfigHeaderViewItem(StringResourceWrapper.String(Res.string.dictconfigs_online_section_title)))
+        configs.on(
+            loaded = {
+                it.onEach { config ->
+                    if (config.type == Config.Type.Yandex) {
+                        val flag = config.methods[Lookup]?.get(LookupFlags)?.toIntOrNull() ?: 0
+                        add(
+                            ConfigYandexViewItem(
+                                id = config.id.toLong(),
+                                hasToken = config.connectParams.securedKey.isNotEmpty(),
+                                lang = config.methods[Lookup]?.get(LookupLang) ?: LookupLangDefault,
+                                settings = YandexSettings.fromInt(flag)
+                            )
+                        )
+                    }
+                }
+            },
+            loading = {
+                add(ConfigLoadingViewItem())
+            },
+            error = {
+                add(ConfigTextViewItem(it.toStringResource()))
+            }
+        )
+
+        add(ConfigCreateViewItem(ConfigCreateViewItem.Type.Online))
     }.let {
         generateViewItemIds(it, viewItems.value, idGenerator)
     }

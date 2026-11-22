@@ -146,7 +146,7 @@
     <string name="settings_remove_misspelling_db">Delete misspelling database</string>
     <string name="settings_open_privacy_policy">Open Privacy Policy</string>
 
-    <string name="dictconfigs_online_section_title">Online dictionaries</string>
+    <string name="dictconfigs_online_section_title">Yandex Dictionary API</string>
     <string name="dictconfigs_offline_section_title">Offline DSL dictionaries</string>
     <string name="dictconfigs_yandex_title">Yandex</string>
     <string name="dictconfigs_yandex_api_token_exists_placeholder">type to change api token</string>

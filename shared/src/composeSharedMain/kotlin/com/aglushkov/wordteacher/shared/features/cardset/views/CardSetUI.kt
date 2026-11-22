@@ -138,7 +138,7 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
         Box(
             modifier = modifier.fillMaxSize().windowInsetsHorizontalPadding()
         ) {
-            if (data != null && data.isNotEmpty()) {
+            if (!data.isNullOrEmpty()) {
                 val listState = rememberLazyListState()
                 val coroutineScope = rememberCoroutineScope()
 
@@ -199,16 +199,18 @@ fun CardSetUI(vm: CardSetVM, modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.BottomEnd
             ) {
                 if (state.isRemoteCardSet) {
-                    FloatingActionButton(
-                        onClick = { vm.onAddClicked() },
-                        modifier = Modifier.padding(
-                            LocalDimensWord.current.articleHorizontalPadding
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.add_white_24),
-                            contentDescription = null
-                        )
+                    if (!data.isNullOrEmpty()) {
+                        FloatingActionButton(
+                            onClick = { vm.onAddClicked() },
+                            modifier = Modifier.padding(
+                                LocalDimensWord.current.articleHorizontalPadding
+                            )
+                        ) {
+                            Icon(
+                                painter = painterResource(Res.drawable.add_white_24),
+                                contentDescription = null
+                            )
+                        }
                     }
                 } else {
                     FloatingActionButton(

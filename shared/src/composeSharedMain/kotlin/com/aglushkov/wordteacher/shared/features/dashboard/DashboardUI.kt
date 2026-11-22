@@ -319,7 +319,7 @@ fun dashboardItem(
     }
     is SettingsViewTitleItem -> {
         ListItem (
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(top = 14.dp),
             text = {
                 Text(item.firstItem().resolve(),
                 style = LocalAppTypography.current.settingsTitle)

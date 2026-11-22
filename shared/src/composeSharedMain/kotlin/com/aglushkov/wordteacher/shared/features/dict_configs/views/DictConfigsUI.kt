@@ -22,6 +22,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -52,6 +53,7 @@ import com.aglushkov.wordteacher.shared.features.dict_configs.vm.ConfigYandexVie
 import com.aglushkov.wordteacher.shared.features.dict_configs.vm.RemoteDictViewItem
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTextItem
 import com.aglushkov.wordteacher.shared.features.settings.vm.SettingsViewTitleItem
+import com.aglushkov.wordteacher.shared.general.AppTypography
 import com.aglushkov.wordteacher.shared.general.LocalAppTypography
 import com.aglushkov.wordteacher.shared.general.LocalDimens
 import com.aglushkov.wordteacher.shared.general.item.BaseViewItem
@@ -189,7 +191,10 @@ private fun showDictConfigsItem(
             },
             trailing = {
                 Row {
-                    Text(item.sizeText)
+                    Text(
+                        item.sizeText,
+                        style = LocalAppTypography.current.listItemSubtitle
+                    )
                     if (item.isImporting()) {
                         val side = 40.dp
                         CircularProgressIndicator(
@@ -219,7 +224,8 @@ private fun showDictConfigsItem(
             },
             secondaryContent = {
                 Text(
-                    text = item.dict.description
+                    text = item.dict.description,
+                    style = LocalAppTypography.current.listItemSubtitle
                 )
             }
         ) {
