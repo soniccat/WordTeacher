@@ -48,80 +48,77 @@ actual fun CustomDialogUI(
     onDismissRequest: () -> Unit,
     content: @Composable BoxScope.() -> Unit
 ) {
-    // snackbars of a dialog are shown instead of the ones on the screens below
-    CompositionLocalProvider(LocalSnackbarLevel provides LocalSnackbarLevel.current + 1) {
-        Dialog(
-            onDismissRequest = onDismissRequest,
-            properties = DialogProperties(
-                usePlatformDefaultWidth = false,
-                decorFitsSystemWindows = false
-            )
-        ) {
-            val window = findDialogWindow() ?: throw Resources.NotFoundException("Window isn't found")
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
-            window.setDimAmount(0.5f)
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        val window = findDialogWindow() ?: throw Resources.NotFoundException("Window isn't found")
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+        window.setDimAmount(0.5f)
 
-            val view = window.decorView
-            val statusBarIsDark = (view.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
-                    Configuration.UI_MODE_NIGHT_YES
-            WindowInsetsControllerCompat(window, view).run {
-                isAppearanceLightStatusBars = !statusBarIsDark
-            }
+        val view = window.decorView
+        val statusBarIsDark = (view.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
+        WindowInsetsControllerCompat(window, view).run {
+            isAppearanceLightStatusBars = !statusBarIsDark
+        }
 
-            var animationProgress: Float by remember { mutableFloatStateOf( 0.0f) }
-            PredictiveBackHandler { progress: Flow<BackEventCompat> ->
-                try {
-                    progress.collect { backEvent ->
-                        animationProgress = backEvent.progress
-                    }
-                    animationProgress = 1F
-                    onDismissRequest()
-                } catch (e: CancellationException) {
-                    animationProgress = 0F
-                    throw e
+        var animationProgress: Float by remember { mutableFloatStateOf( 0.0f) }
+        PredictiveBackHandler { progress: Flow<BackEventCompat> ->
+            try {
+                progress.collect { backEvent ->
+                    animationProgress = backEvent.progress
                 }
+                animationProgress = 1F
+                onDismissRequest()
+            } catch (e: CancellationException) {
+                animationProgress = 0F
+                throw e
             }
+        }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        translationY = -animationProgress * 5.dp.toPx()
-                        translationX = animationProgress * 25.dp.toPx()
-                        alpha = 1 - animationProgress
-                        scaleX = 1 - (animationProgress / 10F)
-                        scaleY = 1 - (animationProgress / 10F)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    translationY = -animationProgress * 5.dp.toPx()
+                    translationX = animationProgress * 25.dp.toPx()
+                    alpha = 1 - animationProgress
+                    scaleX = 1 - (animationProgress / 10F)
+                    scaleY = 1 - (animationProgress / 10F)
 
-                        val radius = 16.dp.toPx() * animationProgress
-                        shape = RoundedCornerShape(
-                            topStart = radius,
-                            topEnd = radius,
-                            bottomEnd = radius,
-                            bottomStart = radius,
-                        )
-                        clip = true
-                    }
-                    .background(
-                        if (MaterialTheme.colors.isLight) {
-                            MaterialTheme.colors.primarySurface
-                        } else {
-                            // hack to make the color above the appbar equal to the appbar background
-                            // changing DarkColorPalette.surface makes the appbar background lighter
-                            // need to investigate... on the same time in the main activity everything
-                            // works as expected
-                            DarkWindowBackground
-                        }
+                    val radius = 16.dp.toPx() * animationProgress
+                    shape = RoundedCornerShape(
+                        topStart = radius,
+                        topEnd = radius,
+                        bottomEnd = radius,
+                        bottomStart = radius,
                     )
-                    .windowInsetsVerticalPaddingWithIME(),
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    content()
+                    clip = true
                 }
-                SnackbarUI()
+                .background(
+                    if (MaterialTheme.colors.isLight) {
+                        MaterialTheme.colors.primarySurface
+                    } else {
+                        // hack to make the color above the appbar equal to the appbar background
+                        // changing DarkColorPalette.surface makes the appbar background lighter
+                        // need to investigate... on the same time in the main activity everything
+                        // works as expected
+                        DarkWindowBackground
+                    }
+                )
+                .windowInsetsVerticalPaddingWithIME(),
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                content()
             }
+            SnackbarUI()
         }
     }
 }

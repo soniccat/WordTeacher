@@ -23,11 +23,9 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
 // Snackbar nesting level of the current composition, zero at the root of
-// an activity. A container which shows snackbars above its content
-// provides level + 1 for the content: CustomDialogUI does it for dialogs,
-// TabsUI for the content above the bottom bar. The composed SnackbarUI
+// an activity. The composed SnackbarUI
 // with the highest level takes precedence over all the SnackbarUIs below.
-val LocalSnackbarLevel = staticCompositionLocalOf { 0 }
+private val LocalSnackbarLevel = staticCompositionLocalOf { 0 }
 
 // Snackbar state of a single composition (a single activity or window):
 // the source of the events to be shown and the registry of the composed
@@ -47,10 +45,6 @@ private class SnackbarState(
 // When it leaves composition the next one takes over and shows any
 // not yet handled event. Among SnackbarUIs with the same level the last
 // registered one wins.
-//
-// Unlike the old global snackBarUICount counter the registry is created
-// inside BindSnackbarEventHolder, so instances of different activities
-// never affect each other.
 private class SnackbarUIRegistry {
     private class Registration(
         val id: Any,
@@ -101,6 +95,15 @@ fun BindSnackbarEventHolder(
 @Composable
 fun BoxScope.SnackbarUI(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+) = CompositionLocalProvider(
+    LocalSnackbarLevel provides LocalSnackbarLevel.current + 1
+) {
+    SnackbarUIInternal(snackbarHostState)
+}
+
+@Composable
+private fun BoxScope.SnackbarUIInternal(
+    snackbarHostState: SnackbarHostState,
 ) {
     // The state is provided by BindSnackbarEventHolder and is available
     // during the first composition, so there is no subscription race

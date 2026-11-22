@@ -19,24 +19,7 @@ interface SnackbarEventHolderRouter {
     fun openLocalCardSet(cardSetId: Long)
 }
 
-data class SnackbarEventHolderItem(
-    val flow: StateFlow<List<SnackbarEventHolder.Event>>,
-    val handler: (SnackbarEventHolder.Event, withAction: Boolean) -> Unit,
-)
-
 interface SnackbarEventHolder {
-    companion object {
-        val map = mutableMapOf<String, SnackbarEventHolderItem>()
-
-        fun addSource(name: String, item: SnackbarEventHolderItem) {
-            map[name] = item
-        }
-
-        fun removeSource(name: String) {
-            map.remove(name)
-        }
-    }
-
     var snackbarEventRouter: SnackbarEventHolderRouter?
     val events: StateFlow<List<Event>>
 
