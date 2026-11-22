@@ -12,7 +12,7 @@ services:
   nginx:
     container_name: "apigateway${TEST_SUFFIX}"
     hostname: "apigateway"
-    image: nginx:alpine
+    image: nginx:1.31.9-alpine
     volumes:
       - ./config/default.conf.template:/etc/nginx/templates/default.conf.template
       - '${VOLUME_NGINX_PATH}:/var/log/nginx'
