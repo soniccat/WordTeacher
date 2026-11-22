@@ -22,14 +22,23 @@ import com.aglushkov.wordteacher.shared.general.resources.resolve
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
-private val LocalSnackbarEventHolder = staticCompositionLocalOf<SnackbarEventHolder?> { null }
-
 // Snackbar nesting level of the current composition, zero at the root of
 // an activity. A container which shows snackbars above its content
 // provides level + 1 for the content: CustomDialogUI does it for dialogs,
 // TabsUI for the content above the bottom bar. The composed SnackbarUI
 // with the highest level takes precedence over all the SnackbarUIs below.
 val LocalSnackbarLevel = staticCompositionLocalOf { 0 }
+
+// Snackbar state of a single composition (a single activity or window):
+// the source of the events to be shown and the registry of the composed
+// SnackbarUI instances. Provided by BindSnackbarEventHolder.
+private val LocalSnackbarState = staticCompositionLocalOf<SnackbarState?> { null }
+
+private class SnackbarState(
+    val eventsHolder: SnackbarEventHolder,
+) {
+    val registry = SnackbarUIRegistry()
+}
 
 // Registry of SnackbarUI instances composed within a single composition
 // (a single activity or window). The registered SnackbarUI with the
@@ -39,11 +48,9 @@ val LocalSnackbarLevel = staticCompositionLocalOf { 0 }
 // not yet handled event. Among SnackbarUIs with the same level the last
 // registered one wins.
 //
-// Unlike the old global snackBarUICount counter the registry is remembered
+// Unlike the old global snackBarUICount counter the registry is created
 // inside BindSnackbarEventHolder, so instances of different activities
 // never affect each other.
-private val LocalSnackbarUIRegistry = staticCompositionLocalOf<SnackbarUIRegistry?> { null }
-
 private class SnackbarUIRegistry {
     private class Registration(
         val id: Any,
@@ -71,10 +78,9 @@ fun BindSnackbarEventHolder(
     eventsHolder: SnackbarEventHolder,
     content: @Composable () -> Unit
 ) {
-    val registry = remember { SnackbarUIRegistry() }
+    val state = remember { SnackbarState(eventsHolder) }
     CompositionLocalProvider(
-        LocalSnackbarEventHolder provides eventsHolder,
-        LocalSnackbarUIRegistry provides registry,
+        LocalSnackbarState provides state,
     ) {
         content()
     }
@@ -96,17 +102,16 @@ fun BindSnackbarEventHolder(
 fun BoxScope.SnackbarUI(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-    // The holder is provided by BindSnackbarEventHolder and is available
+    // The state is provided by BindSnackbarEventHolder and is available
     // during the first composition, so there is no subscription race
-    val eventsHolder = LocalSnackbarEventHolder.current ?: return
-    val registry = LocalSnackbarUIRegistry.current ?: return
+    val state = LocalSnackbarState.current ?: return
     val level = LocalSnackbarLevel.current
     val id = remember { Any() }
 
     DisposableEffect(id, level) {
-        registry.register(id, level)
+        state.registry.register(id, level)
         onDispose {
-            registry.unregister(id)
+            state.registry.unregister(id)
         }
     }
 
@@ -120,11 +125,11 @@ fun BoxScope.SnackbarUI(
     // topId is null during the first composition (registrations happen
     // in the effect phase) and triggers a recomposition as soon as
     // this instance is registered
-    if (registry.topId !== id) {
+    if (state.registry.topId !== id) {
         return
     }
 
-    val events = eventsHolder.events.collectAsState()
+    val events = state.eventsHolder.events.collectAsState()
     val eventToShow = events.value.firstOrNull()
 
     val snackBarMessage = eventToShow?.text?.resolve().orEmpty()
@@ -145,7 +150,7 @@ fun BoxScope.SnackbarUI(
                     snackBarMessage,
                     snackBarActionText
                 )
-                eventsHolder.onEventHandled(event, result == SnackbarResult.ActionPerformed)
+                state.eventsHolder.onEventHandled(event, result == SnackbarResult.ActionPerformed)
                 Logger.v("handled $snackBarMessage", TAG)
             }
         }
